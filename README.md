@@ -39,11 +39,11 @@ Install 3rd-party packages
     
 [TODO] Update src/environments/environment.ts as necessary  
     	
-Run the application (it will start on port 4500; you can change this from package.json file)
+Run the application (it will start on port 4550; you can change this from package.json file)
     
     npm start
     	
-Open your browser on: http://localhost:4500
+Open your browser on: http://localhost:4550
     
 ## Development
     
