@@ -1,3 +1,6 @@
 export const environment = {
-  production: true
+    // enable Production mode
+    production: true,
+    // API base URL
+    apiUrl: 'http://54.164.207.48:3000/api'
 };

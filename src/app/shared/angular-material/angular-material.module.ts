@@ -10,11 +10,11 @@ import {
         MatButtonModule,
         MatInputModule
     ],
+    declarations: [],
     exports: [
         MatButtonModule,
         MatInputModule
-    ],
-    declarations: []
+    ]
 })
 export class AngularMaterialModule {
 }
