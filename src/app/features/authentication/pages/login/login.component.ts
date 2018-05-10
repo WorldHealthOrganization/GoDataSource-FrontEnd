@@ -9,9 +9,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 })
 export class LoginComponent {
 
-    user = {
-        email: 'test'
-    };
+    user = {};
 
     constructor(
         private authDataService: AuthDataService
