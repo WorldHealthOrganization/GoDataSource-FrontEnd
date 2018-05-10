@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-login',
@@ -7,5 +8,15 @@ import { Component, ViewEncapsulation } from '@angular/core';
     styleUrls: ['./login.component.less']
 })
 export class LoginComponent {
+
+    user: {};
+
+    constructor(
+        private authDataService: AuthDataService
+    ) {}
+
+    login() {
+        this.authDataService.login(this.user);
+    }
 
 }

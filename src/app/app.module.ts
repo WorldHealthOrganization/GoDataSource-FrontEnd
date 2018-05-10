@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 
 import { routing } from './app.module.routing';
 
+import { CoreModule } from './core/core.module';
 
 @NgModule({
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
         RouterModule,
-        routing
+        routing,
+        CoreModule
     ],
     declarations: [
         AppComponent

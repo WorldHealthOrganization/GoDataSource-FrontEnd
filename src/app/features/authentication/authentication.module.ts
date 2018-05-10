@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 // modules
-import { routing } from './user.module.routing';
+import { routing } from './authentication.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 
 // components
@@ -15,9 +15,7 @@ import * as fromPages from './pages';
     declarations: [
         ...fromPages.pageComponents
     ],
-    entryComponents: [
-
-    ]
+    entryComponents: []
 })
-export class UserModule {
+export class AuthenticationModule {
 }

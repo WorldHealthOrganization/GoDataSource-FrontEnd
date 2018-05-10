@@ -6,10 +6,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 
-// components
-import { AuthenticationDataService } from './services/data/authentication.data.service';
-
-
 @NgModule({
     imports: [
         CommonModule,
@@ -17,12 +13,8 @@ import { AuthenticationDataService } from './services/data/authentication.data.s
         FlexLayoutModule,
         AngularMaterialModule
     ],
-    declarations: [
-
-    ],
-    providers: [
-        AuthenticationDataService
-    ],
+    declarations: [],
+    providers: [],
     exports: [
         CommonModule,
         FormsModule,

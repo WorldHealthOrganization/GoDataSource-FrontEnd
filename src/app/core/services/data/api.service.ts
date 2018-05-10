@@ -1,4 +1,3 @@
-import { environment } from '../../../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
@@ -6,11 +5,8 @@ import { Optional } from '@angular/core';
 import * as _ from 'lodash';
 
 export class ApiService {
-
     // HTTP client used for making API requests
     httpClient: HttpClient;
-    // API base URL
-    apiUrl: string = environment.apiUrl;
 
     constructor(
         @Optional() http: HttpClient

@@ -4,18 +4,16 @@ import { HttpClient } from '@angular/common/http';
 import { ApiService } from './api.service';
 
 @Injectable()
-export class AuthenticationDataService extends ApiService {
+export class UserDataService extends ApiService {
 
     constructor(
         private http: HttpClient
     ) {
         super(http);
-
-        console.log('AuthenticationDataService - constructor');
     }
 
-    login(user) {
-        return this.post(this.apiUrl, user);
+    getUser(userId) {
+        return this.get(`api/users/${userId}`);
     }
 }
 
