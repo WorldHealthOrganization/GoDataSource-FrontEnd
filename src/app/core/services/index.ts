@@ -4,6 +4,7 @@ import { UserDataService } from './data/user.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
+import { LoggerService } from './helper/logger.service';
 
 // export the list of services
 export const services: any[] = [
@@ -12,5 +13,6 @@ export const services: any[] = [
     UserDataService,
 
     // helper services
-    StorageService
+    StorageService,
+    LoggerService,
 ];

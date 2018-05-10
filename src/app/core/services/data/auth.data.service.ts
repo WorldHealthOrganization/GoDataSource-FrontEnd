@@ -5,7 +5,6 @@ import 'rxjs/add/operator/map';
 
 import * as _ from 'lodash';
 
-import { ApiService } from './api.service';
 import { StorageService, StorageKey } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
 
@@ -13,21 +12,28 @@ import { AuthModel } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
 
 @Injectable()
-export class AuthDataService extends ApiService {
+export class AuthDataService {
 
     constructor(
         private http: HttpClient,
         private storageService: StorageService,
         private userDataService: UserDataService
     ) {
-        super(http);
     }
 
+    /**
+     * Authenticate with email and password
+     * @param user
+     * @returns {Observable<any>}
+     */
     login(user): Observable<any> {
-        return this.post(`users/login`, user)
-            .map((res) => {
+        return this.http.post(`users/login`, user)
+            .do((res) => {
                 // keep auth info
                 const auth = new AuthModel(res);
+
+                // cache auth data so the Auth Token will be added on the next request
+                this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
 
                 // get user info
                 return this.userDataService.getUser(auth.userId)
@@ -35,29 +41,39 @@ export class AuthDataService extends ApiService {
                         // keep user info
                         auth.user = new UserModel(userData);
 
-                        // cache auth data
+                        // cache auth data with authenticated user information
                         this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
                     });
             });
     }
 
+    /**
+     * Get Authentication Data from local storage (if user is authenticated)
+     * @returns {AuthModel | null}
+     */
     getAuthData(): AuthModel|null {
         try {
             // get auth data from cache
-            const auth = <AuthModel>JSON.parse(this.storageService.get(StorageKey.AUTH_DATA));
-
-            return auth;
+            return <AuthModel>JSON.parse(this.storageService.get(StorageKey.AUTH_DATA));
         } catch (e) {
             return null;
         }
     }
 
+    /**
+     * Get the API Authentication Token from local storage (if user is authenticated)
+     * @returns {string | null}
+     */
     getAuthToken(): string|null {
         const authData = this.getAuthData();
 
         return _.get(authData, 'token');
     }
 
+    /**
+     * Get the authenticated User from local storage (if user is authenticated)
+     * @returns {UserModel | null}
+     */
     getAuthenticatedUser(): UserModel|null {
         const authData = this.getAuthData();
 

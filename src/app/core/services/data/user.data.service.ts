@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ApiService } from './api.service';
 
 @Injectable()
-export class UserDataService extends ApiService {
+export class UserDataService {
 
     constructor(
         private http: HttpClient
     ) {
-        super(http);
     }
 
     getUser(userId) {
-        return this.get(`api/users/${userId}`);
+        return this.http.get(`users/${userId}`);
     }
 }
 

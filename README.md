@@ -33,13 +33,13 @@ Install 3rd-party packages
     
     npm install
     
-[TODO] Configure the application for dev environment
+Configure the application for dev environment
 
     cp src/environments/environment.ts.default src/environments/environment.ts
     
-[TODO] Update src/environments/environment.ts as necessary  
+Update src/environments/environment.ts as necessary  
     	
-Run the application (it will start on port 4550; you can change this from package.json file)
+Run the application (it will start on port 4550; you can change this from the package.json file)
     
     npm start
     	
@@ -67,54 +67,3 @@ Use the IDE of your choice (Webstorm recommended).
 
 ## [TODO] Deployment
     
-Install __docker__ on the machine
-- For Ubuntu:
-
-   ```
-   https://docs.docker.com/install/linux/docker-ce/ubuntu/
-   ```
-
-Install __docker-compose__ on the machine
-- For Ubuntu:
-
-   ```
-   https://docs.docker.com/compose/install/
-   ```
-   
-Clone the repository somewhere on the machine
-
-   ```
-   git clone https://github.com/ClarisoftTechnologies/PushWebFrontEnd.git
-   ```
-   
-Run the build with the environment that you need
-- available environment files are located under _src/environments/*_, and have this format: environment.**build_env**.ts
-- examples of environment files:
-    - environment.prod.ts (this is the __prod__ environment)
-    - environment.prodPush.ts (this is the __prodPush__ environment) 
-- run the following command, using the proper environment (depending on the machine where the app will be running):
-
-   ```
-   node build/build-docker-image.js [build_env]
-   ```
-
-- the bundle will be created under __build/assets/push-app:1.0.0.tar__
-- (optional) discard old docker images:
-
-   ```
-   docker images
-   docker rmi <imageId>
-   ```
-
-- load the new image
-
-   ```
-   docker load -i build/push-app:1.0.0.tar
-   ```
-   
-- (optional) configure the __docker-compose.yml__ file
-- build container and start the application:
-
-   ```
-   docker-compose up -d
-   ```
