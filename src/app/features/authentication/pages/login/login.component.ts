@@ -9,14 +9,19 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 })
 export class LoginComponent {
 
-    user: {};
+    user = {
+        email: 'test'
+    };
 
     constructor(
         private authDataService: AuthDataService
-    ) {}
+    ) {
+    }
 
     login() {
-        this.authDataService.login(this.user);
+        this.authDataService
+            .login(this.user)
+            .subscribe();
     }
 
 }

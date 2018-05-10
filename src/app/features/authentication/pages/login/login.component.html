@@ -12,14 +12,14 @@
     <div fxLayout="row" fxLayoutAlign="center">
         <div fxLayout="column" style="width: 300px">
             <mat-form-field>
-                <input matInput name="password" placeholder="E-mail"/>
+                <input matInput [(ngModel)]="user.email" name="password" placeholder="E-mail"/>
             </mat-form-field>
 
             <mat-form-field>
-                <input matInput type="password" name="password" placeholder="Password"/>
+                <input matInput type="password" [(ngModel)]="user.password" name="password" placeholder="Password"/>
             </mat-form-field>
 
-            <button mat-raised-button color="primary">Login</button>
+            <button mat-raised-button color="primary" (click)="login()">Login</button>
         </div>
     </div>
 

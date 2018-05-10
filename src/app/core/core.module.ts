@@ -8,7 +8,9 @@ import { HttpInterceptorService } from './services/helper/http-interceptor.servi
 import * as fromCoreServices from './services';
 
 @NgModule({
-    imports: [],
+    imports: [
+        HttpClientModule
+    ],
     declarations: [],
     providers: [
         fromCoreServices.services
