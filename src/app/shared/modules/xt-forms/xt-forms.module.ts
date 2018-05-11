@@ -4,26 +4,31 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
-import { XtFormsModule } from './modules/xt-forms/xt-forms.module';
-import { AngularMaterialModule } from './angular-material/angular-material.module';
+import { AngularMaterialModule } from '../../angular-material/angular-material.module';
+
+import { components } from './components';
+import { validatorDirectives } from './validators';
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         FlexLayoutModule,
-        XtFormsModule,
         AngularMaterialModule
     ],
-    declarations: [],
+    declarations: [
+        ...components,
+        ...validatorDirectives
+    ],
     providers: [],
     exports: [
         CommonModule,
         FormsModule,
         FlexLayoutModule,
-        XtFormsModule,
-        AngularMaterialModule
+        AngularMaterialModule,
+        ...components,
+        ...validatorDirectives
     ]
 })
-export class SharedModule {
+export class XtFormsModule {
 }

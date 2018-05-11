@@ -11,7 +11,13 @@ export class UserDataService {
     }
 
     getUser(userId) {
-        return this.http.get(`users/${userId}`);
+
+        // include role and permissions in response
+        const includes = JSON.stringify({
+            include: 'role'
+        });
+
+        return this.http.get(`users/${userId}?filter=${includes}`);
     }
 }
 

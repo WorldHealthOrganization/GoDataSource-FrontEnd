@@ -14,7 +14,7 @@ import * as fromCoreServices from './services';
     ],
     declarations: [],
     providers: [
-        fromCoreServices.services,
+        ...fromCoreServices.services,
         {provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true},
         {provide: HTTP_INTERCEPTORS, useClass: ResponseInterceptor, multi: true}
     ],

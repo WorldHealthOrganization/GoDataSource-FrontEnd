@@ -74,10 +74,10 @@ export class AuthDataService {
      * Get the authenticated User from local storage (if user is authenticated)
      * @returns {UserModel | null}
      */
-    getAuthenticatedUser(): UserModel|null {
+    getAuthenticatedUser(): UserModel {
         const authData = this.getAuthData();
 
-        return _.get(authData, 'user');
+        return new UserModel(_.get(authData, 'user'));
     }
 }
 

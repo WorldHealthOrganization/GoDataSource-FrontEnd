@@ -11,13 +11,30 @@
 
     <div fxLayout="row" fxLayoutAlign="center">
         <div fxLayout="column" style="width: 300px">
-            <mat-form-field>
-                <input matInput [(ngModel)]="user.email" name="password" placeholder="E-mail"/>
-            </mat-form-field>
 
-            <mat-form-field>
-                <input matInput type="password" [(ngModel)]="user.password" name="password" placeholder="Password"/>
-            </mat-form-field>
+            <app-form-input
+                name="email"
+                [(ngModel)]="user.email"
+                placeholder="E-mail"
+                required="true"
+                app-emailValidator>
+            </app-form-input>
+
+            <app-form-input
+                type="password"
+                name="password"
+                [(ngModel)]="user.password"
+                placeholder="Create Password"
+                required="true">
+            </app-form-input>
+            <app-form-input
+                type="password"
+                name="passwordConfirm"
+                [(ngModel)]="user.passwordConfirm"
+                placeholder="Confirm Password"
+                app-equalValidator="password"
+                required="true">
+            </app-form-input>
 
             <button mat-raised-button color="primary" (click)="login()">Login</button>
         </div>
