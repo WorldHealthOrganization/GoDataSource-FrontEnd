@@ -1,12 +1,10 @@
-<div class="form-input-container form-element" [class]="theme"
+<div class="form-input-container form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field>
         <input matInput [type]="type" [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder"
                (blur)="onBlur()" />
     </mat-form-field>
-
-    <!--<input [type]="type" [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder" (blur)="onBlur()" />-->
 
     <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>
 

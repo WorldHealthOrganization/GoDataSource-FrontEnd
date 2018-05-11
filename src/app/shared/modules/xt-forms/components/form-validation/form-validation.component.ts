@@ -1,10 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 
 @Component({
     selector: 'app-form-validation',
-    templateUrl: './form-validation.component.html'
+    encapsulation: ViewEncapsulation.None,
+    templateUrl: './form-validation.component.html',
+    styleUrls: ['./form-validation.component.less']
 })
 export class FormValidationComponent {
     @Input() messages: Array<string>;

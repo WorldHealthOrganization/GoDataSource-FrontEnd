@@ -7,6 +7,7 @@ import { ElementBase } from '../../core';
     selector: 'app-form-input',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './form-input.component.html',
+    styleUrls: ['./form-input.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
         useExisting: FormInputComponent,
