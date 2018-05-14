@@ -1,0 +1,21 @@
+<div fxLayout="row">
+
+    <div class="sidebar">
+        <ul>
+            <li><a [routerLink]="['']">Home</a></li>
+            <li><a [routerLink]="['/login']">Login</a></li>
+            <li><a [routerLink]="['/users']">Users</a></li>
+        </ul>
+    </div>
+
+    <div fxLayout="column">
+
+        <div class="page-header"></div>
+
+        <div class="page-wrapper">
+            <router-outlet></router-outlet>
+        </div>
+
+    </div>
+
+</div>

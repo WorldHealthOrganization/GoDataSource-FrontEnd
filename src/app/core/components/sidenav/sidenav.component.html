@@ -1,0 +1,15 @@
+<div class="sidenav" fxLayout="column">
+
+    <div *ngFor="item in items" class="item-wrapper">
+
+        <div *ngIf="item.link" class="item" [routerLink]="item.link">
+            <span class="xt-icon">{{item.icon}}</span>
+        </div>
+
+        <div *ngIf="!item.link" class="item">
+            <span class="xt-icon">{{item.icon}}</span>
+        </div>
+
+    </div>
+
+</div>

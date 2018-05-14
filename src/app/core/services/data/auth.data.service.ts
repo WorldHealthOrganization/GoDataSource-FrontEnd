@@ -77,7 +77,22 @@ export class AuthDataService {
     getAuthenticatedUser(): UserModel {
         const authData = this.getAuthData();
 
-        return new UserModel(_.get(authData, 'user'));
+        if (authData) {
+            return new UserModel(_.get(authData, 'user'));
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if user is authenticated
+     * @returns {boolean}
+     */
+    isAuthenticated(): boolean {
+        // get authenticated user
+        const user = this.getAuthenticatedUser();
+
+        return !!user;
     }
 }
 
