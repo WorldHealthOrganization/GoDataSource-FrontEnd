@@ -9,7 +9,7 @@ import { AuthenticatedComponent } from './core/components/authenticated/authenti
 const routes: Routes = [
     // Authentication Module routes
     {
-        path: 'login',
+        path: 'auth',
         loadChildren: './features/authentication/authentication.module#AuthenticationModule'
     },
 

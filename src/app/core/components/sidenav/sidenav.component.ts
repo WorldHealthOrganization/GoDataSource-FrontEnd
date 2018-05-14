@@ -96,8 +96,13 @@ export class SidenavComponent implements OnInit {
             'Account',
             'account',
             [],
-            [],
-            '/users'
+            [
+                new ChildNavItem(
+                    'Log out',
+                    [],
+                    '/auth/logout'
+                )
+            ]
         )
     ];
 

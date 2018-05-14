@@ -48,6 +48,18 @@ export class AuthDataService {
     }
 
     /**
+     * Logout from API
+     * @returns {Observable<any>}
+     */
+    logout(): Observable<any> {
+        return this.http.post(`users/logout`, null)
+            .do((res) => {
+                // remove auth info from local storage
+                this.storageService.remove(StorageKey.AUTH_DATA);
+            });
+    }
+
+    /**
      * Get Authentication Data from local storage (if user is authenticated)
      * @returns {AuthModel | null}
      */
