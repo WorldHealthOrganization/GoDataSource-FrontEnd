@@ -1,13 +1,41 @@
 <div class="sidenav" fxLayout="column">
 
-    <div *ngFor="item in items" class="item-wrapper">
+    <div *ngFor="let item of items" class="item-wrapper">
 
         <div *ngIf="item.link" class="item" [routerLink]="item.link">
-            <span class="xt-icon">{{item.icon}}</span>
+            <button mat-button color="primary" [routerLink]="[item.link]">
+
+                <div class="item-title" fxLayout="column" fxLayoutAlign="center">
+                    <div class="item-icon">
+                        <span class="xt-icon">{{item.icon}}</span>
+                    </div>
+                    <div class="item-label">
+                        {{item.label}}
+                    </div>
+                </div>
+
+            </button>
         </div>
 
-        <div *ngIf="!item.link" class="item">
-            <span class="xt-icon">{{item.icon}}</span>
+        <div *ngIf="!item.link" class="item-nested">
+            <button mat-button color="primary" [matMenuTriggerFor]="menu">
+
+                <div class="item-title" fxLayout="column" fxLayoutAlign="center">
+                    <div class="item-icon">
+                        <span class="xt-icon">{{item.icon}}</span>
+                    </div>
+                    <div class="item-label">
+                        {{item.label}}
+                    </div>
+                </div>
+
+            </button>
+
+            <mat-menu #menu="matMenu" xPosition="after" yPosition="below">
+                <button mat-menu-item *ngFor="let childItem of item.children" [routerLink]="[childItem.link]">
+                    {{childItem.label}}
+                </button>
+            </mat-menu>
         </div>
 
     </div>
