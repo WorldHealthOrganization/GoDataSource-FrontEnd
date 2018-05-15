@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
     }
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        // get the authenticated user (if it is)
+        // get the authenticated user
         const user = this.authDataService.getAuthenticatedUser();
 
         // check if user is authenticated
@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
             // check if there are any permissions defined on route
             const routePermissions = _.get(next, 'data.permissions', []);
 
-            // check if user has required permissions
+            // check if user has the required permissions
             return user.hasPermissions(...routePermissions);
         }
 

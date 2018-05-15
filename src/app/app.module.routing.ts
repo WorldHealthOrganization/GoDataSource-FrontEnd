@@ -4,25 +4,30 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './core/services/helper/auth-guard.service';
 import { PERMISSION } from './core/models/user-role.model';
 
+import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
+
 const routes: Routes = [
-    {
-        path: '',
-        redirectTo: '/login',
-        pathMatch: 'full'
-    },
     // Authentication Module routes
     {
-        path: '',
+        path: 'auth',
         loadChildren: './features/authentication/authentication.module#AuthenticationModule'
     },
-    // User Module routes
+
+    // Routes for authenticated users
     {
-        path: 'users',
-        loadChildren: './features/user/user.module#UserModule',
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_USER_ACCOUNT]
-        }
+        path: '',
+        component: AuthenticatedComponent,
+        children: [
+            // User Module routes
+            {
+                path: 'users',
+                loadChildren: './features/user/user.module#UserModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_USER_ACCOUNT]
+                }
+            },
+        ]
     },
 ];
 

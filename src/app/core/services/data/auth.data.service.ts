@@ -48,6 +48,18 @@ export class AuthDataService {
     }
 
     /**
+     * Logout from API
+     * @returns {Observable<any>}
+     */
+    logout(): Observable<any> {
+        return this.http.post(`users/logout`, null)
+            .do((res) => {
+                // remove auth info from local storage
+                this.storageService.remove(StorageKey.AUTH_DATA);
+            });
+    }
+
+    /**
      * Get Authentication Data from local storage (if user is authenticated)
      * @returns {AuthModel | null}
      */
@@ -77,7 +89,22 @@ export class AuthDataService {
     getAuthenticatedUser(): UserModel {
         const authData = this.getAuthData();
 
-        return new UserModel(_.get(authData, 'user'));
+        if (authData) {
+            return new UserModel(_.get(authData, 'user'));
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if user is authenticated
+     * @returns {boolean}
+     */
+    isAuthenticated(): boolean {
+        // get authenticated user
+        const user = this.getAuthenticatedUser();
+
+        return !!user;
     }
 }
 
