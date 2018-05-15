@@ -1,0 +1,39 @@
+<div id="create-outbreak">
+
+    <h2>Create Outbreak</h2>
+
+    <form (submit)="save()">
+    <app-form-input
+        name="name"
+        [(ngModel)]="outbreak.name"
+        placeholder="Name"
+        required="true">
+    </app-form-input>
+
+    <app-form-input
+        name="description"
+        [(ngModel)]="outbreak.description"
+        placeholder="Description"
+        required="true">
+    </app-form-input>
+
+    <app-form-input
+        name="disease"
+        [(ngModel)]="outbreak.disease"
+        placeholder="Disease"
+        required="true">
+    </app-form-input>
+
+    <app-form-input
+        name="active"
+        [(ngModel)]="outbreak.active"
+        placeholder="Active"
+        required="true">
+    </app-form-input>
+
+
+    <button mat-raised-button color="primary" >Save</button>
+
+        </form>
+
+</div>
