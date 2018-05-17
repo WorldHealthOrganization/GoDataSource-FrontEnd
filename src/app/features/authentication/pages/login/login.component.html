@@ -27,14 +27,6 @@
                 placeholder="Create Password"
                 required="true">
             </app-form-input>
-            <app-form-input
-                type="password"
-                name="passwordConfirm"
-                [(ngModel)]="user.passwordConfirm"
-                placeholder="Confirm Password"
-                app-equalValidator="password"
-                required="true">
-            </app-form-input>
 
             <button mat-raised-button color="primary" (click)="login()">Login</button>
         </div>

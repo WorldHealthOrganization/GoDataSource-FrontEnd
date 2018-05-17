@@ -1,0 +1,17 @@
+<div fxLayout="row" *ngIf="authUser">
+
+    <div class="sidebar">
+        <app-sidenav></app-sidenav>
+    </div>
+
+    <div fxLayout="column">
+
+        <div class="page-header"></div>
+
+        <div class="page-wrapper">
+            <router-outlet></router-outlet>
+        </div>
+
+    </div>
+
+</div>

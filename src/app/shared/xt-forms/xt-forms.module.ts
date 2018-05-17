@@ -4,10 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
-import { AngularMaterialModule } from '../../angular-material/angular-material.module';
+import { AngularMaterialModule } from '../angular-material/angular-material.module';
 
-import { components } from './components';
-import { validatorDirectives } from './validators';
+import { components } from './components/index';
+import { validatorDirectives } from './validators/index';
 
 @NgModule({
     imports: [

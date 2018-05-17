@@ -1,0 +1,33 @@
+@import '~styles/common';
+
+.sidenav {
+    background-color: #F2F5F6;
+
+    .item-wrapper {
+
+        .item-title {
+            // actually it's 100px, because Material Button adds extra left/right padding of 16px each
+            width: 68px;
+            height: 100px;
+            white-space: normal;
+            line-height: 1;
+            color: #C5CFD4;
+
+            .xt-icon {
+                font-size: 30px;
+            }
+
+            .item-label {
+                padding-top: 10px;
+            }
+        }
+
+        &:hover {
+            background-color: #1898CE;
+
+            .item-title {
+                color: white;
+            }
+        }
+    }
+}

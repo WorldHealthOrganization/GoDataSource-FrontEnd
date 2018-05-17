@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import {OutbreakDataService} from "../../../../core/services/data/outbreak.data.service";
 
 import {MatTableDataSource,  MatSliderModule, MatSlideToggleModule} from '@angular/material';
