@@ -30,7 +30,8 @@ export class AuthenticatedComponent implements OnInit {
             this.router.navigate(['/auth/login']);
         } else {
             // user is authenticated; redirect to default page (#TODO maybe Outbeaks page)
-            this.router.navigate(['/users']);
+            // need to redirect to default page only after login. Here, we need to let the user navigate
+            //this.router.navigate(['/users']);
         }
     }
 

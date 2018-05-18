@@ -4,25 +4,37 @@
     </h2>
 
     <a href="/outbreaks/create" mat-raised-button color="primary">Add</a>
-    <mat-table #table [dataSource]="dataSource">
+    <mat-table #table [dataSource]="dataSource" matSort matSortActive="name" matSortDirection="asc" matSortDisableClear >
         <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
             <mat-cell *matCellDef="let outbreak"> {{outbreak.name}} </mat-cell>
         </ng-container>
-
-        <ng-container matColumnDef="description">
-            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-            <mat-cell *matCellDef="let outbreak">  {{outbreak.description}} </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="disease">
+        <ng-container matColumnDef="disease" mat-sort-header>
             <mat-header-cell *matHeaderCellDef> Disease </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">  {{outbreak.disease}} </mat-cell>
         </ng-container>
-
+        <ng-container matColumnDef="country" >
+            <mat-header-cell *matHeaderCellDef> Country </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">  {{outbreak.country}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="startDate">
+            <mat-header-cell *matHeaderCellDef> Start Date </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">  {{outbreak.startDate | date: 'dd/mm/yyyy' }} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="endDate">
+            <mat-header-cell *matHeaderCellDef> End Date </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">  {{outbreak.endDate | date: 'dd/mm/yyyy'}} </mat-cell>
+        </ng-container>
         <ng-container matColumnDef="active">
-            <mat-header-cell *matHeaderCellDef> Active </mat-header-cell>
-            <mat-cell *matCellDef="let outbreak"> {{outbreak.active ? 'Yes' : 'No'}} </mat-cell>
+            <mat-header-cell *matHeaderCellDef> Active? </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak"> {{outbreak.active ? 'YES' : 'NO'}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="200px"> Actions </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak" fxFlex="200px">
+                <a href="/outbreaks/{{outbreak.id}}/modify" mat-raised-button color="primary">Edit</a>
+                <button (click)="delete($event,outbreak.id,outbreak.name)" mat-raised-button color="warn">Delete</button>
+            </mat-cell>
         </ng-container>
 
 

@@ -17,9 +17,18 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [PERMISSION.WRITE_USER_ACCOUNT]
         }
     },
+ //    Edit Outbreak
+    {
+        path: ':outbreakId/modify',
+        component: fromPages.ModifyOutbreakComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_OUTBREAK]
+        }
+    }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);
