@@ -30,12 +30,7 @@ export class UserRoleDataService {
      * @returns {Observable<UserRoleModel[]>}
      */
     createRole(userRole: UserRoleModel): Observable<any> {
-        return this.http.post('roles', userRole)
-            .map((rolesList: any[]) => {
-                return rolesList.map((role) => {
-                    return new UserRoleModel(role);
-                });
-            });
+        return this.http.post('roles', userRole);
     }
 
     /**
