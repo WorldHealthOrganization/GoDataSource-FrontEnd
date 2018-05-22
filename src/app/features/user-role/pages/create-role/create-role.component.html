@@ -5,12 +5,34 @@
 </app-topnav>
 
 <mat-card class="page-section">
-    <h1>Create Role page</h1>
+    <form #form="ngForm" (submit)="createNewRole(form)">
 
-    <ul>
-        <li><a [routerLink]="['/users']">Users list</a></li>
-        <li><a [routerLink]="['/users/create']">Create new user</a></li>
-        <li><a [routerLink]="['/users/5']">View User</a></li>
-        <li><a [routerLink]="['/users/8/modify']">Modify User</a></li>
-    </ul>
+        <div fxLayout="column">
+
+            <app-form-input
+                name="name"
+                [(ngModel)]="newUserRole.name"
+                placeholder="Name"
+                required="true">
+            </app-form-input>
+
+            <app-form-textarea
+                name="name"
+                [(ngModel)]="newUserRole.description"
+                placeholder="Description">
+            </app-form-textarea>
+
+            <app-form-select
+                name="options"
+                [(ngModel)]="newUserRole.permissions"
+                placeholder="Options"
+                required="true"
+                [options]="availablePermissionsObs | async"
+                multiple="true"
+            ></app-form-select>
+
+            <button mat-raised-button color="primary">Save</button>
+        </div>
+
+    </form>
 </mat-card>

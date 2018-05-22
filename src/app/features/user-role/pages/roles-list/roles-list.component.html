@@ -1,6 +1,6 @@
 <app-topnav [addNewItemRoute]="'./create'">
     <ng-container dynamic-section>
-        #TODO Breadcrumbs Roles
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
 
@@ -35,7 +35,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="50">
                 <mat-chip-list>
-                    <mat-chip *ngFor="let permission of item.permissions">{{ permission }}</mat-chip>
+                    <mat-chip *ngFor="let permission of item.permissions" [matTooltip]="'#TOOD Permission description'">{{ permission }}</mat-chip>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>

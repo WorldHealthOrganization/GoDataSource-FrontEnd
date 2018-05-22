@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { UserRoleModel } from '../../models/user-role.model';
+import { PERMISSION, UserRoleModel } from '../../models/user-role.model';
 import { Observable } from 'rxjs/Observable';
 import { ObservableHelperService } from '../helper/observable-helper.service';
-
 
 @Injectable()
 export class UserRoleDataService {
@@ -37,6 +36,20 @@ export class UserRoleDataService {
                     return new UserRoleModel(role);
                 });
             });
+    }
+
+    /**
+     * Return the list of all the available permissions
+     * @returns {Observable<string[]>}
+     */
+    getAvailablePermissions(): Observable<string[]> {
+        const permissions = [];
+
+        for (const key in PERMISSION) {
+            permissions.push(PERMISSION[key]);
+        }
+
+        return Observable.of(permissions);
     }
 }
 

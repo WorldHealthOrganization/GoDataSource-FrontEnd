@@ -1,5 +1,5 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from './breadcrumb-item-model.component';
+import { BreadcrumbItemModel } from './breadcrumb-item.model';
 
 @Component({
     selector: 'app-breadcrumbs',
