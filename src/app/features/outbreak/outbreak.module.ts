@@ -4,18 +4,13 @@ import { NgModule } from '@angular/core';
 import { routing } from './outbreak.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 
-import { MatInputModule, MatPaginatorModule, MatProgressSpinnerModule,MatSortModule, MatTableModule } from "@angular/material";
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-
 // components
 import * as fromPages from './pages';
 
 @NgModule({
     imports: [
         routing,
-        SharedModule,
-        MatTableModule,
-        MatSlideToggleModule
+        SharedModule
 
     ],
     declarations: [

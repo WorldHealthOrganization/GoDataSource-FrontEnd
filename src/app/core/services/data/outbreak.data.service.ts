@@ -31,7 +31,6 @@ export class OutbreakDataService {
         outbreak.nutritionalStatus = {};
         outbreak.pregnancyInformation = {};
         outbreak. vaccinationStatus = {};
-        outbreak.endDate = null;
 
         return this.http.post(`outbreaks`, outbreak)
             .do((res) => {
@@ -46,8 +45,7 @@ export class OutbreakDataService {
         outbreak.labResultsTemplate = {};
         outbreak.nutritionalStatus = {};
         outbreak.pregnancyInformation = {};
-        outbreak. vaccinationStatus = {};
-        outbreak.endDate = null;
+        outbreak.vaccinationStatus = {};
 
         return this.http.put(`outbreaks/${outbreak.id}`, outbreak)
             .do((res) => {

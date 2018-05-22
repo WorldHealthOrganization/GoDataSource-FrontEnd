@@ -5,6 +5,8 @@ import {OutbreakModel} from "../../../../core/models/outbreak.model";
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
+import * as moment from 'moment';
+
 @Component({
     selector: 'app-modify-outbreak',
     encapsulation: ViewEncapsulation.None,
@@ -13,29 +15,11 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 })
 export class ModifyOutbreakComponent {
     outbreak:any;
-    //outbreak = {
-    //    name: '',
-    //    description: '',
-    //    disease: '',
-    //    active: '',
-    //    startDate: '',
-    //    endDate: '',
-    //    country: '',
-    //    periodOfFollowup: '',
-    //    frequencyOfFollowUp: '',
-    //    displayDateFormat: '',
-    //    noDaysAmongContacts: '',
-    //    noDaysDaysInChains: '',
-    //    noDaysNotSeen: '',
-    //    noLessContacts:'',
-    //    highExposureDuration: ''
-    //};
 
     constructor(private outbreakDataService:OutbreakDataService,
                 private route:ActivatedRoute,
                 private router:Router,
-                private snackbarService:SnackbarService
-    ) {
+                private snackbarService:SnackbarService) {
         this.outbreak = {};
         this.outbreak.name = '';
         this.route.params.subscribe(params => {
@@ -45,20 +29,28 @@ export class ModifyOutbreakComponent {
                 .subscribe(response => {
                     this.outbreak = response;
                 });
-
         });
     }
 
-    save() {
-        this.outbreakDataService
-            .edit(this.outbreak)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .subscribe(response => {
-                this.snackbarService.showSuccess('Success');
-                this.router.navigate(['/outbreaks']);
-            });
+    save(form) {
+        if (form.valid) {
+            this.outbreakDataService
+                .edit(this.outbreak)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(response => {
+                    this.snackbarService.showSuccess('Success');
+                    this.router.navigate(['/outbreaks']);
+                });
+        }
+    }
+
+    cancel(event) {
+        event.preventDefault();
+        if (confirm("Are you sure you want to cancel ? The data updates will be lost.")) {
+            this.router.navigate(['/outbreaks']);
+        }
     }
 }
