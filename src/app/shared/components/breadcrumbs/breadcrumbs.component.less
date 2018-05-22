@@ -1,0 +1,39 @@
+@import '~styles/common';
+
+// variables
+
+// styles
+.breadcrumbs {
+
+    .breadcrumbs-list {
+
+        .breadcrumb-item {
+            font-size: 28px;
+            font-weight: 100;
+            color: @color-accent-main;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            &.active {
+                color: @color-dark-1st;
+
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+
+            .mat-list-item-content {
+                /* overriding Material behavior */
+                padding: 0;
+            }
+        }
+
+        .breadcrumb-separator {
+            font-size: 32px;
+            font-weight: 100;
+            padding-bottom: 5px;
+        }
+    }
+}
