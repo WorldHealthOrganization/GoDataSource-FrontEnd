@@ -1,17 +1,18 @@
-<div fxLayout="row" *ngIf="authUser">
+<div class="authenticated" fxLayout="column" *ngIf="authUser">
 
-    <div class="sidebar" >
-        <app-sidenav></app-sidenav>
-    </div>
+    <mat-sidenav-container class="sidenav-container">
 
-    <div fxLayout="column" fxFlex="100" >
+        <mat-sidenav #snav mode="over" fixedInViewport>
+            <app-sidenav></app-sidenav>
+        </mat-sidenav>
 
-        <div class="page-header"></div>
+        <mat-sidenav-content>
 
-        <div class="page-wrapper">
+            <button class="sidenav-toggle" mat-mini-fab color="primary" (click)="snav.toggle()">MENU</button>
+
             <router-outlet></router-outlet>
-        </div>
 
-    </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
 
 </div>

@@ -7,7 +7,7 @@
 </div>
 
 
-<form>
+<form #form="ngForm" (submit)="login(form)">
 
     <div fxLayout="row" fxLayoutAlign="center">
         <div fxLayout="column" style="width: 300px">
@@ -28,7 +28,7 @@
                 required="true">
             </app-form-input>
 
-            <button mat-raised-button color="primary" (click)="login()">Login</button>
+            <button mat-raised-button color="primary">Login</button>
         </div>
     </div>
 

@@ -1,0 +1,30 @@
+<mat-toolbar class="topnav">
+
+    <mat-list class="topnav-list" fxLayout="row" fxFlex>
+
+        <mat-list-item>
+            +
+        </mat-list-item>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <mat-list-item fxFlex>
+            <!-- Dynamic content -->
+            <ng-content select="[dynamic-section]"></ng-content>
+        </mat-list-item>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <mat-list-item>Selected outbreak</mat-list-item>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <mat-list-item>Language</mat-list-item>
+
+        <mat-divider [vertical]="true"></mat-divider>
+
+        <mat-list-item>Profile</mat-list-item>
+
+    </mat-list>
+
+</mat-toolbar>
