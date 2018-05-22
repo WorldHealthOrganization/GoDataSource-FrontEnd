@@ -1,0 +1,38 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section">
+    <form #form="ngForm" (submit)="modifyRole(form)">
+
+        <div fxLayout="column">
+
+            <app-form-input
+                name="name"
+                [(ngModel)]="userRole.name"
+                placeholder="Name"
+                required="true">
+            </app-form-input>
+
+            <app-form-textarea
+                name="description"
+                [(ngModel)]="userRole.description"
+                placeholder="Description">
+            </app-form-textarea>
+
+            <app-form-select
+                name="permissions"
+                [(ngModel)]="userRole.permissions"
+                placeholder="Options"
+                required="true"
+                [options]="availablePermissionsObs | async"
+                multiple="true"
+            ></app-form-select>
+
+            <button mat-raised-button color="primary">Save</button>
+        </div>
+
+    </form>
+</mat-card>

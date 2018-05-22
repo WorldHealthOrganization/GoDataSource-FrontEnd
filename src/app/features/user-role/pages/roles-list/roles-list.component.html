@@ -30,18 +30,46 @@
 
         <!-- Permissions -->
         <ng-container matColumnDef="permissions">
-            <mat-header-cell *matHeaderCellDef fxFlex="50">
+            <mat-header-cell *matHeaderCellDef fxFlex>
                 Permissions
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="50">
+            <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
                     <mat-chip *ngFor="let permission of item.permissions" [matTooltip]="'#TOOD Permission description'">{{ permission }}</mat-chip>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="['name', 'description', 'permissions']"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: ['name', 'description', 'permissions']"></mat-row>
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+
+                    <span [matTooltip]="(item.name === authUser.role.name ? 'You cannot modify the role that is assigned to you' : '')">
+                        <button mat-menu-item [disabled]="item.name === authUser.role.name" [routerLink]="['.', item.id, 'modify']">
+                            Modify
+                        </button>
+                    </span>
+
+                    <span [matTooltip]="(item.name === authUser.role.name ? 'You cannot delete the role that is assigned to you' : '')">
+                        <button mat-menu-item [disabled]="item.name === authUser.role.name" (click)="deleteRole(item)">
+                            Delete
+                        </button>
+                    </span>
+
+                </mat-menu>
+
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="['name', 'description', 'permissions', 'actions']"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: ['name', 'description', 'permissions', 'actions']"></mat-row>
     </mat-table>
 
 </mat-card>

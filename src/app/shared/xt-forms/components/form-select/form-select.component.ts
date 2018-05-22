@@ -24,6 +24,7 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() name: string;
     @Input() multiple: boolean = false;
     @Input() options: Observable<SelectOptionModel>;
+    @Input() optionTooltipKey: string;
 
     public identifier = `form-select-${identifier++}`;
 
