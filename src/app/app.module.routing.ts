@@ -27,6 +27,15 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_USER_ACCOUNT]
                 }
             },
+            // User Role Module routes
+            {
+                path: 'user-roles',
+                loadChildren: './features/user-role/user-role.module#UserRoleModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_ROLE]
+                }
+            },
         ]
     },
 ];

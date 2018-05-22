@@ -43,14 +43,16 @@ export enum PERMISSION {
 }
 
 export class UserRoleModel {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
     permissions: string[];
+    description: string | null;
 
-    constructor(data) {
+    constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.permissions = _.get(data, 'permissions', []);
+        this.description = _.get(data, 'description');
     }
 
     /**

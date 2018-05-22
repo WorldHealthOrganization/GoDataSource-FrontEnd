@@ -2,26 +2,30 @@ import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf }
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
+import { Observable } from 'rxjs/Observable';
+
+import { SelectOptionModel } from './select-option.model';
 
 @Component({
-    selector: 'app-form-input',
+    selector: 'app-form-select',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-input.component.html',
-    styleUrls: ['./form-input.component.less'],
+    templateUrl: './form-select.component.html',
+    styleUrls: ['./form-select.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormInputComponent,
+        useExisting: FormSelectComponent,
         multi: true
     }]
 })
-export class FormInputComponent extends ElementBase<string> {
+export class FormSelectComponent extends ElementBase<string> {
 
     @Input() placeholder: string;
-    @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
+    @Input() multiple: boolean = false;
+    @Input() options: Observable<SelectOptionModel>;
 
-    public identifier = `form-input-${identifier++}`;
+    public identifier = `form-select-${identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
