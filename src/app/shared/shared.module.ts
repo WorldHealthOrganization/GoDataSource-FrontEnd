@@ -29,7 +29,8 @@ import * as fromSharedComponents from './components';
         FormsModule,
         FlexLayoutModule,
         XtFormsModule,
-        AngularMaterialModule
+        AngularMaterialModule,
+        ...fromSharedComponents.components
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
 
 import * as _ from 'lodash';
 
@@ -26,23 +27,25 @@ export class AuthDataService {
      * @param user
      * @returns {Observable<any>}
      */
-    login(user): Observable<any> {
+    login(user): Observable<AuthModel> {
         return this.http.post(`users/login`, user)
-            .do((res) => {
+            .mergeMap((authRes) => {
                 // keep auth info
-                const auth = new AuthModel(res);
+                const auth = new AuthModel(authRes);
 
                 // cache auth data so the Auth Token will be added on the next request
                 this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
 
                 // get user info
                 return this.userDataService.getUser(auth.userId)
-                    .subscribe((userData) => {
+                    .map((userData) => {
                         // keep user info
                         auth.user = new UserModel(userData);
 
                         // cache auth data with authenticated user information
                         this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
+
+                        return auth;
                     });
             });
     }
