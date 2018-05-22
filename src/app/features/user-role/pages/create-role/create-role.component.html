@@ -1,0 +1,16 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        #TODO Breadcrumbs Create new user
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section">
+    <h1>Create User page</h1>
+
+    <ul>
+        <li><a [routerLink]="['/users']">Users list</a></li>
+        <li><a [routerLink]="['/users/create']">Create new user</a></li>
+        <li><a [routerLink]="['/users/5']">View User</a></li>
+        <li><a [routerLink]="['/users/8/modify']">Modify User</a></li>
+    </ul>
+</mat-card>

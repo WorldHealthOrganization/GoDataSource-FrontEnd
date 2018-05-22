@@ -1,0 +1,47 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        #TODO Breadcrumbs Roles
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section">
+
+    <mat-table #table [dataSource]="rolesListObs | async" matSort>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="20">
+                Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="20">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef fxFlex="30">
+                Description
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="30">
+                {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Permissions -->
+        <ng-container matColumnDef="permissions">
+            <mat-header-cell *matHeaderCellDef fxFlex="50">
+                Permissions
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="50">
+                <mat-chip-list>
+                    <mat-chip *ngFor="let permission of item.permissions">{{ permission }}</mat-chip>
+                </mat-chip-list>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="['name', 'description', 'permissions']"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: ['name', 'description', 'permissions']"></mat-row>
+    </mat-table>
+
+</mat-card>

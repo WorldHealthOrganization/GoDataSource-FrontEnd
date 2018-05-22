@@ -25,6 +25,9 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'search': '&#xe908;',
+            'add': '&#xe909;',
+            'menu': '&#xe90a;',
             'account': '&#xe900;',
             'home': '&#xe901;',
             'admin': '&#xe902;',
