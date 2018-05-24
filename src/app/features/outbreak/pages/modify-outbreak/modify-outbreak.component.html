@@ -1,38 +1,39 @@
 <app-topnav>
     <ng-container dynamic-section>
-        #TODO Breadcrumbs Modify outbreak
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
+
 <mat-card class="page-section">
 
-    <h1>ModifyOutbreak - {{outbreak.name}}</h1>
-
-    <form #form="ngForm" (submit)="save(form)">
+    <form #form="ngForm" (submit)="modifyOutbreak(form)">
 
         <mat-tab-group class="outbreakTabs">
             <mat-tab label="Details">
 
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
                                     name="name"
                                     [(ngModel)]="outbreak.name"
                                     placeholder="Outbreak name"
                                     required="true">
                     </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
-                                    name="description"
-                                    [(ngModel)]="outbreak.description"
-                                    placeholder="Description"
-                                    required="true">
-                    </app-form-input>
-                </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                     name="disease"
                                     [(ngModel)]="outbreak.disease"
                                     placeholder="Disease"
                                     required="true">
                     </app-form-input>
+                </div>
+                <div fxLayout.xs="column">
+                    <app-form-textarea fxFlex="42%"
+                                    name="description"
+                                    [(ngModel)]="outbreak.description"
+                                    placeholder="Description"
+                                    required="true">
+                    </app-form-textarea>
+                </div>
+                <div fxLayout.xs="column">
                     <mat-slide-toggle fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
                                       name="active"
                                       [(ngModel)]="outbreak.active"
@@ -42,8 +43,8 @@
                         Active?
                     </mat-slide-toggle>
                 </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <mat-form-field fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%" class="datePicker">
+                <div fxLayout.xs="column">
+                    <mat-form-field fxFlex="20%" class="datePicker">
                         <input matInput [matDatepicker]="pickerStartDate"
                                name="startDate"
                                [(ngModel)]="outbreak.startDate"
@@ -52,7 +53,7 @@
                         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
                         <mat-datepicker #pickerStartDate></mat-datepicker>
                     </mat-form-field>
-                    <mat-form-field fxFlex="16%" fxFlex.sm="40%" fxFlex.md="30%" class="datePicker">
+                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px" class="datePicker">
                         <input matInput [matDatepicker]="pickerEndDate"
                                name="endDate"
                                [(ngModel)]="outbreak.endDate"
@@ -62,56 +63,56 @@
                         <mat-datepicker #pickerEndDate></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
                                     name="periodOfFollowup"
                                     [(ngModel)]="outbreak.periodOfFollowup"
                                     placeholder="Duration for the follow-up ( days) "
                                     required="true">
                     </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                     name="country"
                                     [(ngModel)]="outbreak.country"
                                     placeholder="Location"
                                     required="true">
                     </app-form-input>
                 </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
                                     name="frequencyOfFollowUp"
                                     [(ngModel)]="outbreak.frequencyOfFollowUp"
                                     placeholder="Follow-up frecquency"
                                     required="true">
                     </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                     name="displayDateFormat"
                                     [(ngModel)]="outbreak.displayDateFormat"
                                     placeholder="Date format display"
                                     required="true">
                     </app-form-input>
                 </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
                                     name="noDaysAmongContacts"
                                     [(ngModel)]="outbreak.noDaysAmongContacts"
                                     placeholder="KPI - days among known contacts"
                                     required="true">
                     </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                     name="noDaysDaysInChains"
                                     [(ngModel)]="outbreak.noDaysDaysInChains"
                                     placeholder="KPI - days in known transmission chains"
                                     required="true">
                     </app-form-input>
                 </div>
-                <div fxLayout fxLayout.xs="column" fxLayoutAlign="left">
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
                                     name="noDaysNotSeen"
                                     [(ngModel)]="outbreak.noDaysNotSeen"
                                     placeholder="KPI - days not seen"
                                     required="true">
                     </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                     name="noLessContacts"
                                     [(ngModel)]="outbreak.noLessContacts"
                                     placeholder="KPI - less than X contacts"

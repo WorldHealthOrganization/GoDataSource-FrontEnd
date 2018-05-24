@@ -3,6 +3,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
+import { OutbreakModel } from "../../../../core/models/outbreak.model";
+import { UserRoleModel } from "../../../../core/models/user-role.model";
 
 
 @Component({
@@ -12,40 +15,32 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     styleUrls: ['./create-outbreak.component.less']
 })
 export class CreateOutbreakComponent {
-    outbreak = {
-        name: '',
-        description: '',
-        disease: '',
-        active: '',
-        startDate: '',
-        endDate: '',
-        country: '',
-        periodOfFollowup: '',
-        frequencyOfFollowUp: '',
-        displayDateFormat: '',
-        noDaysAmongContacts: '',
-        noDaysDaysInChains: '',
-        noDaysNotSeen: '',
-        noLessContacts: '',
-        highExposureDuration: ''
-    };
+
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('Outbreaks', '..'),
+        new BreadcrumbItemModel('Create New Outbreak', '.', true)
+    ];
+
+    newOutbreak: OutbreakModel = new OutbreakModel();
 
     constructor(private outbreakDataService:OutbreakDataService,
                 private router:Router,
                 private snackbarService:SnackbarService) {
-
     }
 
-    save(form) {
+    createOutbreak(form) {
         if (form.valid) {
+            const dirtyFields: any[] = form.value;
+            const outbreakData = new OutbreakModel(dirtyFields);
+
             this.outbreakDataService
-                .create(this.outbreak)
+                .createOutbreak(outbreakData)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
                 .subscribe(response => {
-                    this.snackbarService.showSuccess('Success');
+                    this.snackbarService.showSuccess('Outbreak created');
                     this.router.navigate(['/outbreaks']);
                 });
         }

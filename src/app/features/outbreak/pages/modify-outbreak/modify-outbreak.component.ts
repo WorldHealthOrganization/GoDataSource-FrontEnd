@@ -6,6 +6,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 import * as moment from 'moment';
+import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -14,34 +15,48 @@ import * as moment from 'moment';
     styleUrls: ['./modify-outbreak.component.less']
 })
 export class ModifyOutbreakComponent {
-    outbreak:any;
+
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('Outbreaks', '/outbreaks'),
+        new BreadcrumbItemModel('Modify Outbreak', '.', true)
+    ];
+
+    outbreakId: string;
+    outbreak: OutbreakModel = new OutbreakModel();
 
     constructor(private outbreakDataService:OutbreakDataService,
                 private route:ActivatedRoute,
                 private router:Router,
                 private snackbarService:SnackbarService) {
-        this.outbreak = {};
-        this.outbreak.name = '';
-        this.route.params.subscribe(params => {
-            let outbreakId = params.outbreakId;
 
-            outbreakDataService.getOutbreak(outbreakId)
-                .subscribe(response => {
-                    this.outbreak = response;
+        this.route.params.subscribe(params => {
+            this.outbreakId = params.outbreakId;
+
+           // get the outbreak to modify
+            this.outbreakDataService
+                .getOutbreak(this.outbreakId)
+                .subscribe(outbreakData => {
+                    this.outbreak = outbreakData;
                 });
         });
     }
 
-    save(form) {
+    modifyOutbreak(form) {
         if (form.valid) {
+            const dirtyFields: any[] = form.value;
+
+            // modify the role
             this.outbreakDataService
-                .edit(this.outbreak)
+                .modifyOutbreak(this.outbreakId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+
                     return ErrorObservable.create(err);
                 })
-                .subscribe(response => {
-                    this.snackbarService.showSuccess('Success');
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('Outbreak modified!');
+
+                    // navigate to listing page
                     this.router.navigate(['/outbreaks']);
                 });
         }

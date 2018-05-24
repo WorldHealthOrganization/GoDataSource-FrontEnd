@@ -1,9 +1,12 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import {OutbreakDataService} from "../../../../core/services/data/outbreak.data.service";
-import {MatDialogModule} from '@angular/material/dialog';
+import { OutbreakDataService } from "../../../../core/services/data/outbreak.data.service";
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import {MatTableDataSource,  MatSliderModule, MatSlideToggleModule} from '@angular/material';
+import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
+import { Observable } from "rxjs/Observable";
+import { OutbreakModel } from "../../../../core/models/outbreak.model";
+import { UserModel } from '../../../../core/models/user.model';
 
 
 @Component({
@@ -14,34 +17,44 @@ import {MatTableDataSource,  MatSliderModule, MatSlideToggleModule} from '@angul
 })
 export class OutbreakListComponent {
 
-    outbreaks;
-    dataSource;
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('Outbreaks', '.', true)
+    ];
+
+    // authenticated user
+    authUser: UserModel;
+    // list of existing outbreaks
+    outbreaksListObs: Observable<OutbreakModel[]>;
+
     displayedColumns = ['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ];
+
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private snackbarService:SnackbarService
+        private snackbarService:SnackbarService,
+        private authDataService: AuthDataService,
     ) {
-        outbreakDataService.getOutbreaks().subscribe( response =>{
-            this.outbreaks = response;
-            this.dataSource = new MatTableDataSource( this.outbreaks );
-        });
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+        this.loadOutbreaksList();
     }
 
-    delete(event,outbreakId, outbreakName){
-        if(confirm('Are you sure you want to delete '+outbreakName+' ?')){
+    loadOutbreaksList() {
+        // get the list of existing roles
+        this.outbreaksListObs = this.outbreakDataService.getOutbreaksList();
+    }
+
+    delete(outbreak){
+        if(confirm('Are you sure you want to delete '+outbreak.name+' ?')){
             this.outbreakDataService
-                .delete(outbreakId)
+                .deleteOutbreak(outbreak.id)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
                 .subscribe( response => {
-                    this.outbreakDataService.getOutbreaks().subscribe( response =>{
-                        this.snackbarService.showSuccess('Success');
-                        this.outbreaks = response;
-                        this.dataSource = new MatTableDataSource( this.outbreaks );
-                    });
+                    this.snackbarService.showSuccess("Success");
+                    this.loadOutbreaksList();
                 });
         }
     }

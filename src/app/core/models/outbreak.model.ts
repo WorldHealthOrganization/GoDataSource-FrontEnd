@@ -7,7 +7,7 @@ export class OutbreakModel {
     disease: string;
     active: boolean;
     startDate: string;
-    endDate: string;
+    endDate: string | null;
     country: string;
     periodOfFollowup: number;
     frequencyOfFollowUp: number;
@@ -16,9 +16,16 @@ export class OutbreakModel {
     noDaysDaysInChains: number;
     noDaysNotSeen: number;
     noLessContacts: number;
-    highExposureDuration: number;
+    highExposureDuration: number | 0;
+    caseClassification: any | null;
+    caseInvestigationTemplate: any | null;
+    contactFollowUpTemplate: any | null;
+    labResultsTemplate: any | null;
+    nutritionalStatus: any | null;
+    pregnancyInformation: any | null;
+    vaccinationStatus: any | null;
 
-    constructor(data) {
+    constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.description = _.get(data, 'description');
@@ -34,7 +41,7 @@ export class OutbreakModel {
         this.noDaysDaysInChains = _.get(data, 'noDaysDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
-        this.highExposureDuration = _.get(data, 'highExposureDuration');
+        this.highExposureDuration = 0;
     }
 
 }
