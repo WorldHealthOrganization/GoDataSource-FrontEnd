@@ -8,7 +8,9 @@
 
         <mat-sidenav-content>
 
-            <button class="sidenav-toggle" mat-mini-fab color="primary" (click)="snav.toggle()">MENU</button>
+            <button class="sidenav-toggle" mat-raised-button color="primary" (click)="snav.toggle()">
+                <span class="xt-icon">menu</span>
+            </button>
 
             <router-outlet></router-outlet>
 

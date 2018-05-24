@@ -4,24 +4,23 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 import { ElementBase } from '../../core/index';
 
 @Component({
-    selector: 'app-form-input',
+    selector: 'app-form-textarea',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-input.component.html',
-    styleUrls: ['./form-input.component.less'],
+    templateUrl: './form-textarea.component.html',
+    styleUrls: ['./form-textarea.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormInputComponent,
+        useExisting: FormTextareaComponent,
         multi: true
     }]
 })
-export class FormInputComponent extends ElementBase<string> {
+export class FormTextareaComponent extends ElementBase<string> {
 
     @Input() placeholder: string;
-    @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
 
-    public identifier = `form-input-${identifier++}`;
+    public identifier = `form-textarea-${identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

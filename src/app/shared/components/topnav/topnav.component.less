@@ -1,8 +1,32 @@
 @import '~styles/common';
 
+// variables
+@topnav-height: 90px;
+
+// styles
 .topnav {
 
+    &.mat-toolbar-single-row {
+        /* overriding Material behavior */
+        height: @topnav-height;
+        padding: 0;
+    }
+
     .topnav-list {
+        height: @topnav-height;
         padding-top: 0;
+
+        .mat-list-item {
+            align-self: center;
+        }
+
+        .add-new-item {
+            font-size: 30px;
+            color: @color-accent-main;
+
+            .mat-list-item-content {
+                padding: 0 8px;
+            }
+        }
     }
 }

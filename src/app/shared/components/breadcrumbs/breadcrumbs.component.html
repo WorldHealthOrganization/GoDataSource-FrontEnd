@@ -1,0 +1,19 @@
+<div class="breadcrumbs" fxLayout="row">
+
+    <mat-list class="breadcrumbs-list" fxLayout="row" fxFlex>
+
+        <ng-container *ngFor="let item of items; let last = last;">
+
+            <mat-list-item class="breadcrumb-item" [ngClass]="{'active': item.active}">
+                <a [routerLink]="item.link" class="a-no-style">
+                    {{item.label}}
+                </a>
+            </mat-list-item>
+
+            <mat-list-item *ngIf="!last" class="breadcrumb-separator">|</mat-list-item>
+
+        </ng-container>
+
+    </mat-list>
+
+</div>

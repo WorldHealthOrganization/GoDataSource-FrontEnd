@@ -34,6 +34,11 @@ export class SidenavComponent implements OnInit {
                     'Users',
                     [PERMISSION.READ_USER_ACCOUNT],
                     '/users'
+                ),
+                new ChildNavItem(
+                    'Roles',
+                    [PERMISSION.READ_ROLE],
+                    '/user-roles'
                 )
             ]
         ),

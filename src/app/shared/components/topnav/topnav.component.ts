@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'app-topnav',
@@ -7,5 +7,8 @@ import { Component, ViewEncapsulation } from '@angular/core';
     styleUrls: ['./topnav.component.less']
 })
 export class TopnavComponent {
+
+    // by default, do nothing (stay on the current page)
+    @Input() addNewItemRoute = '.';
 
 }

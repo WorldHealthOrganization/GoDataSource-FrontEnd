@@ -10,7 +10,50 @@ html, body, ul, li, div, span {
     border: 0;
 }
 
+/* Generic styles */
+.a-no-style {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Commonly used styles */
 .page-section {
-    margin: 10px 58px;
+    margin: 15px 20px 15px 47px;
     box-shadow: -2px 2px 8px 1px rgba(0,0,0,.3) !important;
+
+    /* Mat Table overrides */
+    .mat-table {
+
+        // variables
+        @cell-padding-left: 20px;
+
+        .mat-row {
+            align-items: start !important;
+            padding: 15px 0 !important;
+
+            .mat-cell {
+                font-size: 16px !important;
+                padding-left: @cell-padding-left;
+            }
+        }
+
+        .mat-header-row {
+            padding: 0 !important;
+
+            .mat-header-cell {
+                font-size: 14px !important;
+                font-weight: bold !important;
+                padding-left: @cell-padding-left;
+            }
+        }
+
+        .mat-chip-list-wrapper {
+
+            .mat-chip {
+                margin-top: 5px !important;
+                margin-bottom: 5px !important;
+            }
+        }
+
+    }
 }

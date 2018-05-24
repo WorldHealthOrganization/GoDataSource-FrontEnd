@@ -13,7 +13,10 @@ import {
     MatDatepickerModule,
     MatSidenavModule,
     MatToolbarModule,
-    MatListModule
+    MatListModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatSelectModule
 } from '@angular/material';
 
 @NgModule({
@@ -30,7 +33,10 @@ import {
         MatDatepickerModule,
         MatSidenavModule,
         MatToolbarModule,
-        MatListModule
+        MatListModule,
+        MatChipsModule,
+        MatTooltipModule,
+        MatSelectModule
     ],
     declarations: [],
     exports: [
@@ -46,7 +52,10 @@ import {
         MatDatepickerModule,
         MatSidenavModule,
         MatToolbarModule,
-        MatListModule
+        MatListModule,
+        MatChipsModule,
+        MatTooltipModule,
+        MatSelectModule
     ]
 })
 export class AngularMaterialModule {
