@@ -14,12 +14,24 @@ export class UserRoleDataService {
     }
 
     /**
-     * Return the list of User Roles
+     * Retrieve the list of User Roles
      * @returns {Observable<UserRoleModel[]>}
      */
     getRolesList(): Observable<UserRoleModel[]> {
         return this.observableHelper.mapListToModel(
             this.http.get('roles'),
+            UserRoleModel
+        );
+    }
+
+    /**
+     * Retrieve a User Role
+     * @param {string} roleId
+     * @returns {Observable<UserRoleModel>}
+     */
+    getRole(roleId: string): Observable<UserRoleModel> {
+        return this.observableHelper.mapToModel(
+            this.http.get(`roles/${roleId}`),
             UserRoleModel
         );
     }
@@ -31,6 +43,24 @@ export class UserRoleDataService {
      */
     createRole(userRole: UserRoleModel): Observable<any> {
         return this.http.post('roles', userRole);
+    }
+
+    /**
+     * Modify an existing User Role
+     * @param {string} roleId
+     * @returns {Observable<any>}
+     */
+    modifyRole(roleId: string, data: any): Observable<any> {
+        return this.http.patch(`roles/${roleId}`, data);
+    }
+
+    /**
+     * Delete an existing User Role
+     * @param {string} roleId
+     * @returns {Observable<any>}
+     */
+    deleteRole(roleId: string): Observable<any> {
+        return this.http.delete(`roles/${roleId}`);
     }
 
     /**

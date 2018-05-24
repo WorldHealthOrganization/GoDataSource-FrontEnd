@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'arrowDown': '&#xe90c;',
+            'moreVertical': '&#xe90b;',
             'search': '&#xe908;',
             'add': '&#xe909;',
             'menu': '&#xe90a;',

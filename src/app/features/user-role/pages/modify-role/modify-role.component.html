@@ -5,26 +5,26 @@
 </app-topnav>
 
 <mat-card class="page-section">
-    <form #form="ngForm" (submit)="createNewRole(form)">
+    <form #form="ngForm" (submit)="modifyRole(form)">
 
         <div fxLayout="column">
 
             <app-form-input
                 name="name"
-                [(ngModel)]="newUserRole.name"
+                [(ngModel)]="userRole.name"
                 placeholder="Name"
                 required="true">
             </app-form-input>
 
             <app-form-textarea
                 name="description"
-                [(ngModel)]="newUserRole.description"
+                [(ngModel)]="userRole.description"
                 placeholder="Description">
             </app-form-textarea>
 
             <app-form-select
                 name="permissions"
-                [(ngModel)]="newUserRole.permissions"
+                [(ngModel)]="userRole.permissions"
                 placeholder="Options"
                 required="true"
                 [options]="availablePermissionsObs | async"

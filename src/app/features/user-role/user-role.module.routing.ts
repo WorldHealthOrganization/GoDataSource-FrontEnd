@@ -19,6 +19,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_ROLE]
         }
+    },
+    // Modify Role
+    {
+        path: ':roleId/modify',
+        component: fromPages.ModifyRoleComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_ROLE]
+        }
     }
 ];
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -13,26 +13,39 @@ import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-s
 import 'rxjs/add/operator/map';
 
 @Component({
-    selector: 'app-create-role',
+    selector: 'app-modify-role',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-role.component.html',
-    styleUrls: ['./create-role.component.less']
+    templateUrl: './modify-role.component.html',
+    styleUrls: ['./modify-role.component.less']
 })
-export class CreateRoleComponent implements OnInit {
+export class ModifyRoleComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Roles', '..'),
-        new BreadcrumbItemModel('Create New Role', '.', true)
+        new BreadcrumbItemModel('Roles', '/user-roles'),
+        new BreadcrumbItemModel('Modify Role', '.', true)
     ];
 
-    newUserRole: UserRoleModel = new UserRoleModel();
+    userRoleId: string;
+    userRole: UserRoleModel = new UserRoleModel();
     availablePermissionsObs: Observable<SelectOptionModel[]>;
 
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService
     ) {
+        this.route.params.subscribe((params) => {
+            // get the ID of the Role being modified
+            this.userRoleId = params.roleId;
+
+            // retrieve the User Role instance
+            this.userRoleDataService
+                .getRole(this.userRoleId)
+                .subscribe((roleData) => {
+                    this.userRole = new UserRoleModel(roleData);
+                });
+        });
     }
 
     ngOnInit() {
@@ -47,22 +60,20 @@ export class CreateRoleComponent implements OnInit {
             });
     }
 
-    createNewRole(form: NgForm) {
-        if (form.valid) {
+    modifyRole(form: NgForm) {
+        if (form.valid && form.dirty) {
             const dirtyFields: any[] = form.value;
 
-            const userRoleData = new UserRoleModel(dirtyFields);
-
-            // try to authenticate the user
+            // modify the role
             this.userRoleDataService
-                .createRole(userRoleData)
+                .modifyRole(this.userRoleId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('Role created!');
+                    this.snackbarService.showSuccess('Role modified!');
 
                     // navigate to listing page
                     this.router.navigate(['/user-roles']);
