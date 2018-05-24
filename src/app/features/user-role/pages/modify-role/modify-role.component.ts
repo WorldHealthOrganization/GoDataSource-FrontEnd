@@ -62,7 +62,7 @@ export class ModifyRoleComponent implements OnInit {
 
     modifyRole(form: NgForm) {
         if (form.valid && form.dirty) {
-            const dirtyFields: any[] = form.value;
+            const dirtyFields: any = form.value;
 
             // modify the role
             this.userRoleDataService

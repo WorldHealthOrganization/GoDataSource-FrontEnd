@@ -39,6 +39,9 @@ export class RolesListComponent {
         this.loadRolesList();
     }
 
+    /**
+     * Re(load) the User Roles list
+     */
     loadRolesList() {
         // get the list of existing roles
         this.rolesListObs = this.userRoleDataService.getRolesList();

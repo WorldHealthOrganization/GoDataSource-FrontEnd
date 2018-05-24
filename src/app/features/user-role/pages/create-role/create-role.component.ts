@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -18,7 +18,7 @@ import 'rxjs/add/operator/map';
     templateUrl: './create-role.component.html',
     styleUrls: ['./create-role.component.less']
 })
-export class CreateRoleComponent implements OnInit {
+export class CreateRoleComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '..'),
@@ -33,9 +33,6 @@ export class CreateRoleComponent implements OnInit {
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService
     ) {
-    }
-
-    ngOnInit() {
         // get the list of permissions to populate the dropdown in UI
         this.availablePermissionsObs = this.userRoleDataService
             .getAvailablePermissions()
@@ -49,7 +46,7 @@ export class CreateRoleComponent implements OnInit {
 
     createNewRole(form: NgForm) {
         if (form.valid) {
-            const dirtyFields: any[] = form.value;
+            const dirtyFields: any = form.value;
 
             const userRoleData = new UserRoleModel(dirtyFields);
 
