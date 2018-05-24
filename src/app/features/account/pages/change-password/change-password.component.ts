@@ -49,7 +49,7 @@ export class ChangePasswordComponent {
 
                     this.snackbarService.showSuccess('Password changed!');
 
-                    // reload state
+                    // reload the page (to reset the form)
                     this.routerHelper.navigateForce(['/account/change-password']);
                 });
         }

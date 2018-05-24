@@ -11,7 +11,7 @@ export class RouterHelperService {
     }
 
     /**
-     * Navigate to a give URL. If the target URL is the current URL, it will force reloading the page
+     * Navigate to a given URL. If the target URL is the current URL, it will force reloading the page
      * @param {string[]} targetUrl
      * @returns {Promise<void>}
      */
