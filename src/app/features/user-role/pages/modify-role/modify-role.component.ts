@@ -12,6 +12,7 @@ import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-s
 
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-modify-role',
@@ -63,8 +64,10 @@ export class ModifyRoleComponent implements OnInit {
     }
 
     modifyRole(form: NgForm) {
-        if (form.valid && form.dirty) {
-            const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // modify the role
             this.userRoleDataService

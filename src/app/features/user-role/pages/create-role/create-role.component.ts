@@ -12,6 +12,7 @@ import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-s
 
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-role',
@@ -47,8 +48,10 @@ export class CreateRoleComponent {
     }
 
     createNewRole(form: NgForm) {
-        if (form.valid) {
-            const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // try to authenticate the user
             this.userRoleDataService

@@ -13,6 +13,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
+import * as _ from 'lodash';
+
 @Component({
     selector: 'app-modify-user',
     encapsulation: ViewEncapsulation.None,
@@ -71,8 +73,10 @@ export class ModifyUserComponent {
     }
 
     modifyUser(form: NgForm) {
-        if (form.valid && form.dirty) {
-            const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // modify the role
             this.userDataService

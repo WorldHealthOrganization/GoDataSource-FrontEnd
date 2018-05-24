@@ -10,8 +10,9 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-user',
@@ -49,8 +50,10 @@ export class CreateUserComponent {
     }
 
     createNewUser(form: NgForm) {
-        if (form.valid) {
-            const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // try to authenticate the user
             this.userDataService
