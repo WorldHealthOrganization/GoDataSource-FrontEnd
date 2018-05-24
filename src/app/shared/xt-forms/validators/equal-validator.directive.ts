@@ -28,11 +28,11 @@ export class EqualValidatorDirective implements Validator {
             return null;
         }
 
-        // get password control
-        const passwordControl = control.root.get(this.equalValidator);
+        // get the target control
+        const targetControl = control.root.get(this.equalValidator);
 
-        // check if the passwords match
-        if (passwordControl && control.value !== passwordControl.value) {
+        // check if the current value and target value match
+        if (targetControl && control.value !== targetControl.value) {
             return {
                 equalValidator: false
             };

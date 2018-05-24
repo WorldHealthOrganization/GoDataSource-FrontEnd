@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { PasswordChangeModel } from '../../models/password-change.model';
 
 
 @Injectable()
@@ -18,6 +19,10 @@ export class UserDataService {
         });
 
         return this.http.get(`users/${userId}?filter=${includes}`);
+    }
+
+    changePassword(data: PasswordChangeModel) {
+        return this.http.post('users/change-password', data);
     }
 }
 

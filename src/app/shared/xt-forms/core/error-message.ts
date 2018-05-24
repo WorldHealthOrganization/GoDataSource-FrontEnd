@@ -24,6 +24,8 @@ export class ErrorMessage {
                 return 'Terms and conditions must be accepted';
             case 'emailValidator':
                 return 'Invalid email address';
+            case 'passwordValidator':
+                return 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol';
             case 'extensionValidator':
                 return 'Please upload a valid file: ' + this.validator.extensionValidator;
             case 'uniqueEmail':

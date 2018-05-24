@@ -18,6 +18,12 @@ const routes: Routes = [
         path: '',
         component: AuthenticatedComponent,
         children: [
+            // Account Module routes
+            {
+                path: 'account',
+                loadChildren: './features/account/account.module#AccountModule',
+                canActivate: [AuthGuard]
+            },
             // User Module routes
             {
                 path: 'users',
