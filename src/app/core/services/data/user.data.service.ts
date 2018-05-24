@@ -52,10 +52,10 @@ export class UserDataService {
 
     /**
      * Create a new User
-     * @param {UserModel} user
+     * @param any user
      * @returns {Observable<UserModel[]>}
      */
-    createUser(user: UserModel): Observable<any> {
+    createUser(user): Observable<any> {
         return this.http.post('users', user);
     }
 

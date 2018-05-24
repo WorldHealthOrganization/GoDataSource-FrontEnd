@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -8,6 +7,7 @@ import { AuthModel } from '../../../../core/models/auth.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { RouterHelperService } from '../../../../core/services/helper/router-helper.service';
 
 @Component({
     selector: 'app-change-password',
@@ -25,7 +25,7 @@ export class ChangePasswordComponent {
     passwordConfirmModel: string;
 
     constructor(
-        private router: Router,
+        private routerHelper: RouterHelperService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService
     ) {
@@ -49,8 +49,8 @@ export class ChangePasswordComponent {
 
                     this.snackbarService.showSuccess('Password changed!');
 
-                    // successfully authenticated; redirect to dashboard landing page
-                    this.router.navigate(['']);
+                    // reload state
+                    this.routerHelper.navigateForce(['/account/change-password']);
                 });
         }
     }

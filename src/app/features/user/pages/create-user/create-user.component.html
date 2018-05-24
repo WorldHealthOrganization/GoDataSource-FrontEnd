@@ -33,11 +33,30 @@
 
             <app-form-select
                 name="roleId"
-                [(ngModel)]="newUser.role.id"
+                [(ngModel)]="newUser.roleId"
                 placeholder="Role"
                 required="true"
                 [options]="rolesListObs | async">
             </app-form-select>
+
+            <app-form-input
+                type="password"
+                name="password"
+                [(ngModel)]="newUser.password"
+                placeholder="New Password"
+                required="true"
+                app-passwordValidator
+                app-triggerValidationFor="passwordConfirm">
+            </app-form-input>
+
+            <app-form-input
+                type="password"
+                name="passwordConfirm"
+                [(ngModel)]="passwordConfirmModel"
+                placeholder="Confirm New Password"
+                required="true"
+                app-equalValidator="password">
+            </app-form-input>
 
             <button mat-raised-button color="primary">Save</button>
         </div>

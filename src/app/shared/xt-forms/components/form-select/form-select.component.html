@@ -3,7 +3,7 @@
 
     <mat-form-field>
         <mat-select [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder" [multiple]="multiple"
-                    (blur)="onBlur()">
+                    (blur)="onBlur()" [disabled]="disabled">
 
             <mat-option *ngFor="let option of options" [value]="option.value" [matTooltip]="option.tooltip">
                 {{option.label}}

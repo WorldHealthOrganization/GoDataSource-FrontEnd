@@ -11,6 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-select/select-option.model';
 
 import 'rxjs/add/operator/map';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
     selector: 'app-modify-role',
@@ -33,7 +34,8 @@ export class ModifyRoleComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService
     ) {
         this.route.params.subscribe((params) => {
             // get the ID of the Role being modified
@@ -62,7 +64,7 @@ export class ModifyRoleComponent implements OnInit {
 
     modifyRole(form: NgForm) {
         if (form.valid && form.dirty) {
-            const dirtyFields: any = form.value;
+            const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
             // modify the role
             this.userRoleDataService

@@ -11,6 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-select/select-option.model';
 
 import 'rxjs/add/operator/map';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
     selector: 'app-create-role',
@@ -31,7 +32,8 @@ export class CreateRoleComponent {
     constructor(
         private router: Router,
         private userRoleDataService: UserRoleDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService
     ) {
         // get the list of permissions to populate the dropdown in UI
         this.availablePermissionsObs = this.userRoleDataService
@@ -46,13 +48,11 @@ export class CreateRoleComponent {
 
     createNewRole(form: NgForm) {
         if (form.valid) {
-            const dirtyFields: any = form.value;
-
-            const userRoleData = new UserRoleModel(dirtyFields);
+            const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
             // try to authenticate the user
             this.userRoleDataService
-                .createRole(userRoleData)
+                .createRole(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 

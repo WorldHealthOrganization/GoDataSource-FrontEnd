@@ -17,6 +17,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
     styleUrls: ['./user-list.component.less']
 })
 export class UserListComponent {
+
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Users', '.', true)
     ];

@@ -9,6 +9,8 @@ import { LoggerService } from './helper/logger.service';
 import { AuthGuard } from './helper/auth-guard.service';
 import { SnackbarService } from './helper/snackbar.service';
 import { ObservableHelperService } from './helper/observable-helper.service';
+import { RouterHelperService } from './helper/router-helper.service';
+import { FormHelperService } from './helper/form-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -23,4 +25,6 @@ export const services: any[] = [
     AuthGuard,
     SnackbarService,
     ObservableHelperService,
+    RouterHelperService,
+    FormHelperService,
 ];

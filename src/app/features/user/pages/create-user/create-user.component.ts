@@ -10,6 +10,8 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { PasswordChangeModel } from '../../../../core/models/password-change.model';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
     selector: 'app-create-user',
@@ -25,13 +27,15 @@ export class CreateUserComponent {
     ];
 
     newUser: UserModel = new UserModel();
+    passwordConfirmModel: string;
     rolesListObs: Observable<SelectOptionModel[]>;
 
     constructor(
         private router: Router,
         private userDataService: UserDataService,
         private userRoleDataService: UserRoleDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService
     ) {
         // get the list of roles to populate the dropdown in UI
         this.rolesListObs = this.userRoleDataService
@@ -46,13 +50,11 @@ export class CreateUserComponent {
 
     createNewUser(form: NgForm) {
         if (form.valid) {
-            const dirtyFields: any = form.value;
-
-            const userData = new UserModel(dirtyFields);
+            const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
             // try to authenticate the user
             this.userDataService
-                .createUser(userData)
+                .createUser(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 

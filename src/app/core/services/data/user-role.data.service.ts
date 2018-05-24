@@ -41,7 +41,7 @@ export class UserRoleDataService {
      * @param {UserRoleModel} userRole
      * @returns {Observable<UserRoleModel[]>}
      */
-    createRole(userRole: UserRoleModel): Observable<any> {
+    createRole(userRole): Observable<any> {
         return this.http.post('roles', userRole);
     }
 

@@ -7,6 +7,8 @@ export class UserModel {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
+    roleId: string;
     role: UserRoleModel;
 
     constructor(data = null) {
@@ -14,6 +16,8 @@ export class UserModel {
         this.firstName = _.get(data, 'firstName');
         this.lastName = _.get(data, 'lastName');
         this.email = _.get(data, 'email');
+        this.password = _.get(data, 'password');
+        this.roleId = _.get(data, 'roleId');
         this.role = new UserRoleModel(_.get(data, 'role'));
     }
 
