@@ -35,7 +35,13 @@
                     </app-form-textarea>
                 </div>
                 <div fxLayout.xs="column">
-                    <mat-slide-toggle fxFlex="20%"
+                    <app-form-input fxFlex="20%"
+                                    name="country"
+                                    [(ngModel)]="newOutbreak.country"
+                                    placeholder="Location"
+                                    required="true">
+                    </app-form-input>
+                    <mat-slide-toggle fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                       name="active"
                                       [(ngModel)]="newOutbreak.active"
                                       [color]="blue"
@@ -43,6 +49,7 @@
                                       [disabled]="disabled">
                         Active?
                     </mat-slide-toggle>
+
                 </div>
                 <div fxLayout.xs="column">
                     <mat-form-field fxFlex="20%" class="date-picker">
@@ -72,23 +79,9 @@
                                     required="true">
                     </app-form-input>
                     <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                    name="country"
-                                    [(ngModel)]="newOutbreak.country"
-                                    placeholder="Location"
-                                    required="true">
-                    </app-form-input>
-                </div>
-                <div fxLayout.xs="column">
-                    <app-form-input fxFlex="20%"
                                     name="frequencyOfFollowUp"
                                     [(ngModel)]="newOutbreak.frequencyOfFollowUp"
                                     placeholder="Follow-up frecquency"
-                                    required="true">
-                    </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                    name="displayDateFormat"
-                                    [(ngModel)]="newOutbreak.displayDateFormat"
-                                    placeholder="Date format display"
                                     required="true">
                     </app-form-input>
                 </div>

@@ -34,7 +34,13 @@
                     </app-form-textarea>
                 </div>
                 <div fxLayout.xs="column">
-                    <mat-slide-toggle fxFlex="20%" fxFlex.sm="40%" fxFlex.md="30%"
+                    <app-form-input fxFlex="20%"
+                                    name="country"
+                                    [(ngModel)]="outbreak.country"
+                                    placeholder="Location"
+                                    required="true">
+                    </app-form-input>
+                    <mat-slide-toggle fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
                                       name="active"
                                       [(ngModel)]="outbreak.active"
                                       [color]="blue"
@@ -71,23 +77,9 @@
                                     required="true">
                     </app-form-input>
                     <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                    name="country"
-                                    [(ngModel)]="outbreak.country"
-                                    placeholder="Location"
-                                    required="true">
-                    </app-form-input>
-                </div>
-                <div fxLayout.xs="column">
-                    <app-form-input fxFlex="20%"
                                     name="frequencyOfFollowUp"
                                     [(ngModel)]="outbreak.frequencyOfFollowUp"
                                     placeholder="Follow-up frecquency"
-                                    required="true">
-                    </app-form-input>
-                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                    name="displayDateFormat"
-                                    [(ngModel)]="outbreak.displayDateFormat"
-                                    placeholder="Date format display"
                                     required="true">
                     </app-form-input>
                 </div>

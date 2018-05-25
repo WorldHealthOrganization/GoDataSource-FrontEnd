@@ -36,11 +36,11 @@ export class OutbreakModel {
         this.country = _.get(data, 'country');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
-        this.displayDateFormat = _.get(data, 'displayDateFormat');
         this.noDaysAmongContacts = _.get(data, 'noDaysAmongContacts');
         this.noDaysDaysInChains = _.get(data, 'noDaysDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
+        this.displayDateFormat = null;
         this.highExposureDuration = 0;
         this.caseClassification = {};
         this.caseInvestigationTemplate = {};
