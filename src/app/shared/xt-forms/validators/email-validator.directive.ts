@@ -15,7 +15,7 @@ import * as _ from 'lodash';
 })
 
 /**
- * Custom form validation for fields that should have the same value (e.g. password and confirm password)
+ * Check if a form field is a valid e-mail address
  */
 export class EmailValidatorDirective implements Validator {
     constructor() {

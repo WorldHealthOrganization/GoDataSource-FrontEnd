@@ -1,16 +1,81 @@
-<app-topnav>
+<app-topnav [addNewItemRoute]="'./create'">
     <ng-container dynamic-section>
-        #TODO Breadcrumbs Users
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
 
 <mat-card class="page-section">
-    <h1>Users List page</h1>
 
-    <ul>
-        <li><a [routerLink]="['/users']">Users list</a></li>
-        <li><a [routerLink]="['/users/create']">Create new user</a></li>
-        <li><a [routerLink]="['/users/5']">View User</a></li>
-        <li><a [routerLink]="['/users/8/modify']">Modify User</a></li>
-    </ul>
+    <mat-table #table [dataSource]="usersListObs | async" matSort>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                First Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                Last Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Email -->
+        <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef fxFlex="30">
+                Email
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="30">
+                {{ item.email }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Role -->
+        <ng-container matColumnDef="role">
+            <mat-header-cell *matHeaderCellDef fxFlex="30">
+                Role
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="30">
+                {{ item.role.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+
+                    <button mat-menu-item [disabled]="item.name === authUser.role.name" [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
+
+                    <span [matTooltip]="(item.id === authUser.id ? 'You cannot delete your own account' : '')">
+                        <button mat-menu-item [disabled]="item.id === authUser.id" (click)="deleteUser(item)">
+                            Delete
+                        </button>
+                    </span>
+
+                </mat-menu>
+
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
 </mat-card>

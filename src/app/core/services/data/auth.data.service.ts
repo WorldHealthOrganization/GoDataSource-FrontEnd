@@ -38,9 +38,9 @@ export class AuthDataService {
 
                 // get user info
                 return this.userDataService.getUser(auth.userId)
-                    .map((userData) => {
+                    .map((userInstance: UserModel) => {
                         // keep user info
-                        auth.user = new UserModel(userData);
+                        auth.user = userInstance;
 
                         // cache auth data with authenticated user information
                         this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));

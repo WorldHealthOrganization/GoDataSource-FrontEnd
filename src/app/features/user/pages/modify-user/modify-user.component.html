@@ -1,16 +1,65 @@
 <app-topnav>
     <ng-container dynamic-section>
-        #TODO Breadcrumbs Modify User
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
 
 <mat-card class="page-section">
-    <h1>Modify User page</h1>
+    <form #form="ngForm" (submit)="modifyUser(form)">
 
-    <ul>
-        <li><a [routerLink]="['/users']">Users list</a></li>
-        <li><a [routerLink]="['/users/create']">Create new user</a></li>
-        <li><a [routerLink]="['/users/5']">View User</a></li>
-        <li><a [routerLink]="['/users/8/modify']">Modify User</a></li>
-    </ul>
+        <div fxLayout="column">
+
+            <app-form-input
+                name="firstName"
+                [(ngModel)]="user.firstName"
+                placeholder="First Name"
+                required="true">
+            </app-form-input>
+
+            <app-form-input
+                name="lastName"
+                [(ngModel)]="user.lastName"
+                placeholder="Last Name"
+                required="true">
+            </app-form-input>
+
+            <app-form-input
+                name="email"
+                [(ngModel)]="user.email"
+                placeholder="Email"
+                required="true"
+                app-emailValidator>
+            </app-form-input>
+
+            <app-form-select
+                name="roleId"
+                [(ngModel)]="user.roleId"
+                placeholder="Role"
+                required="true"
+                [options]="rolesListObs | async"
+                [disabled]="authUser.id === user.id">
+            </app-form-select>
+
+            <app-form-input
+                type="password"
+                name="password"
+                [(ngModel)]="user.password"
+                placeholder="New Password"
+                app-passwordValidator
+                app-triggerValidationFor="passwordConfirm">
+            </app-form-input>
+
+            <app-form-input
+                type="password"
+                name="passwordConfirm"
+                [(ngModel)]="passwordConfirmModel"
+                placeholder="Confirm New Password"
+                [required]="!!user.password"
+                app-equalValidator="password">
+            </app-form-input>
+
+            <button mat-raised-button color="primary">Save</button>
+        </div>
+
+    </form>
 </mat-card>
