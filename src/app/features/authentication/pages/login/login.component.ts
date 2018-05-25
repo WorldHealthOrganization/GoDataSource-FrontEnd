@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
 
     login(form: NgForm) {
         if (form.valid) {
-            const dirtyFields: any[] = form.value;
+            const dirtyFields: any = form.value;
 
             // try to authenticate the user
             this.authDataService

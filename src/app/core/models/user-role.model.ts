@@ -60,7 +60,7 @@ export class UserRoleModel {
      * @param {string} permissions
      * @returns {boolean} Returns false if at least one permission is missing
      */
-    hasPermissions(...permissions: string[]) {
+    hasPermissions(...permissions: string[]): boolean {
         let i;
         for (i in permissions) {
             // check each permission

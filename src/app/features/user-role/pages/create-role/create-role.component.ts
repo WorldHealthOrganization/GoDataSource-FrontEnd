@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -11,6 +11,8 @@ import { Observable } from 'rxjs/Observable';
 import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-select/select-option.model';
 
 import 'rxjs/add/operator/map';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-role',
@@ -18,7 +20,7 @@ import 'rxjs/add/operator/map';
     templateUrl: './create-role.component.html',
     styleUrls: ['./create-role.component.less']
 })
-export class CreateRoleComponent implements OnInit {
+export class CreateRoleComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '..'),
@@ -31,11 +33,9 @@ export class CreateRoleComponent implements OnInit {
     constructor(
         private router: Router,
         private userRoleDataService: UserRoleDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService
     ) {
-    }
-
-    ngOnInit() {
         // get the list of permissions to populate the dropdown in UI
         this.availablePermissionsObs = this.userRoleDataService
             .getAvailablePermissions()
@@ -48,14 +48,14 @@ export class CreateRoleComponent implements OnInit {
     }
 
     createNewRole(form: NgForm) {
-        if (form.valid) {
-            const dirtyFields: any[] = form.value;
 
-            const userRoleData = new UserRoleModel(dirtyFields);
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // try to authenticate the user
             this.userRoleDataService
-                .createRole(userRoleData)
+                .createRole(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 

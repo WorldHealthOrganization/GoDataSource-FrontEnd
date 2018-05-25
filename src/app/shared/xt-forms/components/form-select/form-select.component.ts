@@ -21,6 +21,7 @@ export class FormSelectComponent extends ElementBase<string> {
 
     @Input() placeholder: string;
     @Input() required: boolean = false;
+    @Input() disabled: boolean = false;
     @Input() name: string;
     @Input() multiple: boolean = false;
     @Input() options: Observable<SelectOptionModel>;
