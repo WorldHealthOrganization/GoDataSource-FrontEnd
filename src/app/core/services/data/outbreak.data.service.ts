@@ -43,15 +43,6 @@ export class OutbreakDataService {
      * @returns {Observable<UserRoleModel[]>}
      */
     createOutbreak(outbreak: OutbreakModel): Observable<any> {
-        outbreak.caseClassification = {};
-        outbreak.caseInvestigationTemplate = {};
-        outbreak.contactFollowUpTemplate = {};
-        outbreak.labResultsTemplate = {};
-        outbreak.nutritionalStatus = {};
-        outbreak.pregnancyInformation = {};
-        outbreak.vaccinationStatus = {};
-        // outbreak.highExposureDuration = null;
-
         return this.http.post('outbreaks', outbreak);
     }
 

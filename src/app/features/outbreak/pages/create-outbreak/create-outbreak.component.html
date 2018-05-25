@@ -5,10 +5,10 @@
 </app-topnav>
 
 <mat-card class="page-section">
-    <h1>Create Outbreak</h1>
+
     <form #form="ngForm" (submit)="createOutbreak(form)">
 
-        <mat-tab-group class="outbreakTabs">
+        <mat-tab-group class="outbreak-tabs">
             <mat-tab label="Details">
 
                 <div fxLayout.xs="column">
@@ -45,7 +45,7 @@
                     </mat-slide-toggle>
                 </div>
                 <div fxLayout.xs="column">
-                    <mat-form-field fxFlex="20%" class="datePicker">
+                    <mat-form-field fxFlex="20%" class="date-picker">
                         <input matInput [matDatepicker]="pickerStartDate"
                                name="startDate"
                                [(ngModel)]="newOutbreak.startDate"
@@ -54,7 +54,7 @@
                         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
                         <mat-datepicker #pickerStartDate></mat-datepicker>
                     </mat-form-field>
-                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px" class="datePicker">
+                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px" class="date-picker">
                         <input matInput [matDatepicker]="pickerEndDate"
                                name="endDate"
                                [(ngModel)]="newOutbreak.endDate"
@@ -128,8 +128,8 @@
         </mat-tab-group>
 
 
-        <button mat-raised-button class="saveButton">Save</button>
-        <button mat-raised-button (click)="cancel($event)">Cancel</button>
+        <button mat-raised-button class="save-button">Save</button>
+        <button mat-raised-button type="button" (click)="cancel()">Cancel</button>
 
     </form>
 

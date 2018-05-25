@@ -42,6 +42,13 @@ export class OutbreakModel {
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.highExposureDuration = 0;
+        this.caseClassification = {};
+        this.caseInvestigationTemplate = {};
+        this.contactFollowUpTemplate = {};
+        this.labResultsTemplate = {};
+        this.nutritionalStatus = {};
+        this.pregnancyInformation = {};
+        this.vaccinationStatus = {};
     }
 
 }

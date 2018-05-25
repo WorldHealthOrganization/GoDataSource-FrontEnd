@@ -30,7 +30,7 @@ export class CreateOutbreakComponent {
 
     createOutbreak(form) {
         if (form.valid) {
-            const dirtyFields: any[] = form.value;
+            const dirtyFields: any = form.value;
             const outbreakData = new OutbreakModel(dirtyFields);
 
             this.outbreakDataService
@@ -46,8 +46,7 @@ export class CreateOutbreakComponent {
         }
     }
 
-    cancel(event) {
-        event.preventDefault();
+    cancel() {
         if (confirm("Are you sure you want to cancel ? The data will be lost.")) {
             this.router.navigate(['/outbreaks']);
         }

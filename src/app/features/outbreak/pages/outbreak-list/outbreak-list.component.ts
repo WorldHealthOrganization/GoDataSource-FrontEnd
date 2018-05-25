@@ -21,21 +21,14 @@ export class OutbreakListComponent {
         new BreadcrumbItemModel('Outbreaks', '.', true)
     ];
 
-    // authenticated user
-    authUser: UserModel;
     // list of existing outbreaks
     outbreaksListObs: Observable<OutbreakModel[]>;
-
-    displayedColumns = ['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ];
 
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private snackbarService:SnackbarService,
-        private authDataService: AuthDataService,
+        private snackbarService:SnackbarService
     ) {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
         this.loadOutbreaksList();
     }
 

@@ -20,7 +20,7 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_USER_ACCOUNT]
         }
     },
- //    Edit Outbreak
+    // Edit Outbreak
     {
         path: ':outbreakId/modify',
         component: fromPages.ModifyOutbreakComponent,

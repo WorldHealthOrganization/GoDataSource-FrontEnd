@@ -43,7 +43,7 @@ export class ModifyOutbreakComponent {
 
     modifyOutbreak(form) {
         if (form.valid) {
-            const dirtyFields: any[] = form.value;
+            const dirtyFields: any = form.value;
 
             // modify the role
             this.outbreakDataService
@@ -62,8 +62,7 @@ export class ModifyOutbreakComponent {
         }
     }
 
-    cancel(event) {
-        event.preventDefault();
+    cancel() {
         if (confirm("Are you sure you want to cancel ? The data updates will be lost.")) {
             this.router.navigate(['/outbreaks']);
         }
