@@ -48,9 +48,9 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_OUTBREAK],
             [
                 new ChildNavItem(
-                    'Outbreak List',
-                    [],
-                    '/users'
+                    'Outbreaks',
+                    [PERMISSION.READ_OUTBREAK],
+                    '/outbreaks'
                 ),
                 new ChildNavItem(
                     'Templates',

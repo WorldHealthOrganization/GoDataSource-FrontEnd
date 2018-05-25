@@ -42,6 +42,15 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_ROLE]
                 }
             },
+            // Outbreaks Module routes
+            {
+                path: 'outbreaks',
+                loadChildren: './features/outbreak/outbreak.module#OutbreakModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_OUTBREAK]
+                }
+            }
         ]
     },
 ];

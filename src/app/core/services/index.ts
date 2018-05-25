@@ -1,6 +1,8 @@
 // import data services
 import { AuthDataService } from './data/auth.data.service';
 import { UserDataService } from './data/user.data.service';
+import { OutbreakDataService } from './data/outbreak.data.service';
+
 import { UserRoleDataService } from './data/user-role.data.service';
 
 // import helper services
@@ -16,6 +18,7 @@ export const services: any[] = [
     AuthDataService,
     UserDataService,
     UserRoleDataService,
+    OutbreakDataService,
 
     // helper services
     StorageService,
