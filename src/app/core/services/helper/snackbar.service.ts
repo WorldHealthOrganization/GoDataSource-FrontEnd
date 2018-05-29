@@ -7,7 +7,7 @@ import { SnackbarComponent } from '../../../shared/components/snackbar/snackbar.
 export class SnackbarService {
 
     // amount of time (in ms) to wait before automatically closing the snackbar
-    private duration = 3000;
+    private duration = 4500;
 
     constructor(
         private snackbar: MatSnackBar
@@ -16,32 +16,32 @@ export class SnackbarService {
     /**
      * Show a Success Snackbar
      * @param message
+     * @param duration
      * @returns {MatSnackBarRef<SnackbarComponent>}
      */
-    showSuccess(message) {
+    showSuccess(message, duration = this.duration) {
         return this.snackbar.openFromComponent(SnackbarComponent, {
             panelClass: 'success',
             data: {
                 message: message
             },
-            announcementMessage: 'TODO Test MI',
-            duration: this.duration
+            duration: duration
         });
     }
 
     /**
      * Show an Error Snackbar
      * @param message
+     * @param duration
      * @returns {MatSnackBarRef<SnackbarComponent>}
      */
-    showError(message) {
+    showError(message, duration = this.duration) {
         return this.snackbar.openFromComponent(SnackbarComponent, {
             panelClass: 'error',
             data: {
                 message: message
             },
-            announcementMessage: 'TODO Test MI',
-            duration: this.duration
+            duration: duration
         });
     }
 }

@@ -86,5 +86,24 @@ export class UserDataService {
         return this.http.post('users/change-password', data);
     }
 
+    /**
+     * Send an e-mail with password reset instructions to user when he forgot his account password
+     * @param data
+     * @returns {Observable<Object>}
+     */
+    forgotPassword(data: any) {
+        return this.http.post('users/reset', data);
+    }
+
+    /**
+     * Reset user's password
+     * @param data
+     * @param token
+     * @returns {Observable<Object>}
+     */
+    resetPassword(data: any, token: string) {
+        return this.http.post(`users/reset-password?access_token=${token}`, data);
+    }
+
 }
 

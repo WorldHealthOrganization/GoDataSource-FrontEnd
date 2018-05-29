@@ -15,7 +15,7 @@
             <app-form-input
                 name="email"
                 [(ngModel)]="user.email"
-                placeholder="E-mail"
+                placeholder="Email"
                 required="true"
                 app-emailValidator>
             </app-form-input>
@@ -29,6 +29,8 @@
             </app-form-input>
 
             <button mat-raised-button color="primary">Login</button>
+
+            <button type="button" mat-raised-button [routerLink]="'/auth/forgot-password'">Forgot Password?</button>
         </div>
     </div>
 
