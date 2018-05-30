@@ -36,7 +36,10 @@
                 [(ngModel)]="user.roleId"
                 placeholder="Role"
                 required="true"
-                [options]="rolesListObs | async"
+                [options]="rolesList$ | async"
+                optionLabelKey="name"
+                optionValueKey="id"
+                optionTooltipKey="description"
                 [disabled]="authUser.id === user.id">
             </app-form-select>
 

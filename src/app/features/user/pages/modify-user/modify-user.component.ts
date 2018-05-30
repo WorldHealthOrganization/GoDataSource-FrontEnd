@@ -5,7 +5,6 @@ import { NgForm } from '@angular/forms';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-select/select-option.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -34,7 +33,7 @@ export class ModifyUserComponent {
     userId: string;
     user: UserModel = new UserModel();
     passwordConfirmModel: string;
-    rolesListObs: Observable<SelectOptionModel[]>;
+    rolesList$: Observable<UserRoleModel[]>;
 
     constructor(
         private router: Router,
@@ -62,14 +61,7 @@ export class ModifyUserComponent {
         });
 
         // get the list of roles to populate the dropdown in UI
-        this.rolesListObs = this.userRoleDataService
-            .getRolesList()
-            .map((roles: UserRoleModel[]) => {
-                // convert permissions to Select Options
-                return roles.map((role: UserRoleModel) => {
-                    return new SelectOptionModel(role.id, role.name, role.description);
-                });
-            });
+        this.rolesList$ = this.userRoleDataService.getRolesList();
     }
 
     modifyUser(form: NgForm) {

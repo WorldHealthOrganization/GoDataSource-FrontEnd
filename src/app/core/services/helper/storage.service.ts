@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 export enum StorageKey {
     AUTH_DATA = 'AUTH_DATA',
-    ACTIVE_OUTBREAK = 'ACTIVE_OUTBREAK'
+    SELECTED_OUTBREAK = 'SELECTED_OUTBREAK'
 }
 
 @Injectable()
