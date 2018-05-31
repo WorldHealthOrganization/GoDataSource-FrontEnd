@@ -115,7 +115,11 @@
                 </div>
 
             </mat-tab>
-            <mat-tab label="Case Investigation"></mat-tab>
+            <mat-tab label="Case Investigation">
+
+             <question *ngFor="let question of questions" [question]="question"></question>
+
+            </mat-tab>
             <mat-tab label="Contact Follow-up"></mat-tab>
             <mat-tab label="Lab Results"></mat-tab>
         </mat-tab-group>
