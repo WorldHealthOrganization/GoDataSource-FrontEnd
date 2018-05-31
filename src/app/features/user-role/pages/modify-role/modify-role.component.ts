@@ -8,7 +8,6 @@ import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Observable } from 'rxjs/Observable';
-import { SelectOptionModel } from '../../../../shared/xt-forms/components/form-select/select-option.model';
 
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -20,7 +19,7 @@ import * as _ from 'lodash';
     templateUrl: './modify-role.component.html',
     styleUrls: ['./modify-role.component.less']
 })
-export class ModifyRoleComponent implements OnInit {
+export class ModifyRoleComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '/user-roles'),
@@ -29,7 +28,7 @@ export class ModifyRoleComponent implements OnInit {
 
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();
-    availablePermissionsObs: Observable<SelectOptionModel[]>;
+    availablePermissions$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -49,16 +48,14 @@ export class ModifyRoleComponent implements OnInit {
                     this.userRole = new UserRoleModel(roleData);
                 });
         });
-    }
 
-    ngOnInit() {
         // get the list of permissions to populate the dropdown in UI
-        this.availablePermissionsObs = this.userRoleDataService
+        this.availablePermissions$ = this.userRoleDataService
             .getAvailablePermissions()
             .map((permissions) => {
-                // convert permissions to Select Options
+                // #TODO temporarily convert permissions to objects (to be updated when API is fixed)
                 return permissions.map((permission: string) => {
-                    return new SelectOptionModel(permission, permission, permission);
+                    return {key: permission};
                 });
             });
     }

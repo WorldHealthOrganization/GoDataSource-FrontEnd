@@ -34,7 +34,7 @@ export class AuthDataService {
                 const auth = new AuthModel(authRes);
 
                 // cache auth data so the Auth Token will be added on the next request
-                this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
+                this.storageService.set(StorageKey.AUTH_DATA, auth);
 
                 // get user info
                 return this.userDataService.getUser(auth.userId)
@@ -43,7 +43,7 @@ export class AuthDataService {
                         auth.user = userInstance;
 
                         // cache auth data with authenticated user information
-                        this.storageService.set(StorageKey.AUTH_DATA, JSON.stringify(auth));
+                        this.storageService.set(StorageKey.AUTH_DATA, auth);
 
                         return auth;
                     });
@@ -69,7 +69,7 @@ export class AuthDataService {
     getAuthData(): AuthModel|null {
         try {
             // get auth data from cache
-            return <AuthModel>JSON.parse(this.storageService.get(StorageKey.AUTH_DATA));
+            return <AuthModel>this.storageService.get(StorageKey.AUTH_DATA);
         } catch (e) {
             return null;
         }

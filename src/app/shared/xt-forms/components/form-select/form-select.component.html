@@ -2,11 +2,12 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field>
-        <mat-select [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder" [multiple]="multiple"
-                    (blur)="onBlur()" [disabled]="disabled">
+        <mat-select #selectElement
+                    [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder"
+                    [multiple]="multiple" (blur)="onBlur()" [disabled]="disabled" (selectionChange)="onChange(selectElement.value)">
 
-            <mat-option *ngFor="let option of options" [value]="option.value" [matTooltip]="option.tooltip">
-                {{option.label}}
+            <mat-option *ngFor="let option of options" [value]="option[optionValueKey]" [matTooltip]="option[optionTooltipKey]">
+                {{option[optionLabelKey]}}
             </mat-option>
 
         </mat-select>

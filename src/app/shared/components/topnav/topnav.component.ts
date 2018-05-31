@@ -1,4 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../core/models/outbreak.model';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-topnav',
@@ -10,5 +13,38 @@ export class TopnavComponent {
 
     // by default, do nothing (stay on the current page)
     @Input() addNewItemRoute = '.';
+
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
+    // list of outbreaks for Selected Outbreak dropdown
+    outbreaksList$: Observable<OutbreakModel[]>;
+
+    constructor(
+        private outbreakDataService: OutbreakDataService
+    ) {
+        // get the outbreaks list
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+
+        // get the selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((outbreak: OutbreakModel|null) => {
+                if (outbreak) {
+                    // there is a selected outbreak
+                    this.selectedOutbreak = outbreak;
+                }
+            });
+    }
+
+    /**
+     * Change the selected Outbreak across the application
+     * @param {OutbreakModel} outbreak
+     */
+    selectOutbreak(outbreak: OutbreakModel) {
+        this.selectedOutbreak = outbreak;
+
+        // cache the selected Outbreak
+        this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+    }
 
 }
