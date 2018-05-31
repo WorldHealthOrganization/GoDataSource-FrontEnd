@@ -85,4 +85,9 @@ export class CreateOutbreakComponent {
         }
     }
 
+    onQuestionChange(questionChanged){
+        console.log("question changed");
+        console.log(questionChanged);
+    }
+
 }

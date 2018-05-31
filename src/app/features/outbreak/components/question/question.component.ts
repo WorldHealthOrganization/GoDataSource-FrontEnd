@@ -1,6 +1,7 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+
 
 
 @Component({
@@ -11,14 +12,17 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 })
 export class QuestionComponent {
     @Input() question: any;
+    @Output() change = new EventEmitter();
 
     constructor(
         private snackbarService: SnackbarService
     ) {
+        console.log('TODO Question changed');
     }
 
 
     duplicate(questionSelected) {
+        this.change.emit(this.question);
         console.log('TODO Duplicate')
     }
 

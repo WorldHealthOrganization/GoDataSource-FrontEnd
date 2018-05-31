@@ -117,7 +117,7 @@
             </mat-tab>
             <mat-tab label="Case Investigation">
 
-             <question *ngFor="let question of questions" [question]="question"></question>
+             <question *ngFor="let question of questions" [question]="question" (change)="onQuestionChange($event)"></question>
 
             </mat-tab>
             <mat-tab label="Contact Follow-up"></mat-tab>
