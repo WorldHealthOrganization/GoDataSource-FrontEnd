@@ -7,6 +7,7 @@ import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/b
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
 
 import { QuestionComponent } from "../../components/question/question.component";
+import { MatTabChangeEvent } from "@angular/material";
 
 @Component({
     selector: 'app-create-outbreak',
@@ -21,9 +22,15 @@ export class CreateOutbreakComponent {
         new BreadcrumbItemModel('Create New Outbreak', '.', true)
     ];
 
-    viewOnlyCaseInvestigation = false;
-    viewOnlyContactFollowup = false;
-    viewOnlyLabResults = false;
+    viewOnlyCaseInvestigation = true;
+    viewOnlyContactFollowup = true;
+    viewOnlyLabResults = true;
+    currentTabIndex = 0;
+
+    caseInvestigationTemplateQuestions: any;
+    contactFollowupTemplateQuestions: any;
+    labResultsTemplateQuestions: any;
+
 
     questions = [
         {
@@ -63,6 +70,9 @@ export class CreateOutbreakComponent {
     constructor(private outbreakDataService:OutbreakDataService,
                 private router:Router,
                 private snackbarService:SnackbarService) {
+        this.caseInvestigationTemplateQuestions = this.questions;
+        this.contactFollowupTemplateQuestions = this.questions;
+        this.labResultsTemplateQuestions = this.questions;
     }
 
     createOutbreak(form) {
@@ -83,21 +93,48 @@ export class CreateOutbreakComponent {
         }
     }
 
-    cancel() {
-        if (confirm("Are you sure you want to cancel ? The data will be lost.")) {
-            this.router.navigate(['/outbreaks']);
-        }
-    }
-
     onQuestionChange(questionChanged){
         console.log("question changed");
         console.log(questionChanged);
     }
 
-    switchView(view){
-        if(view == 'case-investigation')
-            this.viewOnlyCaseInvestigation = true;
-
+    enableEdit(view){
+        switch (view){
+            case 'case-investigation' : {
+                this.viewOnlyCaseInvestigation = false;
+                break;
+            }
+            case 'contact-followup' : {
+                this.viewOnlyContactFollowup = false;
+                break;
+            }
+            case 'lab-results' : {
+                this.viewOnlyLabResults = false;
+                break;
+            }
+        }
     }
+
+    disableEdit(view){
+        switch (view){
+            case 'case-investigation' : {
+                this.viewOnlyCaseInvestigation = true;
+                break;
+            }
+            case 'contact-followup' : {
+                this.viewOnlyContactFollowup = true;
+                break;
+            }
+            case 'lab-results' : {
+                this.viewOnlyLabResults = true;
+                break;
+            }
+        }
+    }
+
+    selectTab(tabChangeEvent: MatTabChangeEvent): void {
+        this.currentTabIndex = tabChangeEvent.index;
+    }
+
 
 }

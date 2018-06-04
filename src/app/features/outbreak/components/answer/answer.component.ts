@@ -12,6 +12,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 export class AnswerComponent {
     @Input() answer: any;
     @Input() index: number;
+    @Input() viewOnly: string;
 
     constructor(
         private snackbarService:SnackbarService

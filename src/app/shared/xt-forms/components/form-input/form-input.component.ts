@@ -22,6 +22,8 @@ export class FormInputComponent extends ElementBase<string> {
     @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
+    @Input() readOnly: boolean = false;
+
 
     public identifier = `form-input-${identifier++}`;
 
@@ -31,6 +33,7 @@ export class FormInputComponent extends ElementBase<string> {
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
+
     }
 
     /**

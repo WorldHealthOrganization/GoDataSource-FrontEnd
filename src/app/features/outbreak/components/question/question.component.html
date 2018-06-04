@@ -1,14 +1,16 @@
-    <div fxLayout.xs="column">
-        <div class="question-box align-center" fxFlex="5%">
-           Q{{question.order}}
+<mat-card class="page-section">
+    <div fxLayout.xs="column" class="question-wrapper">
+        <div class="question-badge align-center" fxFlex="40px">
+            Q{{question.order}}
         </div>
         <div class="question-box" fxFlex="55%">
-        aaaaaaaaaa    {{viewOnly}}
             <app-form-input
-                            name="question.value"
-                            [(ngModel)]="question.value"
-                            placeholder="Question value"
-                            required="true">
+                name="question.value"
+                [(ngModel)]="question.value"
+                placeholder="Question value"
+                required="true"
+                readOnly="{{viewOnly}}"
+            >
             </app-form-input>
         </div>
         <div class="question-box" fxFlex="20%">
@@ -17,22 +19,27 @@
                 [(ngModel)]="question.category"
                 placeholder="Category"
                 required="true"
-                [options]= "[{'value':'Physical Examination','label':'Physical Examination'},{'value':'Clinical','label':'Clinical'}]"
-                multiple="false">
+                [options]="[{'value':'Physical Examination','label':'Physical Examination'},{'value':'Clinical','label':'Clinical'}]"
+                multiple="false"
+                disabled="{{viewOnly}}">
             </app-form-select>
         </div>
-        <div class="question-box align-center" fxFlex="20%">
+        <div class="question-box align-center" fxFlex="20%" fxHide="{{viewOnly}}">
             <mat-slide-toggle
-                              name="question.required"
-                              [(ngModel)]="question.required"
-                              [checked]="checked"
-                              [labelPosition]="before"   >
+                name="question.required"
+                [(ngModel)]="question.required"
+                [checked]="checked"
+                [labelPosition]="before">
                 Required?
             </mat-slide-toggle>
             <br>
             <button mat-button type="button" color="primary" (click)="duplicate(question)">Duplicate</button>
             <button mat-button type="button" color="warn" (click)="delete(question)">Delete</button>
         </div>
+        <div class="question-box align-center" fxFlex="20%" fxHide="{{!viewOnly}}">
+            <div class="alert-label">{{ question.required ? "REQUIRED" : ""}}</div>
+        </div>
     </div>
-    <answer *ngFor="let answer of question.answers; let i=index" [answer]="answer" [index]="i" fxLayout="column"></answer>
-
+    <answer *ngFor="let answer of question.answers; let i=index" [answer]="answer" [index]="i" [viewOnly]="viewOnly"
+            fxLayout="column"></answer>
+</mat-card>

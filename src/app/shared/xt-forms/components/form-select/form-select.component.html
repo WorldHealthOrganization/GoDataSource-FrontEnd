@@ -4,7 +4,7 @@
     <mat-form-field>
         <mat-select #selectElement
                     [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder"
-                    [multiple]="multiple" (blur)="onBlur()" [disabled]="disabled" (selectionChange)="onChange(selectElement.value)">
+                    [multiple]="multiple" (blur)="onBlur()" [disabled]="disabled" (selectionChange)="onChange(selectElement.value)" >
 
             <mat-option *ngFor="let option of options" [value]="option[optionValueKey]" [matTooltip]="option[optionTooltipKey]">
                 {{option[optionLabelKey]}}
