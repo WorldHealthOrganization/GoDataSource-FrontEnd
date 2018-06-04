@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -16,6 +16,8 @@ import * as _ from 'lodash';
     }]
 })
 export class FormSelectComponent extends ElementBase<string> {
+
+    @HostBinding('class.form-element-host') isFormElement = true;
 
     @Input() placeholder: string;
     @Input() required: boolean = false;

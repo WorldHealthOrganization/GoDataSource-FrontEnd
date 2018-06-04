@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -15,6 +15,8 @@ import { ElementBase } from '../../core/index';
     }]
 })
 export class FormInputComponent extends ElementBase<string> {
+
+    @HostBinding('class.form-element-host') isFormElement = true;
 
     @Input() placeholder: string;
     @Input() type: string = 'text';

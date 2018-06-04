@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
+import { MatSidenav } from '@angular/material';
 
 @Component({
     selector: 'app-authenticated',
@@ -12,6 +13,8 @@ import { UserModel } from '../../models/user.model';
 })
 export class AuthenticatedComponent implements OnInit {
 
+    @ViewChild('snav') sideNav: MatSidenav;
+
     // authenticated user
     authUser: UserModel;
 
@@ -19,6 +22,14 @@ export class AuthenticatedComponent implements OnInit {
         private router: Router,
         private authDataService: AuthDataService
     ) {
+        // detect when the route is changed
+        this.router.events.subscribe(() => {
+            // close the SideNav whenever the route is changed
+            if (this.sideNav) {
+                this.sideNav.close();
+            }
+        });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
     }

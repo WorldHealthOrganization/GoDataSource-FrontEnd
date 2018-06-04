@@ -1,0 +1,16 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Constants } from '../../models/constants';
+
+@Injectable()
+export class GenericDataService {
+
+    /**
+     * Retrieve the list of Genders
+     * @returns {Observable<any[]>}
+     */
+    getGendersList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.GENDER));
+    }
+}
+
