@@ -15,10 +15,15 @@ export class LoggerService {
         messages = messages.map((message) => {
             if (!_.isString(message)) {
                 // JSON-encode all messages that are NOT strings
-                const encodedMessage = JSON.stringify(message);
+                let encodedMessage = JSON.stringify(message);
 
                 // obfuscate passwords
-                return encodedMessage.replace(/"password":"(.*?)"/, '"password":"***"');
+                encodedMessage = encodedMessage.replace(/"password":"(.*?)"/, '"password":"***"');
+                encodedMessage = encodedMessage.replace(/"passwordConfirm":"(.*?)"/, '"passwordConfirm":"***"');
+                encodedMessage = encodedMessage.replace(/"newPassword":"(.*?)"/, '"newPassword":"***"');
+                encodedMessage = encodedMessage.replace(/"newPasswordConfirm":"(.*?)"/, '"newPasswordConfirm":"***"');
+
+                return encodedMessage;
             }
 
             return message;
