@@ -61,7 +61,8 @@
                         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
                         <mat-datepicker #pickerStartDate></mat-datepicker>
                     </mat-form-field>
-                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px" class="date-picker">
+                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                    class="date-picker">
                         <input matInput [matDatepicker]="pickerEndDate"
                                name="endDate"
                                [(ngModel)]="newOutbreak.endDate"
@@ -85,7 +86,7 @@
                                     required="true">
                     </app-form-input>
                 </div>
-                <div fxLayout.xs="column" >
+                <div fxLayout.xs="column">
                     <app-form-input fxFlex="20%"
                                     name="noDaysAmongContacts"
                                     [(ngModel)]="newOutbreak.noDaysAmongContacts"
@@ -117,7 +118,12 @@
             </mat-tab>
             <mat-tab label="Case Investigation">
 
-             <question *ngFor="let question of questions" [question]="question" (change)="onQuestionChange($event)"></question>
+
+                    <question *ngFor="let question of questions" [question]="question" [viewOnly]="viewOnlyCaseInvestigation"
+                              (change)="onQuestionChange($event)"></question>
+
+                        <button mat-raised-button type="button" class="save-button" (click)="switchView('case-investigation')">Edit</button>
+                        <button mat-raised-button type="button" type="button" (click)="switchView('case-investigation')">Cancel</button>
 
             </mat-tab>
             <mat-tab label="Contact Follow-up"></mat-tab>

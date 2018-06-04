@@ -21,6 +21,10 @@ export class CreateOutbreakComponent {
         new BreadcrumbItemModel('Create New Outbreak', '.', true)
     ];
 
+    viewOnlyCaseInvestigation = false;
+    viewOnlyContactFollowup = false;
+    viewOnlyLabResults = false;
+
     questions = [
         {
             "value":"Describe the symptoms you have",
@@ -88,6 +92,12 @@ export class CreateOutbreakComponent {
     onQuestionChange(questionChanged){
         console.log("question changed");
         console.log(questionChanged);
+    }
+
+    switchView(view){
+        if(view == 'case-investigation')
+            this.viewOnlyCaseInvestigation = true;
+
     }
 
 }

@@ -3,6 +3,7 @@
            Q{{question.order}}
         </div>
         <div class="question-box" fxFlex="55%">
+        aaaaaaaaaa    {{viewOnly}}
             <app-form-input
                             name="question.value"
                             [(ngModel)]="question.value"
@@ -25,7 +26,7 @@
                               name="question.required"
                               [(ngModel)]="question.required"
                               [checked]="checked"
-                              [labelPosition]="before" >
+                              [labelPosition]="before"   >
                 Required?
             </mat-slide-toggle>
             <br>

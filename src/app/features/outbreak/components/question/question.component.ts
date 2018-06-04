@@ -12,6 +12,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 })
 export class QuestionComponent {
     @Input() question: any;
+    @Input() viewOnly: string;
     @Output() change = new EventEmitter();
 
     constructor(
