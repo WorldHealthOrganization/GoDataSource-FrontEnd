@@ -18,7 +18,7 @@ html, body, ul, li, div, span {
 
 /* Commonly used styles */
 .page-section {
-    margin: 15px 20px 15px 47px;
+    margin: 15px;
     box-shadow: -2px 2px 8px 1px rgba(0,0,0,.3) !important;
 
     /* Mat Table overrides */
@@ -57,8 +57,45 @@ html, body, ul, li, div, span {
 
     }
 
-    .save-button{
-        background-color: #009688;
+    .save-button {
+        background-color: @color-accent-main;
         color: #ffffff;
+    }
+
+    // form elements having dynamic width
+    .form-element-host {
+        flex: 1;
+    }
+}
+
+.page-content {
+    margin-left: @page-left-margin;
+}
+
+.page-tabs-navbar {
+    flex: 1;
+}
+
+.page-tabs-navbar-placeholder {
+    height: 49px;
+}
+
+.form-section {
+    display: flex;
+
+    .form-content {
+        flex: 1;
+    }
+
+    .form-actions {
+        width: 377px;
+        display: flex;
+        flex-direction: column;
+        padding: 15px 0;
+
+        button {
+            width: @page-right-margin;
+            margin: 0 0 7px 0;
+        }
     }
 }

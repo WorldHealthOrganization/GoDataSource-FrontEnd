@@ -4,7 +4,7 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section">
+<mat-card class="page-section page-content">
     <form #form="ngForm" (submit)="modifyRole(form)">
 
         <div fxLayout="column">
@@ -27,7 +27,10 @@
                 [(ngModel)]="userRole.permissions"
                 placeholder="Options"
                 required="true"
-                [options]="availablePermissionsObs | async"
+                [options]="availablePermissions$ | async"
+                optionLabelKey="key"
+                optionValueKey="key"
+                optionTooltipKey="key"
                 multiple="true">
             </app-form-select>
 

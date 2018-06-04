@@ -42,13 +42,22 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_ROLE]
                 }
             },
-            // Outbreaks Module routes
+            // Outbreak Module routes
             {
                 path: 'outbreaks',
                 loadChildren: './features/outbreak/outbreak.module#OutbreakModule',
                 canActivate: [AuthGuard],
                 data: {
                     permissions: [PERMISSION.READ_OUTBREAK]
+                }
+            },
+            // Case Module routes
+            {
+                path: 'cases',
+                loadChildren: './features/case/case.module#CaseModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_CASE]
                 }
             }
         ]

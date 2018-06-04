@@ -81,7 +81,7 @@ export class SidenavComponent implements OnInit {
             'cases',
             [],
             [],
-            '/users'
+            '/cases'
         ),
         new NavItem(
             'Events',

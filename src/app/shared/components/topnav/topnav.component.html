@@ -15,7 +15,18 @@
 
         <mat-divider [vertical]="true"></mat-divider>
 
-        <mat-list-item>Selected outbreak</mat-list-item>
+        <mat-list-item>
+            <app-form-select
+                name="activeOutbreak"
+                [(ngModel)]="selectedOutbreak.id"
+                placeholder="Selected outbreak"
+                [options]="outbreaksList$ | async"
+                optionLabelKey="name"
+                optionValueKey="id"
+                optionTooltipKey="description"
+                (optionChanged)="selectOutbreak($event)">
+            </app-form-select>
+        </mat-list-item>
 
         <mat-divider [vertical]="true"></mat-divider>
 
