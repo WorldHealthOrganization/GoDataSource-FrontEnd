@@ -12,5 +12,13 @@ export class GenericDataService {
     getGendersList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.GENDER));
     }
+
+    /**
+     * Retrieve the list of Case Classifications
+     * @returns {Observable<any[]>}
+     */
+    getCaseClassificationsList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.CASE_CLASSIFICATION));
+    }
 }
 

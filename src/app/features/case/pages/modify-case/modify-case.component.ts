@@ -4,71 +4,49 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import * as _ from 'lodash';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { AddressModel } from '../../../../core/models/address.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 
 @Component({
-    selector: 'app-create-case',
+    selector: 'app-modify-case',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-case.component.html',
-    styleUrls: ['./create-case.component.less']
+    templateUrl: './modify-case.component.html',
+    styleUrls: ['./modify-case.component.less']
 })
-export class CreateCaseComponent implements OnInit {
+export class ModifyCaseComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Cases', '..'),
-        new BreadcrumbItemModel('Create New Case', '.', true)
+        new BreadcrumbItemModel('Modify Case', '.', true)
     ];
 
     caseData: CaseModel = new CaseModel();
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
-    locationsList$: Observable<LocationModel[]>;
-    caseClassificationsList$: Observable<any[]>;
 
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
-        private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
-        this.locationsList$ = this.locationDataService.getLocationsList();
-        this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
+
+        this.addAddress();
     }
 
     ngOnInit() {
-        // by default, enforce User having an address
-        this.caseData.addresses.push(new AddressModel());
-    }
 
-    /**
-     * Add a new address slot in UI
-     */
-    addAddress() {
-        this.caseData.addresses.push(new AddressModel());
-    }
-
-    /**
-     * Remove an address from the list of addresses
-     */
-    deleteAddress(index) {
-        this.caseData.addresses.splice(index, 1);
     }
 
     /**
@@ -78,10 +56,14 @@ export class CreateCaseComponent implements OnInit {
         this.ageSelected = ageSelected;
     }
 
-    createNewCase(stepForms: NgForm[]) {
+    addAddress() {
+        // this.caseData.addresses.push({});
+    }
 
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+    createNewCase(form: NgForm) {
+
+        // get form fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // omit fields that are NOT visible
         if (this.ageSelected) {
@@ -90,10 +72,7 @@ export class CreateCaseComponent implements OnInit {
             delete dirtyFields.age;
         }
 
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
-            !_.isEmpty(dirtyFields)
-        ) {
+        if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // get current outbreak
             this.outbreakDataService
