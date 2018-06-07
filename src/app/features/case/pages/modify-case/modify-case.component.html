@@ -1,0 +1,124 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form class="page-content form-section" #form="ngForm" (submit)="createNewCase(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab label="Personal">
+
+                <!-- Flagged section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        #TBD with API devs
+
+                        <app-form-textarea
+                            name="riskReason"
+                            [(ngModel)]="caseData.riskReason"
+                            placeholder="Reason">
+                        </app-form-textarea>
+
+                    </div>
+                </mat-card>
+
+                <!-- Personal Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="caseData.firstName"
+                                placeholder="First name"
+                                required="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="middleName"
+                                [(ngModel)]="caseData.middleName"
+                                placeholder="Middle name">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="caseData.lastName"
+                                placeholder="Last name">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="gender"
+                                [(ngModel)]="caseData.gender"
+                                placeholder="Sex"
+                                required="true"
+                                [options]="gendersList$ | async">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="phoneNumber"
+                                [(ngModel)]="caseData.phoneNumber"
+                                placeholder="Phone number">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="occupation"
+                                [(ngModel)]="caseData.occupation"
+                                placeholder="Occupation">
+                            </app-form-input>
+
+                            <div fxFlex fxLayout="row">
+                                <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''" (click)="switchAgeDob(true)">
+                                    Age
+                                </button>
+                                <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"  (click)="switchAgeDob(false)">
+                                    Date of birth
+                                </button>
+                            </div>
+
+                            <div fxFlex>
+                                <app-form-input [fxHide]="!ageSelected"
+                                                name="age"
+                                                [(ngModel)]="caseData.age"
+                                                placeholder="Age">
+                                </app-form-input>
+
+                                <app-form-input [fxHide]="ageSelected"
+                                                name="dob"
+                                                [(ngModel)]="caseData.dob"
+                                                placeholder="Date of birth">
+                                </app-form-input>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+
+            <mat-tab label="Address"></mat-tab>
+
+            <mat-tab label="Infection"></mat-tab>
+
+            <mat-tab label="Lab data"></mat-tab>
+
+            <mat-tab label="Exposures"></mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button color="primary">Save</button>
+        <button type="button" [routerLink]="'..'" mat-raised-button>Cancel</button>
+    </div>
+
+
+</form>

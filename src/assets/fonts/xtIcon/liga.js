@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'delete': '&#xe90d;',
             'arrowDown': '&#xe90c;',
             'moreVertical': '&#xe90b;',
             'search': '&#xe908;',

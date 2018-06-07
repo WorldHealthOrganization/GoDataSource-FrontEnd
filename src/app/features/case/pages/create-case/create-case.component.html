@@ -4,18 +4,20 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="createNewCase(form)">
+<div class="page-content">
 
-    <div class="form-content">
-        <mat-tab-group class="page-tabs-navbar">
+    <mat-horizontal-stepper linear #stepper>
 
-            <mat-tab label="Personal">
+        <!-- Personal step -->
+        <mat-step [stepControl]="personalForm">
+            <form #personalForm="ngForm">
+                <ng-template matStepLabel>Personal</ng-template>
 
                 <!-- Flagged section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        #TBD with API devs
+                        Flagged? #TBD with API devs
 
                         <app-form-textarea
                             name="riskReason"
@@ -34,8 +36,7 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="caseData.firstName"
-                                placeholder="First name"
-                                required="true">
+                                placeholder="First name">
                             </app-form-input>
 
                             <app-form-input
@@ -54,7 +55,6 @@
                                 name="gender"
                                 [(ngModel)]="caseData.gender"
                                 placeholder="Sex"
-                                required="true"
                                 [options]="gendersList$ | async">
                             </app-form-select>
                         </div>
@@ -100,25 +100,149 @@
                     </div>
                 </mat-card>
 
-            </mat-tab>
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
 
-            <mat-tab label="Address"></mat-tab>
+        <!-- Address step -->
+        <mat-step [stepControl]="addressForm">
+            <form #addressForm="ngForm">
+                <ng-template matStepLabel>Address</ng-template>
 
-            <mat-tab label="Infection"></mat-tab>
+                <div *ngFor="let address of caseData.addresses; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
 
-            <mat-tab label="Lab data"></mat-tab>
+                    <mat-card class="page-section" fxFlex>
+                        <div fxLayout="column">
 
-            <mat-tab label="Exposures"></mat-tab>
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-select
+                                    [name]="'addresses[' + i + '][locationId]'"
+                                    [(ngModel)]="address.locationId"
+                                    placeholder="Area"
+                                    [options]="locationsList$ | async"
+                                    optionLabelKey="name"
+                                    optionValueKey="id">
+                                </app-form-select>
 
-        </mat-tab-group>
-    </div>
+                                <app-form-input
+                                    [name]="'addresses[' + i + '][city]'"
+                                    [(ngModel)]="address.city"
+                                    placeholder="City">
+                                </app-form-input>
 
-    <div class="form-actions">
-        <div class="page-tabs-navbar-placeholder"></div>
+                                <app-form-input
+                                    [name]="'addresses[' + i + '][postalCode]'"
+                                    [(ngModel)]="address.postalCode"
+                                    placeholder="ZIP">
+                                </app-form-input>
 
-        <button mat-raised-button color="primary">Save</button>
-        <button type="button" [routerLink]="'..'" mat-raised-button>Cancel</button>
-    </div>
+                                <app-form-input
+                                    [name]="'addresses[' + i + '][addressLine1]'"
+                                    [(ngModel)]="address.addressLine1"
+                                    placeholder="Address">
+                                </app-form-input>
+                            </div>
 
+                        </div>
+                    </mat-card>
 
-</form>
+                    <button type="button" mat-icon-button (click)="deleteAddress(i)">
+                        <span class="xt-icon">delete</span>
+                    </button>
+                </div>
+
+                <button type="button" mat-button color="primary" (click)="addAddress()">Add another address</button>
+
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Infection step -->
+        <mat-step [stepControl]="infectionForm">
+            <form #infectionForm="ngForm">
+                <ng-template matStepLabel>Infection</ng-template>
+
+                <!-- Case Infection Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-select
+                                name="classification"
+                                [(ngModel)]="caseData.classification"
+                                placeholder="Classification"
+                                [options]="caseClassificationsList$ | async">
+                            </app-form-select>
+
+                            <app-form-datepicker
+                                name="dateOfInfection"
+                                [(ngModel)]="caseData.dateOfInfection"
+                                placeholder="Date of Infection">
+                            </app-form-datepicker>
+
+                            <app-form-datepicker
+                                name="dateOfOnset"
+                                [(ngModel)]="caseData.dateOfOnset"
+                                placeholder="Date of Onset">
+                            </app-form-datepicker>
+
+                            <app-form-datepicker
+                                name="dateOfOutcome"
+                                [(ngModel)]="caseData.dateOfOutcome"
+                                placeholder="Date of Outcome">
+                            </app-form-datepicker>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-datepicker
+                                name="dateBecomeCase"
+                                [(ngModel)]="caseData.dateBecomeCase"
+                                placeholder="Date became Case">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="deceased"
+                                [(ngModel)]="caseData.deceased"
+                                label="Deceased?">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex>
+                                <app-form-datepicker
+                                    name="dateDeceased"
+                                    [(ngModel)]="caseData.dateDeceased"
+                                    [disabled]="!caseData.deceased"
+                                    placeholder="Date of death">
+                                </app-form-datepicker>
+                            </div>
+
+                            <div fxFlex><!-- placeholder --></div>
+
+                        </div>
+
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm])">Create Case</button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>
