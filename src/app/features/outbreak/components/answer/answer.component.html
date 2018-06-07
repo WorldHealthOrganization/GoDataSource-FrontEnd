@@ -1,49 +1,49 @@
 <div fxLayout.xs="column">
     <div class="answer-badge align-center" fxFlex="40px">
-    A{{index+1}}
+        A{{index+1}}
     </div>
-    <div class="answer-box align-center" fxFlex="15%">
-        <app-form-select
-            name="answer.type"
-            [(ngModel)]="answer.type"
-            placeholder="Answer Type"
-            required="true"
-            [options]= "[{'value':'Free text','label':'Free text'},{'value':'Multiple Options','label':'Multiple Options'}]"
-            multiple="false"
-            disabled="{{viewOnly}}">
-        </app-form-select>
-    </div>
-    <div class="answer-box align-center" fxFlex="15%">
-        <app-form-input
-            name="answer.code"
-            [(ngModel)]="answer.code"
-            placeholder="Answer Code"
-            required="true"
-            readOnly="{{viewOnly}}">
-        </app-form-input>
-    </div>
-    <div class="answer-box align-center" fxFlex="45%">
+    <div class="answer-box align-center" fxFlex="40">
         <app-form-input
             name="answer.value"
             [(ngModel)]="answer.value"
             placeholder="Answer Value"
             required="true"
-            readOnly="{{viewOnly}}">
+            disabled="{{viewOnly}}">
         </app-form-input>
     </div>
-    <div class="answer-box align-center" fxFlex="20%" fxHide="{{viewOnly}}">
+    <div class="answer-box align-center" fxFlex="20">
+        <app-form-input
+            name="answer.code"
+            [(ngModel)]="answer.code"
+            placeholder="Answer Code"
+            required="true"
+            disabled="{{viewOnly}}">
+        </app-form-input>
+    </div>
+    <div class="answer-box align-center" fxFlex="20">
+        <app-form-select
+            name="answer.type"
+            [(ngModel)]="answer.type"
+            placeholder="Answer Type"
+            required="true"
+            [options]="[{'value':'Free text','label':'Free text'},{'value':'Multiple Options','label':'Multiple Options'}]"
+            multiple="false"
+            disabled="{{viewOnly}}">
+        </app-form-select>
+    </div>
+    <div class="answer-box align-center" fxFlex="20" fxHide="{{viewOnly}}">
         <mat-slide-toggle
             name="answer.alert"
             [(ngModel)]="answer.alert"
             [checked]="checked"
-            [labelPosition]="before"   >
+            [labelPosition]="before">
             Alert?
         </mat-slide-toggle>
         <br>
         <button mat-button type="button" color="primary" (click)="link(answer)">Link</button>
         <button mat-button type="button" color="warn" (click)="delete(answer)">Delete</button>
     </div>
-    <div class="answer-box align-center" fxFlex="20%" fxHide="{{!viewOnly}}">
+    <div class="answer-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
         <div class="alert-label">{{ answer.alert ? "ALERT" : ""}}</div>
     </div>
 

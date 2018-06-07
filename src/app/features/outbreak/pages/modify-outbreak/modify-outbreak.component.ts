@@ -7,6 +7,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 import * as moment from 'moment';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
+import { MatTabChangeEvent } from "@angular/material";
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -24,6 +25,15 @@ export class ModifyOutbreakComponent {
     outbreakId: string;
     outbreak: OutbreakModel = new OutbreakModel();
 
+    viewOnlyCaseInvestigation = true;
+    viewOnlyContactFollowup = true;
+    viewOnlyLabResults = true;
+    currentTabIndex = 0;
+
+    caseInvestigationTemplateQuestions: any;
+    contactFollowupTemplateQuestions: any;
+    labResultsTemplateQuestions: any;
+
     constructor(private outbreakDataService:OutbreakDataService,
                 private route:ActivatedRoute,
                 private router:Router,
@@ -37,7 +47,13 @@ export class ModifyOutbreakComponent {
                 .getOutbreak(this.outbreakId)
                 .subscribe(outbreakData => {
                     this.outbreak = outbreakData;
+                    this.caseInvestigationTemplateQuestions = outbreakData.caseInvestigationTemplate;
+                    this.contactFollowupTemplateQuestions = outbreakData.contactFollowUpTemplate;
+                    this.labResultsTemplateQuestions = outbreakData.labResultsTemplate;
                 });
+
+
+
         });
     }
 
@@ -45,12 +61,15 @@ export class ModifyOutbreakComponent {
         if (form.valid) {
             const dirtyFields: any = form.value;
 
-            // modify the role
+            dirtyFields.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
+            dirtyFields.contactFollowupTemplate = this.contactFollowupTemplateQuestions;
+            dirtyFields.labResultsTemplate = this.labResultsTemplateQuestions;
+
+           // modify the outbreak
             this.outbreakDataService
                 .modifyOutbreak(this.outbreakId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
-
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
@@ -62,9 +81,41 @@ export class ModifyOutbreakComponent {
         }
     }
 
-    cancel() {
-        if (confirm("Are you sure you want to cancel ? The data updates will be lost.")) {
-            this.router.navigate(['/outbreaks']);
+    enableEdit(view){
+        switch (view){
+            case 'case-investigation' : {
+                this.viewOnlyCaseInvestigation = false;
+                break;
+            }
+            case 'contact-followup' : {
+                this.viewOnlyContactFollowup = false;
+                break;
+            }
+            case 'lab-results' : {
+                this.viewOnlyLabResults = false;
+                break;
+            }
         }
+    }
+
+    disableEdit(view){
+        switch (view){
+            case 'case-investigation' : {
+                this.viewOnlyCaseInvestigation = true;
+                break;
+            }
+            case 'contact-followup' : {
+                this.viewOnlyContactFollowup = true;
+                break;
+            }
+            case 'lab-results' : {
+                this.viewOnlyLabResults = true;
+                break;
+            }
+        }
+    }
+
+    selectTab(tabChangeEvent: MatTabChangeEvent): void {
+        this.currentTabIndex = tabChangeEvent.index;
     }
 }

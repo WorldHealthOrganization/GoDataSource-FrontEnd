@@ -80,6 +80,10 @@ export class CreateOutbreakComponent {
             const dirtyFields: any = form.value;
             const outbreakData = new OutbreakModel(dirtyFields);
 
+            // outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
+            // outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
+            // outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
+
             this.outbreakDataService
                 .createOutbreak(outbreakData)
                 .catch((err) => {

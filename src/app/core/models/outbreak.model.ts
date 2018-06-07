@@ -24,6 +24,9 @@ export class OutbreakModel {
     nutritionalStatus: any | null;
     pregnancyInformation: any | null;
     vaccinationStatus: any | null;
+    caseIdMask: string;
+    locationId: string | null;
+    longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -43,12 +46,15 @@ export class OutbreakModel {
         this.displayDateFormat = null;
         this.highExposureDuration = 0;
         this.caseClassification = {};
-        this.caseInvestigationTemplate = {};
-        this.contactFollowUpTemplate = {};
-        this.labResultsTemplate = {};
+        this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate');
+        this.contactFollowUpTemplate =  _.get(data, 'contactFollowUpTemplate');
+        this.labResultsTemplate =  _.get(data, 'labResultsTemplate');
         this.nutritionalStatus = {};
         this.pregnancyInformation = {};
         this.vaccinationStatus = {};
+        this.caseIdMask = _.get(data, 'caseIdMask');
+        this.locationId = _.get(data, 'locationId');
+        this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
     }
 
 }

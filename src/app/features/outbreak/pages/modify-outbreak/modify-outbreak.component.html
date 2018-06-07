@@ -4,13 +4,12 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
+<form class="page-content form-section" #form="ngForm" (submit)="modifyOutbreak(form)">
 
-    <form #form="ngForm" (submit)="modifyOutbreak(form)">
-
-        <mat-tab-group class="outbreak-tabs">
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar" (selectedTabChange)="selectTab($event)">
             <mat-tab label="Details">
-
+                <mat-card class="page-section">
                 <div fxLayout.xs="column">
                     <app-form-input fxFlex="20%"
                                     name="name"
@@ -27,10 +26,10 @@
                 </div>
                 <div fxLayout.xs="column">
                     <app-form-textarea fxFlex="42%"
-                                    name="description"
-                                    [(ngModel)]="outbreak.description"
-                                    placeholder="Description"
-                                    required="true">
+                                       name="description"
+                                       [(ngModel)]="outbreak.description"
+                                       placeholder="Description"
+                                       required="true">
                     </app-form-textarea>
                 </div>
                 <div fxLayout.xs="column">
@@ -59,7 +58,8 @@
                         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
                         <mat-datepicker #pickerStartDate></mat-datepicker>
                     </mat-form-field>
-                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px" class="date-picker">
+                    <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                    class="date-picker">
                         <input matInput [matDatepicker]="pickerEndDate"
                                name="endDate"
                                [(ngModel)]="outbreak.endDate"
@@ -111,18 +111,103 @@
                                     required="true">
                     </app-form-input>
                 </div>
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
+                                    name="caseIdMask"
+                                    [(ngModel)]="outbreak.caseIdMask"
+                                    placeholder="Case Id Mask"
+                                    required="true">
+                    </app-form-input>
+                    <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                    name="locationId"
+                                    [(ngModel)]="outbreak.locationId"
+                                    placeholder="Location"
+                                    required="true">
+                    </app-form-input>
+                </div>
+                <div fxLayout.xs="column">
+                    <app-form-input fxFlex="20%"
+                                    name="longPeriodsBetweenCaseOnset"
+                                    [(ngModel)]="outbreak.longPeriodsBetweenCaseOnset"
+                                    placeholder="Long Periods ( days )"
+                                    required="true">
+                    </app-form-input>
+                </div>
+                </mat-card>
 
             </mat-tab>
-            <mat-tab label="Case Investigation"></mat-tab>
+            <mat-tab label="Case Investigation">
 
-            <mat-tab label="Contact Follow-up"></mat-tab>
-            <mat-tab label="Lab Results"></mat-tab>
+                <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyCaseInvestigation"
+                          (change)="onQuestionChange($event)"></question>
+
+            </mat-tab>
+            <mat-tab label="Contact Follow-up">
+
+                <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyContactFollowup"
+                          (change)="onQuestionChange($event)"></question>
+
+            </mat-tab>
+            <mat-tab label="Lab Results">
+
+                <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyLabResults"
+                          (change)="onQuestionChange($event)"></question>
+
+            </mat-tab>
         </mat-tab-group>
+    </div>
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button class="save-button">Save</button>
-        <button mat-raised-button type="button" color="basic" (click)="cancel()">Cancel</button>
+        <!-- buttons for details tab -->
+        <button fxShow="{{currentTabIndex == 0 }}" mat-raised-button color="primary">Save</button>
+        <button fxShow="{{currentTabIndex == 0 }}" type="button" [routerLink]="'/outbreaks'" mat-raised-button>Cancel</button>
 
-    </form>
+        <!-- buttons for case investigation tab -->
+        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button color="primary">
+            Save
+        </button>
+        <button fxShow="{{viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
+                color="primary"
+                (click)="enableEdit('case-investigation')">
+            Edit
+        </button>
+        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
+                type="button" (click)="disableEdit('case-investigation')">
+            Cancel
+        </button>
 
-</mat-card>
+        <!-- buttons for contact followup tab -->
+        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button color="primary">Save
+        </button>
+        <button fxShow="{{viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button"
+                color="primary"
+                (click)="enableEdit('contact-followup')">
+            Edit
+        </button>
+        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button"
+                type="button" (click)="disableEdit('contact-followup')">
+            Cancel
+        </button>
+
+        <!-- buttons for lab results tab -->
+        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button color="primary">Save
+        </button>
+        <button fxShow="{{viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" color="primary"
+                (click)="enableEdit('lab-results')">
+            Edit
+        </button>
+        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" type="button"
+                (click)="disableEdit('lab-results')">
+            Cancel
+        </button>
+
+    </div>
+
+</form>
+
+
 
