@@ -5,8 +5,10 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
-import { UserRoleModel } from "../../../../core/models/user-role.model";
+import * as _ from 'lodash';
 
+import { NgForm } from "@angular/forms";
+import { FormHelperService } from "../../../../core/services/helper/form-helper.service";
 
 @Component({
     selector: 'app-create-outbreak',
@@ -21,18 +23,73 @@ export class CreateOutbreakComponent {
         new BreadcrumbItemModel('Create New Outbreak', '.', true)
     ];
 
+    viewOnlyCaseInvestigation = false;
+    viewOnlyContactFollowup = false;
+    viewOnlyLabResults = false;
+
+    caseInvestigationTemplateQuestions: any;
+    contactFollowupTemplateQuestions: any;
+    labResultsTemplateQuestions: any;
+
+    // We'll initially populate these questions, until we develop the ability to add new questions.
+    // TODO Ability to add new question
+    questions = [
+        {
+            "value": "Describe the symptoms you have",
+            "category": "Physical Examination",
+            "order": "1",
+            "required": true,
+            "answers": [
+                {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
+            ]
+        },
+        {
+            "value": "Headaches in the last 24h?",
+            "category": "Clinical",
+            "order": "2",
+            "required": false,
+            "answers": [
+                {"value": "YES", "alert": true, "type": "Multiple Options", "code": "YES"},
+                {"value": "NO", "alert": false, "type": "Multiple Options", "code": "NO"},
+                {"value": "Don't know", "alert": true, "type": "Multiple Options", "code": "DK"}
+            ]
+        },
+        {
+            "value": "Lorem ipsum dolor sit amet?",
+            "category": "Physical Examination",
+            "order": "3",
+            "required": true,
+            "answers": [
+                {"value": "YES", "alert": true, "type": "Multiple Options", "code": "YES"},
+                {"value": "NO", "alert": false, "type": "Multiple Options", "code": "NO"}
+            ]
+        }
+    ];
+
     newOutbreak: OutbreakModel = new OutbreakModel();
 
-    constructor(private outbreakDataService:OutbreakDataService,
-                private router:Router,
-                private snackbarService:SnackbarService) {
+    constructor(private outbreakDataService: OutbreakDataService,
+                private router: Router,
+                private snackbarService: SnackbarService,
+                private formHelper: FormHelperService) {
+        this.caseInvestigationTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
+        this.contactFollowupTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
+        this.labResultsTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
     }
 
-    createOutbreak(form) {
-        if (form.valid) {
-            const dirtyFields: any = form.value;
-            const outbreakData = new OutbreakModel(dirtyFields);
+    createOutbreak(stepForms: NgForm[]) {
 
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
+            const outbreakData = new OutbreakModel(dirtyFields);
+            outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
+            outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
+            outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
             this.outbreakDataService
                 .createOutbreak(outbreakData)
                 .catch((err) => {
@@ -45,11 +102,4 @@ export class CreateOutbreakComponent {
                 });
         }
     }
-
-    cancel() {
-        if (confirm("Are you sure you want to cancel ? The data will be lost.")) {
-            this.router.navigate(['/outbreaks']);
-        }
-    }
-
 }

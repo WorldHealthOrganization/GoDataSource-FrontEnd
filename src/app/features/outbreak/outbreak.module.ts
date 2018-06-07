@@ -7,6 +7,7 @@ import { SharedModule } from '../../shared/shared.module';
 // components
 import * as fromPages from './pages';
 
+
 @NgModule({
     imports: [
         routing,

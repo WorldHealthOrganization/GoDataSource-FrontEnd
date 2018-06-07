@@ -1,13 +1,10 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from "../../../../core/services/data/outbreak.data.service";
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { Observable } from "rxjs/Observable";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
-import { UserModel } from '../../../../core/models/user.model';
-
 
 @Component({
     selector: 'app-outbreak-list',
@@ -27,7 +24,7 @@ export class OutbreakListComponent {
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private snackbarService:SnackbarService
+        private snackbarService: SnackbarService
     ) {
         this.loadOutbreaksList();
     }
@@ -37,15 +34,15 @@ export class OutbreakListComponent {
         this.outbreaksListObs = this.outbreakDataService.getOutbreaksList();
     }
 
-    delete(outbreak){
-        if(confirm('Are you sure you want to delete '+outbreak.name+' ?')){
+    delete(outbreak) {
+        if (confirm('Are you sure you want to delete ' + outbreak.name + ' ?')) {
             this.outbreakDataService
                 .deleteOutbreak(outbreak.id)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
-                .subscribe( response => {
+                .subscribe(response => {
                     this.snackbarService.showSuccess("Success");
                     this.loadOutbreaksList();
                 });
