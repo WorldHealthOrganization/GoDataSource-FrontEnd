@@ -4,8 +4,6 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {OutbreakModel} from "../../../../core/models/outbreak.model";
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-
-import * as moment from 'moment';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { MatTabChangeEvent } from "@angular/material";
 
@@ -25,11 +23,13 @@ export class ModifyOutbreakComponent {
     outbreakId: string;
     outbreak: OutbreakModel = new OutbreakModel();
 
+    // controls for switching between view and edit mode
     viewOnlyCaseInvestigation = true;
     viewOnlyContactFollowup = true;
     viewOnlyLabResults = true;
     currentTabIndex = 0;
 
+    // questionnaires for outbreak
     caseInvestigationTemplateQuestions: any;
     contactFollowupTemplateQuestions: any;
     labResultsTemplateQuestions: any;
@@ -61,6 +61,7 @@ export class ModifyOutbreakComponent {
         if (form.valid) {
             const dirtyFields: any = form.value;
 
+            // assign the questionnaires objects to the outbreak data
             dirtyFields.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
             dirtyFields.contactFollowupTemplate = this.contactFollowupTemplateQuestions;
             dirtyFields.labResultsTemplate = this.labResultsTemplateQuestions;
@@ -74,13 +75,15 @@ export class ModifyOutbreakComponent {
                 })
                 .subscribe(() => {
                     this.snackbarService.showSuccess('Outbreak modified!');
-
                     // navigate to listing page
                     this.router.navigate(['/outbreaks']);
                 });
         }
     }
 
+    /**
+     * Enable edit on questionnaires tabs
+     */
     enableEdit(view){
         switch (view){
             case 'case-investigation' : {
@@ -98,6 +101,9 @@ export class ModifyOutbreakComponent {
         }
     }
 
+    /**
+     * Disable edit on questionnaires tabs
+     */
     disableEdit(view){
         switch (view){
             case 'case-investigation' : {
@@ -115,6 +121,9 @@ export class ModifyOutbreakComponent {
         }
     }
 
+    /**
+     *  Save the current tab index
+     */
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
     }

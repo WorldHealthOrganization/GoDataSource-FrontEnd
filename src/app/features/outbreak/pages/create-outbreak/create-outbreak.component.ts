@@ -5,9 +5,10 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
+import * as _ from 'lodash';
 
-import { QuestionComponent } from "../../components/question/question.component";
-import { MatTabChangeEvent } from "@angular/material";
+import { NgForm } from "@angular/forms";
+import { FormHelperService } from "../../../../core/services/helper/form-helper.service";
 
 @Component({
     selector: 'app-create-outbreak',
@@ -22,68 +23,73 @@ export class CreateOutbreakComponent {
         new BreadcrumbItemModel('Create New Outbreak', '.', true)
     ];
 
-    viewOnlyCaseInvestigation = true;
-    viewOnlyContactFollowup = true;
-    viewOnlyLabResults = true;
-    currentTabIndex = 0;
+    viewOnlyCaseInvestigation = false;
+    viewOnlyContactFollowup = false;
+    viewOnlyLabResults = false;
 
     caseInvestigationTemplateQuestions: any;
     contactFollowupTemplateQuestions: any;
     labResultsTemplateQuestions: any;
 
-
+    // We'll initially populate these questions, until we develop the ability to add new questions.
+    // TODO Ability to add new question
     questions = [
         {
-            "value":"Describe the symptoms you have",
+            "value": "Describe the symptoms you have",
             "category": "Physical Examination",
-            "order":"1",
+            "order": "1",
             "required": true,
             "answers": [
-                {"value":"", "alert":true, "type":"Free Text", "code":"SYM"}
+                {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
             ]
         },
         {
-            "value":"Headaches in the last 24h?",
+            "value": "Headaches in the last 24h?",
             "category": "Clinical",
-            "order":"2",
+            "order": "2",
             "required": false,
             "answers": [
-                {"value":"YES", "alert":true, "type":"Multiple Options", "code":"YES"},
-                {"value":"NO", "alert":false, "type":"Multiple Options", "code":"NO"},
-                {"value":"Don't know", "alert":true, "type":"Multiple Options", "code":"DK"}
+                {"value": "YES", "alert": true, "type": "Multiple Options", "code": "YES"},
+                {"value": "NO", "alert": false, "type": "Multiple Options", "code": "NO"},
+                {"value": "Don't know", "alert": true, "type": "Multiple Options", "code": "DK"}
             ]
         },
         {
-            "value":"Lorem ipsum dolor sit amet?",
+            "value": "Lorem ipsum dolor sit amet?",
             "category": "Physical Examination",
-            "order":"3",
+            "order": "3",
             "required": true,
             "answers": [
-                {"value":"YES", "alert":true, "type":"Multiple Options", "code":"YES"},
-                {"value":"NO", "alert":false, "type":"Multiple Options", "code":"NO"}
+                {"value": "YES", "alert": true, "type": "Multiple Options", "code": "YES"},
+                {"value": "NO", "alert": false, "type": "Multiple Options", "code": "NO"}
             ]
         }
-        ];
+    ];
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
-    constructor(private outbreakDataService:OutbreakDataService,
-                private router:Router,
-                private snackbarService:SnackbarService) {
-        this.caseInvestigationTemplateQuestions = this.questions;
-        this.contactFollowupTemplateQuestions = this.questions;
-        this.labResultsTemplateQuestions = this.questions;
+    constructor(private outbreakDataService: OutbreakDataService,
+                private router: Router,
+                private snackbarService: SnackbarService,
+                private formHelper: FormHelperService) {
+        this.caseInvestigationTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
+        this.contactFollowupTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
+        this.labResultsTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
     }
 
-    createOutbreak(form) {
-        if (form.valid) {
-            const dirtyFields: any = form.value;
+    createOutbreak(stepForms: NgForm[]) {
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
             const outbreakData = new OutbreakModel(dirtyFields);
-
-            // outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
-            // outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
-            // outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
-
+            outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
+            outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
+            outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
             this.outbreakDataService
                 .createOutbreak(outbreakData)
                 .catch((err) => {
@@ -96,49 +102,4 @@ export class CreateOutbreakComponent {
                 });
         }
     }
-
-    onQuestionChange(questionChanged){
-        console.log("question changed");
-        console.log(questionChanged);
-    }
-
-    enableEdit(view){
-        switch (view){
-            case 'case-investigation' : {
-                this.viewOnlyCaseInvestigation = false;
-                break;
-            }
-            case 'contact-followup' : {
-                this.viewOnlyContactFollowup = false;
-                break;
-            }
-            case 'lab-results' : {
-                this.viewOnlyLabResults = false;
-                break;
-            }
-        }
-    }
-
-    disableEdit(view){
-        switch (view){
-            case 'case-investigation' : {
-                this.viewOnlyCaseInvestigation = true;
-                break;
-            }
-            case 'contact-followup' : {
-                this.viewOnlyContactFollowup = true;
-                break;
-            }
-            case 'lab-results' : {
-                this.viewOnlyLabResults = true;
-                break;
-            }
-        }
-    }
-
-    selectTab(tabChangeEvent: MatTabChangeEvent): void {
-        this.currentTabIndex = tabChangeEvent.index;
-    }
-
-
 }

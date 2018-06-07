@@ -9,7 +9,7 @@
     <mat-horizontal-stepper linear #stepper>
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>Personal</ng-template>
+                <ng-template matStepLabel>Details</ng-template>
 
                 <mat-card class="page-section">
 
@@ -40,38 +40,27 @@
                         <app-form-input fxFlex="20%"
                                         name="country"
                                         [(ngModel)]="newOutbreak.country"
-                                        placeholder="Location"
+                                        placeholder="Country"
                                         required="true">
                         </app-form-input>
-                        <mat-slide-toggle fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                          name="active"
-                                          [(ngModel)]="newOutbreak.active"
-                                          [color]="blue"
-                                          [checked]="checked"
-                                          [disabled]="disabled">
-                            Active?
-                        </mat-slide-toggle>
+                        <app-form-slide-toggle fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                               name="active"
+                                               [(ngModel)]="newOutbreak.active"
+                                               label="Active?">
+                        </app-form-slide-toggle>
                     </div>
                     <div fxLayout.xs="column">
-                        <mat-form-field fxFlex="20%" class="date-picker">
-                            <input matInput [matDatepicker]="pickerStartDate"
-                                   name="startDate"
-                                   [(ngModel)]="newOutbreak.startDate"
-                                   placeholder="Start Date"
-                                   required="true">
-                            <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerStartDate></mat-datepicker>
-                        </mat-form-field>
-                        <mat-form-field fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        class="date-picker">
-                            <input matInput [matDatepicker]="pickerEndDate"
-                                   name="endDate"
-                                   [(ngModel)]="newOutbreak.endDate"
-                                   placeholder="End Date"
-                            >
-                            <mat-datepicker-toggle matSuffix [for]="pickerEndDate"></mat-datepicker-toggle>
-                            <mat-datepicker #pickerEndDate></mat-datepicker>
-                        </mat-form-field>
+                        <app-form-datepicker fxFlex="20%"
+                                             name="startDate"
+                                             [(ngModel)]="newOutbreak.startDate"
+                                             placeholder="Start Date"
+                                             required="true">
+                        </app-form-datepicker>
+                        <app-form-datepicker fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                             name="endDate"
+                                             [(ngModel)]="newOutbreak.endDate"
+                                             placeholder="End Date">
+                        </app-form-datepicker>
                     </div>
                     <div fxLayout.xs="column">
                         <app-form-input fxFlex="20%"
@@ -115,95 +104,79 @@
                                         required="true">
                         </app-form-input>
                     </div>
+                    <div fxLayout.xs="column">
+                        <app-form-input fxFlex="20%"
+                                        name="caseIdMask"
+                                        [(ngModel)]="newOutbreak.caseIdMask"
+                                        placeholder="Case Id Mask"
+                                        required="true">
+                        </app-form-input>
+                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
+                                        name="locationId"
+                                        [(ngModel)]="newOutbreak.locationId"
+                                        placeholder="Location"
+                                        required="true">
+                        </app-form-input>
+                    </div>
+                    <div fxLayout.xs="column">
+                        <app-form-input fxFlex="20%"
+                                        name="longPeriodsBetweenCaseOnset"
+                                        [(ngModel)]="newOutbreak.longPeriodsBetweenCaseOnset"
+                                        placeholder="Long Periods ( days )"
+                                        required="true">
+                        </app-form-input>
+                    </div>
                 </mat-card>
 
                 <div>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-raised-button color="primary" matStepperNext>Next</button>
                 </div>
             </form>
         </mat-step>
 
         <mat-step [stepControl]="caseInvestigationForm">
-            <ng-template matStepLabel>Case Investigation</ng-template>
+            <form #caseInvestigationForm="ngForm">
+                <ng-template matStepLabel>Case Investigation</ng-template>
 
-            <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
-                      [viewOnly]="viewOnlyCaseInvestigation"
-                      (change)="onQuestionChange($event)"></question>
+                <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyCaseInvestigation"></question>
 
-            <button mat-button matStepperNext>Next</button>
-
+                <button mat-raised-button color="primary" matStepperNext>Next</button>
+            </form>
         </mat-step>
         <mat-step [stepControl]="contactFollowUpForm">
-            <ng-template matStepLabel>Contact Follow-up</ng-template>
+            <form #contactFollowUpForm="ngForm">
+                <ng-template matStepLabel>Contact Follow-up</ng-template>
 
-            <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
-                      [viewOnly]="viewOnlyContactFollowup"
-                      (change)="onQuestionChange($event)"></question>
+                <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyContactFollowup"></question>
 
-            <button mat-button matStepperNext>Next</button>
-
+                <button mat-raised-button color="primary" matStepperNext>Next</button>
+            </form>
         </mat-step>
         <mat-step [stepControl]="labResultsForm">
-            <ng-template matStepLabel>Lab Results</ng-template>
+            <form #labResultsForm="ngForm">
+                <ng-template matStepLabel>Lab Results</ng-template>
 
-            <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
-                      [viewOnly]="viewOnlyLabResults"
-                      (change)="onQuestionChange($event)"></question>
+                <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
+                          [viewOnly]="viewOnlyLabResults"></question>
 
-            <button mat-button matStepperNext>Next</button>
+                <button mat-raised-button color="primary" matStepperNext>Next</button>
+            </form>
+        </mat-step>
 
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button matStepperPrevious mat-raised-button>Back</button>
+                <button type="button" mat-raised-button color="primary"
+                        (click)="createOutbreak([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
+                    Create Outbreak
+                </button>
+            </div>
         </mat-step>
     </mat-horizontal-stepper>
 
 </div>
-
-<div class="form-actions">
-    <div class="page-tabs-navbar-placeholder"></div>
-
-    <!-- buttons for details tab -->
-    <button fxShow="{{currentTabIndex == 0 }}" mat-raised-button color="primary">Save</button>
-    <button fxShow="{{currentTabIndex == 0 }}" type="button" [routerLink]="'..'" mat-raised-button>Cancel</button>
-
-    <!-- buttons for case investigation tab -->
-    <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button color="primary">Save
-    </button>
-    <button fxShow="{{viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
-            color="primary"
-            (click)="enableEdit('case-investigation')">
-        Edit
-    </button>
-    <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
-            type="button" (click)="disableEdit('case-investigation')">
-        Cancel
-    </button>
-
-    <!-- buttons for contact followup tab -->
-    <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button color="primary">Save
-    </button>
-    <button fxShow="{{viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button"
-            color="primary"
-            (click)="enableEdit('contact-followup')">
-        Edit
-    </button>
-    <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button" type="button"
-            (click)="disableEdit('contact-followup')">
-        Cancel
-    </button>
-
-    <!-- buttons for lab results tab -->
-    <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button color="primary">Save</button>
-    <button fxShow="{{viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" color="primary"
-            (click)="enableEdit('lab-results')">
-        Edit
-    </button>
-    <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" type="button"
-            (click)="disableEdit('lab-results')">
-        Cancel
-    </button>
-
-
-</div>
-
-
-
-
