@@ -6,13 +6,24 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="usersListObs | async" matSort>
+    <mat-table #table [dataSource]="usersList$ | async" matSort>
 
         <!-- First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef mat-sort-header>
-                First Name
+                <div class="table-header-cell">
+                    <div>First Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('firstName', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
                 {{ item.firstName }}
             </mat-cell>
@@ -21,7 +32,17 @@
         <!-- Last Name -->
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef mat-sort-header>
-                Last Name
+                <div class="table-header-cell" fxLayout="column">
+                    <div>Last Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('lastName', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.lastName }}
@@ -31,7 +52,17 @@
         <!-- Email -->
         <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
-                Email
+                <div class="table-header-cell">
+                    <div>Email</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('email', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="30">
                 {{ item.email }}
@@ -41,7 +72,12 @@
         <!-- Role -->
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
-                Role
+                <div class="table-header-cell">
+                    <div>Role</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="30">
                 {{ item.role.name }}

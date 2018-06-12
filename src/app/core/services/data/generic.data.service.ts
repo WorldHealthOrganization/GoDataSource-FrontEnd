@@ -20,5 +20,21 @@ export class GenericDataService {
     getCaseClassificationsList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.CASE_CLASSIFICATION));
     }
+
+    /**
+     * Retrieve the list of Risk Levels for a Case
+     * @returns {Observable<any[]>}
+     */
+    getCaseRiskLevelsList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.CASE_RISK_LEVEL));
+    }
+
+    /**
+     * Retrieve the list of Document Types
+     * @returns {Observable<any[]>}
+     */
+    getDocumentTypesList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.DOCUMENT_TYPE));
+    }
 }
 

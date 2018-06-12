@@ -44,6 +44,17 @@ html, body, ul, li, div, span {
                 font-size: 14px !important;
                 font-weight: bold !important;
                 padding-left: @cell-padding-left;
+
+                .table-header-cell {
+                    display: flex;
+                    flex-direction: column;
+
+                    .column-filter {
+                        padding-top: 10px;
+                        // keep the height as a placeholder for columns without filters
+                        height: 56px;
+                    }
+                }
             }
         }
 

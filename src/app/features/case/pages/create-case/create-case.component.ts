@@ -11,11 +11,12 @@ import * as _ from 'lodash';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
+import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { Subject } from 'rxjs/Subject';
 
 
 @Component({
@@ -37,6 +38,8 @@ export class CreateCaseComponent implements OnInit {
     gendersList$: Observable<any[]>;
     locationsList$: Observable<LocationModel[]>;
     caseClassificationsList$: Observable<any[]>;
+    caseRiskLevelsList$: Observable<any[]>;
+    documentTypesList$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -50,11 +53,19 @@ export class CreateCaseComponent implements OnInit {
         this.gendersList$ = this.genericDataService.getGendersList();
         this.locationsList$ = this.locationDataService.getLocationsList();
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
+        this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
+        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
         // by default, enforce User having an address
         this.caseData.addresses.push(new AddressModel());
+        // ...and a document
+        this.caseData.documents.push(new DocumentModel());
+        // ...and a hospitalization date
+        this.caseData.hospitalizationDates.push(null);
+        // ...and an isolation date
+        this.caseData.isolationDates.push(null);
     }
 
     /**
@@ -69,6 +80,48 @@ export class CreateCaseComponent implements OnInit {
      */
     deleteAddress(index) {
         this.caseData.addresses.splice(index, 1);
+    }
+
+    /**
+     * Add a new document slot in UI
+     */
+    addDocument() {
+        this.caseData.documents.push(new DocumentModel());
+    }
+
+    /**
+     * Remove a document from the list of documents
+     */
+    deleteDocument(index) {
+        this.caseData.documents.splice(index, 1);
+    }
+
+    /**
+     * Add a new Hospitalization Date slot in UI
+     */
+    addHospitalizationDate() {
+        this.caseData.hospitalizationDates.push(null);
+    }
+
+    /**
+     * Remove a Hospitalization Date from the list
+     */
+    deleteHospitalizationDate(index) {
+        this.caseData.hospitalizationDates.splice(index, 1);
+    }
+
+    /**
+     * Add a new Isolation Date slot in UI
+     */
+    addIsolationDate() {
+        this.caseData.isolationDates.push(null);
+    }
+
+    /**
+     * Remove an Isolation Date from the list
+     */
+    deleteIsolationDate(index) {
+        this.caseData.isolationDates.splice(index, 1);
     }
 
     /**
@@ -96,9 +149,14 @@ export class CreateCaseComponent implements OnInit {
         ) {
 
             // get current outbreak
+            const selectedOutbreakCompleted$ = new Subject();
             this.outbreakDataService
                 .getSelectedOutbreak()
+                .takeUntil(selectedOutbreakCompleted$)
                 .subscribe((currentOutbreak: OutbreakModel) => {
+                    selectedOutbreakCompleted$.next();
+                    selectedOutbreakCompleted$.complete();
+
                     // add the new Case
                     this.caseDataService
                         .createCase(currentOutbreak.id, dirtyFields)

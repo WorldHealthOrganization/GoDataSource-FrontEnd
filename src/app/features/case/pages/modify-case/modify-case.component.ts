@@ -75,9 +75,11 @@ export class ModifyCaseComponent implements OnInit {
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // get current outbreak
-            this.outbreakDataService
+            const selectedOutbreakSubscription = this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((currentOutbreak: OutbreakModel) => {
+                    selectedOutbreakSubscription.unsubscribe();
+
                     // add the new Case
                     this.caseDataService
                         .createCase(currentOutbreak.id, dirtyFields)

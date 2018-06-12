@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -9,6 +8,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/user-role.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 
 @Component({
     selector: 'app-user-list',
@@ -24,11 +24,12 @@ export class UserListComponent {
 
     // authenticated user
     authUser: UserModel;
+
     // list of existing users
-    usersListObs: Observable<UserModel[]>;
+    usersList$: Observable<UserModel[]>;
+    usersListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     constructor(
-        private router: Router,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService
@@ -43,8 +44,25 @@ export class UserListComponent {
      * Re(load) the Users list
      */
     loadUsersList() {
-        // get the list of existing roles
-        this.usersListObs = this.userDataService.getUsersList();
+        // get the list of existing users
+        this.usersList$ = this.userDataService.getUsersList(this.usersListQueryBuilder);
+    }
+
+    /**
+     * Filter the Users list by some field
+     * @param property
+     * @param value
+     */
+    filterBy(property, value) {
+        // filter by any User property
+        this.usersListQueryBuilder.where({
+            [property]: {
+                regexp: `/^${value}/i`
+            }
+        });
+
+        // refresh users list
+        this.loadUsersList();
     }
 
     /**

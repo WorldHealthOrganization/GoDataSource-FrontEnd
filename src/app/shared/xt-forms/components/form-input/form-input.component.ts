@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -25,6 +25,8 @@ export class FormInputComponent extends ElementBase<string> {
     @Input() disabled: boolean = false;
 
 
+    @Output() optionChanged = new EventEmitter<any>();
+
     public identifier = `form-input-${identifier++}`;
 
     constructor(
@@ -41,6 +43,16 @@ export class FormInputComponent extends ElementBase<string> {
      */
     onBlur() {
         this.touch();
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange() {
+        console.log(this.value);
+
+        // emit the current value
+        return this.optionChanged.emit(this.value);
     }
 }
 

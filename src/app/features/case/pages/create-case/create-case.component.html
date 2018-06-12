@@ -17,7 +17,14 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        Flagged? #TBD with API devs
+                        <div fxLayout="row">
+                            <app-form-select fxFlex="25"
+                                name="riskLevel"
+                                [(ngModel)]="caseData.riskLevel"
+                                placeholder="Risk Level Flag"
+                                [options]="caseRiskLevelsList$ | async">
+                            </app-form-select>
+                        </div>
 
                         <app-form-textarea
                             name="riskReason"
@@ -54,7 +61,7 @@
                             <app-form-select
                                 name="gender"
                                 [(ngModel)]="caseData.gender"
-                                placeholder="Sex"
+                                placeholder="Gender"
                                 [options]="gendersList$ | async">
                             </app-form-select>
                         </div>
@@ -100,6 +107,36 @@
                     </div>
                 </mat-card>
 
+                <!-- Documents section -->
+                <div class="section-title">Documents</div>
+
+                <div *ngFor="let document of caseData.documents; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
+
+                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="50">
+                            <app-form-select
+                                [name]="'documents[' + i + '][type]'"
+                                [(ngModel)]="document.type"
+                                placeholder="Document type"
+                                [options]="documentTypesList$ | async">
+                            </app-form-select>
+
+                            <app-form-input
+                                [name]="'documents[' + i + '][number]'"
+                                [(ngModel)]="document.number"
+                                placeholder="Document number">
+                            </app-form-input>
+                        </div>
+
+                        <button type="button" mat-icon-button (click)="deleteDocument(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </mat-card>
+                </div>
+
+                <button type="button" mat-button color="primary" (click)="addDocument()">Add another document</button>
+
                 <div>
                     <button mat-button matStepperNext>Next</button>
                 </div>
@@ -113,8 +150,20 @@
 
                 <div *ngFor="let address of caseData.addresses; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
 
-                    <mat-card class="page-section" fxFlex>
-                        <div fxLayout="column">
+                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                        <div fxLayout="column" fxFlex>
+
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-input
+                                    [name]="'addresses[' + i + '][name]'"
+                                    [(ngModel)]="address.name"
+                                    placeholder="Address name">
+                                </app-form-input>
+
+                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!-- placeholder --></div>
+                            </div>
 
                             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                                 <app-form-select
@@ -146,11 +195,12 @@
                             </div>
 
                         </div>
+
+                        <button type="button" mat-icon-button (click)="deleteAddress(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
                     </mat-card>
 
-                    <button type="button" mat-icon-button (click)="deleteAddress(i)">
-                        <span class="xt-icon">delete</span>
-                    </button>
                 </div>
 
                 <button type="button" mat-button color="primary" (click)="addAddress()">Add another address</button>
@@ -180,15 +230,15 @@
                             </app-form-select>
 
                             <app-form-datepicker
-                                name="dateOfInfection"
-                                [(ngModel)]="caseData.dateOfInfection"
-                                placeholder="Date of Infection">
+                                name="dateBecomeCase"
+                                [(ngModel)]="caseData.dateBecomeCase"
+                                placeholder="Date became Case">
                             </app-form-datepicker>
 
                             <app-form-datepicker
-                                name="dateOfOnset"
-                                [(ngModel)]="caseData.dateOfOnset"
-                                placeholder="Date of Onset">
+                                name="dateOfInfection"
+                                [(ngModel)]="caseData.dateOfInfection"
+                                placeholder="Date of Infection">
                             </app-form-datepicker>
 
                             <app-form-datepicker
@@ -199,11 +249,18 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+
                             <app-form-datepicker
-                                name="dateBecomeCase"
-                                [(ngModel)]="caseData.dateBecomeCase"
-                                placeholder="Date became Case">
+                                name="dateOfOnset"
+                                [(ngModel)]="caseData.dateOfOnset"
+                                placeholder="Date of Onset">
                             </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfOnsetApproximate"
+                                [(ngModel)]="caseData.isDateOfOnsetApproximate"
+                                label="Is date of onset approximate?">
+                            </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="deceased"
@@ -220,12 +277,56 @@
                                 </app-form-datepicker>
                             </div>
 
-                            <div fxFlex><!-- placeholder --></div>
-
                         </div>
 
                     </div>
                 </mat-card>
+
+                <!-- Hospitalization Dates section -->
+                <div *ngFor="let hospitalDate of caseData.hospitalizationDates; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
+
+                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
+
+                            <app-form-datepicker
+                                [name]="'hospitalizationDates[' + i + ']'"
+                                [ngModel]="hospitalDate"
+                                placeholder="Date of hospitalization">
+                            </app-form-datepicker>
+
+                        </div>
+
+                        <button type="button" mat-icon-button (click)="deleteHospitalizationDate(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </mat-card>
+                </div>
+
+                <button type="button" mat-button color="primary" (click)="addHospitalizationDate()">Add another hospitalization date</button>
+
+                <!-- Isolation Dates section -->
+                <div *ngFor="let isolationDate of caseData.isolationDates; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
+
+                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
+
+                            <app-form-datepicker
+                                [name]="'isolationDates[' + i + ']'"
+                                [ngModel]="isolationDate"
+                                placeholder="Date of isolation">
+                            </app-form-datepicker>
+
+                        </div>
+
+                        <button type="button" mat-icon-button (click)="deleteIsolationDate(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </mat-card>
+                </div>
+
+                <button type="button" mat-button color="primary" (click)="addIsolationDate()">Add another isolation date</button>
 
                 <div>
                     <button mat-button matStepperPrevious>Back</button>
