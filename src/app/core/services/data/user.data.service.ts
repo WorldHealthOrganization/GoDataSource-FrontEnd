@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { UserModel } from '../../models/user.model';
 import { ObservableHelperService } from '../helper/observable-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
+import { RequestQueryBuilder } from '../helper/request-query-builder';
 
 
 @Injectable()
@@ -19,15 +20,20 @@ export class UserDataService {
      * Retrieve the list of Users
      * @returns {Observable<UserModel[]>}
      */
-    getUsersList(): Observable<UserModel[]> {
+    getUsersList(queryBuilder: RequestQueryBuilder = null): Observable<UserModel[]> {
 
+        const qb = new RequestQueryBuilder();
         // include role and permissions in response
-        const includes = JSON.stringify({
-            include: 'role'
-        });
+        qb.include('role');
+
+        if (queryBuilder) {
+            qb.merge(queryBuilder);
+        }
+
+        const filter = qb.buildQuery();
 
         return this.observableHelper.mapListToModel(
-            this.http.get(`users?filter=${includes}`),
+            this.http.get(`users?filter=${filter}`),
             UserModel
         );
     }

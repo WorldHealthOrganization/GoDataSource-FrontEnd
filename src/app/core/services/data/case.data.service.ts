@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ObservableHelperService } from '../helper/observable-helper.service';
 import { CaseModel } from '../../models/case.model';
+import { RequestQueryBuilder } from '../helper/request-query-builder';
 
 @Injectable()
 export class CaseDataService {
@@ -18,9 +19,12 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<CaseModel[]>}
      */
-    getCasesList(outbreakId: string): Observable<CaseModel[]> {
+    getCasesList(outbreakId: string, queryBuilder: RequestQueryBuilder = null): Observable<CaseModel[]> {
+
+        const filter = queryBuilder.buildQuery();
+
         return this.observableHelper.mapListToModel(
-            this.http.get(`outbreaks/${outbreakId}/cases`),
+            this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
             CaseModel
         );
     }

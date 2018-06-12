@@ -9,19 +9,22 @@ import { UserRoleModel } from '../../models/user-role.model';
 import { StorageKey, StorageService } from '../helper/storage.service';
 
 import * as _ from 'lodash';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 
 @Injectable()
 export class OutbreakDataService {
 
-    // the Outbreak being selected across the application
-    selectedOutbreak: OutbreakModel;
+    // hold the selected (current) Outbreak and emit it on demand
+    selectedOutbreakSubject: BehaviorSubject<OutbreakModel> = new BehaviorSubject<OutbreakModel>(null);
 
     constructor(
         private http: HttpClient,
         private observableHelper: ObservableHelperService,
         private storageService: StorageService
     ) {
+        // determine the current Outbreak
+        this.determineSelectedOutbreak();
     }
 
     /**
@@ -96,15 +99,19 @@ export class OutbreakDataService {
     }
 
     /**
-     * Get the outbreak that is Selected across the application
+     * Get the selected Outbreak
+     * @returns {BehaviorSubject<OutbreakModel>}
+     */
+    getSelectedOutbreak(): BehaviorSubject<OutbreakModel> {
+        return this.selectedOutbreakSubject;
+    }
+
+    /**
+     * Get the outbreak that is Selected across the application from local storage
+     * If it's not set in local storage, use the Active Outbreak
      * @returns {OutbreakModel}
      */
-    getSelectedOutbreak(): Observable<OutbreakModel> {
-        // get the Selected Outbreak from cache
-        if (this.selectedOutbreak) {
-            return Observable.of(this.selectedOutbreak);
-        }
-
+    private determineSelectedOutbreak(): Observable<OutbreakModel> {
         // get the selected Outbreak from local storage
         const selectedOutbreakFromStorage = <OutbreakModel>this.storageService.get(StorageKey.SELECTED_OUTBREAK);
         if (selectedOutbreakFromStorage) {
@@ -112,10 +119,10 @@ export class OutbreakDataService {
             this.setSelectedOutbreak(selectedOutbreakFromStorage);
 
             // ...and return it
-            return Observable.of(this.selectedOutbreak);
+            return Observable.of(selectedOutbreakFromStorage);
         }
 
-        // by default, the Active Outbreak is selected
+        // by default, use the Active Outbreak
         return this.getActiveOutbreak()
             .do((activeOutbreak) => {
                 // cache the selected Outbreak
@@ -128,11 +135,10 @@ export class OutbreakDataService {
      * @param {OutbreakModel} outbreak
      */
     setSelectedOutbreak(outbreak: OutbreakModel) {
-        // cache the outbreak
-        this.selectedOutbreak = outbreak;
-
         // keep the outbreak in local storage;
         this.storageService.set(StorageKey.SELECTED_OUTBREAK, outbreak);
+
+        this.selectedOutbreakSubject.next(outbreak);
     }
 
 }

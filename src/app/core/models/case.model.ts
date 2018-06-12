@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
+import { DocumentModel } from './document.model';
 
 export class CaseModel {
     id: string;
@@ -11,16 +12,20 @@ export class CaseModel {
     occupation: string;
     dob: string;
     age: number;
+    riskLevel: string;
     riskReason: string;
-    documents: any[];
+    documents: DocumentModel[];
     addresses: AddressModel[];
     classification: string;
     dateOfInfection: string;
     dateOfOnset: string;
+    isDateOfOnsetApproximate: boolean;
     dateOfOutcome: string;
     dateBecomeCase: string;
     deceased: boolean;
     dateDeceased: string;
+    hospitalizationDates: string[];
+    isolationDates: string[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -41,5 +46,7 @@ export class CaseModel {
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
         this.deceased = _.get(data, 'deceased');
         this.dateDeceased = _.get(data, 'dateDeceased');
+        this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
+        this.isolationDates = _.get(data, 'isolationDates', []);
     }
 }
