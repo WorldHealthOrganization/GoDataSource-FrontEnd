@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
@@ -13,18 +13,20 @@ export class AnswerComponent {
     @Input() answer: any;
     @Input() index: number;
     @Input() viewOnly: string;
+    @Output() deleteAnswer = new EventEmitter();
+    @Output() linkAnswer = new EventEmitter();
 
     constructor(
         private snackbarService:SnackbarService
     ) {
     }
 
-    link(questionSelected) {
-        console.log('TODO Link')
+    link() {
+        this.linkAnswer.emit(this.answer);
     }
 
-    delete(questionSelected) {
-        console.log('TODO Delete')
+    delete() {
+        this.deleteAnswer.emit(this.answer);
     }
 
 }
