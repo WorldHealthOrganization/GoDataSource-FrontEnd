@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 export enum StorageKey {
+    SELECTED_LANGUAGE_ID = 'SELECTED_LANGUAGE_ID',
     AUTH_DATA = 'AUTH_DATA',
     SELECTED_OUTBREAK = 'SELECTED_OUTBREAK'
 }

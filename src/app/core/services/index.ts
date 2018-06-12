@@ -6,6 +6,7 @@ import { CaseDataService } from './data/case.data.service';
 import { GenericDataService } from './data/generic.data.service';
 import { LocationDataService } from './data/location.data.service';
 import { UserRoleDataService } from './data/user-role.data.service';
+import { LanguageDataService } from './data/language.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -15,6 +16,7 @@ import { SnackbarService } from './helper/snackbar.service';
 import { ObservableHelperService } from './helper/observable-helper.service';
 import { RouterHelperService } from './helper/router-helper.service';
 import { FormHelperService } from './helper/form-helper.service';
+import { I18nService } from './helper/i18n.service';
 
 // export the list of services
 export const services: any[] = [
@@ -26,6 +28,7 @@ export const services: any[] = [
     CaseDataService,
     GenericDataService,
     LocationDataService,
+    LanguageDataService,
 
     // helper services
     StorageService,
@@ -35,4 +38,5 @@ export const services: any[] = [
     ObservableHelperService,
     RouterHelperService,
     FormHelperService,
+    I18nService,
 ];
