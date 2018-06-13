@@ -78,8 +78,6 @@ export class ModifyCaseComponent implements OnInit {
                         .getCase(currentOutbreak.id, this.caseId)
                         .subscribe(caseDataReturned => {
                             this.caseData = caseDataReturned;
-                            console.log("--------------------------------");
-                            console.log(this.caseData);
                         });
                 });
 
@@ -177,22 +175,19 @@ export class ModifyCaseComponent implements OnInit {
                      // selectedOutbreakSubscription.unsubscribe();
                      // modify Case
 
-                     console.log("--------------------------");
-                     console.log(dirtyFields);
+                     this.caseDataService
+                        .modifyCase(currentOutbreak.id, this.caseId, dirtyFields)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                     // this.caseDataService
-                     //    .modifyCase(currentOutbreak.id, this.caseId, dirtyFields)
-                     //    .catch((err) => {
-                     //        this.snackbarService.showError(err.message);
-                     //
-                     //        return ErrorObservable.create(err);
-                     //    })
-                     //    .subscribe(() => {
-                     //        this.snackbarService.showSuccess('Case saved!');
-                     //
-                     //        // navigate to listing page
-                     //        this.router.navigate(['/cases']);
-                     //     });
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Case saved!');
+
+                            // navigate to listing page
+                            this.router.navigate(['/cases']);
+                         });
                  });
         }
     }

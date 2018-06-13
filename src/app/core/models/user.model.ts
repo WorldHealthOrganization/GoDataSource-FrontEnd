@@ -22,7 +22,7 @@ export class UserModel {
     }
 
     hasPermissions(...permissions: string[]): boolean {
-        // return this.role.hasPermissions(...permissions);
-        return true;
+         return this.role.hasPermissions(...permissions);
+        // return true;
     }
 }
