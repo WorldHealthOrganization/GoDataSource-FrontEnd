@@ -8,6 +8,7 @@ export class UserModel {
     lastName: string;
     email: string;
     password: string;
+    passwordChange: boolean;
     roleIds: string[];
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
@@ -18,6 +19,7 @@ export class UserModel {
         this.lastName = _.get(data, 'lastName');
         this.email = _.get(data, 'email');
         this.password = _.get(data, 'password');
+        this.passwordChange = _.get(data, 'passwordChange', false);
         this.roleIds = _.get(data, 'roleIds', []);
     }
 

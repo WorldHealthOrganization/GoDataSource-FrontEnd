@@ -10,6 +10,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { RouterHelperService } from '../../../../core/services/helper/router-helper.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-change-password',
@@ -23,6 +25,8 @@ export class ChangePasswordComponent {
         new BreadcrumbItemModel('Change Password', '.', true)
     ];
 
+    authUser: UserModel;
+
     passwordChange = new PasswordChangeModel();
     passwordConfirmModel: string;
 
@@ -30,8 +34,10 @@ export class ChangePasswordComponent {
         private routerHelper: RouterHelperService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
-        private modelHelperService: ModelHelperService
+        private modelHelperService: ModelHelperService,
+        private authDataService: AuthDataService
     ) {
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     changePassword(form: NgForm) {
@@ -49,6 +55,14 @@ export class ChangePasswordComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe((auth: AuthModel) => {
+
+                    // check if user was required to change password
+                    if (this.authUser.passwordChange) {
+                        // update user details so next time it's not required to change its password again
+                        this.userDataService
+                            .modifyUser(this.authUser.id, {passwordChange: false})
+                            .subscribe();
+                    }
 
                     this.snackbarService.showSuccess('Password changed!');
 

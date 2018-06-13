@@ -20,8 +20,8 @@ export class LogoutComponent implements OnInit {
         // Logout from API
         this.authDataService.logout()
             .subscribe(() => {
-                // redirect to homepage
-                this.router.navigate(['']);
+                // redirect to Login page
+                this.router.navigate(['/auth/login']);
             });
     }
 

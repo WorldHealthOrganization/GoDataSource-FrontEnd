@@ -46,11 +46,20 @@ export class LoginComponent implements OnInit {
                     return ErrorObservable.create(err);
                 })
                 .subscribe((auth: AuthModel) => {
+                    // successfully authenticated;
 
                     this.snackbarService.showSuccess(`Welcome, ${auth.user.firstName} ${auth.user.lastName}!`);
 
-                    // successfully authenticated; redirect to dashboard landing page
-                    this.router.navigate(['']);
+                    // check if user needs to change password
+                    if (auth.user.passwordChange) {
+                        // user must change password
+                        this.router.navigate(['/account/change-password']);
+                    } else {
+                        // redirect to dashboard landing page
+                        this.router.navigate(['']);
+                    }
+
+
                 });
         }
     }
