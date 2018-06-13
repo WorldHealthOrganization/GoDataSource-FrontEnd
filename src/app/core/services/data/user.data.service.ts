@@ -52,6 +52,7 @@ export class UserDataService {
 
         return this.observableHelper.mapToModel(
             this.http.get(`users/${userId}?filter=${includes}`),
+            // this.http.get(`users/${userId}`),
             UserModel
         );
     }

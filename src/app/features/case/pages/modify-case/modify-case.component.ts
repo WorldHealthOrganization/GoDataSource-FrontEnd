@@ -87,7 +87,6 @@ export class ModifyCaseComponent implements OnInit {
     }
 
     ngOnInit() {
-
     }
 
     /**
@@ -174,6 +173,8 @@ export class ModifyCaseComponent implements OnInit {
                  .subscribe((currentOutbreak: OutbreakModel) => {
                      // selectedOutbreakSubscription.unsubscribe();
                      // modify Case
+                     dirtyFields.documents = this.caseData.documents;
+                     dirtyFields.addresses = this.caseData.addresses;
 
                      this.caseDataService
                         .modifyCase(currentOutbreak.id, this.caseId, dirtyFields)
