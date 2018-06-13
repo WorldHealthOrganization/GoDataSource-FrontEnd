@@ -22,9 +22,6 @@ export class UserModel {
     }
 
     hasPermissions(...permissions: string[]): boolean {
-        // return this.role.hasPermissions(...permissions);
-
-        // TODO only temporary return true.
-        return true;
+        return this.role.hasPermissions(...permissions);
     }
 }
