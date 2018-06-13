@@ -40,6 +40,8 @@ export class CaseModel {
         this.documents = _.get(data, 'documents', []);
         this.addresses = _.get(data, 'addresses', []);
         this.classification = _.get(data, 'classification');
+        this.riskLevel = _.get(data, 'riskLevel');
+        this.riskReason = _.get(data, 'riskReason');
         this.dateOfInfection = _.get(data, 'dateOfInfection');
         this.dateOfOnset = _.get(data, 'dateOfOnset');
         this.dateOfOutcome = _.get(data, 'dateOfOutcome');

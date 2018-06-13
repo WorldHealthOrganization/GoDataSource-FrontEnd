@@ -147,7 +147,8 @@ export class CreateCaseComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-
+            console.log("--------------------------");
+            console.log(dirtyFields);
             // get current outbreak
             const selectedOutbreakCompleted$ = new Subject();
             this.outbreakDataService
@@ -157,20 +158,20 @@ export class CreateCaseComponent implements OnInit {
                     selectedOutbreakCompleted$.next();
                     selectedOutbreakCompleted$.complete();
 
-                    // add the new Case
-                    this.caseDataService
-                        .createCase(currentOutbreak.id, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('Case added!');
-
-                            // navigate to listing page
-                            this.router.navigate(['/cases']);
-                        });
+                    // // add the new Case
+                    // this.caseDataService
+                    //     .createCase(currentOutbreak.id, dirtyFields)
+                    //     .catch((err) => {
+                    //         this.snackbarService.showError(err.message);
+                    //
+                    //         return ErrorObservable.create(err);
+                    //     })
+                    //     .subscribe(() => {
+                    //         this.snackbarService.showSuccess('Case added!');
+                    //
+                    //         // navigate to listing page
+                    //         this.router.navigate(['/cases']);
+                    //     });
                 });
         }
     }

@@ -19,6 +19,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE]
         }
+    },
+    // Edit Case
+    {
+        path: ':caseId/modify',
+        component: fromPages.ModifyCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
     }
 ];
 
