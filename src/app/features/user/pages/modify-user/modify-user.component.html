@@ -32,15 +32,16 @@
             </app-form-input>
 
             <app-form-select
-                name="roleId"
-                [(ngModel)]="user.roleId"
-                placeholder="Role"
+                name="roleIds"
+                [(ngModel)]="user.roleIds"
+                placeholder="Roles"
                 required="true"
                 [options]="rolesList$ | async"
                 optionLabelKey="name"
                 optionValueKey="id"
                 optionTooltipKey="description"
-                [disabled]="authUser.id === user.id">
+                [disabled]="authUser.id === user.id"
+                multiple="true">
             </app-form-select>
 
             <app-form-input

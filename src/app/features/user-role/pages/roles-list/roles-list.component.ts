@@ -9,6 +9,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-roles-list',
@@ -65,5 +66,20 @@ export class RolesListComponent {
                     this.loadRolesList();
                 });
         }
+    }
+
+    /**
+     * Get the list of table columns to be displayed
+     * @returns {string[]}
+     */
+    getTableColumns(): string[] {
+        const columns = ['name', 'description', 'permissions'];
+
+        // check if the authenticated user has WRITE access
+        if (this.authUser.hasPermissions(PERMISSION.WRITE_ROLE)) {
+            columns.push('actions');
+        }
+
+        return columns;
     }
 }

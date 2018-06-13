@@ -7,12 +7,14 @@ import * as _ from 'lodash';
 import { LoggerService } from '../helper/logger.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
+import { StorageKey, StorageService } from '../helper/storage.service';
 
 @Injectable()
 export class ResponseInterceptor implements HttpInterceptor {
 
     constructor(
         private loggerService: LoggerService,
+        private storageService: StorageService,
         private router: Router
     ) {
     }
@@ -43,8 +45,11 @@ export class ResponseInterceptor implements HttpInterceptor {
 
                 // for 401 response status, clear the Auth Data
                 if (error.status === 401) {
-                    // redirect to logout page
-                    this.router.navigate(['/auth/logout']);
+                    // remove auth info from local storage
+                    this.storageService.remove(StorageKey.AUTH_DATA);
+
+                    // redirect to Login page
+                    this.router.navigate(['/auth/login']);
                 }
 
                 return ErrorObservable.create(_.get(error, 'error.error', error.error));

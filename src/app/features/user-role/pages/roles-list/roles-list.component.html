@@ -68,8 +68,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="['name', 'description', 'permissions', 'actions']"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: ['name', 'description', 'permissions', 'actions']"></mat-row>
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
 
 </mat-card>

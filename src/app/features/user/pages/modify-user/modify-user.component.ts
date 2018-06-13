@@ -55,8 +55,8 @@ export class ModifyUserComponent {
             // retrieve the User instance
             this.userDataService
                 .getUser(this.userId)
-                .subscribe((userData) => {
-                    this.user = new UserModel(userData);
+                .subscribe((user: UserModel) => {
+                    this.user = user;
                 });
         });
 
