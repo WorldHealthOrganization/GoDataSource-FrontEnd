@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/helper/auth-guard.service';
-import { PERMISSION } from '../../core/models/user-role.model';
+import { PERMISSION } from '../../core/models/permission.model';
 
 const routes: Routes = [
     // Outbreaks list

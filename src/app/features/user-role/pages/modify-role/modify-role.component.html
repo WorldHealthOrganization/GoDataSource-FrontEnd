@@ -23,14 +23,14 @@
             </app-form-textarea>
 
             <app-form-select
-                name="permissions"
-                [(ngModel)]="userRole.permissions"
+                name="permissionIds"
+                [(ngModel)]="userRole.permissionIds"
                 placeholder="Options"
                 required="true"
                 [options]="availablePermissions$ | async"
-                optionLabelKey="key"
-                optionValueKey="key"
-                optionTooltipKey="key"
+                optionLabelKey="label"
+                optionValueKey="id"
+                optionTooltipKey="description"
                 multiple="true">
             </app-form-select>
 

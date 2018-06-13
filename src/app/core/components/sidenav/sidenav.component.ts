@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
-import { PERMISSION } from '../../models/user-role.model';
+import { PERMISSION } from '../../models/permission.model';
 
 import * as _ from 'lodash';
 import { ChildNavItem, NavItem } from './nav-item.class';

@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { ObservableHelperService } from '../helper/observable-helper.service';
+import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
+import { UserRoleModel } from '../../models/user-role.model';
+import { CacheKey, CacheService } from '../helper/cache.service';
 
 @Injectable()
 export class LanguageDataService {
 
     constructor(
         private http: HttpClient,
-        private observableHelper: ObservableHelperService
+        private modelHelper: ModelHelperService,
+        private cacheService: CacheService
     ) {
     }
 
@@ -18,10 +21,22 @@ export class LanguageDataService {
      * @returns {Observable<LanguageModel[]>}
      */
     getLanguagesList(): Observable<LanguageModel[]> {
-        return this.observableHelper.mapListToModel(
-            this.http.get(`languages`),
-            LanguageModel
-        );
+        // get languages list from cache
+        const languagesList = this.cacheService.get(CacheKey.LANGUAGES);
+        if (languagesList) {
+            return Observable.of(languagesList);
+        } else {
+            // get languages list from API
+            return this.modelHelper
+                .mapObservableListToModel(
+                    this.http.get(`languages`),
+                    LanguageModel
+                )
+                .do((languages) => {
+                    // cache the list
+                    this.cacheService.set(CacheKey.LANGUAGES, languages);
+                });
+        }
     }
 
     /**
@@ -30,7 +45,7 @@ export class LanguageDataService {
      * @returns {Observable<LanguageTokenModel[]>}
      */
     getLanguageTokens(lang: LanguageModel): Observable<LanguageTokenModel[]> {
-        return this.observableHelper.mapListToModel(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`languages/${lang.id}/language-tokens`),
             LanguageTokenModel
         );

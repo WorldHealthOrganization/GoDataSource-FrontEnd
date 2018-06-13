@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { ObservableHelperService } from '../helper/observable-helper.service';
+import { ModelHelperService } from '../helper/model-helper.service';
 
 import 'rxjs/add/operator/map';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -21,7 +21,7 @@ export class OutbreakDataService {
 
     constructor(
         private http: HttpClient,
-        private observableHelper: ObservableHelperService,
+        private modelHelper: ModelHelperService,
         private storageService: StorageService
     ) {
         // determine the current Outbreak
@@ -38,7 +38,7 @@ export class OutbreakDataService {
         if(queryBuilder === null) queryBuilder = new RequestQueryBuilder();
         const filter = queryBuilder.buildQuery();
 
-        return this.observableHelper.mapListToModel(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel
         );
@@ -68,7 +68,7 @@ export class OutbreakDataService {
      * @returns {Observable<OutbreakModel>}
      */
     getOutbreak(outbreakId: string): Observable<OutbreakModel> {
-        return this.observableHelper.mapToModel(
+        return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}`),
             OutbreakModel
         );
@@ -95,7 +95,7 @@ export class OutbreakDataService {
             }
         });
 
-        return this.observableHelper.mapToModel(
+        return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks?filter=${filter}`)
                 .map((outbreaks) => {
                     return _.get(outbreaks, '[0]', null);

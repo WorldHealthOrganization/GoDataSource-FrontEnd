@@ -8,6 +8,8 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { RouterHelperService } from '../../../../core/services/helper/router-helper.service';
+import { LanguageModel } from '../../../../core/models/language.model';
+import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
 
 @Component({
     selector: 'app-change-password',
@@ -27,7 +29,8 @@ export class ChangePasswordComponent {
     constructor(
         private routerHelper: RouterHelperService,
         private userDataService: UserDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private modelHelperService: ModelHelperService
     ) {
     }
 
@@ -35,7 +38,7 @@ export class ChangePasswordComponent {
         if (form.valid) {
             const dirtyFields: any[] = form.value;
 
-            const data = new PasswordChangeModel(dirtyFields);
+            const data = this.modelHelperService.getModelInstance(PasswordChangeModel, dirtyFields);
 
             // try to authenticate the user
             this.userDataService

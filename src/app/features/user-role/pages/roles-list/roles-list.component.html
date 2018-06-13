@@ -6,7 +6,7 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="rolesListObs | async" matSort>
+    <mat-table #table [dataSource]="rolesList$ | async" matSort>
 
         <!-- Name -->
         <ng-container matColumnDef="name">
@@ -35,7 +35,7 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip *ngFor="let permission of item.permissions" [matTooltip]="'#TOOD Permission description'">{{ permission }}</mat-chip>
+                    <mat-chip *ngFor="let permission of item.permissions" [matTooltip]="permission.description | translate">{{ permission.label | translate }}</mat-chip>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>
@@ -51,14 +51,14 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <span [matTooltip]="(item.name === authUser.role.name ? 'You cannot modify the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="item.name === authUser.role.name" [routerLink]="['.', item.id, 'modify']">
+                    <span [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
+                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" [routerLink]="['.', item.id, 'modify']">
                             Modify
                         </button>
                     </span>
 
-                    <span [matTooltip]="(item.name === authUser.role.name ? 'You cannot delete the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="item.name === authUser.role.name" (click)="deleteRole(item)">
+                    <span [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
+                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)">
                             Delete
                         </button>
                     </span>

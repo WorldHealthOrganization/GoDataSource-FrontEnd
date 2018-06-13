@@ -25,7 +25,7 @@ export class RolesListComponent {
     // authenticated user
     authUser: UserModel;
     // list of existing roles
-    rolesListObs: Observable<UserRoleModel[]>;
+    rolesList$: Observable<UserRoleModel[]>;
 
     constructor(
         private router: Router,
@@ -44,7 +44,7 @@ export class RolesListComponent {
      */
     loadRolesList() {
         // get the list of existing roles
-        this.rolesListObs = this.userRoleDataService.getRolesList();
+        this.rolesList$ = this.userRoleDataService.getRolesList();
     }
 
     deleteRole(userRole: UserRoleModel) {

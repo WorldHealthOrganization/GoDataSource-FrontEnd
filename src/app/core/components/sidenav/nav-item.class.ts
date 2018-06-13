@@ -1,4 +1,4 @@
-import { PERMISSION } from '../../models/user-role.model';
+import { PERMISSION } from '../../models/permission.model';
 
 export class ChildNavItem {
 

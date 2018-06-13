@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import { NgForm } from "@angular/forms";
 import { FormHelperService } from "../../../../core/services/helper/form-helper.service";
 import { Observable } from "rxjs/Observable";
+import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -67,6 +68,7 @@ export class CreateOutbreakComponent {
             !_.isEmpty(dirtyFields)
         ) {
             const outbreakData = new OutbreakModel(dirtyFields);
+
             outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
             // temporary populate array with one question.
             // TODO add validation on questionnaires
