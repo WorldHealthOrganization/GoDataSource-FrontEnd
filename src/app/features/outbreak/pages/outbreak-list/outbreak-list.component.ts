@@ -5,6 +5,8 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { Observable } from "rxjs/Observable";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
+import { RequestQueryBuilder } from "../../../../core/services/helper/request-query-builder";
+import { CaseModel } from "../../../../core/models/case.model";
 
 @Component({
     selector: 'app-outbreak-list',
@@ -19,7 +21,8 @@ export class OutbreakListComponent {
     ];
 
     // list of existing outbreaks
-    outbreaksListObs: Observable<OutbreakModel[]>;
+    outbreaksList$: Observable<OutbreakModel[]>;
+    outbreaksListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
 
     constructor(
@@ -29,11 +32,17 @@ export class OutbreakListComponent {
         this.loadOutbreaksList();
     }
 
+    /**
+     * Load the list of outbreaks
+     */
     loadOutbreaksList() {
-        // get the list of existing roles
-        this.outbreaksListObs = this.outbreakDataService.getOutbreaksList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.outbreaksListQueryBuilder);
     }
 
+    /**
+     * Delete an outbreak instance
+     * @param outbreak
+     */
     delete(outbreak) {
         if (confirm('Are you sure you want to delete ' + outbreak.name + ' ?')) {
             this.outbreakDataService
@@ -47,6 +56,40 @@ export class OutbreakListComponent {
                     this.loadOutbreaksList();
                 });
         }
+    }
+
+    /**
+     * Filter the Outbreaks list by some field
+     * @param property
+     * @param value
+     */
+    filterBy(property, value) {
+        this.outbreaksListQueryBuilder.where({
+            [property]: {
+                regexp: `/^${value}/i`
+            }
+        });
+        this.loadOutbreaksList();
+    }
+
+    /**
+     * Filter the Outbreaks list by some field
+     * @param property
+     * @param value
+     */
+    filterActiveBy(property, option) {
+        if (option.value == 'all') {
+            this.outbreaksListQueryBuilder.where({
+                [property]: {
+                    gte: 0
+                }
+            });
+        }else{
+            this.outbreaksListQueryBuilder.where({
+                [property]: option.value
+            });
+        }
+        this.loadOutbreaksList();
     }
 
 }

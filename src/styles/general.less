@@ -1,5 +1,4 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
-
 //Imports:
 @import '_fonts';
 @import 'common';
@@ -19,7 +18,7 @@ html, body, ul, li, div, span {
 /* Commonly used styles */
 .page-section {
     margin: 15px;
-    box-shadow: -2px 2px 8px 1px rgba(0,0,0,.3) !important;
+    box-shadow: -2px 2px 8px 1px rgba(0, 0, 0, .3) !important;
 
     /* Mat Table overrides */
     .mat-table {
@@ -79,13 +78,25 @@ html, body, ul, li, div, span {
     }
 
     // custom buttons having only icon - adjust width
-    .iconBtn{
-        min-width:1%;
+    .iconBtn {
+        min-width: 1%;
         width: 10px;
     }
 
-    app-form-slide-toggle{
+    app-form-slide-toggle {
         display: inline-block;
+    }
+
+    // handle the tooltips on input fields
+    .form-input-tooltip {
+        .mat-input-element {
+            width: 85%;
+        }
+
+        .form-icon {
+            cursor: pointer;
+            line-height: 0;
+        }
     }
 }
 
@@ -121,4 +132,5 @@ html, body, ul, li, div, span {
             margin: 0 0 7px 0;
         }
     }
+
 }

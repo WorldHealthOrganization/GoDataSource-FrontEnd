@@ -6,6 +6,8 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { MatTabChangeEvent } from "@angular/material";
+import { Observable } from "rxjs/Observable";
+import { GenericDataService } from "../../../../core/services/data/generic.data.service";
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -22,6 +24,8 @@ export class ModifyOutbreakComponent {
 
     outbreakId: string;
     outbreak: OutbreakModel = new OutbreakModel();
+    diseasesList$: Observable<any[]>;
+    countriesList$: Observable<any[]>;
 
     // controls for switching between view and edit mode
     viewOnlyCaseInvestigation = true;
@@ -37,6 +41,7 @@ export class ModifyOutbreakComponent {
     constructor(private outbreakDataService: OutbreakDataService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private genericDataService: GenericDataService,
                 private snackbarService: SnackbarService) {
 
         this.route.params.subscribe(params => {
@@ -50,8 +55,13 @@ export class ModifyOutbreakComponent {
                     this.caseInvestigationTemplateQuestions = outbreakData.caseInvestigationTemplate;
                     this.contactFollowupTemplateQuestions = outbreakData.contactFollowUpTemplate;
                     this.labResultsTemplateQuestions = outbreakData.labResultsTemplate;
-                });
+                    this.diseasesList$ = this.genericDataService.getDiseasesList();
+                    this.countriesList$ = this.genericDataService.getCountriesList();
 
+                    // convert countries from list of countries separated by comma into array
+                    // TODO - this is only temporary until backend is fixed
+                    this.outbreak.locationId = outbreakData.locationId.split(',');
+                });
 
         });
     }
@@ -65,18 +75,24 @@ export class ModifyOutbreakComponent {
             dirtyFields.contactFollowupTemplate = this.contactFollowupTemplateQuestions;
             dirtyFields.labResultsTemplate = this.labResultsTemplateQuestions;
 
-            // modify the outbreak
-            this.outbreakDataService
-                .modifyOutbreak(this.outbreakId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('Outbreak modified!');
-                    // navigate to listing page
-                    this.router.navigate(['/outbreaks']);
-                });
+            // validate end date to be greater than start date
+            if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
+                this.snackbarService.showError("End Date needs to be greater than start date");
+            } else {
+
+                // modify the outbreak
+                this.outbreakDataService
+                    .modifyOutbreak(this.outbreakId, dirtyFields)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        this.snackbarService.showSuccess('Outbreak modified!');
+                        // navigate to listing page
+                        this.router.navigate(['/outbreaks']);
+                    });
+            }
         }
     }
 
@@ -143,7 +159,10 @@ export class ModifyOutbreakComponent {
         };
         switch (tab) {
             case 'case-investigation': {
-                newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
+                console.log(this.caseInvestigationTemplateQuestions);
+                console.log(this.caseInvestigationTemplateQuestions != []);
+                let caseInvestigationQuestionsLength = (this.caseInvestigationTemplateQuestions != []) ? this.caseInvestigationTemplateQuestions.length : 0;
+                newQuestion.order = caseInvestigationQuestionsLength + 1;
                 this.caseInvestigationTemplateQuestions.push(newQuestion);
                 break;
             }
@@ -161,6 +180,11 @@ export class ModifyOutbreakComponent {
         this.scrollToEndQuestions();
     }
 
+    /**
+     * Delete a question from the questionnaire
+     * @param tab
+     * @param question
+     */
     deleteQuestion(tab, question) {
         if (confirm("Are you sure you want to delete this question? ")) {
             switch (tab) {
@@ -180,8 +204,13 @@ export class ModifyOutbreakComponent {
         }
     }
 
-    duplicateQuestion(tab,question){
-        if(confirm("Are you sure you want to duplicate this question? ")){
+    /**
+     * Duplicate a question. It will be added to the end
+     * @param tab
+     * @param question
+     */
+    duplicateQuestion(tab, question) {
+        if (confirm("Are you sure you want to duplicate this question? ")) {
             let newQuestion = JSON.parse(JSON.stringify(question));
             switch (tab) {
                 case 'case-investigation': {
@@ -204,6 +233,11 @@ export class ModifyOutbreakComponent {
         }
     }
 
+    /**
+     * Delete an answer
+     * @param tab
+     * @param $event
+     */
     deleteAnswer(tab, $event) {
         if (confirm("Are you sure you want to delete this answer? ")) {
             let answerToDelete = $event.answer;
@@ -226,6 +260,11 @@ export class ModifyOutbreakComponent {
         }
     }
 
+    /**
+     * Link an answer to another question
+     * @param tab
+     * @param $event
+     */
     linkAnswer(tab, $event) {
         if (confirm("Are you sure you want to link this answer? ")) {
             let answerToLink = $event.answer;
@@ -248,7 +287,10 @@ export class ModifyOutbreakComponent {
         }
     }
 
-    scrollToEndQuestions(){
+    /**
+     * Scroll to the bottom
+     */
+    scrollToEndQuestions() {
         setTimeout(function () {
             let elements = document.querySelectorAll('question');
             let len = elements.length;
@@ -257,7 +299,6 @@ export class ModifyOutbreakComponent {
             el.scrollIntoView({behavior: "smooth"});
         }, 100);
     }
-
 
 
 }

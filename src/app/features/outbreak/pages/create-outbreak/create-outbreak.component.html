@@ -4,171 +4,202 @@
     </ng-container>
 </app-topnav>
 
-<div class="form-content">
+<div class="page-content">
 
     <mat-horizontal-stepper linear #stepper>
+
+        <!-- step Details -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
                 <ng-template matStepLabel>Details</ng-template>
 
                 <mat-card class="page-section">
+                    <div fxLayout="column">
 
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="name"
-                                        [(ngModel)]="newOutbreak.name"
-                                        placeholder="Outbreak name"
-                                        required="true">
-                        </app-form-input>
-                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        name="disease"
-                                        [(ngModel)]="newOutbreak.disease"
-                                        placeholder="Disease"
-                                        required="true">
-                        </app-form-input>
-
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-textarea fxFlex="42%"
-                                           name="description"
-                                           [(ngModel)]="newOutbreak.description"
-                                           placeholder="Description"
-                                           required="true">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="newOutbreak.name"
+                                placeholder="Outbreak name"
+                                required="true">
+                            </app-form-input>
+                            <app-form-select
+                                name="disease"
+                                [(ngModel)]="newOutbreak.disease"
+                                placeholder="Disease"
+                                [options]="diseasesList$ | async"
+                                required="true">
+                            </app-form-select>
+                            <app-form-select
+                                name="locationId"
+                                [(ngModel)]="newOutbreak.locationId"
+                                placeholder="Countries"
+                                [options]="countriesList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                required="true"
+                                multiple="true"
+                            >
+                            </app-form-select>
+                            <app-form-slide-toggle
+                                name="active"
+                                [(ngModel)]="newOutbreak.active"
+                                label="Active?">
+                            </app-form-slide-toggle>
+                        </div>
+                        <app-form-textarea
+                            name="description"
+                            [(ngModel)]="newOutbreak.description"
+                            placeholder="Description"
+                            required="true">
                         </app-form-textarea>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="country"
-                                        [(ngModel)]="newOutbreak.country"
-                                        placeholder="Country"
-                                        required="true">
-                        </app-form-input>
-                        <app-form-slide-toggle fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                               name="active"
-                                               [(ngModel)]="newOutbreak.active"
-                                               label="Active?">
-                        </app-form-slide-toggle>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-datepicker fxFlex="20%"
-                                             name="startDate"
-                                             [(ngModel)]="newOutbreak.startDate"
-                                             placeholder="Start Date"
-                                             required="true">
-                        </app-form-datepicker>
-                        <app-form-datepicker fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                             name="endDate"
-                                             [(ngModel)]="newOutbreak.endDate"
-                                             placeholder="End Date">
-                        </app-form-datepicker>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="periodOfFollowup"
-                                        [(ngModel)]="newOutbreak.periodOfFollowup"
-                                        placeholder="Duration for the follow-up ( days) "
-                                        required="true">
-                        </app-form-input>
-                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        name="frequencyOfFollowUp"
-                                        [(ngModel)]="newOutbreak.frequencyOfFollowUp"
-                                        placeholder="Follow-up frecquency"
-                                        required="true">
-                        </app-form-input>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="noDaysAmongContacts"
-                                        [(ngModel)]="newOutbreak.noDaysAmongContacts"
-                                        placeholder="KPI - days among known contacts"
-                                        required="true">
-                        </app-form-input>
-                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        name="noDaysDaysInChains"
-                                        [(ngModel)]="newOutbreak.noDaysDaysInChains"
-                                        placeholder="KPI - days in known transmission chains"
-                                        required="true">
-                        </app-form-input>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="noDaysNotSeen"
-                                        [(ngModel)]="newOutbreak.noDaysNotSeen"
-                                        placeholder="KPI - days not seen"
-                                        required="true">
-                        </app-form-input>
-                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        name="noLessContacts"
-                                        [(ngModel)]="newOutbreak.noLessContacts"
-                                        placeholder="KPI - less than X contacts"
-                                        required="true">
-                        </app-form-input>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="caseIdMask"
-                                        [(ngModel)]="newOutbreak.caseIdMask"
-                                        placeholder="Case Id Mask"
-                                        required="true">
-                        </app-form-input>
-                        <app-form-input fxFlex="20%" fxFlex.sm="30%" fxFlexOffset="20px" fxFlexOffset.sm="0px"
-                                        name="locationId"
-                                        [(ngModel)]="newOutbreak.locationId"
-                                        placeholder="Location"
-                                        required="true">
-                        </app-form-input>
-                    </div>
-                    <div fxLayout.xs="column">
-                        <app-form-input fxFlex="20%"
-                                        name="longPeriodsBetweenCaseOnset"
-                                        [(ngModel)]="newOutbreak.longPeriodsBetweenCaseOnset"
-                                        placeholder="Long Periods ( days )"
-                                        required="true">
-                        </app-form-input>
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-datepicker
+                                name="startDate"
+                                [(ngModel)]="newOutbreak.startDate"
+                                placeholder="Start Date"
+                                required="true">
+                            </app-form-datepicker>
+                            <app-form-datepicker
+                                name="endDate"
+                                [(ngModel)]="newOutbreak.endDate"
+                                placeholder="End Date">
+                            </app-form-datepicker>
+                            <app-form-input
+                                name="periodOfFollowup"
+                                [(ngModel)]="newOutbreak.periodOfFollowup"
+                                placeholder="Duration for the follow-up ( days) "
+                                required="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="frequencyOfFollowUp"
+                                [(ngModel)]="newOutbreak.frequencyOfFollowUp"
+                                placeholder="Follow-up frecquency"
+                                required="true">
+                            </app-form-input>
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="noDaysAmongContacts"
+                                [(ngModel)]="newOutbreak.noDaysAmongContacts"
+                                placeholder="KPI - days among known contacts"
+                                required="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="noDaysDaysInChains"
+                                [(ngModel)]="newOutbreak.noDaysDaysInChains"
+                                placeholder="KPI - days in known transmission chains"
+                                required="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="noDaysNotSeen"
+                                [(ngModel)]="newOutbreak.noDaysNotSeen"
+                                placeholder="KPI - days not seen"
+                                required="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="noLessContacts"
+                                [(ngModel)]="newOutbreak.noLessContacts"
+                                placeholder="KPI - less than X contacts"
+                                required="true">
+                            </app-form-input>
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="caseIdMask"
+                                [(ngModel)]="newOutbreak.caseIdMask"
+                                placeholder="Case Id Mask"
+                                required="true"
+                                tooltip="Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999.">
+                            </app-form-input>
+                            <app-form-input
+                                name="longPeriodsBetweenCaseOnset"
+                                [(ngModel)]="newOutbreak.longPeriodsBetweenCaseOnset"
+                                placeholder="KPI - long periods ( days )"
+                                required="true">
+                            </app-form-input>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
                     </div>
                 </mat-card>
-
                 <div>
                     <button mat-raised-button color="primary" matStepperNext>Next</button>
                 </div>
             </form>
         </mat-step>
 
+        <!-- step Case Investigation - questionnaire -->
         <mat-step [stepControl]="caseInvestigationForm">
             <form #caseInvestigationForm="ngForm">
                 <ng-template matStepLabel>Case Investigation</ng-template>
-
-                <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
-                          [viewOnly]="viewOnlyCaseInvestigation"></question>
-
+                <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyCaseInvestigation}}" type="button" mat-button
+                            color="primary" (click)="addNewQuestion('case-investigation')">Add Question
+                    </button>
+                </div>
+                <div class="questions-wrapper">
+                    <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
+                              [viewOnly]="viewOnlyCaseInvestigation"
+                              (deleteQuestion)="deleteQuestion('case-investigation',question)"
+                              (deleteAnswer)="deleteAnswer('case-investigation',$event)"
+                              (linkAnswer)="linkAnswer('case-investigation',$event)"
+                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)"></question>
+                </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>
         </mat-step>
+
+        <!-- step Contact Follow-up - questionnaire -->
         <mat-step [stepControl]="contactFollowUpForm">
             <form #contactFollowUpForm="ngForm">
                 <ng-template matStepLabel>Contact Follow-up</ng-template>
-
-                <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
-                          [viewOnly]="viewOnlyContactFollowup"></question>
-
+                <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyContactFollowup}}" type="button" mat-button
+                            color="primary" (click)="addNewQuestion('contact-followup')">Add Question
+                    </button>
+                </div>
+                <div class="questions-wrapper">
+                    <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
+                              [viewOnly]="viewOnlyContactFollowup"
+                              (deleteQuestion)="deleteQuestion('contact-followup',question)"
+                              (deleteAnswer)="deleteAnswer('contact-followup',$event)"
+                              (linkAnswer)="linkAnswer('contact-followup',$event)"
+                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)"></question>
+                </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>
         </mat-step>
+
+        <!-- step Lab Results - questionnaire -->
         <mat-step [stepControl]="labResultsForm">
             <form #labResultsForm="ngForm">
                 <ng-template matStepLabel>Lab Results</ng-template>
-
-                <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
-                          [viewOnly]="viewOnlyLabResults"></question>
-
+                <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyLabResults}}" type="button" mat-button
+                            color="primary" (click)="addNewQuestion('lab-results')">Add Question
+                    </button>
+                </div>
+                <div class="questions-wrapper">
+                    <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
+                              [viewOnly]="viewOnlyLabResults"
+                              (deleteQuestion)="deleteQuestion('lab-results',question)"
+                              (deleteAnswer)="deleteAnswer('lab-results',$event)"
+                              (linkAnswer)="linkAnswer('lab-results',$event)"
+                              (duplicateQuestion)="duplicateQuestion('lab-results',question)"></question>
+                </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>
         </mat-step>
 
-        <!-- Final step -->
+        <!-- Final step - submit -->
         <mat-step>
             <ng-template matStepLabel>Done</ng-template>
-            You are now done.
+            <br><br><br>
+            <div fxLayout="row" fxLayoutGap="50px" fxFlex fxFlexAlign="center">
+                You are now done.
+            </div>
+            <br><br><br>
             <div>
                 <button matStepperPrevious mat-raised-button>Back</button>
                 <button type="button" mat-raised-button color="primary"

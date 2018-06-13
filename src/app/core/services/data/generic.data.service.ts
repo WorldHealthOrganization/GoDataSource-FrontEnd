@@ -36,5 +36,22 @@ export class GenericDataService {
     getDocumentTypesList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.DOCUMENT_TYPE));
     }
+
+    /**
+     * Retrieve the list of Diseases
+     * @returns {Observable<any[]>}
+     */
+    getDiseasesList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.DISEASE));
+    }
+
+    /**
+     * Retrieve the list of Countries
+     * @returns {Observable<any[]>}
+     */
+    getCountriesList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.COUNTRY));
+    }
+
 }
 

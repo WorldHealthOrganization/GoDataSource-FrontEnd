@@ -23,6 +23,7 @@ export class FormInputComponent extends ElementBase<string> {
     @Input() required: boolean = false;
     @Input() name: string;
     @Input() disabled: boolean = false;
+    @Input() tooltip: string = null;
 
 
     @Output() optionChanged = new EventEmitter<any>();
@@ -49,7 +50,6 @@ export class FormInputComponent extends ElementBase<string> {
      * Function triggered when the input value is changed
      */
     onChange() {
-        console.log(this.value);
 
         // emit the current value
         return this.optionChanged.emit(this.value);
