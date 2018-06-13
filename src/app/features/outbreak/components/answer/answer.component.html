@@ -1,4 +1,4 @@
-<div fxLayout.xs="column">
+<div fxLayout="row" fxFlex>
     <div class="answer-badge align-center" fxFlex="40px">
         A{{index+1}}
     </div>
@@ -20,7 +20,7 @@
             disabled="{{viewOnly}}">
         </app-form-input>
     </div>
-    <div class="answer-box align-center" fxFlex="20">
+    <div class="answer-box align-center" fxFlex="15">
         <app-form-select
             name="answer.type"
             [(ngModel)]="answer.type"
@@ -31,22 +31,20 @@
             disabled="{{viewOnly}}">
         </app-form-select>
     </div>
-    <div class="answer-box align-center" fxFlex="20" fxHide="{{viewOnly}}">
-        <mat-slide-toggle
+    <div class="answer-box align-right" fxFlex="25" fxHide="{{viewOnly}}" >
+
+        <app-form-slide-toggle
             name="answer.alert"
             [(ngModel)]="answer.alert"
-            [checked]="checked"
-            [labelPosition]="before">
-            Alert?
-        </mat-slide-toggle>
-        <br>
-        <button mat-button type="button" color="primary" (click)="link(answer)">Link</button>
-        <button mat-button type="button" color="warn" (click)="delete(answer)">Delete</button>
+            label="Alert?">
+        </app-form-slide-toggle>
+
+        <button class="iconBtn"  mat-button type="button" color="primary" (click)="link()"> <span class="xt-icon">link</span> </button>
+        <button class="iconBtn" mat-button type="button" color="warn" (click)="delete()" color="warn"> <span class="xt-icon">delete</span> </button>
     </div>
     <div class="answer-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
         <div class="alert-label">{{ answer.alert ? "ALERT" : ""}}</div>
     </div>
-
 
 </div>
 

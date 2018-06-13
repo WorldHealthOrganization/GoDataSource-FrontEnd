@@ -1,5 +1,5 @@
-<mat-card class="page-section">
-    <div fxLayout.xs="column" class="question-wrapper">
+<mat-card class="page-section question-card">
+    <div fxLayout="row" class="question-wrapper">
         <div class="question-badge align-center" fxFlex="40px">
             Q{{question.order}}
         </div>
@@ -24,24 +24,28 @@
                 disabled="{{viewOnly}}">
             </app-form-select>
         </div>
-        <div class="question-box" fxFlex="20">
+        <div class="question-box" fxFlex="15">
         </div>
-        <div class="question-box align-center" fxFlex="20" fxHide="{{viewOnly}}">
-            <mat-slide-toggle
+        <div class="question-box  align-right" fxFlex="25" fxHide="{{viewOnly}}">
+            <app-form-slide-toggle
                 name="question.required"
                 [(ngModel)]="question.required"
-                [checked]="checked"
-                [labelPosition]="before">
-                Required?
-            </mat-slide-toggle>
-            <br>
-            <button mat-button type="button" color="primary" (click)="duplicate(question)">Duplicate</button>
-            <button mat-button type="button" color="warn" (click)="delete(question)">Delete</button>
+                label="Required?">
+            </app-form-slide-toggle>
+            <button class="iconBtn" mat-button type="button" color="primary" (click)="duplicate()"><span
+                class="xt-icon">duplicate</span></button>
+            <button class="iconBtn" mat-button type="button" color="warn" (click)="delete()"><span
+                class="xt-icon">delete</span></button>
         </div>
         <div class="question-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
             <div class="alert-label">{{ question.required ? "REQUIRED" : ""}}</div>
         </div>
     </div>
-    <answer *ngFor="let answer of question.answers; let i=index" [answer]="answer" [index]="i" [viewOnly]="viewOnly"
+    <answer class="answer-wrapper" *ngFor="let answer of question.answers; let i=index"
+            [answer]="answer"
+            [index]="i"
+            [viewOnly]="viewOnly"
+            (deleteAnswer)="deleteAnswerFromQuestion(answer)"
+            (linkAnswer)="linkAnswerQuestion(answer)"
             fxLayout="column"></answer>
 </mat-card>

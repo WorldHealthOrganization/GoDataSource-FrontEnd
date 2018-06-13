@@ -13,7 +13,10 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 export class QuestionComponent {
     @Input() question: any;
     @Input() viewOnly: string;
-    @Output() change = new EventEmitter();
+    @Output() deleteQuestion = new EventEmitter();
+    @Output() duplicateQuestion = new EventEmitter();
+    @Output() deleteAnswer = new EventEmitter();
+    @Output() linkAnswer = new EventEmitter();
 
     constructor(
         private snackbarService: SnackbarService
@@ -22,13 +25,20 @@ export class QuestionComponent {
     }
 
 
-    duplicate(questionSelected) {
-        this.change.emit(this.question);
-        console.log('TODO Duplicate')
+    duplicate() {
+        this.duplicateQuestion.emit(this.question);
     }
 
-    delete(questionSelected) {
-        console.log('TODO Delete')
+    delete() {
+        this.deleteQuestion.emit(this.question);
+    }
+
+    deleteAnswerFromQuestion(answer){
+        this.deleteAnswer.emit({answer: answer});
+    }
+
+    linkAnswerQuestion(answer){
+        this.linkAnswer.emit({answer: answer});
     }
 
 }

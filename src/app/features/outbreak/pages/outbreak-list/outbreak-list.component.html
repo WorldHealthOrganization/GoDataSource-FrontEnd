@@ -6,11 +6,21 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="outbreaksListObs | async" matSort>
+    <mat-table #table [dataSource]="outbreaksList$ | async" matSort>
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef mat-sort-header>
-                Name
+                <div class="table-header-cell">
+                    <div>Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('name', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.name}}
@@ -19,7 +29,17 @@
         <!-- Disease -->
         <ng-container matColumnDef="disease" mat-sort-header>
             <mat-header-cell *matHeaderCellDef>
-                Disease
+                <div class="table-header-cell">
+                    <div>Disease</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('disease', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.disease}}
@@ -28,25 +48,40 @@
         <!-- Country -->
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
-                Country
+                <div class="table-header-cell">
+                    <div>Country</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.country}}
+                {{outbreak.locationId}}
             </mat-cell>
         </ng-container>
         <!-- Start Date -->
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef>
-                Start Date
+                <div class="table-header-cell">
+                    <div>Start Date</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.startDate | date: 'dd/MM/yyy' }}
+                {{outbreak.startDate | date: 'yyy-MM-dd' }}
             </mat-cell>
         </ng-container>
         <!-- End Date -->
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef>
-                End Date
+                <div class="table-header-cell">
+                    <div>End Date</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.endDate | date: 'dd/MM/yyy'}}
@@ -55,7 +90,20 @@
         <!-- Active -->
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
-                Active?
+                <div class="table-header-cell">
+                    <div>Active?</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            [options]="[{'value':'all','label':'All'},{'value':'1','label':'Yes'},{'value':'0','label':'NO'}]"
+                            multiple="false"
+                            (optionChanged)="filterActiveBy('active', $event)">
+                            >
+                        </app-form-select>
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.active ? 'YES' : 'NO'}}
@@ -86,8 +134,10 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ]"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: ['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ]"></mat-row>
+        <mat-header-row
+            *matHeaderRowDef="['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ]"></mat-header-row>
+        <mat-row
+            *matRowDef="let item; columns: ['name', 'disease', 'country', 'startDate', 'endDate', 'active','actions' ]"></mat-row>
 
     </mat-table>
 </mat-card>

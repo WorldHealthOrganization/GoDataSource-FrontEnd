@@ -10,6 +10,7 @@ import { StorageKey, StorageService } from '../helper/storage.service';
 
 import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { RequestQueryBuilder } from "../helper/request-query-builder";
 
 
 @Injectable()
@@ -29,11 +30,16 @@ export class OutbreakDataService {
 
     /**
      * Retrieve the list of Outbreaks
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<OutbreakModel[]>}
      */
-    getOutbreaksList(): Observable<OutbreakModel[]> {
+    getOutbreaksList(queryBuilder: RequestQueryBuilder = null): Observable<OutbreakModel[]> {
+
+        if(queryBuilder === null) queryBuilder = new RequestQueryBuilder();
+        const filter = queryBuilder.buildQuery();
+
         return this.observableHelper.mapListToModel(
-            this.http.get('outbreaks'),
+            this.http.get(`outbreaks?filter=${filter}`),
             OutbreakModel
         );
     }

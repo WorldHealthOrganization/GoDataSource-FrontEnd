@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'help': '&#xe90f;',
+            'link': '&#xe90e;',
             'delete': '&#xe90d;',
             'arrowDown': '&#xe90c;',
             'moreVertical': '&#xe90b;',
