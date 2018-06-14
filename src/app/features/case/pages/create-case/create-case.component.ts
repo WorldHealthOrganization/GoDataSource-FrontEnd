@@ -147,7 +147,6 @@ export class CreateCaseComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-
             // get current outbreak
             const selectedOutbreakCompleted$ = new Subject();
             this.outbreakDataService
