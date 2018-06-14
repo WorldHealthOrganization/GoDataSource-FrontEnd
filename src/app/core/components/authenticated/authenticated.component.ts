@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatSidenav } from '@angular/material';
+import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 
 @Component({
     selector: 'app-authenticated',
@@ -20,7 +21,8 @@ export class AuthenticatedComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService
     ) {
         // detect when the route is changed
         this.router.events.subscribe(() => {
@@ -40,6 +42,9 @@ export class AuthenticatedComponent implements OnInit {
             // user is NOT authenticated; redirect to Login page
             return this.router.navigate(['/auth/login']);
         }
+
+        // determine the Selected Outbreak
+        this.outbreakDataService.determineSelectedOutbreak().subscribe();
 
         if (this.router.url === '/') {
             // redirect to default landing page

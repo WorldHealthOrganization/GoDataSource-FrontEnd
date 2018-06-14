@@ -6,6 +6,8 @@ export class RequestQueryBuilder {
     public includedRelations: any[] = [];
     // Where conditions
     public whereCondition: any = {};
+    // Limit
+    public limitResultsNumber: number;
     // Fields to retrieve
     public fieldsInResponse: string[] = [];
 
@@ -19,6 +21,14 @@ export class RequestQueryBuilder {
         this.whereCondition = {...this.whereCondition, ...condition};
 
         return this;
+    }
+
+    /**
+     * Sets a "limit" on the number of results retrieved in a list
+     * @param {number} limit
+     */
+    limit(limit: number) {
+        this.limitResultsNumber = limit;
     }
 
     /**
@@ -71,6 +81,10 @@ export class RequestQueryBuilder {
             filter.where = this.whereCondition;
         }
 
+        if (this.limitResultsNumber) {
+            filter.limit = this.limitResultsNumber;
+        }
+
         return JSON.stringify(filter);
     }
 
@@ -89,6 +103,9 @@ export class RequestQueryBuilder {
 
         // merge "where" conditions
         this.whereCondition = {...this.whereCondition, ...queryBuilder.whereCondition};
+
+        // update the "limit" if necessary
+        this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
 
         return this;
     }

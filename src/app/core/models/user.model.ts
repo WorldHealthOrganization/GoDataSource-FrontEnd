@@ -9,6 +9,7 @@ export class UserModel {
     email: string;
     password: string;
     passwordChange: boolean;
+    activeOutbreakId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
@@ -20,6 +21,7 @@ export class UserModel {
         this.email = _.get(data, 'email');
         this.password = _.get(data, 'password');
         this.passwordChange = _.get(data, 'passwordChange', false);
+        this.activeOutbreakId = _.get(data, 'activeOutbreakId');
         this.roleIds = _.get(data, 'roleIds', []);
     }
 

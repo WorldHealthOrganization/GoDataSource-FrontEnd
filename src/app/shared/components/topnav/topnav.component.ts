@@ -28,18 +28,11 @@ export class TopnavComponent {
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
 
         // get the selected outbreak
-        const selectedOutbreakCompleted$ = new Subject();
         this.outbreakDataService
             .getSelectedOutbreak()
-            .takeUntil(selectedOutbreakCompleted$)
-            .subscribe((outbreak: OutbreakModel|null) => {
-                if (outbreak) {
-                    // there is a selected outbreak
-                    this.selectedOutbreak = outbreak;
-
-                    selectedOutbreakCompleted$.next();
-                    selectedOutbreakCompleted$.complete();
-                }
+            .subscribe((outbreak: OutbreakModel) => {
+                // there is a selected outbreak
+                this.selectedOutbreak = outbreak;
             });
     }
 

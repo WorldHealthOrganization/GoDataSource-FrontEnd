@@ -161,13 +161,10 @@ export class ModifyCaseComponent implements OnInit {
         this.ageSelected = ageSelected;
     }
 
-    /**
-     * Modify case
-     * @param form
-     */
-    modifyCase(form) {
+    modifyCase(form: NgForm) {
 
-        const dirtyFields: any = form.value;
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
         // omit fields that are NOT visible
         if (this.ageSelected) {
             delete dirtyFields.dob;
@@ -176,24 +173,14 @@ export class ModifyCaseComponent implements OnInit {
         }
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
-            // get current outbreak
-            const selectedOutbreakSubscription = this.outbreakDataService
+            // get selected outbreak
+            this.outbreakDataService
                 .getSelectedOutbreak()
-                .subscribe((currentOutbreak: OutbreakModel) => {
-                    // selectedOutbreakSubscription.unsubscribe();
-                    // modify Case
-                    dirtyFields.documents = this.caseData.documents;
-                    dirtyFields.addresses = this.caseData.addresses;
-                    console.log("_-------------------------------------------");
-                    console.log(this.caseData.hospitalizationDates);
-                    console.log(dirtyFields.hospitalizationDates);
-                    dirtyFields.hospitalizationDates = this.caseData.hospitalizationDates;
-                    console.log(dirtyFields.hospitalizationDates);
-                    console.log(dirtyFields);
+                .subscribe((selectedOutbreak: OutbreakModel) => {
 
-
+                    // modify the outbreak
                     this.caseDataService
-                        .modifyCase(currentOutbreak.id, this.caseId, dirtyFields)
+                        .modifyCase(selectedOutbreak.id, this.caseId, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 

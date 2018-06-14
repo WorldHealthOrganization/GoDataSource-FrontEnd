@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -19,7 +19,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     templateUrl: './cases-list.component.html',
     styleUrls: ['./cases-list.component.less']
 })
-export class CasesListComponent {
+export class CasesListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Cases', '.', true)
@@ -28,6 +28,8 @@ export class CasesListComponent {
     // authenticated user
     authUser: UserModel;
 
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel;
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
@@ -45,21 +47,28 @@ export class CasesListComponent {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
+    }
 
-        this.loadCasesList();
+    ngOnInit() {
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // re-load the list when the Selected Outbreak is changed
+                this.loadCasesList();
+            });
     }
 
     /**
-     * Re(load) the Cases list
+     * Re(load) the Cases list, based on the applied filter, sort criterias
      */
     loadCasesList() {
-        // get current outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((currentOutbreak: OutbreakModel) => {
-                // get the list of existing cases
-                this.casesList$ = this.caseDataService.getCasesList(currentOutbreak.id, this.casesListQueryBuilder);
-            });
+        if (this.selectedOutbreak) {
+            // retrieve the list of Cases
+            this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.casesListQueryBuilder);
+        }
     }
 
     /**
