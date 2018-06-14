@@ -33,9 +33,8 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<OutbreakModel[]>}
      */
-    getOutbreaksList(queryBuilder: RequestQueryBuilder = null): Observable<OutbreakModel[]> {
+    getOutbreaksList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()) : Observable<OutbreakModel[]> {
 
-        if(queryBuilder === null) queryBuilder = new RequestQueryBuilder();
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(

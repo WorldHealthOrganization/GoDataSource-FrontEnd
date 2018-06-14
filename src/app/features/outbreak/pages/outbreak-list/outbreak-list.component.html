@@ -49,14 +49,14 @@
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Country</div>
+                    <div>Countries</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.locationId}}
+                {{outbreak.countries}}
             </mat-cell>
         </ng-container>
         <!-- Start Date -->

@@ -27,13 +27,14 @@
                                 [options]="diseasesList$ | async">
                             </app-form-select>
                             <app-form-select
-                                name="locationId"
-                                [(ngModel)]="outbreak.locationId"
+                                name="countries"
+                                [(ngModel)]="outbreak.countries"
                                 placeholder="Countries"
                                 [options]="countriesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
                                 multiple="true"
+                                required="true"
                             >
                             </app-form-select>
                             <app-form-slide-toggle
