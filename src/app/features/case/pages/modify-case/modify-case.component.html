@@ -202,6 +202,8 @@
 
                 </div>
 
+                <button type="button" mat-button color="primary" (click)="addAddress()">Add another address</button>
+
             </mat-tab>
 
             <mat-tab label="Infection">
@@ -214,6 +216,7 @@
                                 name="classification"
                                 [(ngModel)]="caseData.classification"
                                 placeholder="Classification"
+                                required="true"
                                 [options]="caseClassificationsList$ | async">
                             </app-form-select>
 
@@ -283,7 +286,6 @@
                                 [ngModel]="hospitalDate"
                                 placeholder="Date of hospitalization">
                             </app-form-datepicker>
-
                         </div>
 
                         <button type="button" mat-icon-button (click)="deleteHospitalizationDate(i)">

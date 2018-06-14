@@ -48,6 +48,7 @@ export class CaseModel {
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
         this.deceased = _.get(data, 'deceased');
         this.dateDeceased = _.get(data, 'dateDeceased');
+        this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
     }

@@ -111,7 +111,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.dateOfOnset }}
+                {{ item.dateOfOnset | date: 'yyy-MM-dd'}}
             </mat-cell>
         </ng-container>
 

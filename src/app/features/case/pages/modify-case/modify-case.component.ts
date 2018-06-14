@@ -18,6 +18,8 @@ import { Subject } from 'rxjs/Subject';
 import { AddressModel } from "../../../../core/models/address.model";
 import { DocumentModel } from "../../../../core/models/document.model";
 import { current } from "codelyzer/util/syntaxKind";
+import * as moment from 'moment';
+
 
 @Component({
     selector: 'app-modify-case',
@@ -78,6 +80,13 @@ export class ModifyCaseComponent implements OnInit {
                         .getCase(currentOutbreak.id, this.caseId)
                         .subscribe(caseDataReturned => {
                             this.caseData = caseDataReturned;
+                            // convert dates into ISO format with moment
+                            // let hospitalDatesArray = this.caseData.hospitalizationDates;
+                            // // moment(hospitalDate).format("YYYY-MM-DD")
+                            // this.caseData.hospitalizationDates = hospitalDatesArray
+                            //     .map(
+                            //         hospitalDate => moment(hospitalDate).format("YYYY-MM-DD")
+                            //     );
                         });
                 });
 
@@ -168,15 +177,22 @@ export class ModifyCaseComponent implements OnInit {
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
             // get current outbreak
-             const selectedOutbreakSubscription = this.outbreakDataService
-                 .getSelectedOutbreak()
-                 .subscribe((currentOutbreak: OutbreakModel) => {
-                     // selectedOutbreakSubscription.unsubscribe();
-                     // modify Case
-                     dirtyFields.documents = this.caseData.documents;
-                     dirtyFields.addresses = this.caseData.addresses;
+            const selectedOutbreakSubscription = this.outbreakDataService
+                .getSelectedOutbreak()
+                .subscribe((currentOutbreak: OutbreakModel) => {
+                    // selectedOutbreakSubscription.unsubscribe();
+                    // modify Case
+                    dirtyFields.documents = this.caseData.documents;
+                    dirtyFields.addresses = this.caseData.addresses;
+                    console.log("_-------------------------------------------");
+                    console.log(this.caseData.hospitalizationDates);
+                    console.log(dirtyFields.hospitalizationDates);
+                    dirtyFields.hospitalizationDates = this.caseData.hospitalizationDates;
+                    console.log(dirtyFields.hospitalizationDates);
+                    console.log(dirtyFields);
 
-                     this.caseDataService
+
+                    this.caseDataService
                         .modifyCase(currentOutbreak.id, this.caseId, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
@@ -188,8 +204,8 @@ export class ModifyCaseComponent implements OnInit {
 
                             // navigate to listing page
                             this.router.navigate(['/cases']);
-                         });
-                 });
+                        });
+                });
         }
     }
 
