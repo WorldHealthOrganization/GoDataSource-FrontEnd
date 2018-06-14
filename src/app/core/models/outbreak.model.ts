@@ -8,24 +8,19 @@ export class OutbreakModel {
     active: boolean;
     startDate: string;
     endDate: string | null;
-    country: string;
     periodOfFollowup: number;
     frequencyOfFollowUp: number;
-    displayDateFormat: string;
     noDaysAmongContacts: number;
     noDaysDaysInChains: number;
     noDaysNotSeen: number;
     noLessContacts: number;
-    highExposureDuration: number | 0;
-    caseClassification: any | null;
     caseInvestigationTemplate: any;
     contactFollowUpTemplate: any | null;
     labResultsTemplate: any | null;
-    nutritionalStatus: any | null;
-    pregnancyInformation: any | null;
-    vaccinationStatus: any | null;
+    // TODO - need to allow to set case classifications on outbreak
+    // caseClassification: any | null;
     caseIdMask: string;
-    locationId: any | null;
+    countries: any | null;
     longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {
@@ -36,19 +31,15 @@ export class OutbreakModel {
         this.active = _.get(data, 'active');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
-        this.country = _.get(data, 'country');
+        this.countries = _.get(data, 'countries');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
         this.noDaysAmongContacts = _.get(data, 'noDaysAmongContacts');
         this.noDaysDaysInChains = _.get(data, 'noDaysDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
-        // initialize with 0 until they will be removed from the API or made not mandatory
-        this.displayDateFormat = null;
-        this.highExposureDuration = 0;
-        // initialize with array  - temporary
         // TODO read from reference data
-        this.caseClassification = [{"test": "test"}];
+        // this.caseClassification = [{"test": "test"}];
         this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate');
         if(this.caseInvestigationTemplate == null)
             this.caseInvestigationTemplate = [];
@@ -58,13 +49,7 @@ export class OutbreakModel {
         this.labResultsTemplate = _.get(data, 'labResultsTemplate');
         if(this.labResultsTemplate == null)
             this.labResultsTemplate = [];
-        // initialize with array until they will be removed from the API or made not mandatory
-        this.nutritionalStatus = [{"test": "test"}];
-        this.pregnancyInformation = [{"test": "test"}];
-        this.vaccinationStatus = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
-        this.locationId = _.get(data, 'locationId');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
     }
-
 }

@@ -111,7 +111,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.dateOfOnset }}
+                {{ item.dateOfOnset | date: 'yyy-MM-dd'}}
             </mat-cell>
         </ng-container>
 
@@ -140,6 +140,10 @@
 
                     <button mat-menu-item>
                         Mark as dead
+                    </button>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
                     </button>
 
                 </mat-menu>

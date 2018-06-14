@@ -81,12 +81,14 @@ export class OutbreakListComponent {
         if (option.value == 'all') {
             this.outbreaksListQueryBuilder.where({
                 [property]: {
-                    gte: 0
+                    "inq": [true,false]
                 }
             });
         }else{
             this.outbreaksListQueryBuilder.where({
-                [property]: option.value
+                [property]: {
+                    "eq": option.value
+            }
             });
         }
         this.loadOutbreaksList();

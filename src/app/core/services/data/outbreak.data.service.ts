@@ -6,11 +6,12 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import 'rxjs/add/operator/map';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
-import { StorageKey, StorageService } from '../helper/storage.service';
+import { StorageService } from '../helper/storage.service';
 
-import * as _ from 'lodash';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { RequestQueryBuilder } from "../helper/request-query-builder";
+import { RequestQueryBuilder } from '../helper/request-query-builder';
+import { AuthDataService } from './auth.data.service';
+import { Subject } from 'rxjs/Subject';
 
 
 @Injectable()
@@ -22,10 +23,9 @@ export class OutbreakDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private storageService: StorageService
+        private storageService: StorageService,
+        private authDataService: AuthDataService
     ) {
-        // determine the current Outbreak
-        this.determineSelectedOutbreak();
     }
 
     /**
@@ -33,9 +33,8 @@ export class OutbreakDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<OutbreakModel[]>}
      */
-    getOutbreaksList(queryBuilder: RequestQueryBuilder = null): Observable<OutbreakModel[]> {
+    getOutbreaksList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<OutbreakModel[]> {
 
-        if(queryBuilder === null) queryBuilder = new RequestQueryBuilder();
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
@@ -84,55 +83,72 @@ export class OutbreakDataService {
     }
 
     /**
-     * Retrieve the Active Outbreak
-     * @returns {Observable<OutbreakModel>}
-     */
-    getActiveOutbreak(): Observable<OutbreakModel> {
-        // filter the active outbreak
-        const filter = JSON.stringify({
-            where: {
-                active: true
-            }
-        });
-
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks?filter=${filter}`)
-                .map((outbreaks) => {
-                    return _.get(outbreaks, '[0]', null);
-                }),
-            OutbreakModel
-        );
-    }
-
-    /**
-     * Get the selected Outbreak
+     * Get the selected Outbreak Subject
+     * Note: By subscribing to this Subject, the response handler will be executed every time a new value is emitted
      * @returns {BehaviorSubject<OutbreakModel>}
      */
-    getSelectedOutbreak(): BehaviorSubject<OutbreakModel> {
+    getSelectedOutbreakSubject(): BehaviorSubject<OutbreakModel> {
         return this.selectedOutbreakSubject;
     }
 
     /**
-     * Get the outbreak that is Selected across the application from local storage
-     * If it's not set in local storage, use the Active Outbreak
+     * Get the selected Outbreak
+     * @returns {Observable<OutbreakModel>}
+     */
+    getSelectedOutbreak(): Observable<OutbreakModel> {
+        return Observable.create((observer) => {
+
+            const selectedOutbreakCompleted$ = new Subject();
+            // subscribe to the Subject stream
+            this.getSelectedOutbreakSubject()
+                .takeUntil(selectedOutbreakCompleted$)
+                .subscribe((outbreak: OutbreakModel|null) => {
+                    if (outbreak) {
+                        // found the Selected Outbreak
+                        observer.next(outbreak);
+                        observer.complete();
+
+                        // complete the Subject stream so it will automatically unsubscribe from it
+                        selectedOutbreakCompleted$.next();
+                        selectedOutbreakCompleted$.complete();
+                    }
+                });
+        });
+    }
+
+    /**
+     * Get the Outbreak that is Active for the authenticated user
+     * Otherwise, use the first outbreak in the list
      * @returns {OutbreakModel}
      */
-    private determineSelectedOutbreak(): Observable<OutbreakModel> {
-        // get the selected Outbreak from local storage
-        const selectedOutbreakFromStorage = <OutbreakModel>this.storageService.get(StorageKey.SELECTED_OUTBREAK);
-        if (selectedOutbreakFromStorage) {
-            // cache the selected Outbreak
-            this.setSelectedOutbreak(selectedOutbreakFromStorage);
+    determineSelectedOutbreak(): Observable<OutbreakModel> {
+        // initialize the Selected Outbreak Subject
+        this.selectedOutbreakSubject = new BehaviorSubject<OutbreakModel>(null);
 
-            // ...and return it
-            return Observable.of(selectedOutbreakFromStorage);
+        // check if the authenticated user has an Active Outbreak
+        const authUser = this.authDataService.getAuthenticatedUser();
+        if (authUser.activeOutbreakId) {
+            return this.getOutbreak(authUser.activeOutbreakId)
+                .do((activeOutbreak) => {
+                    // cache the selected Outbreak
+                    this.setSelectedOutbreak(activeOutbreak);
+                });
         }
 
-        // by default, use the Active Outbreak
-        return this.getActiveOutbreak()
-            .do((activeOutbreak) => {
-                // cache the selected Outbreak
-                this.setSelectedOutbreak(activeOutbreak);
+        // by default, use the first Outbreak in list
+        const qb = new RequestQueryBuilder();
+        qb.limit(1);
+        return this.getOutbreaksList(qb)
+            .map((outbreaks: OutbreakModel[]) => {
+                if (outbreaks.length > 0) {
+                    // cache the selected Outbreak
+                    this.setSelectedOutbreak(outbreaks[0]);
+
+                    return outbreaks[0];
+                }
+
+                // there is no Outbreak in the system
+                return new OutbreakModel();
             });
     }
 
@@ -141,9 +157,7 @@ export class OutbreakDataService {
      * @param {OutbreakModel} outbreak
      */
     setSelectedOutbreak(outbreak: OutbreakModel) {
-        // keep the outbreak in local storage;
-        this.storageService.set(StorageKey.SELECTED_OUTBREAK, outbreak);
-
+        // emit the new value
         this.selectedOutbreakSubject.next(outbreak);
     }
 

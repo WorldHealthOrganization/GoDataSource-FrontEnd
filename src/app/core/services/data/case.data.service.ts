@@ -60,7 +60,7 @@ export class CaseDataService {
      * @returns {Observable<any>}
      */
     modifyCase(outbreakId: string, caseId: string, caseData): Observable<any> {
-        return this.http.patch(`outbreaks/${outbreakId}/cases/${caseId}`, caseData);
+        return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData);
     }
 
     /**

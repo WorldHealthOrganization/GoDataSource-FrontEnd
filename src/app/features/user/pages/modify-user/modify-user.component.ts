@@ -70,7 +70,7 @@ export class ModifyUserComponent {
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
-            // modify the role
+            // modify the user
             this.userDataService
                 .modifyUser(this.userId, dirtyFields)
                 .catch((err) => {

@@ -147,19 +147,13 @@ export class CreateCaseComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-
-            // get current outbreak
-            const selectedOutbreakCompleted$ = new Subject();
+            // get selected outbreak
             this.outbreakDataService
                 .getSelectedOutbreak()
-                .takeUntil(selectedOutbreakCompleted$)
-                .subscribe((currentOutbreak: OutbreakModel) => {
-                    selectedOutbreakCompleted$.next();
-                    selectedOutbreakCompleted$.complete();
-
+                .subscribe((selectedOutbreak: OutbreakModel) => {
                     // add the new Case
                     this.caseDataService
-                        .createCase(currentOutbreak.id, dirtyFields)
+                        .createCase(selectedOutbreak.id, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 

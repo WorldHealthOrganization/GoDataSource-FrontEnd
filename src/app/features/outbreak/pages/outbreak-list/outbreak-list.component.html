@@ -49,14 +49,14 @@
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Country</div>
+                    <div>Countries</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.locationId}}
+                {{outbreak.countries}}
             </mat-cell>
         </ng-container>
         <!-- Start Date -->
@@ -84,7 +84,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.endDate | date: 'dd/MM/yyy'}}
+                {{outbreak.endDate | date: 'yyy-MM-dd'}}
             </mat-cell>
         </ng-container>
         <!-- Active -->
@@ -97,7 +97,7 @@
                             name="filter"
                             ngModel
                             placeholder="Filter"
-                            [options]="[{'value':'all','label':'All'},{'value':'1','label':'Yes'},{'value':'0','label':'NO'}]"
+                            [options]="[{'value':'all','label':'All'},{'value': true,'label':'Yes'},{'value': false,'label':'NO'}]"
                             multiple="false"
                             (optionChanged)="filterActiveBy('active', $event)">
                             >
