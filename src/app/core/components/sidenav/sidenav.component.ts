@@ -72,9 +72,9 @@ export class SidenavComponent implements OnInit {
         new NavItem(
             'Contacts',
             'contacts',
+            [PERMISSION.READ_CONTACT],
             [],
-            [],
-            '/users'
+            '/contacts'
         ),
         new NavItem(
             'Cases',
