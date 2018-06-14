@@ -12,6 +12,7 @@ export class QuestionModel {
         this.category = _.get(data, 'category');
         this.order = _.get(data, 'order');
         // this.answers = _.get(data, 'answers');
+        // TODO only temporary initialize answers with an array of answers.
         this.answers = [{"value": "", "alert": true, "type": "Free Text", "code": "SYM"}];
     }
 }
