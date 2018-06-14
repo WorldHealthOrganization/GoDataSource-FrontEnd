@@ -12,6 +12,7 @@ import { NgForm } from "@angular/forms";
 import { FormHelperService } from "../../../../core/services/helper/form-helper.service";
 import { Observable } from "rxjs/Observable";
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
+import { QuestionModel } from "../../../../core/models/question.model";
 
 @Component({
     selector: 'app-create-outbreak',
@@ -72,53 +73,20 @@ export class CreateOutbreakComponent {
             outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
             // temporary populate array with one question.
             // TODO add validation on questionnaires
-            if(outbreakData.caseInvestigationTemplate.length == 0){
-                outbreakData.caseInvestigationTemplate =  [{
-                    "value": "",
-                    "category": "",
-                    "order": "",
-                    "required": true,
-                    "answers": [
-                        {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
-                    ]
-                }];
-            }
+            outbreakData.caseInvestigationTemplate.push(new QuestionModel());
             // temporary populate array with one question.
             // TODO add validation on questionnaires
             outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
-            if(outbreakData.contactFollowUpTemplate.length == 0){
-                outbreakData.contactFollowUpTemplate =  [{
-                    "value": "",
-                    "category": "",
-                    "order": "",
-                    "required": true,
-                    "answers": [
-                        {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
-                    ]
-                }];
-            }
+            outbreakData.contactFollowUpTemplate.push(new QuestionModel());
             // temporary populate array with one question.
             // TODO add validation on questionnaires
             outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
-            if(outbreakData.labResultsTemplate.length == 0){
-                outbreakData.labResultsTemplate =  [{
-                    "value": "",
-                    "category": "",
-                    "order": "",
-                    "required": true,
-                    "answers": [
-                        {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
-                    ]
-                }];
-            }
+            outbreakData.labResultsTemplate.push(new QuestionModel());
             // validate end date to be greater than start date
-            if(outbreakData.endDate && outbreakData.endDate < outbreakData.startDate)
-            {
+            if (outbreakData.endDate && outbreakData.endDate < outbreakData.startDate) {
                 this.snackbarService.showError("End Date needs to be greater than start date");
-            }else{
+            } else {
 
-                console.log('---------------------');
-                console.log(outbreakData);
                 this.outbreakDataService
                     .createOutbreak(outbreakData)
                     .catch((err) => {
@@ -138,15 +106,7 @@ export class CreateOutbreakComponent {
      * @param tab - string identifying the questionnaire
      */
     addNewQuestion(tab) {
-        let newQuestion = {
-            "value": "",
-            "category": "",
-            "order": "",
-            "required": true,
-            "answers": [
-                {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
-            ]
-        };
+        let newQuestion = new QuestionModel();
         switch (tab) {
             case 'case-investigation': {
                 newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
@@ -279,7 +239,6 @@ export class CreateOutbreakComponent {
             let elements = document.querySelectorAll('question');
             let len = elements.length;
             const el = elements[len - 1] as HTMLElement;
-            console.log(el);
             el.scrollIntoView({behavior: "smooth"});
         }, 100);
     }

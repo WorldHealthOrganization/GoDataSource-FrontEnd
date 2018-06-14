@@ -31,8 +31,8 @@
                                 required="true">
                             </app-form-select>
                             <app-form-select
-                                name="locationId"
-                                [(ngModel)]="newOutbreak.locationId"
+                                name="countries"
+                                [(ngModel)]="newOutbreak.countries"
                                 placeholder="Countries"
                                 [options]="countriesList$ | async"
                                 optionLabelKey="label"
@@ -134,7 +134,7 @@
             <form #caseInvestigationForm="ngForm">
                 <ng-template matStepLabel>Case Investigation</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyCaseInvestigation}}" type="button" mat-button
+                    <button fxFlexOffset="15px" type="button" mat-button
                             color="primary" (click)="addNewQuestion('case-investigation')">Add Question
                     </button>
                 </div>
@@ -155,7 +155,7 @@
             <form #contactFollowUpForm="ngForm">
                 <ng-template matStepLabel>Contact Follow-up</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyContactFollowup}}" type="button" mat-button
+                    <button fxFlexOffset="15px" type="button" mat-button
                             color="primary" (click)="addNewQuestion('contact-followup')">Add Question
                     </button>
                 </div>
@@ -176,7 +176,7 @@
             <form #labResultsForm="ngForm">
                 <ng-template matStepLabel>Lab Results</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" fxShow="{{!viewOnlyLabResults}}" type="button" mat-button
+                    <button fxFlexOffset="15px" type="button" mat-button
                             color="primary" (click)="addNewQuestion('lab-results')">Add Question
                     </button>
                 </div>

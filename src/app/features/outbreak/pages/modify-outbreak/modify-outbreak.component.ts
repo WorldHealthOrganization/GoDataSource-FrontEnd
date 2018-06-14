@@ -8,6 +8,8 @@ import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/b
 import { MatTabChangeEvent } from "@angular/material";
 import { Observable } from "rxjs/Observable";
 import { GenericDataService } from "../../../../core/services/data/generic.data.service";
+import { DocumentModel } from "../../../../core/models/document.model";
+import { QuestionModel } from "../../../../core/models/question.model";
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -55,12 +57,14 @@ export class ModifyOutbreakComponent {
                     this.caseInvestigationTemplateQuestions = outbreakData.caseInvestigationTemplate;
                     this.contactFollowupTemplateQuestions = outbreakData.contactFollowUpTemplate;
                     this.labResultsTemplateQuestions = outbreakData.labResultsTemplate;
+                    if (!this.caseInvestigationTemplateQuestions.length)
+                        this.caseInvestigationTemplateQuestions.push(new QuestionModel());
+                    if (!this.contactFollowupTemplateQuestions.length)
+                        this.contactFollowupTemplateQuestions.push(new QuestionModel());
+                    if (!this.labResultsTemplateQuestions.length)
+                        this.labResultsTemplateQuestions.push(new QuestionModel());
                     this.diseasesList$ = this.genericDataService.getDiseasesList();
                     this.countriesList$ = this.genericDataService.getCountriesList();
-
-                    // convert countries from list of countries separated by comma into array
-                    // TODO - this is only temporary until backend is fixed
-                    this.outbreak.locationId = outbreakData.locationId.split(',');
                 });
 
         });
@@ -72,7 +76,7 @@ export class ModifyOutbreakComponent {
 
             // assign the questionnaires objects to the outbreak data
             dirtyFields.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
-            dirtyFields.contactFollowupTemplate = this.contactFollowupTemplateQuestions;
+            dirtyFields.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
             dirtyFields.labResultsTemplate = this.labResultsTemplateQuestions;
 
             // validate end date to be greater than start date
@@ -148,22 +152,11 @@ export class ModifyOutbreakComponent {
      * @param tab - string identifying the questionnaire
      */
     addNewQuestion(tab) {
-        let newQuestion = {
-            "value": "",
-            "category": "",
-            "order": "",
-            "required": true,
-            "answers": [
-                {"value": "", "alert": true, "type": "Free Text", "code": "SYM"}
-            ]
-        };
+        let newQuestion = new QuestionModel();
         switch (tab) {
             case 'case-investigation': {
-                console.log(this.caseInvestigationTemplateQuestions);
-                console.log(this.caseInvestigationTemplateQuestions != []);
-                let caseInvestigationQuestionsLength = (this.caseInvestigationTemplateQuestions != []) ? this.caseInvestigationTemplateQuestions.length : 0;
-                newQuestion.order = caseInvestigationQuestionsLength + 1;
-                this.caseInvestigationTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
+                this.caseInvestigationTemplateQuestions.push(new QuestionModel());
                 break;
             }
             case 'contact-followup': {
@@ -295,7 +288,6 @@ export class ModifyOutbreakComponent {
             let elements = document.querySelectorAll('question');
             let len = elements.length;
             const el = elements[len - 1] as HTMLElement;
-            console.log(el);
             el.scrollIntoView({behavior: "smooth"});
         }, 100);
     }
