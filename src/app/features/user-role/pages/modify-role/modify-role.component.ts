@@ -44,20 +44,13 @@ export class ModifyRoleComponent {
             // retrieve the User Role instance
             this.userRoleDataService
                 .getRole(this.userRoleId)
-                .subscribe((roleData) => {
-                    this.userRole = new UserRoleModel(roleData);
+                .subscribe((role: UserRoleModel) => {
+                    this.userRole = role;
                 });
         });
 
         // get the list of permissions to populate the dropdown in UI
-        this.availablePermissions$ = this.userRoleDataService
-            .getAvailablePermissions()
-            .map((permissions) => {
-                // #TODO temporarily convert permissions to objects (to be updated when API is fixed)
-                return permissions.map((permission: string) => {
-                    return {key: permission};
-                });
-            });
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions();
     }
 
     modifyRole(form: NgForm) {

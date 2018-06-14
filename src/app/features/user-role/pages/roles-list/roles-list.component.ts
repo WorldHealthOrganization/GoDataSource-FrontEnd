@@ -9,6 +9,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-roles-list',
@@ -25,7 +26,7 @@ export class RolesListComponent {
     // authenticated user
     authUser: UserModel;
     // list of existing roles
-    rolesListObs: Observable<UserRoleModel[]>;
+    rolesList$: Observable<UserRoleModel[]>;
 
     constructor(
         private router: Router,
@@ -44,7 +45,7 @@ export class RolesListComponent {
      */
     loadRolesList() {
         // get the list of existing roles
-        this.rolesListObs = this.userRoleDataService.getRolesList();
+        this.rolesList$ = this.userRoleDataService.getRolesList();
     }
 
     deleteRole(userRole: UserRoleModel) {
@@ -65,5 +66,20 @@ export class RolesListComponent {
                     this.loadRolesList();
                 });
         }
+    }
+
+    /**
+     * Get the list of table columns to be displayed
+     * @returns {string[]}
+     */
+    getTableColumns(): string[] {
+        const columns = ['name', 'description', 'permissions'];
+
+        // check if the authenticated user has WRITE access
+        if (this.authUser.hasPermissions(PERMISSION.WRITE_ROLE)) {
+            columns.push('actions');
+        }
+
+        return columns;
     }
 }

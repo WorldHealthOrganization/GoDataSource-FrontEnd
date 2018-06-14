@@ -5,6 +5,8 @@ import { StorageService, StorageKey } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
+import { AuthModel } from '../../models/auth.model';
+import { ModelHelperService } from './model-helper.service';
 
 @Injectable()
 export class I18nService {
@@ -16,7 +18,8 @@ export class I18nService {
     constructor(
         private translateService: TranslateService,
         private storageService: StorageService,
-        private languageDataService: LanguageDataService
+        private languageDataService: LanguageDataService,
+        private modelHelperService: ModelHelperService
     ) {
     }
 
@@ -45,7 +48,7 @@ export class I18nService {
                     .getLanguageTokens(language)
                     .subscribe((tokens: LanguageTokenModel[]) => {
                         // add the tokens to the Language object
-                        language = new LanguageModel({...language, tokens});
+                        language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
 
                         // configure the TranslateService
                         this.translateService.setTranslation(language.id, language.getTokensObject());

@@ -36,14 +36,7 @@ export class CreateRoleComponent {
         private formHelper: FormHelperService
     ) {
         // get the list of permissions to populate the dropdown in UI
-        this.availablePermissions$ = this.userRoleDataService
-            .getAvailablePermissions()
-            .map((permissions) => {
-                // #TODO temporarily convert permissions to objects (to be updated when API is fixed)
-                return permissions.map((permission: string) => {
-                    return {key: permission};
-                });
-            });
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions();
     }
 
     createNewRole(form: NgForm) {

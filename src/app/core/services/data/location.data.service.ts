@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { ObservableHelperService } from '../helper/observable-helper.service';
+import { ModelHelperService } from '../helper/model-helper.service';
 import { LocationModel } from '../../models/location.model';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class LocationDataService {
 
     constructor(
         private http: HttpClient,
-        private observableHelper: ObservableHelperService
+        private modelHelper: ModelHelperService
     ) {
     }
 
@@ -18,7 +18,7 @@ export class LocationDataService {
      * @returns {Observable<LocationModel[]>}
      */
     getLocationsList(): Observable<LocationModel[]> {
-        return this.observableHelper.mapListToModel(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`locations`),
             LocationModel
         );

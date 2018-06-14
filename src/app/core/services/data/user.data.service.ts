@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { UserModel } from '../../models/user.model';
-import { ObservableHelperService } from '../helper/observable-helper.service';
+import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../helper/request-query-builder';
 
@@ -12,7 +12,7 @@ export class UserDataService {
 
     constructor(
         private http: HttpClient,
-        private observableHelper: ObservableHelperService
+        private modelHelper: ModelHelperService
     ) {
     }
 
@@ -20,19 +20,17 @@ export class UserDataService {
      * Retrieve the list of Users
      * @returns {Observable<UserModel[]>}
      */
-    getUsersList(queryBuilder: RequestQueryBuilder = null): Observable<UserModel[]> {
+    getUsersList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel[]> {
 
         const qb = new RequestQueryBuilder();
-        // include role and permissions in response
-        qb.include('role');
+        // include roles and permissions in response
+        qb.include('roles');
 
-        if (queryBuilder) {
-            qb.merge(queryBuilder);
-        }
+        qb.merge(queryBuilder);
 
         const filter = qb.buildQuery();
 
-        return this.observableHelper.mapListToModel(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`users?filter=${filter}`),
             UserModel
         );
@@ -43,16 +41,18 @@ export class UserDataService {
      * @param {string} userId
      * @returns {Observable<UserRoleModel>}
      */
-    getUser(userId: string): Observable<UserModel> {
+    getUser(userId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel> {
 
-        // include role and permissions in response
-        const includes = JSON.stringify({
-            include: 'role'
-        });
+        const qb = new RequestQueryBuilder();
+        // include roles and permissions in response
+        qb.include('roles');
 
-        return this.observableHelper.mapToModel(
-            this.http.get(`users/${userId}?filter=${includes}`),
-            // this.http.get(`users/${userId}`),
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
+
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`users/${userId}?filter=${filter}`),
             UserModel
         );
     }

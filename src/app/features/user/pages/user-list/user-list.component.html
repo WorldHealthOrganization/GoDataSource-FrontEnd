@@ -80,7 +80,9 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="30">
-                {{ item.role.name }}
+                <mat-chip-list>
+                    <mat-chip *ngFor="let role of item.roles" [matTooltip]="role.description">{{ role.name }}</mat-chip>
+                </mat-chip-list>
             </mat-cell>
         </ng-container>
 
@@ -95,7 +97,7 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item [disabled]="item.name === authUser.role.name" [routerLink]="['.', item.id, 'modify']">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                         Modify
                     </button>
 

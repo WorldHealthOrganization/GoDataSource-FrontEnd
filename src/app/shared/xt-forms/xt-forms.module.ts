@@ -3,18 +3,19 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
-
 import { AngularMaterialModule } from '../angular-material/angular-material.module';
+import { TranslateModule } from '@ngx-translate/core';
 
-import { components } from './components/index';
-import { validatorDirectives } from './validators/index';
+import { components } from './components';
+import { validatorDirectives } from './validators';
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         FlexLayoutModule,
-        AngularMaterialModule
+        AngularMaterialModule,
+        TranslateModule
     ],
     declarations: [
         ...components,

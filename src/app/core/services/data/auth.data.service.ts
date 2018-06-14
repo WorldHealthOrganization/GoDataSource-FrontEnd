@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/switchMap';
 
 import * as _ from 'lodash';
 
@@ -11,6 +12,7 @@ import { UserDataService } from './user.data.service';
 
 import { AuthModel } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
+import { ModelHelperService } from '../helper/model-helper.service';
 
 @Injectable()
 export class AuthDataService {
@@ -18,7 +20,8 @@ export class AuthDataService {
     constructor(
         private http: HttpClient,
         private storageService: StorageService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private modelHelperService: ModelHelperService
     ) {
     }
 
@@ -29,9 +32,9 @@ export class AuthDataService {
      */
     login(user): Observable<AuthModel> {
         return this.http.post(`users/login`, user)
-            .mergeMap((authRes) => {
+            .switchMap((authRes) => {
                 // keep auth info
-                const auth = new AuthModel(authRes);
+                const auth = this.modelHelperService.getModelInstance(AuthModel, authRes);
 
                 // cache auth data so the Auth Token will be added on the next request
                 this.storageService.set(StorageKey.AUTH_DATA, auth);
@@ -93,7 +96,7 @@ export class AuthDataService {
         const authData = this.getAuthData();
 
         if (authData) {
-            return new UserModel(_.get(authData, 'user'));
+            return this.modelHelperService.getModelInstance(UserModel, _.get(authData, 'user'));
         }
 
         return null;
