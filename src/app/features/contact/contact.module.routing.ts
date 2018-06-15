@@ -19,6 +19,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CONTACT]
         }
+    },
+    // Modify Contact
+    {
+        path: ':contactId/modify',
+        component: fromPages.ModifyContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CONTACT]
+        }
     }
 ];
 

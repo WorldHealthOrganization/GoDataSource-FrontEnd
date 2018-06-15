@@ -134,6 +134,10 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
+
                     <button mat-menu-item (click)="deleteContact(item)">
                         Delete
                     </button>

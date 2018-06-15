@@ -12,11 +12,11 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationModel } from "../../../../core/models/location.model";
+import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { Subject } from 'rxjs/Subject';
-import { AddressModel } from "../../../../core/models/address.model";
-import { DocumentModel } from "../../../../core/models/document.model";
+import { AddressModel } from '../../../../core/models/address.model';
+import { DocumentModel } from '../../../../core/models/document.model';
 
 
 @Component({
@@ -59,7 +59,9 @@ export class ModifyCaseComponent implements OnInit {
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
         this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
         this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
+    }
 
+    ngOnInit() {
         this.route.params.subscribe(params => {
             this.caseId = params.caseId;
 
@@ -90,10 +92,6 @@ export class ModifyCaseComponent implements OnInit {
 
 
         });
-
-    }
-
-    ngOnInit() {
     }
 
     /**

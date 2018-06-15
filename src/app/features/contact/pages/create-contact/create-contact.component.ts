@@ -27,7 +27,7 @@ import * as _ from 'lodash';
 export class CreateContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Contacts', '..'),
+        new BreadcrumbItemModel('Contacts', '/contacts'),
         new BreadcrumbItemModel('Create New Contact', '.', true)
     ];
 

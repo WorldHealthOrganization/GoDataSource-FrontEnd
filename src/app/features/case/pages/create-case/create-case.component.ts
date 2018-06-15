@@ -27,7 +27,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 export class CreateCaseComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Cases', '..'),
+        new BreadcrumbItemModel('Cases', '/cases'),
         new BreadcrumbItemModel('Create New Case', '.', true)
     ];
 
