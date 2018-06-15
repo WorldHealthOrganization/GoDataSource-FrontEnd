@@ -30,6 +30,7 @@ export class CasesListComponent implements OnInit {
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
+
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
@@ -103,4 +104,27 @@ export class CasesListComponent implements OnInit {
         return columns;
     }
 
+    /**
+     * Delete specific case from the selected outbreak
+     * @param {CaseModel} case
+     */
+    deleteCase(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        if (confirm(`Are you sure you want to delete this case: ${caseModel.firstName} ${caseModel.lastName}?`)) {
+            // delete case
+            this.caseDataService
+                .deleteCase(this.selectedOutbreak.id, caseModel.id)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('Case deleted!');
+
+                    // reload data
+                    this.loadCasesList();
+                });
+        }
+    }
 }
