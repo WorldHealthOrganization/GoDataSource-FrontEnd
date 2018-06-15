@@ -37,6 +37,8 @@ export class CasesListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
 
+    deleteAccesible: boolean = false;
+
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
@@ -46,6 +48,9 @@ export class CasesListComponent implements OnInit {
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // do we have the right to delete a case?
+        this.deleteAccesible = this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
 
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
     }

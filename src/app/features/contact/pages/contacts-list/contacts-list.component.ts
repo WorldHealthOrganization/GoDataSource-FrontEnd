@@ -39,6 +39,8 @@ export class ContactsListComponent implements OnInit {
     // gender list
     genderList$: Observable<any[]>;
 
+    deleteAccesible: boolean = false;
+
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
@@ -48,6 +50,9 @@ export class ContactsListComponent implements OnInit {
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // do we have the right to delete a contact?
+        this.deleteAccesible = this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
 
         // retrieve gender list
         this.genderList$ = this.genericDataService.getGendersList();
