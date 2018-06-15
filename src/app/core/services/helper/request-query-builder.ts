@@ -24,6 +24,17 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove specific condition
+     * @param {string} key
+     * @returns {this}
+     */
+    whereRemoveCondition(property: string) {
+        delete this.whereCondition[property];
+
+        return this;
+    }
+
+    /**
      * Sets a "limit" on the number of results retrieved in a list
      * @param {number} limit
      */
