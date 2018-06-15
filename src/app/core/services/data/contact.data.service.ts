@@ -38,5 +38,15 @@ export class ContactDataService {
     deleteContact(outbreakId: string, contactId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}`);
     }
+
+    /**
+     * Add a new Contact for an Outbreak
+     * @param {string} outbreakId
+     * @param contactData
+     * @returns {Observable<any>}
+     */
+    createContact(outbreakId: string, contactData): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/contacts`, contactData);
+    }
 }
 

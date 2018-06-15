@@ -4,7 +4,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import * as _ from 'lodash';
@@ -17,8 +17,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { Subject } from 'rxjs/Subject';
 import { AddressModel } from "../../../../core/models/address.model";
 import { DocumentModel } from "../../../../core/models/document.model";
-import { current } from "codelyzer/util/syntaxKind";
-import * as moment from 'moment';
 
 
 @Component({

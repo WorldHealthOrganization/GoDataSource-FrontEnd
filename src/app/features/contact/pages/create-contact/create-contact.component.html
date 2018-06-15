@@ -13,28 +13,6 @@
             <form #personalForm="ngForm">
                 <ng-template matStepLabel>Personal</ng-template>
 
-                <!-- Flagged section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
-                        <div fxLayout="row">
-                            <app-form-select fxFlex="25"
-                                name="riskLevel"
-                                [(ngModel)]="caseData.riskLevel"
-                                placeholder="Risk Level Flag"
-                                [options]="caseRiskLevelsList$ | async">
-                            </app-form-select>
-                        </div>
-
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            placeholder="Reason">
-                        </app-form-textarea>
-
-                    </div>
-                </mat-card>
-
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -42,25 +20,25 @@
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="firstName"
-                                [(ngModel)]="caseData.firstName"
+                                [(ngModel)]="contactData.firstName"
                                 placeholder="First name">
                             </app-form-input>
 
                             <app-form-input
                                 name="middleName"
-                                [(ngModel)]="caseData.middleName"
+                                [(ngModel)]="contactData.middleName"
                                 placeholder="Middle name">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
-                                [(ngModel)]="caseData.lastName"
+                                [(ngModel)]="contactData.lastName"
                                 placeholder="Last name">
                             </app-form-input>
 
                             <app-form-select
                                 name="gender"
-                                [(ngModel)]="caseData.gender"
+                                [(ngModel)]="contactData.gender"
                                 placeholder="Gender"
                                 [options]="gendersList$ | async">
                             </app-form-select>
@@ -69,13 +47,13 @@
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
                                 name="phoneNumber"
-                                [(ngModel)]="caseData.phoneNumber"
+                                [(ngModel)]="contactData.phoneNumber"
                                 placeholder="Phone number">
                             </app-form-input>
 
                             <app-form-input
                                 name="occupation"
-                                [(ngModel)]="caseData.occupation"
+                                [(ngModel)]="contactData.occupation"
                                 placeholder="Occupation">
                             </app-form-input>
 
@@ -91,13 +69,13 @@
                             <div fxFlex>
                                 <app-form-input [fxHide]="!ageSelected"
                                                 name="age"
-                                                [(ngModel)]="caseData.age"
+                                                [(ngModel)]="contactData.age"
                                                 placeholder="Age">
                                 </app-form-input>
 
                                 <app-form-datepicker [fxHide]="ageSelected"
                                                 name="dob"
-                                                [(ngModel)]="caseData.dob"
+                                                [(ngModel)]="contactData.dob"
                                                 placeholder="Date of birth">
                                 </app-form-datepicker>
                             </div>
@@ -110,7 +88,7 @@
                 <!-- Documents section -->
                 <div class="section-title">Documents</div>
 
-                <div *ngFor="let document of caseData.documents; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
+                <div *ngFor="let document of contactData.documents; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
 
                     <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
 
@@ -148,7 +126,7 @@
             <form #addressForm="ngForm">
                 <ng-template matStepLabel>Address</ng-template>
 
-                <div *ngFor="let address of caseData.addresses; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
+                <div *ngFor="let address of contactData.addresses; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
 
                     <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                         <div fxLayout="column" fxFlex>
@@ -212,136 +190,13 @@
             </form>
         </mat-step>
 
-        <!-- Infection step -->
-        <mat-step [stepControl]="infectionForm">
-            <form #infectionForm="ngForm">
-                <ng-template matStepLabel>Infection</ng-template>
-
-                <!-- Case Infection Details section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="classification"
-                                [(ngModel)]="caseData.classification"
-                                placeholder="Classification"
-                                [options]="caseClassificationsList$ | async">
-                            </app-form-select>
-
-                            <app-form-datepicker
-                                name="dateBecomeCase"
-                                [(ngModel)]="caseData.dateBecomeCase"
-                                placeholder="Date became Case">
-                            </app-form-datepicker>
-
-                            <app-form-datepicker
-                                name="dateOfInfection"
-                                [(ngModel)]="caseData.dateOfInfection"
-                                placeholder="Date of Infection">
-                            </app-form-datepicker>
-
-                            <app-form-datepicker
-                                name="dateOfOutcome"
-                                [(ngModel)]="caseData.dateOfOutcome"
-                                placeholder="Date of Outcome">
-                            </app-form-datepicker>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-
-                            <app-form-datepicker
-                                name="dateOfOnset"
-                                [(ngModel)]="caseData.dateOfOnset"
-                                placeholder="Date of Onset">
-                            </app-form-datepicker>
-
-                            <app-form-slide-toggle
-                                name="isDateOfOnsetApproximate"
-                                [(ngModel)]="caseData.isDateOfOnsetApproximate"
-                                label="Is date of onset approximate?">
-                            </app-form-slide-toggle>
-
-                            <app-form-slide-toggle
-                                name="deceased"
-                                [(ngModel)]="caseData.deceased"
-                                label="Deceased?">
-                            </app-form-slide-toggle>
-
-                            <div fxFlex>
-                                <app-form-datepicker
-                                    name="dateDeceased"
-                                    [(ngModel)]="caseData.dateDeceased"
-                                    [disabled]="!caseData.deceased"
-                                    placeholder="Date of death">
-                                </app-form-datepicker>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </mat-card>
-
-                <!-- Hospitalization Dates section -->
-                <div *ngFor="let hospitalDate of caseData.hospitalizationDates; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
-
-                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
-
-                            <app-form-datepicker
-                                [name]="'hospitalizationDates[' + i + ']'"
-                                [ngModel]="hospitalDate"
-                                placeholder="Date of hospitalization">
-                            </app-form-datepicker>
-
-                        </div>
-
-                        <button type="button" mat-icon-button (click)="deleteHospitalizationDate(i)">
-                            <span class="xt-icon">delete</span>
-                        </button>
-                    </mat-card>
-                </div>
-
-                <button type="button" mat-button color="primary" (click)="addHospitalizationDate()">Add another hospitalization date</button>
-
-                <!-- Isolation Dates section -->
-                <div *ngFor="let isolationDate of caseData.isolationDates; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
-
-                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
-
-                            <app-form-datepicker
-                                [name]="'isolationDates[' + i + ']'"
-                                [ngModel]="isolationDate"
-                                placeholder="Date of isolation">
-                            </app-form-datepicker>
-
-                        </div>
-
-                        <button type="button" mat-icon-button (click)="deleteIsolationDate(i)">
-                            <span class="xt-icon">delete</span>
-                        </button>
-                    </mat-card>
-                </div>
-
-                <button type="button" mat-button color="primary" (click)="addIsolationDate()">Add another isolation date</button>
-
-                <div>
-                    <button mat-button matStepperPrevious>Back</button>
-                    <button mat-button matStepperNext>Next</button>
-                </div>
-            </form>
-        </mat-step>
-
         <!-- Final step -->
         <mat-step>
             <ng-template matStepLabel>Done</ng-template>
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm])">Create Case</button>
+                <button type="button" mat-button (click)="createNewContact([personalForm, addressForm])">Create Contact</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

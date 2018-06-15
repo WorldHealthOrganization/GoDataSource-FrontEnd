@@ -1,13 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import * as _ from 'lodash';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -16,33 +14,33 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import * as _ from 'lodash';
 
 
 @Component({
-    selector: 'app-create-case',
+    selector: 'app-create-contact',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-case.component.html',
-    styleUrls: ['./create-case.component.less']
+    templateUrl: './create-contact.component.html',
+    styleUrls: ['./create-contact.component.less']
 })
-export class CreateCaseComponent implements OnInit {
+export class CreateContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Cases', '..'),
-        new BreadcrumbItemModel('Create New Case', '.', true)
+        new BreadcrumbItemModel('Contacts', '..'),
+        new BreadcrumbItemModel('Create New Contact', '.', true)
     ];
 
-    caseData: CaseModel = new CaseModel();
+    contactData: ContactModel = new ContactModel();
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
     locationsList$: Observable<LocationModel[]>;
-    caseClassificationsList$: Observable<any[]>;
-    caseRiskLevelsList$: Observable<any[]>;
     documentTypesList$: Observable<any[]>;
 
     constructor(
         private router: Router,
-        private caseDataService: CaseDataService,
+        private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private locationDataService: LocationDataService,
@@ -51,76 +49,43 @@ export class CreateCaseComponent implements OnInit {
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
         this.locationsList$ = this.locationDataService.getLocationsList();
-        this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
-        this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
         this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
         // by default, enforce User having an address
-        this.caseData.addresses.push(new AddressModel());
+        this.contactData.addresses.push(new AddressModel());
+
         // ...and a document
-        this.caseData.documents.push(new DocumentModel());
-        // ...and a hospitalization date
-        this.caseData.hospitalizationDates.push(null);
-        // ...and an isolation date
-        this.caseData.isolationDates.push(null);
+        this.contactData.documents.push(new DocumentModel());
     }
 
     /**
      * Add a new address slot in UI
      */
     addAddress() {
-        this.caseData.addresses.push(new AddressModel());
+        this.contactData.addresses.push(new AddressModel());
     }
 
     /**
      * Remove an address from the list of addresses
      */
     deleteAddress(index) {
-        this.caseData.addresses.splice(index, 1);
+        this.contactData.addresses.splice(index, 1);
     }
 
     /**
      * Add a new document slot in UI
      */
     addDocument() {
-        this.caseData.documents.push(new DocumentModel());
+        this.contactData.documents.push(new DocumentModel());
     }
 
     /**
      * Remove a document from the list of documents
      */
     deleteDocument(index) {
-        this.caseData.documents.splice(index, 1);
-    }
-
-    /**
-     * Add a new Hospitalization Date slot in UI
-     */
-    addHospitalizationDate() {
-        this.caseData.hospitalizationDates.push(null);
-    }
-
-    /**
-     * Remove a Hospitalization Date from the list
-     */
-    deleteHospitalizationDate(index) {
-        this.caseData.hospitalizationDates.splice(index, 1);
-    }
-
-    /**
-     * Add a new Isolation Date slot in UI
-     */
-    addIsolationDate() {
-        this.caseData.isolationDates.push(null);
-    }
-
-    /**
-     * Remove an Isolation Date from the list
-     */
-    deleteIsolationDate(index) {
-        this.caseData.isolationDates.splice(index, 1);
+        this.contactData.documents.splice(index, 1);
     }
 
     /**
@@ -130,8 +95,11 @@ export class CreateCaseComponent implements OnInit {
         this.ageSelected = ageSelected;
     }
 
-    createNewCase(stepForms: NgForm[]) {
-
+    /**
+     * Create Contact
+     * @param {NgForm[]} stepForms
+     */
+    createNewContact(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -150,22 +118,21 @@ export class CreateCaseComponent implements OnInit {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Case
-                    this.caseDataService
-                        .createCase(selectedOutbreak.id, dirtyFields)
+                    // add the new Contact
+                    this.contactDataService
+                        .createContact(selectedOutbreak.id, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('Case added!');
+                            this.snackbarService.showSuccess('Contact added!');
 
                             // navigate to listing page
-                            this.router.navigate(['/cases']);
+                            this.router.navigate(['/contacts']);
                         });
                 });
         }
     }
-
 }
