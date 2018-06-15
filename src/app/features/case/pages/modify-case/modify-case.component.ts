@@ -14,7 +14,6 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { Subject } from 'rxjs/Subject';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 
@@ -66,18 +65,14 @@ export class ModifyCaseComponent implements OnInit {
             this.caseId = params.caseId;
 
             // get current outbreak
-            const selectedOutbreakCompleted$ = new Subject();
             this.outbreakDataService
                 .getSelectedOutbreak()
-                .takeUntil(selectedOutbreakCompleted$)
-                .subscribe((currentOutbreak: OutbreakModel) => {
+                .subscribe((selectedOutbreak: OutbreakModel) => {
+                    this.outbreakId = selectedOutbreak.id;
 
-                    selectedOutbreakCompleted$.next();
-                    selectedOutbreakCompleted$.complete();
-                    this.outbreakId = currentOutbreak.id;
                     // get case
                     this.caseDataService
-                        .getCase(currentOutbreak.id, this.caseId)
+                        .getCase(selectedOutbreak.id, this.caseId)
                         .subscribe(caseDataReturned => {
                             this.caseData = caseDataReturned;
                             // convert dates into ISO format with moment
@@ -105,7 +100,10 @@ export class ModifyCaseComponent implements OnInit {
      * Remove an address from the list of addresses
      */
     deleteAddress(index) {
-        this.caseData.addresses.splice(index, 1);
+        // show confirm dialog to confirm the action
+        if (confirm(`Are you sure you want to delete this address?`)) {
+            this.caseData.addresses.splice(index, 1);
+        }
     }
 
     /**
@@ -119,7 +117,10 @@ export class ModifyCaseComponent implements OnInit {
      * Remove a document from the list of documents
      */
     deleteDocument(index) {
-        this.caseData.documents.splice(index, 1);
+        // show confirm dialog to confirm the action
+        if (confirm(`Are you sure you want to delete this document?`)) {
+            this.caseData.documents.splice(index, 1);
+        }
     }
 
     /**
@@ -133,7 +134,10 @@ export class ModifyCaseComponent implements OnInit {
      * Remove a Hospitalization Date from the list
      */
     deleteHospitalizationDate(index) {
-        this.caseData.hospitalizationDates.splice(index, 1);
+        // show confirm dialog to confirm the action
+        if (confirm(`Are you sure you want to delete this hospitalization date?`)) {
+            this.caseData.hospitalizationDates.splice(index, 1);
+        }
     }
 
     /**
@@ -147,7 +151,10 @@ export class ModifyCaseComponent implements OnInit {
      * Remove an Isolation Date from the list
      */
     deleteIsolationDate(index) {
-        this.caseData.isolationDates.splice(index, 1);
+        // show confirm dialog to confirm the action
+        if (confirm(`Are you sure you want to delete this isolation date?`)) {
+            this.caseData.isolationDates.splice(index, 1);
+        }
     }
 
     /**
@@ -168,28 +175,36 @@ export class ModifyCaseComponent implements OnInit {
             delete dirtyFields.age;
         }
 
-        if (form.valid && !_.isEmpty(dirtyFields)) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-
-                    // modify the outbreak
-                    this.caseDataService
-                        .modifyCase(selectedOutbreak.id, this.caseId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('Case saved!');
-
-                            // navigate to listing page
-                            this.router.navigate(['/cases']);
-                        });
-                });
+        if (!form.valid) {
+            this.snackbarService.showError('Invalid form!');
+            return;
         }
+
+        if (_.isEmpty(dirtyFields)) {
+            this.snackbarService.showSuccess('No changes...');
+            return;
+        }
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+
+                // modify the case
+                this.caseDataService
+                    .modifyCase(selectedOutbreak.id, this.caseId, dirtyFields)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        this.snackbarService.showSuccess('Case saved!');
+
+                        // navigate to listing page
+                        this.router.navigate(['/cases']);
+                    });
+            });
     }
 
 }

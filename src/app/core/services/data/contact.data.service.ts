@@ -48,5 +48,29 @@ export class ContactDataService {
     createContact(outbreakId: string, contactData): Observable<any> {
         return this.http.post(`outbreaks/${outbreakId}/contacts`, contactData);
     }
+
+    /**
+     * Retrieve a Contact of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<ContactModel>}
+     */
+    getContact(outbreakId: string, contactId: string): Observable<ContactModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}`),
+            ContactModel
+        );
+    }
+
+    /**
+     * Modify an existing Contact of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param contactData
+     * @returns {Observable<any>}
+     */
+    modifyContact(outbreakId: string, contactId: string, contactData): Observable<any> {
+        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData);
+    }
 }
 
