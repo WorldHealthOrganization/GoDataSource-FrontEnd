@@ -106,7 +106,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.active ? 'YES' : 'NO'}}
+                {{ (outbreak.id == authUser.activeOutbreakId) ? 'YES' : 'NO'}}
             </mat-cell>
         </ng-container>
 
@@ -120,6 +120,10 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+
+                    <button mat-menu-item (click)="setActive(item)" >
+                        Set Active
+                    </button>
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                         Modify

@@ -17,7 +17,7 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_USER_ACCOUNT]
+            permissions: [PERMISSION.WRITE_OUTBREAK]
         }
     },
     // Edit Outbreak
