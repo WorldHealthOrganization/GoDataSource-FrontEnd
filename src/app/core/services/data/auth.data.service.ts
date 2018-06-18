@@ -53,6 +53,20 @@ export class AuthDataService {
             });
     }
 
+    reloadAndPersistAuthUser(): Observable<AuthModel> {
+        const authData = this.getAuthData();
+        const userId = _.get(authData,'user.id','');
+        // get user info
+        return this.userDataService.getUser(userId)
+            .map((userInstance: UserModel) => {
+                // keep user info
+                authData.user = userInstance;
+                // cache auth data with authenticated user information
+                this.storageService.set(StorageKey.AUTH_DATA, authData);
+                return authData;
+            });
+    }
+
     /**
      * Logout from API
      * @returns {Observable<any>}
@@ -112,5 +126,6 @@ export class AuthDataService {
 
         return !!user;
     }
+
 }
 

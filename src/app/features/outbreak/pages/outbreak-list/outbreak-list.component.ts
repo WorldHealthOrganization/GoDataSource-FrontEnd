@@ -1,12 +1,14 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from "../../../../core/services/data/outbreak.data.service";
+import { UserDataService } from "../../../../core/services/data/user.data.service";
+import { AuthDataService } from "../../../../core/services/data/auth.data.service";
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
 import { Observable } from "rxjs/Observable";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
 import { RequestQueryBuilder } from "../../../../core/services/helper/request-query-builder";
-import { CaseModel } from "../../../../core/models/case.model";
+import { UserModel } from "../../../../core/models/user.model";
 
 @Component({
     selector: 'app-outbreak-list',
@@ -23,12 +25,15 @@ export class OutbreakListComponent {
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
     outbreaksListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
-
+    authUser: UserModel;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
+        private userDataService: UserDataService,
+        private authDataService: AuthDataService,
         private snackbarService: SnackbarService
     ) {
+        this.authUser = this.authDataService.getAuthenticatedUser();
         this.loadOutbreaksList();
     }
 
@@ -45,15 +50,49 @@ export class OutbreakListComponent {
      */
     delete(outbreak) {
         if (confirm('Are you sure you want to delete ' + outbreak.name + ' ?')) {
-            this.outbreakDataService
-                .deleteOutbreak(outbreak.id)
+            // make outbreak inactive
+            let userData = {'activeOutbreakId': ''};
+            var userId = this.authUser.id;
+            this.userDataService
+                .modifyUser(userId, userData)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
                 .subscribe(response => {
-                    this.snackbarService.showSuccess("Success");
-                    this.loadOutbreaksList();
+                    this.outbreakDataService
+                        .deleteOutbreak(outbreak.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(response => {
+                            this.snackbarService.showSuccess('Success');
+                            this.loadOutbreaksList();
+                        });
+                });
+
+        }
+    }
+
+    setActive(outbreak){
+        if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be overwritten.')) {
+            let userData = {'activeOutbreakId': outbreak.id};
+            var userId = this.authUser.id;
+            this.userDataService
+                .modifyUser(userId, userData)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(response => {
+                    this.authDataService
+                        .reloadAndPersistAuthUser()
+                        .subscribe((authenticatedUser) => {
+                            this.authUser = authenticatedUser.user;
+                            this.snackbarService.showSuccess('Success');
+                            this.loadOutbreaksList();
+                        });
                 });
         }
     }
@@ -78,18 +117,31 @@ export class OutbreakListComponent {
      * @param value
      */
     filterActiveBy(property, option) {
-        if (option.value == 'all') {
-            this.outbreaksListQueryBuilder.where({
-                [property]: {
-                    "inq": [true,false]
-                }
-            });
-        }else{
-            this.outbreaksListQueryBuilder.where({
-                [property]: {
-                    "eq": option.value
+        switch (option.value) {
+            case 'all' : {
+                this.outbreaksListQueryBuilder.where({
+                    ['id']: {
+                        'like': `-`
+                    }
+                });
+                break;
             }
-            });
+            case true : {
+                this.outbreaksListQueryBuilder.where({
+                    ['id']: {
+                        'eq': this.authUser.activeOutbreakId
+                    }
+                });
+                break;
+            }
+            case false : {
+                this.outbreaksListQueryBuilder.where({
+                    ['id']: {
+                        'neq': this.authUser.activeOutbreakId
+                    }
+                });
+                break;
+            }
         }
         this.loadOutbreaksList();
     }
