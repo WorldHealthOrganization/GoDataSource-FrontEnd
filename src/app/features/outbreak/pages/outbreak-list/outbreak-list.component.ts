@@ -50,22 +50,34 @@ export class OutbreakListComponent {
      */
     delete(outbreak) {
         if (confirm('Are you sure you want to delete ' + outbreak.name + ' ?')) {
-            this.outbreakDataService
-                .deleteOutbreak(outbreak.id)
+            // make outbreak inactive
+            let userData = {'activeOutbreakId': ''};
+            var userId = this.authUser.id;
+            this.userDataService
+                .modifyUser(userId, userData)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
                 .subscribe(response => {
-                    this.snackbarService.showSuccess("Success");
-                    this.loadOutbreaksList();
+                    this.outbreakDataService
+                        .deleteOutbreak(outbreak.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(response => {
+                            this.snackbarService.showSuccess('Success');
+                            this.loadOutbreaksList();
+                        });
                 });
+
         }
     }
 
     setActive(outbreak){
         if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be overwritten.')) {
-            let userData = {"activeOutbreakId": outbreak.id};
+            let userData = {'activeOutbreakId': outbreak.id};
             var userId = this.authUser.id;
             this.userDataService
                 .modifyUser(userId, userData)
@@ -78,7 +90,7 @@ export class OutbreakListComponent {
                         .reloadAndPersistAuthUser()
                         .subscribe((authenticatedUser) => {
                             this.authUser = authenticatedUser.user;
-                            this.snackbarService.showSuccess("Success");
+                            this.snackbarService.showSuccess('Success');
                             this.loadOutbreaksList();
                         });
                 });
@@ -109,7 +121,7 @@ export class OutbreakListComponent {
             case 'all' : {
                 this.outbreaksListQueryBuilder.where({
                     ['id']: {
-                        "like": `-`
+                        'like': `-`
                     }
                 });
                 break;
@@ -117,7 +129,7 @@ export class OutbreakListComponent {
             case true : {
                 this.outbreaksListQueryBuilder.where({
                     ['id']: {
-                        "eq": this.authUser.activeOutbreakId
+                        'eq': this.authUser.activeOutbreakId
                     }
                 });
                 break;
@@ -125,7 +137,7 @@ export class OutbreakListComponent {
             case false : {
                 this.outbreaksListQueryBuilder.where({
                     ['id']: {
-                        "neq": this.authUser.activeOutbreakId
+                        'neq': this.authUser.activeOutbreakId
                     }
                 });
                 break;
