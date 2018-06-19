@@ -141,7 +141,7 @@ export class ContactsListComponent implements OnInit {
     deleteContact(contact: ContactModel) {
         // show confirm dialog to confirm the action
         if (confirm(`Are you sure you want to delete this contact: ${contact.firstName} ${contact.lastName}?`)) {
-            // delete the user
+            // delete contact
             this.contactDataService
                 .deleteContact(this.selectedOutbreak.id, contact.id)
                 .catch((err) => {
