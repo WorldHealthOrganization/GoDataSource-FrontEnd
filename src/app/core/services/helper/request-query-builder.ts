@@ -28,29 +28,9 @@ export class RequestQueryBuilder {
      * @param {string} property
      * @returns {this}
      */
-    whereRemoveCondition(property: string) {
+    whereRemove(property: string) {
         delete this.whereCondition[property];
 
-        return this;
-    }
-
-    /**
-     * Remove a list of properties or all of them if empty array is provided
-     * @param {string[]} properties Leave empty if you want to remove all
-     * @returns {this}
-     */
-    whereRemoveConditions(properties: string[] = []) {
-        if (!properties ||  properties.length < 1) {
-            for (const p in this.whereCondition) {
-                this.whereRemoveCondition(p);
-            }
-        } else {
-            for (const p of properties) {
-                this.whereRemoveCondition(p);
-            }
-        }
-
-        // finished
         return this;
     }
 
@@ -59,7 +39,13 @@ export class RequestQueryBuilder {
      * @returns {this}
      */
     clear() {
-        this.whereRemoveConditions();
+        // remove conditions - same as this.whereCondition = [], but this method will keep the same object in case we're binding it
+        for (const p in this.whereCondition) {
+            delete this.whereCondition[p];
+        }
+
+        // finished
+        return this;
     }
 
     /**

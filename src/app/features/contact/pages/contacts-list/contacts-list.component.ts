@@ -83,7 +83,7 @@ export class ContactsListComponent implements OnInit {
     filterBy(property, value, valueTo) {
         // clear filter ?
         if (_.isEmpty(value) && _.isEmpty(valueTo)) {
-            this.contactsListQueryBuilder.whereRemoveCondition(property);
+            this.contactsListQueryBuilder.whereRemove(property);
         } else {
             // filter by any User property
             switch (property) {
