@@ -51,6 +51,15 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_OUTBREAK]
                 }
             },
+            // Contacts Module routes
+            {
+                path: 'contacts',
+                loadChildren: './features/contact/contact.module#ContactModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_CONTACT]
+                }
+            },
             // Case Module routes
             {
                 path: 'cases',

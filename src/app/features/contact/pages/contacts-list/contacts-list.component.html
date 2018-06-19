@@ -1,0 +1,152 @@
+<app-topnav [addNewItemRoute]="'./create'">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="contactsList$ | async" matSort>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <div class="table-header-cell">
+                    <div>First Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('firstName', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <div class="table-header-cell" fxLayout="column">
+                    <div>Last Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('lastName', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+         <!-- Age -->
+        <ng-container matColumnDef="age">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Age</div>
+                    <div class="column-filter column-filter-range">
+                        <div>
+                            <app-form-input
+                                #ageFromFilter
+                                name="filter"
+                                ngModel
+                                placeholder="From"
+                                type="number"
+                                (optionChanged)="filterBy('age', $event, ageToFilter.value)">
+                            </app-form-input>
+                        </div>
+                        <div>-</div>
+                        <div>
+                            <app-form-input
+                                #ageToFilter
+                                name="filter"
+                                ngModel
+                                placeholder="To"
+                                type="number"
+                                (optionChanged)="filterBy('age', ageFromFilter.value, $event)">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.age }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Gender</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBy('gender', $event)">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.gender }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Phone number -->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Phone</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('phoneNumber', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.phoneNumber }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
+
+                    <button mat-menu-item (click)="deleteContact(item)">
+                        Delete
+                    </button>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
+</mat-card>

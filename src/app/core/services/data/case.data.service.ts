@@ -19,7 +19,7 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<CaseModel[]>}
      */
-    getCasesList(outbreakId: string, queryBuilder: RequestQueryBuilder = null): Observable<CaseModel[]> {
+    getCasesList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<CaseModel[]> {
 
         const filter = queryBuilder.buildQuery();
 
@@ -61,16 +61,6 @@ export class CaseDataService {
      */
     modifyCase(outbreakId: string, caseId: string, caseData): Observable<any> {
         return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData);
-    }
-
-    /**
-     * Delete an existing Case of an Outbreak
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<any>}
-     */
-    deleteRole(outbreakId: string, caseId: string): Observable<any> {
-        return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}`);
     }
 }
 

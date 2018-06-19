@@ -24,6 +24,31 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove specific condition
+     * @param {string} property
+     * @returns {this}
+     */
+    whereRemove(property: string) {
+        delete this.whereCondition[property];
+
+        return this;
+    }
+
+    /**
+     * Remove all filters
+     * @returns {this}
+     */
+    clear() {
+        // remove conditions - same as this.whereCondition = [], but this method will keep the same object in case we're binding it
+        for (const p in this.whereCondition) {
+            delete this.whereCondition[p];
+        }
+
+        // finished
+        return this;
+    }
+
+    /**
      * Sets a "limit" on the number of results retrieved in a list
      * @param {number} limit
      */
