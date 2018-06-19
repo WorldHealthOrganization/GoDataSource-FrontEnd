@@ -53,7 +53,7 @@ export class CreateContactComponent implements OnInit {
     }
 
     ngOnInit() {
-        // by default, enforce User having an address
+        // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
 
         // ...and a document

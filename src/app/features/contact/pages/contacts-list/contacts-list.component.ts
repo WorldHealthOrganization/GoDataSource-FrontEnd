@@ -34,7 +34,7 @@ export class ContactsListComponent implements OnInit {
     contactsListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     // contacts outbreak
-    contactsOutbreak: OutbreakModel;
+    selectedOutbreak: OutbreakModel;
 
     // gender list
     genderList$: Observable<any[]>;
@@ -54,24 +54,25 @@ export class ContactsListComponent implements OnInit {
     }
 
     ngOnInit() {
-        // refresh listview
-        this.loadContactsList();
+        // subscribe to the Selected Outbreak
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // re-load the list when the Selected Outbreak is changed
+                this.loadContactsList();
+            });
     }
 
     /**
      * Re(load) the Contacts list
      */
     loadContactsList() {
-        // get current outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((currentOutbreak: OutbreakModel) => {
-                // keep outbreak to use later
-                this.contactsOutbreak = currentOutbreak;
-
-                // get the list of existing contacts
-                this.contactsList$ = this.contactDataService.getContactsList(currentOutbreak.id, this.contactsListQueryBuilder);
-            });
+        if (this.selectedOutbreak) {
+            // retrieve the list of Cases
+            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.contactsListQueryBuilder);
+        }
     }
 
     /**
@@ -108,7 +109,7 @@ export class ContactsListComponent implements OnInit {
                     // contains
                     this.contactsListQueryBuilder.where({
                         [property]: {
-                            regexp: `/${value}/i`
+                            regexp: `/^${value}/i`
                         }
                     });
             }
@@ -142,7 +143,7 @@ export class ContactsListComponent implements OnInit {
         if (confirm(`Are you sure you want to delete this contact: ${contact.firstName} ${contact.lastName}?`)) {
             // delete the user
             this.contactDataService
-                .deleteContact(this.contactsOutbreak.id, contact.id)
+                .deleteContact(this.selectedOutbreak.id, contact.id)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 

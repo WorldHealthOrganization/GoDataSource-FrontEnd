@@ -57,7 +57,7 @@ export class CreateCaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        // by default, enforce User having an address
+        // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());
         // ...and a document
         this.caseData.documents.push(new DocumentModel());

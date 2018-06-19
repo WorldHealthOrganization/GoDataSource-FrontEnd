@@ -19,7 +19,7 @@ export class ContactDataService {
      * @param {string} outbreakId
      * @returns {Observable<ContactModel[]>}
      */
-    getContactsList(outbreakId: string, queryBuilder: RequestQueryBuilder = null): Observable<ContactModel[]> {
+    getContactsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactModel[]> {
 
         const filter = queryBuilder.buildQuery();
 
