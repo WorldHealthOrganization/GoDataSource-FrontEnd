@@ -1,0 +1,26 @@
+<div class="document-container form-element "OnInit
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <div fxLayout="row" fxLayoutGap="20px" fxFlex="50">
+        <app-form-select
+            [name]="name + '[type]'"
+            [(ngModel)]="document.type"
+            placeholder="Document type"
+            [options]="documentTypesList$ | async"
+            [disabled]="disabled"
+            [required]="required"
+            optionLabelKey="label"
+            optionValueKey="value"
+            (optionChanged)="onChange()">
+        </app-form-select>
+
+        <app-form-input
+            [name]="name + '[number]'"
+            [(ngModel)]="document.number"
+            placeholder="Document number"
+            [disabled]="disabled"
+            [required]="required"
+            (input)="onChange()">
+        </app-form-input>
+    </div>
+</div>

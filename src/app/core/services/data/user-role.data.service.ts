@@ -6,15 +6,21 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
+import 'rxjs/add/operator/share';
 
 @Injectable()
 export class UserRoleDataService {
+
+    userRoleList$: Observable<any>;
+    availablePermissions$: Observable<any>;
 
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
+        this.userRoleList$ = this.http.get('roles').share();
+        this.availablePermissions$ = this.http.get(`roles/available-permissions`).share();
     }
 
     /**
@@ -35,8 +41,7 @@ export class UserRoleDataService {
                     // get roles list from API
                     return this.modelHelper
                         .mapObservableListToModel(
-                            this.http
-                                .get('roles')
+                            this.userRoleList$
                                 .map((rolesResult: any[]) => {
                                     // include available permissions on each Role object
                                     return _.map(rolesResult, (role) => {
@@ -123,7 +128,7 @@ export class UserRoleDataService {
             // get permissions list from API
             return this.modelHelper
                 .mapObservableListToModel(
-                    this.http.get(`roles/available-permissions`),
+                    this.availablePermissions$,
                     PermissionModel
                 )
                 .do((permissions) => {

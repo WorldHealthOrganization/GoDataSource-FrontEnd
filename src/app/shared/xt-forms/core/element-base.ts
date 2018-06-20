@@ -10,7 +10,6 @@ import { ValueAccessorBase } from './value-accessor-base';
 import {
     AsyncValidatorArray,
     ValidatorArray,
-    ValidationResult,
     validate,
 } from './validate';
 import { ErrorMessage } from './error-message';
@@ -26,7 +25,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
 
     public validationResult = null;
 
-    constructor(
+    protected constructor(
         private controlContainer: ControlContainer,
         private validators: ValidatorArray,
         private asyncValidators: AsyncValidatorArray

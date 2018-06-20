@@ -1,0 +1,61 @@
+<div class="address-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <div fxLayout="column" fxFlex>
+        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <app-form-input
+                [name]="name + '[name]'"
+                [(ngModel)]="address.name"
+                placeholder="Address name"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()">
+            </app-form-input>
+
+            <div fxFlex><!-- placeholder --></div>
+            <div fxFlex><!-- placeholder --></div>
+            <div fxFlex><!-- placeholder --></div>
+        </div>
+
+        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <app-form-select
+                [name]="name + '[locationId]'"
+                [(ngModel)]="address.locationId"
+                placeholder="Area"
+                [options]="locationsList$ | async"
+                [disabled]="disabled"
+                [required]="required"
+                optionLabelKey="name"
+                optionValueKey="id"
+                (optionChanged)="onChange()">
+            </app-form-select>
+
+            <app-form-input
+                [name]="name + '[city]'"
+                [(ngModel)]="address.city"
+                placeholder="City"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()">
+            </app-form-input>
+
+            <app-form-input
+                [name]="name + '[postalCode]'"
+                [(ngModel)]="address.postalCode"
+                placeholder="ZIP"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()">
+            </app-form-input>
+
+            <app-form-input
+                [name]="name + '[addressLine1]'"
+                [(ngModel)]="address.addressLine1"
+                placeholder="Address"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()">
+            </app-form-input>
+        </div>
+    </div>
+</div>

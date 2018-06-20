@@ -12,10 +12,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 
 
 @Component({
@@ -38,10 +34,8 @@ export class ModifyCaseComponent implements OnInit {
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
-    locationsList$: Observable<LocationModel[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
-    documentTypesList$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -49,15 +43,12 @@ export class ModifyCaseComponent implements OnInit {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
-        private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
-        this.locationsList$ = this.locationDataService.getLocationsList();
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
         this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
-        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
@@ -87,40 +78,6 @@ export class ModifyCaseComponent implements OnInit {
 
 
         });
-    }
-
-    /**
-     * Add a new address slot in UI
-     */
-    addAddress() {
-        this.caseData.addresses.push(new AddressModel());
-    }
-
-    /**
-     * Remove an address from the list of addresses
-     */
-    deleteAddress(index) {
-        // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this address?`)) {
-            this.caseData.addresses.splice(index, 1);
-        }
-    }
-
-    /**
-     * Add a new document slot in UI
-     */
-    addDocument() {
-        this.caseData.documents.push(new DocumentModel());
-    }
-
-    /**
-     * Remove a document from the list of documents
-     */
-    deleteDocument(index) {
-        // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this document?`)) {
-            this.caseData.documents.splice(index, 1);
-        }
     }
 
     /**

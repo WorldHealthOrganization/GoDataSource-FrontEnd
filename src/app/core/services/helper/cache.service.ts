@@ -5,6 +5,7 @@ export enum CacheKey {
     AUTH_ROLES = 'AUTH_ROLES',
     PERMISSIONS = 'PERMISSIONS',
     LANGUAGES = 'LANGUAGES',
+    LOCATIONS = 'LOCATIONS'
 }
 
 @Injectable()

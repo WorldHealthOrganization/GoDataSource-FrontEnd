@@ -12,8 +12,6 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import * as _ from 'lodash';
 
@@ -35,21 +33,16 @@ export class CreateContactComponent implements OnInit {
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
-    locationsList$: Observable<LocationModel[]>;
-    documentTypesList$: Observable<any[]>;
 
     constructor(
         private router: Router,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
-        private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
-        this.locationsList$ = this.locationDataService.getLocationsList();
-        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
@@ -58,34 +51,6 @@ export class CreateContactComponent implements OnInit {
 
         // ...and a document
         this.contactData.documents.push(new DocumentModel());
-    }
-
-    /**
-     * Add a new address slot in UI
-     */
-    addAddress() {
-        this.contactData.addresses.push(new AddressModel());
-    }
-
-    /**
-     * Remove an address from the list of addresses
-     */
-    deleteAddress(index) {
-        this.contactData.addresses.splice(index, 1);
-    }
-
-    /**
-     * Add a new document slot in UI
-     */
-    addDocument() {
-        this.contactData.documents.push(new DocumentModel());
-    }
-
-    /**
-     * Remove a document from the list of documents
-     */
-    deleteDocument(index) {
-        this.contactData.documents.splice(index, 1);
     }
 
     /**

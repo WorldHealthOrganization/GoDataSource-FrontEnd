@@ -109,33 +109,10 @@
 
                 <!-- Documents section -->
                 <div class="section-title">Documents</div>
-
-                <div *ngFor="let document of caseData.documents; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
-
-                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex="50">
-                            <app-form-select
-                                [name]="'documents[' + i + '][type]'"
-                                [(ngModel)]="document.type"
-                                placeholder="Document type"
-                                [options]="documentTypesList$ | async">
-                            </app-form-select>
-
-                            <app-form-input
-                                [name]="'documents[' + i + '][number]'"
-                                [(ngModel)]="document.number"
-                                placeholder="Document number">
-                            </app-form-input>
-                        </div>
-
-                        <button type="button" mat-icon-button (click)="deleteDocument(i)">
-                            <span class="xt-icon">delete</span>
-                        </button>
-                    </mat-card>
-                </div>
-
-                <button type="button" mat-button color="primary" (click)="addDocument()">Add another document</button>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="caseData.documents">
+                </app-form-document-list>
 
                 <div>
                     <button mat-button matStepperNext>Next</button>
@@ -148,62 +125,10 @@
             <form #addressForm="ngForm">
                 <ng-template matStepLabel>Address</ng-template>
 
-                <div *ngFor="let address of caseData.addresses; let i = index" fxFlex fxLayout="row" fxLayoutAlign="start center">
-
-                    <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-                        <div fxLayout="column" fxFlex>
-
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                                <app-form-input
-                                    [name]="'addresses[' + i + '][name]'"
-                                    [(ngModel)]="address.name"
-                                    placeholder="Address name">
-                                </app-form-input>
-
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                            </div>
-
-                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                                <app-form-select
-                                    [name]="'addresses[' + i + '][locationId]'"
-                                    [(ngModel)]="address.locationId"
-                                    placeholder="Area"
-                                    [options]="locationsList$ | async"
-                                    optionLabelKey="name"
-                                    optionValueKey="id">
-                                </app-form-select>
-
-                                <app-form-input
-                                    [name]="'addresses[' + i + '][city]'"
-                                    [(ngModel)]="address.city"
-                                    placeholder="City">
-                                </app-form-input>
-
-                                <app-form-input
-                                    [name]="'addresses[' + i + '][postalCode]'"
-                                    [(ngModel)]="address.postalCode"
-                                    placeholder="ZIP">
-                                </app-form-input>
-
-                                <app-form-input
-                                    [name]="'addresses[' + i + '][addressLine1]'"
-                                    [(ngModel)]="address.addressLine1"
-                                    placeholder="Address">
-                                </app-form-input>
-                            </div>
-
-                        </div>
-
-                        <button type="button" mat-icon-button (click)="deleteAddress(i)">
-                            <span class="xt-icon">delete</span>
-                        </button>
-                    </mat-card>
-
-                </div>
-
-                <button type="button" mat-button color="primary" (click)="addAddress()">Add another address</button>
+                <app-form-address-list
+                    name="addresses"
+                    [(ngModel)]="caseData.addresses">
+                </app-form-address-list>
 
                 <div>
                     <button mat-button matStepperPrevious>Back</button>

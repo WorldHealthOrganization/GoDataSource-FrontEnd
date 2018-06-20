@@ -11,5 +11,5 @@ export const components: any[] = [
     FormTextareaComponent,
     FormSelectComponent,
     FormDatepickerComponent,
-    FormSlideToggleComponent,
+    FormSlideToggleComponent
 ];

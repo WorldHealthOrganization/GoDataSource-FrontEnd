@@ -3,10 +3,6 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,12 +33,9 @@ export class ModifyContactComponent implements OnInit {
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
-    locationsList$: Observable<LocationModel[]>;
-    documentTypesList$: Observable<any[]>;
 
     constructor(
         private genericDataService: GenericDataService,
-        private locationDataService: LocationDataService,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private contactDataService: ContactDataService,
@@ -51,8 +44,6 @@ export class ModifyContactComponent implements OnInit {
         private router: Router
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
-        this.locationsList$ = this.locationDataService.getLocationsList();
-        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
@@ -73,40 +64,6 @@ export class ModifyContactComponent implements OnInit {
                         });
                 });
         });
-    }
-
-    /**
-     * Add a new address slot in UI
-     */
-    addAddress() {
-        this.contactData.addresses.push(new AddressModel());
-    }
-
-    /**
-     * Remove an address from the list of addresses
-     */
-    deleteAddress(index) {
-        // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this address?`)) {
-            this.contactData.addresses.splice(index, 1);
-        }
-    }
-
-    /**
-     * Add a new document slot in UI
-     */
-    addDocument() {
-        this.contactData.documents.push(new DocumentModel());
-    }
-
-    /**
-     * Remove a document from the list of documents
-     */
-    deleteDocument(index) {
-        // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this document?`)) {
-            this.contactData.documents.splice(index, 1);
-        }
     }
 
     /**

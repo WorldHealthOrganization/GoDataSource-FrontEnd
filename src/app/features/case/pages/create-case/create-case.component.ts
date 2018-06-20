@@ -14,8 +14,6 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 
 @Component({
@@ -35,25 +33,20 @@ export class CreateCaseComponent implements OnInit {
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
-    locationsList$: Observable<LocationModel[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
-    documentTypesList$: Observable<any[]>;
 
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
-        private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
-        this.locationsList$ = this.locationDataService.getLocationsList();
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
         this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
-        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
     }
 
     ngOnInit() {
@@ -65,34 +58,6 @@ export class CreateCaseComponent implements OnInit {
         this.caseData.hospitalizationDates.push(null);
         // ...and an isolation date
         this.caseData.isolationDates.push(null);
-    }
-
-    /**
-     * Add a new address slot in UI
-     */
-    addAddress() {
-        this.caseData.addresses.push(new AddressModel());
-    }
-
-    /**
-     * Remove an address from the list of addresses
-     */
-    deleteAddress(index) {
-        this.caseData.addresses.splice(index, 1);
-    }
-
-    /**
-     * Add a new document slot in UI
-     */
-    addDocument() {
-        this.caseData.documents.push(new DocumentModel());
-    }
-
-    /**
-     * Remove a document from the list of documents
-     */
-    deleteDocument(index) {
-        this.caseData.documents.splice(index, 1);
     }
 
     /**

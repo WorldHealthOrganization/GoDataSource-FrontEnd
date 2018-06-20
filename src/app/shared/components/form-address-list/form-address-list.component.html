@@ -1,0 +1,40 @@
+<div class="address-list-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <!-- Edit Mode -->
+    <form *ngIf="!viewOnly" >
+        <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
+             fxLayoutAlign="start center">
+            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <app-form-address
+                    [name]="name + '[' + i + ']'"
+                    [(ngModel)]="values[i]"
+                    (changed)="onChange()">
+                </app-form-address>
+            </mat-card>
+
+            <button type="button" mat-icon-button (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+        </div>
+
+        <button type="button" mat-button color="primary" (click)="add()">Add another address</button>
+    </form>
+    <!-- End of Edit Mode -->
+
+    <!-- View Only Mode -->
+    <ng-container *ngIf="viewOnly">
+        <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+            <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
+                 fxLayoutAlign="start center">
+                <app-form-address
+                    [name]="name + '[' + i + ']'"
+                    [(ngModel)]="values[i]"
+                    (changed)="onChange()"
+                    <!-- @TODO add readonly property -->>
+                </app-form-address>
+            </div>
+        </mat-card>
+    </ng-container>
+    <!-- End of View Only Mode -->
+</div>

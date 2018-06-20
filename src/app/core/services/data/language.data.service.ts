@@ -3,17 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
-import { UserRoleModel } from '../../models/user-role.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
+import 'rxjs/add/operator/share';
 
 @Injectable()
 export class LanguageDataService {
+
+    languageList$: Observable<any>;
 
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
+        this.languageList$ = this.http.get(`languages`).share();
     }
 
     /**
@@ -29,7 +32,7 @@ export class LanguageDataService {
             // get languages list from API
             return this.modelHelper
                 .mapObservableListToModel(
-                    this.http.get(`languages`),
+                    this.languageList$,
                     LanguageModel
                 )
                 .do((languages) => {
