@@ -76,7 +76,7 @@ export class OutbreakListComponent {
     }
 
     setActive(outbreak){
-        if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be overwritten.')) {
+        if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be deactivated.')) {
             let userData = {'activeOutbreakId': outbreak.id};
             var userId = this.authUser.id;
             this.userDataService
@@ -86,11 +86,12 @@ export class OutbreakListComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(response => {
+                    // reload user data to save the new active outbreak
                     this.authDataService
                         .reloadAndPersistAuthUser()
                         .subscribe((authenticatedUser) => {
                             this.authUser = authenticatedUser.user;
-                            this.snackbarService.showSuccess('Success');
+                            this.snackbarService.showSuccess('Active outbreak changed successfully');
                             this.loadOutbreaksList();
                         });
                 });
