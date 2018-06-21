@@ -20,6 +20,7 @@ export class FormInputComponent extends ElementBase<string> {
 
     @Input() placeholder: string;
     @Input() type: string = 'text';
+    @Input() pattern: string;
     @Input() required: boolean = false;
     @Input() name: string;
     @Input() disabled: boolean = false;

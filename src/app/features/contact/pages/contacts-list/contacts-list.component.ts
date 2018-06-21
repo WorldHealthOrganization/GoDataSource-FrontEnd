@@ -13,6 +13,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { FormRangeModel } from '../../../../shared/components/form-range/form-range.component';
 
 @Component({
     selector: 'app-contacts-list',
@@ -21,6 +22,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     styleUrls: ['./contacts-list.component.less']
 })
 export class ContactsListComponent implements OnInit {
+    // Filters
+    ageRangeFilter: FormRangeModel = new FormRangeModel();
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Contacts', '.', true)
@@ -45,15 +48,15 @@ export class ContactsListComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService
-    ) {
+    ) {}
+
+    ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // retrieve gender list
         this.genderList$ = this.genericDataService.getGendersList();
-    }
 
-    ngOnInit() {
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -80,29 +83,19 @@ export class ContactsListComponent implements OnInit {
      * @param property
      * @param value
      */
-    filterBy(property, value, valueTo) {
+    filterBy(property, value) {
         // clear filter ?
-        if (_.isEmpty(value) && _.isEmpty(valueTo)) {
+        if (_.isEmpty(value)) {
             this.contactsListQueryBuilder.whereRemove(property);
         } else {
             // filter by any User property
             switch (property) {
                 case 'age':
-                    // between
-                    if (!_.isEmpty(value) && !_.isEmpty(valueTo)) {
-                        this.contactsListQueryBuilder.where({
-                            [property]: {
-                                between: [value, valueTo]
-                            }
-                        });
-                    } else {
-                        this.contactsListQueryBuilder.where({
-                            [property]: {
-                                [_.isEmpty(valueTo) ? 'gte' : 'lte']: _.isEmpty(valueTo) ? value : valueTo
-                            }
-                        });
-                    }
-
+                    this.contactsListQueryBuilder.where({
+                        [property]: {
+                            [value.operator]: value.value
+                        }
+                    });
                     break;
 
                 default:
