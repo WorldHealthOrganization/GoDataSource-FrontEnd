@@ -9,6 +9,8 @@ import { Observable } from "rxjs/Observable";
 import { OutbreakModel } from "../../../../core/models/outbreak.model";
 import { RequestQueryBuilder } from "../../../../core/services/helper/request-query-builder";
 import { UserModel } from "../../../../core/models/user.model";
+import * as _ from 'lodash';
+import { GenericDataService } from "../../../../core/services/data/generic.data.service";
 
 @Component({
     selector: 'app-outbreak-list',
@@ -24,6 +26,7 @@ export class OutbreakListComponent {
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
+    activeOptionsList$: Observable<any[]>;
     outbreaksListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
     authUser: UserModel;
 
@@ -31,9 +34,11 @@ export class OutbreakListComponent {
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
+        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService
     ) {
         this.authUser = this.authDataService.getAuthenticatedUser();
+        this.activeOptionsList$ = this.genericDataService.getActiveOptions();
         this.loadOutbreaksList();
     }
 
@@ -104,44 +109,40 @@ export class OutbreakListComponent {
      * @param value
      */
     filterBy(property, value) {
-        this.outbreaksListQueryBuilder.where({
-            [property]: {
-                regexp: `/^${value}/i`
-            }
-        });
-        this.loadOutbreaksList();
-    }
-
-    /**
-     * Filter the Outbreaks list by some field
-     * @param property
-     * @param value
-     */
-    filterActiveBy(property, option) {
-        switch (option.value) {
-            case 'all' : {
-                this.outbreaksListQueryBuilder.where({
-                    ['id']: {
-                        'like': `-`
+        if (_.isEmpty(value)) {
+            this.outbreaksListQueryBuilder.whereRemove(property);
+        } else {
+            switch (property) {
+                case 'active':
+                    switch (value.value) {
+                        case '' : {
+                            this.outbreaksListQueryBuilder.whereRemove('id');
+                            break;
+                        }
+                        case true : {
+                            this.outbreaksListQueryBuilder.where({
+                                id: {
+                                    'eq': this.authUser.activeOutbreakId
+                                }
+                            });
+                            break;
+                        }
+                        case false : {
+                            this.outbreaksListQueryBuilder.where({
+                                id: {
+                                    'neq': this.authUser.activeOutbreakId
+                                }
+                            });
+                            break;
+                        }
                     }
-                });
-                break;
-            }
-            case true : {
-                this.outbreaksListQueryBuilder.where({
-                    ['id']: {
-                        'eq': this.authUser.activeOutbreakId
-                    }
-                });
-                break;
-            }
-            case false : {
-                this.outbreaksListQueryBuilder.where({
-                    ['id']: {
-                        'neq': this.authUser.activeOutbreakId
-                    }
-                });
-                break;
+                    break;
+                default:
+                    this.outbreaksListQueryBuilder.where({
+                        [property]: {
+                            regexp: `/^${value}/i`
+                        }
+                    });
             }
         }
         this.loadOutbreaksList();
