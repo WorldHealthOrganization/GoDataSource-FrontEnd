@@ -107,4 +107,22 @@ export class Constants {
             value: 'Sudan'
         }
     };
+
+    // #TODO replace with Reference Data
+    static ACTIVE_OPTIONS = {
+        ALL: {
+            label: 'ALL',
+            value: ''
+        },
+        YES: {
+            label: 'YES',
+            value: true
+        },
+        NO: {
+            label: 'NO',
+            value: false
+        }
+
+    };
+
 }

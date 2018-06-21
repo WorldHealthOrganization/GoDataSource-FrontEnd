@@ -44,5 +44,26 @@ export class SnackbarService {
             duration: duration
         });
     }
+
+    /**
+     * Show an Error Snackbar
+     * @param message
+     * @param duration
+     * @returns {MatSnackBarRef<SnackbarComponent>}
+     */
+    showNotice(message) {
+        return this.snackbar.openFromComponent(SnackbarComponent, {
+            panelClass: 'notice',
+            data: {
+                message: message
+            },
+            verticalPosition: 'top',
+            horizontalPosition: 'start'
+        });
+    }
+
+    dismissAll(){
+        this.snackbar.dismiss();
+    }
 }
 

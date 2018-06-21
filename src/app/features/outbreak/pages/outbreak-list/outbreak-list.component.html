@@ -97,9 +97,9 @@
                             name="filter"
                             ngModel
                             placeholder="Filter"
-                            [options]="[{'value':'all','label':'All'},{'value': true,'label':'Yes'},{'value': false,'label':'NO'}]"
+                            [options]="activeOptionsList$ | async"
                             multiple="false"
-                            (optionChanged)="filterActiveBy('active', $event)">
+                            (optionChanged)="filterBy('active', $event)">
                             >
                         </app-form-select>
                     </div>
@@ -121,17 +121,24 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button  fxShow="{{ (item.id != authUser.activeOutbreakId) }}" mat-menu-item (click)="setActive(item)" >
+                    <button fxShow="{{ (item.id != authUser.activeOutbreakId) }}" mat-menu-item
+                            (click)="setActive(item)">
                         Set Active
                     </button>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
-                    </button>
+                    <span [matTooltip]="((item.id != authUser.activeOutbreakId) ? 'You cannot modify an inactive outbreak' : '')">
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']"
+                            [disabled]="(item.id != authUser.activeOutbreakId)">
+                            Modify
+                        </button>
+                    </span>
 
-                    <button mat-menu-item (click)="delete(item)">
-                        Delete
-                    </button>
+                    <span [matTooltip]="((item.id != authUser.activeOutbreakId) ? 'You cannot delete an inactive outbreak' : '')">
+                         <button mat-menu-item (click)="delete(item)"
+                            [disabled]="(item.id != authUser.activeOutbreakId)">
+                            Delete
+                        </button>
+                    </span>
 
                 </mat-menu>
 

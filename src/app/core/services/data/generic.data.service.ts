@@ -53,5 +53,12 @@ export class GenericDataService {
         return Observable.of(Object.values(Constants.COUNTRY));
     }
 
+    /**
+     * Retrieve the list of Active options
+     * @returns {Observable<any[]>}
+     */
+    getActiveOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.ACTIVE_OPTIONS));
+    }
 }
 

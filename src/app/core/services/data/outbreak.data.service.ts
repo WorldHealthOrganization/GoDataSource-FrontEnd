@@ -12,6 +12,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { RequestQueryBuilder } from '../helper/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { Subject } from 'rxjs/Subject';
+import { SnackbarService } from "../helper/snackbar.service";
 
 
 @Injectable()
@@ -24,6 +25,7 @@ export class OutbreakDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private storageService: StorageService,
+        private snackbarService: SnackbarService,
         private authDataService: AuthDataService
     ) {
     }
@@ -102,7 +104,7 @@ export class OutbreakDataService {
             // subscribe to the Subject stream
             this.getSelectedOutbreakSubject()
                 .takeUntil(selectedOutbreakCompleted$)
-                .subscribe((outbreak: OutbreakModel|null) => {
+                .subscribe((outbreak: OutbreakModel | null) => {
                     if (outbreak) {
                         // found the Selected Outbreak
                         observer.next(outbreak);
@@ -122,9 +124,6 @@ export class OutbreakDataService {
      * @returns {OutbreakModel}
      */
     determineSelectedOutbreak(): Observable<OutbreakModel> {
-        // initialize the Selected Outbreak Subject
-        this.selectedOutbreakSubject = new BehaviorSubject<OutbreakModel>(null);
-
         // check if the authenticated user has an Active Outbreak
         const authUser = this.authDataService.getAuthenticatedUser();
         if (authUser.activeOutbreakId) {
@@ -160,6 +159,30 @@ export class OutbreakDataService {
         // emit the new value
         this.selectedOutbreakSubject.next(outbreak);
     }
+
+    /**
+     *  Check if the active outbreak for the logged in user is the same as the selected one and display message if not
+     */
+    checkActiveSelectedOutbreak() {
+        this.getSelectedOutbreak()
+            .subscribe((selectedOutbreak) => {
+                const authUser = this.authDataService.getAuthenticatedUser();
+                if (!authUser.activeOutbreakId) {
+                    this.snackbarService.showNotice(`You don't have an active outbreak set.`);
+                } else {
+                    if (authUser.activeOutbreakId != selectedOutbreak.id) {
+                        this.getOutbreak(authUser.activeOutbreakId)
+                            .subscribe((outbreak) => {
+                                this.snackbarService.showNotice(`The active outbreak is ${outbreak.name} while the selected one is ${selectedOutbreak.name}.`);
+                            });
+                    }
+                    else {
+                        this.snackbarService.dismissAll();
+                    }
+                }
+            });
+    }
+
 
 }
 

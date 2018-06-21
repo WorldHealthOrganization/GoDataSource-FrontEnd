@@ -54,9 +54,12 @@ export class FormSelectComponent extends ElementBase<string> {
      */
     onChange(selectedValue) {
         // find the corresponding object for the selected value
-        const selectedOption = _.find(this.options, (option) => {
+        let selectedOption = _.find(this.options, (option) => {
             return option[this.optionValueKey] === selectedValue;
         });
+
+        // clone the option so we don't affect the Options list
+        selectedOption = _.cloneDeep(selectedOption);
 
         // emit the currently selected option
         return this.optionChanged.emit(selectedOption);
