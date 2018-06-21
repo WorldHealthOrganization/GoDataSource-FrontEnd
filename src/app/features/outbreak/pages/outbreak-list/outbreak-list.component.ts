@@ -76,11 +76,10 @@ export class OutbreakListComponent {
                             this.loadOutbreaksList();
                         });
                 });
-
         }
     }
 
-    setActive(outbreak){
+    setActive(outbreak) {
         if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be deactivated.')) {
             let userData = {'activeOutbreakId': outbreak.id};
             var userId = this.authUser.id;
@@ -97,6 +96,7 @@ export class OutbreakListComponent {
                         .subscribe((authenticatedUser) => {
                             this.authUser = authenticatedUser.user;
                             this.snackbarService.showSuccess('Active outbreak changed successfully');
+                            this.outbreakDataService.checkActiveSelectedOutbreak();
                             this.loadOutbreaksList();
                         });
                 });

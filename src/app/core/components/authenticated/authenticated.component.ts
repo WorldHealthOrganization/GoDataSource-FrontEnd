@@ -5,6 +5,8 @@ import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatSidenav } from '@angular/material';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
+import { OutbreakModel } from "../../models/outbreak.model";
+import { SnackbarService } from "../../services/helper/snackbar.service";
 
 @Component({
     selector: 'app-authenticated',
@@ -22,6 +24,7 @@ export class AuthenticatedComponent implements OnInit {
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
+        private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService
     ) {
         // detect when the route is changed
@@ -44,8 +47,14 @@ export class AuthenticatedComponent implements OnInit {
         }
 
         // determine the Selected Outbreak
-        this.outbreakDataService.determineSelectedOutbreak().subscribe();
-
+        this.outbreakDataService
+            .determineSelectedOutbreak()
+            .subscribe(() => {
+                this.outbreakDataService.getSelectedOutbreakSubject()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakDataService.checkActiveSelectedOutbreak();
+                    });
+            });
         if (this.router.url === '/') {
             // redirect to default landing page
             return this.router.navigate(['/users']);
