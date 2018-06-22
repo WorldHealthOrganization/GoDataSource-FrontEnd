@@ -16,6 +16,10 @@ export class EventModel {
         this.dateOfOnset = _.get(data, 'dateOfOnset');
         this.description = _.get(data, 'description');
         this.addresses = _.get(data, 'addresses', []);
+
+        if (_.get(data, 'name')) {
+            this.name = _.get(data, 'name');
+        }
     }
 
     get name(): string {

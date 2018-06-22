@@ -1,0 +1,79 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>Details</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="eventData.name"
+                                placeholder="Name"
+                                required="true">
+                            </app-form-input>
+
+                            <app-form-datepicker
+                                 name="date"
+                                 [(ngModel)]="eventData.date"
+                                 placeholder="Event Date">
+                            </app-form-datepicker>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="eventData.description"
+                                placeholder="Description">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Address step -->
+        <mat-step [stepControl]="addressForm">
+            <form #addressForm="ngForm">
+                <ng-template matStepLabel>Address</ng-template>
+
+                <app-form-address-list
+                    name="addresses"
+                    [(ngModel)]="eventData.addresses">
+                </app-form-address-list>
+
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">Create Event</button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

@@ -14,6 +14,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.READ_EVENT]
         }
+    },
+    // Create Event
+    {
+        path: 'create',
+        component: fromPages.CreateEventComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_EVENT]
+        }
     }
 ];
 
