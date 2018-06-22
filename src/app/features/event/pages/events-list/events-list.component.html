@@ -1,0 +1,70 @@
+<app-topnav [addNewItemRoute]="'./create'">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="eventsList$ | async" matSort>
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>
+                <div class="table-header-cell">
+                    <div>Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('name', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+         <!-- Date -->
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Date</div>
+                    <div class="column-filter">
+                        <!-- @TODO later -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.date }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Description</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="descriptionFilter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterBy('description', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+</mat-card>

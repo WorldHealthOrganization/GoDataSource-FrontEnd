@@ -9,7 +9,11 @@ const routes: Routes = [
     // Contact list
     {
         path: '',
-        component: fromPages.ContactsListComponent
+        component: fromPages.ContactsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CONTACT]
+        }
     },
     // Create Contact
     {

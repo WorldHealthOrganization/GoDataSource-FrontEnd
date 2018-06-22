@@ -70,7 +70,7 @@ export class ContactsListComponent implements OnInit {
      */
     loadContactsList() {
         if (this.selectedOutbreak) {
-            // retrieve the list of Cases
+            // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.contactsListQueryBuilder);
         }
     }
@@ -106,7 +106,7 @@ export class ContactsListComponent implements OnInit {
                     break;
 
                 default:
-                    // contains
+                    // starts with
                     this.contactsListQueryBuilder.where({
                         [property]: {
                             regexp: `/^${value}/i`

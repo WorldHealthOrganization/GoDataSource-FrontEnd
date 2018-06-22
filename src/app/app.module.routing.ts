@@ -68,6 +68,15 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.READ_CASE]
                 }
+            },
+            // Event Module routes
+            {
+                path: 'events',
+                loadChildren: './features/event/event.module#EventModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.READ_EVENT]
+                }
             }
         ]
     },
