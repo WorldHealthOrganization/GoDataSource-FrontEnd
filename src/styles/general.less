@@ -52,24 +52,6 @@ html, body, ul, li, div, span {
                         padding-top: 10px;
                         // keep the height as a placeholder for columns without filters
                         height: 56px;
-
-                        @column-filter-range-spacer-width: 20px;
-                        &.column-filter-range {
-                            > div {
-                                display: inline-block;
-
-                                &:nth-child(1),
-                                &:nth-child(3) {
-                                    width: calc(50% - @column-filter-range-spacer-width / 2);
-                                }
-
-                                &:nth-child(2) {
-                                    width: @column-filter-range-spacer-width;
-                                    text-align: center;
-                                }
-                            }
-                        }
-
                     }
                 }
             }

@@ -13,7 +13,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { FormRangeModel } from '../../../../shared/components/form-range/form-range.component';
 
 @Component({
     selector: 'app-contacts-list',
@@ -22,9 +21,6 @@ import { FormRangeModel } from '../../../../shared/components/form-range/form-ra
     styleUrls: ['./contacts-list.component.less']
 })
 export class ContactsListComponent implements OnInit {
-    // Filters
-    ageRangeFilter: FormRangeModel = new FormRangeModel();
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Contacts', '.', true)
     ];
@@ -91,11 +87,30 @@ export class ContactsListComponent implements OnInit {
             // filter by any User property
             switch (property) {
                 case 'age':
-                    this.contactsListQueryBuilder.where({
-                        [property]: {
-                            [value.operator]: value.value
+                    if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
+                        this.contactsListQueryBuilder.whereRemove(property);
+                    } else {
+                        // determine operator & value
+                        let operator;
+                        let valueToCompare;
+                        if (!_.isEmpty(value.from) && !_.isEmpty(value.to)) {
+                            operator = 'between';
+                            valueToCompare = [value.from, value.to];
+                        } else if (!_.isEmpty(value.from)) {
+                            operator = 'gte';
+                            valueToCompare = value.from;
+                        } else {
+                            operator = 'lte';
+                            valueToCompare = value.to;
                         }
-                    });
+
+                        // filter
+                        this.contactsListQueryBuilder.where({
+                            [property]: {
+                                [operator]: valueToCompare
+                            }
+                        });
+                    }
                     break;
 
                 default:

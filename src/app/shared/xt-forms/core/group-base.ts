@@ -14,12 +14,6 @@ export abstract class GroupBase<T> extends ElementBase<T> {
     // group input name
     @Input() name: string;
 
-    // converts value to something else
-    @Input() valueMap;
-
-    // converts value to something else
-    protected valueMapInternal;
-
     // handler for when one of the group value has changed
     @Output() changed = new EventEmitter<T>();
 
@@ -44,10 +38,6 @@ export abstract class GroupBase<T> extends ElementBase<T> {
         }
 
         // call changed event
-        return this.changed.emit(
-            this.valueMap ?
-                this.valueMap(this.valueMapInternal ? this.valueMapInternal(this.value) : this.value) :
-                (this.valueMapInternal ? this.valueMapInternal(this.value) : this.value)
-        );
+        return this.changed.emit(this.value);
     }
 }

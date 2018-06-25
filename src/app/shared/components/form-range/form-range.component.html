@@ -1,24 +1,24 @@
-<div class="column-filter column-filter-range"
-     [id]="identifier">
-    <div>
-        <app-form-input
-            [name]="name + '[from]'"
-            [(ngModel)]="range.from"
-            placeholder="From"
-            [type]="isNumber ? 'number' : 'text'"
-            [pattern]="isNumber ? '' : '\\d*'"
-            (input)="onChange()">
-        </app-form-input>
-    </div>
-    <div>-</div>
-    <div>
-        <app-form-input
-            [name]="name + '[to]'"
-            [(ngModel)]="range.to"
-            placeholder="To"
-            [type]="isNumber ? 'number' : 'text'"
-            [pattern]="isNumber ? '' : '\\d*'"
-            (input)="onChange()">
-        </app-form-input>
-    </div>
+<div
+    fxLayout="row"
+    class="form-range"
+    [id]="identifier">
+    <app-form-input
+        fxFlex
+        [name]="name + '[from]'"
+        [(ngModel)]="range.from"
+        placeholder="From"
+        type="number"
+        (input)="onChange()">
+    </app-form-input>
+    <div
+        class="form-range-separator"
+    >-</div>
+    <app-form-input
+        fxFlex
+        [name]="name + '[to]'"
+        [(ngModel)]="range.to"
+        placeholder="To"
+        type="number"
+        (input)="onChange()">
+    </app-form-input>
 </div>

@@ -54,11 +54,12 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div>Age</div>
-                    <app-form-range
-                        name="ageFilter"
-                        [(ngModel)]="ageRangeFilter"
-                        (changed)="filterBy('age', $event)">
-                    </app-form-range>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="ageFilter"
+                            (changed)="filterBy('age', $event)">
+                        </app-form-range>
+                    </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
