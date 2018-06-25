@@ -2,8 +2,10 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil';
+import { UserModel } from '../../../core/models/user.model';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../core/models/permission.model';
 
 @Component({
     selector: 'app-topnav',
@@ -13,17 +15,20 @@ import 'rxjs/add/operator/takeUntil';
 })
 export class TopnavComponent {
 
-    // by default, do nothing (stay on the current page)
-    @Input() addNewItemRoute = '.';
-
+    // authenticated user
+    authUser: UserModel;
     // selected Outbreak
     selectedOutbreak: OutbreakModel = new OutbreakModel();
     // list of outbreaks for Selected Outbreak dropdown
     outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService
     ) {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the outbreaks list
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
 
@@ -45,6 +50,13 @@ export class TopnavComponent {
 
         // cache the selected Outbreak
         this.outbreakDataService.setSelectedOutbreak(this.selectedOutbreak);
+    }
+
+    /**
+     * Display the Selected Outbreak dropdown only for users that have the right access
+     */
+    showSelectedOutbreakDropdown() {
+        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
     }
 
 }

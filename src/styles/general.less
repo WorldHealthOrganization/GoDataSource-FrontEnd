@@ -1,6 +1,7 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 //Imports:
 @import '_fonts';
+@import 'overrides';
 @import 'common';
 
 html, body, ul, li, div, span {
@@ -133,4 +134,8 @@ html, body, ul, li, div, span {
         }
     }
 
+}
+
+.button-primary {
+    background-color: @color-accent-main !important;
 }
