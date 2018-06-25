@@ -2,23 +2,29 @@
     fxLayout="row"
     class="form-range"
     [id]="identifier">
-    <app-form-input
-        fxFlex
-        [name]="name + '[from]'"
-        [(ngModel)]="range.from"
-        placeholder="From"
-        type="number"
-        (input)="onChange()">
-    </app-form-input>
     <div
+        fxFlex>
+        <app-form-input
+            [name]="name + '[from]'"
+            [(ngModel)]="range.from"
+            placeholder="From"
+            type="number"
+            (input)="onChange()">
+        </app-form-input>
+    </div>
+    <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
         class="form-range-separator"
     >-</div>
-    <app-form-input
-        fxFlex
-        [name]="name + '[to]'"
-        [(ngModel)]="range.to"
-        placeholder="To"
-        type="number"
-        (input)="onChange()">
-    </app-form-input>
+    <div
+        fxFlex>
+        <app-form-input
+            [name]="name + '[to]'"
+            [(ngModel)]="range.to"
+            placeholder="To"
+            type="number"
+            (input)="onChange()">
+        </app-form-input>
+    </div>
 </div>
