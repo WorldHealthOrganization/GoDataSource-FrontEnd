@@ -1,17 +1,17 @@
 import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
-import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
-import { ElementBase } from './element-base';
-
+import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NgModel } from '@angular/forms';
+import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
+import { ValueAccessorBase } from './value-accessor-base';
 
 /**
  * Base class to be extended by components that implement lists of group components or single components
  */
-export abstract class ListBase<T> extends ElementBase<T[]> {
+export abstract class ListBase<T> extends GroupValidator<T[]> {
     static _identifier: number = 0;
 
     // element unique ID
-    public identifier: string = `group-${ListBase._identifier++}`;
+    public identifier: string = `list-${ListBase._identifier++}`;
 
     // group input name
     @Input() name: string;
@@ -23,7 +23,6 @@ export abstract class ListBase<T> extends ElementBase<T[]> {
     @Output() changed = new EventEmitter<T>();
 
     @Input() removeConfirmMsg: string = 'Are you sure you want to delete this item?';
-    @Input() viewOnly: boolean = false;
 
     /**
      * Constructor
@@ -40,6 +39,9 @@ export abstract class ListBase<T> extends ElementBase<T[]> {
      * Function triggered when the input value is changed
      */
     onChange() {
+        // validate group
+        super.validateGroup();
+
         // mark as dirty
         if (this.control) {
             this.control.markAsDirty();
@@ -70,6 +72,9 @@ export abstract class ListBase<T> extends ElementBase<T[]> {
 
         // mark as dirty
         this.control.markAsDirty();
+
+        // validate groups & inputs
+        setTimeout(() => { this.validateGroup(); });
     }
 
     /**
@@ -86,6 +91,41 @@ export abstract class ListBase<T> extends ElementBase<T[]> {
 
             // mark as dirty
             this.control.markAsDirty();
+
+            // validate groups & inputs
+            setTimeout(() => { this.validateGroup(); });
         }
+    }
+
+    /**
+     * Override touch function
+     */
+    public touch() {
+        // touch children
+        if (this.controlContainer) {
+            const formDirectives = _.get(this.controlContainer, '_directives', []);
+            _.forEach(formDirectives, (ngModel: NgModel) => {
+                const groupFormDirectives = _.get(ngModel, 'valueAccessor.groupForm._directives', []);
+                _.forEach(groupFormDirectives, (groupModel: NgModel) => {
+                    if (
+                        groupModel.valueAccessor &&
+                        groupModel.valueAccessor instanceof ValueAccessorBase
+                    ) {
+                        (groupModel.valueAccessor as ValueAccessorBase<any>).touch();
+                    }
+                });
+            });
+        }
+    }
+
+    /**
+     * Override validate functions
+     */
+    protected validate() {
+        // call parent
+        super.validate();
+
+        // touch list
+        this.touch();
     }
 }

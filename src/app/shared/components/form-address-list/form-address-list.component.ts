@@ -17,6 +17,8 @@ import { ListBase } from '../../xt-forms/core';
     }]
 })
 export class FormAddressListComponent extends ListBase<AddressModel> implements OnInit {
+    @Input() viewOnly: boolean = false;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,

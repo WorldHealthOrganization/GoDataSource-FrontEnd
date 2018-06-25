@@ -21,6 +21,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 placeholder="Risk Level Flag"
+                                required="true"
                                 [options]="caseRiskLevelsList$ | async">
                             </app-form-select>
                         </div>

@@ -26,7 +26,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     public validationResult = null;
 
     protected constructor(
-        private controlContainer: ControlContainer,
+        protected controlContainer: ControlContainer,
         private validators: ValidatorArray,
         private asyncValidators: AsyncValidatorArray
     ) {
@@ -108,12 +108,10 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     }
 
     ngAfterViewInit() {
-        const that = this;
-
         // wait for the Form object to be initialized with form controls,
         // then get the current form control object
-        setTimeout(function() {
-            that.getControl();
+        setTimeout(() => {
+            this.getControl();
         });
     }
 }
