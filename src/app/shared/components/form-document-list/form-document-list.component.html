@@ -2,14 +2,15 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <!-- Edit Mode -->
-    <form *ngIf="!viewOnly" >
+    <form *ngIf="!viewOnly" #groupForm="ngForm">
         <div *ngFor="let document of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-document
                     [name]="name + '[' + i + ']'"
                     [(ngModel)]="values[i]"
-                    (changed)="onChange()">
+                    (changed)="onChange()"
+                    (groupInitialized)="validateGroup()">
                 </app-form-document>
             </mat-card>
 
