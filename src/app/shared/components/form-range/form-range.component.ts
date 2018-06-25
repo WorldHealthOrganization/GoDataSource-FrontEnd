@@ -14,7 +14,7 @@ import { FormRangeModel } from './form-range.model';
         multi: true
     }]
 })
-export class FormRangeComponent extends GroupBase<FormRangeModel> implements OnInit {
+export class FormRangeComponent extends GroupBase<FormRangeModel> {
     @HostBinding('class.form-element-host') isFormElement = true;
 
     constructor(
@@ -22,19 +22,11 @@ export class FormRangeComponent extends GroupBase<FormRangeModel> implements OnI
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
+        // init parent
         super(controlContainer, validators, asyncValidators);
-    }
 
-    /**
-     * Initialize component elements
-     */
-    ngOnInit() {
         // init value
-        if (this.value) {
-            this.value = this.value instanceof FormRangeModel ? this.value : new FormRangeModel(this.value);
-        } else {
-            this.value = new FormRangeModel();
-        }
+        this.value = new FormRangeModel(this.value);
     }
 
     /**
@@ -42,6 +34,6 @@ export class FormRangeComponent extends GroupBase<FormRangeModel> implements OnI
      */
     get range(): FormRangeModel {
         // finished
-        return this.value ? this.value : new FormRangeModel();
+        return this.value;
     }
 }
