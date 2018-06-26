@@ -9,11 +9,7 @@ const routes: Routes = [
     // Cases list
     {
         path: '',
-        component: fromPages.CasesListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_CASE]
-        }
+        component: fromPages.CasesListComponent
     },
     // Create Case
     {

@@ -1,6 +1,14 @@
-<app-topnav [addNewItemRoute]="'./create'">
+<app-topnav>
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    Add <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 
@@ -61,6 +69,19 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Address -->
+        <ng-container matColumnDef="address">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>Address</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.address.fullAddress }}
             </mat-cell>
         </ng-container>
 

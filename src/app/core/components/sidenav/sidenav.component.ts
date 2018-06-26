@@ -105,7 +105,7 @@ export class SidenavComponent {
         new NavItem(
             'Events',
             'event',
-            [],
+            [PERMISSION.READ_EVENT],
             [],
             '/events'
         ),

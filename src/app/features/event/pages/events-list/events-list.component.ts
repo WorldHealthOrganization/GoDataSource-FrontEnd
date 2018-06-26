@@ -82,7 +82,7 @@ export class EventsListComponent implements OnInit {
      */
     getTableColumns(): string[] {
         // allways visible columns
-        const columns = ['name', 'date', 'description'];
+        const columns = ['name', 'date', 'description', 'address'];
 
         // finished
         return columns;
