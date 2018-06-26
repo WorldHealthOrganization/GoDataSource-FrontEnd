@@ -97,6 +97,7 @@ export class SidenavComponent implements OnInit {
             [],
             '/users'
         ),
+
         new NavItem(
             'Account',
             'account',
