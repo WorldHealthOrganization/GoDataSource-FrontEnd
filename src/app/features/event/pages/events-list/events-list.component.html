@@ -48,7 +48,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.date }}
+                {{ item.date | date: 'MM/dd/yyy' }}
             </mat-cell>
         </ng-container>
 

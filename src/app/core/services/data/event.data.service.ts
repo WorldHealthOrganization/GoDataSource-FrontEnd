@@ -28,5 +28,15 @@ export class EventDataService {
             EventModel
         );
     }
+
+    /**
+     * Add new Event to an existing Outbreak
+     * @param {string} outbreakId
+     * @param eventData
+     * @returns {Observable<any>}
+     */
+    createEvent(outbreakId: string, eventData): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/events`, eventData);
+    }
 }
 
