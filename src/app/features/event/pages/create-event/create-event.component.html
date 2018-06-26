@@ -22,7 +22,8 @@
                                 name="name"
                                 [(ngModel)]="eventData.name"
                                 placeholder="Name"
-                                required="true">
+                                required="true"
+                                maxlength="100">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -37,7 +38,8 @@
                             <app-form-textarea
                                 name="description"
                                 [(ngModel)]="eventData.description"
-                                placeholder="Description">
+                                placeholder="Description"
+                                maxlength="500">
                             </app-form-textarea>
                         </div>
                     </div>
