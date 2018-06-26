@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>

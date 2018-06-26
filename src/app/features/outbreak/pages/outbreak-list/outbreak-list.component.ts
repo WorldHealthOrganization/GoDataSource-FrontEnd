@@ -1,16 +1,18 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { OutbreakDataService } from "../../../../core/services/data/outbreak.data.service";
-import { UserDataService } from "../../../../core/services/data/user.data.service";
-import { AuthDataService } from "../../../../core/services/data/auth.data.service";
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
-import { Observable } from "rxjs/Observable";
-import { OutbreakModel } from "../../../../core/models/outbreak.model";
-import { RequestQueryBuilder } from "../../../../core/services/helper/request-query-builder";
-import { UserModel } from "../../../../core/models/user.model";
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Observable } from 'rxjs/Observable';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
+import { UserModel } from '../../../../core/models/user.model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+
 import * as _ from 'lodash';
-import { GenericDataService } from "../../../../core/services/data/generic.data.service";
 
 @Component({
     selector: 'app-outbreak-list',
@@ -146,6 +148,14 @@ export class OutbreakListComponent {
             }
         }
         this.loadOutbreaksList();
+    }
+
+    /**
+     * Check if we have write access to outbreaks
+     * @returns {boolean}
+     */
+    hasOutbreakWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
     }
 
 }

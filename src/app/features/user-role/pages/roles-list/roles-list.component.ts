@@ -69,6 +69,14 @@ export class RolesListComponent {
     }
 
     /**
+     * Check if we have write access to user roles
+     * @returns {boolean}
+     */
+    hasUserRoletWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -76,7 +84,7 @@ export class RolesListComponent {
         const columns = ['name', 'description', 'permissions'];
 
         // check if the authenticated user has WRITE access
-        if (this.authUser.hasPermissions(PERMISSION.WRITE_ROLE)) {
+        if (this.hasUserRoletWriteAccess()) {
             columns.push('actions');
         }
 
