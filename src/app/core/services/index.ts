@@ -4,6 +4,7 @@ import { UserDataService } from './data/user.data.service';
 import { OutbreakDataService } from './data/outbreak.data.service';
 import { ContactDataService } from './data/contact.data.service';
 import { CaseDataService } from './data/case.data.service';
+import { EventDataService } from './data/event.data.service';
 import { GenericDataService } from './data/generic.data.service';
 import { LocationDataService } from './data/location.data.service';
 import { UserRoleDataService } from './data/user-role.data.service';
@@ -29,6 +30,7 @@ export const services: any[] = [
     OutbreakDataService,
     ContactDataService,
     CaseDataService,
+    EventDataService,
     GenericDataService,
     LocationDataService,
     LanguageDataService,
@@ -42,5 +44,5 @@ export const services: any[] = [
     RouterHelperService,
     FormHelperService,
     I18nService,
-    CacheService,
+    CacheService
 ];

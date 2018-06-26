@@ -31,6 +31,11 @@ export enum PERMISSION {
     READ_CASE = 'read_case',
     WRITE_CASE = 'write_case',
 
+    // events
+    // right now we don't have event permissions, but later we might add one so it is better to have a constant for it than having to change later in multiple places
+    READ_EVENT = READ_CASE,
+    WRITE_EVENT = WRITE_CASE,
+
     // contacts
     READ_CONTACT = 'read_contact',
     WRITE_CONTACT = 'write_contact',
