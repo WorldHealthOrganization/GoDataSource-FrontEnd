@@ -28,7 +28,8 @@
                             <app-form-datepicker
                                  name="date"
                                  [(ngModel)]="eventData.date"
-                                 placeholder="Event Date">
+                                 placeholder="Event Date"
+                                required="true">
                             </app-form-datepicker>
                         </div>
 
@@ -53,10 +54,12 @@
             <form #addressForm="ngForm">
                 <ng-template matStepLabel>Address</ng-template>
 
-                <app-form-address-list
-                    name="addresses"
-                    [(ngModel)]="eventData.addresses">
-                </app-form-address-list>
+                <mat-card class="page-section">
+                    <app-form-address
+                        name="address"
+                        [(ngModel)]="eventData.address">
+                    </app-form-address>
+                </mat-card>
 
                 <div>
                     <button mat-button matStepperPrevious>Back</button>
