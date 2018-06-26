@@ -16,11 +16,8 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     // group input name
     @Input() name: string;
 
-    // converts value to something else
-    @Input() valueMap;
-
     // handler for when one of the group value has changed
-    @Output() changed = new EventEmitter<T>();
+    @Output() changed = new EventEmitter<T[]>();
 
     @Input() removeConfirmMsg: string = 'Are you sure you want to delete this item?';
 
@@ -48,7 +45,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
         }
 
         // call changed event
-        return this.changed.emit(this.valueMap ? this.valueMap(this.value) : this.value);
+        return this.changed.emit(this.value);
     }
 
     /**

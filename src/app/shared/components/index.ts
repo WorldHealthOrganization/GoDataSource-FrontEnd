@@ -6,6 +6,7 @@ import { FormAddressComponent } from './form-address/form-address.component';
 import { FormAddressListComponent } from './form-address-list/form-address-list.component';
 import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormDocumentListComponent } from './form-document-list/form-document-list.component';
+import { FormRangeComponent } from './form-range/form-range.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -18,5 +19,6 @@ export const components: any[] = [
     FormAddressComponent,
     FormAddressListComponent,
     FormDocumentComponent,
-    FormDocumentListComponent
+    FormDocumentListComponent,
+    FormRangeComponent
 ];

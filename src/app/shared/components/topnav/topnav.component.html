@@ -2,39 +2,37 @@
 
     <mat-list class="topnav-list" fxLayout="row" fxFlex>
 
-        <mat-list-item class="add-new-item">
-            <a [routerLink]="addNewItemRoute" class="a-no-style"><span class="xt-icon">add</span></a>
+        <mat-list-item class="logo-item">
+            <img src="/assets/images/logo.png" />
         </mat-list-item>
 
         <mat-divider [vertical]="true"></mat-divider>
 
-        <mat-list-item fxFlex>
+        <mat-list-item fxFlex class="dynamic-section">
             <!-- Dynamic content -->
             <ng-content select="[dynamic-section]"></ng-content>
         </mat-list-item>
 
-        <mat-divider [vertical]="true"></mat-divider>
+        <ng-container *ngIf="showSelectedOutbreakDropdown()">
+            <mat-divider [vertical]="true"></mat-divider>
 
-        <mat-list-item>
-            <app-form-select
-                name="activeOutbreak"
-                [(ngModel)]="selectedOutbreak.id"
-                placeholder="Selected outbreak"
-                [options]="outbreaksList$ | async"
-                optionLabelKey="name"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                (optionChanged)="selectOutbreak($event)">
-            </app-form-select>
-        </mat-list-item>
+            <mat-list-item>
+                <app-form-select
+                    name="activeOutbreak"
+                    [(ngModel)]="selectedOutbreak.id"
+                    placeholder="Selected outbreak"
+                    [options]="outbreaksList$ | async"
+                    optionLabelKey="name"
+                    optionValueKey="id"
+                    optionTooltipKey="description"
+                    (optionChanged)="selectOutbreak($event)">
+                </app-form-select>
+            </mat-list-item>
+        </ng-container>
 
         <mat-divider [vertical]="true"></mat-divider>
 
         <mat-list-item>Language</mat-list-item>
-
-        <mat-divider [vertical]="true"></mat-divider>
-
-        <mat-list-item>Profile</mat-list-item>
 
     </mat-list>
 

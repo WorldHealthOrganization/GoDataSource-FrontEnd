@@ -13,16 +13,40 @@ import { ChildNavItem, NavItem } from './nav-item.class';
     templateUrl: './sidenav.component.html',
     styleUrls: ['./sidenav.component.less']
 })
-export class SidenavComponent implements OnInit {
+export class SidenavComponent {
 
     // authenticated user
     authUser: UserModel;
 
-    // Nav items with configuration
-    items: NavItem[] = [
+    // Nav Item - Account
+    accountItem: NavItem = new NavItem(
+        '',
+        'account',
+        [],
+        [
+            new ChildNavItem(
+                'Log out',
+                [],
+                '/auth/logout'
+            ),
+            new ChildNavItem(
+                'Change Password',
+                [],
+                '/account/change-password'
+            ),
+            new ChildNavItem(
+                'Set Security Questions',
+                [],
+                '/account/set-security-questions'
+            )
+        ]
+    );
+
+    // Nav Items - main
+    mainItems: any[] = [
         new NavItem(
             'Admin',
-            'admin',
+            'settings',
             [],
             [
                 new ChildNavItem(
@@ -44,7 +68,7 @@ export class SidenavComponent implements OnInit {
         ),
         new NavItem(
             'Outbreaks',
-            'outbreaks',
+            'bug',
             [PERMISSION.READ_OUTBREAK],
             [
                 new ChildNavItem(
@@ -71,54 +95,48 @@ export class SidenavComponent implements OnInit {
         ),
         new NavItem(
             'Contacts',
-            'contacts',
+            'people',
             [PERMISSION.READ_CONTACT],
             [],
             '/contacts'
         ),
         new NavItem(
             'Cases',
-            'cases',
+            'addFolder',
             [],
             [],
             '/cases'
         ),
         new NavItem(
             'Events',
-            'events',
+            'event',
             [],
             [],
             '/users'
         ),
         new NavItem(
             'Duplicated Records',
-            'duplicate',
+            'fileCopy',
             [],
             [],
             '/users'
         ),
-
+        {
+            separator: true
+        },
         new NavItem(
-            'Account',
-            'account',
+            'Reference data',
+            'language',
+            [PERMISSION.READ_SYS_CONFIG],
             [],
-            [
-                new ChildNavItem(
-                    'Log out',
-                    [],
-                    '/auth/logout'
-                ),
-                new ChildNavItem(
-                    'Change Password',
-                    [],
-                    '/account/change-password'
-                ),
-                new ChildNavItem(
-                    'Set Security Questions',
-                    [],
-                    '/account/set-security-questions'
-                )
-            ]
+            '/reference-data'
+        ),
+        new NavItem(
+            'Help & Support',
+            'help',
+            [],
+            [],
+            '/help'
         )
     ];
 
@@ -129,36 +147,19 @@ export class SidenavComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
-    ngOnInit() {
-        // filter the Nav items based on user's Role
-        this.items = this.items.reduce((acc, item) => {
+    /**
+     * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
+     */
+    shouldDisplayItem(item) {
+        // check if it is an item with a Submenu list
+        if (item.children && item.children.length > 0) {
+            // check if there is any visible Child Item
+            return _.filter(item.children, (childItem) => {
+                return this.authUser.hasPermissions(...childItem.permissions);
+            });
+        }
 
-            const itemPermissions = _.get(item, 'permissions', []);
-
-            // check if user has permission to view the main item
-            if (this.authUser.hasPermissions(...itemPermissions)) {
-                // user has access to current item
-
-                // filter the children items that user has access to
-                const children = _.filter(item.children, (childItem) => {
-
-                    const childItemPermissions = _.get(item, 'permissions', []);
-
-                    return this.authUser.hasPermissions(...childItemPermissions);
-                });
-
-                // keep only available children items
-                item.children = children;
-
-                // the Nav Item must either have a link or at least one child item
-                if (item.link || item.children.length > 0) {
-                    acc.push(item);
-                    return acc;
-                }
-            }
-
-            return acc;
-        }, []);
+        return this.authUser.hasPermissions(...item.permissions);
     }
 
 }

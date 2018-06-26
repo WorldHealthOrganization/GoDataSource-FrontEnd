@@ -17,9 +17,6 @@ export abstract class GroupBase<T> extends GroupValidator<T> implements AfterVie
     // group input name
     @Input() name: string;
 
-    // converts value to something else
-    @Input() valueMap;
-
     // handler for when one of the group value has changed
     @Output() changed = new EventEmitter<T>();
 
@@ -50,7 +47,7 @@ export abstract class GroupBase<T> extends GroupValidator<T> implements AfterVie
         }
 
         // call changed event
-        return this.changed.emit(this.valueMap ? this.valueMap(this.value) : this.value);
+        return this.changed.emit(this.value);
     }
 
     /**
