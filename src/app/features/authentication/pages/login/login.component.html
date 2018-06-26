@@ -1,37 +1,56 @@
-<div style="text-align:center">
-    <h1>
-        Welcome to Go.Data!
-    </h1>
-    <img width="300" alt="Angular Logo"
-         src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-
-
-<form #form="ngForm" (submit)="login(form)">
-
-    <div fxLayout="row" fxLayoutAlign="center">
-        <div fxLayout="column" style="width: 300px">
-
-            <app-form-input
-                name="email"
-                [(ngModel)]="user.email"
-                placeholder="Email"
-                required="true"
-                app-emailValidator>
-            </app-form-input>
-
-            <app-form-input
-                type="password"
-                name="password"
-                [(ngModel)]="user.password"
-                placeholder="Create Password"
-                required="true">
-            </app-form-input>
-
-            <button mat-raised-button color="primary">Login</button>
-
-            <button type="button" mat-raised-button [routerLink]="'/auth/forgot-password'">Forgot Password?</button>
+<div
+    fxFlex fxLayout="row"
+    class="login-page">
+    <div
+        fxFlex fxLayoutAlign="start end"
+        class="login-page-left">
+        <div class="login-page-logo-container">
+            <img src="/assets/images/logo-wide.png" />
         </div>
     </div>
+    <div
+        fxFlex fxLayoutAlign="center center" fxLayout="column"
+        class="login-page-right">
 
-</form>
+        <div
+            class="login-page-welcome">
+            Welcome!
+        </div>
+
+        <form #form="ngForm" (submit)="login(form)">
+
+            <div fxLayout="column">
+
+                <app-form-input
+                    name="email"
+                    [(ngModel)]="user.email"
+                    placeholder="Email address"
+                    required="true"
+                    app-emailValidator></app-form-input>
+
+                <div
+                    fxFlex fxLayoutAlign="row">
+                    <app-form-input
+                        class="password-input"
+                        type="password"
+                        name="password"
+                        [(ngModel)]="user.password"
+                        placeholder="Password"
+                        required="true"></app-form-input>
+
+                    <button
+                        mat-raised-button
+                        type="button"
+                        class="reset-pass-button"
+                        routerLink="/auth/forgot-password"
+                        matTooltip="Forgot password?">?</button>
+                </div>
+
+                <button
+                    mat-raised-button
+                    class="login-button">Login</button>
+            </div>
+
+        </form>
+    </div>
+</div>
