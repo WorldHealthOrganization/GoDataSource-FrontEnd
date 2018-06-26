@@ -19,7 +19,7 @@
 
     .login-page-right {
         .login-page-welcome {
-            font-size: 2em;
+            font-size: 40px;
             font-weight: 600;
             margin-bottom: 50px;
         }
@@ -29,6 +29,12 @@
 
             .password-input {
                 min-width: 100%;
+
+                @password-input-padding: 37px;
+                input {
+                    padding-right: @password-input-padding;
+                    width: ~"calc(100% - @{password-input-padding})"; // this is needed due to a less bug ( calc (100% - @password-input-padding ) => it will subtract the percent instead of teh px value)
+                }
             }
 
             .mat-raised-button {
