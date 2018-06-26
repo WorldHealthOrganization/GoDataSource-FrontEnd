@@ -84,7 +84,7 @@ export class ContactsListComponent implements OnInit {
         if (_.isEmpty(value)) {
             this.contactsListQueryBuilder.whereRemove(property);
         } else {
-            // filter by any User property
+            // filter by any property
             switch (property) {
                 case 'age':
                     if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
@@ -123,7 +123,7 @@ export class ContactsListComponent implements OnInit {
             }
         }
 
-        // refresh users list
+        // refresh list
         this.loadContactsList();
     }
 

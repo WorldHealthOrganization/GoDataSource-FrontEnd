@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -37,6 +38,9 @@ export class CasesListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
 
+    // gender list
+    genderList$: Observable<any[]>;
+
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
@@ -51,6 +55,9 @@ export class CasesListComponent implements OnInit {
     }
 
     ngOnInit() {
+        // retrieve gender list
+        this.genderList$ = this.genericDataService.getGendersList();
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -78,14 +85,50 @@ export class CasesListComponent implements OnInit {
      * @param value
      */
     filterBy(property, value) {
-        // filter by any User property
-        this.casesListQueryBuilder.where({
-            [property]: {
-                regexp: `/^${value}/i`
-            }
-        });
+        // clear filter ?
+        if (_.isEmpty(value)) {
+            this.casesListQueryBuilder.whereRemove(property);
+        } else {
+            // filter by any property
+            switch (property) {
+                case 'age':
+                    if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
+                        this.casesListQueryBuilder.whereRemove(property);
+                    } else {
+                        // determine operator & value
+                        let operator;
+                        let valueToCompare;
+                        if (!_.isEmpty(value.from) && !_.isEmpty(value.to)) {
+                            operator = 'between';
+                            valueToCompare = [value.from, value.to];
+                        } else if (!_.isEmpty(value.from)) {
+                            operator = 'gte';
+                            valueToCompare = value.from;
+                        } else {
+                            operator = 'lte';
+                            valueToCompare = value.to;
+                        }
 
-        // refresh users list
+                        // filter
+                        this.casesListQueryBuilder.where({
+                            [property]: {
+                                [operator]: valueToCompare
+                            }
+                        });
+                    }
+                    break;
+
+                default:
+                    // contains
+                    this.casesListQueryBuilder.where({
+                        [property]: {
+                            regexp: `/^${value}/i`
+                        }
+                    });
+            }
+        }
+
+        // refresh list
         this.loadCasesList();
     }
 
