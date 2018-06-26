@@ -29,7 +29,7 @@ export abstract class ValueAccessorBase<T> implements ControlValueAccessor {
         this.onTouchFns.push(fn);
     }
 
-    touch() {
+    public touch() {
         this.onTouchFns.forEach(f => f());
     }
 }

@@ -1,43 +1,113 @@
 <div class="sidenav" fxLayout="column">
 
-    <div *ngFor="let item of items" class="item-wrapper">
-
-        <div *ngIf="item.link" class="item" [routerLink]="item.link">
-            <button mat-button color="primary" [routerLink]="[item.link]">
-
-                <div class="item-title" fxLayout="column" fxLayoutAlign="center">
-                    <div class="item-icon">
-                        <span class="xt-icon">{{item.icon}}</span>
-                    </div>
-                    <div class="item-label">
-                        {{item.label}}
-                    </div>
-                </div>
-
-            </button>
+    <!-- Logo -->
+    <div class="logo" fxLayout="row" fxLayoutAlign="center">
+        <div class="logo-image-container">
+            <img src="/assets/images/logo-wide.png" />
         </div>
-
-        <div *ngIf="!item.link" class="item-nested">
-            <button mat-button color="primary" [matMenuTriggerFor]="menu">
-
-                <div class="item-title" fxLayout="column" fxLayoutAlign="center">
-                    <div class="item-icon">
-                        <span class="xt-icon">{{item.icon}}</span>
-                    </div>
-                    <div class="item-label">
-                        {{item.label}}
-                    </div>
-                </div>
-
-            </button>
-
-            <mat-menu #menu="matMenu" xPosition="after" yPosition="below">
-                <button mat-menu-item *ngFor="let childItem of item.children" [routerLink]="[childItem.link]">
-                    {{childItem.label}}
-                </button>
-            </mat-menu>
-        </div>
-
     </div>
+
+    <!-- Account Menu Item -->
+    <div class="item account-item" fxLayout="row">
+
+        <!-- Submenu -->
+        <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
+            <button mat-menu-item *ngFor="let childItem of accountItem.children" [routerLink]="[childItem.link]">
+                {{childItem.label}}
+            </button>
+        </mat-menu>
+
+        <!-- Menu Item Button -->
+        <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
+
+            <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
+
+                <!-- Item icon and label -->
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                    <!-- Item icon -->
+                    <span class="xt-icon">{{accountItem.icon}}</span>
+
+                    <!-- Item label -->
+                    <div class="item-name" fxLayout="column" fxLayoutAlign="center start">
+                        <div class="user-name">
+                            {{authUser.firstName}} {{authUser.lastName}}
+                        </div>
+                        <div class="user-email">
+                            {{authUser.email}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- "Expand" icon -->
+                <span class="xt-icon expand">thinArrowDown</span>
+            </div>
+
+        </button>
+    </div>
+
+    <div class="item-separator account-item-separator"></div>
+
+    <!-- Main Menu Items  -->
+    <ng-container *ngFor="let item of mainItems">
+
+        <!-- Menu Item with Link -->
+        <div *ngIf="item.link && shouldDisplayItem(item)" class="item" fxLayout="row">
+
+            <button fxFlex mat-button color="primary" [routerLink]="item.link">
+
+                <div class="item-content" fxLayout="row" fxLayoutAlign="start center">
+
+                    <!-- Item icon and label -->
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                        <!-- Item icon -->
+                        <span class="xt-icon">{{item.icon}}</span>
+
+                        <!-- Item label -->
+                        <div class="item-name">{{item.label}}</div>
+                    </div>
+                </div>
+
+            </button>
+        </div>
+
+        <!-- Menu Item with Submenu -->
+        <div *ngIf="item.children?.length > 0 && shouldDisplayItem(item)" class="item" fxLayout="row">
+
+            <!-- Submenu -->
+            <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
+                <ng-container *ngFor="let childItem of item.children">
+                    <button *ngIf="shouldDisplayItem(item)" mat-menu-item  [routerLink]="[childItem.link]">
+                        {{childItem.label}}
+                    </button>
+                </ng-container>
+            </mat-menu>
+
+            <!-- Menu Item Button -->
+            <button fxFlex mat-button color="primary" [matMenuTriggerFor]="menu">
+
+                <div class="item-content" fxLayout="row" fxLayoutAlign="space-between center">
+
+                    <!-- Item icon and label -->
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+                        <!-- Item icon -->
+                        <span class="xt-icon">{{item.icon}}</span>
+
+                        <!-- Item label -->
+                        <div class="item-name">{{item.label}}</div>
+                    </div>
+
+                    <!-- "Expand" icon -->
+                    <span class="xt-icon expand">thinArrowDown</span>
+                </div>
+
+            </button>
+        </div>
+
+        <div *ngIf="item.separator" class="item-separator"></div>
+
+    </ng-container>
 
 </div>
