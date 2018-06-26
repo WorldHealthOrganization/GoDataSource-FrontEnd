@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { UserRoleModel } from './user-role.model';
 import { PERMISSION } from './permission.model';
+import { SecurityQuestionModel } from "./securityQuestion.model";
 
 export class UserModel {
     id: string;
@@ -13,6 +14,7 @@ export class UserModel {
     roleIds: string[];
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
+    securityQuestions: SecurityQuestionModel[] = [];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -23,6 +25,7 @@ export class UserModel {
         this.passwordChange = _.get(data, 'passwordChange', false);
         this.activeOutbreakId = _.get(data, 'activeOutbreakId');
         this.roleIds = _.get(data, 'roleIds', []);
+        this.securityQuestions = _.get(data, 'securityQuestions');
     }
 
     hasPermissions(...permissionIds: PERMISSION[]): boolean {

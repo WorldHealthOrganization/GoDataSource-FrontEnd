@@ -5,6 +5,7 @@ import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../helper/request-query-builder';
+import { SecurityQuestionModel } from "../../models/securityQuestion.model";
 
 
 @Injectable()
@@ -110,6 +111,31 @@ export class UserDataService {
      */
     resetPassword(data: any, token: string) {
         return this.http.post(`users/reset-password?access_token=${token}`, data);
+    }
+
+    /**
+     * Reset user's password using security questions
+     * @param data
+     * @returns {Observable<Object>}
+     */
+    resetPasswordQuestions(data: any) {
+        return this.http.post(`users/reset-password-with-security-question`, data);
+    }
+
+    /**
+     * Retrieve the list of available security questions
+     * @returns {Observable<SecurityQuestionModel[]>}
+     */
+    getSecurityQuestionsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+
+        const qb = new RequestQueryBuilder();
+        // include roles and permissions in response
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
+
+        return this.http.get(`security-questions?filter=${filter}`);
+
     }
 
 }

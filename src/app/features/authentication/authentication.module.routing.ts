@@ -19,6 +19,10 @@ const routes: Routes = [
     {
         path: 'reset-password',
         component: fromPages.ResetPasswordComponent
+    },
+    {
+        path: 'reset-password-questions',
+        component: fromPages.ResetPasswordQuestionsComponent
     }
 ];
 

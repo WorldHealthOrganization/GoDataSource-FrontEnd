@@ -1,0 +1,58 @@
+<div class="set-security-questions">
+    <app-topnav>
+        <ng-container dynamic-section>
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </ng-container>
+    </app-topnav>
+
+    <mat-card class="page-section page-content">
+        <form #form="ngForm" (submit)="save(form)">
+
+            <div fxLayout="column">
+                <div fxShow="{{alreadySet}}"> You already set your security questions.
+                    <br><br>
+                    <div>Question 1: {{authUser.securityQuestions[0].question | translate}}</div>
+                    <div>Question 2: {{authUser.securityQuestions[1].question | translate}}</div>
+                    <br><br>
+                    <button fxShow="{{!viewForm}}" mat-raised-button color="primary" (click)="allowEdit()"> Edit
+                    </button>
+                    <br><br>
+                </div>
+
+                <div fxShow="{{viewForm}}">
+                    <div>Select the questions below and add an answer for each of them!</div>
+                    <app-form-select
+                        name="question0"
+                        [(ngModel)]="authUser.securityQuestions[0].question"
+                        placeholder="Question 1"
+                        [options]="securityQuestionsList$"
+                        required="true"
+                    >
+                    </app-form-select>
+                    <app-form-input
+                        name="answer0"
+                        [(ngModel)]="authUser.securityQuestions[0].answer"
+                        placeholder="Answer"
+                        required="true">
+                    </app-form-input>
+                    <br><br>
+                    <app-form-select
+                        name="question1"
+                        [(ngModel)]="authUser.securityQuestions[1].question"
+                        placeholder="Question 2"
+                        [options]="securityQuestionsList$"
+                        required="true">
+                    </app-form-select>
+                    <app-form-input
+                        name="answer1"
+                        [(ngModel)]="authUser.securityQuestions[1].answer"
+                        placeholder="Answer"
+                        required="true">
+                    </app-form-input>
+
+                    <button mat-raised-button color="primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </mat-card>
+</div>

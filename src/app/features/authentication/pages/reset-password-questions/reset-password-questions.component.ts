@@ -1,0 +1,78 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+
+import * as _ from 'lodash';
+
+@Component({
+    selector: 'app-reset-password-questions',
+    encapsulation: ViewEncapsulation.None,
+    templateUrl: './reset-password-questions.component.html',
+    styleUrls: ['./reset-password-questions.component.less']
+})
+export class ResetPasswordQuestionsComponent{
+
+    dataModel = {
+        email: null,
+        questions: [{question: null, answer: null}, {question: null, answer: null}]
+   };
+    dataNewPassword = {newPassword: null};
+    confirmPassword: string;
+
+    securityQuestionsList$: any[] = [];
+
+
+    constructor(
+        private router: Router,
+        private authDataService: AuthDataService,
+        private userDataService: UserDataService,
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService
+    ) {
+        this.userDataService.getSecurityQuestionsList().subscribe((questionsList) => {
+            for (let securityQuestion of questionsList){
+                this.securityQuestionsList$.push({label: securityQuestion, value: securityQuestion});
+            }
+        });
+    }
+
+
+    resetPassword(form: NgForm) {
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (form.valid && !_.isEmpty(dirtyFields)) {
+
+            // send request to get token
+            this.userDataService
+                .resetPasswordQuestions(this.dataModel)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((result) => {
+                    // reset password using token:
+                    this.userDataService
+                        .resetPassword(this.dataNewPassword , result.token)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Password changed!');
+                            // redirect to login page
+                            this.router.navigate(['/auth/login']);
+                        });
+                });
+
+
+        }
+    }
+
+}

@@ -111,6 +111,11 @@ export class SidenavComponent implements OnInit {
                     'Change Password',
                     [],
                     '/account/change-password'
+                ),
+                new ChildNavItem(
+                    'Set Security Questions',
+                    [],
+                    '/account/set-security-questions'
                 )
             ]
         )
