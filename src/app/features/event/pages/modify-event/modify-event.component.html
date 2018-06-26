@@ -1,0 +1,67 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form class="page-content form-section" #form="ngForm" (submit)="modifyContact(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab label="Details">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="eventData.name"
+                                placeholder="Name"
+                                required="true"
+                                maxlength="100">
+                            </app-form-input>
+
+                            <app-form-datepicker
+                                name="date"
+                                [(ngModel)]="eventData.date"
+                                placeholder="Event Date"
+                                required="true">
+                            </app-form-datepicker>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="eventData.description"
+                                placeholder="Description"
+                                maxlength="500">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+
+            <mat-tab label="Address">
+                <mat-card class="page-section">
+                    <app-form-address
+                        name="address"
+                        [(ngModel)]="eventData.address">
+                    </app-form-address>
+                </mat-card>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button color="primary">Save</button>
+        <button type="button" [routerLink]="'/events'" mat-raised-button>Cancel</button>
+    </div>
+
+
+</form>

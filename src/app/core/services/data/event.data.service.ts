@@ -38,5 +38,29 @@ export class EventDataService {
     createEvent(outbreakId: string, eventData): Observable<any> {
         return this.http.post(`outbreaks/${outbreakId}/events`, eventData);
     }
+
+    /**
+     * Retrieve an Event of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} eventId
+     * @returns {Observable<EventModel>}
+     */
+    getEvent(outbreakId: string, eventId: string): Observable<EventModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/events/${eventId}`),
+            EventModel
+        );
+    }
+
+    /**
+     * Modify an existing Event of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} eventId
+     * @param eventData
+     * @returns {Observable<any>}
+     */
+    modifyEvent(outbreakId: string, eventId: string, eventData): Observable<any> {
+        return this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData);
+    }
 }
 

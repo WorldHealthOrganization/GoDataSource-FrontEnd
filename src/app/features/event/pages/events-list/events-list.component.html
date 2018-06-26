@@ -85,6 +85,22 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>

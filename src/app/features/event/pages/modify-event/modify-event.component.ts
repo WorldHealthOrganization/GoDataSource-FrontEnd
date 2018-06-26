@@ -1,54 +1,47 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import * as _ from 'lodash';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { EventModel } from '../../../../core/models/event.model';
+import { EventDataService } from '../../../../core/services/data/event.data.service';
+
+import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-modify-contact',
+    selector: 'app-modify-event',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-contact.component.html',
-    styleUrls: ['./modify-contact.component.less']
+    templateUrl: './modify-event.component.html',
+    styleUrls: ['./modify-event.component.less']
 })
-export class ModifyContactComponent implements OnInit {
+export class ModifyEventComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Contacts', '/contacts'),
-        new BreadcrumbItemModel('Modify Contact', '.', true)
+        new BreadcrumbItemModel('Events', '/events'),
+        new BreadcrumbItemModel('Modify Event', '.', true)
     ];
 
-    contactId: string;
+    eventId: string;
     outbreakId: string;
 
-    contactData: ContactModel = new ContactModel();
-    ageSelected: boolean = true;
-
-    gendersList$: Observable<any[]>;
+    eventData: EventModel = new EventModel();
 
     constructor(
-        private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
-        private contactDataService: ContactDataService,
+        private eventDataService: EventDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router
-    ) {
-        this.gendersList$ = this.genericDataService.getGendersList();
-    }
+    ) {}
 
     ngOnInit() {
         this.route.params.subscribe(params => {
-            this.contactId = params.contactId;
+            this.eventId = params.eventId;
 
             // get current outbreak
             this.outbreakDataService
@@ -57,31 +50,17 @@ export class ModifyContactComponent implements OnInit {
                     this.outbreakId = selectedOutbreak.id;
 
                     // get contact
-                    this.contactDataService
-                        .getContact(selectedOutbreak.id, this.contactId)
-                        .subscribe(contactDataReturned => {
-                            this.contactData = contactDataReturned;
+                    this.eventDataService
+                        .getEvent(selectedOutbreak.id, this.eventId)
+                        .subscribe(eventDataReturned => {
+                            this.eventData = eventDataReturned;
                         });
                 });
         });
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
-    }
-
     modifyContact(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
-        }
 
         if (!form.valid) {
             this.snackbarService.showError('Invalid form!');
@@ -99,18 +78,18 @@ export class ModifyContactComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
 
                 // modify the contact
-                this.contactDataService
-                    .modifyContact(selectedOutbreak.id, this.contactId, dirtyFields)
+                this.eventDataService
+                    .modifyEvent(selectedOutbreak.id, this.eventId, dirtyFields)
                     .catch((err) => {
                         this.snackbarService.showError(err.message);
 
                         return ErrorObservable.create(err);
                     })
                     .subscribe(() => {
-                        this.snackbarService.showSuccess('Contact saved!');
+                        this.snackbarService.showSuccess('Event saved!');
 
                         // navigate to listing page
-                        this.router.navigate(['/contacts']);
+                        this.router.navigate(['/events']);
                     });
             });
     }
