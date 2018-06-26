@@ -30,10 +30,10 @@
             .password-input {
                 min-width: 100%;
 
-                @password-input-padding: 37px;
                 input {
-                    padding-right: @password-input-padding;
-                    width: ~"calc(100% - @{password-input-padding})"; // this is needed due to a less bug ( calc (100% - @password-input-padding ) => it will subtract the percent instead of teh px value)
+                    box-sizing: border-box;
+                    padding-right: 37px;
+                    width: 100%;
                 }
             }
 
