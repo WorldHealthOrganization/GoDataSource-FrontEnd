@@ -133,6 +133,14 @@ export class CasesListComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -140,7 +148,7 @@ export class CasesListComponent implements OnInit {
         const columns = ['firstName', 'lastName', 'classification', 'age', 'gender', 'dateOfOnset'];
 
         // check if the authenticated user has WRITE access
-        if (this.authUser.hasPermissions(PERMISSION.WRITE_CASE)) {
+        if (this.hasCaseWriteAccess()) {
             columns.push('actions');
         }
 

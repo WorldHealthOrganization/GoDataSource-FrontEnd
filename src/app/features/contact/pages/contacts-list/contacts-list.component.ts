@@ -128,6 +128,14 @@ export class ContactsListComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -135,7 +143,7 @@ export class ContactsListComponent implements OnInit {
         const columns = ['firstName', 'lastName', 'age', 'gender', 'phoneNumber'];
 
         // check if the authenticated user has WRITE access
-        if (this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT)) {
+        if (this.hasContactWriteAccess()) {
             columns.push('actions');
         }
 
