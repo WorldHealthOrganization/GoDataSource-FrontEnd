@@ -17,4 +17,16 @@ export class AddressModel {
         this.locationId = _.get(data, 'locationId');
         this.location = _.get(data, 'location');
     }
+
+    get fullAddress() {
+        // construct address
+        let fullAddress = _.isEmpty(this.addressLine1) ? '' : this.addressLine1;
+        fullAddress += _.isEmpty(this.city) ? '' : (
+            (_.isEmpty(fullAddress) ? '' : ', ') +
+            this.city
+        );
+
+        // finished
+        return fullAddress;
+    }
 }

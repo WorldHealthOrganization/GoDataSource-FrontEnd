@@ -1,6 +1,14 @@
-<app-topnav [addNewItemRoute]="'./create'">
+<app-topnav>
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    Add <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 
@@ -54,28 +62,11 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div>Age</div>
-                    <div class="column-filter column-filter-range">
-                        <div>
-                            <app-form-input
-                                #ageFromFilter
-                                name="filter"
-                                ngModel
-                                placeholder="From"
-                                type="number"
-                                (optionChanged)="filterBy('age', $event, ageToFilter.value)">
-                            </app-form-input>
-                        </div>
-                        <div>-</div>
-                        <div>
-                            <app-form-input
-                                #ageToFilter
-                                name="filter"
-                                ngModel
-                                placeholder="To"
-                                type="number"
-                                (optionChanged)="filterBy('age', ageFromFilter.value, $event)">
-                            </app-form-input>
-                        </div>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="ageFilter"
+                            (changed)="filterBy('age', $event)">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>

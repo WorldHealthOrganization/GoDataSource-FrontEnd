@@ -21,7 +21,8 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
-                                placeholder="First name">
+                                placeholder="First name"
+                                required="true">
                             </app-form-input>
 
                             <app-form-input
@@ -40,6 +41,7 @@
                                 name="gender"
                                 [(ngModel)]="contactData.gender"
                                 placeholder="Gender"
+                                required="true"
                                 [options]="gendersList$ | async">
                             </app-form-select>
                         </div>

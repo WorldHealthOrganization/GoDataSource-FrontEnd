@@ -6,18 +6,20 @@
 .breadcrumbs {
 
     .breadcrumbs-list {
+        padding: 0;
 
         .breadcrumb-item {
             font-size: 28px;
             font-weight: 100;
-            color: @color-accent-main;
+            color: #252525;
 
             &:hover {
                 text-decoration: underline;
             }
 
             &.active {
-                color: @color-dark-1st;
+                cursor: default;
+                font-weight: bold;
 
                 &:hover {
                     text-decoration: none;
@@ -33,7 +35,6 @@
         .breadcrumb-separator {
             font-size: 32px;
             font-weight: 100;
-            padding-bottom: 5px;
         }
     }
 }

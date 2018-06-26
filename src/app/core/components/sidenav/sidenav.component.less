@@ -1,33 +1,71 @@
 @import '~styles/common';
 
 .sidenav {
-    background-color: #F2F5F6;
+    width: 330px;
+    background-color: white;
 
-    .item-wrapper {
+    .logo {
+        background-color: @color-accent-main;
+        color: white;
+        padding: 15px;
 
-        .item-title {
-            // actually it's 100px, because Material Button adds extra left/right padding of 16px each
-            width: 68px;
-            height: 100px;
-            white-space: normal;
-            line-height: 1;
-            color: #C5CFD4;
+        .logo-image-container {
 
-            .xt-icon {
-                font-size: 30px;
-            }
-
-            .item-label {
-                padding-top: 10px;
+            img {
+                width: 145px;
             }
         }
+    }
 
-        &:hover {
-            background-color: #1898CE;
+    .item {
 
-            .item-title {
-                color: white;
+        .item-content {
+            font-size: 16px;
+            padding: 13px 0 13px 10px;
+            color: @color-dark-1st;
+
+            .xt-icon {
+                font-size: 25px;
+                color: @color-accent-main;
+
+                &.expand {
+                    font-size: 25px !important;
+                    color: @color-dark-1st;
+                }
             }
+        }
+    }
+
+    .account-item {
+
+        .item-content {
+            font-size: 14px;
+            padding-left: 0;
+
+            .xt-icon {
+                font-size: 40px;
+            }
+
+            .item-name {
+                > div {
+                    line-height: 1.5;
+                }
+
+                .user-email {
+                    color: @color-dark-2nd;
+                }
+            }
+        }
+    }
+
+    .item-separator {
+        margin: 20px 0;
+        width: 100%;
+        height: 1px;
+        background: #e7e7e7;
+
+        &.account-item-separator {
+            margin-top: 0;
         }
     }
 }

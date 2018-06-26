@@ -20,8 +20,12 @@ export class FormValidationComponent {
     displayErrors() {
         // form submitted?
         const formSubmitted = _.get(this.controlContainer, 'formDirective.submitted', false);
+
         // form control touched?
-        const controlTouched = _.get(this.controlContainer, 'control.controls.' + this.controlName + '.touched', false);
+        const formControls = _.get(this.controlContainer, 'control.controls', false);
+        const controlTouched = formControls &&
+            formControls[this.controlName] &&
+            formControls[this.controlName].touched;
 
         return formSubmitted || controlTouched;
     }

@@ -22,6 +22,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 placeholder="Risk Level Flag"
+                                required="true"
                                 [options]="caseRiskLevelsList$ | async">
                             </app-form-select>
                         </div>
@@ -43,7 +44,8 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="caseData.firstName"
-                                placeholder="First name">
+                                placeholder="First name"
+                                required="true">
                             </app-form-input>
 
                             <app-form-input
@@ -62,6 +64,7 @@
                                 name="gender"
                                 [(ngModel)]="caseData.gender"
                                 placeholder="Gender"
+                                required="true"
                                 [options]="gendersList$ | async">
                             </app-form-select>
                         </div>
@@ -151,6 +154,7 @@
                                 name="classification"
                                 [(ngModel)]="caseData.classification"
                                 placeholder="Classification"
+                                required="true"
                                 [options]="caseClassificationsList$ | async">
                             </app-form-select>
 
