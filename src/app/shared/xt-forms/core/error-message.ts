@@ -1,7 +1,5 @@
 import { ValidationResult } from './validate';
 
-import * as _ from 'lodash';
-
 export class ErrorMessage {
 
     constructor(
@@ -10,91 +8,37 @@ export class ErrorMessage {
     ) {
     }
 
-    /**
-     * Replace all variables from an error
-     * @param {string} errorMessage
-     * @returns {string}
-     */
-    protected replaceVariables(errorMessage: string) {
-        // find variables
-        const varRegex = /\$\{([a-z0-9_]+)\}/ig;
-        const variables = {};
-        let vR = null;
-        do {
-            vR = varRegex.exec(errorMessage);
-            if (vR) {
-                // ignore duplicates
-                variables[vR[1]] = {
-                    text: vR[0],
-                    expression: vR[1]
-                };
-            }
-        } while (vR);
-
-        // replace variables - right now we don't need expression - just a simple find & replace
-        _.forEach(variables, (v) => {
-            // determine the replacement value
-            // at this point we look in just one place - so there is no need for extra logic
-            const replaceValue = _.get(this.validator, this.key + '.' + v.expression);
-
-            // replace all occurrences
-            errorMessage = errorMessage.replace(
-                new RegExp(v.text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'), 'g'),
-                replaceValue);
-        });
-
-        // finished
-        return errorMessage;
-    }
-
     getMessage(): string {
-        let message: string;
         switch (this.key) {
             case 'required':
-                message = 'This field is required';
-                break;
+                return 'This field is required';
             case 'pattern':
-                message = 'Value does not match required pattern';
-                break;
+                return 'Value does not match required pattern';
             case 'minlength':
-                message = 'Value must be N characters';
-                break;
+                return 'Value must be N characters';
             case 'maxlength':
-                message = 'Must contain a maximum of ${requiredLength} characters';
-                break;
+                return `Must contain a maximum of ${this.validator.maxlength['requiredLength']} characters`;
             case 'equalValidator':
-                message = 'Value must match password';
-                break;
+                return 'Value must match password';
             case 'truthyValidator-terms':
-                message = 'Terms and conditions must be accepted';
-                break;
+                return 'Terms and conditions must be accepted';
             case 'emailValidator':
-                message = 'Invalid email address';
-                break;
+                return 'Invalid email address';
             case 'passwordValidator':
-                message = 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol';
-                break;
+                return 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol';
             case 'extensionValidator':
-                message = 'Please upload a valid file: ' + this.validator.extensionValidator;
-                break;
+                return 'Please upload a valid file: ' + this.validator.extensionValidator;
             case 'uniqueEmail':
-                message = 'E-mail does already exist.';
-                break;
+                return 'E-mail does already exist.';
             case 'uniquePageUrl':
-                message = 'Page name does already exist';
-                break;
+                return 'Page name does already exist';
         }
 
-        if (!message) {
-            switch (typeof this.validator[this.key]) {
-                case 'string':
-                    message = <string> this.validator[this.key];
-                    break;
-                default:
-                    message = `Validation failed: ${this.key}`;
-            }
+        switch (typeof this.validator[this.key]) {
+            case 'string':
+                return <string> this.validator[this.key];
+            default:
+                return `Validation failed: ${this.key}`;
         }
-
-        return this.replaceVariables(message);
     }
 }
