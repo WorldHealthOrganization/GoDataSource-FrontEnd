@@ -105,9 +105,9 @@ export class SidenavComponent {
         new NavItem(
             'Events',
             'event',
+            [PERMISSION.READ_EVENT],
             [],
-            [],
-            '/users'
+            '/events'
         ),
         new NavItem(
             'Duplicated Records',
