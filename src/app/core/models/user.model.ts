@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { UserRoleModel } from './user-role.model';
 import { PERMISSION } from './permission.model';
-import { SecurityQuestionModel } from "./securityQuestion.model";
+import { SecurityQuestionModel } from './securityQuestion.model';
 
 export class UserModel {
     id: string;
