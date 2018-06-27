@@ -32,10 +32,13 @@
                 [(ngModel)]="question.required"
                 label="Required?">
             </app-form-slide-toggle>
-            <button class="iconBtn" mat-button type="button" color="primary" (click)="duplicate()"><span
-                class="xt-icon">duplicate</span></button>
-            <button class="iconBtn" mat-button type="button" color="warn" (click)="delete()"><span
-                class="xt-icon">delete</span></button>
+
+            <button mat-icon-button type="button" color="primary" (click)="duplicate()">
+                <span class="xt-icon">fileCopy</span>
+            </button>
+            <button mat-icon-button type="button" color="warn" (click)="delete()">
+                <span class="xt-icon">delete</span>
+            </button>
         </div>
         <div class="question-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
             <div class="alert-label">{{ question.required ? "REQUIRED" : ""}}</div>
