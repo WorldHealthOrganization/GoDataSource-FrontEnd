@@ -40,7 +40,7 @@
                     </app-form-input>
                     <app-form-select
                         name="securityQuestions[1][question]"
-                        [(ngModel)]="authUser.securityQuestions[1][question]"
+                        [(ngModel)]="authUser.securityQuestions[1].question"
                         placeholder="Question 2"
                         [options]="securityQuestionsList$ | async"
                         optionLabelKey="question"
