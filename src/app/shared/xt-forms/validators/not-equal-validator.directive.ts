@@ -30,12 +30,9 @@ export class NotEqualValidatorDirective implements Validator {
 
         // get the target control
          const targetControl = control.root.get(this.notEqualValidator);
-      //  const targetControl = control.root.controls[this.notEqualValidator];
 
-        const targetValue = control.root.value[this.notEqualValidator];
         // check if the current value and target value match
-
-        if (targetValue && control.value == targetValue) {
+        if (targetControl && control.value === targetControl.value) {
             return {
                 notEqualValidator: false
             };

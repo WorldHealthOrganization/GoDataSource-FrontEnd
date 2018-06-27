@@ -9,45 +9,48 @@
         <form #form="ngForm" (submit)="save(form)">
 
             <div fxLayout="column">
-                <div fxShow="{{alreadySet}}" class="questionsDisplay"> You already set your security questions.
+                <div fxShow="{{alreadySet && !viewForm}}" class="questionsDisplay"> You already set your security questions.
                     <div>Question 1: {{authUser.securityQuestions[0].question | translate}}</div>
+                    <div>Answer 1: ***</div>
                     <div>Question 2: {{authUser.securityQuestions[1].question | translate}}</div>
+                    <div>Answer 2: ***</div>
                     <button fxShow="{{!viewForm}}" mat-raised-button color="primary" (click)="allowEdit()" class="editQuestionsBtn"> Edit
                     </button>
                 </div>
 
                 <div fxShow="{{viewForm}}">
                     <div>Select the questions below and add an answer for each of them!</div>
-                    <app-form-select
-                        name="securityQuestions[0].question"
+
+                   <app-form-select
+                        name="securityQuestions[0][question]"
                         [(ngModel)]="authUser.securityQuestions[0].question"
                         placeholder="Question 1"
                         [options]="securityQuestionsList$ | async"
                         optionLabelKey="question"
                         optionValueKey="question"
                         required="true"
-                        app-triggerValidationFor="securityQuestions[1].question"
+                        app-triggerValidationFor="securityQuestions[1][question]"
                     >
                     </app-form-select>
                     <app-form-input
-                        name="securityQuestions[0].answer"
-                        [(ngModel)]="authUser.securityQuestions[0].answer"
+                        name="securityQuestions[0][answer]"
+                        [(ngModel)]="answers[0]"
                         placeholder="Answer 1"
                         required="true">
                     </app-form-input>
                     <app-form-select
-                        name="securityQuestions[1].question"
-                        [(ngModel)]="authUser.securityQuestions[1].question"
+                        name="securityQuestions[1][question]"
+                        [(ngModel)]="authUser.securityQuestions[1][question]"
                         placeholder="Question 2"
                         [options]="securityQuestionsList$ | async"
                         optionLabelKey="question"
                         optionValueKey="question"
-                        app-notEqualValidator="securityQuestions[0].question"
+                        app-notEqualValidator="securityQuestions[0][question]"
                         required="true">
                     </app-form-select>
                     <app-form-input
-                        name="securityQuestions[1].answer"
-                        [(ngModel)]="authUser.securityQuestions[1].answer"
+                        name="securityQuestions[1][answer]"
+                        [(ngModel)]="answers[1]"
                         placeholder="Answer 2"
                         required="true">
                     </app-form-input>

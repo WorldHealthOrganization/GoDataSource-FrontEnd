@@ -28,6 +28,7 @@ export class SetSecurityQuestionsComponent {
 
     authUser: UserModel;
     securityQuestionsList$: Observable<SecurityQuestionModel[]>;
+    answers: any = [];
     alreadySet: boolean = true;
     viewForm: boolean = false;
 
