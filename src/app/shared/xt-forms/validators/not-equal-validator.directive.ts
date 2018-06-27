@@ -15,7 +15,7 @@ import * as _ from 'lodash';
 })
 
 /**
- * Custom form validation for fields that should have the same value (e.g. password and confirm password)
+ * Custom form validation for fields that should not have the same value (e.g. security questions)
  */
 export class NotEqualValidatorDirective implements Validator {
     constructor(

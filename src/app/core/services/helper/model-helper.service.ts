@@ -27,23 +27,6 @@ export class ModelHelperService {
     }
 
     /**
-     * Transform an observable's response from a list of objects to a list of model instances
-     * Using share() to avoid multiple requests.
-     * @param {Observable<any>} obs
-     * @param modelClass The Model Class to be instantiated for each item in the list
-     * @returns {Observable<any[]>}
-     */
-    mapObservableListToModelShare(obs: Observable<any>, modelClass): Observable<any> {
-        return obs.map(
-            (listResult) => {
-                return listResult.map((item) => {
-                    return this.getModelInstance(modelClass, item);
-                });
-            }
-        ).share();
-    }
-
-    /**
      * Transform an observable's response from an object to an instance of a model
      * @param {Observable<any>} obs
      * @param modelClass The Model Class to be instantiated for the retrieved item
@@ -114,12 +97,6 @@ export class ModelHelperService {
                 }
 
                 return userRole;
-
-            case SecurityQuestionModel:
-                // create the UserRole instance
-                const securityQuestion = new SecurityQuestionModel(data);
-                securityQuestion.question = data;
-                return securityQuestion;
 
             default:
                 return new modelClass(data);

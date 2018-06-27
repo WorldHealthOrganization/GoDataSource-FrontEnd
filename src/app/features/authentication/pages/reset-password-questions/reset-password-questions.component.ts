@@ -34,7 +34,7 @@ export class ResetPasswordQuestionsComponent{
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
-        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList();
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
     }
 
 

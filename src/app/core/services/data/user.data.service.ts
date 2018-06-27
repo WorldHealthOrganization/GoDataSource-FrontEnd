@@ -127,7 +127,7 @@ export class UserDataService {
      */
     getSecurityQuestionsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SecurityQuestionModel[]> {
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableListToModelShare(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`security-questions?filter=${filter}`),
             SecurityQuestionModel
         );

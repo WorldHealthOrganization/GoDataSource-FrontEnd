@@ -1,5 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import * as _ from 'lodash';
 
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -42,8 +43,8 @@ export class SetSecurityQuestionsComponent {
         private authDataService: AuthDataService
     ) {
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList();
-        if (!this.authUser.securityQuestions[0].question && !this.authUser.securityQuestions[1].question) {
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
+        if (_.isEmpty(this.authUser.securityQuestions[0].question) || _.isEmpty(this.authUser.securityQuestions[1].question)) {
             this.alreadySet = false;
             this.viewForm = true;
         }

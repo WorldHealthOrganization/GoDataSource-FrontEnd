@@ -4,6 +4,6 @@ export class SecurityQuestionModel {
     question: string;
 
     constructor(data = null) {
-        this.question = _.get(data, 'question');
+        this.question = data;
     }
 }
