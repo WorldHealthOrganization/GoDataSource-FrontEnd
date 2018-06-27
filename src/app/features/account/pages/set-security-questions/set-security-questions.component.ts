@@ -10,10 +10,10 @@ import { RouterHelperService } from '../../../../core/services/helper/router-hel
 import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SecurityQuestionModel } from "../../../../core/models/securityQuestion.model";
-import { Router } from "@angular/router";
-import { Observable } from "rxjs/Observable";
-import { FormHelperService } from "../../../../core/services/helper/form-helper.service";
+import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
     selector: 'app-set-security-questions',

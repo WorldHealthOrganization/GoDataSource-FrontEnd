@@ -5,7 +5,6 @@ import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
-import { SecurityQuestionModel } from "../../models/securityQuestion.model";
 
 @Injectable()
 export class ModelHelperService {
