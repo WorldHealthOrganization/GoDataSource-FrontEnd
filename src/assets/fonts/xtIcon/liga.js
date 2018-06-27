@@ -25,17 +25,6 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
-            'thinArrowRight': '&#xe913;',
-            'addCircle': '&#xe900;',
-            'fileCopy': '&#xe911;',
-            'account': '&#xe912;',
-            'language': '&#xe906;',
-            'bug': '&#xe902;',
-            'newFolder': '&#xe903;',
-            'event': '&#xe904;',
-            'thinArrowDown': '&#xe905;',
-            'people': '&#xe907;',
-            'settings': '&#xe910;',
             'help': '&#xe90f;',
             'link': '&#xe90e;',
             'delete': '&#xe90d;',
@@ -44,7 +33,14 @@
             'search': '&#xe908;',
             'add': '&#xe909;',
             'menu': '&#xe90a;',
+            'account': '&#xe900;',
             'home': '&#xe901;',
+            'admin': '&#xe902;',
+            'cases': '&#xe903;',
+            'contacts': '&#xe904;',
+            'duplicate': '&#xe905;',
+            'events': '&#xe906;',
+            'outbreaks': '&#xe907;',
           '0': 0
         };
         delete icons['0'];
