@@ -7,6 +7,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EventModel } from '../../../../core/models/event.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-events-list',
@@ -20,6 +23,9 @@ export class EventsListComponent implements OnInit {
         new BreadcrumbItemModel('Events', '.', true)
     ];
 
+    // authenticated user
+    authUser: UserModel;
+
     // list of existing events
     eventsList$: Observable<EventModel[]>;
     eventsListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
@@ -29,10 +35,14 @@ export class EventsListComponent implements OnInit {
 
     constructor(
         private eventDataService: EventDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
     ) {}
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -83,6 +93,11 @@ export class EventsListComponent implements OnInit {
     getTableColumns(): string[] {
         // allways visible columns
         const columns = ['name', 'date', 'description', 'address'];
+
+        // check if the authenticated user has WRITE access
+        if (this.authUser.hasPermissions(PERMISSION.WRITE_EVENT)) {
+            columns.push('actions');
+        }
 
         // finished
         return columns;

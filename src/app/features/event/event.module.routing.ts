@@ -19,6 +19,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_EVENT]
         }
+    },
+    // Modify Event
+    {
+        path: ':eventId/modify',
+        component: fromPages.ModifyEventComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_EVENT]
+        }
     }
 ];
 

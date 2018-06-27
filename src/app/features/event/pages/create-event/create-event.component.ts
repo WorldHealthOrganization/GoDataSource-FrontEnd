@@ -7,7 +7,6 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 
@@ -33,7 +32,6 @@ export class CreateEventComponent {
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {}
