@@ -5,7 +5,7 @@ import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../helper/request-query-builder';
-import { SecurityQuestionModel } from "../../models/securityQuestion.model";
+import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 
 @Injectable()
 export class UserDataService {
