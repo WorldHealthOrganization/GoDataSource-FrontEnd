@@ -20,6 +20,8 @@ export class ErrorMessage {
                 return 'Value must be a maximum of N characters';
             case 'equalValidator':
                 return 'Value must match password';
+            case 'notEqualValidator':
+                return 'The questions need to be different';
             case 'truthyValidator-terms':
                 return 'Terms and conditions must be accepted';
             case 'emailValidator':

@@ -25,7 +25,7 @@ export class UserModel {
         this.passwordChange = _.get(data, 'passwordChange', false);
         this.activeOutbreakId = _.get(data, 'activeOutbreakId');
         this.roleIds = _.get(data, 'roleIds', []);
-        this.securityQuestions = _.get(data, 'securityQuestions');
+        this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
     }
 
     hasPermissions(...permissionIds: PERMISSION[]): boolean {

@@ -9,6 +9,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
+import { Observable } from "rxjs/Observable";
+import { SecurityQuestionModel } from "../../../../core/models/securityQuestion.model";
 
 @Component({
     selector: 'app-reset-password-questions',
@@ -22,10 +24,7 @@ export class ResetPasswordQuestionsComponent{
         email: null,
         questions: [{question: null, answer: null}, {question: null, answer: null}]
    };
-    dataNewPassword = {newPassword: null};
-    confirmPassword: string;
-
-    securityQuestionsList$: any[] = [];
+    securityQuestionsList$: Observable<SecurityQuestionModel[]>;
 
 
     constructor(
@@ -35,11 +34,7 @@ export class ResetPasswordQuestionsComponent{
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
-        this.userDataService.getSecurityQuestionsList().subscribe((questionsList) => {
-            for (let securityQuestion of questionsList){
-                this.securityQuestionsList$.push({label: securityQuestion, value: securityQuestion});
-            }
-        });
+        this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList();
     }
 
 
@@ -51,25 +46,15 @@ export class ResetPasswordQuestionsComponent{
 
             // send request to get token
             this.userDataService
-                .resetPasswordQuestions(this.dataModel)
+                .resetPasswordQuestions(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
                 .subscribe((result) => {
-                    // reset password using token:
-                    this.userDataService
-                        .resetPassword(this.dataNewPassword , result.token)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('Password changed!');
-                            // redirect to login page
-                            this.router.navigate(['/auth/login']);
-                        });
-                });
+                    // send the user to reset password page
+                    this.router.navigate(['/auth/reset-password'], { queryParams: { token: result.token } });
+                 });
 
 
         }

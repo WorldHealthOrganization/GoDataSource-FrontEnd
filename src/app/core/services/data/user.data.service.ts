@@ -7,7 +7,6 @@ import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../helper/request-query-builder';
 import { SecurityQuestionModel } from "../../models/securityQuestion.model";
 
-
 @Injectable()
 export class UserDataService {
 
@@ -126,16 +125,12 @@ export class UserDataService {
      * Retrieve the list of available security questions
      * @returns {Observable<SecurityQuestionModel[]>}
      */
-    getSecurityQuestionsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
-
-        const qb = new RequestQueryBuilder();
-        // include roles and permissions in response
-        qb.merge(queryBuilder);
-
-        const filter = qb.buildQuery();
-
-        return this.http.get(`security-questions?filter=${filter}`);
-
+    getSecurityQuestionsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SecurityQuestionModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModelShare(
+            this.http.get(`security-questions?filter=${filter}`),
+            SecurityQuestionModel
+        );
     }
 
 }
