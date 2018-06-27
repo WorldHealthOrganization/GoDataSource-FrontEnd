@@ -69,7 +69,6 @@ export class SetSecurityQuestionsComponent {
                             this.alreadySet = true;
                         });
                 });
-
         }
     }
 
