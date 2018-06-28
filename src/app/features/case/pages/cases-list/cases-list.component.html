@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -84,7 +84,10 @@
                 <div class="table-header-cell">
                     <div>Age</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-range
+                            name="ageFilter"
+                            (changed)="filterBy('age', $event)">
+                        </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
@@ -99,7 +102,13 @@
                 <div class="table-header-cell">
                     <div>Gender</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="filter"
+                            ngModel
+                            placeholder="Filter"
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBy('gender', $event)">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>

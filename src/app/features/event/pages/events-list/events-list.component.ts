@@ -91,6 +91,14 @@ export class EventsListComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to events
+     * @returns {boolean}
+     */
+    hasEventWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -99,7 +107,7 @@ export class EventsListComponent implements OnInit {
         const columns = ['name', 'date', 'description', 'address'];
 
         // check if the authenticated user has WRITE access
-        if (this.authUser.hasPermissions(PERMISSION.WRITE_EVENT)) {
+        if (this.hasEventWriteAccess()) {
             columns.push('actions');
         }
 

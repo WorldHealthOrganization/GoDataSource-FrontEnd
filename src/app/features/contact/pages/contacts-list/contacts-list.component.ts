@@ -84,7 +84,7 @@ export class ContactsListComponent implements OnInit {
         if (_.isEmpty(value)) {
             this.contactsListQueryBuilder.whereRemove(property);
         } else {
-            // filter by any User property
+            // filter by any property
             switch (property) {
                 case 'age':
                     if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
@@ -123,8 +123,16 @@ export class ContactsListComponent implements OnInit {
             }
         }
 
-        // refresh users list
+        // refresh list
         this.loadContactsList();
+    }
+
+    /**
+     * Check if we have write access to contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**
@@ -135,7 +143,7 @@ export class ContactsListComponent implements OnInit {
         const columns = ['firstName', 'lastName', 'age', 'gender', 'phoneNumber'];
 
         // check if the authenticated user has WRITE access
-        if (this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT)) {
+        if (this.hasContactWriteAccess()) {
             columns.push('actions');
         }
 

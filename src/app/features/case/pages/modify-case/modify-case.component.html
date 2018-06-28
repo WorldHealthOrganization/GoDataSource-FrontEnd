@@ -44,19 +44,22 @@
                                 name="firstName"
                                 [(ngModel)]="caseData.firstName"
                                 placeholder="First name"
-                                required="true">
+                                required="true"
+                                maxlength="200">
                             </app-form-input>
 
                             <app-form-input
                                 name="middleName"
                                 [(ngModel)]="caseData.middleName"
-                                placeholder="Middle name">
+                                placeholder="Middle name"
+                                maxlength="200">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
                                 [(ngModel)]="caseData.lastName"
-                                placeholder="Last name">
+                                placeholder="Last name"
+                                maxlength="200">
                             </app-form-input>
 
                             <app-form-select
@@ -72,13 +75,15 @@
                             <app-form-input
                                 name="phoneNumber"
                                 [(ngModel)]="caseData.phoneNumber"
-                                placeholder="Phone number">
+                                placeholder="Phone number"
+                                maxlength="50">
                             </app-form-input>
 
                             <app-form-input
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
-                                placeholder="Occupation">
+                                placeholder="Occupation"
+                                maxlength="500">
                             </app-form-input>
 
 

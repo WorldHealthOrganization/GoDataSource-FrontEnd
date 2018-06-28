@@ -17,7 +17,7 @@ export class ErrorMessage {
             case 'minlength':
                 return 'Value must be N characters';
             case 'maxlength':
-                return 'Value must be a maximum of N characters';
+                return `Must contain a maximum of ${this.validator.maxlength['requiredLength']} characters`;
             case 'equalValidator':
                 return 'Value must match password';
             case 'truthyValidator-terms':
