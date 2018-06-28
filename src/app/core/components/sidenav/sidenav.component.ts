@@ -25,12 +25,12 @@ export class SidenavComponent {
         [],
         [
             new ChildNavItem(
-                'Log out',
+                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
                 [],
                 '/auth/logout'
             ),
             new ChildNavItem(
-                'Change Password',
+                'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
                 [],
                 '/account/change-password'
             )
@@ -40,77 +40,77 @@ export class SidenavComponent {
     // Nav Items - main
     mainItems: any[] = [
         new NavItem(
-            'Admin',
+            'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL',
             'settings',
             [],
             [
                 new ChildNavItem(
-                    'System Configuration',
+                    'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
                     [PERMISSION.READ_SYS_CONFIG],
                     ''
                 ),
                 new ChildNavItem(
-                    'Users',
+                    'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',
                     [PERMISSION.READ_USER_ACCOUNT],
                     '/users'
                 ),
                 new ChildNavItem(
-                    'Roles',
+                    'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
                     [PERMISSION.READ_ROLE],
                     '/user-roles'
                 )
             ]
         ),
         new NavItem(
-            'Outbreaks',
+            'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
             'bug',
             [PERMISSION.READ_OUTBREAK],
             [
                 new ChildNavItem(
-                    'Outbreaks',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
                     [PERMISSION.READ_OUTBREAK],
                     '/outbreaks'
                 ),
                 new ChildNavItem(
-                    'Templates',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
                     [],
                     '/users'
                 ),
                 new ChildNavItem(
-                    'Teams',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
                     [PERMISSION.READ_TEAM],
                     '/users'
                 ),
                 new ChildNavItem(
-                    'Clusters',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL',
                     [],
                     '/users'
                 )
             ]
         ),
         new NavItem(
-            'Contacts',
+            'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
             'people',
             [PERMISSION.READ_CONTACT],
             [],
             '/contacts'
         ),
         new NavItem(
-            'Cases',
+            'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
             [],
             [],
             '/cases'
         ),
         new NavItem(
-            'Events',
+            'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
             'event',
             [PERMISSION.READ_EVENT],
             [],
             '/events'
         ),
         new NavItem(
-            'Duplicated Records',
+            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
             'fileCopy',
             [],
             [],
@@ -120,14 +120,14 @@ export class SidenavComponent {
             separator: true
         },
         new NavItem(
-            'Reference data',
+            'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
             'language',
             [PERMISSION.READ_SYS_CONFIG],
             [],
             '/reference-data'
         ),
         new NavItem(
-            'Help & Support',
+            'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
             'help',
             [],
             [],

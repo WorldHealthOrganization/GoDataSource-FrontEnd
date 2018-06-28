@@ -5,8 +5,8 @@ import { StorageService, StorageKey } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
-import { AuthModel } from '../../models/auth.model';
 import { ModelHelperService } from './model-helper.service';
+import { EnglishUsLang } from '../../../i18n/english_us';
 
 @Injectable()
 export class I18nService {
@@ -47,6 +47,12 @@ export class I18nService {
                 this.languageDataService
                     .getLanguageTokens(language)
                     .subscribe((tokens: LanguageTokenModel[]) => {
+                        // get the local language tokens
+                        const localLanguageTokens = _.get(this.getLocalLanguageTokens(), language.id, []);
+
+                        // merge local tokens with the tokens received from server
+                        tokens = [...localLanguageTokens, ...tokens];
+
                         // add the tokens to the Language object
                         language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
 
@@ -55,6 +61,23 @@ export class I18nService {
                         this.translateService.use(language.id);
                     });
             });
+    }
+
+    /**
+     * Temporarily, we'll keep the UI Language tokens locally
+     */
+    getLocalLanguageTokens() {
+        const languages = [EnglishUsLang];
+        const localLanguageTokens = {};
+
+        return _.transform(languages, (result, language) => {
+            result[language.id] = _.map(language.tokens, (value, token) => {
+                return new LanguageTokenModel({
+                    token: token,
+                    translation: value
+                });
+            });
+        }, {});
     }
 
     /**
@@ -92,6 +115,16 @@ export class I18nService {
 
                 return true;
             });
+    }
+
+    /**
+     * Get the translation of a token
+     * @param token Token to be translated
+     * @param {{}} data Parameters to be replaced in translated message
+     * @returns {Observable<string | any>}
+     */
+    get(token, data = {}) {
+        return this.translateService.get(token, data);
     }
 
 }

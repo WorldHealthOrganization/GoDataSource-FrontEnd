@@ -13,7 +13,7 @@
         <!-- Submenu -->
         <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
             <button mat-menu-item *ngFor="let childItem of accountItem.children" [routerLink]="[childItem.link]">
-                {{childItem.label}}
+                {{childItem.label | translate}}
             </button>
         </mat-menu>
 
@@ -65,7 +65,7 @@
                         <span class="xt-icon">{{item.icon}}</span>
 
                         <!-- Item label -->
-                        <div class="item-name">{{item.label}}</div>
+                        <div class="item-name">{{item.label | translate}}</div>
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@
             <mat-menu #menu="matMenu" xPosition="before" yPosition="below">
                 <ng-container *ngFor="let childItem of item.children">
                     <button *ngIf="shouldDisplayItem(item)" mat-menu-item  [routerLink]="[childItem.link]">
-                        {{childItem.label}}
+                        {{childItem.label | translate}}
                     </button>
                 </ng-container>
             </mat-menu>
@@ -96,7 +96,7 @@
                         <span class="xt-icon">{{item.icon}}</span>
 
                         <!-- Item label -->
-                        <div class="item-name">{{item.label}}</div>
+                        <div class="item-name">{{item.label | translate}}</div>
                     </div>
 
                     <!-- "Expand" icon -->

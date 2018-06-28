@@ -20,7 +20,7 @@
                 <app-form-select
                     name="activeOutbreak"
                     [(ngModel)]="selectedOutbreak.id"
-                    placeholder="Selected outbreak"
+                    [placeholder]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
                     [options]="outbreaksList$ | async"
                     optionLabelKey="name"
                     optionValueKey="id"
@@ -32,7 +32,17 @@
 
         <mat-divider [vertical]="true"></mat-divider>
 
-        <mat-list-item>Language</mat-list-item>
+        <mat-list-item>
+            <app-form-select
+                name="language"
+                [(ngModel)]="selectedLanguageId"
+                [placeholder]="'LNG_LAYOUT_LANGUAGE_LABEL' | translate"
+                [options]="languagesList$ | async"
+                optionLabelKey="name"
+                optionValueKey="id"
+                (optionChanged)="selectOutbreak($event)">
+            </app-form-select>
+        </mat-list-item>
 
     </mat-list>
 

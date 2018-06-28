@@ -14,7 +14,7 @@
 
         <div
             class="login-page-welcome">
-            Welcome!
+            {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
         </div>
 
         <form #form="ngForm" (submit)="login(form)">
@@ -24,7 +24,7 @@
                 <app-form-input
                     name="email"
                     [(ngModel)]="user.email"
-                    placeholder="Email address"
+                    [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
                     required="true"
                     app-emailValidator></app-form-input>
 
@@ -35,7 +35,7 @@
                         type="password"
                         name="password"
                         [(ngModel)]="user.password"
-                        placeholder="Password"
+                        [placeholder]="'LNG_COMMON_FIELD_LABEL_PASSWORD' | translate"
                         required="true"></app-form-input>
 
                     <button
@@ -43,7 +43,7 @@
                         type="button"
                         class="reset-pass-button"
                         routerLink="/auth/forgot-password"
-                        matTooltip="Forgot password?">?</button>
+                        [matTooltip]="'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate">?</button>
                 </div>
 
                 <button

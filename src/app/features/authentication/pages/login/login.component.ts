@@ -41,14 +41,19 @@ export class LoginComponent implements OnInit {
             this.authDataService
                 .login(dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
 
                     return ErrorObservable.create(err);
                 })
                 .subscribe((auth: AuthModel) => {
                     // successfully authenticated;
 
-                    this.snackbarService.showSuccess(`Welcome, ${auth.user.firstName} ${auth.user.lastName}!`);
+                    this.snackbarService.showSuccess(
+                        'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
+                        {
+                            name: `${auth.user.firstName} ${auth.user.lastName}`
+                        }
+                    );
 
                     // check if user needs to change password
                     if (auth.user.passwordChange) {
