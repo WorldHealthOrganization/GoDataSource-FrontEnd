@@ -22,6 +22,8 @@ export class FormTextareaComponent extends ElementBase<string> {
     @Input() required: boolean = false;
     @Input() name: string;
 
+    @Input() maxlength: number;
+
     public identifier = `form-textarea-${identifier++}`;
 
     constructor(

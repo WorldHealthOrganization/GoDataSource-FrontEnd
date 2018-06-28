@@ -2,7 +2,7 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field>
-        <textarea matInput [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder"
+        <textarea matInput [(ngModel)]="value" [maxlength]="maxlength" [attr.name]="name" [required]="required" [placeholder]="placeholder"
                   (blur)="onBlur()"></textarea>
     </mat-form-field>
 

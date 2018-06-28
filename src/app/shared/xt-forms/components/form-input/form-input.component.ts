@@ -25,6 +25,8 @@ export class FormInputComponent extends ElementBase<string> {
     @Input() disabled: boolean = false;
     @Input() tooltip: string = null;
 
+    @Input() maxlength: number;
+
 
     @Output() optionChanged = new EventEmitter<any>();
 
