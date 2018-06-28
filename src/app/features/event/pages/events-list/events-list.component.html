@@ -97,6 +97,10 @@
                     <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                         Modify
                     </button>
+
+                    <button mat-menu-item (click)="deleteEvent(item)">
+                        Delete
+                    </button>
                 </mat-menu>
             </mat-cell>
         </ng-container>

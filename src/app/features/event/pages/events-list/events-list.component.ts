@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
@@ -10,6 +9,10 @@ import { EventModel } from '../../../../core/models/event.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-events-list',
@@ -37,6 +40,7 @@ export class EventsListComponent implements OnInit {
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
+        private snackbarService: SnackbarService
     ) {}
 
     ngOnInit() {
@@ -109,5 +113,29 @@ export class EventsListComponent implements OnInit {
 
         // finished
         return columns;
+    }
+
+    /**
+     * Delete specific event from outbreak
+     * @param {EventModel} event
+     */
+    deleteEvent(event: EventModel) {
+        // show confirm dialog
+        if (confirm(`Are you sure you want to delete this event: ${event.name}?`)) {
+            // delete contact
+            this.eventDataService
+                .deleteEvent(this.selectedOutbreak.id, event.id)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('Event deleted!');
+
+                    // reload data
+                    this.loadEventsList();
+                });
+        }
     }
 }

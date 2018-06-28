@@ -39,8 +39,12 @@
             label="Alert?">
         </app-form-slide-toggle>
 
-        <button class="iconBtn"  mat-button type="button" color="primary" (click)="link()"> <span class="xt-icon">link</span> </button>
-        <button class="iconBtn" mat-button type="button" color="warn" (click)="delete()" color="warn"> <span class="xt-icon">delete</span> </button>
+        <button mat-icon-button type="button" color="primary" (click)="link()">
+            <span class="xt-icon">link</span>
+        </button>
+        <button mat-icon-button type="button" (click)="delete()" color="warn">
+            <span class="xt-icon">delete</span>
+        </button>
     </div>
     <div class="answer-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
         <div class="alert-label">{{ answer.alert ? "ALERT" : ""}}</div>

@@ -62,5 +62,15 @@ export class EventDataService {
     modifyEvent(outbreakId: string, eventId: string, eventData): Observable<any> {
         return this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData);
     }
+
+    /**
+     * Delete an existing Event from Outbreak
+     * @param {string} outbreakId
+     * @param {string} eventId
+     * @returns {Observable<any>}
+     */
+    deleteEvent(outbreakId: string, eventId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/events/${eventId}`);
+    }
 }
 
