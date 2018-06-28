@@ -13,6 +13,8 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 
 @Component({
     selector: 'app-cases-list',
@@ -46,7 +48,8 @@ export class CasesListComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -160,22 +163,24 @@ export class CasesListComponent implements OnInit {
      * @param {CaseModel} case
      */
     deleteCase(caseModel: CaseModel) {
-        // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this case: ${caseModel.firstName} ${caseModel.lastName}?`)) {
-            // delete case
-            this.caseDataService
-                .deleteCase(this.selectedOutbreak.id, caseModel.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', caseModel)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete case
+                    this.caseDataService
+                        .deleteCase(this.selectedOutbreak.id, caseModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('Case deleted!');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Case deleted!');
 
-                    // reload data
-                    this.loadCasesList();
-                });
-        }
+                            // reload data
+                            this.loadCasesList();
+                        });
+                }
+            });
     }
 }

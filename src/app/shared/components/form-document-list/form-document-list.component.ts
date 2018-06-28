@@ -3,7 +3,9 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 
 import { ListBase } from '../../xt-forms/core';
 import { DocumentModel } from '../../../core/models/document.model';
-
+import { Subscriber } from 'rxjs/Subscriber';
+import { DialogConfirmAnswer } from '../dialog-confirm/dialog-confirm.component';
+import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-form-document-list',
@@ -22,12 +24,21 @@ export class FormDocumentListComponent extends ListBase<DocumentModel> implement
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private dialogService: DialogService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
 
     ngOnInit() {
-        this.removeConfirmMsg = 'Are you sure you want to delete this document?';
+        // handle remove item confirmation
+        this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DOCUMENT')
+                .subscribe((answer: DialogConfirmAnswer) => {
+                    if (answer === DialogConfirmAnswer.Yes) {
+                        observer.next();
+                    }
+                });
+        });
     }
 }

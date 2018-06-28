@@ -1,15 +1,16 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { OutbreakDataService } from "../../../../core/services/data/outbreak.data.service";
-import { ActivatedRoute, Router } from "@angular/router";
-import { OutbreakModel } from "../../../../core/models/outbreak.model";
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { BreadcrumbItemModel } from "../../../../shared/components/breadcrumbs/breadcrumb-item.model";
-import { MatTabChangeEvent } from "@angular/material";
-import { Observable } from "rxjs/Observable";
-import { GenericDataService } from "../../../../core/services/data/generic.data.service";
-import { DocumentModel } from "../../../../core/models/document.model";
-import { QuestionModel } from "../../../../core/models/question.model";
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { MatTabChangeEvent } from '@angular/material';
+import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { QuestionModel } from '../../../../core/models/question.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -44,7 +45,8 @@ export class ModifyOutbreakComponent {
                 private route: ActivatedRoute,
                 private router: Router,
                 private genericDataService: GenericDataService,
-                private snackbarService: SnackbarService) {
+                private snackbarService: SnackbarService,
+                private dialogService: DialogService) {
 
         this.route.params.subscribe(params => {
             this.outbreakId = params.outbreakId;
@@ -81,7 +83,7 @@ export class ModifyOutbreakComponent {
 
             // validate end date to be greater than start date
             if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
-                this.snackbarService.showError("End Date needs to be greater than start date");
+                this.snackbarService.showError('End Date needs to be greater than start date');
             } else {
 
                 // modify the outbreak
@@ -152,7 +154,7 @@ export class ModifyOutbreakComponent {
      * @param tab - string identifying the questionnaire
      */
     addNewQuestion(tab) {
-        let newQuestion = new QuestionModel();
+        const newQuestion = new QuestionModel();
         switch (tab) {
             case 'case-investigation': {
                 newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
@@ -179,22 +181,25 @@ export class ModifyOutbreakComponent {
      * @param question
      */
     deleteQuestion(tab, question) {
-        if (confirm("Are you sure you want to delete this question? ")) {
-            switch (tab) {
-                case 'case-investigation': {
-                    this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                    break;
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    switch (tab) {
+                        case 'case-investigation': {
+                            this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'contact-followup': {
+                            this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'lab-results': {
+                            this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                    }
                 }
-                case 'contact-followup': {
-                    this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-                case 'lab-results': {
-                    this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-            }
-        }
+            });
     }
 
     /**
@@ -203,27 +208,30 @@ export class ModifyOutbreakComponent {
      * @param question
      */
     duplicateQuestion(tab, question) {
-        if (confirm("Are you sure you want to duplicate this question? ")) {
-            let newQuestion = JSON.parse(JSON.stringify(question));
-            switch (tab) {
-                case 'case-investigation': {
-                    newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
-                    this.caseInvestigationTemplateQuestions.push(newQuestion);
-                    break;
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    const newQuestion = JSON.parse(JSON.stringify(question));
+                    switch (tab) {
+                        case 'case-investigation': {
+                            newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
+                            this.caseInvestigationTemplateQuestions.push(newQuestion);
+                            break;
+                        }
+                        case 'contact-followup': {
+                            newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
+                            this.contactFollowupTemplateQuestions.push(newQuestion);
+                            break;
+                        }
+                        case 'lab-results': {
+                            newQuestion.order = this.labResultsTemplateQuestions.length + 1;
+                            this.labResultsTemplateQuestions.push(newQuestion);
+                            break;
+                        }
+                    }
+                    this.scrollToEndQuestions();
                 }
-                case 'contact-followup': {
-                    newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
-                    this.contactFollowupTemplateQuestions.push(newQuestion);
-                    break;
-                }
-                case 'lab-results': {
-                    newQuestion.order = this.labResultsTemplateQuestions.length + 1;
-                    this.labResultsTemplateQuestions.push(newQuestion);
-                    break;
-                }
-            }
-            this.scrollToEndQuestions();
-        }
+            });
     }
 
     /**
@@ -232,25 +240,28 @@ export class ModifyOutbreakComponent {
      * @param $event
      */
     deleteAnswer(tab, $event) {
-        if (confirm("Are you sure you want to delete this answer? ")) {
-            let answerToDelete = $event.answer;
-            console.log(answerToDelete);
-            //TODO delete answer
-            switch (tab) {
-                case 'case-investigation': {
-                    // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                    break;
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    const answerToDelete = $event.answer;
+                    console.log(answerToDelete);
+                    // TODO delete answer
+                    switch (tab) {
+                        case 'case-investigation': {
+                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'contact-followup': {
+                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'lab-results': {
+                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                    }
                 }
-                case 'contact-followup': {
-                    // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-                case 'lab-results': {
-                    // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-            }
-        }
+            });
     }
 
     /**
@@ -259,25 +270,28 @@ export class ModifyOutbreakComponent {
      * @param $event
      */
     linkAnswer(tab, $event) {
-        if (confirm("Are you sure you want to link this answer? ")) {
-            let answerToLink = $event.answer;
-            //TODO link answer
-            console.log(answerToLink);
-            switch (tab) {
-                case 'case-investigation': {
-                    // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                    break;
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    const answerToLink = $event.answer;
+                    // TODO link answer
+                    console.log(answerToLink);
+                    switch (tab) {
+                        case 'case-investigation': {
+                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'contact-followup': {
+                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                        case 'lab-results': {
+                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
+                            break;
+                        }
+                    }
                 }
-                case 'contact-followup': {
-                    // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-                case 'lab-results': {
-                    // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                    break;
-                }
-            }
-        }
+            });
     }
 
     /**
@@ -285,10 +299,10 @@ export class ModifyOutbreakComponent {
      */
     scrollToEndQuestions() {
         setTimeout(function () {
-            let elements = document.querySelectorAll('question');
-            let len = elements.length;
+            const elements = document.querySelectorAll('question');
+            const len = elements.length;
             const el = elements[len - 1] as HTMLElement;
-            el.scrollIntoView({behavior: "smooth"});
+            el.scrollIntoView({behavior: 'smooth'});
         }, 100);
     }
 

@@ -1,0 +1,18 @@
+<div
+    class="dialog-confirm">
+    <div
+        class="dialog-confirm-msg" [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
+    </div>
+
+    <hr />
+
+    <div
+        fxFlex fxLayout="row" fxLayoutAlign="space-between">
+        <button mat-raised-button color="primary" (click)="yes()">
+            {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
+        </button>
+        <button mat-raised-button (click)="cancel()">
+            {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
+        </button>
+    </div>
+</div>

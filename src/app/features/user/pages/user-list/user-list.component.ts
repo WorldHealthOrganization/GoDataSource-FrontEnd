@@ -9,6 +9,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-user-list',
@@ -32,7 +34,8 @@ export class UserListComponent {
     constructor(
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -90,22 +93,25 @@ export class UserListComponent {
 
     deleteUser(user: UserModel) {
         // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this user: ${user.firstName} ${user.lastName}?`)) {
-            // delete the user
-            this.userDataService
-                .deleteUser(user.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER', user)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete the user
+                    this.userDataService
+                        .deleteUser(user.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('User deleted!');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('User deleted!');
 
-                    // reload data
-                    this.loadUsersList();
-                });
-        }
+                            // reload data
+                            this.loadUsersList();
+                        });
+                }
+            });
     }
 
 }

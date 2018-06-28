@@ -3,6 +3,7 @@ import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NgModel } from '@
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
 import { ValueAccessorBase } from './value-accessor-base';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Base class to be extended by components that implement lists of group components or single components
@@ -19,7 +20,8 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     // handler for when one of the group value has changed
     @Output() changed = new EventEmitter<T[]>();
 
-    @Input() removeConfirmMsg: string = 'Are you sure you want to delete this item?';
+    // allow each component to decide if we need to display a confirmation dialog or just remove it
+    @Output() deleteConfirm = new EventEmitter<T[]>();
 
     /**
      * Constructor
@@ -78,11 +80,8 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
      * Remove an existing model
      */
     delete(index) {
-        // show confirm dialog to confirm the action
-        if (
-            !_.values(this.values[index]).some(x => x !== undefined && x !== '') ||
-            confirm(this.removeConfirmMsg)
-        ) {
+        // delete method
+        const deleteItem = () => {
             // remove document
             this.values.splice(index, 1);
 
@@ -91,6 +90,17 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
 
             // validate groups & inputs
             setTimeout(() => { this.validateGroup(); });
+        };
+
+        // show confirm dialog to confirm the action
+        if (!_.values(this.values[index]).some(x => x !== undefined && x !== '')) {
+            deleteItem();
+        } else {
+            Observable.create((observer) => {
+                this.deleteConfirm.emit(observer);
+            }).subscribe(() => {
+                deleteItem();
+            });
         }
     }
 

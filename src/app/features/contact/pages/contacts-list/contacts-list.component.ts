@@ -13,6 +13,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 
 @Component({
     selector: 'app-contacts-list',
@@ -43,7 +45,8 @@ export class ContactsListComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -156,22 +159,25 @@ export class ContactsListComponent implements OnInit {
      */
     deleteContact(contact: ContactModel) {
         // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this contact: ${contact.firstName} ${contact.lastName}?`)) {
-            // delete contact
-            this.contactDataService
-                .deleteContact(this.selectedOutbreak.id, contact.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CONTACT', contact)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete contact
+                    this.contactDataService
+                        .deleteContact(this.selectedOutbreak.id, contact.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('Contact deleted!');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Contact deleted!');
 
-                    // reload data
-                    this.loadContactsList();
-                });
-        }
+                            // reload data
+                            this.loadContactsList();
+                        });
+                }
+            });
     }
 
 }

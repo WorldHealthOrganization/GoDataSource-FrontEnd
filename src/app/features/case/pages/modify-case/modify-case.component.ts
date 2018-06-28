@@ -12,6 +12,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 
 @Component({
@@ -44,7 +46,8 @@ export class ModifyCaseComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
@@ -92,9 +95,12 @@ export class ModifyCaseComponent implements OnInit {
      */
     deleteHospitalizationDate(index) {
         // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this hospitalization date?`)) {
-            this.caseData.hospitalizationDates.splice(index, 1);
-        }
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    this.caseData.hospitalizationDates.splice(index, 1);
+                }
+            });
     }
 
     /**
@@ -109,9 +115,12 @@ export class ModifyCaseComponent implements OnInit {
      */
     deleteIsolationDate(index) {
         // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this isolation date?`)) {
-            this.caseData.isolationDates.splice(index, 1);
-        }
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    this.caseData.isolationDates.splice(index, 1);
+                }
+            });
     }
 
     /**

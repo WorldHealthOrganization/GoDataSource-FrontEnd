@@ -13,6 +13,8 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 import * as _ from 'lodash';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 
 @Component({
     selector: 'app-events-list',
@@ -40,7 +42,8 @@ export class EventsListComponent implements OnInit {
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -121,21 +124,24 @@ export class EventsListComponent implements OnInit {
      */
     deleteEvent(event: EventModel) {
         // show confirm dialog
-        if (confirm(`Are you sure you want to delete this event: ${event.name}?`)) {
-            // delete contact
-            this.eventDataService
-                .deleteEvent(this.selectedOutbreak.id, event.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_EVENT', event)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete contact
+                    this.eventDataService
+                        .deleteEvent(this.selectedOutbreak.id, event.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('Event deleted!');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Event deleted!');
 
-                    // reload data
-                    this.loadEventsList();
-                });
-        }
+                            // reload data
+                            this.loadEventsList();
+                        });
+                }
+            });
     }
 }

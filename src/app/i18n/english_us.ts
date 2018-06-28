@@ -26,6 +26,27 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
 
         /**
+         * Dialogs
+         */
+        'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',
+        'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
+        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{firstName}} {{lastName}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE': 'Are you sure you want to delete this hospitalization date?',
+        'LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE': 'Are you sure you want to delete this isolation date?',
+        'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{firstName}} {{lastName}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
+        'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
+        'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: {{name}}',
+        'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
+        'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
+        'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
+        'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': 'Are you sure you want to duplicate this question?',
+        'LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER': 'Are you sure you want to delete this answer?',
+        'LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER': 'Are you sure you want to link this answer?',
+
+        /**
          * Login page
          */
         'LNG_PAGE_LOGIN_WELCOME_MESSAGE': 'Welcome!',

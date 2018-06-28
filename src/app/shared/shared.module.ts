@@ -36,7 +36,8 @@ import * as fromSharedComponents from './components';
         ...fromSharedComponents.components
     ],
     entryComponents: [
-        fromSharedComponents.SnackbarComponent
+        fromSharedComponents.SnackbarComponent,
+        fromSharedComponents.DialogConfirmComponent
     ]
 })
 export class SharedModule {

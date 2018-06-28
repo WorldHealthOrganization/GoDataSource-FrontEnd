@@ -7,14 +7,16 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import * as _ from 'lodash';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-case',
@@ -42,7 +44,8 @@ export class CreateCaseComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         this.gendersList$ = this.genericDataService.getGendersList();
         this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
@@ -71,7 +74,13 @@ export class CreateCaseComponent implements OnInit {
      * Remove a Hospitalization Date from the list
      */
     deleteHospitalizationDate(index) {
-        this.caseData.hospitalizationDates.splice(index, 1);
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    this.caseData.hospitalizationDates.splice(index, 1);
+                }
+            });
     }
 
     /**
@@ -85,7 +94,13 @@ export class CreateCaseComponent implements OnInit {
      * Remove an Isolation Date from the list
      */
     deleteIsolationDate(index) {
-        this.caseData.isolationDates.splice(index, 1);
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    this.caseData.isolationDates.splice(index, 1);
+                }
+            });
     }
 
     /**

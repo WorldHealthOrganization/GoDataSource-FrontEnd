@@ -10,6 +10,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 
 @Component({
     selector: 'app-roles-list',
@@ -32,7 +34,8 @@ export class RolesListComponent {
         private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -50,22 +53,25 @@ export class RolesListComponent {
 
     deleteRole(userRole: UserRoleModel) {
         // show confirm dialog to confirm the action
-        if (confirm(`Are you sure you want to delete this role: ${userRole.name}?`)) {
-            // delete the role
-            this.userRoleDataService
-                .deleteRole(userRole.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER_ROLE', userRole)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete the role
+                    this.userRoleDataService
+                        .deleteRole(userRole.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('Role deleted!');
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Role deleted!');
 
-                    // reload data
-                    this.loadRolesList();
-                });
-        }
+                            // reload data
+                            this.loadRolesList();
+                        });
+                }
+            });
     }
 
     /**

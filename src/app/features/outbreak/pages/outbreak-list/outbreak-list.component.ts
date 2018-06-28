@@ -10,6 +10,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 import { UserModel } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogConfirmAnswer } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 import * as _ from 'lodash';
@@ -40,7 +42,8 @@ export class OutbreakListComponent {
         private authDataService: AuthDataService,
         private dialog: MatDialog,
         private genericDataService: GenericDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getActiveOptions();
@@ -59,68 +62,74 @@ export class OutbreakListComponent {
      * @param outbreak
      */
     delete(outbreak) {
-        if (confirm(`Are you sure you want to delete the outbreak ${outbreak.name}?`)) {
-            // find users with this outbreak set as active and display them:
-            const outbreakUsersListQueryBuilder = new RequestQueryBuilder();
-            outbreakUsersListQueryBuilder.where({
-                'activeOutbreakId': {
-                    'eq': `${outbreak.id}`
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // find users with this outbreak set as active and display them:
+                    const outbreakUsersListQueryBuilder = new RequestQueryBuilder();
+                    outbreakUsersListQueryBuilder.where({
+                        'activeOutbreakId': {
+                            'eq': `${outbreak.id}`
+                        }
+                    });
+
+                    this.userDataService.getUsersList(outbreakUsersListQueryBuilder)
+                        .subscribe((users) => {
+                            // check users.length > 1 as it needs to be active for the user that will delete it.
+                            if (users.length <= 1) {
+                                this.outbreakDataService
+                                    .deleteOutbreak(outbreak.id)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(response => {
+                                        // reload user data to get the updated data regarding active outbreak
+                                        this.authDataService
+                                            .reloadAndPersistAuthUser()
+                                            .subscribe((authenticatedUser) => {
+                                                this.authUser = authenticatedUser.user;
+                                                this.snackbarService.showSuccess('Success');
+                                                this.loadOutbreaksList();
+                                            });
+
+                                    });
+                            } else {
+                                this.dialog.open(OutbreakDialogComponent, {
+                                    data: {users: users}
+                                });
+                            }
+
+                        });
                 }
             });
-
-            this.userDataService.getUsersList(outbreakUsersListQueryBuilder)
-                .subscribe((users) => {
-                    // check users.length > 1 as it needs to be active for the user that will delete it.
-                    if (users.length <= 1) {
-                        this.outbreakDataService
-                            .deleteOutbreak(outbreak.id)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe(response => {
-                                // reload user data to get the updated data regarding active outbreak
-                                this.authDataService
-                                    .reloadAndPersistAuthUser()
-                                    .subscribe((authenticatedUser) => {
-                                        this.authUser = authenticatedUser.user;
-                                        this.snackbarService.showSuccess('Success');
-                                        this.loadOutbreaksList();
-                                    });
-
-                            });
-                    } else {
-                        this.dialog.open(OutbreakDialogComponent, {
-                            data: {users: users}
-                        });
-                    }
-
-                });
-        }
     }
 
     setActive(outbreak) {
-        if (confirm('Are you sure you want to set this outbreak active ? \nThe other active outbreak will be deactivated.')) {
-            let userData = {'activeOutbreakId': outbreak.id};
-            var userId = this.authUser.id;
-            this.userDataService
-                .modifyUser(userId, userData)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(response => {
-                    // reload user data to save the new active outbreak
-                    this.authDataService
-                        .reloadAndPersistAuthUser()
-                        .subscribe((authenticatedUser) => {
-                            this.authUser = authenticatedUser.user;
-                            this.snackbarService.showSuccess('Active outbreak changed successfully');
-                            this.outbreakDataService.checkActiveSelectedOutbreak();
-                            this.loadOutbreaksList();
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    const userData = {'activeOutbreakId': outbreak.id};
+                    const userId = this.authUser.id;
+                    this.userDataService
+                        .modifyUser(userId, userData)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(response => {
+                            // reload user data to save the new active outbreak
+                            this.authDataService
+                                .reloadAndPersistAuthUser()
+                                .subscribe((authenticatedUser) => {
+                                    this.authUser = authenticatedUser.user;
+                                    this.snackbarService.showSuccess('Active outbreak changed successfully');
+                                    this.outbreakDataService.checkActiveSelectedOutbreak();
+                                    this.loadOutbreaksList();
+                                });
                         });
-                });
-        }
+                }
+            });
     }
 
     /**
