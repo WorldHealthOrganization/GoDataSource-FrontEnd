@@ -20,6 +20,8 @@ export class ErrorMessage {
                 return `Must contain a maximum of ${this.validator.maxlength['requiredLength']} characters`;
             case 'equalValidator':
                 return 'Value must match password';
+            case 'notEqualValidator':
+                return 'The questions need to be different';
             case 'truthyValidator-terms':
                 return 'Terms and conditions must be accepted';
             case 'emailValidator':

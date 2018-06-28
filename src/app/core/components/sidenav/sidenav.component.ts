@@ -33,6 +33,11 @@ export class SidenavComponent {
                 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
                 [],
                 '/account/change-password'
+            ),
+            new ChildNavItem(
+                'Set Security Questions',
+                [],
+                '/account/set-security-questions'
             )
         ]
     );

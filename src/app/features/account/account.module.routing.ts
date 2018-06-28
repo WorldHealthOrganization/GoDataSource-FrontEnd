@@ -7,6 +7,10 @@ const routes: Routes = [
     {
         path: 'change-password',
         component: fromPages.ChangePasswordComponent
+    },
+    {
+        path: 'set-security-questions',
+        component: fromPages.SetSecurityQuestionsComponent
     }
 ];
 
