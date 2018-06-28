@@ -17,7 +17,8 @@ import {
     MatChipsModule,
     MatTooltipModule,
     MatSelectModule,
-    MatStepperModule
+    MatStepperModule,
+    MatDialogModule
 } from '@angular/material';
 
 @NgModule({
@@ -38,7 +39,8 @@ import {
         MatChipsModule,
         MatTooltipModule,
         MatSelectModule,
-        MatStepperModule
+        MatStepperModule,
+        MatDialogModule
     ],
     declarations: [],
     exports: [
@@ -58,7 +60,8 @@ import {
         MatChipsModule,
         MatTooltipModule,
         MatSelectModule,
-        MatStepperModule
+        MatStepperModule,
+        MatDialogModule
     ]
 })
 export class AngularMaterialModule {

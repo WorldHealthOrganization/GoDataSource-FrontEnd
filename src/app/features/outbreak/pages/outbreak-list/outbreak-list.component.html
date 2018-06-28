@@ -134,19 +134,13 @@
                         Set Active
                     </button>
 
-                    <span [matTooltip]="((item.id != authUser.activeOutbreakId) ? 'You cannot modify an inactive outbreak' : '')">
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']"
-                            [disabled]="(item.id != authUser.activeOutbreakId)">
-                            Modify
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                             Modify
                         </button>
-                    </span>
 
-                    <span [matTooltip]="((item.id != authUser.activeOutbreakId) ? 'You cannot delete an inactive outbreak' : '')">
-                         <button mat-menu-item (click)="delete(item)"
-                            [disabled]="(item.id != authUser.activeOutbreakId)">
+                         <button mat-menu-item (click)="delete(item)">
                             Delete
                         </button>
-                    </span>
 
                 </mat-menu>
 

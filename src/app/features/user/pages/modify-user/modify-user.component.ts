@@ -13,6 +13,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-modify-user',
@@ -34,6 +37,7 @@ export class ModifyUserComponent {
     user: UserModel = new UserModel();
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
+    outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(
         private router: Router,
@@ -42,6 +46,7 @@ export class ModifyUserComponent {
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
+        private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService
     ) {
         // get the authenticated user
@@ -62,6 +67,7 @@ export class ModifyUserComponent {
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
     }
 
     modifyUser(form: NgForm) {
@@ -79,11 +85,24 @@ export class ModifyUserComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('User modified!');
 
-                    // navigate to listing page
-                    this.router.navigate(['/users']);
+                    // reload user auth data in case he's changing the active outbreaqk
+                    this.authDataService
+                        .reloadAndPersistAuthUser()
+                        .subscribe((authenticatedUser) => {
+                            this.snackbarService.showSuccess('User modified!');
+                            // navigate to listing page
+                            this.router.navigate(['/users']);
+                        });
                 });
         }
+    }
+
+    /**
+     * Check if the user has read access to outbreaks
+     * @returns {boolean}
+     */
+    hasOutbreakReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
     }
 }

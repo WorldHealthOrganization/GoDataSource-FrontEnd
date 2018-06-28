@@ -44,6 +44,18 @@
                 multiple="true">
             </app-form-select>
 
+            <app-form-select
+                *ngIf="hasOutbreakReadAccess()"
+                name="activeOutbreakId"
+                [(ngModel)]="user.activeOutbreakId"
+                placeholder="Active Outbreak"
+                optionLabelKey="name"
+                optionValueKey="id"
+                optionTooltipKey="description"
+                [options]="outbreaksList$ | async">
+            </app-form-select>
+
+
             <app-form-input
                 type="password"
                 name="password"

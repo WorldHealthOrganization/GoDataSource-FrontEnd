@@ -13,6 +13,8 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 import * as _ from 'lodash';
+import { OutbreakDialogComponent } from '../../components/outbreak-dialog/outbreak-dialog.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -36,6 +38,7 @@ export class OutbreakListComponent {
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
+        private dialog: MatDialog,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService
     ) {
@@ -56,27 +59,42 @@ export class OutbreakListComponent {
      * @param outbreak
      */
     delete(outbreak) {
-        if (confirm('Are you sure you want to delete ' + outbreak.name + ' ?')) {
-            // make outbreak inactive
-            let userData = {'activeOutbreakId': ''};
-            var userId = this.authUser.id;
-            this.userDataService
-                .modifyUser(userId, userData)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(response => {
-                    this.outbreakDataService
-                        .deleteOutbreak(outbreak.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(response => {
-                            this.snackbarService.showSuccess('Success');
-                            this.loadOutbreaksList();
+        if (confirm(`Are you sure you want to delete the outbreak ${outbreak.name}?`)) {
+            // find users with this outbreak set as active and display them:
+            const outbreakUsersListQueryBuilder = new RequestQueryBuilder();
+            outbreakUsersListQueryBuilder.where({
+                'activeOutbreakId': {
+                    'eq': `${outbreak.id}`
+                }
+            });
+
+            this.userDataService.getUsersList(outbreakUsersListQueryBuilder)
+                .subscribe((users) => {
+                    // check users.length > 1 as it needs to be active for the user that will delete it.
+                    if (users.length <= 1) {
+                        this.outbreakDataService
+                            .deleteOutbreak(outbreak.id)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe(response => {
+                                // reload user data to get the updated data regarding active outbreak
+                                this.authDataService
+                                    .reloadAndPersistAuthUser()
+                                    .subscribe((authenticatedUser) => {
+                                        this.authUser = authenticatedUser.user;
+                                        this.snackbarService.showSuccess('Success');
+                                        this.loadOutbreaksList();
+                                    });
+
+                            });
+                    } else {
+                        this.dialog.open(OutbreakDialogComponent, {
+                            data: {users: users}
                         });
+                    }
+
                 });
         }
     }

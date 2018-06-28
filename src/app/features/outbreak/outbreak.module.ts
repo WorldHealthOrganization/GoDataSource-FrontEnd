@@ -6,7 +6,7 @@ import { SharedModule } from '../../shared/shared.module';
 
 // components
 import * as fromPages from './pages';
-
+import { OutbreakDialogComponent } from './pages';
 
 @NgModule({
     imports: [
@@ -17,7 +17,7 @@ import * as fromPages from './pages';
     declarations: [
         ...fromPages.pageComponents
     ],
-    entryComponents: []
+    entryComponents: [OutbreakDialogComponent]
 })
 export class OutbreakModule {
 }
