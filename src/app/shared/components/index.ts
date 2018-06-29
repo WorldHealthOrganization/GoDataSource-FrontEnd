@@ -24,7 +24,7 @@ export const components: any[] = [
     FormDocumentComponent,
     FormDocumentListComponent,
     FormRangeComponent,
-    NotAuthTemplateComponent
+    NotAuthTemplateComponent,
     FormRangeComponent,
     DialogConfirmComponent
 ];
