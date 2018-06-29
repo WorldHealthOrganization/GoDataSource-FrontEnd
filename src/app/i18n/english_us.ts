@@ -65,6 +65,7 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS': 'Email Address',
         'LNG_COMMON_FIELD_LABEL_PASSWORD': 'Password',
+        'LNG_COMMON_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
 
         /**
          * Case Fields
@@ -220,7 +221,17 @@ export const EnglishUsLang = {
         'LNG_PAGE_RESET_PASSWORD_TITLE': 'Reset Password',
         'LNG_PAGE_RESET_PASSWORD_BUTTON': 'Change Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD': 'New Password',
-        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password'
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password',
+
+        /**
+         * Change Password Page
+         */
+        'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_NOTIFICATION': 'We recommend setting the security questions which will allow you to change your password even ' +
+                                            'if there are connectivity issues. However, this can be done later as well from the user menu.',
+        'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION': 'You must change your password to be different from the default one!',
+        'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
+        'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
+        'LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed'
 
 
     }
