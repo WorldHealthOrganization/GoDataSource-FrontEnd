@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
-import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
@@ -15,6 +14,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
     selector: 'app-events-list',
@@ -22,7 +22,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
     templateUrl: './events-list.component.html',
     styleUrls: ['./events-list.component.less']
 })
-export class EventsListComponent implements OnInit {
+export class EventsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Events', '.', true)
@@ -33,7 +33,6 @@ export class EventsListComponent implements OnInit {
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
-    eventsListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     // events outbreak
     selectedOutbreak: OutbreakModel;
@@ -44,7 +43,9 @@ export class EventsListComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get the authenticated user
@@ -57,17 +58,17 @@ export class EventsListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.loadEventsList();
+                this.refreshList();
             });
     }
 
     /**
      * Re(load) the Events list
      */
-    loadEventsList() {
+    refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Events
-            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.eventsListQueryBuilder);
+            this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -79,10 +80,10 @@ export class EventsListComponent implements OnInit {
     filterBy(property, value) {
         // clear filter ?
         if (_.isEmpty(value)) {
-            this.eventsListQueryBuilder.whereRemove(property);
+            this.queryBuilder.whereRemove(property);
         } else {
             // starts with
-            this.eventsListQueryBuilder.where({
+            this.queryBuilder.where({
                 [property]: {
                     regexp: `/^${value}/i`
                 }
@@ -90,7 +91,7 @@ export class EventsListComponent implements OnInit {
         }
 
         // refresh events list
-        this.loadEventsList();
+        this.refreshList();
     }
 
     /**
@@ -139,7 +140,7 @@ export class EventsListComponent implements OnInit {
                             this.snackbarService.showSuccess('Event deleted!');
 
                             // reload data
-                            this.loadEventsList();
+                            this.refreshList();
                         });
                 }
             });
