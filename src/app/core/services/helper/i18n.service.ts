@@ -1,96 +1,51 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
-import { StorageService, StorageKey } from './storage.service';
+import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from './model-helper.service';
-import { EnglishUsLang } from '../../../i18n/english_us';
+import { UserDataService } from '../data/user.data.service';
+import { AuthDataService } from '../data/auth.data.service';
+import 'rxjs/add/operator/mergeMap';
 
 @Injectable()
 export class I18nService {
 
     private defaultLanguageId = 'english_us';
-    // the list of languages
-    private languages: LanguageModel[];
 
     constructor(
         private translateService: TranslateService,
         private storageService: StorageService,
         private languageDataService: LanguageDataService,
-        private modelHelperService: ModelHelperService
+        private modelHelperService: ModelHelperService,
+        private userDataService: UserDataService,
+        private authDataService: AuthDataService
     ) {
     }
 
     /**
-     * Initialize the service by:
-     *  - retrieving and caching the list of languages
-     *  - retrieving and caching the tokens for the selected language
-     *  - initialize the "TranslateService", setting the language to use
-     */
-    init() {
-        // get the list of languages
-        this.languageDataService
-            .getLanguagesList()
-            .subscribe((languages: LanguageModel[]) => {
-                // cache the languages
-                this.languages = languages;
-
-                // get the selected language
-                const langId = this.getSelectedLanguageId();
-                let language = _.find(languages, (lang: LanguageModel) => {
-                    return lang.id === langId;
-                });
-
-                // get the tokens for the selected language
-                this.languageDataService
-                    .getLanguageTokens(language)
-                    .subscribe((tokens: LanguageTokenModel[]) => {
-                        // get the local language tokens
-                        const localLanguageTokens = _.get(this.getLocalLanguageTokens(), language.id, []);
-
-                        // merge local tokens with the tokens received from server
-                        tokens = [...localLanguageTokens, ...tokens];
-
-                        // add the tokens to the Language object
-                        language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
-
-                        // configure the TranslateService
-                        this.translateService.setTranslation(language.id, language.getTokensObject());
-                        this.translateService.use(language.id);
-                    });
-            });
-    }
-
-    /**
-     * Temporarily, we'll keep the UI Language tokens locally
-     */
-    getLocalLanguageTokens() {
-        const languages = [EnglishUsLang];
-        const localLanguageTokens = {};
-
-        return _.transform(languages, (result, language) => {
-            result[language.id] = _.map(language.tokens, (value, token) => {
-                return new LanguageTokenModel({
-                    token: token,
-                    translation: value
-                });
-            });
-        }, {});
-    }
-
-    /**
      * Get the ID of the language selected by User in UI
-     * Note: 'en-us' is the default language
+     * Note: 'english_us' is the default language
      * @returns {string}
      */
     getSelectedLanguageId(): string {
-        // get selected language ID from local storage
-        const langId = this.storageService.get(StorageKey.SELECTED_LANGUAGE_ID);
+        let languageId;
 
-        // use 'en-us' language by default
-        return langId ? langId : this.defaultLanguageId;
+        // get the authenticated user
+        const authUser = this.authDataService.getAuthenticatedUser();
+
+        // if user is authenticated and has a language selected, use it
+        if (authUser && authUser.languageId) {
+            languageId = authUser.languageId;
+        } else {
+            // get the language from local storage
+            languageId = this.storageService.get(StorageKey.SELECTED_LANGUAGE_ID);
+        }
+
+        // return the selected language, or use the default one
+        return languageId ? languageId : this.defaultLanguageId;
     }
 
     /**
@@ -98,22 +53,72 @@ export class I18nService {
      * @param {LanguageModel} language
      * @returns {Observable<boolean>}
      */
-    changeLanguage(language: LanguageModel): Observable<boolean> {
+    changeLanguage(language: LanguageModel): Observable<any> {
         // get the tokens for the selected language
         return this.languageDataService
             .getLanguageTokens(language)
-            .map((tokens: LanguageTokenModel[]) => {
+            .mergeMap((tokens: LanguageTokenModel[]) => {
                 // add the tokens to the Language object
                 const selectedLanguage = new LanguageModel({...language, tokens});
 
                 // configure the TranslateService
                 this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
+
                 this.translateService.use(selectedLanguage.id);
 
-                // keep the selected language ID in local storage
-                this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, language.id);
+                return this.persistUserLanguage(language.id);
+            });
+    }
 
-                return true;
+    /**
+     * Save the selected language for the authenticated user
+     * @param languageId
+     * @returns {Observable<any>}
+     */
+    persistUserLanguage(languageId): Observable<any> {
+        // save the selected language to local storage
+        this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, languageId);
+
+        // get the authenticated user
+        const authUser = this.authDataService.getAuthenticatedUser();
+
+        return this.userDataService
+            .modifyUser(authUser.id, {languageId: languageId})
+            .mergeMap(() => {
+                return this.authDataService.reloadAndPersistAuthUser();
+            });
+    }
+
+    /**
+     * Load authenticated user's language
+     * Note: If user is NOT authenticated, or doesn't have a language selected, use the default language (english_us)
+     * @returns {Observable<any>}
+     */
+    loadUserLanguage(): Observable<LanguageModel> {
+        // get the selected language ID
+        const langId = this.getSelectedLanguageId();
+
+        // save the selected language to local storage
+        this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, langId);
+
+        // retrieve the language data
+        return this.languageDataService
+            .getLanguage(langId)
+            .mergeMap((language: LanguageModel) => {
+                // get the tokens for the selected language
+                return this.languageDataService
+                    .getLanguageTokens(language)
+                    .map((tokens: LanguageTokenModel[]) => {
+
+                        // add the tokens to the Language object
+                        language = this.modelHelperService.getModelInstance(LanguageModel, {...language, tokens});
+
+                        // configure the TranslateService
+                        this.translateService.setTranslation(language.id, language.getTokensObject());
+                        this.translateService.use(language.id);
+
+                        return language;
+                    });
             });
     }
 

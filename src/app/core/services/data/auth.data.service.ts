@@ -55,7 +55,7 @@ export class AuthDataService {
 
     reloadAndPersistAuthUser(): Observable<AuthModel> {
         const authData = this.getAuthData();
-        const userId = _.get(authData,'user.id','');
+        const userId = _.get(authData, 'user.id', '');
         // get user info
         return this.userDataService.getUser(userId)
             .map((userInstance: UserModel) => {

@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // init the i18n Service
-        this.i18nService.init();
+        // load the default language
+        this.i18nService.loadUserLanguage().subscribe();
     }
 }

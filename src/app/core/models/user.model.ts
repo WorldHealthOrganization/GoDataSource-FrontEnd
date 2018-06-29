@@ -11,6 +11,7 @@ export class UserModel {
     password: string;
     passwordChange: boolean;
     activeOutbreakId: string;
+    languageId: string;
     roleIds: string[];
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
@@ -24,6 +25,7 @@ export class UserModel {
         this.password = _.get(data, 'password');
         this.passwordChange = _.get(data, 'passwordChange', false);
         this.activeOutbreakId = _.get(data, 'activeOutbreakId');
+        this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
     }

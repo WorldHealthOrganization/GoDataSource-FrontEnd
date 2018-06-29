@@ -7,6 +7,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { AuthModel } from '../../../../core/models/auth.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-login',
@@ -21,7 +22,8 @@ export class LoginComponent implements OnInit {
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {
     }
 
@@ -48,21 +50,28 @@ export class LoginComponent implements OnInit {
                 .subscribe((auth: AuthModel) => {
                     // successfully authenticated;
 
-                    this.snackbarService.showSuccess(
-                        'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
-                        {
-                            name: `${auth.user.firstName} ${auth.user.lastName}`
-                        }
-                    );
+                    // use authenticated user's preferred language
+                    this.i18nService
+                        .loadUserLanguage()
+                        .subscribe(() => {
 
-                    // check if user needs to change password
-                    if (auth.user.passwordChange) {
-                        // user must change password
-                        this.router.navigate(['/account/change-password']);
-                    } else {
-                        // redirect to dashboard landing page
-                        this.router.navigate(['']);
-                    }
+                            this.snackbarService.showSuccess(
+                                'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE',
+                                {
+                                    name: `${auth.user.firstName} ${auth.user.lastName}`
+                                }
+                            );
+
+                            // check if user needs to change password
+                            if (auth.user.passwordChange) {
+                                // user must change password
+                                this.router.navigate(['/account/change-password']);
+                            } else {
+                                // redirect to dashboard landing page
+                                this.router.navigate(['']);
+                            }
+
+                        });
 
                 });
         }
