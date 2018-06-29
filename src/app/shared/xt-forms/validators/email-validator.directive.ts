@@ -26,7 +26,7 @@ export class EmailValidatorDirective implements Validator {
             return null;
         }
 
-        const isValid = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/.test(control.value);
+        const isValid = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i.test(control.value);
 
         // check if the value is an email address
         if (!isValid) {
