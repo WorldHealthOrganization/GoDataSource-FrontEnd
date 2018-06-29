@@ -46,7 +46,7 @@ export class AuthenticatedComponent implements OnInit {
             return this.router.navigate(['/auth/login']);
         }
 
-        // determine the Selected Outbreak
+        // determine the Selected Outbreak and display message if different than the active one.
         this.outbreakDataService
             .determineSelectedOutbreak()
             .subscribe(() => {
@@ -55,6 +55,7 @@ export class AuthenticatedComponent implements OnInit {
                         this.outbreakDataService.checkActiveSelectedOutbreak();
                     });
             });
+
         if (this.router.url === '/') {
             // redirect to default landing page
             return this.router.navigate(['/users']);

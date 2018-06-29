@@ -1,0 +1,51 @@
+@import '~styles/common';
+
+.not-auth-page {
+    min-width: 700px;
+    min-height: 400px;
+    height: 100vh;
+
+    .not-auth-page-left {
+        background-color: @color-accent-main;
+
+        .not-auth-page-logo-container {
+            margin: 0 0 30px 70px;
+
+            img {
+                width: 270px;
+            }
+        }
+    }
+    .not-auth-page-right {
+        padding: 20px;
+
+        .not-auth-title {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 800;
+        }
+
+        .not-auth-description{
+            font-size: 1.2em;
+            font-weight: 600;
+            padding: 10px 0px;
+        }
+
+        // the class below can be used if you want to limit the content. For advanced styling of the right side, don't use this class
+        .not-auth-content-limited {
+            width: 500px;
+        }
+
+        // update style of all raised button in the section to match the design
+        .mat-raised-button {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .not-auth-main-button {
+            color: white;
+            background-color: @color-accent-main;
+        }
+    }
+
+}

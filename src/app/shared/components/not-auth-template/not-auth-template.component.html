@@ -1,0 +1,21 @@
+<div
+    fxFlex fxLayout="row"
+    class="not-auth-page">
+    <div
+        fxFlex fxLayoutAlign="start end"
+        class="not-auth-page-left">
+        <div class="not-auth-page-logo-container">
+            <img src="/assets/images/logo-wide.png"/>
+        </div>
+    </div>
+    <div
+        fxFlex fxLayoutAlign="center center" fxLayout="column"
+        class="not-auth-page-right">
+
+        <!-- Content from the other components will be added to ng-content below.
+             The component that's using the not-auth-template need to have an element with class 'not-auth-content'
+             and its content will be added below -->
+        <ng-content></ng-content>
+
+    </div>
+</div>

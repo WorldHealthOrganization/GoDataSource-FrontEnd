@@ -7,6 +7,7 @@ import { FormAddressListComponent } from './form-address-list/form-address-list.
 import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormDocumentListComponent } from './form-document-list/form-document-list.component';
 import { FormRangeComponent } from './form-range/form-range.component';
+import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.component';
 import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.component';
 
 // export necessary components individually
@@ -22,6 +23,8 @@ export const components: any[] = [
     FormAddressListComponent,
     FormDocumentComponent,
     FormDocumentListComponent,
+    FormRangeComponent,
+    NotAuthTemplateComponent
     FormRangeComponent,
     DialogConfirmComponent
 ];

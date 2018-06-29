@@ -193,6 +193,35 @@ export const EnglishUsLang = {
         'LNG_SECURITY_QUESTION_3': 'What is your favorite team?',
         'LNG_SECURITY_QUESTION_5': 'What was the house number and street name you lived in as a child?',
         'LNG_SECURITY_QUESTION_6': 'What primary school did you attend?',
-        'LNG_SECURITY_QUESTION_7': 'What is your spouse or partner\'s mother\'s maiden name?'
+        'LNG_SECURITY_QUESTION_7': 'What is your spouse or partner\'s mother\'s maiden name?',
+
+        /**
+         * Forgot Password Page
+         */
+        'LNG_PAGE_FORGOT_PASSWORD_TITLE': 'Reset Password',
+        'LNG_PAGE_FORGOT_PASSWORD_DESCRIPTION': 'In order to reset your password, please input the email address associated with your account and press Reset Password button.',
+        'LNG_PAGE_FORGOT_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Use Security Questions',
+        'LNG_PAGE_FORGOT_PASSWORD_BUTTON': 'Reset Password',
+
+        /**
+         * Reset Password Using Security Questions Page
+         */
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_TITLE': 'Reset Password',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_DESCRIPTION': 'In order to reset your password, please input the email address associated with your account and the security questions and answers',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Reset Password',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION1': 'Question 1',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION2': 'Question 2',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER1': 'Answer 1',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER2': 'Answer 2',
+
+        /**
+         * Reset Password Page
+         */
+        'LNG_PAGE_RESET_PASSWORD_TITLE': 'Reset Password',
+        'LNG_PAGE_RESET_PASSWORD_BUTTON': 'Change Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD': 'New Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password'
+
+
     }
 };

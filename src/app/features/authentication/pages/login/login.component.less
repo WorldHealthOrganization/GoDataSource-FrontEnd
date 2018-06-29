@@ -1,66 +1,32 @@
 @import '~styles/common';
 
-.login-page {
-    min-width: 700px;
-    min-height: 400px;
-    height: 100vh;
+.login-form {
 
-    .login-page-left {
-        background-color: @color-accent-main;
+    .password-input {
+        min-width: 100%;
 
-        .login-page-logo-container {
-            margin: 0 0 30px 70px;
-
-            img {
-                width: 270px;
-            }
+        input {
+            box-sizing: border-box;
+            padding-right: 37px;
+            width: 100%;
         }
     }
 
-    .login-page-right {
-        .login-page-welcome {
-            font-size: 40px;
-            font-weight: 600;
-            margin-bottom: 50px;
-        }
+    .mat-raised-button {
 
-        form {
-            width: 300px;
-
-            .password-input {
-                min-width: 100%;
-
-                input {
-                    box-sizing: border-box;
-                    padding-right: 37px;
-                    width: 100%;
-                }
-            }
-
-            .mat-raised-button {
-                font-size: 16px;
-                font-weight: 600;
-
-                &.login-button {
-                    color: white;
-                    background-color: @color-accent-main;
-                }
-
-                &.reset-pass-button {
-                    color: @color-accent-main;
-                    flex: none;
-                    background-color: white;
-                    min-width: auto;
-                    width: 27px;
-                    min-height: auto;
-                    height: 27px;
-                    position: relative;
-                    padding: 0;
-                    margin: 10px 0 0 -27px;
-                    border-radius: 4px;
-                    line-height: 27px;
-                }
-            }
+        &.reset-pass-button {
+            color: @color-accent-main;
+            flex: none;
+            background-color: white;
+            min-width: auto;
+            width: 27px;
+            min-height: auto;
+            height: 27px;
+            position: relative;
+            padding: 0;
+            margin: 10px 0 0 -27px;
+            border-radius: 4px;
+            line-height: 27px;
         }
     }
 }
