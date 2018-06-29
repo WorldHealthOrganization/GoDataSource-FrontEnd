@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
-
 import * as _ from 'lodash';
+import { LoggingDataService } from '../data/logging.data.service';
+import { environment } from '../../../../environments/environment';
 
 @Injectable()
 export class LoggerService {
+
+    // set to 'true' when a logging request fails
+    apiLoggerCrashed = false;
+
+    constructor(
+        private loggingDataService: LoggingDataService
+    ) {}
 
     /**
      * Add a log message
@@ -32,8 +40,25 @@ export class LoggerService {
         // compose the log message
         const logMessage = messages.join('\r\n');
 
-        // #TODO logging via API
-        console.log(logMessage);
+        // log messages on client side?
+        if (environment.enableClientLogging) {
+            console.log(logMessage);
+        }
+
+        // log messages on server?
+        if (
+            environment.enableApiLogging &&
+            !this.apiLoggerCrashed
+        ) {
+            this.loggingDataService.log([logMessage])
+                .catch((err) => {
+                    // do not make API calls for next logs
+                    this.apiLoggerCrashed = true;
+
+                    return err;
+                })
+                .subscribe();
+        }
     }
 }
 

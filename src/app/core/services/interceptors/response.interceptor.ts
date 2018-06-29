@@ -26,22 +26,28 @@ export class ResponseInterceptor implements HttpInterceptor {
 
                 // check if we got a response
                 if (response.status) {
-                    // log the incoming Response
-                    this.loggerService.log(
-                        `Incoming HTTP Response for: ${request.method} ${request.url}`,
-                        `Response status: ${response.status} ${response.statusText}`,
-                        `Response body:`, response.body
-                    );
+                    // do NOT log the "logging" response
+                    if (!/logs$/.test(request.url)) {
+                        // log the incoming Response
+                        this.loggerService.log(
+                            `Incoming HTTP Response for: ${request.method} ${request.url}`,
+                            `Response status: ${response.status} ${response.statusText}`,
+                            `Response body:`, response.body
+                        );
+                    }
                 }
 
             })
             .catch((error: HttpErrorResponse) => {
-                // log the incoming Error Response
-                this.loggerService.log(
-                    `Incoming HTTP Error Response for: ${request.method} ${request.url}`,
-                    `Response status: ${error.status} ${error.statusText}`,
-                    `Error:`, error.error
-                );
+                // do NOT log the "logging" response
+                if (!/logs$/.test(request.url)) {
+                    // log the incoming Error Response
+                    this.loggerService.log(
+                        `Incoming HTTP Error Response for: ${request.method} ${request.url}`,
+                        `Response status: ${error.status} ${error.statusText}`,
+                        `Error:`, error.error
+                    );
+                }
 
                 // for 401 response status, clear the Auth Data
                 if (error.status === 401) {

@@ -27,11 +27,14 @@ export class RequestInterceptor implements HttpInterceptor {
             url: this.normalizeUrl(request.url)
         });
 
-        // log the outgoing Request
-        this.loggerService.log(
-            `Outgoing HTTP Request: ${clonedRequest.method} ${clonedRequest.url}`,
-            `Request body:`, clonedRequest.body
-        );
+        // do NOT log the "logging" request
+        if (!/logs$/.test(request.url)) {
+            // log the outgoing Request
+            this.loggerService.log(
+                `Outgoing HTTP Request: ${clonedRequest.method} ${clonedRequest.url}`,
+                `Request body:`, clonedRequest.body
+            );
+        }
 
         return next.handle(clonedRequest);
     }

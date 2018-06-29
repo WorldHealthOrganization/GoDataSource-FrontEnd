@@ -9,6 +9,7 @@ import { GenericDataService } from './data/generic.data.service';
 import { LocationDataService } from './data/location.data.service';
 import { UserRoleDataService } from './data/user-role.data.service';
 import { LanguageDataService } from './data/language.data.service';
+import { LoggingDataService } from './data/logging.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -35,6 +36,7 @@ export const services: any[] = [
     GenericDataService,
     LocationDataService,
     LanguageDataService,
+    LoggingDataService,
 
     // helper services
     StorageService,
