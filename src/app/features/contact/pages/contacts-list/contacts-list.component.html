@@ -14,13 +14,13 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="contactsList$ | async" matSort>
+    <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- First Name -->
         <ng-container matColumnDef="firstName">
-            <mat-header-cell *matHeaderCellDef mat-sort-header>
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>First Name</div>
+                    <div mat-sort-header>First Name</div>
                     <div class="column-filter">
                         <app-form-input
                             name="filter"
@@ -39,9 +39,9 @@
 
         <!-- Last Name -->
         <ng-container matColumnDef="lastName">
-            <mat-header-cell *matHeaderCellDef mat-sort-header>
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div>Last Name</div>
+                    <div mat-sort-header>Last Name</div>
                     <div class="column-filter">
                         <app-form-input
                             name="filter"
@@ -61,7 +61,7 @@
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Age</div>
+                    <div mat-sort-header>Age</div>
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
@@ -79,7 +79,7 @@
         <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Gender</div>
+                    <div mat-sort-header>Gender</div>
                     <div class="column-filter">
                         <app-form-select
                             name="filter"
@@ -100,7 +100,7 @@
         <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Phone</div>
+                    <div mat-sort-header>Phone</div>
                     <div class="column-filter">
                         <app-form-input
                             name="filter"

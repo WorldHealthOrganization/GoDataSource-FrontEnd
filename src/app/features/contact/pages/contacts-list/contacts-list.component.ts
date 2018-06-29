@@ -15,6 +15,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
     selector: 'app-contacts-list',
@@ -22,7 +23,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
     templateUrl: './contacts-list.component.html',
     styleUrls: ['./contacts-list.component.less']
 })
-export class ContactsListComponent implements OnInit {
+export class ContactsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Contacts', '.', true)
     ];
@@ -32,7 +33,6 @@ export class ContactsListComponent implements OnInit {
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
-    contactsListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -47,7 +47,9 @@ export class ContactsListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get the authenticated user
@@ -63,17 +65,17 @@ export class ContactsListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.loadContactsList();
+                this.refreshList();
             });
     }
 
     /**
      * Re(load) the Contacts list
      */
-    loadContactsList() {
+    refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Contacts
-            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.contactsListQueryBuilder);
+            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -85,13 +87,13 @@ export class ContactsListComponent implements OnInit {
     filterBy(property, value) {
         // clear filter ?
         if (_.isEmpty(value)) {
-            this.contactsListQueryBuilder.whereRemove(property);
+            this.queryBuilder.whereRemove(property);
         } else {
             // filter by any property
             switch (property) {
                 case 'age':
                     if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
-                        this.contactsListQueryBuilder.whereRemove(property);
+                        this.queryBuilder.whereRemove(property);
                     } else {
                         // determine operator & value
                         let operator;
@@ -108,7 +110,7 @@ export class ContactsListComponent implements OnInit {
                         }
 
                         // filter
-                        this.contactsListQueryBuilder.where({
+                        this.queryBuilder.where({
                             [property]: {
                                 [operator]: valueToCompare
                             }
@@ -118,7 +120,7 @@ export class ContactsListComponent implements OnInit {
 
                 default:
                     // starts with
-                    this.contactsListQueryBuilder.where({
+                    this.queryBuilder.where({
                         [property]: {
                             regexp: `/^${value}/i`
                         }
@@ -127,7 +129,7 @@ export class ContactsListComponent implements OnInit {
         }
 
         // refresh list
-        this.loadContactsList();
+        this.refreshList();
     }
 
     /**
@@ -174,10 +176,9 @@ export class ContactsListComponent implements OnInit {
                             this.snackbarService.showSuccess('Contact deleted!');
 
                             // reload data
-                            this.loadContactsList();
+                            this.refreshList();
                         });
                 }
             });
     }
-
 }

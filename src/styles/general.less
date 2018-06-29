@@ -45,9 +45,17 @@ html, body, ul, li, div, span {
                 font-weight: bold !important;
                 padding-left: @cell-padding-left;
 
+                .mat-sort-header-button {
+                    text-align: left;
+                }
+
                 .table-header-cell {
                     display: flex;
                     flex-direction: column;
+
+                    .mat-sort-header-container {
+                        justify-content: space-between;
+                    }
 
                     .column-filter {
                         padding-top: 10px;

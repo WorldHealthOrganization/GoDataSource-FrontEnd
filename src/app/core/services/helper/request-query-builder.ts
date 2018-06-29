@@ -1,11 +1,32 @@
 import * as _ from 'lodash';
 
+export enum RequestQueryBuilderSortDirection {
+    ASC = 'asc',
+    DESC = 'desc'
+}
+
+export class RequestQueryBuilderSort {
+    public property: string = '';
+    public direction: RequestQueryBuilderSortDirection;
+
+    constructor(data) {
+        this.property = _.get(data, 'active');
+        this.direction = _.get(data, 'direction');
+    }
+
+    get value(): string {
+        return this.property + (this.direction ? ' ' + this.direction.toUpperCase() : '');
+    }
+}
+
 export class RequestQueryBuilder {
 
     // Relations to include
     public includedRelations: any[] = [];
     // Where conditions
     public whereCondition: any = {};
+    // order fields
+    public orderBy: string[] = [];
     // Limit
     public limitResultsNumber: number;
     // Fields to retrieve
@@ -32,6 +53,26 @@ export class RequestQueryBuilder {
         delete this.whereCondition[property];
 
         return this;
+    }
+
+    /**
+     * Sort by one or multiple properties ( priority: first - higher, last - lower)
+     * @param {RequestQueryBuilderSort | RequestQueryBuilderSort[]} properties
+     */
+    sort(properties: RequestQueryBuilderSort | RequestQueryBuilderSort[]) {
+        // clear sort ?
+        if (_.isEmpty(properties)) {
+            this.orderBy = [];
+            return;
+        }
+
+        // convert to array if necessary
+        if (!_.isArray(properties)) {
+            properties = [properties as RequestQueryBuilderSort];
+        }
+
+        // map to sortable objects and get formatted value
+        this.orderBy = _.map(properties, (s) => (new RequestQueryBuilderSort(s).value));
     }
 
     /**
@@ -104,6 +145,10 @@ export class RequestQueryBuilder {
 
         if (Object.keys(this.whereCondition).length > 0) {
             filter.where = this.whereCondition;
+        }
+
+        if (this.orderBy && this.orderBy.length > 0) {
+            filter.order = this.orderBy;
         }
 
         if (this.limitResultsNumber) {
