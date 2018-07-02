@@ -38,7 +38,6 @@ export class FormInputComponent extends ElementBase<string> {
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
-
     }
 
     /**

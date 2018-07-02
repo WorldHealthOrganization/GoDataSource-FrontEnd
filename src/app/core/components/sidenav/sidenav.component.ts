@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
@@ -20,21 +20,25 @@ export class SidenavComponent {
 
     // Nav Item - Account
     accountItem: NavItem = new NavItem(
+        'my-account-group',
         '',
         'account',
         [],
         [
             new ChildNavItem(
+                'logout',
                 'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
                 [],
                 '/auth/logout'
             ),
             new ChildNavItem(
+                'change-password',
                 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
                 [],
                 '/account/change-password'
             ),
             new ChildNavItem(
+                'security-questions',
                 'Set Security Questions',
                 [],
                 '/account/set-security-questions'
@@ -45,21 +49,31 @@ export class SidenavComponent {
     // Nav Items - main
     mainItems: any[] = [
         new NavItem(
+            'admin-group',
             'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL',
             'settings',
             [],
             [
                 new ChildNavItem(
+                    'system-config',
                     'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
                     [PERMISSION.READ_SYS_CONFIG],
                     ''
                 ),
                 new ChildNavItem(
+                    'users',
                     'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',
                     [PERMISSION.READ_USER_ACCOUNT],
                     '/users'
                 ),
                 new ChildNavItem(
+                    'teams',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
+                    [PERMISSION.READ_TEAM],
+                    '/users'
+                ),
+                new ChildNavItem(
+                    'roles',
                     'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
                     [PERMISSION.READ_ROLE],
                     '/user-roles'
@@ -67,33 +81,33 @@ export class SidenavComponent {
             ]
         ),
         new NavItem(
+            'outbreaks-group',
             'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
             'bug',
-            [PERMISSION.READ_OUTBREAK],
+            [],
             [
                 new ChildNavItem(
+                    'outbreaks',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
                     [PERMISSION.READ_OUTBREAK],
                     '/outbreaks'
                 ),
                 new ChildNavItem(
+                    'outbreak-templates',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
-                    [],
+                    [PERMISSION.READ_OUTBREAK],
                     '/users'
                 ),
                 new ChildNavItem(
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
-                    [PERMISSION.READ_TEAM],
-                    '/users'
-                ),
-                new ChildNavItem(
+                    'clusters',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL',
-                    [],
+                    [PERMISSION.READ_OUTBREAK],
                     '/users'
                 )
             ]
         ),
         new NavItem(
+            'contacts',
             'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
             'people',
             [PERMISSION.READ_CONTACT],
@@ -101,13 +115,15 @@ export class SidenavComponent {
             '/contacts'
         ),
         new NavItem(
+            'cases',
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
-            [],
+            [PERMISSION.READ_CASE],
             [],
             '/cases'
         ),
         new NavItem(
+            'events',
             'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
             'event',
             [PERMISSION.READ_EVENT],
@@ -115,8 +131,10 @@ export class SidenavComponent {
             '/events'
         ),
         new NavItem(
+            'duplicated-records',
             'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
             'fileCopy',
+            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
             [],
             [],
             '/users'
@@ -125,13 +143,15 @@ export class SidenavComponent {
             separator: true
         },
         new NavItem(
+            'reference-data',
             'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
             'language',
-            [PERMISSION.READ_SYS_CONFIG],
+            [PERMISSION.WRITE_REFERENCE_DATA],
             [],
             '/reference-data'
         ),
         new NavItem(
+            'help',
             'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
             'help',
             [],
@@ -151,15 +171,24 @@ export class SidenavComponent {
      * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
      */
     shouldDisplayItem(item) {
-        // check if it is an item with a Submenu list
-        if (item.children && item.children.length > 0) {
-            // check if there is any visible Child Item
-            return _.filter(item.children, (childItem) => {
-                return this.authUser.hasPermissions(...childItem.permissions);
-            });
-        }
+        switch (item.id) {
+            case 'duplicated-records':
+                return (
+                    this.authUser.hasPermissions(PERMISSION.READ_CASE) ||
+                    this.authUser.hasPermissions(PERMISSION.READ_CONTACT)
+                );
 
-        return this.authUser.hasPermissions(...item.permissions);
+            default:
+                // check if it is an item with a Submenu list
+                if (item.children && item.children.length > 0) {
+                    // check if there is any visible Child Item
+                    return _.filter(item.children, (childItem) => {
+                        return this.authUser.hasPermissions(...childItem.permissions);
+                    }).length > 0;
+                }
+
+                return this.authUser.hasPermissions(...item.permissions);
+        }
     }
 
 }
