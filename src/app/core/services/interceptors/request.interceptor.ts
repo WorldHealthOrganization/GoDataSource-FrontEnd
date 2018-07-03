@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
-
 import { environment } from '../../../../environments/environment';
-
 import { AuthDataService } from '../data/auth.data.service';
 import { LoggerService } from '../helper/logger.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class RequestInterceptor implements HttpInterceptor {
@@ -29,10 +27,12 @@ export class RequestInterceptor implements HttpInterceptor {
 
         // do NOT log the "logging" request
         if (!/logs$/.test(request.url)) {
+            const transactionId = clonedRequest.headers.get('Transaction-Id');
+
             // log the outgoing Request
             this.loggerService.log(
                 `Outgoing HTTP Request: ${clonedRequest.method} ${clonedRequest.url}`,
-                `Request body:`, clonedRequest.body
+                `Request Transaction ID: ${transactionId}`
             );
         }
 
@@ -45,7 +45,8 @@ export class RequestInterceptor implements HttpInterceptor {
      */
     private getHeaders() {
         const headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Transaction-Id': uuid()
         };
 
         // set Auth Header if existing

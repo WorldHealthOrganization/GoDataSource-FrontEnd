@@ -28,11 +28,13 @@ export class ResponseInterceptor implements HttpInterceptor {
                 if (response.status) {
                     // do NOT log the "logging" response
                     if (!/logs$/.test(request.url)) {
+                        const transactionId = response.headers.get('Transaction-Id');
+
                         // log the incoming Response
                         this.loggerService.log(
                             `Incoming HTTP Response for: ${request.method} ${request.url}`,
                             `Response status: ${response.status} ${response.statusText}`,
-                            `Response body:`, response.body
+                            `Response Transaction ID: ${transactionId}`
                         );
                     }
                 }
@@ -41,10 +43,13 @@ export class ResponseInterceptor implements HttpInterceptor {
             .catch((error: HttpErrorResponse) => {
                 // do NOT log the "logging" response
                 if (!/logs$/.test(request.url)) {
+                    const transactionId = error.headers.get('Transaction-Id');
+
                     // log the incoming Error Response
                     this.loggerService.log(
                         `Incoming HTTP Error Response for: ${request.method} ${request.url}`,
                         `Response status: ${error.status} ${error.statusText}`,
+                        `Response Transaction ID: ${transactionId}`,
                         `Error:`, error.error
                     );
                 }
