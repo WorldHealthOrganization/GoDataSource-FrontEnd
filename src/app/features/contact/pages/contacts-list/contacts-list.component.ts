@@ -79,59 +79,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Filter the Contacts list by some field
-     * @param property
-     * @param value
-     */
-    filterBy(property, value) {
-        // clear filter ?
-        if (_.isEmpty(value)) {
-            this.queryBuilder.whereRemove(property);
-        } else {
-            // filter by any property
-            switch (property) {
-                case 'age':
-                    if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
-                        this.queryBuilder.whereRemove(property);
-                    } else {
-                        // determine operator & value
-                        let operator;
-                        let valueToCompare;
-                        if (!_.isEmpty(value.from) && !_.isEmpty(value.to)) {
-                            operator = 'between';
-                            valueToCompare = [value.from, value.to];
-                        } else if (!_.isEmpty(value.from)) {
-                            operator = 'gte';
-                            valueToCompare = value.from;
-                        } else {
-                            operator = 'lte';
-                            valueToCompare = value.to;
-                        }
-
-                        // filter
-                        this.queryBuilder.where({
-                            [property]: {
-                                [operator]: valueToCompare
-                            }
-                        });
-                    }
-                    break;
-
-                default:
-                    // starts with
-                    this.queryBuilder.where({
-                        [property]: {
-                            regexp: `/^${value}/i`
-                        }
-                    });
-            }
-        }
-
-        // refresh list
-        this.refreshList();
-    }
-
-    /**
      * Check if we have write access to contacts
      * @returns {boolean}
      */

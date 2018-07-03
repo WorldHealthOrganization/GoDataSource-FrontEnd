@@ -73,28 +73,6 @@ export class EventsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Filter Events by some field
-     * @param property
-     * @param value
-     */
-    filterBy(property, value) {
-        // clear filter ?
-        if (_.isEmpty(value)) {
-            this.queryBuilder.whereRemove(property);
-        } else {
-            // starts with
-            this.queryBuilder.where({
-                [property]: {
-                    regexp: `/^${value}/i`
-                }
-            });
-        }
-
-        // refresh events list
-        this.refreshList();
-    }
-
-    /**
      * Check if we have write access to events
      * @returns {boolean}
      */

@@ -53,16 +53,28 @@ export class FormSelectComponent extends ElementBase<string> {
      * @param selectedValue The new value that has been selected
      */
     onChange(selectedValue) {
-        // find the corresponding object for the selected value
-        let selectedOption = _.find(this.options, (option) => {
-            return option[this.optionValueKey] === selectedValue;
+        // note that this could be a single or a multi select
+        let selectedOptions = _.filter(this.options, (option) => {
+            if (!_.isArray(selectedValue)) {
+                // single select
+                return option[this.optionValueKey] === selectedValue;
+            } else {
+                // multi select
+                return selectedValue.indexOf(option[this.optionValueKey]) >= 0;
+            }
         });
 
-        // clone the option so we don't affect the Options list
-        selectedOption = _.cloneDeep(selectedOption);
+        // clone the selected options so we don't affect the Options list
+        selectedOptions = _.cloneDeep(selectedOptions);
 
-        // emit the currently selected option
-        return this.optionChanged.emit(selectedOption);
+        if (!this.multiple) {
+            // single select; keep only the first option that was found
+            selectedOptions = selectedOptions[0];
+        }
+
+        // emit the currently selected option(s)
+        return this.optionChanged.emit(selectedOptions);
+
     }
 }
 

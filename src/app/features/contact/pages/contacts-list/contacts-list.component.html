@@ -23,10 +23,10 @@
                     <div mat-sort-header>First Name</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="filter"
+                            name="firstNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterBy('firstName', $event)">
+                            (optionChanged)="filterTextBy('firstName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -44,10 +44,10 @@
                     <div mat-sort-header>Last Name</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="filter"
+                            name="lastNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterBy('lastName', $event)">
+                            (optionChanged)="filterTextBy('lastName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
-                            (changed)="filterBy('age', $event)">
+                            (changed)="filterRangeBy('age', $event)">
                         </app-form-range>
                     </div>
                 </div>
@@ -82,11 +82,12 @@
                     <div mat-sort-header>Gender</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="filter"
+                            name="genderFilter"
                             ngModel
                             placeholder="Filter"
                             [options]="genderList$ | async"
-                            (optionChanged)="filterBy('gender', $event)">
+                            (optionChanged)="filterSelectBy('gender', $event)"
+                            multiple="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -103,10 +104,10 @@
                     <div mat-sort-header>Phone</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="filter"
+                            name="phoneNumberFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterBy('phoneNumber', $event)">
+                            (optionChanged)="filterTextBy('phoneNumber', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -118,8 +119,8 @@
 
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef></mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
                 <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>

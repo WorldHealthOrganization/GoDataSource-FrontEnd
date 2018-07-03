@@ -7,6 +7,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import 'rxjs/add/operator/share';
+import { RequestQueryBuilder } from '../helper/request-query-builder';
 
 @Injectable()
 export class UserRoleDataService {
@@ -27,12 +28,18 @@ export class UserRoleDataService {
      * Retrieve the list of User Roles
      * @returns {Observable<UserRoleModel[]>}
      */
-    getRolesList(): Observable<UserRoleModel[]> {
+    getRolesList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserRoleModel[]> {
         // get roles list from cache
         const rolesList = this.cacheService.get(CacheKey.AUTH_ROLES);
-        if (rolesList) {
+        if (queryBuilder.isEmpty() && rolesList) {
             return Observable.of(rolesList);
         } else {
+
+            let userRolesList$ = this.userRoleList$;
+            if (!queryBuilder.isEmpty()) {
+                const filter = queryBuilder.buildQuery();
+                userRolesList$ = this.http.get(`roles?filter=${filter}`);
+            }
 
             // firstly, retrieve available permissions so we can add them for each Role
             return this.getAvailablePermissions()
@@ -41,7 +48,7 @@ export class UserRoleDataService {
                     // get roles list from API
                     return this.modelHelper
                         .mapObservableListToModel(
-                            this.userRoleList$
+                            userRolesList$
                                 .map((rolesResult: any[]) => {
                                     // include available permissions on each Role object
                                     return _.map(rolesResult, (role) => {

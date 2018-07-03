@@ -15,6 +15,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
     selector: 'app-cases-list',
@@ -22,7 +23,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
     templateUrl: './cases-list.component.html',
     styleUrls: ['./cases-list.component.less']
 })
-export class CasesListComponent implements OnInit {
+export class CasesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Cases', '.', true)
@@ -36,7 +37,6 @@ export class CasesListComponent implements OnInit {
 
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
-    casesListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     caseClassificationsList$: Observable<any[]>;
 
@@ -51,6 +51,8 @@ export class CasesListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private dialogService: DialogService
     ) {
+        super();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -68,71 +70,18 @@ export class CasesListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.loadCasesList();
+                this.refreshList();
             });
     }
 
     /**
      * Re(load) the Cases list, based on the applied filter, sort criterias
      */
-    loadCasesList() {
+    refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Cases
-            this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.casesListQueryBuilder);
+            this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.queryBuilder);
         }
-    }
-
-    /**
-     * Filter the Cases list by some field
-     * @param property
-     * @param value
-     */
-    filterBy(property, value) {
-        // clear filter ?
-        if (_.isEmpty(value)) {
-            this.casesListQueryBuilder.whereRemove(property);
-        } else {
-            // filter by any property
-            switch (property) {
-                case 'age':
-                    if (_.isEmpty(value.from) && _.isEmpty(value.to)) {
-                        this.casesListQueryBuilder.whereRemove(property);
-                    } else {
-                        // determine operator & value
-                        let operator;
-                        let valueToCompare;
-                        if (!_.isEmpty(value.from) && !_.isEmpty(value.to)) {
-                            operator = 'between';
-                            valueToCompare = [value.from, value.to];
-                        } else if (!_.isEmpty(value.from)) {
-                            operator = 'gte';
-                            valueToCompare = value.from;
-                        } else {
-                            operator = 'lte';
-                            valueToCompare = value.to;
-                        }
-
-                        // filter
-                        this.casesListQueryBuilder.where({
-                            [property]: {
-                                [operator]: valueToCompare
-                            }
-                        });
-                    }
-                    break;
-
-                default:
-                    // contains
-                    this.casesListQueryBuilder.where({
-                        [property]: {
-                            regexp: `/^${value}/i`
-                        }
-                    });
-            }
-        }
-
-        // refresh list
-        this.loadCasesList();
     }
 
     /**
@@ -160,7 +109,7 @@ export class CasesListComponent implements OnInit {
 
     /**
      * Delete specific case from the selected outbreak
-     * @param {CaseModel} case
+     * @param {CaseModel} caseModel
      */
     deleteCase(caseModel: CaseModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', caseModel)
@@ -178,7 +127,7 @@ export class CasesListComponent implements OnInit {
                             this.snackbarService.showSuccess('Case deleted!');
 
                             // reload data
-                            this.loadCasesList();
+                            this.refreshList();
                         });
                 }
             });

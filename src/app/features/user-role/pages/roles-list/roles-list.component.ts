@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
     selector: 'app-roles-list',
@@ -19,7 +20,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
     templateUrl: './roles-list.component.html',
     styleUrls: ['./roles-list.component.less']
 })
-export class RolesListComponent {
+export class RolesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Roles', '.', true)
@@ -37,18 +38,22 @@ export class RolesListComponent {
         private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
+        super();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+    }
 
-        this.loadRolesList();
+    ngOnInit() {
+        this.refreshList();
     }
 
     /**
      * Re(load) the User Roles list
      */
-    loadRolesList() {
+    refreshList() {
         // get the list of existing roles
-        this.rolesList$ = this.userRoleDataService.getRolesList();
+        this.rolesList$ = this.userRoleDataService.getRolesList(this.queryBuilder);
     }
 
     deleteRole(userRole: UserRoleModel) {
@@ -68,7 +73,7 @@ export class RolesListComponent {
                             this.snackbarService.showSuccess('Role deleted!');
 
                             // reload data
-                            this.loadRolesList();
+                            this.refreshList();
                         });
                 }
             });

@@ -135,7 +135,7 @@
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
+                    <question *ngFor="let question of Questions" [question]="question"
                               [viewOnly]="viewOnlyCaseInvestigation"
                               (deleteQuestion)="deleteQuestion('case-investigation',question)"
                               (deleteAnswer)="deleteAnswer('case-investigation',$event)"

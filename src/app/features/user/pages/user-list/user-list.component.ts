@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -8,9 +8,11 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { UserRoleModel } from '../../../../core/models/user-role.model';
+import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 
 @Component({
     selector: 'app-user-list',
@@ -18,7 +20,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.less']
 })
-export class UserListComponent {
+export class UserListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Users', '.', true)
@@ -29,43 +31,34 @@ export class UserListComponent {
 
     // list of existing users
     usersList$: Observable<UserModel[]>;
-    usersListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+
+    rolesList$: Observable<UserRoleModel[]>;
 
     constructor(
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private userRoleDataService: UserRoleDataService
     ) {
+        super();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+    }
 
-        this.loadUsersList();
+    ngOnInit() {
+        this.rolesList$ = this.userRoleDataService.getRolesList();
+
+        this.refreshList();
     }
 
     /**
      * Re(load) the Users list
      */
-    loadUsersList() {
+    refreshList() {
         // get the list of existing users
-        this.usersList$ = this.userDataService.getUsersList(this.usersListQueryBuilder);
-    }
-
-    /**
-     * Filter the Users list by some field
-     * @param property
-     * @param value
-     */
-    filterBy(property, value) {
-        // filter by any User property
-        this.usersListQueryBuilder.where({
-            [property]: {
-                regexp: `/^${value}/i`
-            }
-        });
-
-        // refresh users list
-        this.loadUsersList();
+        this.usersList$ = this.userDataService.getUsersList(this.queryBuilder);
     }
 
     /**
@@ -108,7 +101,7 @@ export class UserListComponent {
                             this.snackbarService.showSuccess('User deleted!');
 
                             // reload data
-                            this.loadUsersList();
+                            this.refreshList();
                         });
                 }
             });

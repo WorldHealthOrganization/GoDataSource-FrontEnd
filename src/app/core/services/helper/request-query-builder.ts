@@ -174,10 +174,24 @@ export class RequestQueryBuilder {
         // merge "where" conditions
         this.whereCondition = {...this.whereCondition, ...queryBuilder.whereCondition};
 
+        // merge "order" criterias
+        this.orderBy = [...this.orderBy, ...queryBuilder.orderBy];
+
         // update the "limit" if necessary
         this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
 
         return this;
+    }
+
+    /**
+     * Check if the query builder is empty
+     */
+    isEmpty(): boolean {
+        return _.isEmpty(this.includedRelations) &&
+            _.isEmpty(this.whereCondition) &&
+            _.isEmpty(this.orderBy) &&
+            _.isEmpty(this.limitResultsNumber) &&
+            _.isEmpty(this.fieldsInResponse);
     }
 }
 

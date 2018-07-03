@@ -14,13 +14,24 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="rolesList$ | async" matSort>
+    <mat-table #table [dataSource]="rolesList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->
         <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="20">
-                Name
+            <mat-header-cell *matHeaderCellDef fxFlex="20">
+                <div class="table-header-cell">
+                    <div mat-sort-header>Name</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterTextBy('name', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item" fxFlex="20">
                 {{ item.name }}
             </mat-cell>
