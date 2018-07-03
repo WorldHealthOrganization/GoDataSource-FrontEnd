@@ -48,6 +48,10 @@ export class Constants {
         NATIONAL_ID: {
             label: 'nationalId',
             value: 'nationalId'
+        },
+        EXTERNAL_ID: {
+            label: 'externalId',
+            value: 'externalId'
         }
     };
 
