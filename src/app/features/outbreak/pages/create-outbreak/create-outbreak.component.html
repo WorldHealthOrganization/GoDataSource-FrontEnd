@@ -141,12 +141,12 @@
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
+                    <app-question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
                               [viewOnly]="viewOnlyCaseInvestigation"
                               (deleteQuestion)="deleteQuestion('case-investigation',question)"
                               (deleteAnswer)="deleteAnswer('case-investigation',$event)"
                               (linkAnswer)="linkAnswer('case-investigation',$event)"
-                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)"></question>
+                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)"></app-question>
                 </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>
@@ -162,12 +162,12 @@
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
+                    <app-question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
                               [viewOnly]="viewOnlyContactFollowup"
                               (deleteQuestion)="deleteQuestion('contact-followup',question)"
                               (deleteAnswer)="deleteAnswer('contact-followup',$event)"
                               (linkAnswer)="linkAnswer('contact-followup',$event)"
-                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)"></question>
+                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)"></app-question>
                 </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>
@@ -183,12 +183,12 @@
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
+                    <app-question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
                               [viewOnly]="viewOnlyLabResults"
                               (deleteQuestion)="deleteQuestion('lab-results',question)"
                               (deleteAnswer)="deleteAnswer('lab-results',$event)"
                               (linkAnswer)="linkAnswer('lab-results',$event)"
-                              (duplicateQuestion)="duplicateQuestion('lab-results',question)"></question>
+                              (duplicateQuestion)="duplicateQuestion('lab-results',question)"></app-question>
                 </div>
                 <button mat-raised-button color="primary" matStepperNext>Next</button>
             </form>

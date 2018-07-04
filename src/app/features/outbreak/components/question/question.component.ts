@@ -5,7 +5,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 
 @Component({
-    selector: 'question',
+    selector: 'app-question',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './question.component.html',
     styleUrls: ['./question.component.less']

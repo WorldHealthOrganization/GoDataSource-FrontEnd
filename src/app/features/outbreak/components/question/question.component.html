@@ -3,19 +3,25 @@
         <div class="question-badge align-center" fxFlex="40px">
             Q{{question.order}}
         </div>
-        <div class="question-box" fxFlex="40">
+        <div class="question-box" fxFlex="30">
             <app-form-input
-                name="question.value"
-                [(ngModel)]="question.value"
-                placeholder="Question value"
+                name="question[new]"
+                [(ngModel)]="question.new"
+                hidden="true"
+            >
+            </app-form-input>
+            <app-form-input
+                name="question[text]"
+                [(ngModel)]="question.text"
+                placeholder="Question"
                 required="true"
                 disabled="{{viewOnly}}"
             >
             </app-form-input>
         </div>
-        <div class="question-box" fxFlex="20">
+        <div class="question-box" fxFlex="15">
             <app-form-select
-                name="question.category"
+                name="question[category]"
                 [(ngModel)]="question.category"
                 placeholder="Category"
                 required="true"
@@ -25,10 +31,29 @@
             </app-form-select>
         </div>
         <div class="question-box" fxFlex="15">
+            <app-form-input
+                name="question[variable]"
+                [(ngModel)]="question.variable"
+                placeholder="Question Variable"
+                required="true"
+                disabled="{{viewOnly}}"
+            >
+            </app-form-input>
+        </div>
+        <div class="question-box" fxFlex="15">
+        <app-form-select
+            name="question[answerType]"
+            [(ngModel)]="question.answerType"
+            placeholder="Answer Type"
+            required="true"
+            [options]="[{'value':'Free text','label':'Free text'}]"
+            multiple="false"
+            disabled="{{viewOnly}}">
+        </app-form-select>
         </div>
         <div class="question-box  align-right" fxFlex="25" fxHide="{{viewOnly}}">
             <app-form-slide-toggle
-                name="question.required"
+                name="question[required]"
                 [(ngModel)]="question.required"
                 label="Required?">
             </app-form-slide-toggle>
@@ -44,11 +69,5 @@
             <div class="alert-label">{{ question.required ? "REQUIRED" : ""}}</div>
         </div>
     </div>
-    <answer class="answer-wrapper" *ngFor="let answer of question.answers; let i=index"
-            [answer]="answer"
-            [index]="i"
-            [viewOnly]="viewOnly"
-            (deleteAnswer)="deleteAnswerFromQuestion(answer)"
-            (linkAnswer)="linkAnswerQuestion(answer)"
-            fxLayout="column"></answer>
+
 </mat-card>

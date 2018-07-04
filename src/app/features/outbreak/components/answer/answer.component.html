@@ -4,7 +4,7 @@
     </div>
     <div class="answer-box align-center" fxFlex="40">
         <app-form-input
-            name="answer.value"
+            name="answer[value]"
             [(ngModel)]="answer.value"
             placeholder="Answer Value"
             required="true"
@@ -13,20 +13,20 @@
     </div>
     <div class="answer-box align-center" fxFlex="20">
         <app-form-input
-            name="answer.code"
-            [(ngModel)]="answer.code"
-            placeholder="Answer Code"
+            name="answer[label]"
+            [(ngModel)]="answer.label"
+            placeholder="Answer Label"
             required="true"
             disabled="{{viewOnly}}">
         </app-form-input>
     </div>
     <div class="answer-box align-center" fxFlex="15">
         <app-form-select
-            name="answer.type"
+            name="answer[type]"
             [(ngModel)]="answer.type"
             placeholder="Answer Type"
             required="true"
-            [options]="[{'value':'Free text','label':'Free text'},{'value':'Multiple Options','label':'Multiple Options'}]"
+            [options]="[{'value':'Free text','label':'Free text'}]"
             multiple="false"
             disabled="{{viewOnly}}">
         </app-form-select>
@@ -34,7 +34,7 @@
     <div class="answer-box align-right" fxFlex="25" fxHide="{{viewOnly}}" >
 
         <app-form-slide-toggle
-            name="answer.alert"
+            name="answer[alert]"
             [(ngModel)]="answer.alert"
             label="Alert?">
         </app-form-slide-toggle>

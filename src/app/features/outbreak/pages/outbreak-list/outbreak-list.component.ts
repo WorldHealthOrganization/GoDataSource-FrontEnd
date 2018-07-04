@@ -80,15 +80,15 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showError(err.message);
                             return ErrorObservable.create(err);
                         })
-                        .subscribe(response => {
+                        .subscribe(() => {
                             // reload user data to get the updated data regarding active outbreak
                             this.authDataService
                                 .reloadAndPersistAuthUser()
                                 .subscribe((authenticatedUser) => {
                                     this.authUser = authenticatedUser.user;
-                                    this.snackbarService.showSuccess('Success');
-                                    this.refreshList();
                                 });
+                            this.snackbarService.showSuccess('Success');
+                            this.refreshList();
                         });
                 }
             });
@@ -125,7 +125,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      * Filters the outbreaks by Active property
      * @param {string} property
      * @param value
-     * @param {string} valueKey
      */
     filterByActiveOutbreak(property: string, value: any) {
         // check if value is boolean. If not, remove filter

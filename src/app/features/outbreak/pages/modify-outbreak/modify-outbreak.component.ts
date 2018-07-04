@@ -59,12 +59,6 @@ export class ModifyOutbreakComponent {
                     this.caseInvestigationTemplateQuestions = outbreakData.caseInvestigationTemplate;
                     this.contactFollowupTemplateQuestions = outbreakData.contactFollowUpTemplate;
                     this.labResultsTemplateQuestions = outbreakData.labResultsTemplate;
-                    if (!this.caseInvestigationTemplateQuestions.length)
-                        this.caseInvestigationTemplateQuestions.push(new QuestionModel());
-                    if (!this.contactFollowupTemplateQuestions.length)
-                        this.contactFollowupTemplateQuestions.push(new QuestionModel());
-                    if (!this.labResultsTemplateQuestions.length)
-                        this.labResultsTemplateQuestions.push(new QuestionModel());
                     this.diseasesList$ = this.genericDataService.getDiseasesList();
                     this.countriesList$ = this.genericDataService.getCountriesList();
                 });
