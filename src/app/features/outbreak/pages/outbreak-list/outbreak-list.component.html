@@ -4,7 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                        [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -14,45 +15,53 @@
 
 <mat-card class="page-section page-content">
 
-    <mat-table #table [dataSource]="outbreaksList$ | async" matSort>
+    <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
+
         <!-- Name -->
         <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header>
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Name</div>
+                    <div mat-sort-header>Name</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="filter"
+                            name="nameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterBy('name', $event)">
+                            (optionChanged)="filterTextBy('name', $event)">
                         </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.name}}
             </mat-cell>
         </ng-container>
+
         <!-- Disease -->
-        <ng-container matColumnDef="disease" >
-            <mat-header-cell *matHeaderCellDef mat-sort-header>
+        <ng-container matColumnDef="disease">
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Disease</div>
+                    <div mat-sort-header>Disease</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="filter"
+                        <app-form-select
+                            name="diseaseFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterBy('disease', $event)">
-                        </app-form-input>
+                            [options]="diseasesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterSelectBy('disease', $event)"
+                        >
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.disease}}
             </mat-cell>
         </ng-container>
+
         <!-- Country -->
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
@@ -67,20 +76,23 @@
                 {{outbreak.countries}}
             </mat-cell>
         </ng-container>
+
         <!-- Start Date -->
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Start Date</div>
+                    <div mat-sort-header>Start Date</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.startDate | date: 'yyy-MM-dd' }}
             </mat-cell>
         </ng-container>
+
         <!-- End Date -->
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef>
@@ -91,10 +103,12 @@
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let outbreak">
                 {{outbreak.endDate | date: 'yyy-MM-dd'}}
             </mat-cell>
         </ng-container>
+
         <!-- Active -->
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
@@ -102,17 +116,17 @@
                     <div>Active?</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="filter"
+                            name="activeFilter"
                             ngModel
                             placeholder="Filter"
                             [options]="activeOptionsList$ | async"
-                            multiple="false"
-                            (optionChanged)="filterBy('active', $event)">
-                            >
+                            (optionChanged)="filterByActiveOutbreak('id', $event)"
+                        >
                         </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let outbreak">
                 {{ (outbreak.id == authUser.activeOutbreakId) ? 'YES' : 'NO'}}
             </mat-cell>
@@ -134,13 +148,13 @@
                         Set Active
                     </button>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                             Modify
-                        </button>
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
 
-                         <button mat-menu-item (click)="delete(item)">
-                            Delete
-                        </button>
+                    <button mat-menu-item (click)="delete(item)">
+                        Delete
+                    </button>
 
                 </mat-menu>
 

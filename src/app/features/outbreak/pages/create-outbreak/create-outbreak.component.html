@@ -76,6 +76,19 @@
                         </div>
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
+                                name="frequencyOfFollowUpPerDay"
+                                [(ngModel)]="newOutbreak.frequencyOfFollowUpPerDay"
+                                placeholder="Follow-up frecquency Per Day"
+                                required="true">
+                            </app-form-input>
+                            <app-form-input
+                                name="caseIdMask"
+                                [(ngModel)]="newOutbreak.caseIdMask"
+                                placeholder="Case Id Mask"
+                                required="true"
+                                tooltip="Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999.">
+                            </app-form-input>
+                            <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="newOutbreak.noDaysAmongContacts"
                                 placeholder="KPI - days among known contacts"
@@ -87,6 +100,9 @@
                                 placeholder="KPI - days in known transmission chains"
                                 required="true">
                             </app-form-input>
+
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="newOutbreak.noDaysNotSeen"
@@ -99,22 +115,12 @@
                                 placeholder="KPI - less than X contacts"
                                 required="true">
                             </app-form-input>
-                        </div>
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
-                                name="caseIdMask"
-                                [(ngModel)]="newOutbreak.caseIdMask"
-                                placeholder="Case Id Mask"
-                                required="true"
-                                tooltip="Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999.">
-                            </app-form-input>
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="newOutbreak.longPeriodsBetweenCaseOnset"
                                 placeholder="KPI - long periods ( days )"
                                 required="true">
                             </app-form-input>
-                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

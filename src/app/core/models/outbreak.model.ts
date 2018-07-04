@@ -9,6 +9,7 @@ export class OutbreakModel {
     endDate: string | null;
     periodOfFollowup: number;
     frequencyOfFollowUp: number;
+    frequencyOfFollowUpPerDay: number;
     noDaysAmongContacts: number;
     noDaysDaysInChains: number;
     noDaysNotSeen: number;
@@ -32,6 +33,7 @@ export class OutbreakModel {
         this.countries = _.get(data, 'countries');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
+        this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');
         this.noDaysAmongContacts = _.get(data, 'noDaysAmongContacts');
         this.noDaysDaysInChains = _.get(data, 'noDaysDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');

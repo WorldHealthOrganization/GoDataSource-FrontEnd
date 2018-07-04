@@ -73,17 +73,10 @@ export class CreateOutbreakComponent {
             const outbreakData = new OutbreakModel(dirtyFields);
 
             outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
-            // temporary populate array with one question.
-            // TODO add validation on questionnaires
-            outbreakData.caseInvestigationTemplate.push(new QuestionModel());
-            // temporary populate array with one question.
             // TODO add validation on questionnaires
             outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
-            outbreakData.contactFollowUpTemplate.push(new QuestionModel());
-            // temporary populate array with one question.
             // TODO add validation on questionnaires
             outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
-            outbreakData.labResultsTemplate.push(new QuestionModel());
             // validate end date to be greater than start date
             if (outbreakData.endDate && outbreakData.endDate < outbreakData.startDate) {
                 this.snackbarService.showError('End Date needs to be greater than start date');

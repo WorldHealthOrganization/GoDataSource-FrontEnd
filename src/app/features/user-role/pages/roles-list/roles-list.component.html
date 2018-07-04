@@ -4,7 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                        [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -40,7 +41,12 @@
         <!-- Description -->
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
-                Description
+                <div class="table-header-cell">
+                    Description
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="30">
                 {{ item.description }}
@@ -50,11 +56,18 @@
         <!-- Permissions -->
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
-                Permissions
+                <div class="table-header-cell">
+                    Permissions
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip *ngFor="let permission of item.permissions" [matTooltip]="permission.description | translate">{{ permission.label | translate }}</mat-chip>
+                    <mat-chip *ngFor="let permission of item.permissions"
+                              [matTooltip]="permission.description | translate">{{ permission.label | translate }}
+                    </mat-chip>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>
@@ -70,13 +83,16 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <span [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" [routerLink]="['.', item.id, 'modify']">
+                    <span
+                        [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
+                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
+                                [routerLink]="['.', item.id, 'modify']">
                             Modify
                         </button>
                     </span>
 
-                    <span [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
+                    <span
+                        [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)">
                             Delete
                         </button>

@@ -121,4 +121,5 @@ export abstract class ListComponent {
         // refresh list
         this.refreshList();
     }
+
 }

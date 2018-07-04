@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -15,8 +15,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 import * as _ from 'lodash';
-import { OutbreakDialogComponent } from '../../components/outbreak-dialog/outbreak-dialog.component';
-import { MatDialog } from '@angular/material';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -24,7 +23,7 @@ import { MatDialog } from '@angular/material';
     templateUrl: './outbreak-list.component.html',
     styleUrls: ['./outbreak-list.component.less']
 })
-export class OutbreakListComponent {
+export class OutbreakListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Outbreaks', '.', true)
@@ -32,29 +31,38 @@ export class OutbreakListComponent {
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
+    // list of options from the Active dropdown
     activeOptionsList$: Observable<any[]>;
-    outbreaksListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+    // list of diseases
+    diseasesList$: Observable<any[]>;
+    // authenticated user
     authUser: UserModel;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        private dialog: MatDialog,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
-        this.authUser = this.authDataService.getAuthenticatedUser();
-        this.activeOptionsList$ = this.genericDataService.getActiveOptions();
-        this.loadOutbreaksList();
+        super();
+
     }
 
+    ngOnInit() {
+        this.authUser = this.authDataService.getAuthenticatedUser();
+        this.activeOptionsList$ = this.genericDataService.getActiveOptions();
+        this.diseasesList$ = this.genericDataService.getDiseasesList();
+        this.refreshList();
+    }
     /**
-     * Load the list of outbreaks
+     * Re(load) the Outbreaks list
      */
-    loadOutbreaksList() {
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.outbreaksListQueryBuilder);
+    refreshList() {
+       // retrieve the list of Outbreaks
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder);
+
     }
 
     /**
@@ -65,41 +73,22 @@ export class OutbreakListComponent {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
             .subscribe((answer: DialogConfirmAnswer) => {
                 if (answer === DialogConfirmAnswer.Yes) {
-                    // find users with this outbreak set as active and display them:
-                    const outbreakUsersListQueryBuilder = new RequestQueryBuilder();
-                    outbreakUsersListQueryBuilder.where({
-                        'activeOutbreakId': {
-                            'eq': `${outbreak.id}`
-                        }
-                    });
 
-                    this.userDataService.getUsersList(outbreakUsersListQueryBuilder)
-                        .subscribe((users) => {
-                            // check users.length > 1 as it needs to be active for the user that will delete it.
-                            if (users.length <= 1) {
-                                this.outbreakDataService
-                                    .deleteOutbreak(outbreak.id)
-                                    .catch((err) => {
-                                        this.snackbarService.showError(err.message);
-                                        return ErrorObservable.create(err);
-                                    })
-                                    .subscribe(response => {
-                                        // reload user data to get the updated data regarding active outbreak
-                                        this.authDataService
-                                            .reloadAndPersistAuthUser()
-                                            .subscribe((authenticatedUser) => {
-                                                this.authUser = authenticatedUser.user;
-                                                this.snackbarService.showSuccess('Success');
-                                                this.loadOutbreaksList();
-                                            });
-
-                                    });
-                            } else {
-                                this.dialog.open(OutbreakDialogComponent, {
-                                    data: {users: users}
+                    this.outbreakDataService
+                        .deleteOutbreak(outbreak.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(response => {
+                            // reload user data to get the updated data regarding active outbreak
+                            this.authDataService
+                                .reloadAndPersistAuthUser()
+                                .subscribe((authenticatedUser) => {
+                                    this.authUser = authenticatedUser.user;
+                                    this.snackbarService.showSuccess('Success');
+                                    this.refreshList();
                                 });
-                            }
-
                         });
                 }
             });
@@ -125,7 +114,7 @@ export class OutbreakListComponent {
                                     this.authUser = authenticatedUser.user;
                                     this.snackbarService.showSuccess('Active outbreak changed successfully');
                                     this.outbreakDataService.checkActiveSelectedOutbreak();
-                                    this.loadOutbreaksList();
+                                    this.refreshList();
                                 });
                         });
                 }
@@ -133,48 +122,38 @@ export class OutbreakListComponent {
     }
 
     /**
-     * Filter the Outbreaks list by some field
-     * @param property
+     * Filters the outbreaks by Active property
+     * @param {string} property
      * @param value
+     * @param {string} valueKey
      */
-    filterBy(property, value) {
-        if (_.isEmpty(value)) {
-            this.outbreaksListQueryBuilder.whereRemove(property);
+    filterByActiveOutbreak(property: string, value: any) {
+        // check if value is boolean. If not, remove filter
+        if (!_.isBoolean(value.value)) {
+            // remove filter
+            this.queryBuilder.whereRemove(property);
         } else {
-            switch (property) {
-                case 'active':
-                    switch (value.value) {
-                        case '' : {
-                            this.outbreaksListQueryBuilder.whereRemove('id');
-                            break;
-                        }
-                        case true : {
-                            this.outbreaksListQueryBuilder.where({
-                                id: {
-                                    'eq': this.authUser.activeOutbreakId
-                                }
-                            });
-                            break;
-                        }
-                        case false : {
-                            this.outbreaksListQueryBuilder.where({
-                                id: {
-                                    'neq': this.authUser.activeOutbreakId
-                                }
-                            });
-                            break;
-                        }
-                    }
-                    break;
-                default:
-                    this.outbreaksListQueryBuilder.where({
-                        [property]: {
-                            regexp: `/^${value}/i`
+            switch (value.value) {
+                case true : {
+                    this.queryBuilder.where({
+                        id: {
+                            'eq': this.authUser.activeOutbreakId
                         }
                     });
+                    break;
+                }
+                case false : {
+                    this.queryBuilder.where({
+                        id: {
+                            'neq': this.authUser.activeOutbreakId
+                        }
+                    });
+                    break;
+                }
             }
         }
-        this.loadOutbreaksList();
+        // refresh list
+        this.refreshList();
     }
 
     /**
