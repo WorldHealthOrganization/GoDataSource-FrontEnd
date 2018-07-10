@@ -65,6 +65,7 @@
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
+                            ngModel
                             (changed)="filterRangeBy('age', $event)">
                         </app-form-range>
                     </div>

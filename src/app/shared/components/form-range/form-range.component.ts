@@ -30,6 +30,20 @@ export class FormRangeComponent extends GroupBase<FormRangeModel> {
     }
 
     /**
+     * In this case value always needs to be a FormRangeModel
+     * @param {FormRangeModel} value
+     */
+    writeValue(value: FormRangeModel) {
+        // in this case we always need to handle an object since we always bind further the properties of this object ( from & to )
+        if (!value) {
+            value = new FormRangeModel(value);
+        }
+
+        // let parent handle the binding value
+        super.writeValue(value);
+    }
+
+    /**
      * Model
      */
     get range(): FormRangeModel {
