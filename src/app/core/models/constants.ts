@@ -1,5 +1,9 @@
 
 export class Constants {
+    // default display constants
+    static DEFAULT_DATE_DISPLAY_FORMAT = 'MM/dd/yyy';
+
+    // Gender
     static GENDER = {
         MALE: {
             label: 'Male',

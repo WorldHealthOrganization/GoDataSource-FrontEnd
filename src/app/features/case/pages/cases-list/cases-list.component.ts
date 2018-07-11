@@ -14,6 +14,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 
 @Component({
@@ -27,6 +28,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Cases', '.', true)
     ];
+
+    // import constants into template
+    constants = Constants;
 
     // authenticated user
     authUser: UserModel;

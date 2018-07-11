@@ -15,6 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -27,6 +28,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Outbreaks', '.', true)
     ];
+
+    // import constants into template
+    constants = Constants;
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;

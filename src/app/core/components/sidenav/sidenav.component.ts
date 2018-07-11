@@ -107,12 +107,24 @@ export class SidenavComponent {
             ]
         ),
         new NavItem(
-            'contacts',
+            'contacts-group',
             'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
             'people',
             [PERMISSION.READ_CONTACT],
-            [],
-            '/contacts'
+            [
+                new ChildNavItem(
+                    'contacts',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
+                    [],
+                    '/contacts'
+                ),
+                new ChildNavItem(
+                    'contact-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
+                    [PERMISSION.READ_FOLLOWUP],
+                    '/follow-ups'
+                )
+            ]
         ),
         new NavItem(
             'cases',

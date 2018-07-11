@@ -16,6 +16,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Upcoming Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
         'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL': 'Duplicated Records',
@@ -24,6 +25,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
+        'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
 
         /**
          * Dialogs
@@ -132,6 +134,18 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_RELATION': 'Relation',
         'LNG_RELATIONSHIP_FIELD_CLUSTER': 'Cluster',
         'LNG_RELATIONSHIP_FIELD_COMMENT': 'Comment',
+
+        /**
+         * Follow-ups List page
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_ADD_BUTTON': 'Add',
+        'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
+        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_FIRST_NAME': 'First Name',
+        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_LAST_NAME': 'Last Name',
+        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_DATE': 'Date',
+        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_AREA': 'Area',
+        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_ADDRESS': 'Address',
+        'LNG_PAGE_LIST_FOLLOW_UPS_TOAST_GENERATED': 'Follow-ups generated!',
 
         /**
          * Permissions
