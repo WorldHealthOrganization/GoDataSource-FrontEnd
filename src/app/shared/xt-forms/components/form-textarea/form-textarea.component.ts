@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -20,9 +20,12 @@ export class FormTextareaComponent extends ElementBase<string> {
 
     @Input() placeholder: string;
     @Input() required: boolean = false;
+    @Input() disabled: boolean = false;
     @Input() name: string;
 
     @Input() maxlength: number;
+
+    @Output() optionChanged = new EventEmitter<any>();
 
     public identifier = `form-textarea-${identifier++}`;
 
@@ -39,6 +42,14 @@ export class FormTextareaComponent extends ElementBase<string> {
      */
     onBlur() {
         this.touch();
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange() {
+        // emit the current value
+        return this.optionChanged.emit(this.value);
     }
 }
 

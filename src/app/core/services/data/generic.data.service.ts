@@ -60,5 +60,45 @@ export class GenericDataService {
     getActiveOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.ACTIVE_OPTIONS));
     }
+
+    /**
+     * Retrieve the list of Certainty Level options
+     * @returns {Observable<any[]>}
+     */
+    getCertaintyLevelOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.CERTAINTY_LEVEL_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of Exposure Type options
+     * @returns {Observable<any[]>}
+     */
+    getExposureTypeOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.EXPOSURE_TYPE_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of Exposure Frequency options
+     * @returns {Observable<any[]>}
+     */
+    getExposureFrequencyOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.EXPOSURE_FREQUENCY_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of Exposure Duration options
+     * @returns {Observable<any[]>}
+     */
+    getExposureDurationOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.EXPOSURE_DURATION_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of Social Relationship options
+     * @returns {Observable<any[]>}
+     */
+    getSocialRelationshipOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SOCIAL_RELATIONSHIP_OPTIONS));
+    }
 }
 

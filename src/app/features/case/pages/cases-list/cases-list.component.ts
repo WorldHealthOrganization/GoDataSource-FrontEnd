@@ -93,6 +93,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have access to create a contact
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */

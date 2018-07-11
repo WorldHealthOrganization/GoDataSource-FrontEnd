@@ -3,11 +3,6 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-            <div class="topnav-actions">
-                <button *ngIf="hasContactWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                    Add <span class="xt-icon">addCircle</span>
-                </button>
-            </div>
         </div>
     </ng-container>
 </app-topnav>

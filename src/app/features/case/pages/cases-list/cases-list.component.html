@@ -145,7 +145,7 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item>
+                    <button mat-menu-item *ngIf="hasContactWriteAccess()" routerLink="/contacts/create" [queryParams]="{ caseId: item.id }" queryParamsHandling="merge">
                         Add contact
                     </button>
 

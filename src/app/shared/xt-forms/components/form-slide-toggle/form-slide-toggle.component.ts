@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -25,6 +25,8 @@ export class FormSlideToggleComponent extends ElementBase<string> {
 
     public identifier = `form-input-${identifier++}`;
 
+    @Output() optionChanged = new EventEmitter<any>();
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -38,6 +40,14 @@ export class FormSlideToggleComponent extends ElementBase<string> {
      */
     onClick() {
         this.touch();
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange() {
+        // emit the current value
+        return this.optionChanged.emit(this.value);
     }
 }
 

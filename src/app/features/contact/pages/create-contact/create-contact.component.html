@@ -122,13 +122,35 @@
             </form>
         </mat-step>
 
+        <!-- Relationship step -->
+        <mat-step [stepControl]="relationshipForm">
+            <form #relationshipForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}</ng-template>
+
+                <mat-card class="page-section">
+                    <app-form-relationship
+                        name="relationship"
+                        [(ngModel)]="relationship"
+                        [relatedTitle]="'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE' | translate"
+                        [relatedObject]="caseData"
+                        required="true"
+                    ></app-form-relationship>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
         <!-- Final step -->
         <mat-step>
             <ng-template matStepLabel>Done</ng-template>
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewContact([personalForm, addressForm])">Create Contact</button>
+                <button type="button" mat-button (click)="createNewContact([personalForm, addressForm, relationshipForm])">Create Contact</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

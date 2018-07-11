@@ -1,0 +1,116 @@
+<div class="relationship-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="column" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <div>{{ relatedTitle }}</div>
+                <div>{{ relatedObject?.firstName + ' ' + relatedObject?.lastName}}</div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <app-form-datepicker
+                    [name]="name + '[contactDate]'"
+                    [(ngModel)]="relationship.contactDate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CONTACT_DATE' | translate"
+                    [disabled]="disabled"
+                    [required]="required"
+                    (optionChanged)="onChange()">
+                </app-form-datepicker>
+
+                <app-form-slide-toggle
+                    name="name + '[contactDateEstimated]'"
+                    [(ngModel)]="relationship.contactDateEstimated"
+                    [label]="'LNG_RELATIONSHIP_FIELD_CONTACT_DATE_ESTIMATED' | translate"
+                    [disabled]="disabled"
+                    (optionChanged)="onChange()">
+                </app-form-slide-toggle>
+
+                <app-form-select
+                    [name]="name + '[certaintyLevelId]'"
+                    [(ngModel)]="relationship.certaintyLevelId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CERTAINTY_LEVEL' | translate"
+                    [options]="certaintyLevelOptions$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+
+                <app-form-select
+                    [name]="name + '[exposureTypeId]'"
+                    [(ngModel)]="relationship.exposureTypeId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_TYPE' | translate"
+                    [options]="exposureTypeOptions$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <app-form-select
+                    [name]="name + '[exposureFrequencyId]'"
+                    [(ngModel)]="relationship.exposureFrequencyId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_FREQUENCY' | translate"
+                    [options]="exposureFrequencyOptions$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+
+                <app-form-select
+                    [name]="name + '[exposureDurationId]'"
+                    [(ngModel)]="relationship.exposureDurationId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_DURATION' | translate"
+                    [options]="exposureDurationOptions$ | async"
+                    [disabled]="disabled"
+                    [required]="required"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+
+                <app-form-select
+                    [name]="name + '[socialRelationshipTypeId]'"
+                    [(ngModel)]="relationship.socialRelationshipTypeId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_RELATION' | translate"
+                    [options]="socialRelationshipOptions$ | async"
+                    [disabled]="disabled"
+                    required="false"
+                    optionLabelKey="label"
+                    optionValueKey="value"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+
+                <app-form-select
+                    [name]="name + '[clusterId]'"
+                    [(ngModel)]="relationship.clusterId"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CLUSTER' | translate"
+                    [options]="clusterOptions$ | async"
+                    [disabled]="disabled"
+                    required="false"
+                    optionLabelKey="name"
+                    optionValueKey="id"
+                    (optionChanged)="onChange()">
+                </app-form-select>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <app-form-textarea
+                    [name]="name + '[comment]'"
+                    [(ngModel)]="relationship.comment"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_COMMENT' | translate"
+                    [disabled]="disabled"
+                    required="false"
+                    (optionChanged)="onChange()">
+                </app-form-textarea>
+            </div>
+        </div>
+    </form>
+</div>

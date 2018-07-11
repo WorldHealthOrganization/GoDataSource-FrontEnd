@@ -114,6 +114,26 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_ADDRESS_GEO_LOCATION_LNG': 'Geo-Location Longitude',
 
         /**
+         * Create Contact page
+         */
+        'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_REQUIRED': 'You can add a contact only though a case!',
+        'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
+        'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
+
+        /**
+         * Relationship Fields
+         */
+        'LNG_RELATIONSHIP_FIELD_CONTACT_DATE': 'Date of last contact',
+        'LNG_RELATIONSHIP_FIELD_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
+        'LNG_RELATIONSHIP_FIELD_CERTAINTY_LEVEL': 'Certainty Level',
+        'LNG_RELATIONSHIP_FIELD_EXPOSURE_TYPE': 'Exposure Type',
+        'LNG_RELATIONSHIP_FIELD_EXPOSURE_FREQUENCY': 'Exposure Frequency',
+        'LNG_RELATIONSHIP_FIELD_EXPOSURE_DURATION': 'Exposure Duration',
+        'LNG_RELATIONSHIP_FIELD_RELATION': 'Relation',
+        'LNG_RELATIONSHIP_FIELD_CLUSTER': 'Cluster',
+        'LNG_RELATIONSHIP_FIELD_COMMENT': 'Comment',
+
+        /**
          * Permissions
          */
         'LNG_ROLE_AVAILABLE_PERMISSIONS_READ_ROLE': 'Read Role',
