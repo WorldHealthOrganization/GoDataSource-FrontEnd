@@ -10,6 +10,7 @@ import { FormRangeComponent } from './form-range/form-range.component';
 import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.component';
 import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
+import { SideFiltersComponent } from './side-filters/side-filters.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -28,5 +29,6 @@ export const components: any[] = [
     FormDocumentListComponent,
     FormRangeComponent,
     FormRangeComponent,
-    FormRelationshipComponent
+    FormRelationshipComponent,
+    SideFiltersComponent
 ];

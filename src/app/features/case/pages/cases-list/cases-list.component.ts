@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -6,7 +5,6 @@ import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -16,6 +14,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-cases-list',
@@ -40,6 +39,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
 
+    // available side filters
+    availableSideFilters: FilterModel[];
+
     // gender list
     genderList$: Observable<any[]>;
 
@@ -61,7 +63,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     ngOnInit() {
         // retrieve gender list
-        this.genderList$ = this.genericDataService.getGendersList();
+        this.genderList$ = this.genericDataService.getGendersList().share();
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
@@ -72,6 +74,13 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
             });
+
+        this.availableSideFilters = [
+            new FilterModel('firstName', FilterType.TEXT),
+            new FilterModel('lastName', FilterType.TEXT),
+            new FilterModel('gender', FilterType.MULTISELECT, this.genderList$),
+            new FilterModel('age', FilterType.RANGE),
+        ];
     }
 
     /**

@@ -1,105 +1,34 @@
 import * as _ from 'lodash';
-
-export enum RequestQueryBuilderSortDirection {
-    ASC = 'asc',
-    DESC = 'desc'
-}
-
-export class RequestQueryBuilderSort {
-    public property: string = '';
-    public direction: RequestQueryBuilderSortDirection;
-
-    constructor(data) {
-        this.property = _.get(data, 'active');
-        this.direction = _.get(data, 'direction');
-    }
-
-    get value(): string {
-        return this.property + (this.direction ? ' ' + this.direction.toUpperCase() : '');
-    }
-}
+import { RequestFilter } from './request-filter';
+import { RequestSort } from './request-sort';
 
 export class RequestQueryBuilder {
-
     // Relations to include
     public includedRelations: any[] = [];
     // Where conditions
-    public whereCondition: any = {};
-    // order fields
-    public orderBy: string[] = [];
+    public filter: RequestFilter = new RequestFilter();
+    // Order fields
+    public sort: RequestSort = new RequestSort();
     // Limit
     public limitResultsNumber: number;
     // Fields to retrieve
     public fieldsInResponse: string[] = [];
 
     /**
-     * Adds a "where" condition
-     * Note: conditions on the same property are overwritten by the last "where" clause added
-     * @param condition Loopback condition on a property
-     * @returns {this}
-     */
-    where(condition: any) {
-        this.whereCondition = {...this.whereCondition, ...condition};
-
-        return this;
-    }
-
-    /**
-     * Remove specific condition
-     * @param {string} property
-     * @returns {this}
-     */
-    whereRemove(property: string) {
-        delete this.whereCondition[property];
-
-        return this;
-    }
-
-    /**
-     * Sort by one or multiple properties ( priority: first - higher, last - lower)
-     * @param {RequestQueryBuilderSort | RequestQueryBuilderSort[]} properties
-     */
-    sort(properties: RequestQueryBuilderSort | RequestQueryBuilderSort[]) {
-        // clear sort ?
-        if (_.isEmpty(properties)) {
-            this.orderBy = [];
-            return;
-        }
-
-        // convert to array if necessary
-        if (!_.isArray(properties)) {
-            properties = [properties as RequestQueryBuilderSort];
-        }
-
-        // map to sortable objects and get formatted value
-        this.orderBy = _.map(properties, (s) => (new RequestQueryBuilderSort(s).value));
-    }
-
-    /**
-     * Remove all filters
-     * @returns {this}
-     */
-    clear() {
-        // remove conditions - same as this.whereCondition = [], but this method will keep the same object in case we're binding it
-        for (const p in this.whereCondition) {
-            delete this.whereCondition[p];
-        }
-
-        // finished
-        return this;
-    }
-
-    /**
      * Sets a "limit" on the number of results retrieved in a list
      * @param {number} limit
+     * @returns {RequestQueryBuilder}
      */
     limit(limit: number) {
         this.limitResultsNumber = limit;
+
+        return this;
     }
 
     /**
      * Include one or many relations
      * @param {string|any} relations
+     * @returns {RequestQueryBuilder}
      */
     include(...relations: any[]) {
         // keep all relations as objects
@@ -123,9 +52,12 @@ export class RequestQueryBuilder {
     /**
      * Include fields to be retrieved in response
      * @param {string} fields
+     * @returns {RequestQueryBuilder}
      */
     fields(...fields: string[]) {
         this.fieldsInResponse = _.uniq([...this.fieldsInResponse, ...fields]);
+
+        return this;
     }
 
     /**
@@ -143,12 +75,12 @@ export class RequestQueryBuilder {
             filter.fields = this.fieldsInResponse;
         }
 
-        if (Object.keys(this.whereCondition).length > 0) {
-            filter.where = this.whereCondition;
+        if (!this.filter.isEmpty()) {
+            filter.where = this.filter.generateCondition();
         }
 
-        if (this.orderBy && this.orderBy.length > 0) {
-            filter.order = this.orderBy;
+        if (!this.sort.isEmpty()) {
+            filter.order = this.sort.generateCriteria();
         }
 
         if (this.limitResultsNumber) {
@@ -160,9 +92,9 @@ export class RequestQueryBuilder {
 
     /**
      * Merge current Query Builder with a new one.
-     * Note: The new Query Builder will overwrite the properties of the current one
+     * Note: 'AND' operator will be applied between the conditions of the two Query Builders
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {this}
+     * @returns {RequestQueryBuilder}
      */
     merge(queryBuilder: RequestQueryBuilder) {
         // merge includes
@@ -172,10 +104,21 @@ export class RequestQueryBuilder {
         this.fields(...queryBuilder.fieldsInResponse);
 
         // merge "where" conditions
-        this.whereCondition = {...this.whereCondition, ...queryBuilder.whereCondition};
+        if (this.filter.isEmpty()) {
+            // use the other filter
+            this.filter = queryBuilder.filter;
+        } else if (queryBuilder.filter.isEmpty()) {
+            // do nothing; there is no filter to merge with
+        } else {
+            // merge the two filters
+            const mergedFilter = new RequestFilter();
+            mergedFilter.where(this.filter.generateCondition());
+            mergedFilter.where(queryBuilder.filter.generateCondition());
+            this.filter = mergedFilter;
+        }
 
         // merge "order" criterias
-        this.orderBy = [...this.orderBy, ...queryBuilder.orderBy];
+        this.sort.criterias = {...this.sort.criterias, ...queryBuilder.sort.criterias};
 
         // update the "limit" if necessary
         this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
@@ -188,8 +131,8 @@ export class RequestQueryBuilder {
      */
     isEmpty(): boolean {
         return _.isEmpty(this.includedRelations) &&
-            _.isEmpty(this.whereCondition) &&
-            _.isEmpty(this.orderBy) &&
+            this.filter.isEmpty() &&
+            this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             _.isEmpty(this.fieldsInResponse);
     }

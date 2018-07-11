@@ -1,0 +1,133 @@
+<div class="side-filters">
+
+    <button class="sidenav-toggle" mat-raised-button (click)="openSideNav()">
+        <span class="xt-icon">filter</span>
+    </button>
+
+    <div class="page-overlay mat-drawer-backdrop" [class.mat-drawer-shown]="sideNav.opened" (click)="closeSideNav()"></div>
+
+    <mat-sidenav-container>
+
+        <mat-sidenav #sideNav mode="over" fixedInViewport>
+
+            <form #form="ngForm" (submit)="apply(form)">
+
+                <!-- Columns to display -->
+                <div *ngIf="columns.length > 0" class="section columns-section">
+
+                    <div class="title">
+                        Columns to display
+                    </div>
+
+                    <div class="actions">
+                        <!-- #TODO -->
+                    </div>
+
+                </div>
+
+                <!-- Filters -->
+                <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
+
+                    <div class="title">
+                        Filters
+                    </div>
+
+                    <div class="actions">
+
+                        <div fxFlex fxLayout="row" class="switch-buttons">
+                            <button fxFlex type="button" mat-raised-button
+                                    [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
+                                    (click)="setFilterOperator(RequestFilterOperator.AND)">
+                                AND
+                            </button>
+                            <button fxFlex type="button" mat-raised-button
+                                    [color]="isFilterOperator(RequestFilterOperator.OR) ? 'primary' : ''"
+                                    (click)="setFilterOperator(RequestFilterOperator.OR)">
+                                OR
+                            </button>
+
+                            <input type="hidden" name="filter[operator]" [(ngModel)]="appliedFilterOperator" />
+                        </div>
+                    </div>
+
+                    <div *ngFor="let filter of appliedFilters; let i = index" class="applied-filter" fxLayout="column">
+
+                        <div *ngIf="i > 0" class="operator">
+                            {{appliedFilterOperator}}
+                        </div>
+
+                        <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
+                            <mat-card class="filter-details" fxFlex>
+                                <!-- Filter Type -->
+                                <app-form-select
+                                    [name]="'filter[filters][' + i + '][filter]'"
+                                    [(ngModel)]="filter.filter"
+                                    placeholder="Filter"
+                                    [options]="filterOptions"
+                                    optionLabelKey="fieldName"
+                                    optionValueKey="self">
+                                </app-form-select>
+
+                                <!-- TEXT Filter -->
+                                <app-form-input
+                                    *ngIf="filter.filter?.type === FilterType.TEXT"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    placeholder="Filter">
+                                </app-form-input>
+
+                                <!-- SELECT / MULTI-SELECT Filter -->
+                                <app-form-select
+                                    *ngIf="filter.filter?.type === FilterType.SELECT || filter.filter?.type === FilterType.MULTISELECT"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    placeholder="Filter"
+                                    [options]="filter.filter.options$ | async"
+                                    [multiple]="filter.filter.type === FilterType.MULTISELECT">
+                                </app-form-select>
+
+                                <!-- RANGE Filter -->
+                                <app-form-range
+                                    *ngIf="filter.filter?.type === FilterType.RANGE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value">
+                                </app-form-range>
+
+                            </mat-card>
+
+                            <button type="button" mat-icon-button (click)="deleteFilter(i)">
+                                <span class="xt-icon">delete</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <button fxFlex="50" type="button" mat-button color="primary" (click)="addFilter()">Add another filter</button>
+
+                </div>
+
+                <!-- Sort Criterias -->
+                <div *ngIf="sortOptions.length > 0" class="section sort-section">
+
+                    <div class="title">
+                        Sort
+                    </div>
+
+                    <div class="actions">
+                        <!-- #TODO -->
+                    </div>
+
+                </div>
+
+                <button *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
+                        type="submit" class="button-primary" mat-raised-button color="primary">
+                    Apply filters
+                </button>
+
+            </form>
+
+        </mat-sidenav>
+
+    </mat-sidenav-container>
+
+</div>

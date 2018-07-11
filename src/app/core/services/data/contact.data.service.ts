@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactModel } from '../../models/contact.model';
-import { RequestQueryBuilder } from '../helper/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 @Injectable()
 export class ContactDataService {

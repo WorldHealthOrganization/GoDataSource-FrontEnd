@@ -27,7 +27,7 @@
                             name="nameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('name', $event)">
+                            (optionChanged)="filterByTextField('name', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                             placeholder="Filter"
                             [options]="diseasesList$ | async"
                             multiple="true"
-                            (optionChanged)="filterSelectBy('disease', $event)"
+                            (optionChanged)="filterBySelectField('disease', $event)"
                         >
                         </app-form-select>
                     </div>

@@ -9,10 +9,10 @@ import { UserRoleModel } from '../../models/user-role.model';
 import { StorageService } from '../helper/storage.service';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { RequestQueryBuilder } from '../helper/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { Subject } from 'rxjs/Subject';
-import { SnackbarService } from "../helper/snackbar.service";
+import { SnackbarService } from '../helper/snackbar.service';
 
 
 @Injectable()

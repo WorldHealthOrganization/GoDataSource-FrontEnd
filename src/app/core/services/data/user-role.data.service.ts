@@ -7,7 +7,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import 'rxjs/add/operator/share';
-import { RequestQueryBuilder } from '../helper/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 @Injectable()
 export class UserRoleDataService {

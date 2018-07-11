@@ -7,7 +7,6 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { RequestQueryBuilder } from '../../../../core/services/helper/request-query-builder';
 import { UserModel } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -130,11 +129,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // check if value is boolean. If not, remove filter
         if (!_.isBoolean(value.value)) {
             // remove filter
-            this.queryBuilder.whereRemove(property);
+            this.queryBuilder.filter.remove(property);
         } else {
             switch (value.value) {
                 case true : {
-                    this.queryBuilder.where({
+                    this.queryBuilder.filter.where({
                         id: {
                             'eq': this.authUser.activeOutbreakId
                         }
@@ -142,7 +141,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                     break;
                 }
                 case false : {
-                    this.queryBuilder.where({
+                    this.queryBuilder.filter.where({
                         id: {
                             'neq': this.authUser.activeOutbreakId
                         }

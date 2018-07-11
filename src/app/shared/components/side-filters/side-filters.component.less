@@ -1,0 +1,61 @@
+@import '~styles/common';
+
+// variables
+
+// styles
+.side-filters {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    .page-overlay {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    mat-sidenav-container {
+        position: absolute;
+        z-index: 10;
+
+        mat-sidenav {
+            margin-top: 10vh;
+            max-height: 80vh;
+            width: 350px;
+            padding: 15px;
+            height: auto;
+            bottom: unset !important;
+        }
+    }
+
+    .sidenav-toggle {
+        background-color: white;
+        margin-top: 155px;
+        padding: 7px 5px;
+    }
+
+    .section {
+
+        &:not(:first-child) {
+            margin-top: 20px;
+        }
+
+        .title {
+            font-size: 22px;
+            padding-bottom: 10px;
+        }
+    }
+
+    .filters-section {
+
+        .applied-filter {
+
+            .operator {
+                padding-left: 20px;
+            }
+
+            .filter-container {
+                margin: 10px 0;
+            }
+        }
+    }
+}

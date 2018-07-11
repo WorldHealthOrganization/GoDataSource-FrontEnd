@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'filter': '&#xe914;',
             'thinArrowRight': '&#xe913;',
             'addCircle': '&#xe900;',
             'fileCopy': '&#xe911;',

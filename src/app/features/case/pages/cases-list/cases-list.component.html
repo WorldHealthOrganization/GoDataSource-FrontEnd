@@ -26,7 +26,7 @@
                             name="firstNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('firstName', $event)">
+                            (optionChanged)="filterByTextField('firstName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                             name="lastNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('lastName', $event)">
+                            (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             ngModel
                             placeholder="Filter"
                             [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterSelectBy('classification', $event)"
+                            (optionChanged)="filterBySelectField('classification', $event)"
                             multiple="true">
                         </app-form-select>
                     </div>
@@ -87,7 +87,8 @@
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
-                            (changed)="filterRangeBy('age', $event)">
+                            ngModel
+                            (changed)="filterByRangeField('age', $event)">
                         </app-form-range>
                     </div>
                 </div>
@@ -108,7 +109,7 @@
                             ngModel
                             placeholder="Filter"
                             [options]="genderList$ | async"
-                            (optionChanged)="filterSelectBy('gender', $event)"
+                            (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true">
                         </app-form-select>
                     </div>
@@ -178,3 +179,6 @@
     </mat-table>
 
 </mat-card>
+
+
+<app-side-filters [filterOptions]="availableSideFilters" (filtersApplied)="applySideFilters($event)"></app-side-filters>

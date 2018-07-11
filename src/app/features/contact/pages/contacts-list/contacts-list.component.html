@@ -21,7 +21,7 @@
                             name="firstNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('firstName', $event)">
+                            (optionChanged)="filterByTextField('firstName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                             name="lastNameFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('lastName', $event)">
+                            (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterRangeBy('age', $event)">
+                            (changed)="filterByRangeField('age', $event)">
                         </app-form-range>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                             ngModel
                             placeholder="Filter"
                             [options]="genderList$ | async"
-                            (optionChanged)="filterSelectBy('gender', $event)"
+                            (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true">
                         </app-form-select>
                     </div>
@@ -103,7 +103,7 @@
                             name="phoneNumberFilter"
                             ngModel
                             placeholder="Filter"
-                            (optionChanged)="filterTextBy('phoneNumber', $event)">
+                            (optionChanged)="filterByTextField('phoneNumber', $event)">
                         </app-form-input>
                     </div>
                 </div>
