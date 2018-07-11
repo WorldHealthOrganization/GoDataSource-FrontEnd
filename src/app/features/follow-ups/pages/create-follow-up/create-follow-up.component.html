@@ -1,0 +1,73 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>Details</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div>Contact</div>
+                            <div>{{ contactData.name }}</div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-datepicker
+                                name="date"
+                                [(ngModel)]="followUpData.date"
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                                required="true">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="performed"
+                                [(ngModel)]="followUpData.performed"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="lostToFollowUp"
+                                [(ngModel)]="followUpData.lostToFollowUp"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate">
+                            </app-form-slide-toggle>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Address section -->
+                <div class="section-title">{{ 'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE' | translate }}</div>
+                <mat-card class="page-section">
+                    <app-form-address
+                        name="address"
+                        [(ngModel)]="followUpData.address">
+                    </app-form-address>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button type="button" mat-button (click)="createNewFollowUp([detailsForm])">Create Follow-up</button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

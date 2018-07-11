@@ -70,20 +70,25 @@ export const EnglishUsLang = {
         'LNG_COMMON_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
 
         /**
+         * Address Fields
+         */
+        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Name',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
+        'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
+        'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
+        'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
+
+        /**
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_POSTAL_CODE': 'Postal Code',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_COUNTRY': 'Country',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': 'Fill Geo-Location Latitude',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': 'Date of Outcome',
         'LNG_CASE_FIELD_LABEL_AGE': 'Age',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of Onset',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_NAME': 'Name',
         'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk Reason',
         'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': 'Hospitalization Dates',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION_ID': 'Location ID',
         'LNG_CASE_FIELD_LABEL_ID': 'ID',
         'LNG_CASE_FIELD_LABEL_UPDATED_AT': 'Updated At',
         'LNG_CASE_FIELD_LABEL_OUTBREAK_ID': 'Outbreak ID',
@@ -91,8 +96,6 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_CREATED_BY': 'Created By',
         'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE': 'Date of Becoming case',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle Name',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_GEO_LOCATION_LAT': 'Geo-Location Latitude',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_ADDRESS_LINE_1': 'Address Line 1',
         'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
         'LNG_CASE_FIELD_LABEL_DELETED_AT': 'Deleted At',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LNG': 'Fill Geo-Location Longitude',
@@ -111,16 +114,41 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_ADDRESS_LINE_2': 'Address Line 2',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_CITY': 'CITY',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_GEO_LOCATION_LNG': 'Geo-Location Longitude',
+
+        /**
+         * Cases list page
+         */
+        'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
+
+        /**
+         * Create Case page
+         */
+        'LNG_PAGE_CREATE_CASE_TITLE': 'Create New Case',
+        'LNG_PAGE_CREATE_CASE_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
+         * Modify Case page
+         */
+        'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify Case',
+
+        /**
+         * Contacts list page
+         */
+        'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
 
         /**
          * Create Contact page
          */
+        'LNG_PAGE_CREATE_CONTACT_TITLE': 'Create New Contact',
+        'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_REQUIRED': 'You can add a contact only though a case!',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
+
+        /**
+         * Modify Contact page
+         */
+        'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify Contact',
 
         /**
          * Relationship Fields
@@ -136,16 +164,40 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_COMMENT': 'Comment',
 
         /**
-         * Follow-ups List page
+         * Follow-up fields
          */
-        'LNG_PAGE_LIST_FOLLOW_UPS_ADD_BUTTON': 'Add',
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME': 'First Name',
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME': 'Last Name',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_AREA': 'Area',
+        'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS': 'Address',
+        'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED': 'Performed',
+        'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP': 'Lost to Follow-up',
+
+        /**
+         * Follow-ups list page
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
-        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_FIRST_NAME': 'First Name',
-        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_LAST_NAME': 'Last Name',
-        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_DATE': 'Date',
-        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_AREA': 'Area',
-        'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_ADDRESS': 'Address',
-        'LNG_PAGE_LIST_FOLLOW_UPS_TOAST_GENERATED': 'Follow-ups generated!',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
+
+        /**
+         * Create Follow-up page
+         */
+        'LNG_PAGE_CREATE_FOLLOW_UP_TITLE': 'Create New Follow-up',
+        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CREATE_FOLLOW_UP_WARNING_CONTACT_REQUIRED': 'You can add a follow-up only though a contact!',
+        'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up added!',
+
+        /**
+         * Event fields
+         */
+        'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
+
+        /**
+         * Create Event page
+         */
+        'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
 
         /**
          * Permissions

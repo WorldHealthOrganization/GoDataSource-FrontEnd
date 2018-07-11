@@ -54,7 +54,7 @@
         <!-- Address step -->
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
-                <ng-template matStepLabel>Address</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
 
                 <mat-card class="page-section">
                     <app-form-address

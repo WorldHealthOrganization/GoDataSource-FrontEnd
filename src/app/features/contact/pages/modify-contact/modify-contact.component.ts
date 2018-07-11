@@ -22,8 +22,9 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 export class ModifyContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Contacts', '/contacts'),
-        new BreadcrumbItemModel('Modify Contact', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_MODIFY_CONTACT_TITLE', '.', true)
     ];
 
     contactId: string;

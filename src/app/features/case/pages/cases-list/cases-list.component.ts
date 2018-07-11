@@ -26,11 +26,11 @@ import { FilterType, FilterModel } from '../../../../shared/components/side-filt
 export class CasesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Cases', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
     ];
 
     // import constants into template
-    constants = Constants;
+    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;

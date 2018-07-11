@@ -28,4 +28,13 @@ export class ContactModel {
         this.documents = _.get(data, 'documents', []);
         this.addresses = _.get(data, 'addresses', []);
     }
+
+    /**
+     * Contact Name
+     * @returns {string}
+     */
+    get name(): string {
+        return ( this.firstName ? this.firstName : '' ) +
+            ' ' + ( this.lastName ? this.lastName : '' );
+    }
 }

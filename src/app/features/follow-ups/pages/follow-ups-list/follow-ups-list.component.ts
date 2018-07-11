@@ -15,6 +15,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -24,11 +25,13 @@ import { LocationModel } from '../../../../core/models/location.model';
 })
 export class FollowUpsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Follow-ups', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '.', true)
     ];
 
     // import constants into template
-    constants = Constants;
+    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;
@@ -66,43 +69,16 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
 
     refreshList() {
         if (this.selectedOutbreak) {
-            // make sure we request contact as well
-            this.queryBuilder.include('contact');
+            // display only unresolved followups
+            this.queryBuilder.filter.where({
+                performed: {
+                    'eq': false
+                }
+            });
 
-            // retrieve locations
-            this.locationDataService
-                .getLocationsList()
-                .subscribe((locations) => {
-                    // map names to id
-                    const locationsMapped = _.transform(locations, (result, location: LocationModel) => {
-                        result[location.id] = location;
-                    });
-
-                    // display only unresolved followups
-                    this.queryBuilder.filter.where({
-                        performed: {
-                            'eq': false
-                        }
-                    });
-
-                    // retrieve the list of Follow Ups
-                    this.followUpsList$ = this.followUpsDataService
-                        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-                        .map((followUps) => {
-                            return _.map(followUps, (followUp: FollowUpModel) => {
-                                // map location
-                                if (
-                                    followUp.address &&
-                                    followUp.address.locationId
-                                ) {
-                                    followUp.address.location = locationsMapped[followUp.address.locationId];
-                                }
-
-                                // finished
-                                return followUp;
-                            });
-                        });
-                });
+            // retrieve the list of Follow Ups
+            this.followUpsList$ = this.followUpsDataService
+                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -149,7 +125,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
                     return ErrorObservable.create(err);
                 })
                 .subscribe((data) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_TOAST_GENERATED');
+                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                     // reload data
                     this.refreshList();

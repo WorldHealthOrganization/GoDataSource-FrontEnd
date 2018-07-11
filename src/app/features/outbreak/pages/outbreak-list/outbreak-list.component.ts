@@ -30,7 +30,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     ];
 
     // import constants into template
-    constants = Constants;
+    Constants = Constants;
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;

@@ -108,7 +108,7 @@
         <!-- Address step -->
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
-                <ng-template matStepLabel>Address</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
 
                 <app-form-address-list
                     name="addresses"

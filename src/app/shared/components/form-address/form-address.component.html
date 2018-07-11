@@ -7,7 +7,7 @@
                 <app-form-input
                     [name]="name + '[name]'"
                     [(ngModel)]="address.name"
-                    placeholder="Address name"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     (input)="onChange()">
@@ -22,7 +22,7 @@
                 <app-form-select
                     [name]="name + '[locationId]'"
                     [(ngModel)]="address.locationId"
-                    placeholder="Area"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
                     [options]="locationsList$ | async"
                     [disabled]="disabled"
                     [required]="required"
@@ -34,7 +34,7 @@
                 <app-form-input
                     [name]="name + '[city]'"
                     [(ngModel)]="address.city"
-                    placeholder="City"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     (input)="onChange()">
@@ -43,7 +43,7 @@
                 <app-form-input
                     [name]="name + '[postalCode]'"
                     [(ngModel)]="address.postalCode"
-                    placeholder="ZIP"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     (input)="onChange()">
@@ -52,7 +52,7 @@
                 <app-form-input
                     [name]="name + '[addressLine1]'"
                     [(ngModel)]="address.addressLine1"
-                    placeholder="Address"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     (input)="onChange()">

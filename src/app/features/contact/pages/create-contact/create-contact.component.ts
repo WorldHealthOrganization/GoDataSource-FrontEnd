@@ -29,8 +29,8 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 export class CreateContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Contacts', '/contacts'),
-        new BreadcrumbItemModel('Create New Contact', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
     contactData: ContactModel = new ContactModel();
@@ -77,11 +77,8 @@ export class CreateContactComponent implements OnInit {
                     return;
                 }
 
-                // update breadcrumb
-                const createBreadcrumb = _.find(this.breadcrumbs, { link: '.' });
-                if (createBreadcrumb) {
-                    createBreadcrumb.params.caseId = params.caseId;
-                }
+                // update breadcrumbs
+                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true, { caseId: params.caseId }));
 
                 // get selected outbreak
                 this.outbreakDataService

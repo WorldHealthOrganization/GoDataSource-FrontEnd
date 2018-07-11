@@ -25,8 +25,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 export class ModifyCaseComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Cases', '/cases'),
-        new BreadcrumbItemModel('Modify Case', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_MODIFY_CASE_TITLE', '.', true)
     ];
 
     outbreakId: string;

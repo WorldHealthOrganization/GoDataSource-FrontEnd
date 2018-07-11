@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
 import { GroupBase } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';

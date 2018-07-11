@@ -66,7 +66,7 @@ const routes: Routes = [
                 loadChildren: './features/follow-ups/follow-ups.module#FollowUpsModule',
                 canActivate: [AuthGuard],
                 data: {
-                    permissions: [PERMISSION.READ_CONTACT]
+                    permissions: [PERMISSION.READ_FOLLOWUP]
                 }
             },
             // Case Module routes

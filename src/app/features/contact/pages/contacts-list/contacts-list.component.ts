@@ -23,7 +23,8 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 })
 export class ContactsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Contacts', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -83,6 +84,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     hasContactWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
+     * Check if we have write access to follow-ups
+     * @returns {boolean}
+     */
+    hasFollowUpWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 
     /**

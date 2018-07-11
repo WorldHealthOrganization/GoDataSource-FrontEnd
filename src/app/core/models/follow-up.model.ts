@@ -12,9 +12,9 @@ export class FollowUpModel {
 
     constructor(data = null) {
         this.date = _.get(data, 'date');
-        this.performed = _.get(data, 'performed');
-        this.lostToFollowUp = _.get(data, 'lostToFollowUp');
-        this.address = _.get(data, 'address');
+        this.performed = _.get(data, 'performed', false);
+        this.lostToFollowUp = _.get(data, 'lostToFollowUp', false);
+        this.address = _.get(data, 'address', new AddressModel());
         this.personId = _.get(data, 'personId');
         this.contact = _.get(data, 'contact', {});
     }

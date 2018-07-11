@@ -5,8 +5,8 @@
         <ng-container *ngFor="let item of items; let last = last;">
 
             <mat-list-item class="breadcrumb-item" [ngClass]="{'active': item.active}">
-                <a [routerLink]="item.link" [queryParams]="item.params" queryParamsHandling="merge" class="a-no-style">
-                    {{item.label}}
+                <a [routerLink]="item.link" [queryParams]="item.params" class="a-no-style">
+                    {{item.label | translate}}
                 </a>
             </mat-list-item>
 

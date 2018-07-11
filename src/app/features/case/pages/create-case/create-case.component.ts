@@ -27,8 +27,8 @@ import * as _ from 'lodash';
 export class CreateCaseComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Cases', '/cases'),
-        new BreadcrumbItemModel('Create New Case', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_TITLE', '.', true)
     ];
 
     caseData: CaseModel = new CaseModel();

@@ -52,4 +52,13 @@ export class CaseModel {
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
     }
+
+    /**
+     * Case Name
+     * @returns {string}
+     */
+    get name(): string {
+        return ( this.firstName ? this.firstName : '' ) +
+            ' ' + ( this.lastName ? this.lastName : '' );
+    }
 }

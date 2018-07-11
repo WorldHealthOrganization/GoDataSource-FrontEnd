@@ -7,22 +7,18 @@
                 <button *ngIf="hasFollowUpsWriteAccess()" class="button-primary" mat-raised-button color="primary" (click)="generateFollowUps()">
                     {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
                 </button>
-
-                <!--<button *ngIf="hasFollowUpsWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">-->
-                    <!--{{ 'LNG_PAGE_LIST_FOLLOW_UPS_ADD_BUTTON' | translate }} <span class="xt-icon">addCircle</span>-->
-                <!--</button>-->
             </div>
         </div>
     </ng-container>
 </app-topnav>
 
 <mat-card class="page-section page-content">
-    <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="followUpsList$ | async">
         <!-- Contact First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ 'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_FIRST_NAME' | translate }}</div>
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -38,7 +34,7 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>{{ 'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_LAST_NAME' | translate }}</div>
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -53,14 +49,14 @@
         <ng-container matColumnDef="date">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ 'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_DATE' | translate }}</div>
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.date | date: constants.DEFAULT_DATE_DISPLAY_FORMAT }}
+                {{ item.date | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
             </mat-cell>
         </ng-container>
 
@@ -68,7 +64,7 @@
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ 'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_AREA' | translate }}</div>
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -83,7 +79,7 @@
         <ng-container matColumnDef="fullAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ 'LNG_PAGE_LIST_FOLLOW_UPS_HEADER_COLUMN_ADDRESS' | translate }}</div>
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>

@@ -70,17 +70,13 @@ export const JapaneseLang = {
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': '[言語] Date of Infection',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_POSTAL_CODE': '[言語] Postal Code',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_COUNTRY': '[言語] Country',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': '[言語] Fill Geo-Location Latitude',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': '[言語] Date of Outcome',
         'LNG_CASE_FIELD_LABEL_AGE': '[言語] Age',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': '[言語] First Name',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': '[言語] Date of Onset',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_NAME': '[言語] Name',
         'LNG_CASE_FIELD_LABEL_RISK_REASON': '[言語] Risk Reason',
         'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': '[言語] Hospitalization Dates',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION_ID': '[言語] Location ID',
         'LNG_CASE_FIELD_LABEL_ID': '[言語] ID',
         'LNG_CASE_FIELD_LABEL_UPDATED_AT': '[言語] Updated At',
         'LNG_CASE_FIELD_LABEL_OUTBREAK_ID': '[言語] Outbreak ID',
@@ -88,8 +84,6 @@ export const JapaneseLang = {
         'LNG_CASE_FIELD_LABEL_CREATED_BY': '[言語] Created By',
         'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE': '[言語] Date of Becoming case',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': '[言語] Middle Name',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_GEO_LOCATION_LAT': '[言語] Geo-Location Latitude',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_ADDRESS_LINE_1': '[言語] Address Line 1',
         'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': '[言語] Incubation Dates',
         'LNG_CASE_FIELD_LABEL_DELETED_AT': '[言語] Deleted At',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LNG': '[言語] Fill Geo-Location Longitude',
@@ -108,9 +102,6 @@ export const JapaneseLang = {
         'LNG_CASE_FIELD_LABEL_LAST_NAME': '[言語] Last Name',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': '[言語] Date of Decease',
         'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': '[言語] Document Number',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_ADDRESS_LINE_2': '[言語] Address Line 2',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_CITY': '[言語] CITY',
-        'LNG_CASE_FIELD_LABEL_ADDRESS_GEO_LOCATION_LNG': '[言語] Geo-Location Longitude',
 
         /**
          * Permissions

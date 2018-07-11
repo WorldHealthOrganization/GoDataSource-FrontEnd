@@ -5,7 +5,7 @@
         <div fxLayout="column" fxFlex>
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <div>{{ relatedTitle }}</div>
-                <div>{{ relatedObject?.firstName + ' ' + relatedObject?.lastName}}</div>
+                <div>{{ relatedObject?.name }}</div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
@@ -19,7 +19,7 @@
                 </app-form-datepicker>
 
                 <app-form-slide-toggle
-                    name="name + '[contactDateEstimated]'"
+                    [name]="name + '[contactDateEstimated]'"
                     [(ngModel)]="relationship.contactDateEstimated"
                     [label]="'LNG_RELATIONSHIP_FIELD_CONTACT_DATE_ESTIMATED' | translate"
                     [disabled]="disabled"
