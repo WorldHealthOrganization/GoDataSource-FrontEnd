@@ -12,6 +12,8 @@ import { QuestionModel } from '../../../../core/models/question.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import * as _ from 'lodash';
+import { SnackbarComponent } from '../../../../shared/components/snackbar/snackbar.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -46,6 +48,7 @@ export class ModifyOutbreakComponent {
                 private router: Router,
                 private genericDataService: GenericDataService,
                 private snackbarService: SnackbarService,
+                private i18nService: I18nService,
                 private dialogService: DialogService) {
 
         this.route.params.subscribe(params => {
@@ -62,6 +65,11 @@ export class ModifyOutbreakComponent {
                     this.setNewFalse(this.outbreak.caseInvestigationTemplate);
                     this.setNewFalse(this.outbreak.contactFollowUpTemplate);
                     this.setNewFalse(this.outbreak.labResultsTemplate);
+
+                    this.setTranslation(this.outbreak.caseInvestigationTemplate);
+                    this.setTranslation(this.outbreak.contactFollowUpTemplate);
+                    this.setTranslation(this.outbreak.labResultsTemplate);
+
                 });
         });
     }
@@ -73,14 +81,12 @@ export class ModifyOutbreakComponent {
     modifyOutbreak(form) {
         if (form.valid) {
             const dirtyFields: any = form.value;
-            console.log(dirtyFields);
 
             // assign the questionnaires objects to the outbreak data
             dirtyFields.caseInvestigationTemplate = this.outbreak.caseInvestigationTemplate;
             dirtyFields.contactFollowUpTemplate = this.outbreak.contactFollowUpTemplate;
             dirtyFields.labResultsTemplate = this.outbreak.labResultsTemplate;
 
-            console.log(dirtyFields);
             // validate end date to be greater than start date
             if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
                 this.snackbarService.showError('End Date needs to be greater than start date');
@@ -95,6 +101,9 @@ export class ModifyOutbreakComponent {
                     })
                     .subscribe(() => {
                         this.snackbarService.showSuccess('Outbreak modified!');
+                        // load language tokens so they will be available
+                        this.i18nService.loadUserLanguage().subscribe(() => {
+                        });
                         // navigate to listing page
                         this.router.navigate(['/outbreaks']);
                     });
@@ -278,17 +287,42 @@ export class ModifyOutbreakComponent {
     /**
      * Set attribute new to false for all questions and answers in the array.
      */
-    setNewFalse( questionsArray = [] ) {
-        if ( !_.isEmpty(questionsArray)) {
-            _.forEach(questionsArray, function(question, key) {
+    setNewFalse(questionsArray = []) {
+        if (!_.isEmpty(questionsArray)) {
+            _.forEach(questionsArray, function (question, key) {
                 questionsArray[key].new = false;
-                if ( !_.isEmpty(questionsArray[key].answers) ) {
+                if (!_.isEmpty(questionsArray[key].answers)) {
                     _.forEach(questionsArray[key].answers, function (answer, keyAnswer) {
                         questionsArray[key].answers[keyAnswer].new = false;
                     });
                 }
-                });
-            }
+            });
         }
+    }
+
+    /**
+     * Replace token with translation for all questions and answers in the array.
+     */
+    setTranslation(questionsArray = []) {
+        if (!_.isEmpty(questionsArray)) {
+
+            // loop through questions
+            questionsArray.forEach((question, key) => {
+                // get translation for the question token and update the value of the question text property
+                const translatedValue = this.i18nService.instant(questionsArray[key].text);
+                questionsArray[key].text = translatedValue;
+
+                if (!_.isEmpty(questionsArray[key].answers)) {
+                    // loop through the answers array
+                    questionsArray[key].answers.forEach((answer, keyAnswer) => {
+                        // get translation for the answer label and update the property
+                        const translatedAnswerValue = this.i18nService.instant(questionsArray[key].answers[keyAnswer].label);
+                        questionsArray[key].answers[keyAnswer].label = translatedAnswerValue;
+                    });
+                }
+            });
+
+        }
+    }
 
 }

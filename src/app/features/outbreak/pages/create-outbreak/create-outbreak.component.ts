@@ -14,6 +14,7 @@ import { Observable } from 'rxjs/Observable';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -42,6 +43,7 @@ export class CreateOutbreakComponent {
                 private snackbarService: SnackbarService,
                 private genericDataService: GenericDataService,
                 private formHelper: FormHelperService,
+                private i18nService: I18nService,
                 private dialogService: DialogService) {
         this.diseasesList$ = this.genericDataService.getDiseasesList();
         this.countriesList$ = this.genericDataService.getCountriesList();
@@ -76,6 +78,9 @@ export class CreateOutbreakComponent {
                     })
                     .subscribe(response => {
                         this.snackbarService.showSuccess('Outbreak created');
+                        // load language tokens so they will be available
+                        this.i18nService.loadUserLanguage().subscribe(() => { });
+                        // navigate to listing page
                         this.router.navigate(['/outbreaks']);
                     });
             }

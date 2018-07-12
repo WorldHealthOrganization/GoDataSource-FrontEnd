@@ -132,5 +132,16 @@ export class I18nService {
         return this.translateService.get(token, data);
     }
 
+    /**
+     * Get the translation of a token
+     * @param token Token to be translated
+     * @param {{}} data Parameters to be replaced in translated message
+     * @returns String
+     */
+    instant(token, data = {}) {
+        return this.translateService.instant(token, data);
+    }
+
+
 }
 
