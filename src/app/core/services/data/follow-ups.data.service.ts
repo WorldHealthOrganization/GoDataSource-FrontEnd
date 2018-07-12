@@ -92,5 +92,17 @@ export class FollowUpsDataService {
     createFollowUp(outbreakId: string, contactId: string, followUpData): Observable<any> {
         return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups`, followUpData);
     }
+
+    /**
+     * Modify an existing Follow-up for a Contact
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param {string} followUpId
+     * @param followUpData
+     * @returns {Observable<any>}
+     */
+    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<any> {
+        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData);
+    }
 }
 

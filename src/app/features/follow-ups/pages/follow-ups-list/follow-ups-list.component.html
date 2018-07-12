@@ -100,7 +100,9 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-
+                    <button mat-menu-item *ngIf="item.contact?.id" (click)="markContactAsMissedFromFollowUp(item)">
+                        Mark contact as missed
+                    </button>
                 </mat-menu>
             </mat-cell>
         </ng-container>

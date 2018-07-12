@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -14,8 +13,9 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { LocationModel } from '../../../../core/models/location.model';
-import { AddressModel } from '../../../../core/models/address.model';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -47,7 +47,8 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
-        private locationDataService: LocationDataService
+        private locationDataService: LocationDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -105,9 +106,9 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
         ];
 
         // check if the authenticated user has WRITE access
-        // if (this.hasFollowUpsWriteAccess()) {
-        //     columns.push('actions');
-        // }
+        if (this.hasFollowUpsWriteAccess()) {
+            columns.push('actions');
+        }
 
         // return columns that should be visible
         return columns;
@@ -131,5 +132,36 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
                     this.refreshList();
                 });
         }
+    }
+
+    /**
+     * Mark a contact as missing from a follow-up
+     * @param {FollowUpModel} followUp
+     */
+    markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    this.outbreakDataService
+                        .getSelectedOutbreak()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            // mark follow-up
+                            this.followUpsDataService
+                                .modifyFollowUp(selectedOutbreak.id, followUp.contact.id, followUp.id, {
+                                    lostToFollowUp: true
+                                })
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
+                                });
+                        });
+                }
+            });
+
     }
 }
