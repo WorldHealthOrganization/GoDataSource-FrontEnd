@@ -62,6 +62,22 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve the list of Answer Types
+     * @returns {Observable<any[]>}
+     */
+    getAnswerTypesList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.ANSWER_TYPES));
+    }
+
+    /**
+     * Retrieve the list of Question Categories
+     * @returns {Observable<any[]>}
+     */
+    getQuestionCategoriesList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.QUESTION_CATEGORIES));
+    }
+
+    /**
      * Retrieve the list of Certainty Level options
      * @returns {Observable<any[]>}
      */

@@ -18,6 +18,17 @@ export class Constants {
         }
     };
 
+    static ANSWER_TYPES = {
+        FREE_TEXT: {
+            label: 'Free text',
+            value: 'Free text'
+        },
+        MULTIPLE_OPTIONS: {
+            label: 'Multiple Options',
+            value: 'Multiple Options'
+        }
+    };
+
     // #TODO replace with Reference Data
     static CASE_CLASSIFICATION = {
         SUSPECT: {
@@ -134,6 +145,18 @@ export class Constants {
             value: false
         }
 
+    };
+
+    // #TODO replace with Reference Data
+    static QUESTION_CATEGORIES = {
+        PHYSICAL_EXAMINATION: {
+            label: 'Physical Examination',
+            value: 'Physical Examination'
+        },
+        CLINICAL: {
+            label: 'Clinical',
+            value: 'Clinical'
+        }
     };
 
     // #TODO replace with Reference Data

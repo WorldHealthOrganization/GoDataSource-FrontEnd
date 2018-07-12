@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { QuestionModel } from './question.model';
 
 export class OutbreakModel {
     id: string;
@@ -14,9 +15,9 @@ export class OutbreakModel {
     noDaysDaysInChains: number;
     noDaysNotSeen: number;
     noLessContacts: number;
-    caseInvestigationTemplate: any;
-    contactFollowUpTemplate: any | null;
-    labResultsTemplate: any | null;
+    caseInvestigationTemplate: QuestionModel[];
+    contactFollowUpTemplate: QuestionModel[];
+    labResultsTemplate: QuestionModel[];
     // TODO - need to allow to set case classifications on outbreak
     // caseClassification: any | null;
     caseIdMask: string;
@@ -40,15 +41,9 @@ export class OutbreakModel {
         this.noLessContacts = _.get(data, 'noLessContacts');
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
-        this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate');
-        if(this.caseInvestigationTemplate == null)
-            this.caseInvestigationTemplate = [];
-        this.contactFollowUpTemplate = _.get(data, 'contactFollowUpTemplate');
-        if(this.contactFollowUpTemplate == null)
-            this.contactFollowUpTemplate = [];
-        this.labResultsTemplate = _.get(data, 'labResultsTemplate');
-        if(this.labResultsTemplate == null)
-            this.labResultsTemplate = [];
+        this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate', []);
+        this.contactFollowUpTemplate = _.get(data, 'contactFollowUpTemplate', []);
+        this.labResultsTemplate = _.get(data, 'labResultsTemplate', []);
         this.caseIdMask = _.get(data, 'caseIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
     }

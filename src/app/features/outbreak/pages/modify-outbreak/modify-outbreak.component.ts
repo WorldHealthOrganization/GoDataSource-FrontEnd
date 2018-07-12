@@ -11,6 +11,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { QuestionModel } from '../../../../core/models/question.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -25,9 +26,13 @@ export class ModifyOutbreakComponent {
         new BreadcrumbItemModel('Modify Outbreak', '.', true)
     ];
 
+    // id of the outbreak to modify
     outbreakId: string;
+    // outbreak to modify
     outbreak: OutbreakModel = new OutbreakModel();
+    // list of diseases
     diseasesList$: Observable<any[]>;
+    // list of countries
     countriesList$: Observable<any[]>;
 
     // controls for switching between view and edit mode
@@ -35,11 +40,6 @@ export class ModifyOutbreakComponent {
     viewOnlyContactFollowup = true;
     viewOnlyLabResults = true;
     currentTabIndex = 0;
-
-    // questionnaires for outbreak
-    caseInvestigationTemplateQuestions: any;
-    contactFollowupTemplateQuestions: any;
-    labResultsTemplateQuestions: any;
 
     constructor(private outbreakDataService: OutbreakDataService,
                 private route: ActivatedRoute,
@@ -56,25 +56,31 @@ export class ModifyOutbreakComponent {
                 .getOutbreak(this.outbreakId)
                 .subscribe(outbreakData => {
                     this.outbreak = outbreakData;
-                    this.caseInvestigationTemplateQuestions = outbreakData.caseInvestigationTemplate;
-                    this.contactFollowupTemplateQuestions = outbreakData.contactFollowUpTemplate;
-                    this.labResultsTemplateQuestions = outbreakData.labResultsTemplate;
                     this.diseasesList$ = this.genericDataService.getDiseasesList();
                     this.countriesList$ = this.genericDataService.getCountriesList();
+                    // set questions and answers to new property to false.
+                    this.setNewFalse(this.outbreak.caseInvestigationTemplate);
+                    this.setNewFalse(this.outbreak.contactFollowUpTemplate);
+                    this.setNewFalse(this.outbreak.labResultsTemplate);
                 });
-
         });
     }
 
+    /**
+     * Handles form submit
+     * @param form
+     */
     modifyOutbreak(form) {
         if (form.valid) {
             const dirtyFields: any = form.value;
+            console.log(dirtyFields);
 
             // assign the questionnaires objects to the outbreak data
-            dirtyFields.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
-            dirtyFields.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
-            dirtyFields.labResultsTemplate = this.labResultsTemplateQuestions;
+            dirtyFields.caseInvestigationTemplate = this.outbreak.caseInvestigationTemplate;
+            dirtyFields.contactFollowUpTemplate = this.outbreak.contactFollowUpTemplate;
+            dirtyFields.labResultsTemplate = this.outbreak.labResultsTemplate;
 
+            console.log(dirtyFields);
             // validate end date to be greater than start date
             if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
                 this.snackbarService.showError('End Date needs to be greater than start date');
@@ -151,18 +157,18 @@ export class ModifyOutbreakComponent {
         const newQuestion = new QuestionModel();
         switch (tab) {
             case 'case-investigation': {
-                newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
-                this.caseInvestigationTemplateQuestions.push(new QuestionModel());
+                newQuestion.order = this.outbreak.caseInvestigationTemplate.length + 1;
+                this.outbreak.caseInvestigationTemplate.push(new QuestionModel());
                 break;
             }
             case 'contact-followup': {
-                newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
-                this.contactFollowupTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.outbreak.contactFollowUpTemplate.length + 1;
+                this.outbreak.contactFollowUpTemplate.push(newQuestion);
                 break;
             }
             case 'lab-results': {
-                newQuestion.order = this.labResultsTemplateQuestions.length + 1;
-                this.labResultsTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.outbreak.labResultsTemplate.length + 1;
+                this.outbreak.labResultsTemplate.push(newQuestion);
                 break;
             }
         }
@@ -180,15 +186,15 @@ export class ModifyOutbreakComponent {
                 if (answer === DialogConfirmAnswer.Yes) {
                     switch (tab) {
                         case 'case-investigation': {
-                            this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
+                            this.outbreak.caseInvestigationTemplate = this.outbreak.caseInvestigationTemplate.filter(item => item !== question);
                             break;
                         }
                         case 'contact-followup': {
-                            this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
+                            this.outbreak.contactFollowUpTemplate = this.outbreak.contactFollowUpTemplate.filter(item => item !== question);
                             break;
                         }
                         case 'lab-results': {
-                            this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
+                            this.outbreak.labResultsTemplate = this.outbreak.labResultsTemplate.filter(item => item !== question);
                             break;
                         }
                     }
@@ -208,52 +214,22 @@ export class ModifyOutbreakComponent {
                     const newQuestion = JSON.parse(JSON.stringify(question));
                     switch (tab) {
                         case 'case-investigation': {
-                            newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
-                            this.caseInvestigationTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.outbreak.caseInvestigationTemplate.length + 1;
+                            this.outbreak.caseInvestigationTemplate.push(newQuestion);
                             break;
                         }
                         case 'contact-followup': {
-                            newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
-                            this.contactFollowupTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.outbreak.contactFollowUpTemplate.length + 1;
+                            this.outbreak.contactFollowUpTemplate.push(newQuestion);
                             break;
                         }
                         case 'lab-results': {
-                            newQuestion.order = this.labResultsTemplateQuestions.length + 1;
-                            this.labResultsTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.outbreak.labResultsTemplate.length + 1;
+                            this.outbreak.labResultsTemplate.push(newQuestion);
                             break;
                         }
                     }
                     this.scrollToEndQuestions();
-                }
-            });
-    }
-
-    /**
-     * Delete an answer
-     * @param tab
-     * @param $event
-     */
-    deleteAnswer(tab, $event) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    const answerToDelete = $event.answer;
-                    console.log(answerToDelete);
-                    // TODO delete answer
-                    switch (tab) {
-                        case 'case-investigation': {
-                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'contact-followup': {
-                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'lab-results': {
-                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                    }
                 }
             });
     }
@@ -269,7 +245,6 @@ export class ModifyOutbreakComponent {
                 if (answer === DialogConfirmAnswer.Yes) {
                     const answerToLink = $event.answer;
                     // TODO link answer
-                    console.log(answerToLink);
                     switch (tab) {
                         case 'case-investigation': {
                             // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
@@ -293,12 +268,27 @@ export class ModifyOutbreakComponent {
      */
     scrollToEndQuestions() {
         setTimeout(function () {
-            const elements = document.querySelectorAll('question');
+            const elements = document.querySelectorAll('app-question');
             const len = elements.length;
             const el = elements[len - 1] as HTMLElement;
             el.scrollIntoView({behavior: 'smooth'});
         }, 100);
     }
 
+    /**
+     * Set attribute new to false for all questions and answers in the array.
+     */
+    setNewFalse( questionsArray = [] ) {
+        if ( !_.isEmpty(questionsArray)) {
+            _.forEach(questionsArray, function(question, key) {
+                questionsArray[key].new = false;
+                if ( !_.isEmpty(questionsArray[key].answers) ) {
+                    _.forEach(questionsArray[key].answers, function (answer, keyAnswer) {
+                        questionsArray[key].answers[keyAnswer].new = false;
+                    });
+                }
+                });
+            }
+        }
 
 }

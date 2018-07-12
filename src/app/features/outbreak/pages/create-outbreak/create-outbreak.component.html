@@ -4,7 +4,7 @@
     </ng-container>
 </app-topnav>
 
-<div class="page-content">
+<div class="page-content create-outbreak-page">
 
     <mat-horizontal-stepper linear #stepper>
 
@@ -41,7 +41,9 @@
                                 multiple="true"
                             >
                             </app-form-select>
-                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex>
+                                <!-- placeholder -->
+                            </div>
                         </div>
                         <app-form-textarea
                             name="description"
@@ -126,7 +128,7 @@
                     </div>
                 </mat-card>
                 <div>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>Next</button>
                 </div>
             </form>
         </mat-step>
@@ -136,19 +138,24 @@
             <form #caseInvestigationForm="ngForm">
                 <ng-template matStepLabel>Case Investigation</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" type="button" mat-button
-                            color="primary" (click)="addNewQuestion('case-investigation')">Add Question
+                    <button mat-button type="button" fxFlexOffset="15px"
+                            color="primary" class="link-primary"
+                            (click)="addNewQuestion('case-investigation')">
+                        Add Question
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <app-question *ngFor="let question of caseInvestigationTemplateQuestions" [question]="question"
-                              [viewOnly]="viewOnlyCaseInvestigation"
-                              (deleteQuestion)="deleteQuestion('case-investigation',question)"
-                              (deleteAnswer)="deleteAnswer('case-investigation',$event)"
-                              (linkAnswer)="linkAnswer('case-investigation',$event)"
-                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)"></app-question>
+                    <app-question *ngFor="let question of newOutbreak.caseInvestigationTemplate; let i = index"
+                                  [question]="question"
+                                  [viewOnly]="false"
+                                  [index]="i"
+                                  [name]="'caseInvestigationTemplate'"
+                                  (deleteQuestion)="deleteQuestion('case-investigation',question)"
+                                  (linkAnswer)="linkAnswer('case-investigation',$event)"
+                                  (duplicateQuestion)="duplicateQuestion('case-investigation',question)">
+                    </app-question>
                 </div>
-                <button mat-raised-button color="primary" matStepperNext>Next</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>Next</button>
             </form>
         </mat-step>
 
@@ -157,19 +164,24 @@
             <form #contactFollowUpForm="ngForm">
                 <ng-template matStepLabel>Contact Follow-up</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" type="button" mat-button
-                            color="primary" (click)="addNewQuestion('contact-followup')">Add Question
+                    <button mat-button type="button" fxFlexOffset="15px"
+                            color="primary" class="link-primary"
+                            (click)="addNewQuestion('contact-followup')">
+                        Add Question
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <app-question *ngFor="let question of contactFollowupTemplateQuestions" [question]="question"
-                              [viewOnly]="viewOnlyContactFollowup"
-                              (deleteQuestion)="deleteQuestion('contact-followup',question)"
-                              (deleteAnswer)="deleteAnswer('contact-followup',$event)"
-                              (linkAnswer)="linkAnswer('contact-followup',$event)"
-                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)"></app-question>
+                    <app-question *ngFor="let question of newOutbreak.contactFollowUpTemplate; let i = index"
+                                  [question]="question"
+                                  [viewOnly]="false"
+                                  [index]="i"
+                                  [name]="'contactFollowUpTemplate'"
+                                  (deleteQuestion)="deleteQuestion('contact-followup',question)"
+                                  (linkAnswer)="linkAnswer('contact-followup',$event)"
+                                  (duplicateQuestion)="duplicateQuestion('contact-followup',question)">
+                    </app-question>
                 </div>
-                <button mat-raised-button color="primary" matStepperNext>Next</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>Next</button>
             </form>
         </mat-step>
 
@@ -178,19 +190,24 @@
             <form #labResultsForm="ngForm">
                 <ng-template matStepLabel>Lab Results</ng-template>
                 <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                    <button fxFlexOffset="15px" type="button" mat-button
-                            color="primary" (click)="addNewQuestion('lab-results')">Add Question
+                    <button mat-button type="button" fxFlexOffset="15px"
+                            color="primary" class="link-primary"
+                            (click)="addNewQuestion('lab-results')">
+                        Add Question
                     </button>
                 </div>
                 <div class="questions-wrapper">
-                    <app-question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
-                              [viewOnly]="viewOnlyLabResults"
-                              (deleteQuestion)="deleteQuestion('lab-results',question)"
-                              (deleteAnswer)="deleteAnswer('lab-results',$event)"
-                              (linkAnswer)="linkAnswer('lab-results',$event)"
-                              (duplicateQuestion)="duplicateQuestion('lab-results',question)"></app-question>
+                    <app-question *ngFor="let question of newOutbreak.labResultsTemplate; let i = index"
+                                  [question]="question"
+                                  [viewOnly]="false"
+                                  [index]="i"
+                                  [name]="'labResultsTemplate'"
+                                  (deleteQuestion)="deleteQuestion('lab-results',question)"
+                                  (linkAnswer)="linkAnswer('lab-results',$event)"
+                                  (duplicateQuestion)="duplicateQuestion('lab-results',question)">
+                    </app-question>
                 </div>
-                <button mat-raised-button color="primary" matStepperNext>Next</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>Next</button>
             </form>
         </mat-step>
 
@@ -204,7 +221,7 @@
             <br><br><br>
             <div>
                 <button matStepperPrevious mat-raised-button>Back</button>
-                <button type="button" mat-raised-button color="primary"
+                <button type="button" mat-raised-button color="primary" class="button-primary"
                         (click)="createOutbreak([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
                     Create Outbreak
                 </button>

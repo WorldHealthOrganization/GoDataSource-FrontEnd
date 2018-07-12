@@ -37,7 +37,9 @@
                                 required="true"
                             >
                             </app-form-select>
-                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex>
+                                <!-- placeholder -->
+                            </div>
                         </div>
                         <app-form-textarea
                             name="description"
@@ -116,49 +118,61 @@
                                 placeholder="Long Periods ( days )"
                                 required="true">
                             </app-form-input>
-                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex>
+                                <!-- placeholder -->
+                            </div>
                         </div>
                     </div>
                 </mat-card>
 
             </mat-tab>
             <mat-tab label="Case Investigation">
-                <br>
-                <button fxFlexOffset="15px" fxShow="{{!viewOnlyCaseInvestigation}}" type="button" mat-button
-                        color="primary" (click)="addNewQuestion('case-investigation')">Add Question
+                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyCaseInvestigation}}"
+                        color="primary" class="link-primary"
+                        (click)="addNewQuestion('case-investigation')">
+                    Add Question
                 </button>
-                <app-question *ngFor="let question of caseInvestigationTemplateQuestions"
-                          [question]="question"
-                          [viewOnly]="viewOnlyCaseInvestigation"
-                          (deleteQuestion)="deleteQuestion('case-investigation',question)"
-                          (deleteAnswer)="deleteAnswer('case-investigation',$event)"
-                          (linkAnswer)="linkAnswer('case-investigation',$event)"
-                          (duplicateQuestion)="duplicateQuestion('case-investigation',question)"></app-question>
+                <app-question *ngFor="let question of outbreak.caseInvestigationTemplate; let i = index"
+                              [question]="question"
+                              [viewOnly]="viewOnlyCaseInvestigation"
+                              [index]="i"
+                              [name]="'caseInvestigationTemplate'"
+                              (deleteQuestion)="deleteQuestion('case-investigation',question)"
+                              (linkAnswer)="linkAnswer('case-investigation',$event)"
+                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)">
+                </app-question>
             </mat-tab>
             <mat-tab label="Contact Follow-up">
-                <br>
-                <button fxFlexOffset="15px" fxShow="{{!viewOnlyContactFollowup}}" type="button" mat-button
-                        color="primary" (click)="addNewQuestion('contact-followup')">Add Question
+                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyContactFollowup}}"
+                        color="primary" class="link-primary"
+                        (click)="addNewQuestion('contact-followup')">
+                    Add Question
                 </button>
-                <app-question *ngFor="let question of contactFollowupTemplateQuestions"
-                          [question]="question"
-                          [viewOnly]="viewOnlyContactFollowup"
-                          (deleteQuestion)="deleteQuestion('contact-followup',question)"
-                          (deleteAnswer)="deleteAnswer('contact-followup',$event)"
-                          (linkAnswer)="linkAnswer('contact-followup',$event)"
-                          (duplicateQuestion)="duplicateQuestion('contact-followup',question)"></app-question>
+                <app-question *ngFor="let question of outbreak.contactFollowUpTemplate; let i = index"
+                              [question]="question"
+                              [viewOnly]="viewOnlyContactFollowup"
+                              [index]="i"
+                              [name]="'contactFollowUpTemplate'"
+                              (deleteQuestion)="deleteQuestion('contact-followup',question)"
+                              (linkAnswer)="linkAnswer('contact-followup',$event)"
+                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)">
+                </app-question>
             </mat-tab>
             <mat-tab label="Lab Results">
-                <br>
-                <button fxFlexOffset="15px" fxShow="{{!viewOnlyLabResults}}" type="button" mat-button
-                        color="primary" (click)="addNewQuestion('lab-results')">Add Question
+                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyLabResults}}"
+                        color="primary" class="link-primary"
+                        (click)="addNewQuestion('lab-results')">
+                    Add Question
                 </button>
-                <app-question *ngFor="let question of labResultsTemplateQuestions" [question]="question"
-                          [viewOnly]="viewOnlyLabResults"
-                          (deleteQuestion)="deleteQuestion('lab-results',question)"
-                          (deleteAnswer)="deleteAnswer('lab-results',$event)"
-                          (linkAnswer)="linkAnswer('lab-results',$event)"
-                          (duplicateQuestion)="duplicateQuestion('lab-results',question)"></app-question>
+                <app-question *ngFor="let question of outbreak.labResultsTemplate; let i = index"
+                              [question]="question"
+                              [viewOnly]="viewOnlyLabResults"
+                              [index]="i"
+                              [name]="'labResultsTemplate'"
+                              (deleteQuestion)="deleteQuestion('lab-results',question)"
+                              (linkAnswer)="linkAnswer('lab-results',$event)"
+                              (duplicateQuestion)="duplicateQuestion('lab-results',question)">
+                </app-question>
             </mat-tab>
         </mat-tab-group>
     </div>
@@ -166,29 +180,53 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <!-- buttons for details tab -->
-        <button fxShow="{{currentTabIndex == 0 }}" mat-raised-button color="primary">Save</button>
-        <button fxShow="{{currentTabIndex == 0 }}" type="button" [routerLink]="'/outbreaks'" mat-raised-button>Cancel
+        <button fxShow="{{currentTabIndex == 0 }}"
+                mat-raised-button
+                color="primary"
+                class="button-primary">
+            Save
+        </button>
+        <button fxShow="{{currentTabIndex == 0 }}"
+                type="button"
+                [routerLink]="'/outbreaks'"
+                mat-raised-button>
+            Cancel
         </button>
 
         <!-- buttons for case investigation tab -->
-        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button color="primary">
+        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+                mat-raised-button
+                color="primary"
+                class="button-primary">
             Save
         </button>
-        <button fxShow="{{viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
+        <button fxShow="{{viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+                mat-raised-button
+                type="button"
                 color="primary"
+                class="button-primary"
                 (click)="enableEdit('case-investigation')">
             Edit
         </button>
-        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}" mat-raised-button type="button"
-                type="button" (click)="disableEdit('case-investigation')">
+        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+                mat-raised-button
+                type="button"
+                (click)="disableEdit('case-investigation')">
             View
         </button>
 
         <!-- buttons for contact followup tab -->
-        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button color="primary">Save
-        </button>
-        <button fxShow="{{viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button"
+        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}"
+                mat-raised-button
                 color="primary"
+                class="button-primary">
+            Save
+        </button>
+        <button fxShow="{{viewOnlyContactFollowup && currentTabIndex == 2 }}"
+                mat-raised-button
+                type="button"
+                color="primary"
+                class="button-primary"
                 (click)="enableEdit('contact-followup')">
             Edit
         </button>
@@ -198,13 +236,23 @@
         </button>
 
         <!-- buttons for lab results tab -->
-        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button color="primary">Save
+        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}"
+                mat-raised-button
+                color="primary"
+                class="button-primary">
+            Save
         </button>
-        <button fxShow="{{viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" color="primary"
+        <button fxShow="{{viewOnlyLabResults && currentTabIndex == 3 }}"
+                mat-raised-button
+                type="button"
+                color="primary"
+                class="button-primary"
                 (click)="enableEdit('lab-results')">
             Edit
         </button>
-        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}" mat-raised-button type="button" type="button"
+        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}"
+                mat-raised-button
+                type="button"
                 (click)="disableEdit('lab-results')">
             View
         </button>

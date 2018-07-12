@@ -1,17 +1,20 @@
 <mat-card class="page-section question-card">
+
     <div fxLayout="row" class="question-wrapper">
-        <div class="question-badge align-center" fxFlex="40px">
-            Q{{question.order}}
+
+        <div class="question-badge" fxFlex="40px">
+            Q{{index + 1}}
         </div>
-        <div class="question-box" fxFlex="30">
+
+        <div class="question-box" fxFlex="40">
             <app-form-input
-                name="question[new]"
+                [name]="name + '[' + index + '][new]'"
                 [(ngModel)]="question.new"
                 hidden="true"
             >
             </app-form-input>
             <app-form-input
-                name="question[text]"
+                [name]="name + '[' + index + '][text]'"
                 [(ngModel)]="question.text"
                 placeholder="Question"
                 required="true"
@@ -19,41 +22,31 @@
             >
             </app-form-input>
         </div>
-        <div class="question-box" fxFlex="15">
+
+        <div class="question-box" fxFlex="20">
             <app-form-select
-                name="question[category]"
+                [name]="name + '[' + index + '][category]'"
                 [(ngModel)]="question.category"
                 placeholder="Category"
                 required="true"
-                [options]="[{'value':'Physical Examination','label':'Physical Examination'},{'value':'Clinical','label':'Clinical'}]"
-                multiple="false"
+                [options]="questionCategoriesList$ | async"
                 disabled="{{viewOnly}}">
             </app-form-select>
         </div>
-        <div class="question-box" fxFlex="15">
+
+        <div class="question-box" fxFlex>
             <app-form-input
-                name="question[variable]"
+                [name]="name + '[' + index + '][variable]'"
                 [(ngModel)]="question.variable"
-                placeholder="Question Variable"
-                required="true"
+                placeholder="Variable"
                 disabled="{{viewOnly}}"
             >
             </app-form-input>
         </div>
-        <div class="question-box" fxFlex="15">
-        <app-form-select
-            name="question[answerType]"
-            [(ngModel)]="question.answerType"
-            placeholder="Answer Type"
-            required="true"
-            [options]="[{'value':'Free text','label':'Free text'}]"
-            multiple="false"
-            disabled="{{viewOnly}}">
-        </app-form-select>
-        </div>
-        <div class="question-box  align-right" fxFlex="25" fxHide="{{viewOnly}}">
+
+        <div class="question-box  text-right" fxFlex="25" fxHide="{{viewOnly}}">
             <app-form-slide-toggle
-                name="question[required]"
+                [name]="name + '[' + index + '][required]'"
                 [(ngModel)]="question.required"
                 label="Required?">
             </app-form-slide-toggle>
@@ -65,8 +58,47 @@
                 <span class="xt-icon">delete</span>
             </button>
         </div>
-        <div class="question-box align-center" fxFlex="20" fxHide="{{!viewOnly}}">
-            <div class="alert-label">{{ question.required ? "REQUIRED" : ""}}</div>
+        <div class="question-box text-right" fxFlex="20" fxHide="{{!viewOnly}}">
+            <div>{{ question.required ? "Required" : ""}}</div>
+        </div>
+    </div>
+
+    <div fxLayout="row" class="answer-wrapper">
+        <div fxFlex="40px" fxLayoutAlign="center center">
+            <button [fxShow]="question.answerType === multipleOptionsAnswerType && !viewOnly"
+                    flex mat-icon-button
+                    color="primary"
+                    class="link-primary"
+                    type="button"
+                    (click)="addAnswer()">
+                Add
+            </button>
+        </div>
+        <div class="answer-box" fxFlex="35">
+            <app-form-select
+                [name]="name + '[' + index + '][answerType]'"
+                [(ngModel)]="question.answerType"
+                placeholder="Answer Type"
+                required="true"
+                [options]="answerTypesList$ | async"
+                multiple="false"
+                disabled="{{viewOnly}}"
+                (optionChanged)="answerTypeChanged()"
+            >
+            </app-form-select>
+        </div>
+        <div fxFlex>
+            <div *ngFor="let answer of question.answers; let i = index" fxFlex fxLayout="column"
+                 [fxShow]="question.answerType === multipleOptionsAnswerType">
+                <app-answer
+                    [answer]="question.answers[i]"
+                    [name]="name + '[' + index + ']'"
+                    [viewOnly]="viewOnly"
+                    [index]="i"
+                    (deleteAnswer)="deleteAnswerFromQuestion($event)"
+                >
+                </app-answer>
+            </div>
         </div>
     </div>
 

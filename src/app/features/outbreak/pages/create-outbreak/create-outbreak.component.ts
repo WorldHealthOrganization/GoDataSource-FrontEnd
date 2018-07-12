@@ -32,19 +32,8 @@ export class CreateOutbreakComponent {
     diseasesList$: Observable<any[]>;
     countriesList$: Observable<any[]>;
 
-    // control view / edit - only edit in Create
-    viewOnlyCaseInvestigation = false;
-    viewOnlyContactFollowup = false;
-    viewOnlyLabResults = false;
-
-    // save questionnaires
-    caseInvestigationTemplateQuestions: any;
-    contactFollowupTemplateQuestions: any;
-    labResultsTemplateQuestions: any;
-
-    // We'll initially populate these questions, until we develop the ability to add new questions.
-    // TODO Ability to add new question and validations on questions
-    questions = [];
+    // TODO Validations on questions
+    // TODO Handle translation of values from questions / answers
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -54,9 +43,6 @@ export class CreateOutbreakComponent {
                 private genericDataService: GenericDataService,
                 private formHelper: FormHelperService,
                 private dialogService: DialogService) {
-        this.caseInvestigationTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
-        this.contactFollowupTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
-        this.labResultsTemplateQuestions = JSON.parse(JSON.stringify(this.questions));
         this.diseasesList$ = this.genericDataService.getDiseasesList();
         this.countriesList$ = this.genericDataService.getCountriesList();
     }
@@ -72,11 +58,11 @@ export class CreateOutbreakComponent {
         ) {
             const outbreakData = new OutbreakModel(dirtyFields);
 
-            outbreakData.caseInvestigationTemplate = this.caseInvestigationTemplateQuestions;
-            // TODO add validation on questionnaires
-            outbreakData.contactFollowUpTemplate = this.contactFollowupTemplateQuestions;
-            // TODO add validation on questionnaires
-            outbreakData.labResultsTemplate = this.labResultsTemplateQuestions;
+            // add questionnaires values to outbreakData
+            outbreakData.caseInvestigationTemplate = this.newOutbreak.caseInvestigationTemplate;
+            outbreakData.contactFollowUpTemplate = this.newOutbreak.contactFollowUpTemplate;
+            outbreakData.labResultsTemplate = this.newOutbreak.labResultsTemplate;
+
             // validate end date to be greater than start date
             if (outbreakData.endDate && outbreakData.endDate < outbreakData.startDate) {
                 this.snackbarService.showError('End Date needs to be greater than start date');
@@ -104,18 +90,18 @@ export class CreateOutbreakComponent {
         const newQuestion = new QuestionModel();
         switch (tab) {
             case 'case-investigation': {
-                newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
-                this.caseInvestigationTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.newOutbreak.caseInvestigationTemplate.length + 1;
+                this.newOutbreak.caseInvestigationTemplate.push(newQuestion);
                 break;
             }
             case 'contact-followup': {
-                newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
-                this.contactFollowupTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.newOutbreak.contactFollowUpTemplate.length + 1;
+                this.newOutbreak.contactFollowUpTemplate.push(newQuestion);
                 break;
             }
             case 'lab-results': {
-                newQuestion.order = this.labResultsTemplateQuestions.length + 1;
-                this.labResultsTemplateQuestions.push(newQuestion);
+                newQuestion.order = this.newOutbreak.labResultsTemplate.length + 1;
+                this.newOutbreak.labResultsTemplate.push(newQuestion);
                 break;
             }
         }
@@ -133,15 +119,15 @@ export class CreateOutbreakComponent {
                 if (answer === DialogConfirmAnswer.Yes) {
                     switch (tab) {
                         case 'case-investigation': {
-                            this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
+                            this.newOutbreak.caseInvestigationTemplate = this.newOutbreak.caseInvestigationTemplate.filter(item => item !== question);
                             break;
                         }
                         case 'contact-followup': {
-                            this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
+                            this.newOutbreak.contactFollowUpTemplate = this.newOutbreak.contactFollowUpTemplate.filter(item => item !== question);
                             break;
                         }
                         case 'lab-results': {
-                            this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
+                            this.newOutbreak.labResultsTemplate = this.newOutbreak.labResultsTemplate.filter(item => item !== question);
                             break;
                         }
                     }
@@ -161,18 +147,18 @@ export class CreateOutbreakComponent {
                     const newQuestion = JSON.parse(JSON.stringify(question));
                     switch (tab) {
                         case 'case-investigation': {
-                            newQuestion.order = this.caseInvestigationTemplateQuestions.length + 1;
-                            this.caseInvestigationTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.newOutbreak.caseInvestigationTemplate.length + 1;
+                            this.newOutbreak.caseInvestigationTemplate.push(newQuestion);
                             break;
                         }
                         case 'contact-followup': {
-                            newQuestion.order = this.contactFollowupTemplateQuestions.length + 1;
-                            this.contactFollowupTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.newOutbreak.contactFollowUpTemplate.length + 1;
+                            this.newOutbreak.contactFollowUpTemplate.push(newQuestion);
                             break;
                         }
                         case 'lab-results': {
-                            newQuestion.order = this.labResultsTemplateQuestions.length + 1;
-                            this.labResultsTemplateQuestions.push(newQuestion);
+                            newQuestion.order = this.newOutbreak.labResultsTemplate.length + 1;
+                            this.newOutbreak.labResultsTemplate.push(newQuestion);
                             break;
                         }
                     }
@@ -182,37 +168,7 @@ export class CreateOutbreakComponent {
     }
 
     /**
-     * Delete an answer
-     * @param tab
-     * @param $event
-     */
-    deleteAnswer(tab, $event) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    const answerToDelete = $event.answer;
-                    console.log(answerToDelete);
-                    // TODO delete answer
-                    switch (tab) {
-                        case 'case-investigation': {
-                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'contact-followup': {
-                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'lab-results': {
-                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                    }
-                }
-            });
-    }
-
-    /**
-     * Link an answer to another question
+     * TODO Link an answer to another question
      * @param tab
      * @param $event
      */
@@ -222,18 +178,14 @@ export class CreateOutbreakComponent {
                 if (answer === DialogConfirmAnswer.Yes) {
                     const answerToLink = $event.answer;
                     // TODO link answer
-                    console.log(answerToLink);
                     switch (tab) {
                         case 'case-investigation': {
-                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
                             break;
                         }
                         case 'contact-followup': {
-                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
                             break;
                         }
                         case 'lab-results': {
-                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
                             break;
                         }
                     }
@@ -241,9 +193,12 @@ export class CreateOutbreakComponent {
             });
     }
 
+    /**
+     * Scroll to the last question
+     */
     scrollToEndQuestions() {
         setTimeout(function () {
-            const elements = document.querySelectorAll('question');
+            const elements = document.querySelectorAll('app-question');
             const len = elements.length;
             const el = elements[len - 1] as HTMLElement;
             el.scrollIntoView({behavior: 'smooth'});

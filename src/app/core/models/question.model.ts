@@ -1,26 +1,24 @@
 import * as _ from 'lodash';
-import { LocationModel } from './location.model';
+import { AnswerModel } from './answer.model';
 
 export class QuestionModel {
     new: boolean;
     text: string;
     variable: string;
-    answerType: string;
     category: string;
+    required: boolean;
     order: number;
-    answers: any;
+    answerType: string;
+    answers: AnswerModel[];
 
     constructor(data = null) {
+        this.new = _.get(data, 'new', true);
         this.text = _.get(data, 'text');
-        if ( !_.isNull(data) ) {
-            this.new = true;
-        }
         this.variable = _.get(data, 'variable');
-        this.answerType = _.get(data, 'answerType');
         this.category = _.get(data, 'category');
+        this.required = _.get(data, 'required');
         this.order = _.get(data, 'order');
-        // this.answers = _.get(data, 'answers');
-        // TODO only temporary initialize answers with an array of answers.
-        this.answers = [];
+        this.answerType = _.get(data, 'answerType');
+        this.answers = _.get(data, 'answers', []);
     }
 }
