@@ -1,0 +1,15 @@
+<mat-card class="page-section page-content">
+    <mat-chip-list>
+        <mat-chip *ngFor="let item of items" (click)="onChange(item)">
+            <div
+                fxLayout="row">
+                <div class="counted-items-list-count" [style.background-color]="item.countBgColor">
+                    {{ item.count }}
+                </div>
+                <div class="counted-items-list-label">
+                    {{ item.label | translate }}
+                </div>
+            </div>
+        </mat-chip>
+    </mat-chip-list>
+</mat-card>

@@ -7,6 +7,11 @@
     </ng-container>
 </app-topnav>
 
+<app-counted-items-list
+    [items]="countedNewContactsGroupedByExposureType$ | async"
+    (optionChanged)="filterByRelationshipExposureType($event)">
+</app-counted-items-list>
+
 <mat-card class="page-section page-content">
 
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event)">
@@ -147,6 +152,8 @@
                     <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" routerLink="/follow-ups/create" [queryParams]="{ contactId: item.id }" queryParamsHandling="merge">
                         Add Follow-up
                     </button>
+
+                    <mat-divider></mat-divider>
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                         Modify

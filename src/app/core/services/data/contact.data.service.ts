@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactModel } from '../../models/contact.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { ExposureTypeGroupModel } from '../../models/exposure-type-group';
 
 @Injectable()
 export class ContactDataService {
@@ -71,6 +72,19 @@ export class ContactDataService {
      */
     modifyContact(outbreakId: string, contactId: string, contactData): Observable<any> {
         return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData);
+    }
+
+    /**
+     * Retrieve the list of new Contacts grouped by Exposure Type
+     * @param {string} outbreakId
+     * @returns {Observable<ExposureTypeGroupModel>}
+     */
+    getNewContactsGroupedByExposureType(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ExposureTypeGroupModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/contacts/new-by-exposure-type/count?filter=${filter}`),
+            ExposureTypeGroupModel
+        );
     }
 }
 

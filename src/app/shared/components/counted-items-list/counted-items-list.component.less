@@ -1,0 +1,30 @@
+app-counted-items-list {
+    .mat-card {
+        border: none !important;
+        box-shadow: none !important;
+
+        .mat-chip-list-wrapper {
+            place-content: flex-end;
+
+            @margin-left-right: 7px;
+            @margin-top-bottom: 12px;
+            @border-radius: 7px;
+            .mat-chip {
+                margin: @margin-left-right;
+                border-radius: @border-radius;
+                padding: 0px;
+                cursor: pointer;
+
+                .counted-items-list-count,
+                .counted-items-list-label {
+                    padding: @margin-left-right @margin-top-bottom;
+                    border-radius: @border-radius;
+                }
+
+                .counted-items-list-count {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}

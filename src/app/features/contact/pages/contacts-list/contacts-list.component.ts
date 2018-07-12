@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
@@ -14,6 +15,9 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
+import { ExposureTypeModel } from '../../../../core/models/exposure-type';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-contacts-list',
@@ -38,6 +42,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // gender list
     genderList$: Observable<any[]>;
+
+    // new contacts grouped by exposure types
+    countedNewContactsGroupedByExposureType$: Observable<any[]>;
 
     // risk level
     riskLevelsList$: Observable<any[]>;
@@ -68,6 +75,20 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // get new contacts grouped by exposure types
+                if (this.selectedOutbreak) {
+                    this.countedNewContactsGroupedByExposureType$ = this.contactDataService
+                        .getNewContactsGroupedByExposureType(this.selectedOutbreak.id)
+                        .map((data: ExposureTypeGroupModel) => {
+                            return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
+                                return new CountedItemsListItem(
+                                    item.count,
+                                    item.id
+                                );
+                            });
+                        });
+                }
 
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
@@ -159,5 +180,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * #TODO
+     */
+    filterByRelationshipExposureType(item) {
+        // #TODO
+        // this function will be replaced by search criteria inside a relationship
+        // we can't do this right now since we can't search by relationship data
+        console.log('#TODO', item);
     }
 }

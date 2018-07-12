@@ -11,10 +11,12 @@ import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.
 import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { SideFiltersComponent } from './side-filters/side-filters.component';
+import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
 export * from './dialog-confirm/dialog-confirm.component';
+export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -30,5 +32,6 @@ export const components: any[] = [
     FormRangeComponent,
     FormRangeComponent,
     FormRelationshipComponent,
-    SideFiltersComponent
+    SideFiltersComponent,
+    CountedItemsListComponent
 ];

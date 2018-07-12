@@ -79,6 +79,11 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
 
         /**
+         * Outbreak Fields
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
+
+        /**
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',

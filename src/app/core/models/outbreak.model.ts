@@ -15,6 +15,7 @@ export class OutbreakModel {
     noDaysDaysInChains: number;
     noDaysNotSeen: number;
     noLessContacts: number;
+    noDaysNewContacts: number;
     caseInvestigationTemplate: QuestionModel[];
     contactFollowUpTemplate: QuestionModel[];
     labResultsTemplate: QuestionModel[];
@@ -39,6 +40,7 @@ export class OutbreakModel {
         this.noDaysDaysInChains = _.get(data, 'noDaysDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
+        this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
         this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate', []);

@@ -123,7 +123,12 @@
                                 placeholder="KPI - long periods ( days )"
                                 required="true">
                             </app-form-input>
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-input
+                                name="noDaysNewContacts"
+                                [(ngModel)]="newOutbreak.noDaysNewContacts"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
+                                type="number">
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>
