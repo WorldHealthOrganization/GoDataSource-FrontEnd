@@ -10,6 +10,7 @@ import { LocationDataService } from './data/location.data.service';
 import { UserRoleDataService } from './data/user-role.data.service';
 import { LanguageDataService } from './data/language.data.service';
 import { LoggingDataService } from './data/logging.data.service';
+import { ReferenceDataDataService } from './data/reference-data.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -43,6 +44,7 @@ export const services: any[] = [
     ClusterDataService,
     RelationshipDataService,
     FollowUpsDataService,
+    ReferenceDataDataService,
 
     // helper services
     StorageService,

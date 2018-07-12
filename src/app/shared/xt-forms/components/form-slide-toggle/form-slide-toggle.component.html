@@ -1,9 +1,17 @@
 <div class="form-slide-toggle-container form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <mat-slide-toggle [(ngModel)]="value" [attr.name]="name" [disabled]="disabled" (click)="onClick()" [labelPosition]="labelBefore ? 'before' : 'after'" (change)="onChange()">
+    <mat-slide-toggle *ngIf="!readonly"
+                      [(ngModel)]="value" [attr.name]="name" [labelPosition]="labelBefore ? 'before' : 'after'"
+                      [disabled]="disabled"
+                      (click)="onClick()" (change)="onChange()">
         {{label}}
     </mat-slide-toggle>
+
+    <span *ngIf="readonly" class="label-readonly">
+        <ng-container *ngIf="value">{{label}}</ng-container>
+        <ng-container *ngIf="!value">{{notCheckedLabel}}</ng-container>
+    </span>
 
     <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>
 

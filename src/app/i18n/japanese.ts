@@ -1,5 +1,5 @@
 export const JapaneseLang = {
-    id: 'dc0272bd-85a6-48e7-8083-948ae3dc761b',
+    id: 'japanese_jp',
     tokens: {
         /**
          * Generic layout

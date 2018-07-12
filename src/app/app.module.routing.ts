@@ -86,6 +86,15 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.READ_EVENT]
                 }
+            },
+            // Reference Data Module routes
+            {
+                path: 'reference-data',
+                loadChildren: './features/reference-data/reference-data.module#ReferenceDataModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+                }
             }
         ]
     },

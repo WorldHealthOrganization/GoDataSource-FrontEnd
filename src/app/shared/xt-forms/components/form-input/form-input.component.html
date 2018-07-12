@@ -2,7 +2,8 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field>
-        <input matInput [type]="type" [maxlength]="maxlength" [(ngModel)]="value" [attr.name]="name" [required]="required" [placeholder]="placeholder" [disabled]="disabled"
+        <input matInput [type]="type" [maxlength]="maxlength" [(ngModel)]="value" [attr.name]="name" [required]="required"
+               [placeholder]="placeholder" [disabled]="disabled" [readonly]="readonly"
                (blur)="onBlur()" (input)="onChange()" />
 
         <span fxShow="{{tooltip !== null}}" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>

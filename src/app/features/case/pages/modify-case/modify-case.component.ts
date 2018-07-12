@@ -7,7 +7,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import * as _ from 'lodash';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
@@ -141,13 +140,7 @@ export class ModifyCaseComponent implements OnInit {
             delete dirtyFields.age;
         }
 
-        if (!form.valid) {
-            this.snackbarService.showError('Invalid form!');
-            return;
-        }
-
-        if (_.isEmpty(dirtyFields)) {
-            this.snackbarService.showSuccess('No changes...');
+        if (!this.formHelper.validateForm(form)) {
             return;
         }
 

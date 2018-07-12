@@ -21,9 +21,12 @@ export class FormTextareaComponent extends ElementBase<string> {
     @Input() placeholder: string;
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
+    @Input() readonly: boolean = false;
     @Input() name: string;
 
     @Input() maxlength: number;
+    @Input() minRows: number = 2;
+    @Input() maxRows: number;
 
     @Output() optionChanged = new EventEmitter<any>();
 

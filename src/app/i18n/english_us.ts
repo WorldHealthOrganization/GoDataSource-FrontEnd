@@ -28,6 +28,12 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
 
         /**
+         * Common labels
+         */
+        'LNG_COMMON_LABEL_YES': 'Yes',
+        'LNG_COMMON_LABEL_NO': 'No',
+
+        /**
          * Dialogs
          */
         'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',
@@ -47,6 +53,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': 'Are you sure you want to duplicate this question?',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER': 'Are you sure you want to delete this answer?',
         'LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER': 'Are you sure you want to link this answer?',
+        'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
 
         /**
          * Login page
@@ -55,6 +62,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LOGIN_LOGIN_LABEL': 'Login',
         'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL': 'Forgot Password?',
         'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE': `Welcome, {{name}}!`,
+
+        /**
+         * Form Errors, Warnings and Success messages
+         */
+        'LNG_FORM_ERROR_FORM_INVALID': 'The form is invalid!',
+        'LNG_FORM_WARNING_NO_CHANGES': 'There are no changes to be saved!',
 
         /**
          * API Errors
@@ -252,7 +265,7 @@ export const EnglishUsLang = {
         'LNG_ROLE_AVAILABLE_PERMISSIONS_READ_ROLE_DESCRIPTION': 'This permission allows reading roles information.',
 
         /**
-         * Reference Data
+         * Reference Data categories
          */
         'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL': 'Risk Level',
         'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY': 'Exposure Intensity',
@@ -270,6 +283,43 @@ export const EnglishUsLang = {
         'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE': 'Document Type',
         'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE': 'Exposure Type',
         'LNG_REFERENCE_DATA_CATEGORY_DISEASE': 'Disease',
+
+        /**
+         * Reference Data Category fields
+         */
+        'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_CATEGORY_NAME': 'Category Name',
+        'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES': 'Entries',
+
+        /**
+         * Reference Data Entry fields
+         */
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE': 'Label',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON': 'Icon',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR': 'Color',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE': 'Active',
+
+        /**
+         * Reference Data - Categories List page
+         */
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
+
+        /**
+         * Reference Data - Category Entries List page
+         */
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry deleted!',
+
+        /**
+         * Create Reference Data Entry page
+         */
+        'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE': 'Create New Entry',
+        'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry created!',
+
+
+        /**
+         * Modify Reference Data Entry page
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry modified!',
 
         /**
          * Outbreak Templates

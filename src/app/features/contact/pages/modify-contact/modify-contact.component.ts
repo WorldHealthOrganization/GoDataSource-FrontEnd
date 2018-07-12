@@ -10,7 +10,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import * as _ from 'lodash';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
@@ -86,13 +85,7 @@ export class ModifyContactComponent implements OnInit {
             delete dirtyFields.age;
         }
 
-        if (!form.valid) {
-            this.snackbarService.showError('Invalid form!');
-            return;
-        }
-
-        if (_.isEmpty(dirtyFields)) {
-            this.snackbarService.showSuccess('No changes...');
+        if (!this.formHelper.validateForm(form)) {
             return;
         }
 

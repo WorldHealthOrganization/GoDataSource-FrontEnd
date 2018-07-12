@@ -1,0 +1,112 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    Add <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="categoryEntries$ | async">
+
+        <!-- Label -->
+        <ng-container matColumnDef="label">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.value | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.description | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Icon -->
+        <ng-container matColumnDef="icon">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <!-- placeholder -->
+            </mat-cell>
+        </ng-container>
+
+        <!-- Color -->
+        <ng-container matColumnDef="color">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <!-- placeholder -->
+            </mat-cell>
+        </ng-container>
+
+        <!-- Active -->
+        <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ (item.active ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+
+                <button *ngIf="!item.readonly" mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+
+                    <button mat-menu-item [routerLink]="['.', item.id]">
+                        Modify
+                    </button>
+
+                    <button mat-menu-item (click)="deleteEntry(item)">
+                        Delete
+                    </button>
+
+                </mat-menu>
+
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
+</mat-card>

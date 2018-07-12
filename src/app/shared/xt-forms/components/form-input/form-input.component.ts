@@ -23,6 +23,7 @@ export class FormInputComponent extends ElementBase<string> {
     @Input() required: boolean = false;
     @Input() name: string;
     @Input() disabled: boolean = false;
+    @Input() readonly: boolean = false;
     @Input() tooltip: string = null;
 
     @Input() maxlength: number;

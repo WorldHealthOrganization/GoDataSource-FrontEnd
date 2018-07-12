@@ -38,18 +38,23 @@ export class SnackbarService {
 
     /**
      * Show an Error Snackbar
-     * @param message
+     * @param messageToken
+     * @param translateData
      * @param duration
-     * @returns {MatSnackBarRef<SnackbarComponent>}
      */
-    showError(message, duration = this.duration) {
-        return this.snackbar.openFromComponent(SnackbarComponent, {
-            panelClass: 'error',
-            data: {
-                message: message
-            },
-            duration: duration
-        });
+    showError(messageToken, translateData = {}, duration = this.duration) {
+        return this.i18nService
+            .get(messageToken, translateData)
+            .subscribe((message) => {
+                // show the translated message
+                this.snackbar.openFromComponent(SnackbarComponent, {
+                    panelClass: 'error',
+                    data: {
+                        message: message
+                    },
+                    duration: duration
+                });
+            });
     }
 
     /**

@@ -19,9 +19,12 @@ export class FormSlideToggleComponent extends ElementBase<string> {
     @HostBinding('class.form-element-host') isFormElement = true;
 
     @Input() label: string;
-    @Input() disabled: boolean = false;
+    // used only when toggle is "readonly" and not checked
+    @Input() notCheckedLabel: string;
     @Input() name: string;
     @Input() labelBefore: boolean;
+    @Input() readonly: boolean = false;
+    @Input() disabled: boolean = false;
 
     public identifier = `form-input-${identifier++}`;
 

@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { FormControl, NgForm } from '@angular/forms';
-
 import * as _ from 'lodash';
+import { SnackbarService } from './snackbar.service';
 
 @Injectable()
 export class FormHelperService {
+
+    constructor(
+        private snackbarService: SnackbarService
+    ) {}
 
     /**
      * Get all fields of a form, with their values
@@ -85,6 +89,28 @@ export class FormHelperService {
         });
 
         return isValid;
+    }
+
+    /**
+     * Check if a form is modified and valid, otherwise display a meaningful error
+     * @param form
+     * @returns {boolean}
+     */
+    validateForm(form) {
+        // get dirty fields
+        const dirtyFields: any = this.getDirtyFields(form);
+
+        if (!form.valid) {
+            this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            return false;
+        }
+
+        if (_.isEmpty(dirtyFields)) {
+            this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+            return false;
+        }
+
+        return true;
     }
 }
 

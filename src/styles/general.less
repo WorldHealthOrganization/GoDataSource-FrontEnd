@@ -16,10 +16,18 @@ html, body, ul, li, div, span {
     color: inherit;
 }
 
+.transparent {
+    opacity: 0;
+}
+
 /* Commonly used styles */
 .page-section {
     margin: 15px;
     box-shadow: -2px 2px 8px 1px rgba(0, 0, 0, .3) !important;
+
+    &.form-content {
+        margin-left: 0;
+    }
 
     /* Mat Table overrides */
     .mat-table {

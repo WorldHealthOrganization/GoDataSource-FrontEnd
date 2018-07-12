@@ -1,0 +1,46 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form class="page-content form-section" #form="ngForm" (submit)="createNewEntry(form)">
+
+    <mat-card class="form-content page-section">
+
+        <div fxLayout="column">
+
+            <div fxLayout="row">
+                <app-form-slide-toggle
+                    name="active"
+                    [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
+                    [ngModel]="entry.active">
+                </app-form-slide-toggle>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-input fxFlex="30"
+                    name="value"
+                    [ngModel]="entry.value"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                    required="true">
+                </app-form-input>
+
+                <app-form-textarea fxFlex
+                    name="description"
+                    [ngModel]="entry.description"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
+                    minRows="1">
+                </app-form-textarea>
+            </div>
+
+        </div>
+
+    </mat-card>
+
+    <div class="form-actions">
+        <button mat-raised-button color="primary" class="button-primary">Save</button>
+        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>Cancel</button>
+    </div>
+
+</form>

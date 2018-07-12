@@ -10,8 +10,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 
-import * as _ from 'lodash';
-
 @Component({
     selector: 'app-modify-event',
     encapsulation: ViewEncapsulation.None,
@@ -62,13 +60,7 @@ export class ModifyEventComponent implements OnInit {
     modifyContact(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        if (!form.valid) {
-            this.snackbarService.showError('Invalid form!');
-            return;
-        }
-
-        if (_.isEmpty(dirtyFields)) {
-            this.snackbarService.showSuccess('No changes...');
+        if (!this.formHelper.validateForm(form)) {
             return;
         }
 
