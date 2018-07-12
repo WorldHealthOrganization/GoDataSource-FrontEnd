@@ -70,8 +70,8 @@ export class QuestionComponent {
      * If multiple options, then add an empty answer if there are no answers
      */
     answerTypeChanged() {
-        if ( _.isEmpty(this.question.answers) ) {
-            this.addAnswer();
+        if ( this.question.answerType === this.multipleOptionsAnswerType && _.isEmpty(this.question.answers) ) {
+                this.addAnswer();
         }
     }
 
