@@ -92,6 +92,31 @@
                     </div>
                 </mat-card>
 
+                <!-- Flag contact section -->
+                <div class="section-title">{{ 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}</div>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row">
+                            <app-form-select
+                                fxFlex="25"
+                                name="riskLevel"
+                                [(ngModel)]="contactData.riskLevel"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                [options]="riskLevelsList$ | async">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row">
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="contactData.riskReason"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate">
+                            </app-form-textarea>
+                        </div>
+                    </div>
+                </mat-card>
+
                 <!-- Documents section -->
                 <div class="section-title">Documents</div>
                 <app-form-document-list

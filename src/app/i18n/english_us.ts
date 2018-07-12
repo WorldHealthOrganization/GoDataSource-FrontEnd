@@ -132,6 +132,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify Case',
 
         /**
+         * Contact Fields
+         */
+        'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
+        'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
+
+        /**
          * Contacts list page
          */
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
@@ -149,6 +155,7 @@ export const EnglishUsLang = {
          * Modify Contact page
          */
         'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify Contact',
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
 
         /**
          * Relationship Fields

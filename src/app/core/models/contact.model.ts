@@ -14,6 +14,8 @@ export class ContactModel {
     age: number;
     documents: DocumentModel[];
     addresses: AddressModel[];
+    riskLevel: string;
+    riskReason: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -27,6 +29,8 @@ export class ContactModel {
         this.age = _.get(data, 'age');
         this.documents = _.get(data, 'documents', []);
         this.addresses = _.get(data, 'addresses', []);
+        this.riskLevel = _.get(data, 'riskLevel');
+        this.riskReason = _.get(data, 'riskReason');
     }
 
     /**

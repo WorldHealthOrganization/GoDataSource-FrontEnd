@@ -34,6 +34,7 @@ export class ModifyContactComponent implements OnInit {
     ageSelected: boolean = true;
 
     gendersList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     constructor(
         private genericDataService: GenericDataService,
@@ -43,11 +44,12 @@ export class ModifyContactComponent implements OnInit {
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router
-    ) {
-        this.gendersList$ = this.genericDataService.getGendersList();
-    }
+    ) {}
 
     ngOnInit() {
+        this.gendersList$ = this.genericDataService.getGendersList();
+        this.riskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
+
         this.route.params.subscribe(params => {
             this.contactId = params.contactId;
 

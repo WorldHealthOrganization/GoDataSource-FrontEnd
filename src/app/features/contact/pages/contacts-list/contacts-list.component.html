@@ -27,7 +27,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
                 {{ item.firstName }}
             </mat-cell>
         </ng-container>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
                 {{ item.lastName }}
             </mat-cell>
         </ng-container>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
                 {{ item.gender }}
             </mat-cell>
         </ng-container>
@@ -108,8 +108,30 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
                 {{ item.phoneNumber }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Risk Level -->
+        <ng-container matColumnDef="riskLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{ 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="riskLevelsList$ | async"
+                            (optionChanged)="filterBySelectField('riskLevel', $event)"
+                            multiple="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+                {{ item.riskLevel }}
             </mat-cell>
         </ng-container>
 

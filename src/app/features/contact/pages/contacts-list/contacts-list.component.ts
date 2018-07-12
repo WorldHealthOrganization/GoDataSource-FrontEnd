@@ -39,6 +39,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // gender list
     genderList$: Observable<any[]>;
 
+    // risk level
+    riskLevelsList$: Observable<any[]>;
+
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
@@ -56,6 +59,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
         // retrieve gender list
         this.genderList$ = this.genericDataService.getGendersList();
+
+        // risk level
+        this.riskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -99,7 +105,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'age', 'gender', 'phoneNumber'];
+        const columns = ['firstName', 'lastName', 'age', 'gender', 'phoneNumber', 'riskLevel'];
 
         // check if the authenticated user has WRITE access
         if (this.hasContactWriteAccess()) {
@@ -107,6 +113,25 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         }
 
         return columns;
+    }
+
+    /**
+     * Retrieve risk color accordingly to risk level
+     * @param item
+     */
+    getRiskColor(item: ContactModel) {
+        switch (item.riskLevel) {
+            // #TODO - replace with reference data logic when implemented
+            case 'low':
+                return '#5ec800';
+            case 'medium':
+                return '#f69a0c';
+            case 'high':
+                return '#F90909';
+
+            default:
+                return '';
+        }
     }
 
     /**
