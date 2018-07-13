@@ -6,6 +6,9 @@ export class Constants {
     // Follow-ups
     static DEFAULT_FOLLOWUP_PERIOD_DAYS = 1;
 
+    // Reference categories
+    static REFERENCE_CATEGORY_DOCUMENT_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE';
+
     // Gender
     static GENDER = {
         MALE: {
@@ -54,22 +57,6 @@ export class Constants {
         HIGH: {
             label: 'high',
             value: 'high'
-        }
-    };
-
-    // #TODO replace with Reference Data
-    static DOCUMENT_TYPE = {
-        PASSPORT: {
-            label: 'passport',
-            value: 'passport'
-        },
-        NATIONAL_ID: {
-            label: 'nationalId',
-            value: 'nationalId'
-        },
-        EXTERNAL_ID: {
-            label: 'externalId',
-            value: 'externalId'
         }
     };
 

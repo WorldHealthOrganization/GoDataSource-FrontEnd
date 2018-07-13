@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { UserModel } from '../../models/user.model';
 import { I18nService } from '../helper/i18n.service';
+import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class ReferenceDataDataService {
@@ -87,6 +88,20 @@ export class ReferenceDataDataService {
             .map((entries) => {
                 // find the category
                 return _.find(entries, {id: categoryId});
+            });
+    }
+
+    /**
+     * Retrieve the list of Reference Data Entries for a specific Category mapped as LabelValuePair
+     * @param {string} categoryId
+     * @returns {Observable<ReferenceDataCategoryModel>}
+     */
+    getReferenceDataByCategoryAsLabelValue(categoryId: string): Observable<LabelValuePair[]> {
+        return this.getReferenceDataByCategory(categoryId)
+            .map((data: ReferenceDataCategoryModel) => {
+                return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                    new LabelValuePair(entry.value, entry.id)
+                );
             });
     }
 

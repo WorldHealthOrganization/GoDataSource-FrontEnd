@@ -4,7 +4,8 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 import { Observable } from 'rxjs/Observable';
 import { GroupBase } from '../../xt-forms/core';
 import { DocumentModel } from '../../../core/models/document.model';
-import { GenericDataService } from '../../../core/services/data/generic.data.service';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-form-document',
@@ -27,7 +28,7 @@ export class FormDocumentComponent extends GroupBase<DocumentModel> implements O
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private genericDataService: GenericDataService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -36,14 +37,11 @@ export class FormDocumentComponent extends GroupBase<DocumentModel> implements O
      * Initialize component elements
      */
     ngOnInit() {
-        this.documentTypesList$ = this.genericDataService.getDocumentTypesList();
+        // retrieve document types
+        this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(Constants.REFERENCE_CATEGORY_DOCUMENT_TYPE);
 
         // init value
-        if (this.value) {
-            this.value = this.value instanceof DocumentModel ? this.value : new DocumentModel(this.value);
-        } else {
-            this.value = new DocumentModel();
-        }
+        this.value = new DocumentModel(this.value);
     }
 
     /**

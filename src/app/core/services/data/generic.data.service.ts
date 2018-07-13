@@ -4,7 +4,6 @@ import { Constants } from '../../models/constants';
 
 @Injectable()
 export class GenericDataService {
-
     /**
      * Retrieve the list of Genders
      * @returns {Observable<any[]>}
@@ -27,14 +26,6 @@ export class GenericDataService {
      */
     getCaseRiskLevelsList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.CASE_RISK_LEVEL));
-    }
-
-    /**
-     * Retrieve the list of Document Types
-     * @returns {Observable<any[]>}
-     */
-    getDocumentTypesList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.DOCUMENT_TYPE));
     }
 
     /**

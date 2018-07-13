@@ -1,21 +1,117 @@
-A. In case you need to create a new sprint server ( if you don't - sprint server already exist, jump over these steps )
-1. make sure subdomain whoN.clarisoft.com points to the proper server ( where N = sprint number e.g who3.clarisoft.com )
-2. change virtual host to point to handle the new subdomain ( update proxy - point to the new server - probably you need to update the port ) 
+**A. Creating spring branches & building the distribution files:**
+1. For CD branch you need to use the master branch to build the distribution files
+    - git checkout master
+    - git pull ( make sure we have the latest master code )
+    - update environment files if necessary to point to the proper who api ( e.g http://whoapicd.clarisoft.com/api )
+        - files to update
+            - src/environments/environment.prod.ts ( main one for distribution )
+            - src/environments/environment.ts
+            - src/environments/environment.ts.default
+        - if you changed something, then we need to push changes
+            - git add <files>
+            - git commit -m message
+            - git push
+    - rm -r dist ( remove distribution files, this isn't really necessary, but... )
+    - npm run build ( build distribution files )
+2. For sprint branches ( s1, s2, ... sn ) you either need to create a new branch if it doesn't exist or you need to update the existing one
+    - create:
+        - git checkout master
+        - git pull
+        - git checkout -b sX
+        - update environment files to point to the proper who api ( e.g http://whoapiX.clarisoft.com/api )
+            - files to update
+                - src/environments/environment.prod.ts ( main one for distribution )
+                - src/environments/environment.ts
+                - src/environments/environment.ts.default
+            - push changes
+                - git add <files>
+                - git commit -m message
+                - git push --set-upstream origin sX
+        - rm -r dist ( remove distribution files, this isn't really necessary, but... )
+        - npm run build ( build distribution files )
+    - update 
+        - git checkout master
+        - git pull
+        - git checkout sX
+        - git pull origin master
+        - fix conflicts if any
+        - update environment files if necessary to point to the proper who api ( e.g http://whoapiX.clarisoft.com/api )
+            - files to update
+                - src/environments/environment.prod.ts ( main one for distribution )
+                - src/environments/environment.ts
+                - src/environments/environment.ts.default
+        - push changes
+            - git add <files>
+            - git commit -m message
+            - git push sX
+        - rm -r dist ( remove distribution files, this isn't really necessary, but... )
+        - npm run build ( build distribution files )
 
-B. Deployment
-1. Make sure envioment config files ( both dev & prod ) point to the proper sprint revision api
-2. create branch if it doesn't exist ( e.g s4 )
-2.1 Create PR ( from master to sprint branch (  e.g. s3 ) ) - if necessary to update branch
-2.2 Merge PR
-3. Switch to branch PR
-4. remove dist directory ( project root ) - optional
-5. run npm run build - to build dist directory from the new rev
-6. zip / tar dist dir ( e.g. "zip go.Data_s3_20180619.zip dist -r" - replace sprint number and date )
-7. copy zip to server ( you can use filezilla - sftp with key )
-8. backup dist directory ( in case you had a stable version deployed which you update )
-9. remove unnecessary files from dist ( if dist exists, otherwise create directory )
-10. unzip archive ( e.g. "unzip go.Data_s3_20180619.zip" )
-11. restart service ( "forever list" + "forever restart pid" ) 
-12. jump over 13 because it brings bad luck
-13. test website
-14. remove dist backup ( don't remove zip files )
+**B. Deploying distribution:**
+    On the previous step ( A ) we created the distribution files by running "npm run build".
+    To easily copy the distribution files to our server, we should make an archive.
+    - remove previous zip files ( optional )
+        - rm cd.zip
+        - rm sX.zip
+    - zip files
+        - CD branch
+            - zip -r cd.zip dist
+        - sprint sX branches 
+            - zip -r sX.zip dist
+    - remove distribution files
+        - rm -r dist
+    - connect to with a SFTP client to clarisoft server ( 54.164.207.48 with ppk file )
+        - CD branch
+            - cd /opt/go.data/web/cd
+        - sprint sX
+            - cd /opt/go.data/web/sX ( if exists already )
+            - cd /opt/go.data/web & mkdir sX & cd sX ( if it doesn't exist )
+        - copy the distribution zip file from local to cd / sprint directory
+    - remove local zip file
+        - rm cd.zip / rm sX.zip
+    - connect with Putty to clarisoft server ( ec2-user@54.164.207.48 with ppk file )
+        - navigate to cd / sprint sX directory
+            - cd /opt/go.data/web/cd / cd /opt/go.data/web/sX
+        - remove dist directory if there is one
+            - rm -rf dist
+        - unzip the zip file
+            - unzip cd.zip / unzip sX.zip
+        - check that dist directory is there once more
+            - ls / ll
+        - remove zip file from remote host
+            - rm cd.zip / rm sX.zip
+        - add sub-domain to virtual hosts ( if it doesn't exist one already for this job )
+            - sudo vi /etc/httpd/conf/httpd.conf
+            - scroll down until you see web sprint virtual hosts
+                e.g:
+                <VirtualHost *:80>
+                    ServerName who5.clarisoft.com
+                    ProxyPass "/" "http://localhost:3105/"
+                    ProxyPassReverse "/" "http://localhost:3105/"
+                </VirtualHost>
+            - add new virtual host ( if necessary - it doesn't exist already )
+                <VirtualHost *:80>
+                    ServerName whoX.clarisoft.com
+                    ProxyPass "/" "http://localhost:310X/"
+                    ProxyPassReverse "/" "http://localhost:310X/"
+                </VirtualHost>
+                - you need to replace the 3 X characters with the sprint number e.g 5 as you can see in the above example
+            - save file
+                - press escape
+                - write ":w" and press enter
+                - write ":q" and press enter
+            - if you added a new virtual host you need to restart apache
+                - sudo service httpd restart
+        - add forever job ( or restart job if we have one for this branch )
+            - use forever list to see what jobs are running at this point
+                - forever list
+                    e.g
+                    /home/ec2-user/.nvm/versions/node/v6.9.4/bin/node /home/ec2-user/.nvm/versions/node/v6.9.4/bin/angular-http-server -p 3105 --path /opt/go.data/web/s5/dist/
+                - if for our branch we already have a job, we just need to restart the job
+                    - forever restart UUID => UUID can be taken from forever list
+                - if we need to add a new job for our branch:
+                    - forever start /home/ec2-user/.nvm/versions/node/v6.9.4/bin/angular-http-server -p 310X --path /opt/go.data/web/sX/dist/
+                        - you need to replace the 2 X characters with the sprint number e.g 5 as you can see in the above example
+                    - make sure our new job is running
+                        - forever list => should display our job now
+        - TADA => the new version of the website should be up & running, take a cup of cofee, open a browser and test a bit to make sure it works
