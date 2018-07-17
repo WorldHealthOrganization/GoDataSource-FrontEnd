@@ -10,6 +10,7 @@ export class FollowUpModel {
     address: AddressModel;
     personId: string;
     contact: ContactModel;
+    deleted: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -19,5 +20,6 @@ export class FollowUpModel {
         this.address = _.get(data, 'address', new AddressModel());
         this.personId = _.get(data, 'personId');
         this.contact = _.get(data, 'contact', {});
+        this.deleted = _.get(data, 'deleted');
     }
 }

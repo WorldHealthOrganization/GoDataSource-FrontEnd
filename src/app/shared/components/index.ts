@@ -12,6 +12,7 @@ import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.componen
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { SideFiltersComponent } from './side-filters/side-filters.component';
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
+import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -33,5 +34,6 @@ export const components: any[] = [
     FormRangeComponent,
     FormRelationshipComponent,
     SideFiltersComponent,
-    CountedItemsListComponent
+    CountedItemsListComponent,
+    YesNoLabelComponent
 ];

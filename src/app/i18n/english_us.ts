@@ -32,6 +32,13 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_LABEL_YES': 'Yes',
         'LNG_COMMON_LABEL_NO': 'No',
+        'LNG_COMMON_LABEL_ALL': 'All',
+
+        /**
+         * General Actions
+         */
+        'LNG_PAGE_ACTION_DELETE': 'Delete',
+        'LNG_PAGE_ACTION_RESTORE': 'Restore',
 
         /**
          * Dialogs
@@ -55,6 +62,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER': 'Are you sure you want to link this answer?',
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as missing from a follow-up?',
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
+        'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
+        'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
 
         /**
          * Login page
@@ -199,6 +208,7 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED': 'Performed',
         'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP': 'Lost to Follow-up',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DELETED': 'Deleted',
 
         /**
          * Follow-ups list page
@@ -207,6 +217,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up marked as missed!',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING': 'Mark contact as missed',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Follow-up deleted!',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Follow-up restored!',
 
         /**
          * Create Follow-up page
@@ -358,7 +371,8 @@ export const EnglishUsLang = {
          * Reset Password Using Security Questions Page
          */
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_TITLE': 'Reset Password',
-        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_DESCRIPTION': 'In order to reset your password, please input the email address associated with your account and the security questions and answers',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_DESCRIPTION': 'In order to reset your password, please input the email address associated ' +
+            'with your account and the security questions and answers',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Reset Password',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION1': 'Question 1',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION2': 'Question 2',

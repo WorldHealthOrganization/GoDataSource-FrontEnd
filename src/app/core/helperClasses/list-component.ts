@@ -71,6 +71,32 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter by deleted field
+     * @param value
+     */
+    filterByDeletedField(value: any) {
+        // filter
+        if (value === false) {
+            this.queryBuilder.excludeDeleted();
+            this.queryBuilder.filter.remove('deleted');
+        } else {
+            this.queryBuilder.includeDeleted();
+            if (value === true) {
+                this.queryBuilder.filter.where({
+                    'deleted': {
+                        'eq': true
+                    }
+                }, true);
+            } else {
+                this.queryBuilder.filter.remove('deleted');
+            }
+        }
+
+        // refresh list
+        this.refreshList();
+    }
+
+    /**
      * Apply the filters selected from the Side Filters section
      * @param {RequestQueryBuilder} queryBuilder
      */

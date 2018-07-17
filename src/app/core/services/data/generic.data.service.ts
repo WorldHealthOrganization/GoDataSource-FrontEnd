@@ -45,11 +45,11 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Active options
+     * Retrieve the list of Filter Yes / No options
      * @returns {Observable<any[]>}
      */
-    getActiveOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.ACTIVE_OPTIONS));
+    getFilterYesNoOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.FILTER_YES_NO_OPTIONS));
     }
 
     /**

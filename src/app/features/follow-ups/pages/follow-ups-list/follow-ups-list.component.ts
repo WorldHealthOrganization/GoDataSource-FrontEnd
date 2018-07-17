@@ -16,6 +16,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -42,13 +43,17 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
 
+    // deleted options
+    deletedOptionsList$: Observable<any[]>;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
         private locationDataService: LocationDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
@@ -56,6 +61,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+        this.deletedOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -75,7 +81,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
                 performed: {
                     'eq': false
                 }
-            });
+            }, true);
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
@@ -107,11 +113,66 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
 
         // check if the authenticated user has WRITE access
         if (this.hasFollowUpsWriteAccess()) {
+            columns.push('deleted');
             columns.push('actions');
         }
 
         // return columns that should be visible
         return columns;
+    }
+
+    /**
+     * Delete specific follow-up
+     * @param {FollowUpModel} followUp
+     */
+    deleteFollowUp(followUp: FollowUpModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete follow up
+                    this.followUpsDataService
+                        .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore specific follow-up
+     * @param {FollowUpModel} followUp
+     */
+    restoreFollowUp(followUp: FollowUpModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete follow up
+                    this.followUpsDataService
+                        .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
     }
 
     /**

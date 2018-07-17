@@ -117,18 +117,17 @@ export class Constants {
         }
     };
 
-    // #TODO replace with Reference Data
-    static ACTIVE_OPTIONS = {
+    static FILTER_YES_NO_OPTIONS = {
         ALL: {
-            label: 'ALL',
+            label: 'LNG_COMMON_LABEL_ALL',
             value: ''
         },
         YES: {
-            label: 'YES',
+            label: 'LNG_COMMON_LABEL_YES',
             value: true
         },
         NO: {
-            label: 'NO',
+            label: 'LNG_COMMON_LABEL_NO',
             value: false
         }
 

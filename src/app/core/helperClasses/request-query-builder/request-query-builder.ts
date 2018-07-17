@@ -9,6 +9,8 @@ export class RequestQueryBuilder {
     public filter: RequestFilter = new RequestFilter();
     // Order fields
     public sort: RequestSort = new RequestSort();
+    // Return deleted records ?
+    private deleted: boolean = false;
     // Limit
     public limitResultsNumber: number;
     // Fields to retrieve
@@ -61,6 +63,24 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Include deleted records
+     * @returns {this}
+     */
+    includeDeleted() {
+        this.deleted = true;
+        return this;
+    }
+
+    /**
+     * Exclude deleted records ( this is the default behaviour )
+     * @returns {this}
+     */
+    excludeDeleted() {
+        this.deleted = false;
+        return this;
+    }
+
+    /**
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
@@ -85,6 +105,10 @@ export class RequestQueryBuilder {
 
         if (this.limitResultsNumber) {
             filter.limit = this.limitResultsNumber;
+        }
+
+        if (this.deleted) {
+            filter.deleted = true;
         }
 
         return JSON.stringify(filter);
@@ -122,6 +146,9 @@ export class RequestQueryBuilder {
 
         // update the "limit" if necessary
         this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
+
+        // merge deleted
+        this.deleted = queryBuilder.deleted;
 
         return this;
     }

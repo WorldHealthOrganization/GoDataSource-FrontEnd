@@ -104,5 +104,27 @@ export class FollowUpsDataService {
     modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<any> {
         return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData);
     }
+
+    /**
+     * Delete an existing Follow-up of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param {string} followUpId
+     * @returns {Observable<any>}
+     */
+    deleteFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`);
+    }
+
+    /**
+     * Restore an existing Follow-up of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param {string} followUpId
+     * @returns {Observable<any>}
+     */
+    restoreFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}/restore`, {});
+    }
 }
 

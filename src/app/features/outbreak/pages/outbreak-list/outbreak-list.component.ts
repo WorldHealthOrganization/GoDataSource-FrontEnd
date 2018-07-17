@@ -55,7 +55,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.activeOptionsList$ = this.genericDataService.getActiveOptions();
+        this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.genericDataService.getDiseasesList();
         this.refreshList();
     }

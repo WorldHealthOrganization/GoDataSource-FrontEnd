@@ -90,6 +90,26 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Deleted -->
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="deletedOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
 
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
@@ -101,7 +121,16 @@
 
                 <mat-menu #actionsMenu="matMenu">
                     <button mat-menu-item *ngIf="item.contact?.id" (click)="markContactAsMissedFromFollowUp(item)">
-                        Mark contact as missed
+                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate }}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button mat-menu-item *ngIf="!item.deleted" (click)="deleteFollowUp(item)">
+                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                    </button>
+                    <button mat-menu-item *ngIf="item.deleted" (click)="restoreFollowUp(item)">
+                        {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
                     </button>
                 </mat-menu>
             </mat-cell>
