@@ -12,7 +12,7 @@
                 <app-form-datepicker
                     [name]="name + '[contactDate]'"
                     [(ngModel)]="relationship.contactDate"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CONTACT_DATE' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     (optionChanged)="onChange()">
@@ -21,7 +21,7 @@
                 <app-form-slide-toggle
                     [name]="name + '[contactDateEstimated]'"
                     [(ngModel)]="relationship.contactDateEstimated"
-                    [label]="'LNG_RELATIONSHIP_FIELD_CONTACT_DATE_ESTIMATED' | translate"
+                    [label]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED' | translate"
                     [disabled]="disabled"
                     (optionChanged)="onChange()">
                 </app-form-slide-toggle>
@@ -29,7 +29,7 @@
                 <app-form-select
                     [name]="name + '[certaintyLevelId]'"
                     [(ngModel)]="relationship.certaintyLevelId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CERTAINTY_LEVEL' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
                     [options]="certaintyLevelOptions$ | async"
                     [disabled]="disabled"
                     [required]="required"
@@ -41,7 +41,7 @@
                 <app-form-select
                     [name]="name + '[exposureTypeId]'"
                     [(ngModel)]="relationship.exposureTypeId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_TYPE' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
                     [options]="exposureTypeOptions$ | async"
                     [disabled]="disabled"
                     [required]="required"
@@ -55,7 +55,7 @@
                 <app-form-select
                     [name]="name + '[exposureFrequencyId]'"
                     [(ngModel)]="relationship.exposureFrequencyId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_FREQUENCY' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
                     [options]="exposureFrequencyOptions$ | async"
                     [disabled]="disabled"
                     [required]="required"
@@ -67,7 +67,7 @@
                 <app-form-select
                     [name]="name + '[exposureDurationId]'"
                     [(ngModel)]="relationship.exposureDurationId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_EXPOSURE_DURATION' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
                     [options]="exposureDurationOptions$ | async"
                     [disabled]="disabled"
                     [required]="required"
@@ -79,7 +79,7 @@
                 <app-form-select
                     [name]="name + '[socialRelationshipTypeId]'"
                     [(ngModel)]="relationship.socialRelationshipTypeId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_RELATION' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
                     [options]="socialRelationshipOptions$ | async"
                     [disabled]="disabled"
                     required="false"
@@ -91,7 +91,7 @@
                 <app-form-select
                     [name]="name + '[clusterId]'"
                     [(ngModel)]="relationship.clusterId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_CLUSTER' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
                     [options]="clusterOptions$ | async"
                     [disabled]="disabled"
                     required="false"
@@ -105,7 +105,7 @@
                 <app-form-textarea
                     [name]="name + '[comment]'"
                     [(ngModel)]="relationship.comment"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_COMMENT' | translate"
+                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT' | translate"
                     [disabled]="disabled"
                     required="false"
                     (optionChanged)="onChange()">

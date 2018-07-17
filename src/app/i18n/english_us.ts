@@ -38,10 +38,10 @@ export const EnglishUsLang = {
          */
         'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
-        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{firstName}} {{lastName}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE': 'Are you sure you want to delete this hospitalization date?',
         'LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE': 'Are you sure you want to delete this isolation date?',
-        'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{firstName}} {{lastName}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: {{name}}',
@@ -179,15 +179,15 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
-        'LNG_RELATIONSHIP_FIELD_CONTACT_DATE': 'Date of last contact',
-        'LNG_RELATIONSHIP_FIELD_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
-        'LNG_RELATIONSHIP_FIELD_CERTAINTY_LEVEL': 'Certainty Level',
-        'LNG_RELATIONSHIP_FIELD_EXPOSURE_TYPE': 'Exposure Type',
-        'LNG_RELATIONSHIP_FIELD_EXPOSURE_FREQUENCY': 'Exposure Frequency',
-        'LNG_RELATIONSHIP_FIELD_EXPOSURE_DURATION': 'Exposure Duration',
-        'LNG_RELATIONSHIP_FIELD_RELATION': 'Relation',
-        'LNG_RELATIONSHIP_FIELD_CLUSTER': 'Cluster',
-        'LNG_RELATIONSHIP_FIELD_COMMENT': 'Comment',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL': 'Certainty Level',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE': 'Exposure Type',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY': 'Exposure Frequency',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION': 'Exposure Duration',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
+        'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
 
         /**
          * Follow-up fields
@@ -381,8 +381,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION': 'You must change your password to be different from the default one!',
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
         'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
-        'LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed'
+        'LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
 
-
+        /**
+         * Form Range Fields
+         */
+        'LNG_FORM_RANGE_FIELD_LABEL_FROM': 'From',
+        'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To'
     }
 };

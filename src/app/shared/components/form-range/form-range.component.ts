@@ -1,5 +1,5 @@
 import { GroupBase } from '../../xt-forms/core/group-base';
-import { Component, Host, HostBinding, Inject, OnInit, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { Component, Host, HostBinding, Inject, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormRangeModel } from './form-range.model';
 

@@ -7,7 +7,7 @@
         <app-form-input
             [name]="name + '[from]'"
             [(ngModel)]="range.from"
-            placeholder="From"
+            [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
             type="number"
             (input)="onChange()">
         </app-form-input>
@@ -15,14 +15,13 @@
     <div
         fxLayout="row"
         fxLayoutAlign="center center"
-        class="form-range-separator"
-    >-</div>
+        class="form-range-separator">-</div>
     <div
         fxFlex>
         <app-form-input
             [name]="name + '[to]'"
             [(ngModel)]="range.to"
-            placeholder="To"
+            [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
             type="number"
             (input)="onChange()">
         </app-form-input>

@@ -90,7 +90,8 @@
                                 <app-form-range
                                     *ngIf="filter.filter?.type === FilterType.RANGE"
                                     [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value">
+                                    [ngModel]="filter.value"
+                                    (changed)="filter.value = $event;">
                                 </app-form-range>
 
                             </mat-card>
