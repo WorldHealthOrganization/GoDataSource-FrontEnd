@@ -13,6 +13,7 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DateRangeModel } from '../../../../core/models/date-range.model';
 
 
 @Component({
@@ -86,7 +87,7 @@ export class ModifyCaseComponent implements OnInit {
      * Add a new Hospitalization Date slot in UI
      */
     addHospitalizationDate() {
-        this.caseData.hospitalizationDates.push(null);
+        this.caseData.hospitalizationDates.push(new DateRangeModel());
     }
 
     /**
@@ -106,7 +107,7 @@ export class ModifyCaseComponent implements OnInit {
      * Add a new Isolation Date slot in UI
      */
     addIsolationDate() {
-        this.caseData.isolationDates.push(null);
+        this.caseData.isolationDates.push(new DateRangeModel());
     }
 
     /**
@@ -132,7 +133,6 @@ export class ModifyCaseComponent implements OnInit {
     modifyCase(form: NgForm) {
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
         // omit fields that are NOT visible
         if (this.ageSelected) {
             delete dirtyFields.dob;

@@ -17,6 +17,7 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 import * as _ from 'lodash';
+import { DateRangeModel } from '../../../../core/models/date-range.model';
 
 @Component({
     selector: 'app-create-case',
@@ -57,17 +58,17 @@ export class CreateCaseComponent implements OnInit {
         this.caseData.addresses.push(new AddressModel());
         // ...and a document
         this.caseData.documents.push(new DocumentModel());
-        // ...and a hospitalization date
-        this.caseData.hospitalizationDates.push(null);
-        // ...and an isolation date
-        this.caseData.isolationDates.push(null);
+        // ...and a hospitalization date range
+        this.caseData.hospitalizationDates.push(new DateRangeModel());
+        // ...and an isolation date range
+        this.caseData.isolationDates.push(new DateRangeModel());
     }
 
     /**
      * Add a new Hospitalization Date slot in UI
      */
     addHospitalizationDate() {
-        this.caseData.hospitalizationDates.push(null);
+        this.caseData.hospitalizationDates.push(new DateRangeModel());
     }
 
     /**
@@ -87,7 +88,7 @@ export class CreateCaseComponent implements OnInit {
      * Add a new Isolation Date slot in UI
      */
     addIsolationDate() {
-        this.caseData.isolationDates.push(null);
+        this.caseData.isolationDates.push(new DateRangeModel());
     }
 
     /**
@@ -115,7 +116,7 @@ export class CreateCaseComponent implements OnInit {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        // omit fields that are NOT visible
+       // omit fields that are NOT visible
         if (this.ageSelected) {
             delete dirtyFields.dob;
         } else {

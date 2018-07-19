@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { DocumentModel } from './document.model';
+import { DateRangeModel } from './date-range.model';
 
 export class CaseModel {
     id: string;
@@ -24,8 +25,9 @@ export class CaseModel {
     dateBecomeCase: string;
     deceased: boolean;
     dateDeceased: string;
-    hospitalizationDates: string[];
-    isolationDates: string[];
+    hospitalizationDates: DateRangeModel[];
+    isolationDates: DateRangeModel[];
+    incubationDates: DateRangeModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -51,6 +53,7 @@ export class CaseModel {
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
+        this.incubationDates = _.get(data, 'incubationDates', []);
     }
 
     /**

@@ -201,6 +201,7 @@
                     </div>
                 </mat-card>
 
+                <div class="section-title">Hospitalization</div>
                 <!-- Hospitalization Dates section -->
                 <div *ngFor="let hospitalDate of caseData.hospitalizationDates; let i = index" fxFlex fxLayout="row"
                      fxLayoutAlign="start center">
@@ -210,9 +211,15 @@
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
 
                             <app-form-datepicker
-                                [name]="'hospitalizationDates[' + i + ']'"
-                                [ngModel]="hospitalDate"
-                                placeholder="Date of hospitalization">
+                                [name]="'hospitalizationDates[' + i + '][startDate]'"
+                                [ngModel]="caseData.hospitalizationDates[i].startDate"
+                                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate">
+                            </app-form-datepicker>
+
+                            <app-form-datepicker
+                                [name]="'hospitalizationDates[' + i + '][endDate]'"
+                                [ngModel]="caseData.hospitalizationDates[i].endDate"
+                                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate">
                             </app-form-datepicker>
                         </div>
 
@@ -226,6 +233,7 @@
                     hospitalization date
                 </button>
 
+                <div class="section-title">Isolation</div>
                 <!-- Isolation Dates section -->
                 <div *ngFor="let isolationDate of caseData.isolationDates; let i = index" fxFlex fxLayout="row"
                      fxLayoutAlign="start center">
@@ -235,11 +243,16 @@
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex="25">
 
                             <app-form-datepicker
-                                [name]="'isolationDates[' + i + ']'"
-                                [ngModel]="isolationDate"
-                                placeholder="Date of isolation">
+                                [name]="'isolationDates[' + i + '][startDate]'"
+                                [ngModel]="caseData.isolationDates[i].startDate"
+                                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate">
                             </app-form-datepicker>
 
+                            <app-form-datepicker
+                                [name]="'isolationDates[' + i + '][endDate]'"
+                                [ngModel]="caseData.isolationDates[i].endDate"
+                                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate">
+                            </app-form-datepicker>
                         </div>
 
                         <button type="button" mat-icon-button (click)="deleteIsolationDate(i)">
@@ -251,7 +264,6 @@
                 <button type="button" mat-button color="primary" (click)="addIsolationDate()">Add another isolation
                     date
                 </button>
-
 
             </mat-tab>
 
