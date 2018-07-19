@@ -46,6 +46,18 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter the list by a text field
+     * @param {string} property
+     * @param {string} value
+     */
+    filterByBooleanField(property: string, value: boolean | null | undefined) {
+        this.queryBuilder.filter.byBoolean(property, value);
+
+        // refresh list
+        this.refreshList();
+    }
+
+    /**
      * Filter the list by a range field ('from' / 'to')
      * @param {string} property
      * @param value Object with 'from' and 'to' properties
@@ -74,7 +86,7 @@ export abstract class ListComponent {
      * Filter by deleted field
      * @param value
      */
-    filterByDeletedField(value: any) {
+    filterByDeletedField(value: boolean | null | undefined) {
         // filter
         if (value === false) {
             this.queryBuilder.excludeDeleted();

@@ -1,0 +1,64 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form class="page-content form-section" #form="ngForm" (submit)="modifyFollowUp(form)">
+
+    <div class="form-content">
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE' | translate">
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                            <a [routerLink]="['/contacts', followUpData.personId, 'modify']">{{ followUpData.contact.name }}</a>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-datepicker
+                                name="date"
+                                [(ngModel)]="followUpData.date"
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                                required="true">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="performed"
+                                [(ngModel)]="followUpData.performed"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="lostToFollowUp"
+                                [(ngModel)]="followUpData.lostToFollowUp"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate">
+                            </app-form-slide-toggle>
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_ADDRESS_TITLE' | translate">
+                <mat-card class="page-section">
+                    <app-form-address
+                        name="address"
+                        [(ngModel)]="followUpData.address">
+                    </app-form-address>
+                </mat-card>
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button color="primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}</button>
+        <button type="button" [routerLink]="'/contacts/follow-ups'" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
+    </div>
+</form>

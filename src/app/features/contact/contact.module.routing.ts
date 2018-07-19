@@ -28,6 +28,34 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CONTACT]
         }
+    },
+
+    // Follow-ups list
+    {
+        path: 'follow-ups',
+        component: fromPages.ContactsFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_FOLLOWUP]
+        }
+    },
+    // Create Follow Up
+    {
+        path: ':contactId/follow-ups/create',
+        component: fromPages.CreateContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_FOLLOWUP]
+        }
+    },
+    // Modify Follow Up
+    {
+        path: ':contactId/follow-ups/:followUpId/modify',
+        component: fromPages.ModifyContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_FOLLOWUP]
+        }
     }
 ];
 

@@ -15,17 +15,17 @@ import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 
 @Component({
-    selector: 'app-create-contact',
+    selector: 'app-create-follow-up',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-follow-up.component.html',
-    styleUrls: ['./create-follow-up.component.less']
+    templateUrl: './create-contact-follow-up.component.html',
+    styleUrls: ['./create-contact-follow-up.component.less']
 })
-export class CreateFollowUpComponent implements OnInit {
+export class CreateContactFollowUpComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/follow-ups')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
 
     followUpData: FollowUpModel = new FollowUpModel();
@@ -44,19 +44,10 @@ export class CreateFollowUpComponent implements OnInit {
 
     ngOnInit() {
         // retrieve query params
-        this.route.queryParams
+        this.route.params
             .subscribe(params => {
-                // check if we have proper values ( contact & outbreak )
-                if (!params.contactId) {
-                    this.snackbarService.showError('LNG_PAGE_CREATE_FOLLOW_UP_WARNING_CONTACT_REQUIRED');
-
-                    // navigate to contacts listing page
-                    this.router.navigate(['/contacts']);
-                    return;
-                }
-
                 // update breadcrumbs
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true, { contactId: params.contactId }));
+                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true));
 
                 // get selected outbreak
                 this.outbreakDataService
@@ -116,7 +107,7 @@ export class CreateFollowUpComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
                             // navigate to listing page
-                            this.router.navigate(['/follow-ups']);
+                            this.router.navigate(['/contacts/follow-ups']);
                         });
                 });
         }

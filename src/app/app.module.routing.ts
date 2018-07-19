@@ -60,15 +60,6 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_CONTACT]
                 }
             },
-            // Follow-ups Module routes
-            {
-                path: 'follow-ups',
-                loadChildren: './features/follow-ups/follow-ups.module#FollowUpsModule',
-                canActivate: [AuthGuard],
-                data: {
-                    permissions: [PERMISSION.READ_FOLLOWUP]
-                }
-            },
             // Case Module routes
             {
                 path: 'cases',

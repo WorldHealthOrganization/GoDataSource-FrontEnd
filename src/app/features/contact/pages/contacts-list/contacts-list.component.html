@@ -149,7 +149,7 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" routerLink="/follow-ups/create" [queryParams]="{ contactId: item.id }" queryParamsHandling="merge">
+                    <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
                         Add Follow-up
                     </button>
 

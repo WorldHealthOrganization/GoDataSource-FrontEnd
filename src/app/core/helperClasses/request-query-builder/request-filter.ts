@@ -32,6 +32,56 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by a boolean field
+     * @param {string} property
+     * @param {boolean | null | undefined} value
+     * @param {boolean} replace
+     */
+    byBoolean(property: string, value: boolean | null | undefined, replace: boolean = true) {
+        // handle property removal
+        const removeCondition = () => {
+            // remove filter
+            this.remove(property);
+
+            // remove or condition
+            this.conditions = _.filter(this.conditions, (condition) => {
+                const prop = Object.keys(condition)[0];
+                return prop !== 'or' ||
+                    !condition.or ||
+                    condition.or.length !== 2 ||
+                    Object.keys(condition.or[0])[0] !== property ||
+                    Object.keys(condition.or[1])[0] !== property;
+            });
+        };
+
+        // nothing to filter ?
+        if (!_.isBoolean(value)) {
+            removeCondition();
+        } else {
+            // remove filter
+            if (replace) {
+                removeCondition();
+            }
+
+            // add new filter
+            if (value) {
+                // filter
+                this.where({
+                    [property]: true
+                });
+            } else {
+                // filter
+                this.where({
+                    or: [
+                        { [property]: false },
+                        { [property]: { eq: null } }
+                    ]
+                });
+            }
+        }
+    }
+
+    /**
      * Filter by a range field ('from' / 'to')
      * @param {string} property
      * @param value Object with 'from' and 'to' properties

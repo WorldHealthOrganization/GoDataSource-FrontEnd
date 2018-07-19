@@ -122,7 +122,7 @@ export class SidenavComponent {
                     'contact-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
                     [PERMISSION.READ_FOLLOWUP],
-                    '/follow-ups'
+                    '/contacts/follow-ups'
                 )
             ]
         ),

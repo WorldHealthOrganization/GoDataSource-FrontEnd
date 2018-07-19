@@ -21,10 +21,10 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 @Component({
     selector: 'app-follow-ups-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './follow-ups-list.component.html',
-    styleUrls: ['./follow-ups-list.component.less']
+    templateUrl: './contacts-follow-ups-list.component.html',
+    styleUrls: ['./contacts-follow-ups-list.component.less']
 })
-export class FollowUpsListComponent extends ListComponent implements OnInit {
+export class ContactsFollowUpsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
@@ -43,8 +43,8 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
 
-    // deleted options
-    deletedOptionsList$: Observable<any[]>;
+    // yes / no / all options
+    yesNoOptionsList$: Observable<any[]>;
 
     constructor(
         private authDataService: AuthDataService,
@@ -61,7 +61,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-        this.deletedOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -78,9 +78,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // display only unresolved followups
             this.queryBuilder.filter.where({
-                performed: {
-                    'eq': false
-                }
+                performed: false
             }, true);
 
             // retrieve the list of Follow Ups
@@ -108,7 +106,8 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
             'lastName',
             'date',
             'area',
-            'fullAddress'
+            'fullAddress',
+            'lostToFollowUp'
         ];
 
         // check if the authenticated user has WRITE access
@@ -209,7 +208,7 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
                         .subscribe((selectedOutbreak: OutbreakModel) => {
                             // mark follow-up
                             this.followUpsDataService
-                                .modifyFollowUp(selectedOutbreak.id, followUp.contact.id, followUp.id, {
+                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
                                     lostToFollowUp: true
                                 })
                                 .catch((err) => {
@@ -218,7 +217,11 @@ export class FollowUpsListComponent extends ListComponent implements OnInit {
                                     return ErrorObservable.create(err);
                                 })
                                 .subscribe(() => {
+                                    // mark follow-up
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
+
+                                    // refresh list
+                                    this.refreshList();
                                 });
                         });
                 }

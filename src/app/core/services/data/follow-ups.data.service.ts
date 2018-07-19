@@ -83,6 +83,32 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Retrieve Follow-up of a Contact
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @param {string} followUpId
+     * @returns {Observable<FollowUpModel>}
+     */
+    getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
+        // include contact in response
+        const qb = new RequestQueryBuilder();
+        qb.include('contact');
+        qb.filter.where({
+            id: followUpId
+        });
+
+        // construct query
+        const filter = qb.buildQuery();
+
+        // !!!IMPORTANT!!!
+        // since include doesn't work in GET single follow-up item, we need to use get list or make two requests ( 1 for contact and 1 for follow-up which would be slower )
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
+            FollowUpModel
+        ).mergeMap(followUps => followUps);
+    }
+
+    /**
      * Add a new Follow-up for a Contact
      * @param {string} outbreakId
      * @param {string} contactId

@@ -17,9 +17,13 @@ export class FollowUpModel {
         this.date = _.get(data, 'date');
         this.performed = _.get(data, 'performed', false);
         this.lostToFollowUp = _.get(data, 'lostToFollowUp', false);
-        this.address = _.get(data, 'address', new AddressModel());
         this.personId = _.get(data, 'personId');
-        this.contact = _.get(data, 'contact', {});
         this.deleted = _.get(data, 'deleted');
+
+        this.address = _.get(data, 'address', new AddressModel());
+        this.address = new AddressModel(this.address);
+
+        this.contact = _.get(data, 'contact', {});
+        this.contact = new ContactModel(this.contact);
     }
 }

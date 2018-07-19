@@ -1,3 +1,4 @@
+// tslint:disable:max-line-length
 export const EnglishUsLang = {
     id: 'english_us',
     tokens: {
@@ -39,6 +40,13 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_ACTION_DELETE': 'Delete',
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
+        'LNG_PAGE_ACTION_MODIFY': 'Modify',
+
+        /**
+         * Common buttons
+         */
+        'LNG_COMMON_BUTTON_SAVE': 'Save',
+        'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
 
         /**
          * Dialogs
@@ -201,6 +209,7 @@ export const EnglishUsLang = {
         /**
          * Follow-up fields
          */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT': 'Contact',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME': 'First Name',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME': 'Last Name',
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
@@ -225,9 +234,17 @@ export const EnglishUsLang = {
          * Create Follow-up page
          */
         'LNG_PAGE_CREATE_FOLLOW_UP_TITLE': 'Create New Follow-up',
+        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
-        'LNG_PAGE_CREATE_FOLLOW_UP_WARNING_CONTACT_REQUIRED': 'You can add a follow-up only though a contact!',
         'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up added!',
+
+        /**
+         * Modify Follow-up page
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
 
         /**
          * Event fields
@@ -371,8 +388,7 @@ export const EnglishUsLang = {
          * Reset Password Using Security Questions Page
          */
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_TITLE': 'Reset Password',
-        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_DESCRIPTION': 'In order to reset your password, please input the email address associated ' +
-            'with your account and the security questions and answers',
+        'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_DESCRIPTION': 'In order to reset your password, please input the email address associated with your account and the security questions and answers',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Reset Password',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION1': 'Question 1',
         'LNG_PAGE_RESET_PASSWORD_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION2': 'Question 2',
@@ -390,8 +406,7 @@ export const EnglishUsLang = {
         /**
          * Change Password Page
          */
-        'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_NOTIFICATION': 'We recommend setting the security questions which will allow you to change your password even ' +
-                                            'if there are connectivity issues. However, this can be done later as well from the user menu.',
+        'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_NOTIFICATION': 'We recommend setting the security questions which will allow you to change your password even if there are connectivity issues. However, this can be done later as well from the user menu.',
         'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION': 'You must change your password to be different from the default one!',
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
         'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
