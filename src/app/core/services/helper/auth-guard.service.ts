@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 
 import * as _ from 'lodash';
@@ -9,7 +9,8 @@ import { AuthDataService } from '../data/auth.data.service';
 export class AuthGuard implements CanActivate {
 
     constructor(
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private router: Router
     ) {
     }
 
@@ -25,6 +26,9 @@ export class AuthGuard implements CanActivate {
             // check if user has the required permissions
             return user.hasPermissions(...routePermissions);
         }
+
+        // not logged in so redirect to login page
+        this.router.navigate(['/auth/login']);
 
         return false;
     }

@@ -98,6 +98,12 @@ const routes: Routes = [
             }
         ]
     },
+    {
+        // if any other route is tried and the user is not authenticated, send to authenticated component which will redirect to login
+        path: '**',
+        component: AuthenticatedComponent
+    }
+
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes);
