@@ -11,6 +11,8 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -32,11 +34,12 @@ export class ModifyContactComponent implements OnInit {
     contactData: ContactModel = new ContactModel();
     ageSelected: boolean = true;
 
-    gendersList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
 
     constructor(
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private contactDataService: ContactDataService,
@@ -46,8 +49,8 @@ export class ModifyContactComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.gendersList$ = this.genericDataService.getGendersList();
-        this.riskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         this.route.params.subscribe(params => {
             this.contactId = params.contactId;

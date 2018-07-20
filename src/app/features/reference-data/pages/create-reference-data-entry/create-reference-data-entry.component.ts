@@ -46,7 +46,7 @@ export class CreateReferenceDataEntryComponent implements OnInit {
                 .subscribe((category: ReferenceDataCategoryModel) => {
                     // add new breadcrumb: Category page
                     this.breadcrumbs.push(
-                        new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`),
+                        new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`)
                     );
                     // add new breadcrumb: page title
                     this.breadcrumbs.push(

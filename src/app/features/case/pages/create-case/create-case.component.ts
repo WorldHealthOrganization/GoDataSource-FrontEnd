@@ -18,6 +18,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-create-case',
@@ -35,7 +37,7 @@ export class CreateCaseComponent implements OnInit {
     caseData: CaseModel = new CaseModel();
     ageSelected: boolean = true;
 
-    gendersList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
 
@@ -44,13 +46,14 @@ export class CreateCaseComponent implements OnInit {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private dialogService: DialogService
     ) {
-        this.gendersList$ = this.genericDataService.getGendersList();
-        this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
-        this.caseRiskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
     }
 
     ngOnInit() {

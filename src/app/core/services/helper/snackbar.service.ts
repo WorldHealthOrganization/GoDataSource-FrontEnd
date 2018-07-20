@@ -58,6 +58,28 @@ export class SnackbarService {
     }
 
     /**
+     * Show a Notice Snackbar
+     * @param messageToken
+     * @param translateData
+     * @returns {MatSnackBarRef<SnackbarComponent>}
+     */
+    showNotice(messageToken, translateData = {}) {
+        return this.i18nService
+            .get(messageToken, translateData)
+            .subscribe((message) => {
+                // show the translated message
+                this.snackbar.openFromComponent(SnackbarComponent, {
+                    panelClass: 'notice',
+                    data: {
+                        message: message
+                    },
+                    verticalPosition: 'top',
+                    horizontalPosition: 'start'
+                });
+            });
+    }
+
+    /**
      * Show an Error Snackbar displaying the translated error message corresponding to the API Error received
      * @param err API error object
      * @param {{}} translateData
@@ -87,23 +109,6 @@ export class SnackbarService {
                     this.showError(apiErrorMessage, duration);
                 }
             });
-    }
-
-    /**
-     * Show an Error Snackbar
-     * @param message
-     * @param duration
-     * @returns {MatSnackBarRef<SnackbarComponent>}
-     */
-    showNotice(message) {
-        return this.snackbar.openFromComponent(SnackbarComponent, {
-            panelClass: 'notice',
-            data: {
-                message: message
-            },
-            verticalPosition: 'top',
-            horizontalPosition: 'start'
-        });
     }
 
     dismissAll(){

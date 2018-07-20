@@ -6,7 +6,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import 'rxjs/add/operator/map';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { UserRoleModel } from '../../models/user-role.model';
-import { StorageService } from '../helper/storage.service';
+import { StorageKey, StorageService } from '../helper/storage.service';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -51,7 +51,15 @@ export class OutbreakDataService {
      * @returns {Observable<any>}
      */
     deleteOutbreak(outbreakId: string): Observable<any> {
-        return this.http.delete(`outbreaks/${outbreakId}`);
+        return this.http.delete(`outbreaks/${outbreakId}`)
+            .mergeMap((res) => {
+                // re-determine the selected Outbreak
+                return this.determineSelectedOutbreak()
+                    .map(() => {
+                        // preserve the output of the main request
+                        return res;
+                    });
+            });
     }
 
     /**
@@ -60,7 +68,15 @@ export class OutbreakDataService {
      * @returns {Observable<UserRoleModel[]>}
      */
     createOutbreak(outbreak: OutbreakModel): Observable<any> {
-        return this.http.post('outbreaks', outbreak);
+        return this.http.post('outbreaks', outbreak)
+            .mergeMap((res) => {
+                // re-determine the selected Outbreak
+                return this.determineSelectedOutbreak()
+                    .map(() => {
+                        // preserve the output of the main request
+                        return res;
+                    });
+            });
     }
 
     /**
@@ -81,7 +97,15 @@ export class OutbreakDataService {
      * @returns {Observable<any>}
      */
     modifyOutbreak(outbreakId: string, data: any): Observable<any> {
-        return this.http.patch(`outbreaks/${outbreakId}`, data);
+        return this.http.patch(`outbreaks/${outbreakId}`, data)
+            .mergeMap((res) => {
+                // re-determine the selected Outbreak
+                return this.determineSelectedOutbreak()
+                    .map(() => {
+                        // preserve the output of the main request
+                        return res;
+                    });
+            });
     }
 
     /**
@@ -124,6 +148,24 @@ export class OutbreakDataService {
      * @returns {OutbreakModel}
      */
     determineSelectedOutbreak(): Observable<OutbreakModel> {
+        // check if user has selected any Outbreak (get it from local storage)
+        const selectedOutbreakId = this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID);
+        if (selectedOutbreakId) {
+            // retrieve the Outbreak
+            return this.getOutbreak(selectedOutbreakId)
+                .catch(() => {
+                    // Outbreak not found; clean it up from local storage since it's outdated
+                    this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
+
+                    // ...and re-run the routine
+                    return this.determineSelectedOutbreak();
+                })
+                .do((selectedOutbreak) => {
+                    // cache the selected Outbreak
+                    this.setSelectedOutbreak(selectedOutbreak);
+                });
+        }
+
         // check if the authenticated user has an Active Outbreak
         const authUser = this.authDataService.getAuthenticatedUser();
         if (authUser.activeOutbreakId) {
@@ -156,6 +198,9 @@ export class OutbreakDataService {
      * @param {OutbreakModel} outbreak
      */
     setSelectedOutbreak(outbreak: OutbreakModel) {
+        // set the new Outbreak ID in local storage
+        this.storageService.set(StorageKey.SELECTED_OUTBREAK_ID, outbreak.id);
+
         // emit the new value
         this.selectedOutbreakSubject.next(outbreak);
     }
@@ -168,15 +213,20 @@ export class OutbreakDataService {
             .subscribe((selectedOutbreak) => {
                 const authUser = this.authDataService.getAuthenticatedUser();
                 if (!authUser.activeOutbreakId) {
-                    this.snackbarService.showNotice(`You don't have an active outbreak set.`);
+                    this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK');
                 } else {
-                    if (authUser.activeOutbreakId != selectedOutbreak.id) {
+                    if (authUser.activeOutbreakId !== selectedOutbreak.id) {
                         this.getOutbreak(authUser.activeOutbreakId)
                             .subscribe((outbreak) => {
-                                this.snackbarService.showNotice(`The active outbreak is ${outbreak.name} while the selected one is ${selectedOutbreak.name}.`);
+                                this.snackbarService.showNotice(
+                                    'LNG_GENERIC_WARNING_SELECTED_OUTBREAK_NOT_ACTIVE',
+                                    {
+                                        activeOutbreakName: outbreak.name,
+                                        selectedOutbreakName: selectedOutbreak.name
+                                    }
+                                );
                             });
-                    }
-                    else {
+                    } else {
                         this.snackbarService.dismissAll();
                     }
                 }

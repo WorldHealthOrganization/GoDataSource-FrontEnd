@@ -18,6 +18,8 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
 import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -55,6 +57,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         super();
@@ -64,11 +67,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // retrieve gender list
-        this.genderList$ = this.genericDataService.getGendersList();
-
-        // risk level
-        this.riskLevelsList$ = this.genericDataService.getCaseRiskLevelsList();
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService

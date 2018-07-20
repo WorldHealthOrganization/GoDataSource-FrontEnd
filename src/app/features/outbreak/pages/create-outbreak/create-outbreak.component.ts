@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -10,6 +10,8 @@ import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable } from 'rxjs/Observable';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -18,7 +20,7 @@ import * as _ from 'lodash';
     templateUrl: './create-outbreak.component.html',
     styleUrls: ['./create-outbreak.component.less']
 })
-export class CreateOutbreakComponent {
+export class CreateOutbreakComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '..'),
@@ -31,13 +33,19 @@ export class CreateOutbreakComponent {
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
-    constructor(private outbreakDataService: OutbreakDataService,
-                private router: Router,
-                private snackbarService: SnackbarService,
-                private genericDataService: GenericDataService,
-                private formHelper: FormHelperService,
-                private i18nService: I18nService) {
-        this.diseasesList$ = this.genericDataService.getDiseasesList();
+    constructor(
+        private outbreakDataService: OutbreakDataService,
+        private router: Router,
+        private snackbarService: SnackbarService,
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private formHelper: FormHelperService,
+        private i18nService: I18nService
+    ) {
+    }
+
+    ngOnInit() {
+        this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.genericDataService.getCountriesList();
     }
 

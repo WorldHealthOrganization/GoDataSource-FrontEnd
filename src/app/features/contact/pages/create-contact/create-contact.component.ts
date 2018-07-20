@@ -38,7 +38,7 @@ export class CreateContactComponent implements OnInit {
     contactData: ContactModel = new ContactModel();
     ageSelected: boolean = true;
 
-    gendersList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
 
     caseData: CaseModel;
     relationship: RelationshipModel;
@@ -54,7 +54,7 @@ export class CreateContactComponent implements OnInit {
         private caseDataService: CaseDataService,
         private relationshipDataService: RelationshipDataService
     ) {
-        this.gendersList$ = this.genericDataService.getGendersList();
+        this.genderList$ = this.genericDataService.getGenderList();
     }
 
     ngOnInit() {

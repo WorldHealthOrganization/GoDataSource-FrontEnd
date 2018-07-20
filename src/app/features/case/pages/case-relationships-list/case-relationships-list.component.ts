@@ -14,6 +14,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityType } from '../../../../core/models/entity.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 
 
 @Component({
@@ -37,6 +38,7 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
 
     // provide constants to template
     Constants = Constants;
+    ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(
         private router: Router,
@@ -96,6 +98,8 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
             // include related people in response
             const qb = new RequestQueryBuilder();
             qb.include('people');
+
+            qb.merge(this.queryBuilder);
 
             // retrieve the list of Relationships
             this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(

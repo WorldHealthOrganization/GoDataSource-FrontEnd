@@ -7,6 +7,7 @@ import { MatSidenav } from '@angular/material';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from "../../models/outbreak.model";
 import { SnackbarService } from "../../services/helper/snackbar.service";
+import { ReferenceDataDataService } from '../../services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-authenticated',
@@ -25,7 +26,8 @@ export class AuthenticatedComponent implements OnInit {
         private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         // detect when the route is changed
         this.router.events.subscribe(() => {
@@ -55,6 +57,9 @@ export class AuthenticatedComponent implements OnInit {
                         this.outbreakDataService.checkActiveSelectedOutbreak();
                     });
             });
+
+        // cache reference data
+        this.referenceDataDataService.getReferenceData().subscribe();
 
         if (this.router.url === '/') {
             // redirect to default landing page

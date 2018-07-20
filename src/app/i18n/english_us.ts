@@ -97,6 +97,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE': `Welcome, {{name}}!`,
 
         /**
+         * Generic Errors, Warnings, Info messages
+         */
+        'LNG_GENERIC_WARNING_NO_ACTIVE_OUTBREAK': 'You don\'t have an active outbreak set.',
+        'LNG_GENERIC_WARNING_SELECTED_OUTBREAK_NOT_ACTIVE': 'The active outbreak is {{activeOutbreakName}} while the selected one is {{selectedOutbreakName}}.',
+
+        /**
          * Form Errors, Warnings and Success messages
          */
         'LNG_FORM_ERROR_FORM_INVALID': 'The form is invalid!',

@@ -76,6 +76,8 @@ export class AuthDataService {
             .do((res) => {
                 // remove auth info from local storage
                 this.storageService.remove(StorageKey.AUTH_DATA);
+                // remove selected outbreak from local storage
+                this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
             });
     }
 

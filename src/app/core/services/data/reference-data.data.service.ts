@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import 'rxjs/add/operator/mergeMap';
 import * as _ from 'lodash';
@@ -79,10 +79,10 @@ export class ReferenceDataDataService {
 
     /**
      * Retrieve the list of Reference Data Entries for a specific Category
-     * @param {string} categoryId
+     * @param {ReferenceDataCategory} categoryId
      * @returns {Observable<ReferenceDataCategoryModel>}
      */
-    getReferenceDataByCategory(categoryId: string): Observable<ReferenceDataCategoryModel> {
+    getReferenceDataByCategory(categoryId: ReferenceDataCategory): Observable<ReferenceDataCategoryModel> {
         // get reference data entries
         return this.getReferenceData()
             .map((entries) => {
@@ -93,10 +93,10 @@ export class ReferenceDataDataService {
 
     /**
      * Retrieve the list of Reference Data Entries for a specific Category mapped as LabelValuePair
-     * @param {string} categoryId
+     * @param {ReferenceDataCategory} categoryId
      * @returns {Observable<ReferenceDataCategoryModel>}
      */
-    getReferenceDataByCategoryAsLabelValue(categoryId: string): Observable<LabelValuePair[]> {
+    getReferenceDataByCategoryAsLabelValue(categoryId: ReferenceDataCategory): Observable<LabelValuePair[]> {
         return this.getReferenceDataByCategory(categoryId)
             .map((data: ReferenceDataCategoryModel) => {
                 return _.map(data.entries, (entry: ReferenceDataEntryModel) =>

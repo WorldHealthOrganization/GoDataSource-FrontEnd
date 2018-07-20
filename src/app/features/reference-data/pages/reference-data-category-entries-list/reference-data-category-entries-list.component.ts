@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -23,7 +23,7 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
     ];
 
     categoryEntries$: Observable<ReferenceDataEntryModel[]>;
-    categoryId: string;
+    categoryId: ReferenceDataCategory;
 
     constructor(
         private router: Router,

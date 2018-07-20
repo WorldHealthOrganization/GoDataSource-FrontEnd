@@ -8,6 +8,8 @@ import { Observable } from 'rxjs/Observable';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-form-relationship',
@@ -43,7 +45,8 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService,
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -56,11 +59,11 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         this.value = new RelationshipModel(this.value);
 
         // reference data
-        this.certaintyLevelOptions$ = this.genericDataService.getCertaintyLevelOptions();
-        this.exposureTypeOptions$ = this.genericDataService.getExposureTypeOptions();
-        this.exposureFrequencyOptions$ = this.genericDataService.getExposureFrequencyOptions();
-        this.exposureDurationOptions$ = this.genericDataService.getExposureDurationOptions();
-        this.socialRelationshipOptions$ = this.genericDataService.getSocialRelationshipOptions();
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService

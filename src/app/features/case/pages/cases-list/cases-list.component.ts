@@ -16,6 +16,8 @@ import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -55,6 +57,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         super();
@@ -62,12 +65,12 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.caseClassificationsList$ = this.genericDataService.getCaseClassificationsList();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
     }
 
     ngOnInit() {
         // retrieve gender list
-        this.genderList$ = this.genericDataService.getGendersList().share();
+        this.genderList$ = this.genericDataService.getGenderList().share();
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService

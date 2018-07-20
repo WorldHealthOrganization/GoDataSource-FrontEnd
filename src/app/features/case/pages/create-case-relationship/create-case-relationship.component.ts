@@ -18,6 +18,8 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -59,17 +61,18 @@ export class CreateCaseRelationshipComponent implements OnInit {
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
     }
 
     ngOnInit() {
         this.availableRelatedEntityTypes$ = this.genericDataService.getAvailableRelatedEntityTypes(EntityType.CASE);
-        this.certaintyLevelOptions$ = this.genericDataService.getCertaintyLevelOptions();
-        this.exposureTypeOptions$ = this.genericDataService.getExposureTypeOptions();
-        this.exposureFrequencyOptions$ = this.genericDataService.getExposureFrequencyOptions();
-        this.exposureDurationOptions$ = this.genericDataService.getExposureDurationOptions();
-        this.socialRelationshipOptions$ = this.genericDataService.getSocialRelationshipOptions();
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
         this.route.params.subscribe(params => {
             this.caseId = params.caseId;

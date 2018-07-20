@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -11,6 +11,8 @@ import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
@@ -19,7 +21,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     templateUrl: './modify-outbreak.component.html',
     styleUrls: ['./modify-outbreak.component.less']
 })
-export class ModifyOutbreakComponent {
+export class ModifyOutbreakComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks'),
@@ -40,13 +42,21 @@ export class ModifyOutbreakComponent {
     // index of the current tab
     currentTabIndex = 0;
 
-    constructor(private outbreakDataService: OutbreakDataService,
-                private route: ActivatedRoute,
-                private router: Router,
-                private genericDataService: GenericDataService,
-                private snackbarService: SnackbarService,
-                private i18nService: I18nService,
-                private formHelper: FormHelperService) {
+    constructor(
+        private outbreakDataService: OutbreakDataService,
+        private route: ActivatedRoute,
+        private router: Router,
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService,
+        private formHelper: FormHelperService
+    ) {
+    }
+
+    ngOnInit() {
+        this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.countriesList$ = this.genericDataService.getCountriesList();
 
         this.route.params.subscribe(params => {
             this.outbreakId = params.outbreakId;
@@ -56,8 +66,7 @@ export class ModifyOutbreakComponent {
                 .getOutbreak(this.outbreakId)
                 .subscribe(outbreakData => {
                     this.outbreak = outbreakData;
-                    this.diseasesList$ = this.genericDataService.getDiseasesList();
-                    this.countriesList$ = this.genericDataService.getCountriesList();
+
                     // set questions and answers to new property to false.
                     this.setNewFalse(this.outbreak.caseInvestigationTemplate);
                     this.setNewFalse(this.outbreak.contactFollowUpTemplate);

@@ -12,10 +12,11 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
-
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -46,26 +47,27 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
         super();
-
     }
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        this.diseasesList$ = this.genericDataService.getDiseasesList();
+        this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+
         this.refreshList();
     }
+
     /**
      * Re(load) the Outbreaks list
      */
     refreshList() {
-       // retrieve the list of Outbreaks
+        // retrieve the list of Outbreaks
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder);
-
     }
 
     /**

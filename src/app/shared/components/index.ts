@@ -16,6 +16,7 @@ import { FormQuestionListComponent } from '../../features/outbreak/components/fo
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-fill-questionnaire.component';
+import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -39,5 +40,6 @@ export const components: any[] = [
     SideFiltersComponent,
     CountedItemsListComponent,
     YesNoLabelComponent,
-    FormFillQuestionnaireComponent
+    FormFillQuestionnaireComponent,
+    ReferenceDataLabelComponent
 ];
