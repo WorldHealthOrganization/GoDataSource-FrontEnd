@@ -11,6 +11,7 @@ export class FollowUpModel {
     personId: string;
     contact: ContactModel;
     deleted: boolean;
+    questionnaireAnswers: {};
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -25,5 +26,7 @@ export class FollowUpModel {
 
         this.contact = _.get(data, 'contact', {});
         this.contact = new ContactModel(this.contact);
+
+        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
 }

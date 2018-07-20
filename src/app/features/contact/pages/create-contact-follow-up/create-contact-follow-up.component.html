@@ -49,9 +49,27 @@
                 <mat-card class="page-section">
                     <app-form-address
                         name="address"
-                        [(ngModel)]="followUpData.address">
+                        [ngModel]="followUpData.address">
                     </app-form-address>
                 </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Questionnaire step -->
+        <mat-step [stepControl]="questionnaireForm">
+            <form #questionnaireForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+
+                <!-- Questionnaire section -->
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="followUpData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.contactFollowUpTemplate">
+                </app-form-fill-questionnaire>
 
                 <div>
                     <button mat-button matStepperNext>Next</button>
@@ -65,7 +83,7 @@
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewFollowUp([detailsForm])">Create Follow-up</button>
+                <button type="button" mat-button (click)="createNewFollowUp([detailsForm, questionnaireForm])">Create Follow-up</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

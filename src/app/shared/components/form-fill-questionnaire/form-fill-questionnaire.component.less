@@ -1,0 +1,47 @@
+@import '~styles/_colors';
+
+app-form-fill-questionnaire {
+    font-size: 17px;
+
+    .mat-card {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .questionnaire-category-title {
+        font-weight: bold;
+        padding-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .questionnaire-category-question {
+        padding: 10px 40px;
+
+        &:nth-child(odd) {
+            background-color: @color-gray-background;
+
+            .questionnaire-category-question-nr {
+                background-color: white;
+            }
+        }
+
+        &:nth-child(even) {
+            background-color: white;
+
+            .questionnaire-category-question-nr {
+                background-color: @color-gray-background;
+            }
+        }
+
+        .questionnaire-category-question-nr {
+            padding: 10px;
+            border-radius: 20px;
+            margin-right: 20px;
+        }
+
+        .questionnaire-category-question-text,
+        .questionnaire-category-question-nr {
+            font-weight: bold;
+        }
+    }
+}

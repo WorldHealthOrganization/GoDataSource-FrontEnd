@@ -31,6 +31,8 @@ export class CreateContactFollowUpComponent implements OnInit {
     followUpData: FollowUpModel = new FollowUpModel();
     contactData: ContactModel = new ContactModel();
 
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -61,6 +63,9 @@ export class CreateContactFollowUpComponent implements OnInit {
                         return ErrorObservable.create(err);
                     })
                     .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // keep selected outbreak for later user
+                        this.selectedOutbreak = selectedOutbreak;
+
                         // retrieve contact information
                         this.contactDataService
                             .getContact(selectedOutbreak.id, params.contactId)

@@ -1,0 +1,60 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <mat-card class="page-section">
+            <div fxFlex fxLayout="column" fxLayoutGap="40px">
+                <div
+                    *ngFor="let categoryData of questionsGroupedByCategory"
+                    fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+                    <div fxFlex fxLayout="row" fxLayoutAlign="center"
+                         class="questionnaire-category-title">
+                        {{ categoryData.category | translate }}
+                    </div>
+                    <div>
+                        <div
+                            *ngFor="let question of categoryData.questions; let questionIndex = index"
+                            fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-evenly stretch"
+                            class="questionnaire-category-question">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                <div
+                                    class="questionnaire-category-question-nr">
+                                    {{ ( 'LNG_TEMPLATE_QUESTION_BADGE' | translate )  + (questionIndex + 1) }}
+                                </div>
+                                <div
+                                    class="questionnaire-category-question-text">
+                                    {{ question.text | translate }}
+                                </div>
+                            </div>
+                            <div fxFlex>
+                                <!-- Free text -->
+                                <app-form-input
+                                    *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
+                                    [name]="name + '[' + question.text + ']'"
+                                    [(ngModel)]="value[question.text]"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                    [required]="question.required"
+                                    (optionChanged)="onChange()">
+                                </app-form-input>
+
+                                <!-- Multiple selections -->
+                                <app-form-select
+                                    *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
+                                    [name]="name + '[' + question.text + ']'"
+                                    [(ngModel)]="value[question.text]"
+                                    [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
+                                    [required]="question.required"
+                                    [options]="question.answers"
+                                    optionLabelKey="label"
+                                    optionValueKey="value"
+                                    [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                    (optionChanged)="onChange()">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+    </form>
+</div>

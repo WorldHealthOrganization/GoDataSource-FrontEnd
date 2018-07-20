@@ -104,6 +104,9 @@ export abstract class GroupValidator<T> extends ElementBase<T> implements AfterV
      * Override validate functions
      */
     protected validate() {
+        // validate group
+        this.validateGroup();
+
         // call parent
         super.validate();
 

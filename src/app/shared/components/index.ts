@@ -15,6 +15,7 @@ import { FormAnswerListComponent } from '../../features/outbreak/components/form
 import { FormQuestionListComponent } from '../../features/outbreak/components/form-question-list/form-question-list.component';
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
+import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-fill-questionnaire.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -37,5 +38,6 @@ export const components: any[] = [
     FormRelationshipComponent,
     SideFiltersComponent,
     CountedItemsListComponent,
-    YesNoLabelComponent
+    YesNoLabelComponent,
+    FormFillQuestionnaireComponent
 ];

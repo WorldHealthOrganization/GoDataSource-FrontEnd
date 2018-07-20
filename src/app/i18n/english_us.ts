@@ -125,6 +125,13 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
 
         /**
+         * Questionnaire
+         */
+        'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
+        'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
+        'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
+
+        /**
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
@@ -294,6 +301,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_FOLLOW_UP_TITLE': 'Create New Follow-up',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up added!',
 
         /**
@@ -301,7 +309,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
-        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
 
         /**

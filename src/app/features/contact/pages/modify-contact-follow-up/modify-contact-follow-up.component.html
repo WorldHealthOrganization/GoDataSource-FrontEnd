@@ -41,15 +41,21 @@
                         </div>
                     </div>
                 </mat-card>
-            </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_ADDRESS_TITLE' | translate">
+                <div class="section-title">{{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS' | translate }}</div>
                 <mat-card class="page-section">
                     <app-form-address
                         name="address"
-                        [(ngModel)]="followUpData.address">
+                        [ngModel]="followUpData.address">
                     </app-form-address>
                 </mat-card>
+            </mat-tab>
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="followUpData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.contactFollowUpTemplate"></app-form-fill-questionnaire>
             </mat-tab>
 
         </mat-tab-group>
