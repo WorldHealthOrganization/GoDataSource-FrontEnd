@@ -26,6 +26,7 @@ import { DialogService } from './helper/dialog.service';
 import { ClusterDataService } from './data/cluster.data.service';
 import { RelationshipDataService } from './data/relationship.data.service';
 import { FollowUpsDataService } from './data/follow-ups.data.service';
+import { LabResultDataService } from './data/lab-result.data.service';
 import { DomService } from './helper/dom.service';
 
 // export the list of services
@@ -46,6 +47,7 @@ export const services: any[] = [
     RelationshipDataService,
     FollowUpsDataService,
     ReferenceDataDataService,
+    LabResultDataService,
 
     // helper services
     StorageService,

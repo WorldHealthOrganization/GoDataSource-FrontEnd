@@ -50,6 +50,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
+        'LNG_PAGE_ACTION_RELATIONSHIPS': 'Relationships',
 
         /**
          * Common buttons
@@ -201,6 +202,7 @@ export const EnglishUsLang = {
          * Cases list page
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
+        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
 
         /**
          * Create Case page
@@ -212,6 +214,24 @@ export const EnglishUsLang = {
          * Modify Case page
          */
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify Case',
+        'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab results',
+
+        /**
+         * Case lab results fields
+         */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_ID': 'Sample Lab Id',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': 'Sample delivered to lab',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': 'Date of the result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME': 'Lab name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE': 'Test type',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT': 'Result',
+
+        /**
+         * Case lab results list page
+         */
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Case lab results',
 
         /**
          * Case Relationships list page

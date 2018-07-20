@@ -279,6 +279,15 @@
 
         <button mat-raised-button color="primary">Save</button>
         <button type="button" [routerLink]="'/cases'" mat-raised-button>Cancel</button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'relationships']">
+            {{ 'LNG_PAGE_ACTION_RELATIONSHIPS' | translate }}
+        </button>
+        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
+        </button>
     </div>
 
 

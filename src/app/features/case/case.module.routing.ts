@@ -29,6 +29,17 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_CASE]
         }
     },
+
+    // Lab results
+    {
+        path: ':caseId/lab-results',
+        component: fromPages.CaseLabResultsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
+    },
+
     // Case Relationships list
     {
         path: ':caseId/relationships',

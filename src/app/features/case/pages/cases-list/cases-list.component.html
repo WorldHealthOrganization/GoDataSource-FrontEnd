@@ -146,7 +146,7 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item *ngIf="hasContactWriteAccess()" routerLink="/contacts/create" [queryParams]="{ caseId: item.id }" queryParamsHandling="merge">
+                    <button mat-menu-item *ngIf="hasContactWriteAccess()" routerLink="/contacts/create" [queryParams]="{ caseId: item.id }">
                         Add contact
                     </button>
 
@@ -162,6 +162,10 @@
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'relationships']">
                         {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                    </button>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'lab-results']">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS' | translate }}
                     </button>
 
                     <mat-divider></mat-divider>

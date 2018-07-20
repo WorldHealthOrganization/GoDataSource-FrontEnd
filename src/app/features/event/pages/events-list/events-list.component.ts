@@ -10,11 +10,10 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-
-import * as _ from 'lodash';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-events-list',
@@ -36,6 +35,9 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
     // events outbreak
     selectedOutbreak: OutbreakModel;
+
+    // constants
+    Constants = Constants;
 
     constructor(
         private eventDataService: EventDataService,
