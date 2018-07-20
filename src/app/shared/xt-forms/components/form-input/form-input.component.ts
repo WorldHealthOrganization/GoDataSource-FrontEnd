@@ -1,4 +1,16 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter } from '@angular/core';
+import {
+    Component,
+    Input,
+    ViewEncapsulation,
+    Optional,
+    Inject,
+    Host,
+    SkipSelf,
+    HostBinding,
+    Output,
+    EventEmitter,
+    AfterViewInit
+} from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
@@ -14,7 +26,7 @@ import { ElementBase } from '../../core/index';
         multi: true
     }]
 })
-export class FormInputComponent extends ElementBase<string> {
+export class FormInputComponent extends ElementBase<string> implements AfterViewInit {
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -30,6 +42,7 @@ export class FormInputComponent extends ElementBase<string> {
 
 
     @Output() optionChanged = new EventEmitter<any>();
+    @Output() initialized = new EventEmitter<any>();
 
     public identifier = `form-input-${identifier++}`;
 
@@ -55,6 +68,16 @@ export class FormInputComponent extends ElementBase<string> {
 
         // emit the current value
         return this.optionChanged.emit(this.value);
+    }
+
+    ngAfterViewInit() {
+        // wait for the input object to be initialized
+        // then trigger the initialized event
+        setTimeout(() => {
+            return this.initialized.emit(this.value);
+        });
+
+        super.ngAfterViewInit();
     }
 }
 

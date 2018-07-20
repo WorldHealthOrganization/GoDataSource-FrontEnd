@@ -23,13 +23,18 @@ export class Constants {
 
     static ANSWER_TYPES = {
         FREE_TEXT: {
-            label: 'Free text',
+            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT',
             value: 'Free text'
         },
         MULTIPLE_OPTIONS: {
-            label: 'Multiple Options',
+            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_OPTIONS',
             value: 'Multiple Options'
+        },
+        SINGLE_SELECTION: {
+            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_SELECTION',
+            value: 'Single Selection'
         }
+
     };
 
     // #TODO replace with Reference Data

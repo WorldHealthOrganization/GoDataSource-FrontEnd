@@ -26,6 +26,7 @@ import { DialogService } from './helper/dialog.service';
 import { ClusterDataService } from './data/cluster.data.service';
 import { RelationshipDataService } from './data/relationship.data.service';
 import { FollowUpsDataService } from './data/follow-ups.data.service';
+import { DomService } from './helper/dom.service';
 
 // export the list of services
 export const services: any[] = [
@@ -56,5 +57,6 @@ export const services: any[] = [
     FormHelperService,
     I18nService,
     CacheService,
-    DialogService
+    DialogService,
+    DomService
 ];

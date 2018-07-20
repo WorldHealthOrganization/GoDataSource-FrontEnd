@@ -10,7 +10,8 @@
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
                     [disabled]="disabled"
                     [required]="required"
-                    (input)="onChange()">
+                    (input)="onChange()"
+                    (optionChanged)="onChange()">
                 </app-form-input>
 
                 <div fxFlex><!-- placeholder --></div>

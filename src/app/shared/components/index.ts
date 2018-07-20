@@ -11,6 +11,8 @@ import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.
 import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { SideFiltersComponent } from './side-filters/side-filters.component';
+import { FormAnswerListComponent } from '../../features/outbreak/components/form-answer-list/form-answer-list.component';
+import { FormQuestionListComponent } from '../../features/outbreak/components/form-question-list/form-question-list.component';
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 

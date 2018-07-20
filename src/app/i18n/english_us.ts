@@ -34,6 +34,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_YES': 'Yes',
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
+        'LNG_COMMON_LABEL_DONE': 'You are now done',
 
         /**
          * General Actions
@@ -47,6 +48,12 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_ADD': 'Add',
+        'LNG_COMMON_BUTTON_NEXT': 'Next',
+        'LNG_COMMON_BUTTON_BACK': 'Back',
+        'LNG_COMMON_BUTTON_CREATE': 'Create',
+        'LNG_COMMON_BUTTON_EDIT': 'Edit',
+        'LNG_COMMON_BUTTON_VIEW': 'View',
 
         /**
          * Dialogs
@@ -113,6 +120,23 @@ export const EnglishUsLang = {
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
+        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
+        'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
+        'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
+        'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
+        'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
+        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
+        'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_TOOLTIP': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
+        'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
 
         /**
          * Case Fields
@@ -357,10 +381,25 @@ export const EnglishUsLang = {
          * Outbreak Templates
          */
         'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT': 'Free Text',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWER': 'Multiple Answers',
+        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_OPTIONS': 'Multiple Options',
+        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_SELECTION': 'Single Selection',
         'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': 'Date/Time',
         'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': 'Numeric',
         'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': 'Single Answer',
+        'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
+        'LNG_TEMPLATE_QUESTION_BADGE': 'Q',
+        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
+        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
+        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
+        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE': 'Answer Type',
+        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED': 'Required?',
+        'LNG_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED': 'Required',
+        'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add',
+        'LNG_TEMPLATE_QUESTION_ANSWER_BADGE': 'A',
+        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL': 'Answer Label',
+        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE': 'Answer Value',
+        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
+        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
 
         /**
          * Security Questions
@@ -411,6 +450,35 @@ export const EnglishUsLang = {
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
         'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
         'LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
+
+        /**
+         * Outbreaks List Page
+         */
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
+
+        /**
+         * Create Outbreak Page
+         */
+        'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE': 'Done',
+        'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak created',
+        'LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR': 'End date needs to be greater than start date',
+
+        /**
+         * Modify Outbreak page
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify Outbreak',
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
 
         /**
          * Form Range Fields

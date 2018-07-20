@@ -9,7 +9,11 @@
 
         <mat-tab-group class="page-tabs-navbar" (selectedTabChange)="selectTab($event)">
 
-            <mat-tab label="Details">
+            <!-- tab Details -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS' | translate}}
+                </ng-template>
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
@@ -17,19 +21,19 @@
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="outbreak.name"
-                                placeholder="Outbreak name"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
                                 [(ngModel)]="outbreak.disease"
-                                placeholder="Disease"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate"
                                 [options]="diseasesList$ | async">
                             </app-form-select>
                             <app-form-select
                                 name="countries"
                                 [(ngModel)]="outbreak.countries"
-                                placeholder="Countries"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate"
                                 [options]="countriesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -41,81 +45,85 @@
                                 <!-- placeholder -->
                             </div>
                         </div>
+
                         <app-form-textarea
                             name="description"
                             [(ngModel)]="outbreak.description"
-                            placeholder="Description"
+                            [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
                             required="true">
                         </app-form-textarea>
+
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
                                 name="startDate"
                                 [(ngModel)]="outbreak.startDate"
-                                placeholder="Start Date"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate"
                                 required="true">
                             </app-form-datepicker>
                             <app-form-datepicker
                                 name="endDate"
                                 [(ngModel)]="outbreak.endDate"
-                                placeholder="End Date">
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate">
                             </app-form-datepicker>
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="outbreak.periodOfFollowup"
-                                placeholder="Duration for the follow-up ( days) "
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
                                 name="frequencyOfFollowUp"
                                 [(ngModel)]="outbreak.frequencyOfFollowUp"
-                                placeholder="Follow-up frecquency"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
                                 required="true">
                             </app-form-input>
                         </div>
+
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="frequencyOfFollowUpPerDay"
                                 [(ngModel)]="outbreak.frequencyOfFollowUpPerDay"
-                                placeholder="Follow-up frecquency per day"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
                                 name="caseIdMask"
                                 [(ngModel)]="outbreak.caseIdMask"
-                                placeholder="Case Id Mask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
                                 required="true"
-                                tooltip="Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999.">
+                                [tooltip]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_TOOLTIP' | translate">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="outbreak.noDaysAmongContacts"
-                                placeholder="KPI - days among known contacts"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="outbreak.noDaysInChains"
-                                placeholder="KPI - days in known transmission chains"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS' | translate"
                                 required="true">
                             </app-form-input>
                         </div>
+
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="outbreak.noDaysNotSeen"
-                                placeholder="KPI - days not seen"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
                                 name="noLessContacts"
                                 [(ngModel)]="outbreak.noLessContacts"
-                                placeholder="KPI - less than X contacts"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="outbreak.longPeriodsBetweenCaseOnset"
-                                placeholder="Long Periods ( days )"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS' | translate"
                                 required="true">
                             </app-form-input>
                             <app-form-input
@@ -124,61 +132,52 @@
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
                                 type="number">
                             </app-form-input>
+
                         </div>
                     </div>
                 </mat-card>
 
             </mat-tab>
-            <mat-tab label="Case Investigation">
-                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyCaseInvestigation}}"
-                        color="primary" class="link-primary"
-                        (click)="addNewQuestion('case-investigation')">
-                    Add Question
-                </button>
-                <app-question *ngFor="let question of outbreak.caseInvestigationTemplate; let i = index"
-                              [question]="question"
-                              [viewOnly]="viewOnlyCaseInvestigation"
-                              [index]="i"
-                              [name]="'caseInvestigationTemplate'"
-                              (deleteQuestion)="deleteQuestion('case-investigation',question)"
-                              (linkAnswer)="linkAnswer('case-investigation',$event)"
-                              (duplicateQuestion)="duplicateQuestion('case-investigation',question)">
-                </app-question>
+
+            <!-- tab Case Investigation -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION' | translate}}
+                </ng-template>
+                <app-form-question-list
+                    name="caseInvestigationTemplate"
+                    [ngModel]="outbreak.caseInvestigationTemplate"
+                    [viewOnly]="viewOnly">
+                </app-form-question-list>
             </mat-tab>
-            <mat-tab label="Contact Follow-up">
-                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyContactFollowup}}"
-                        color="primary" class="link-primary"
-                        (click)="addNewQuestion('contact-followup')">
-                    Add Question
-                </button>
-                <app-question *ngFor="let question of outbreak.contactFollowUpTemplate; let i = index"
-                              [question]="question"
-                              [viewOnly]="viewOnlyContactFollowup"
-                              [index]="i"
-                              [name]="'contactFollowUpTemplate'"
-                              (deleteQuestion)="deleteQuestion('contact-followup',question)"
-                              (linkAnswer)="linkAnswer('contact-followup',$event)"
-                              (duplicateQuestion)="duplicateQuestion('contact-followup',question)">
-                </app-question>
+
+            <!-- tab Contact Follow-up -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP' | translate}}
+                </ng-template>
+                <app-form-question-list
+                    name="contactFollowUpTemplate"
+                    [ngModel]="outbreak.contactFollowUpTemplate"
+                    [viewOnly]="viewOnly">
+                </app-form-question-list>
             </mat-tab>
-            <mat-tab label="Lab Results">
-                <button mat-button type="button" fxFlexOffset="15px" fxShow="{{!viewOnlyLabResults}}"
-                        color="primary" class="link-primary"
-                        (click)="addNewQuestion('lab-results')">
-                    Add Question
-                </button>
-                <app-question *ngFor="let question of outbreak.labResultsTemplate; let i = index"
-                              [question]="question"
-                              [viewOnly]="viewOnlyLabResults"
-                              [index]="i"
-                              [name]="'labResultsTemplate'"
-                              (deleteQuestion)="deleteQuestion('lab-results',question)"
-                              (linkAnswer)="linkAnswer('lab-results',$event)"
-                              (duplicateQuestion)="duplicateQuestion('lab-results',question)">
-                </app-question>
+
+            <!-- tab Lab Results -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS' | translate}}
+                </ng-template>
+                <app-form-question-list
+                    name="labResultsTemplate"
+                    [(ngModel)]="outbreak.labResultsTemplate"
+                    [viewOnly]="viewOnly">
+                </app-form-question-list>
             </mat-tab>
+
         </mat-tab-group>
     </div>
+    <!-- outbreak form actions -->
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
@@ -187,78 +186,37 @@
                 mat-raised-button
                 color="primary"
                 class="button-primary">
-            Save
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button fxShow="{{currentTabIndex == 0 }}"
                 type="button"
                 [routerLink]="'/outbreaks'"
                 mat-raised-button>
-            Cancel
+            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
 
-        <!-- buttons for case investigation tab -->
-        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+        <!-- buttons for case questionnaires tab -->
+        <button [fxShow]="!viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 color="primary"
                 class="button-primary">
-            Save
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
-        <button fxShow="{{viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+        <button [fxShow]="viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 type="button"
                 color="primary"
                 class="button-primary"
-                (click)="enableEdit('case-investigation')">
-            Edit
+                (click)="enableEdit()">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
-        <button fxShow="{{!viewOnlyCaseInvestigation && currentTabIndex == 1 }}"
+        <button [fxShow]="!viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 type="button"
-                (click)="disableEdit('case-investigation')">
-            View
+                (click)="disableEdit()">
+            {{'LNG_COMMON_BUTTON_VIEW' | translate}}
         </button>
 
-        <!-- buttons for contact followup tab -->
-        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}"
-                mat-raised-button
-                color="primary"
-                class="button-primary">
-            Save
-        </button>
-        <button fxShow="{{viewOnlyContactFollowup && currentTabIndex == 2 }}"
-                mat-raised-button
-                type="button"
-                color="primary"
-                class="button-primary"
-                (click)="enableEdit('contact-followup')">
-            Edit
-        </button>
-        <button fxShow="{{!viewOnlyContactFollowup && currentTabIndex == 2 }}" mat-raised-button type="button"
-                type="button" (click)="disableEdit('contact-followup')">
-            View
-        </button>
-
-        <!-- buttons for lab results tab -->
-        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}"
-                mat-raised-button
-                color="primary"
-                class="button-primary">
-            Save
-        </button>
-        <button fxShow="{{viewOnlyLabResults && currentTabIndex == 3 }}"
-                mat-raised-button
-                type="button"
-                color="primary"
-                class="button-primary"
-                (click)="enableEdit('lab-results')">
-            Edit
-        </button>
-        <button fxShow="{{!viewOnlyLabResults && currentTabIndex == 3 }}"
-                mat-raised-button
-                type="button"
-                (click)="disableEdit('lab-results')">
-            View
-        </button>
     </div>
 </form>
 

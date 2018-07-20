@@ -1,8 +1,7 @@
 import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
-import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NgModel } from '@angular/forms';
+import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
-import { ValueAccessorBase } from './value-accessor-base';
 import { Observable } from 'rxjs/Observable';
 
 /**
@@ -35,22 +34,6 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     }
 
     /**
-     * Function triggered when the input value is changed
-     */
-    onChange() {
-        // validate group
-        super.validateGroup();
-
-        // mark as dirty
-        if (this.control) {
-            this.control.markAsDirty();
-        }
-
-        // call changed event
-        return this.changed.emit(this.value);
-    }
-
-    /**
      * Model array
      */
     get values(): any {
@@ -60,26 +43,40 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     /**
      * Add a new model
      */
-    add() {
+    add(newItem: T = {} as T) {
         // do we need to initialize the list ?
         if (!this.values) {
             this.value = [];
         }
 
         // add new model
-        this.values.push({});
+        this.values.push(newItem);
 
         // mark as dirty
         this.control.markAsDirty();
 
         // validate groups & inputs
-        setTimeout(() => { this.validateGroup(); });
+        setTimeout(() => {
+            // validate
+            this.validateGroup();
+
+            // call on change
+            this.changed.emit(this.value);
+        });
+    }
+
+    /**
+     * Clone item and add it to list
+     * @param {T} item
+     */
+    clone(item: T) {
+        this.add(_.cloneDeep(item));
     }
 
     /**
      * Remove an existing model
      */
-    delete(index) {
+    delete(index, overrideConfirm: boolean = false) {
         // delete method
         const deleteItem = () => {
             // remove document
@@ -89,11 +86,17 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
             this.control.markAsDirty();
 
             // validate groups & inputs
-            setTimeout(() => { this.validateGroup(); });
+            setTimeout(() => {
+                // validate
+                this.validateGroup();
+
+                // call on change
+                this.changed.emit(this.value);
+            });
         };
 
         // show confirm dialog to confirm the action
-        if (!_.values(this.values[index]).some(x => x !== undefined && x !== '')) {
+        if (!_.values(this.values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
             deleteItem();
         } else {
             Observable.create((observer) => {
@@ -105,34 +108,20 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     }
 
     /**
-     * Override touch function
+     * Function triggered when the input value is changed
      */
-    public touch() {
-        // touch children
-        if (this.controlContainer) {
-            const formDirectives = _.get(this.controlContainer, '_directives', []);
-            _.forEach(formDirectives, (ngModel: NgModel) => {
-                const groupFormDirectives = _.get(ngModel, 'valueAccessor.groupForm._directives', []);
-                _.forEach(groupFormDirectives, (groupModel: NgModel) => {
-                    if (
-                        groupModel.valueAccessor &&
-                        groupModel.valueAccessor instanceof ValueAccessorBase
-                    ) {
-                        (groupModel.valueAccessor as ValueAccessorBase<any>).touch();
-                    }
-                });
-            });
+    onChange(validateGroup: boolean = true) {
+        // validate group
+        if (validateGroup) {
+            super.validateGroup();
         }
-    }
 
-    /**
-     * Override validate functions
-     */
-    protected validate() {
-        // call parent
-        super.validate();
+        // mark as dirty
+        if (this.control) {
+            this.control.markAsDirty();
+        }
 
-        // touch list
-        this.touch();
+        // call changed event
+        this.changed.emit(this.value);
     }
 }

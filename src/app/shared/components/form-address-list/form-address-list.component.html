@@ -8,10 +8,10 @@
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <app-form-address
                     [name]="name + '[' + i + ']'"
-                    [(ngModel)]="values[i]"
-                    (changed)="onChange()"
+                    [ngModel]="values[i]"
+                    (changed)="onChange(false)"
                     [required]="true"
-                    (groupInitialized)="validateGroup()">
+                    (groupValidated)="validateGroup()">
                 </app-form-address>
             </mat-card>
 
@@ -31,8 +31,9 @@
                  fxLayoutAlign="start center">
                 <app-form-address
                     [name]="name + '[' + i + ']'"
-                    [(ngModel)]="values[i]"
-                    (changed)="onChange()"
+                    [ngModel]="values[i]"
+                    (changed)="onChange(false)"
+                    (groupValidated)="validateGroup()"
                     <!-- @TODO add readonly property -->>
                 </app-form-address>
             </div>

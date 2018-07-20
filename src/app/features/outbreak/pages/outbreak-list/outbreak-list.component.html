@@ -6,7 +6,7 @@
             <div class="topnav-actions">
                 <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
                         [routerLink]="'./create'">
-                    Add <span class="xt-icon">addCircle</span>
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Name</div>
+                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -42,7 +42,7 @@
         <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Disease</div>
+                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="diseaseFilter"
@@ -66,7 +66,7 @@
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Countries</div>
+                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -81,7 +81,7 @@
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Start Date</div>
+                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -97,7 +97,7 @@
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>End Date</div>
+                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -113,7 +113,7 @@
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>Active?</div>
+                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="activeFilter"
@@ -128,7 +128,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
-                {{ (outbreak.id == authUser.activeOutbreakId) ? 'YES' : 'NO'}}
+                <app-yes-no-label [value]="outbreak.id == authUser.activeOutbreakId"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -145,15 +145,15 @@
 
                     <button fxShow="{{ (item.id != authUser.activeOutbreakId) }}" mat-menu-item
                             (click)="setActive(item)">
-                        Set Active
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE' | translate}}
                     </button>
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
+                        {{ 'LNG_PAGE_ACTION_MODIFY' | translate}}
                     </button>
 
                     <button mat-menu-item (click)="delete(item)">
-                        Delete
+                        {{ 'LNG_PAGE_ACTION_DELETE' | translate}}
                     </button>
 
                 </mat-menu>

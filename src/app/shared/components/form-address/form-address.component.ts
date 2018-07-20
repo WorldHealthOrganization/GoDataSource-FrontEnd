@@ -40,11 +40,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
         this.locationsList$ = this.locationDataService.getLocationsList();
 
         // init value
-        if (this.value) {
-            this.value = this.value instanceof AddressModel ? this.value : new AddressModel(this.value);
-        } else {
-            this.value = new AddressModel();
-        }
+        this.value = new AddressModel(this.value);
     }
 
     /**

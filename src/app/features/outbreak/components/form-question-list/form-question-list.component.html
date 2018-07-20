@@ -1,0 +1,32 @@
+<div class="form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <div fxLayout="row">
+        <!-- btn to add a new question -->
+        <button mat-button type="button" [fxShow]="!viewOnly"
+                color="primary" class="link-primary"
+                (click)="addNewQuestion()">
+            {{'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
+        </button>
+    </div>
+
+    <form #groupForm="ngForm">
+        <!-- list of questions -->
+        <div *ngFor="let question of values; let i = index" fxFlex fxLayout="row"
+             fxLayoutAlign="start center">
+            <mat-card class="page-section question-card" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <app-form-question
+                    [name]="name + '[' + i + ']'"
+                    [ngModel]="values[i]"
+                    (changed)="onChange(false)"
+                    required="true"
+                    [viewOnly]="viewOnly"
+                    [title]="('LNG_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) "
+                    (deleteQuestion)="delete(i)"
+                    (duplicateQuestion)="duplicateQuestion(question)"
+                    (groupValidated)="validateGroup()">
+                </app-form-question>
+            </mat-card>
+        </div>
+    </form>
+</div>

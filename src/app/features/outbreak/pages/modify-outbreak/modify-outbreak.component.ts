@@ -3,17 +3,15 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { MatTabChangeEvent } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { QuestionModel } from '../../../../core/models/question.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
 import * as _ from 'lodash';
-import { SnackbarComponent } from '../../../../shared/components/snackbar/snackbar.component';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { NgForm } from '@angular/forms';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -24,8 +22,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 export class ModifyOutbreakComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Outbreaks', '/outbreaks'),
-        new BreadcrumbItemModel('Modify Outbreak', '.', true)
+        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks'),
+        new BreadcrumbItemModel('LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY', '.', true)
     ];
 
     // id of the outbreak to modify
@@ -38,9 +36,8 @@ export class ModifyOutbreakComponent {
     countriesList$: Observable<any[]>;
 
     // controls for switching between view and edit mode
-    viewOnlyCaseInvestigation = true;
-    viewOnlyContactFollowup = true;
-    viewOnlyLabResults = true;
+    viewOnly = true;
+    // index of the current tab
     currentTabIndex = 0;
 
     constructor(private outbreakDataService: OutbreakDataService,
@@ -49,7 +46,7 @@ export class ModifyOutbreakComponent {
                 private genericDataService: GenericDataService,
                 private snackbarService: SnackbarService,
                 private i18nService: I18nService,
-                private dialogService: DialogService) {
+                private formHelper: FormHelperService) {
 
         this.route.params.subscribe(params => {
             this.outbreakId = params.outbreakId;
@@ -65,11 +62,6 @@ export class ModifyOutbreakComponent {
                     this.setNewFalse(this.outbreak.caseInvestigationTemplate);
                     this.setNewFalse(this.outbreak.contactFollowUpTemplate);
                     this.setNewFalse(this.outbreak.labResultsTemplate);
-
-                    this.setTranslation(this.outbreak.caseInvestigationTemplate);
-                    this.setTranslation(this.outbreak.contactFollowUpTemplate);
-                    this.setTranslation(this.outbreak.labResultsTemplate);
-
                 });
         });
     }
@@ -78,77 +70,49 @@ export class ModifyOutbreakComponent {
      * Handles form submit
      * @param form
      */
-    modifyOutbreak(form) {
-        if (form.valid) {
-            const dirtyFields: any = form.value;
+    modifyOutbreak(form: NgForm) {
+        // const dirtyFields: any = this.formHelper.getFields(form);
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        // validate form
+        if (!form.valid) {
+            this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            return;
+        }
 
-            // assign the questionnaires objects to the outbreak data
-            dirtyFields.caseInvestigationTemplate = this.outbreak.caseInvestigationTemplate;
-            dirtyFields.contactFollowUpTemplate = this.outbreak.contactFollowUpTemplate;
-            dirtyFields.labResultsTemplate = this.outbreak.labResultsTemplate;
+        // validate end date to be greater than start date
+        if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
+            this.snackbarService.showError('LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR');
+        } else {
 
-            // validate end date to be greater than start date
-            if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
-                this.snackbarService.showError('End Date needs to be greater than start date');
-            } else {
-
-                // modify the outbreak
-                this.outbreakDataService
-                    .modifyOutbreak(this.outbreakId, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('Outbreak modified!');
-                        // load language tokens so they will be available
-                        this.i18nService.loadUserLanguage().subscribe(() => {
-                        });
-                        // navigate to listing page
-                        this.router.navigate(['/outbreaks']);
-                    });
-            }
+            // modify the outbreak
+            this.outbreakDataService
+                .modifyOutbreak(this.outbreakId, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+                    // update language tokens to get the translation of submitted questions and answers
+                    this.i18nService.loadUserLanguage().subscribe();
+                    // navigate to listing page
+                    this.router.navigate(['/outbreaks']);
+                });
         }
     }
 
     /**
      * Enable edit on questionnaires tabs
      */
-    enableEdit(view) {
-        switch (view) {
-            case 'case-investigation' : {
-                this.viewOnlyCaseInvestigation = false;
-                break;
-            }
-            case 'contact-followup' : {
-                this.viewOnlyContactFollowup = false;
-                break;
-            }
-            case 'lab-results' : {
-                this.viewOnlyLabResults = false;
-                break;
-            }
-        }
+    enableEdit() {
+        this.viewOnly = false;
     }
 
     /**
      * Disable edit on questionnaires tabs
      */
-    disableEdit(view) {
-        switch (view) {
-            case 'case-investigation' : {
-                this.viewOnlyCaseInvestigation = true;
-                break;
-            }
-            case 'contact-followup' : {
-                this.viewOnlyContactFollowup = true;
-                break;
-            }
-            case 'lab-results' : {
-                this.viewOnlyLabResults = true;
-                break;
-            }
-        }
+    disableEdit() {
+        this.viewOnly = true;
     }
 
     /**
@@ -156,132 +120,6 @@ export class ModifyOutbreakComponent {
      */
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
-    }
-
-    /**
-     * Adds a new question
-     * @param tab - string identifying the questionnaire
-     */
-    addNewQuestion(tab) {
-        const newQuestion = new QuestionModel();
-        switch (tab) {
-            case 'case-investigation': {
-                newQuestion.order = this.outbreak.caseInvestigationTemplate.length + 1;
-                this.outbreak.caseInvestigationTemplate.push(new QuestionModel());
-                break;
-            }
-            case 'contact-followup': {
-                newQuestion.order = this.outbreak.contactFollowUpTemplate.length + 1;
-                this.outbreak.contactFollowUpTemplate.push(newQuestion);
-                break;
-            }
-            case 'lab-results': {
-                newQuestion.order = this.outbreak.labResultsTemplate.length + 1;
-                this.outbreak.labResultsTemplate.push(newQuestion);
-                break;
-            }
-        }
-        this.scrollToEndQuestions();
-    }
-
-    /**
-     * Delete a question from the questionnaire
-     * @param tab
-     * @param question
-     */
-    deleteQuestion(tab, question) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    switch (tab) {
-                        case 'case-investigation': {
-                            this.outbreak.caseInvestigationTemplate = this.outbreak.caseInvestigationTemplate.filter(item => item !== question);
-                            break;
-                        }
-                        case 'contact-followup': {
-                            this.outbreak.contactFollowUpTemplate = this.outbreak.contactFollowUpTemplate.filter(item => item !== question);
-                            break;
-                        }
-                        case 'lab-results': {
-                            this.outbreak.labResultsTemplate = this.outbreak.labResultsTemplate.filter(item => item !== question);
-                            break;
-                        }
-                    }
-                }
-            });
-    }
-
-    /**
-     * Duplicate a question. It will be added to the end
-     * @param tab
-     * @param question
-     */
-    duplicateQuestion(tab, question) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    const newQuestion = JSON.parse(JSON.stringify(question));
-                    switch (tab) {
-                        case 'case-investigation': {
-                            newQuestion.order = this.outbreak.caseInvestigationTemplate.length + 1;
-                            this.outbreak.caseInvestigationTemplate.push(newQuestion);
-                            break;
-                        }
-                        case 'contact-followup': {
-                            newQuestion.order = this.outbreak.contactFollowUpTemplate.length + 1;
-                            this.outbreak.contactFollowUpTemplate.push(newQuestion);
-                            break;
-                        }
-                        case 'lab-results': {
-                            newQuestion.order = this.outbreak.labResultsTemplate.length + 1;
-                            this.outbreak.labResultsTemplate.push(newQuestion);
-                            break;
-                        }
-                    }
-                    this.scrollToEndQuestions();
-                }
-            });
-    }
-
-    /**
-     * Link an answer to another question
-     * @param tab
-     * @param $event
-     */
-    linkAnswer(tab, $event) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    const answerToLink = $event.answer;
-                    // TODO link answer
-                    switch (tab) {
-                        case 'case-investigation': {
-                            // this.caseInvestigationTemplateQuestions = this.caseInvestigationTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'contact-followup': {
-                            // this.contactFollowupTemplateQuestions = this.contactFollowupTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                        case 'lab-results': {
-                            // this.labResultsTemplateQuestions = this.labResultsTemplateQuestions.filter(item => item !== question);
-                            break;
-                        }
-                    }
-                }
-            });
-    }
-
-    /**
-     * Scroll to the bottom
-     */
-    scrollToEndQuestions() {
-        setTimeout(function () {
-            const elements = document.querySelectorAll('app-question');
-            const len = elements.length;
-            const el = elements[len - 1] as HTMLElement;
-            el.scrollIntoView({behavior: 'smooth'});
-        }, 100);
     }
 
     /**
@@ -297,31 +135,6 @@ export class ModifyOutbreakComponent {
                     });
                 }
             });
-        }
-    }
-
-    /**
-     * Replace token with translation for all questions and answers in the array.
-     */
-    setTranslation(questionsArray = []) {
-        if (!_.isEmpty(questionsArray)) {
-
-            // loop through questions
-            questionsArray.forEach((question, key) => {
-                // get translation for the question token and update the value of the question text property
-                const translatedValue = this.i18nService.instant(questionsArray[key].text);
-                questionsArray[key].text = translatedValue;
-
-                if (!_.isEmpty(questionsArray[key].answers)) {
-                    // loop through the answers array
-                    questionsArray[key].answers.forEach((answer, keyAnswer) => {
-                        // get translation for the answer label and update the property
-                        const translatedAnswerValue = this.i18nService.instant(questionsArray[key].answers[keyAnswer].label);
-                        questionsArray[key].answers[keyAnswer].label = translatedAnswerValue;
-                    });
-                }
-            });
-
         }
     }
 

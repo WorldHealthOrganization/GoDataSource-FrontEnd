@@ -1,0 +1,33 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <div fxLayout="row">
+        <!-- btn to add answers -->
+        <button
+            flex mat-icon-button
+            color="primary"
+            class="link-primary add-answer-btn"
+            type="button"
+            [fxShow]="!viewOnly"
+            (click)="addAnswer()">
+            {{'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}
+        </button>
+    </div>
+
+    <form #groupForm="ngForm">
+        <!-- list of answers -->
+        <div *ngFor="let answer of values; let i = index" fxFlex fxLayout="row"
+             fxLayoutAlign="start center">
+            <app-form-answer
+                [name]="name + '[' + i + ']'"
+                [ngModel]="values[i]"
+                (changed)="onChange(false)"
+                [required]="true"
+                [viewOnly]="viewOnly"
+                [title]="('LNG_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) "
+                (deleteAnswer)="delete(i)"
+                (groupValidated)="validateGroup()">
+            </app-form-answer>
+        </div>
+    </form>
+</div>

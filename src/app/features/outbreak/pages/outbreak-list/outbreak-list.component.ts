@@ -26,7 +26,7 @@ import { Constants } from '../../../../core/models/constants';
 export class OutbreakListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Outbreaks', '.', true)
+        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '.', true)
     ];
 
     // import constants into template
@@ -90,7 +90,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                 .subscribe((authenticatedUser) => {
                                     this.authUser = authenticatedUser.user;
                                 });
-                            this.snackbarService.showSuccess('Success');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
                             this.refreshList();
                         });
                 }
@@ -115,7 +115,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                 .reloadAndPersistAuthUser()
                                 .subscribe((authenticatedUser) => {
                                     this.authUser = authenticatedUser.user;
-                                    this.snackbarService.showSuccess('Active outbreak changed successfully');
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
                                     this.outbreakDataService.checkActiveSelectedOutbreak();
                                     this.refreshList();
                                 });
@@ -135,6 +135,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             // remove filter
             this.queryBuilder.filter.remove(property);
         } else {
+            // remove filter on the property to not add more conditions on the same property.
+            this.queryBuilder.filter.remove(property);
             switch (value.value) {
                 case true : {
                     this.queryBuilder.filter.where({
