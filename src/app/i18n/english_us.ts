@@ -250,6 +250,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
 
         /**
+         * Modify Case Relationship page
+         */
+        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified!',
+
+        /**
          * Contact Fields
          */
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',

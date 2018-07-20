@@ -20,15 +20,14 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
-    selector: 'app-create-case-relationship',
+    selector: 'app-modify-case-relationship',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-case-relationship.component.html',
-    styleUrls: ['./create-case-relationship.component.less']
+    templateUrl: './modify-case-relationship.component.html',
+    styleUrls: ['./modify-case-relationship.component.less']
 })
-export class CreateCaseRelationshipComponent implements OnInit {
+export class ModifyCaseRelationshipComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -36,8 +35,9 @@ export class CreateCaseRelationshipComponent implements OnInit {
 
     // selected outbreak ID
     outbreakId: string;
-    // route param
+    // route params
     caseId: string;
+    relationshipId: string;
 
     relatedEntityType: string;
     relatedEntityId: string;
@@ -69,23 +69,15 @@ export class CreateCaseRelationshipComponent implements OnInit {
 
     ngOnInit() {
         this.availableRelatedEntityTypes$ = this.genericDataService.getAvailableRelatedEntityTypes(EntityType.CASE);
-        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
         this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
-        // set default values on relationship
-        this.certaintyLevelOptions$
-            .subscribe((options: LabelValuePair[]) => {
-                if (!_.isEmpty(options)) {
-                    // get the first option selected by default
-                    this.relationshipData.certaintyLevelId = options[0].value;
-                }
-            });
-
         this.route.params.subscribe(params => {
             this.caseId = params.caseId;
+            this.relationshipId = params.relationshipId;
 
             // get selected outbreak
             this.outbreakDataService
@@ -113,81 +105,69 @@ export class CreateCaseRelationshipComponent implements OnInit {
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE', `/cases/${this.caseId}/relationships`)
                             );
-                            // add new breadcrumb: page title
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_RELATIONSHIP_TITLE', '.', true)
-                            );
+
+                            // get relationship data
+                            this.relationshipDataService
+                                .getEntityRelationship(this.outbreakId, EntityType.CASE, this.caseId, this.relationshipId)
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+
+                                    // Relationship not found; navigate back to Case Relationships list
+                                    this.router.navigate([`/cases/${this.caseId}/relationships`]);
+
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe((relationshipData) => {
+                                    this.relationshipData = relationshipData;
+
+                                    // get related entity
+                                    const relatedEntityModel = _.get(relationshipData.relatedEntity(this.caseId), 'model', {});
+
+                                    // add new breadcrumb: page title
+                                    this.breadcrumbs.push(
+                                        new BreadcrumbItemModel(
+                                            'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TITLE',
+                                            null,
+                                            true,
+                                            {},
+                                            relatedEntityModel
+                                        )
+                                    );
+                                });
+
                         });
                 });
         });
     }
 
-    /**
-     * Refresh te list of persons based on the selected relationship type
-     */
-    refreshPersonsList() {
-        if (!this.outbreakId) {
+    modifyRelationship(form: NgForm) {
+
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        if (!this.formHelper.validateForm(form)) {
             return;
         }
 
-        this.relatedEntityId = null;
+        // modify the case
+        this.relationshipDataService
+            .modifyRelationship(
+                this.outbreakId,
+                EntityType.CASE,
+                this.caseId,
+                this.relationshipId,
+                dirtyFields
+            )
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-        switch (this.relatedEntityType) {
-            case EntityType.CASE:
-                // exclude current Case from the list
-                const casesQueryBuilder = new RequestQueryBuilder();
-                casesQueryBuilder.merge(this.personsQueryBuilder);
-                casesQueryBuilder.filter.where({
-                    id: {
-                        'neq': this.caseId
-                    }
-                });
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                this.personsList$ = this.caseDataService.getCasesList(this.outbreakId, casesQueryBuilder);
-                break;
-
-            case EntityType.CONTACT:
-                this.personsList$ = this.contactDataService.getContactsList(this.outbreakId, this.personsQueryBuilder);
-                break;
-
-            case EntityType.EVENT:
-                this.personsList$ = this.eventDataService.getEventsList(this.outbreakId, this.personsQueryBuilder);
-                break;
-        }
-    }
-
-    createNewRelationship(stepForms: NgForm[]) {
-
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-
-        // remove unnecessary fields
-        delete dirtyFields.relatedEntityType;
-
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
-            !_.isEmpty(dirtyFields)
-        ) {
-            // add the new Case
-            this.relationshipDataService
-                .createRelationship(
-                    this.outbreakId,
-                    EntityType.CASE,
-                    this.caseId,
-                    dirtyFields
-                )
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
-
-                    // navigate to listing page
-                    this.router.navigate([`/cases/${this.caseId}/relationships`]);
-                });
-        }
+                // navigate back to Case Relationships list
+                this.router.navigate([`/cases/${this.caseId}/relationships`]);
+            });
     }
 
 }

@@ -6,10 +6,10 @@
 
             <mat-list-item class="breadcrumb-item" [ngClass]="{'active': item.active}">
                 <a *ngIf="!item.active" [routerLink]="item.link" [queryParams]="item.params" class="a-no-style">
-                    {{item.label | translate}}
+                    {{item.label | translate: item.translateData}}
                 </a>
                 <div *ngIf="item.active">
-                    {{item.label | translate}}
+                    {{item.label | translate: item.translateData}}
                 </div>
             </mat-list-item>
 

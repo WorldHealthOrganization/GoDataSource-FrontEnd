@@ -16,7 +16,7 @@ export class RelationshipModel {
     persons: RelationshipPersonModel[];
     contactDate: string;
     contactDateEstimated: boolean;
-    certaintyLevelId: number;
+    certaintyLevelId: string;
     exposureTypeId: string;
     exposureFrequencyId: string;
     exposureDurationId: string;

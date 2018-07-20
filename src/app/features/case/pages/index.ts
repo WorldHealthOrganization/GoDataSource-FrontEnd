@@ -5,6 +5,7 @@ import { ModifyCaseComponent } from './modify-case/modify-case.component';
 import { CaseLabResultsListComponent } from './case-lab-results-list/case-lab-results-list.component';
 import { CaseRelationshipsListComponent } from './case-relationships-list/case-relationships-list.component';
 import { CreateCaseRelationshipComponent } from './create-case-relationship/create-case-relationship.component';
+import { ModifyCaseRelationshipComponent } from './modify-case-relationship/modify-case-relationship.component';
 
 // export each page component individually
 export * from './cases-list/cases-list.component';
@@ -13,6 +14,7 @@ export * from './modify-case/modify-case.component';
 export * from './case-lab-results-list/case-lab-results-list.component';
 export * from './case-relationships-list/case-relationships-list.component';
 export * from './create-case-relationship/create-case-relationship.component';
+export * from './modify-case-relationship/modify-case-relationship.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -21,5 +23,6 @@ export const pageComponents: any[] = [
     ModifyCaseComponent,
     CaseLabResultsListComponent,
     CaseRelationshipsListComponent,
-    CreateCaseRelationshipComponent
+    CreateCaseRelationshipComponent,
+    ModifyCaseRelationshipComponent
 ];

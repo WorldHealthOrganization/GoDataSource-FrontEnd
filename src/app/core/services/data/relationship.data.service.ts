@@ -68,6 +68,39 @@ export class RelationshipDataService {
     }
 
     /**
+     * Retrieve a Relationship between 2 entities (Cases / Contacts / Events)
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {string} relationshipId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<RelationshipModel>}
+     */
+    getEntityRelationship(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        relationshipId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<RelationshipModel> {
+
+        const qb = new RequestQueryBuilder();
+        // include people in response
+        qb.include('people');
+
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
+
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(
+                `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}?filter=${filter}`
+            ),
+            RelationshipModel
+        );
+    }
+
+    /**
      * Delete an existing Relationship between 2 entities (Cases / Contacts / Events)
      * @param {string} outbreakId
      * @param {EntityType} entityType

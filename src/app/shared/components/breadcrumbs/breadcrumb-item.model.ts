@@ -6,7 +6,8 @@ export class BreadcrumbItemModel {
         public label: string = '',
         public link: string = '.',
         public active: boolean = false,
-        public params: {} = {}
+        public params: {} = {},
+        public translateData: {} = {}
     ) {
     }
 }
