@@ -1,0 +1,159 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Person step -->
+        <mat-step [stepControl]="personForm">
+            <form #personForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_PERSON' | translate}}</ng-template>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row">
+                            <app-form-select fxFlex="25"
+                                 name="relatedEntityType"
+                                 [(ngModel)]="relatedEntityType"
+                                 [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_TYPE' | translate"
+                                 required="true"
+                                 (optionChanged)="refreshPersonsList()"
+                                 [options]="availableRelatedEntityTypes$ | async">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row">
+                            <!-- Related Person -->
+                            <app-form-select fxFlex="50"
+                                 *ngIf="relatedEntityType"
+                                 name="persons[0][id]"
+                                 [(ngModel)]="relatedEntityId"
+                                 [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATED_PERSON' | translate"
+                                 required="true"
+                                 [options]="personsList$ | async"
+                                 optionLabelKey="name"
+                                 optionValueKey="id">
+                            </app-form-select>
+                        </div>
+
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>
+                        {{'LNG_STEPPER_LABEL_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_DETAILS' | translate }}</ng-template>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-datepicker
+                                 name="contactDate"
+                                 [(ngModel)]="relationshipData.contactDate"
+                                 required="true"
+                                 [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="contactDateEstimated"
+                                [(ngModel)]="relationshipData.contactDateEstimated"
+                                required="true"
+                                [label]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED' | translate">
+                            </app-form-slide-toggle>
+
+                            <app-form-select
+                                 name="certaintyLevelId"
+                                 [(ngModel)]="relationshipData.certaintyLevelId"
+                                 [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
+                                 required="true"
+                                 [options]="certaintyLevelOptions$ | async">
+                            </app-form-select>
+
+                            <app-form-select
+                                 name="exposureTypeId"
+                                 [(ngModel)]="relationshipData.exposureTypeId"
+                                 [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
+                                 required="true"
+                                 [options]="exposureTypeOptions$ | async">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-select
+                                name="exposureFrequencyId"
+                                [(ngModel)]="relationshipData.exposureFrequencyId"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
+                                required="true"
+                                [options]="exposureFrequencyOptions$ | async">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="exposureDurationId"
+                                [(ngModel)]="relationshipData.exposureDurationId"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
+                                required="true"
+                                [options]="exposureDurationOptions$ | async">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="socialRelationshipTypeId"
+                                [(ngModel)]="relationshipData.socialRelationshipTypeId"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
+                                [options]="socialRelationshipOptions$ | async">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="comment"
+                                [(ngModel)]="relationshipData.comment"
+                                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT' | translate">
+                            </app-form-textarea>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperPrevious>
+                        {{'LNG_STEPPER_LABEL_BACK' | translate}}
+                    </button>
+                    <button mat-button matStepperNext>
+                        {{'LNG_STEPPER_LABEL_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button type="button" mat-button (click)="createNewRelationship([personForm, detailsForm])">
+                    {{'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

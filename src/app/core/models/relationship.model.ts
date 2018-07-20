@@ -1,26 +1,18 @@
 import * as _ from 'lodash';
-
-export enum RelationshipType {
-    CASE = 'case',
-    CONTACT = 'contact'
-}
+import { EntityModel } from './entity.model';
 
 export class RelationshipPersonModel {
     id: string;
     type: string;
 
-    constructor(dataOrId: {} | string = null, type: RelationshipType = null) {
-        if (!dataOrId || _.isObject(dataOrId)) {
-            this.id = _.get(dataOrId, 'id');
-            this.type = _.get(dataOrId, 'type');
-        } else {
-            this.id = dataOrId as string;
-            this.type = type;
-        }
+    constructor(data) {
+        this.id = _.get(data, 'id');
+        this.type = _.get(data, 'type');
     }
 }
 
 export class RelationshipModel {
+    id: string;
     persons: RelationshipPersonModel[];
     contactDate: string;
     contactDateEstimated: boolean;
@@ -31,8 +23,10 @@ export class RelationshipModel {
     socialRelationshipTypeId: string;
     clusterId: string;
     comment: string;
+    people: EntityModel[];
 
     constructor(data = null) {
+        this.id = _.get(data, 'id');
         this.persons = _.get(data, 'persons', []);
         this.contactDate = _.get(data, 'contactDate');
         this.contactDateEstimated = _.get(data, 'contactDateEstimated', false);
@@ -43,5 +37,22 @@ export class RelationshipModel {
         this.socialRelationshipTypeId = _.get(data, 'socialRelationshipTypeId');
         this.clusterId = _.get(data, 'clusterId');
         this.comment = _.get(data, 'comment');
+
+        const peopleData = _.get(data, 'people', []);
+        this.people = _.map(peopleData, (entityData) => {
+            return new EntityModel(entityData);
+        });
+    }
+
+    /**
+     * Get the related entity
+     * @param {string} currentEntityId
+     * @return {EntityModel}
+     */
+    relatedEntity(currentEntityId: string): EntityModel {
+        return _.find(this.people, (entity: EntityModel) => {
+            const entityId = _.get(entity, 'model.id');
+            return entityId !== currentEntityId;
+        });
     }
 }

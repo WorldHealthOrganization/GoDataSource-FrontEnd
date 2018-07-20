@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Constants } from '../../models/constants';
+import { EntityType } from '../../models/entity.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class GenericDataService {
@@ -106,6 +108,29 @@ export class GenericDataService {
      */
     getSocialRelationshipOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.SOCIAL_RELATIONSHIP_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of available Entity Types that, optionally, can be related to a given type (Case, Contact or Event)
+     * @param {EntityType} forType
+     * @returns {Observable<any[]>}
+     */
+    getAvailableRelatedEntityTypes(forType: EntityType = null): Observable<any[]> {
+        const availableTypes = _.cloneDeep(Constants.ENTITY_TYPE);
+
+        switch (forType) {
+            case EntityType.CASE:
+            case EntityType.EVENT:
+                // all types can be related with a Case or an Event
+                break;
+
+            case EntityType.CONTACT:
+                // all types, except Contact, can be related with a Contact
+                delete availableTypes.CONTACT;
+                break;
+        }
+
+        return Observable.of(Object.values(availableTypes));
     }
 }
 

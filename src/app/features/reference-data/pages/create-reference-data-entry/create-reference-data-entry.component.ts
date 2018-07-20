@@ -44,13 +44,14 @@ export class CreateReferenceDataEntryComponent implements OnInit {
             this.referenceDataDataService
                 .getReferenceDataByCategory(params.categoryId)
                 .subscribe((category: ReferenceDataCategoryModel) => {
-                    // add new breadcrumbs
-                    this.breadcrumbs.push.apply([
-                        // link to Category
+                    // add new breadcrumb: Category page
+                    this.breadcrumbs.push(
                         new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`),
-                        // current page title
+                    );
+                    // add new breadcrumb: page title
+                    this.breadcrumbs.push(
                         new BreadcrumbItemModel('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE', '.', true)
-                    ]);
+                    );
                 });
         });
     }

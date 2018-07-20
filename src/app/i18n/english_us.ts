@@ -29,6 +29,12 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
 
         /**
+         * Stepper buttons
+         */
+        'LNG_STEPPER_LABEL_NEXT': 'Next',
+        'LNG_STEPPER_LABEL_BACK': 'Back',
+
+        /**
          * Common labels
          */
         'LNG_COMMON_LABEL_YES': 'Yes',
@@ -42,6 +48,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_DELETE': 'Delete',
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
+        'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
 
         /**
          * Common buttons
@@ -192,6 +199,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify Case',
 
         /**
+         * Case Relationships list page
+         */
+        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
+
+        /**
+         * Create Case Relationship page
+         */
+        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TITLE': 'Create New Relationship',
+        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_PERSON': 'Person',
+        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP': 'Create Relationship',
+        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
+
+        /**
          * Contact Fields
          */
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
@@ -220,6 +242,8 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
+        'LNG_RELATIONSHIP_FIELD_LABEL_TYPE': 'Relationship Type',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATED_PERSON': 'Related Person',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
         'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL': 'Certainty Level',
@@ -229,6 +253,14 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
         'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
+        'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_NAME': 'Name',
+
+        /**
+         * Entity Types
+         */
+        'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
+        'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
+        'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
 
         /**
          * Follow-up fields

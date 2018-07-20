@@ -1,0 +1,173 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    {{'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Person Name -->
+        <ng-container matColumnDef="personName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.relatedEntity(caseId)?.model.name}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Contact Date -->
+        <ng-container matColumnDef="contactDate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.contactDate | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Certainty Level -->
+        <ng-container matColumnDef="certaintyLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.certaintyLevelId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Type -->
+        <ng-container matColumnDef="exposureType">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.exposureTypeId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Frequency -->
+        <ng-container matColumnDef="exposureFrequency">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.exposureFrequencyId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Exposure Duration -->
+        <ng-container matColumnDef="exposureDuration">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.exposureDurationId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Relation -->
+        <ng-container matColumnDef="relation">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{item.socialRelationshipTypeId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+
+                    <button mat-menu-item>
+                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                    </button>
+
+                    <button mat-menu-item>
+                        {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                    </button>
+
+                </mat-menu>
+
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
+</mat-card>

@@ -160,6 +160,12 @@
 
                     <mat-divider></mat-divider>
 
+                    <button mat-menu-item [routerLink]="['.', item.id, 'relationships']">
+                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
                     <button mat-menu-item>
                         Mark as dead
                     </button>

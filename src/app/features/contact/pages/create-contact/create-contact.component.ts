@@ -15,10 +15,12 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { RelationshipModel, RelationshipPersonModel, RelationshipType } from '../../../../core/models/relationship.model';
+import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -107,7 +109,11 @@ export class CreateContactComponent implements OnInit {
                                 // initialize case
                                 // add case to list
                                 this.caseData = caseData;
-                                this.relationship.persons.push(new RelationshipPersonModel(this.caseData.id));
+                                this.relationship.persons.push(
+                                    new RelationshipPersonModel({
+                                        id: this.caseData.id
+                                    })
+                                );
                             });
                     });
             });
@@ -156,7 +162,12 @@ export class CreateContactComponent implements OnInit {
                         })
                         .subscribe((contactData: ContactModel) => {
                             this.relationshipDataService
-                                .createRelationship(selectedOutbreak.id, RelationshipType.CONTACT, contactData.id, relationship)
+                                .createRelationship(
+                                    selectedOutbreak.id,
+                                    EntityType.CONTACT,
+                                    contactData.id,
+                                    relationship
+                                )
                                 .catch((err) => {
                                     // display error message
                                     this.snackbarService.showError(err.message);
