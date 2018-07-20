@@ -18,15 +18,14 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute } from '@angular/router';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as moment from 'moment';
 
 @Component({
     selector: 'app-follow-ups-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-follow-ups-list.component.html',
-    styleUrls: ['./contacts-follow-ups-list.component.less']
+    templateUrl: './contacts-follow-ups-missed-list.component.html',
+    styleUrls: ['./contacts-follow-ups-missed-list.component.less']
 })
-export class ContactsFollowUpsListComponent extends ListComponent implements OnInit {
+export class ContactsFollowUpsMissedListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
@@ -68,7 +67,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                'LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE',
                 '.',
                 true
             )
@@ -88,19 +87,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     refreshList() {
         if (this.selectedOutbreak) {
-            // display only unresolved followups
-            this.queryBuilder.filter.where({
-                performed: false
-            }, true).where({
-                date: {
-                    // #TODO to be replaced when we change the API endpoint to allow us to use the server time & timezone
-                    gte: moment()
-                }
-            }, true);
-
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
-                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                .getLastFollowUpsMissedList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -124,7 +113,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'date',
             'area',
             'fullAddress',
-            'lostToFollowUp',
             'deleted'
         ];
 
@@ -189,60 +177,5 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         });
                 }
             });
-    }
-
-    /**
-     * Generate Follow Ups
-     */
-    generateFollowUps() {
-        if (this.selectedOutbreak) {
-            this.followUpsDataService
-                .generateFollowUps(this.selectedOutbreak.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((data) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                    // reload data
-                    this.refreshList();
-                });
-        }
-    }
-
-    /**
-     * Mark a contact as missing from a follow-up
-     * @param {FollowUpModel} followUp
-     */
-    markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
-                    this.outbreakDataService
-                        .getSelectedOutbreak()
-                        .subscribe((selectedOutbreak: OutbreakModel) => {
-                            // mark follow-up
-                            this.followUpsDataService
-                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
-                                    lostToFollowUp: true
-                                })
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
-
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    // mark follow-up
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
-
-                                    // refresh list
-                                    this.refreshList();
-                                });
-                        });
-                }
-            });
-
     }
 }

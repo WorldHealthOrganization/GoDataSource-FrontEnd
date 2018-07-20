@@ -123,6 +123,12 @@ export class SidenavComponent {
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
                     [PERMISSION.READ_FOLLOWUP],
                     '/contacts/follow-ups'
+                ),
+                new ChildNavItem(
+                    'contact-missed-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL',
+                    [PERMISSION.READ_FOLLOWUP],
+                    '/contacts/follow-ups/missed'
                 )
             ]
         ),

@@ -22,9 +22,7 @@ export class ModifyContactFollowUpComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
     followUpData: FollowUpModel = new FollowUpModel();
@@ -44,32 +42,38 @@ export class ModifyContactFollowUpComponent implements OnInit {
         // retrieve route params
         this.route.params
             .subscribe(params => {
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .catch((err) => {
-                        // show error message
-                        this.snackbarService.showError(err.message);
+                // retrieve query params
+                this.route.queryParams
+                    .subscribe(queryParams => {
+                        // display missed follow-ups or upcoming follow-ups link
+                        if (queryParams.displayOnlyMissedFollowUps) {
+                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE', '/contacts/follow-ups/missed'));
+                        } else {
+                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'));
+                        }
 
-                        // redirect to cases
-                        this.router.navigate(['/contacts/follow-ups']);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        // retrieve follow-up information
-                        this.followUpsDataService
-                            .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
-                            .catch((err) => {
-                                // show error message
-                                this.snackbarService.showError(err.message);
+                        // modify link
+                        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', '.', true));
 
-                                // redirect to cases
-                                this.router.navigate(['/contacts/follow-ups']);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((followUpData: FollowUpModel) => {
-                                // initialize follow-up
-                                this.followUpData = new FollowUpModel(followUpData);
+                        // get selected outbreak
+                        this.outbreakDataService
+                            .getSelectedOutbreak()
+                            .subscribe((selectedOutbreak: OutbreakModel) => {
+                                // retrieve follow-up information
+                                this.followUpsDataService
+                                    .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
+                                    .catch((err) => {
+                                        // show error message
+                                        this.snackbarService.showError(err.message);
+
+                                        // redirect to cases
+                                        this.router.navigate(['/contacts/follow-ups']);
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe((followUpData: FollowUpModel) => {
+                                        // initialize follow-up
+                                        this.followUpData = new FollowUpModel(followUpData);
+                                    });
                             });
                     });
             });

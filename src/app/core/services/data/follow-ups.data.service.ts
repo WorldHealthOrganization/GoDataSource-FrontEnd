@@ -58,21 +58,58 @@ export class FollowUpsDataService {
             .getLocationsList()
             .mergeMap((locations) => {
                 // map names to id
-                const locationsMapped = _.transform(locations, (result, location: LocationModel) => {
-                    result[location.id] = location;
-                });
-
+                const locationsMapped = _.groupBy(locations, 'id');
                 return this.modelHelper.mapObservableListToModel(
                     this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
                     FollowUpModel
                 ).map((followUps) => {
                     return _.map(followUps, (followUp: FollowUpModel) => {
                         // map location
-                        if (followUp.address) {
-                            followUp.address = new AddressModel(followUp.address);
-                            if (followUp.address.locationId) {
-                                followUp.address.location = locationsMapped[followUp.address.locationId];
-                            }
+                        if (
+                            followUp.address &&
+                            followUp.address.locationId
+                        ) {
+                            followUp.address.location = locationsMapped[followUp.address.locationId];
+                        }
+
+                        // finished
+                        return followUp;
+                    });
+                });
+            });
+    }
+
+    /**
+     * Retrieve the list of of contacts that missed their last follow-up
+     * @param {string} outbreakId
+     * @returns {Observable<FollowUpModel[]>}
+     */
+    getLastFollowUpsMissedList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<FollowUpModel[]> {
+        // include contact in response
+        const qb = new RequestQueryBuilder();
+        qb.include('contact');
+        qb.merge(queryBuilder);
+
+        // construct query
+        const filter = qb.buildQuery();
+
+        // retrieve locations
+        return this.locationDataService
+            .getLocationsList()
+            .mergeMap((locations) => {
+                // map names to id
+                const locationsMapped = _.groupBy(locations, 'id');
+                return this.modelHelper.mapObservableListToModel(
+                    this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed?filter=${filter}`),
+                    FollowUpModel
+                ).map((followUps) => {
+                    return _.map(followUps, (followUp: FollowUpModel) => {
+                        // map location
+                        if (
+                            followUp.address &&
+                            followUp.address.locationId
+                        ) {
+                            followUp.address.location = locationsMapped[followUp.address.locationId];
                         }
 
                         // finished
