@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     {{'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -172,7 +172,7 @@
                         {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                     </button>
 
-                    <button mat-menu-item>
+                    <button mat-menu-item (click)="deleteRelationship(item)">
                         {{'LNG_PAGE_ACTION_DELETE' | translate}}
                     </button>
 

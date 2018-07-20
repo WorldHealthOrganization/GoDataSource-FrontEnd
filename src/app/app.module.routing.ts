@@ -90,7 +90,7 @@ const routes: Routes = [
         ]
     },
     {
-        // if any other route is tried and the user is not authenticated, send to authenticated component which will redirect to login
+        // for unknown routes, redirect to home page
         path: '**',
         redirectTo: '/'
     }

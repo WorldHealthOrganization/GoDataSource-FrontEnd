@@ -87,6 +87,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
 
         /**
          * Login page
@@ -217,6 +218,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE': 'Relationships',
         'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
+        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
 
         /**
          * Create Case Relationship page

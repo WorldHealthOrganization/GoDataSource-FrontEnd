@@ -56,11 +56,13 @@ export class TopnavComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
-                // refresh the outbreaks list
-                this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+                if (outbreak) {
+                    // refresh the outbreaks list
+                    this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
 
-                // update the selected outbreak
-                this.selectedOutbreak = outbreak;
+                    // update the selected outbreak
+                    this.selectedOutbreak = outbreak;
+                }
             });
     }
 

@@ -15,7 +15,12 @@ import { EntityType } from '../../../../core/models/entity.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-case-relationships-list',
@@ -29,6 +34,8 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
     ];
 
+    // authenticated user
+    authUser: UserModel;
     // selected outbreak ID
     outbreakId: string;
     // route param
@@ -43,15 +50,19 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
     constructor(
         private router: Router,
         private route: ActivatedRoute,
+        private authDataService: AuthDataService,
         private caseDataService: CaseDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {
         super();
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.params.subscribe(params => {
             this.caseId = params.caseId;
@@ -111,6 +122,10 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
         }
     }
 
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
     /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
@@ -118,10 +133,43 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
     getTableColumns(): string[] {
         const columns = [
             'personName', 'contactDate', 'certaintyLevel', 'exposureType',
-            'exposureFrequency', 'exposureDuration', 'relation', 'actions'
+            'exposureFrequency', 'exposureDuration', 'relation'
         ];
 
+        // check if the authenticated user has WRITE access
+        if (this.hasCaseWriteAccess()) {
+            columns.push('actions');
+        }
+
         return columns;
+    }
+
+    /**
+     * Delete a relationship for current Case
+     * @param {RelationshipModel} relationshipModel
+     */
+    deleteRelationship(relationshipModel: RelationshipModel) {
+        // get related entity
+        const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.caseId), 'model', {});
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntityModel)
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete relationship
+                    this.relationshipDataService
+                        .deleteRelationship(this.outbreakId, EntityType.CASE, this.caseId, relationshipModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
     }
 
 }

@@ -61,16 +61,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService
     ) {
         super();
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
     }
 
     ngOnInit() {
-        // retrieve gender list
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // reference data
         this.genderList$ = this.genericDataService.getGenderList().share();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService

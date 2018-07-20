@@ -66,5 +66,46 @@ export class RelationshipDataService {
             RelationshipModel
         );
     }
+
+    /**
+     * Delete an existing Relationship between 2 entities (Cases / Contacts / Events)
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {string} relationshipId
+     * @returns {Observable<any>}
+     */
+    deleteRelationship(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        relationshipId: string,
+    ): Observable<any> {
+        return this.http.delete(
+            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`
+        );
+    }
+
+    /**
+     * Modify a Relationship between 2 entities (Cases / Contacts / Events)
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {string} relationshipId
+     * @param relationshipData
+     * @returns {Observable<any>}
+     */
+    modifyRelationship(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        relationshipId: string,
+        relationshipData
+    ): Observable<any> {
+        return this.http.put(
+            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
+            relationshipData
+        );
+    }
 }
 

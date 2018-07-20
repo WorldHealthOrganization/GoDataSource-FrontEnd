@@ -35,7 +35,7 @@ const routes: Routes = [
         component: fromPages.CaseRelationshipsListComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [PERMISSION.READ_CASE]
         }
     },
     // Create Case Relationship
