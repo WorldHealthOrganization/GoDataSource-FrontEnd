@@ -120,7 +120,7 @@
       true,
       "attribute",
       "app",
-      "camelCase"
+      "kebab-case"
     ],
     "component-selector": [
       true,

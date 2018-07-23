@@ -94,7 +94,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button color="primary">
+        <button *app-selected-outbreak-is-active mat-raised-button color="primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button type="button" [routerLink]="'/cases'" mat-raised-button>

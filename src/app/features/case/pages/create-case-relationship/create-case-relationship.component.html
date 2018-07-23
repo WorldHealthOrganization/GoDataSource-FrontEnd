@@ -149,7 +149,7 @@
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewRelationship([personForm, detailsForm])">
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewRelationship([personForm, detailsForm])">
                     {{'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP' | translate}}
                 </button>
             </div>

@@ -289,7 +289,7 @@
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm])">Create Case</button>
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm])">Create Case</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

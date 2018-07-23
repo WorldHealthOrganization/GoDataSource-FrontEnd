@@ -144,25 +144,27 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu">
-                    <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
-                        Add Follow-up
+                <div *app-selected-outbreak-is-active>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-divider></mat-divider>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
+                            Add Follow-up
+                        </button>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
-                    </button>
+                        <mat-divider></mat-divider>
 
-                    <button mat-menu-item (click)="deleteContact(item)">
-                        Delete
-                    </button>
-                </mat-menu>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            Modify
+                        </button>
+
+                        <button mat-menu-item (click)="deleteContact(item)">
+                            Delete
+                        </button>
+                    </mat-menu>
+                </div>
             </mat-cell>
         </ng-container>
 

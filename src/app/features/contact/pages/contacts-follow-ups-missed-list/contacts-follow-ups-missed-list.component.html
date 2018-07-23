@@ -109,22 +109,24 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu">
-                    <button mat-menu-item *ngIf="!item.deleted && item.personId" [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]" [queryParams]="{ displayOnlyMissedFollowUps: true }" >
-                        {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                    </button>
-                    <button mat-menu-item *ngIf="!item.deleted" (click)="deleteFollowUp(item)">
-                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                <div *app-selected-outbreak-is-active>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <button mat-menu-item *ngIf="item.deleted" (click)="restoreFollowUp(item)">
-                        {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
-                    </button>
-                </mat-menu>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item *ngIf="!item.deleted && item.personId" [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]" [queryParams]="{ displayOnlyMissedFollowUps: true }" >
+                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                        </button>
+                        <button mat-menu-item *ngIf="!item.deleted" (click)="deleteFollowUp(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+
+                        <button mat-menu-item *ngIf="item.deleted" (click)="restoreFollowUp(item)">
+                            {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
+                        </button>
+                    </mat-menu>
+                </div>
             </mat-cell>
         </ng-container>
 

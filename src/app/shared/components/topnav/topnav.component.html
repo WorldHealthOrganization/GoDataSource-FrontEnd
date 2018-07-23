@@ -21,7 +21,7 @@
                     name="activeOutbreak"
                     [(ngModel)]="selectedOutbreak.id"
                     [placeholder]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
-                    [options]="outbreaksList$ | async"
+                    [options]="outbreaksList"
                     optionLabelKey="name"
                     optionValueKey="id"
                     optionTooltipKey="description"

@@ -4,9 +4,11 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                    {{'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
-                </button>
+                <ng-container *app-selected-outbreak-is-active>
+                    <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                        {{'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
             </div>
         </div>
     </ng-container>
@@ -161,23 +163,23 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu">
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                <div *app-selected-outbreak-is-active>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <button mat-menu-item (click)="deleteRelationship(item)">
-                        {{'LNG_PAGE_ACTION_DELETE' | translate}}
-                    </button>
+                    <mat-menu #actionsMenu="matMenu">
 
-                </mat-menu>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        </button>
 
+                        <button mat-menu-item (click)="deleteRelationship(item)">
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                        </button>
+
+                    </mat-menu>
+                </div>
             </mat-cell>
         </ng-container>
 

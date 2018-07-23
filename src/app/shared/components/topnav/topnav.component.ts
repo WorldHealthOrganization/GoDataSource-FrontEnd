@@ -27,7 +27,8 @@ export class TopnavComponent implements OnInit {
     selectedLanguageId: string;
 
     // list of outbreaks for Selected Outbreak dropdown
-    outbreaksList$: Observable<OutbreakModel[]>;
+    outbreaksList: OutbreakModel[] = [];
+
     // list of languages
     languagesList$: Observable<LanguageModel[]>;
 
@@ -42,7 +43,7 @@ export class TopnavComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get the outbreaks list
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+        this.refreshOutbreaksList();
 
         // get the list of languages
         this.languagesList$ = this.languageDataService.getLanguagesList();
@@ -58,12 +59,21 @@ export class TopnavComponent implements OnInit {
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
                     // refresh the outbreaks list
-                    this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+                    this.refreshOutbreaksList();
 
                     // update the selected outbreak
                     this.selectedOutbreak = outbreak;
                 }
             });
+    }
+
+    /**
+     * Refresh outbreak list
+     */
+    refreshOutbreaksList() {
+        this.outbreakDataService.getOutbreaksList().subscribe((outbreaksList) => {
+            this.outbreaksList = outbreaksList;
+        });
     }
 
     /**

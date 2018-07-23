@@ -83,7 +83,7 @@
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button type="button" mat-button (click)="createNewFollowUp([detailsForm, questionnaireForm])">Create Follow-up</button>
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewFollowUp([detailsForm, questionnaireForm])">Create Follow-up</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

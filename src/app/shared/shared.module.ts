@@ -10,6 +10,7 @@ import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 
 import * as fromSharedComponents from './components';
+import * as fromSharedDirectives from './directives';
 
 @NgModule({
     imports: [
@@ -22,7 +23,8 @@ import * as fromSharedComponents from './components';
         TranslateModule
     ],
     declarations: [
-        ...fromSharedComponents.components
+        ...fromSharedComponents.components,
+        ...fromSharedDirectives.directives
     ],
     providers: [],
     exports: [
@@ -33,7 +35,8 @@ import * as fromSharedComponents from './components';
         TranslateModule,
         XtFormsModule,
         AngularMaterialModule,
-        ...fromSharedComponents.components
+        ...fromSharedComponents.components,
+        ...fromSharedDirectives.directives
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent,

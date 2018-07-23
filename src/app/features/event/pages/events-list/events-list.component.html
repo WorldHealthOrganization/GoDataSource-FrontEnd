@@ -4,9 +4,11 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasEventWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                    Add <span class="xt-icon">addCircle</span>
-                </button>
+                <ng-container *app-selected-outbreak-is-active>
+                    <button *ngIf="hasEventWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                        Add <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
             </div>
         </div>
     </ng-container>
@@ -89,19 +91,21 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu">
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
+                <div *app-selected-outbreak-is-active>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <button mat-menu-item (click)="deleteEvent(item)">
-                        Delete
-                    </button>
-                </mat-menu>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            Modify
+                        </button>
+
+                        <button mat-menu-item (click)="deleteEvent(item)">
+                            Delete
+                        </button>
+                    </mat-menu>
+                </div>
             </mat-cell>
         </ng-container>
 
