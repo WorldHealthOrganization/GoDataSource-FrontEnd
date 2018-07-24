@@ -11,6 +11,8 @@ import { LocationDataService } from './location.data.service';
 import { LocationModel } from '../../models/location.model';
 import 'rxjs/add/operator/mergeMap';
 import { AddressModel } from '../../models/address.model';
+import { MetricContactsFollowUpModel } from '../../models/metric-contacts-follow-up.model';
+import { OutbreakModel } from '../../models/outbreak.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -34,7 +36,7 @@ export class FollowUpsDataService {
      */
     generateFollowUps(outbreakId: string, followUpPeriod: number = Constants.DEFAULT_FOLLOWUP_PERIOD_DAYS): Observable<ContactFollowUpsModel[]> {
         return this.modelHelper.mapObservableListToModel(
-            this.http.post(`outbreaks/${outbreakId}/generate-followups`, { followUpPeriod: followUpPeriod }),
+            this.http.post(`outbreaks/${outbreakId}/generate-followups`, {followUpPeriod: followUpPeriod}),
             ContactFollowUpsModel
         );
     }
@@ -188,6 +190,18 @@ export class FollowUpsDataService {
      */
     restoreFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<any> {
         return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}/restore`, {});
+    }
+
+    /**
+     * Get metrics for contacts on follow-up lists
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string): Observable<MetricContactsFollowUpModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count`),
+            MetricContactsFollowUpModel
+        );
     }
 }
 

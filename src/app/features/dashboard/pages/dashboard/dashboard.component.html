@@ -1,0 +1,26 @@
+<div>
+    <app-topnav>
+        <ng-container dynamic-section>
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </ng-container>
+    </app-topnav>
+
+    <div class="page-content">
+
+        <mat-card>
+            <!-- other KPI section header -->
+            <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}</div>
+
+            <!-- other KPI section content -->
+            <div fxLayout="row">
+
+                <!-- Contacts on the follow-up list -->
+                <app-contacts-on-followup-list-dashlet
+                    *ngIf="hasReadContactPermissions()">
+                </app-contacts-on-followup-list-dashlet>
+
+            </div>
+        </mat-card>
+
+    </div>
+</div>

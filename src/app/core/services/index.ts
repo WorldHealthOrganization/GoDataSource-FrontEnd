@@ -11,6 +11,11 @@ import { UserRoleDataService } from './data/user-role.data.service';
 import { LanguageDataService } from './data/language.data.service';
 import { LoggingDataService } from './data/logging.data.service';
 import { ReferenceDataDataService } from './data/reference-data.data.service';
+import { ClusterDataService } from './data/cluster.data.service';
+import { RelationshipDataService } from './data/relationship.data.service';
+import { FollowUpsDataService } from './data/follow-ups.data.service';
+import { LabResultDataService } from './data/lab-result.data.service';
+import { ListFilterDataService } from './data/list-filter.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -23,10 +28,6 @@ import { FormHelperService } from './helper/form-helper.service';
 import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
 import { DialogService } from './helper/dialog.service';
-import { ClusterDataService } from './data/cluster.data.service';
-import { RelationshipDataService } from './data/relationship.data.service';
-import { FollowUpsDataService } from './data/follow-ups.data.service';
-import { LabResultDataService } from './data/lab-result.data.service';
 import { DomService } from './helper/dom.service';
 
 // export the list of services
@@ -48,6 +49,7 @@ export const services: any[] = [
     FollowUpsDataService,
     ReferenceDataDataService,
     LabResultDataService,
+    ListFilterDataService,
 
     // helper services
     StorageService,

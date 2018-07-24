@@ -19,7 +19,6 @@ export class Constants {
         }
     };
 
-    // #TODO To be replaced with Reference Data
     static ANSWER_TYPES = {
         FREE_TEXT: {
             label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT',
@@ -34,6 +33,10 @@ export class Constants {
             value: 'Single Selection'
         }
 
+    };
+
+    static APPLY_LIST_FILTER = {
+        CONTACTS_FOLLOWUP_LIST: 'contacts_followup_list'
     };
 
     // #TODO replace with Reference Data

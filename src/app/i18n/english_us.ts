@@ -24,6 +24,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL': 'Duplicated Records',
         'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL': 'Reference Data',
         'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & Support',
+        'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL': 'Dashboard',
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
@@ -562,6 +563,16 @@ export const EnglishUsLang = {
          * Form Range Fields
          */
         'LNG_FORM_RANGE_FIELD_LABEL_FROM': 'From',
-        'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To'
+        'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To',
+
+        /**
+         * Dasboard Page
+         */
+        'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
+        'LNG_PAGE_DASHBOARD_KPI_TITLE': 'Other KPIs',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'CONTACTS ON THE FOLLOW-UP LIST'
+
+
+
     }
 };

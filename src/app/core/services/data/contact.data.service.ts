@@ -21,9 +21,7 @@ export class ContactDataService {
      * @returns {Observable<ContactModel[]>}
      */
     getContactsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts?filter=${filter}`),
             ContactModel

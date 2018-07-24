@@ -20,6 +20,10 @@ import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import 'rxjs/add/operator/filter';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -58,10 +62,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private route: ActivatedRoute,
+        private followUpDataService: FollowUpsDataService,
+        private dialogService: DialogService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
-    }
+        super(listFilterDataService, route.queryParams);
+      }
 
     ngOnInit() {
         // get the authenticated user
@@ -191,4 +198,5 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // we can't do this right now since we can't search by relationship data
         console.log('#TODO', item);
     }
+
 }

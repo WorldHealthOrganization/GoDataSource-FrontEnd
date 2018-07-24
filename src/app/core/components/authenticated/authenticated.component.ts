@@ -63,7 +63,7 @@ export class AuthenticatedComponent implements OnInit {
 
         if (this.router.url === '/') {
             // redirect to default landing page
-            return this.router.navigate(['/users']);
+            return this.router.navigate(['/dashboard']);
         }
     }
 

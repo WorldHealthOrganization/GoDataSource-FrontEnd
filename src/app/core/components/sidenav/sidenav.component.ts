@@ -107,6 +107,14 @@ export class SidenavComponent {
             ]
         ),
         new NavItem(
+            'dashboard',
+            'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL',
+            'barChart',
+            [],
+            [],
+            '/dashboard'
+        ),
+        new NavItem(
             'contacts-group',
             'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
             'people',

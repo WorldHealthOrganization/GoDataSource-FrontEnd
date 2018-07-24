@@ -86,6 +86,11 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.WRITE_REFERENCE_DATA]
                 }
+            },
+            // Dashboard Module routes
+            {
+                path: 'dashboard',
+                loadChildren: './features/dashboard/dashboard.module#DashboardModule'
             }
         ]
     },

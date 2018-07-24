@@ -1,5 +1,9 @@
 import { RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
+import { ListFilterDataService } from '../services/data/list-filter.data.service';
+import { Params } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+import { Constants } from '../models/constants';
 
 export abstract class ListComponent {
     /**
@@ -7,6 +11,15 @@ export abstract class ListComponent {
      * @type {RequestQueryBuilder}
      */
     public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+
+
+    protected constructor(
+        protected listFilterDataService: ListFilterDataService = null,
+        protected queryParams: Observable<Params> = null
+    ) {
+        this.checkListFilters();
+    }
+
 
     /**
      * Refresh list
@@ -117,6 +130,38 @@ export abstract class ListComponent {
 
         // refresh list
         this.refreshList();
+    }
+
+    /**
+     *  Check if list filter applies
+     */
+    protected checkListFilters() {
+        if (!_.isEmpty(this.queryParams) && !_.isEmpty(this.listFilterDataService)) {
+            // get query params
+            this.queryParams
+                .subscribe(params => {
+                    if (!_.isEmpty(params)) {
+                        // call function to apply filters - update query buiilder
+                        this.applyListFilters(params);
+                    }
+                });
+        }
+    }
+
+    protected applyListFilters(queryParams) {
+        // check params for apply list filter
+        switch (queryParams.applyListFilter) {
+            case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterContactsOnFollowUpListsFromDashboard()
+                    .subscribe((filterQueryBuilder) => {
+                        // remove property 'id' to not duplicate the conditions
+                        this.queryBuilder.filter.remove('id');
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+        }
     }
 
 }

@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'barChart': '&#xe915;',
+            'timelineChart': '&#xe916;',
             'filter': '&#xe914;',
             'thinArrowRight': '&#xe913;',
             'addCircle': '&#xe900;',
