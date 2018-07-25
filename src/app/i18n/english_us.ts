@@ -25,6 +25,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL': 'Reference Data',
         'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & Support',
         'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL': 'Dashboard',
+        'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL': 'Chains of Transmission',
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
@@ -345,13 +346,6 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME': 'Last Name',
 
         /**
-         * Entity Types
-         */
-        'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
-        'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
-        'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
-
-        /**
          * Progress Options
          */
         'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS': 'In progress',
@@ -622,13 +616,25 @@ export const EnglishUsLang = {
         'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To',
 
         /**
-         * Dasboard Page
+         * Dashboard Page
          */
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
         'LNG_PAGE_DASHBOARD_KPI_TITLE': 'Other KPIs',
-        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'CONTACTS ON THE FOLLOW-UP LIST'
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'CONTACTS ON THE FOLLOW-UP LIST',
 
+        /**
+         * Transmission Chain Fields
+         */
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_FIRST_CONTACT_DATE': 'First Contact Date',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE': 'Root Case',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES': 'Number of Cases',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE': 'Number of Alive Cases',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ACTIVE': 'Active',
 
+        /**
+         * Transmission Chains List page
+         */
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission'
 
     }
 };

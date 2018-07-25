@@ -165,6 +165,14 @@ export class SidenavComponent {
             [],
             '/users'
         ),
+        new NavItem(
+            'transmission-chains',
+            'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
+            'barChart',
+            [],
+            [],
+            '/transmission-chains'
+        ),
         {
             separator: true
         },

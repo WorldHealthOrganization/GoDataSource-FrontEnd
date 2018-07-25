@@ -96,6 +96,11 @@ const routes: Routes = [
             {
                 path: 'dashboard',
                 loadChildren: './features/dashboard/dashboard.module#DashboardModule'
+            },
+            // Transmission Chain Module routes
+            {
+                path: 'transmission-chains',
+                loadChildren: './features/transmission-chain/transmission-chain.module#TransmissionChainModule'
             }
         ]
     },
