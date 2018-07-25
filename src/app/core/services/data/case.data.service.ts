@@ -72,5 +72,21 @@ export class CaseDataService {
     deleteCase(outbreakId: string, caseId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}`);
     }
+
+    /**
+     * Return count of deceased cases
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getDeceasedCasesCount(outbreakId: string): Observable<any> {
+        // generate a query builder for deceased
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.where({
+            deceased: true
+        }, true);
+        const filter = filterQueryBuilder.buildQuery(true);
+        // call endpoint
+        return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
+    }
 }
 

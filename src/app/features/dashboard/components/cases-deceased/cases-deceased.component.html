@@ -1,0 +1,10 @@
+<div class="dashboard-box">
+    <div class="dashboard-box-header"
+         [routerLink]="['/cases']"
+         [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_DECEASED}">
+        {{'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE' | translate}}
+    </div>
+    <div class="dashboard-box-content">
+        {{casesDeceasedCount}}
+    </div>
+</div>

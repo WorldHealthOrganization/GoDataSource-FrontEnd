@@ -621,6 +621,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
         'LNG_PAGE_DASHBOARD_KPI_TITLE': 'Other KPIs',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'CONTACTS ON THE FOLLOW-UP LIST',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
 
         /**
          * Transmission Chain Fields

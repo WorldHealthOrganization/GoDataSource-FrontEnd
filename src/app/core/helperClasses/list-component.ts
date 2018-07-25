@@ -156,10 +156,15 @@ export abstract class ListComponent {
         }
     }
 
-    protected applyListFilters(queryParams) {
+    /**
+     * Verify what list filter is sent into the query params and updates the query builder based in this.
+     * @param queryParams
+     */
+    protected applyListFilters(queryParams: Params): void {
         // check params for apply list filter
         switch (queryParams.applyListFilter) {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
+
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsOnFollowUpListsFromDashboard()
                     .subscribe((filterQueryBuilder) => {
@@ -169,6 +174,25 @@ export abstract class ListComponent {
                         // refresh list
                         this.refreshList();
                     });
+                break;
+            case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
+
+                // get the correct query builder and merge with the existing one
+                const filterQueryBuilder = new RequestQueryBuilder();
+
+                // add condition for deceased cases
+                filterQueryBuilder.filter.where({
+                    deceased: true
+                }, true);
+
+                // removed deceased condition so it will not be added twice
+                this.queryBuilder.filter.remove('deceased');
+                // merge with existing query builder
+                this.queryBuilder.merge(filterQueryBuilder);
+
+                // refresh list
+                this.refreshList();
+                break;
         }
     }
 

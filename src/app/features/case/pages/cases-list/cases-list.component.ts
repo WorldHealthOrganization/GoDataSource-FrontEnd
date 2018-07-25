@@ -18,6 +18,8 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
@@ -56,9 +58,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        protected route: ActivatedRoute,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {

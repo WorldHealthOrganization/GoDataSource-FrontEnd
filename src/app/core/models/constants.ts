@@ -36,7 +36,8 @@ export class Constants {
     };
 
     static APPLY_LIST_FILTER = {
-        CONTACTS_FOLLOWUP_LIST: 'contacts_followup_list'
+        CONTACTS_FOLLOWUP_LIST: 'contacts_followup_list',
+        CASES_DECEASED: 'cases_deceased'
     };
 
     // #TODO replace with Reference Data

@@ -84,8 +84,16 @@ export class RequestQueryBuilder {
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
-    buildQuery() {
+    buildQuery(countFormat: boolean = false) {
         const filter: any = {};
+
+        if (!this.filter.isEmpty()) {
+            filter.where = this.filter.generateCondition();
+
+            if (countFormat) {
+                return JSON.stringify(filter.where);
+            }
+        }
 
         if (this.includedRelations.length > 0) {
             filter.include = this.includedRelations;
@@ -93,10 +101,6 @@ export class RequestQueryBuilder {
 
         if (this.fieldsInResponse.length > 0) {
             filter.fields = this.fieldsInResponse;
-        }
-
-        if (!this.filter.isEmpty()) {
-            filter.where = this.filter.generateCondition();
         }
 
         if (!this.sort.isEmpty()) {

@@ -19,6 +19,12 @@
                     *ngIf="hasReadContactPermissions()">
                 </app-contacts-on-followup-list-dashlet>
 
+                <!-- Cases who have died -->
+                <app-cases-deceased
+                    *ngIf="hasReadContactPermissions()"
+                    fxFlexOffset="10px">
+                </app-cases-deceased>
+
             </div>
         </mat-card>
 
