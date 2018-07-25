@@ -18,6 +18,7 @@ import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-cases-list',
@@ -31,25 +32,22 @@ export class CasesListComponent extends ListComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
     ];
 
-    // import constants into template
-    Constants = Constants;
-
     // authenticated user
     authUser: UserModel;
-
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
-
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
 
     caseClassificationsList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[];
 
-    // gender list
-    genderList$: Observable<any[]>;
+    // provide constants to template
+    Constants = Constants;
+    EntityType = EntityType;
 
     constructor(
         private caseDataService: CaseDataService,

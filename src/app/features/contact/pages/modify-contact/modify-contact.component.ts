@@ -13,6 +13,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-modify-contact',
@@ -36,6 +37,9 @@ export class ModifyContactComponent implements OnInit {
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private genericDataService: GenericDataService,

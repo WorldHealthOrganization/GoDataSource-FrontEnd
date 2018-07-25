@@ -24,6 +24,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-contacts-list',
@@ -54,6 +55,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // risk level
     riskLevelsList$: Observable<any[]>;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private contactDataService: ContactDataService,

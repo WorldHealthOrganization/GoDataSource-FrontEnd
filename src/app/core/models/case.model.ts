@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { DocumentModel } from './document.model';
 import { DateRangeModel } from './date-range.model';
+import { EntityType } from './entity-type';
 
 export class CaseModel {
     id: string;
@@ -28,6 +29,7 @@ export class CaseModel {
     hospitalizationDates: DateRangeModel[];
     isolationDates: DateRangeModel[];
     incubationDates: DateRangeModel[];
+    type: EntityType = EntityType.CASE;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

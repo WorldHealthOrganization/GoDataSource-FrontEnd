@@ -3,9 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { Constants } from '../../models/constants';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { EntityType } from '../../models/entity.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class RelationshipDataService {

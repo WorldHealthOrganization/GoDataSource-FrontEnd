@@ -19,8 +19,7 @@ import { RelationshipModel, RelationshipPersonModel } from '../../../../core/mod
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { Constants } from '../../../../core/models/constants';
-import { EntityType } from '../../../../core/models/entity.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-create-contact',
@@ -41,7 +40,7 @@ export class CreateContactComponent implements OnInit {
     genderList$: Observable<any[]>;
 
     caseData: CaseModel;
-    relationship: RelationshipModel;
+    relationship: RelationshipModel = new RelationshipModel();
 
     constructor(
         private router: Router,
@@ -63,9 +62,6 @@ export class CreateContactComponent implements OnInit {
 
         // ...and a document
         this.contactData.documents.push(new DocumentModel());
-
-        // init the first relationship
-        this.relationship = new RelationshipModel();
 
         // retrieve query params
         this.route.queryParams

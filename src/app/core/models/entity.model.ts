@@ -2,12 +2,7 @@ import * as _ from 'lodash';
 import { ContactModel } from './contact.model';
 import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
-
-export enum EntityType {
-    CASE = 'case',
-    CONTACT = 'contact',
-    EVENT = 'event'
-}
+import { EntityType } from './entity-type';
 
 /**
  * Model representing a Case, a Contact or an Event

@@ -3,12 +3,12 @@
 
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div class="relationship-title" fxLayout="row" fxLayoutGap="20px">
                 <div>{{ relatedTitle }}</div>
                 <div>{{ relatedObject?.name }}</div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-datepicker
                     [name]="name + '[contactDate]'"
                     [(ngModel)]="relationship.contactDate"
@@ -51,7 +51,7 @@
                 </app-form-select>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-select
                     [name]="name + '[exposureFrequencyId]'"
                     [(ngModel)]="relationship.exposureFrequencyId"
@@ -101,7 +101,7 @@
                 </app-form-select>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-textarea
                     [name]="name + '[comment]'"
                     [(ngModel)]="relationship.comment"
@@ -110,6 +110,8 @@
                     required="false"
                     (optionChanged)="onChange()">
                 </app-form-textarea>
+
+                <div fxFlex><!-- placeholder --></div>
             </div>
         </div>
     </form>

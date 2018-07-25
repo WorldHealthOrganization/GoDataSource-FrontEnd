@@ -14,6 +14,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-events-list',
@@ -36,8 +37,9 @@ export class EventsListComponent extends ListComponent implements OnInit {
     // events outbreak
     selectedOutbreak: OutbreakModel;
 
-    // constants
+    // provide constants to template
     Constants = Constants;
+    EntityType = EntityType;
 
     constructor(
         private eventDataService: EventDataService,

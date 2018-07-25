@@ -17,7 +17,7 @@ export class EventDataService {
     /**
      * Retrieve the list of Events for an Outbreak
      * @param {string} outbreakId
-     * @returns {Observable<EventMode[]>}
+     * @returns {Observable<EventModel[]>}
      */
     getEventsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<EventModel[]> {
 

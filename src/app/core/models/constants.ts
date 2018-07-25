@@ -1,4 +1,4 @@
-import { EntityType } from './entity.model';
+import { EntityType } from './entity-type';
 
 export class Constants {
     // default display constants
@@ -101,21 +101,6 @@ export class Constants {
         NO: {
             label: 'LNG_COMMON_LABEL_NO',
             value: false
-        }
-    };
-
-    static ENTITY_TYPE = {
-        CASE: {
-            label: 'LNG_ENTITY_TYPE_LABEL_CASE',
-            value: EntityType.CASE
-        },
-        CONTACT: {
-            label: 'LNG_ENTITY_TYPE_LABEL_CONTACT',
-            value: EntityType.CONTACT
-        },
-        EVENT: {
-            label: 'LNG_ENTITY_TYPE_LABEL_EVENT',
-            value: EntityType.EVENT
         }
     };
 

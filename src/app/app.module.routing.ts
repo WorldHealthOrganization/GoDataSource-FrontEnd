@@ -78,6 +78,11 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_EVENT]
                 }
             },
+            // Relationship Module routes
+            {
+                path: 'relationships',
+                loadChildren: './features/relationship/relationship.module#RelationshipModule'
+            },
             // Reference Data Module routes
             {
                 path: 'reference-data',

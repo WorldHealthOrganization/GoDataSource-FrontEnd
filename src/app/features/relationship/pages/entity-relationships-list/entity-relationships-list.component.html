@@ -5,8 +5,9 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                        {{'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
+                    <button *ngIf="hasEntityWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                            [routerLink]="['/relationships', entityType, entityId, 'available-entities']">
+                        {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
             </div>
@@ -18,12 +19,12 @@
 
     <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
 
-        <!-- Person Name -->
-        <ng-container matColumnDef="personName">
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div>
-                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_NAME' | translate}}
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
                         <!-- Placeholder -->
@@ -31,8 +32,34 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
-                {{item.relatedEntity(caseId)?.model.name}}
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
+                {{
+                    item.relatedEntity(entityId)?.type === EntityType.EVENT ?
+                        item.relatedEntity(entityId)?.model.name :
+                        item.relatedEntity(entityId)?.model.firstName
+                }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
+                {{
+                    item.relatedEntity(entityId)?.type === EntityType.EVENT ?
+                        '' :
+                        item.relatedEntity(entityId)?.model.lastName
+                }}
             </mat-cell>
         </ng-container>
 
@@ -49,7 +76,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 {{ item.contactDate | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
             </mat-cell>
         </ng-container>
@@ -67,7 +94,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CERTAINTY_LEVEL"
                     [value]="item.certaintyLevelId">
@@ -88,7 +115,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_TYPE"
                     [value]="item.exposureTypeId">
@@ -109,7 +136,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_FREQUENCY"
                     [value]="item.exposureFrequencyId">
@@ -130,7 +157,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.EXPOSURE_DURATION"
                     [value]="item.exposureDurationId">
@@ -151,7 +178,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.relatedEntity(entityId)?.type">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTEXT_OF_TRANSMISSION"
                     [value]="item.socialRelationshipTypeId">

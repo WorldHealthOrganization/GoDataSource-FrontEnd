@@ -96,10 +96,17 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            Modify
-                        </button>
+                <mat-menu #actionsMenu="matMenu">
+
+                    <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        Modify
+                    </button>
 
                         <button mat-menu-item (click)="deleteEvent(item)">
                             Delete

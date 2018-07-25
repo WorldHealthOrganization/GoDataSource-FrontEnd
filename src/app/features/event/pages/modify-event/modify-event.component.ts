@@ -9,6 +9,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-modify-event',
@@ -27,6 +28,9 @@ export class ModifyEventComponent implements OnInit {
     outbreakId: string;
 
     eventData: EventModel = new EventModel();
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private route: ActivatedRoute,

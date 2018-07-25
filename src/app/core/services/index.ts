@@ -16,6 +16,7 @@ import { RelationshipDataService } from './data/relationship.data.service';
 import { FollowUpsDataService } from './data/follow-ups.data.service';
 import { LabResultDataService } from './data/lab-result.data.service';
 import { ListFilterDataService } from './data/list-filter.data.service';
+import { EntityDataService } from './data/entity.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -50,6 +51,7 @@ export const services: any[] = [
     ReferenceDataDataService,
     LabResultDataService,
     ListFilterDataService,
+    EntityDataService,
 
     // helper services
     StorageService,

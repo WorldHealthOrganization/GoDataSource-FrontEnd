@@ -164,7 +164,7 @@
 
                     <mat-divider *app-selected-outbreak-is-active></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'relationships']">
+                    <button mat-menu-item [routerLink]="['/relationships', EntityType.CASE, item.id]">
                         {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                     </button>
 

@@ -43,15 +43,8 @@ export class RequestFilter {
             // remove filter
             this.remove(property);
 
-            // remove or condition
-            this.conditions = _.filter(this.conditions, (condition) => {
-                const prop = Object.keys(condition)[0];
-                return prop !== 'or' ||
-                    !condition.or ||
-                    condition.or.length !== 2 ||
-                    Object.keys(condition.or[0])[0] !== property ||
-                    Object.keys(condition.or[1])[0] !== property;
-            });
+            // remove OR condition
+            this.removeOperation(RequestFilterOperator.OR, [property]);
         };
 
         // nothing to filter ?
@@ -174,17 +167,7 @@ export class RequestFilter {
 
         if (replace) {
             // if there is already a condition on the same property, remove it
-
-            // get the property that the condition applies to
-            const property = Object.keys(condition)[0];
-
-            if (
-                property !== RequestFilterOperator.AND &&
-                property !== RequestFilterOperator.OR
-            ) {
-                // remove condition(s) on the same property
-                this.remove(property);
-            }
+            this.removeCondition(condition);
         }
 
         // add new condition
@@ -202,6 +185,61 @@ export class RequestFilter {
         this.conditions = _.filter(this.conditions, (condition) => {
             const prop = Object.keys(condition)[0];
             return prop !== property;
+        });
+
+        return this;
+    }
+
+    /**
+     * Remove a given condition
+     * Note: This method could be applied on simple property conditions and on combined conditions with AND / OR operators
+     * @param condition
+     * @returns {RequestFilter}
+     */
+    removeCondition(condition: any) {
+        // get the property that the condition applies to
+        const property = Object.keys(condition)[0];
+
+        if (
+            property !== RequestFilterOperator.AND &&
+            property !== RequestFilterOperator.OR
+        ) {
+            // remove condition(s) on the property
+            this.remove(property);
+        } else {
+            // it is an AND/OR operation
+            const operator = property;
+            // find condition properties
+            const properties = _.map(condition[operator], (conditionProp) => {
+                return Object.keys(conditionProp)[0];
+            });
+
+            // remove condition
+            this.removeOperation(operator, properties);
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove all operations of a given type on a list of properties
+     * @param {RequestFilterOperator} operator
+     * @param {string[]} properties
+     * @returns {RequestFilter}
+     */
+    removeOperation(operator: RequestFilterOperator, properties: string[]) {
+        this.conditions = _.filter(this.conditions, (condition) => {
+            const prop = Object.keys(condition)[0];
+
+            if (prop !== operator) {
+                return true;
+            }
+
+            const conditionProperties = _.map(condition.or, (conditionProp) => {
+                return Object.keys(conditionProp)[0];
+            });
+
+            return !_.isEqual(conditionProperties, properties);
         });
 
         return this;

@@ -16,6 +16,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 
 @Component({
@@ -40,6 +41,9 @@ export class ModifyCaseComponent implements OnInit {
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private router: Router,

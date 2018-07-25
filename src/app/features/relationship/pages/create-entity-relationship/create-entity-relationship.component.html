@@ -1,0 +1,48 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Relationships step -->
+        <mat-step [stepControl]="relationshipsForm">
+            <form #relationshipsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}</ng-template>
+
+                <mat-card class="page-section" *ngFor="let person of selectedEntities; let i = index">
+                    <input type="hidden" [name]="'relationships[' + i + '][relatedEntityId]'" [ngModel]="person.id" />
+
+                    <app-form-relationship
+                        [name]="'relationships[' + i + '][relationship]'"
+                        ngModel
+                        [relatedObject]="person"
+                        required="true">
+                    </app-form-relationship>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>
+                        {{'LNG_STEPPER_LABEL_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            You are now done.
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button type="button" mat-button (click)="createNewRelationship(relationshipsForm)">
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

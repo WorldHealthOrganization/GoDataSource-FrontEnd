@@ -61,6 +61,12 @@
 
         <button *app-selected-outbreak-is-active mat-raised-button color="primary">Save</button>
         <button type="button" [routerLink]="'/events'" mat-raised-button>Cancel</button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id]">
+            {{ 'LNG_PAGE_ACTION_RELATIONSHIPS' | translate }}
+        </button>
     </div>
 
 

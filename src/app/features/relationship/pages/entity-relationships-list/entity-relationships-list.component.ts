@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
@@ -11,7 +10,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { EntityType } from '../../../../core/models/entity.model';
+import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -21,37 +20,59 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogConfirmAnswer } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
-    selector: 'app-case-relationships-list',
+    selector: 'app-entity-relationships-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './case-relationships-list.component.html',
-    styleUrls: ['./case-relationships-list.component.less']
+    templateUrl: './entity-relationships-list.component.html',
+    styleUrls: ['./entity-relationships-list.component.less']
 })
-export class CaseRelationshipsListComponent extends ListComponent implements OnInit {
+export class EntityRelationshipsListComponent extends ListComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // Entities Map for specific data
+    entityMap = {
+        [EntityType.CASE]: {
+            'label': 'LNG_PAGE_LIST_CASES_TITLE',
+            'link': '/cases',
+            'writePermission': PERMISSION.WRITE_CASE
+        },
+        [EntityType.CONTACT]: {
+            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            'link': '/contacts',
+            'writePermission': PERMISSION.WRITE_CONTACT
+        },
+        [EntityType.EVENT]: {
+            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
+            'link': '/events',
+            'writePermission': PERMISSION.WRITE_EVENT
+        }
+    };
 
     // authenticated user
     authUser: UserModel;
     // selected outbreak ID
     outbreakId: string;
-    // route param
-    caseId: string;
+    // route params
+    entityType: EntityType;
+    entityId: string;
     // list of relationships
     relationshipsList$: Observable<RelationshipModel[]>;
 
     // provide constants to template
     Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
+    EntityType = EntityType;
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private authDataService: AuthDataService,
-        private caseDataService: CaseDataService,
+        private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
@@ -65,7 +86,13 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.params.subscribe(params => {
-            this.caseId = params.caseId;
+            this.entityType = params.entityType;
+            this.entityId = params.entityId;
+
+            // add new breadcrumb: Entity List page
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+            );
 
             // get selected outbreak
             this.outbreakDataService
@@ -75,25 +102,28 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
 
                     this.refreshList();
 
-                    // get case data
-                    this.caseDataService
-                        .getCase(this.outbreakId, this.caseId)
+                    // get entity data
+                    this.entityDataService
+                        .getEntity(this.entityType, this.outbreakId, this.entityId)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
-                            // Case not found; navigate back to Cases list
-                            this.router.navigate(['/cases']);
+                            // Entity not found; navigate back to Entities list
+                            this.router.navigate([this.entityMap[this.entityType].link]);
 
                             return ErrorObservable.create(err);
                         })
-                        .subscribe((caseData: CaseModel) => {
-                            // add new breadcrumb: Case Modify page
+                        .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                            // add new breadcrumb: Entity Modify page
                             this.breadcrumbs.push(
-                                new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`)
+                                new BreadcrumbItemModel(
+                                    entityData.name,
+                                    `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                )
                             );
                             // add new breadcrumb: page title
                             this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE', '.', true)
+                                new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE', null, true)
                             );
                         });
                 });
@@ -101,10 +131,10 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
     }
 
     /**
-     * Re(load) the Cases list, based on the applied filter, sort criterias
+     * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.outbreakId && this.caseId) {
+        if (this.outbreakId && this.entityType && this.entityId) {
 
             // include related people in response
             const qb = new RequestQueryBuilder();
@@ -115,15 +145,15 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
             // retrieve the list of Relationships
             this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(
                 this.outbreakId,
-                EntityType.CASE,
-                this.caseId,
+                this.entityType,
+                this.entityId,
                 qb
             );
         }
     }
 
-    hasCaseWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    hasEntityWriteAccess(): boolean {
+        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
     }
 
     /**
@@ -132,12 +162,12 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         const columns = [
-            'personName', 'contactDate', 'certaintyLevel', 'exposureType',
+            'firstName', 'lastName', 'contactDate', 'certaintyLevel', 'exposureType',
             'exposureFrequency', 'exposureDuration', 'relation'
         ];
 
         // check if the authenticated user has WRITE access
-        if (this.hasCaseWriteAccess()) {
+        if (this.hasEntityWriteAccess()) {
             columns.push('actions');
         }
 
@@ -145,25 +175,25 @@ export class CaseRelationshipsListComponent extends ListComponent implements OnI
     }
 
     /**
-     * Delete a relationship for current Case
+     * Delete a relationship for current Entity
      * @param {RelationshipModel} relationshipModel
      */
     deleteRelationship(relationshipModel: RelationshipModel) {
         // get related entity
-        const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.caseId), 'model', {});
+        const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.entityId), 'model', {});
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntityModel)
             .subscribe((answer: DialogConfirmAnswer) => {
                 if (answer === DialogConfirmAnswer.Yes) {
                     // delete relationship
                     this.relationshipDataService
-                        .deleteRelationship(this.outbreakId, EntityType.CASE, this.caseId, relationshipModel.id)
+                        .deleteRelationship(this.outbreakId, this.entityType, this.entityId, relationshipModel.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                             // reload data
                             this.refreshList();

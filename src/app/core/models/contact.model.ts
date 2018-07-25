@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { DocumentModel } from './document.model';
+import { EntityType } from './entity-type';
 
 export class ContactModel {
     id: string;
@@ -16,6 +17,7 @@ export class ContactModel {
     addresses: AddressModel[];
     riskLevel: string;
     riskReason: string;
+    type: EntityType = EntityType.CONTACT;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

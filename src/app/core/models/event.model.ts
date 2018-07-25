@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
+import { EntityType } from './entity-type';
 
 export class EventModel {
     id: string;
@@ -8,6 +9,7 @@ export class EventModel {
     dateApproximate: boolean;
     description: string;
     address: AddressModel;
+    type: EntityType = EntityType.EVENT;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

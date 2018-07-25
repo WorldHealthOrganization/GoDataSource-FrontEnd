@@ -12,6 +12,14 @@ export abstract class ListComponent {
      */
     public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
+    /**
+     * Models for the checkbox functionality
+     * @type {boolean}
+     */
+    public checkboxModels = {
+        checkAll: false,
+        individualCheck: []
+    };
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
@@ -162,6 +170,28 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
         }
+    }
+
+    /**
+     * "Check All" checkbox was touched
+     */
+    checkAll() {
+        // check/un-check all individual checkboxes
+        for (const key in this.checkboxModels.individualCheck) {
+            this.checkboxModels.individualCheck[key] = this.checkboxModels.checkAll;
+        }
+    }
+
+    /**
+     * An individual checkbox was touched
+     */
+    individualCheck() {
+        // un-check the "CheckAll" checkbox
+        this.checkboxModels.checkAll = false;
+    }
+
+    initIndividualCheckbox(key) {
+        this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
     }
 
 }

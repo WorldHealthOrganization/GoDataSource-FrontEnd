@@ -6,46 +6,56 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { EntityType } from '../../../../core/models/entity.model';
+import { EntityType } from '../../../../core/models/entity-type';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 
 @Component({
-    selector: 'app-modify-case-relationship',
+    selector: 'app-modify-entity-relationship',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-case-relationship.component.html',
-    styleUrls: ['./modify-case-relationship.component.less']
+    templateUrl: './modify-entity-relationship.component.html',
+    styleUrls: ['./modify-entity-relationship.component.less']
 })
-export class ModifyCaseRelationshipComponent implements OnInit {
+export class ModifyEntityRelationshipComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
+
+    // Entities Map for specific data
+    entityMap = {
+        [EntityType.CASE]: {
+            'label': 'LNG_PAGE_LIST_CASES_TITLE',
+            'link': '/cases'
+        },
+        [EntityType.CONTACT]: {
+            'label': 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            'link': '/contacts'
+        },
+        [EntityType.EVENT]: {
+            'label': 'LNG_PAGE_LIST_EVENTS_TITLE',
+            'link': '/events'
+        }
+    };
 
     // selected outbreak ID
     outbreakId: string;
     // route params
-    caseId: string;
+    entityType: EntityType;
+    entityId: string;
     relationshipId: string;
 
     relatedEntityType: string;
-    relatedEntityId: string;
     relationshipData: RelationshipModel = new RelationshipModel();
 
-    availableRelatedEntityTypes$: Observable<any[]>;
-    personsList$: Observable<any[]>;
-    personsQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
     certaintyLevelOptions$: Observable<any[]>;
     exposureTypeOptions$: Observable<any[]>;
     exposureFrequencyOptions$: Observable<any[]>;
@@ -55,9 +65,7 @@ export class ModifyCaseRelationshipComponent implements OnInit {
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private caseDataService: CaseDataService,
-        private contactDataService: ContactDataService,
-        private eventDataService: EventDataService,
+        private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
@@ -68,7 +76,6 @@ export class ModifyCaseRelationshipComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.availableRelatedEntityTypes$ = this.genericDataService.getAvailableRelatedEntityTypes(EntityType.CASE);
         this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
         this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
@@ -76,8 +83,14 @@ export class ModifyCaseRelationshipComponent implements OnInit {
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
         this.route.params.subscribe(params => {
-            this.caseId = params.caseId;
+            this.entityType = params.entityType;
+            this.entityId = params.entityId;
             this.relationshipId = params.relationshipId;
+
+            // add new breadcrumb: Entity List page
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+            );
 
             // get selected outbreak
             this.outbreakDataService
@@ -85,35 +98,41 @@ export class ModifyCaseRelationshipComponent implements OnInit {
                 .subscribe((selectedOutbreak: OutbreakModel) => {
                     this.outbreakId = selectedOutbreak.id;
 
-                    // get case data
-                    this.caseDataService
-                        .getCase(this.outbreakId, this.caseId)
+                    // get entity data
+                    this.entityDataService
+                        .getEntity(this.entityType, this.outbreakId, this.entityId)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
-                            // Case not found; navigate back to Cases list
-                            this.router.navigate(['/cases']);
+                            // Entity not found; navigate back to Entities list
+                            this.router.navigate([this.entityMap[this.entityType].link]);
 
                             return ErrorObservable.create(err);
                         })
-                        .subscribe((caseData: CaseModel) => {
-                            // add new breadcrumb: Case Modify page
+                        .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                            // add new breadcrumb: Entity Modify page
                             this.breadcrumbs.push(
-                                new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`),
+                                new BreadcrumbItemModel(
+                                    entityData.name,
+                                    `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                )
                             );
                             // add new breadcrumb: Relationships list page
                             this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE', `/cases/${this.caseId}/relationships`)
+                                new BreadcrumbItemModel(
+                                    'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
+                                    `/relationships/${this.entityType}/${this.entityId}`
+                                )
                             );
 
                             // get relationship data
                             this.relationshipDataService
-                                .getEntityRelationship(this.outbreakId, EntityType.CASE, this.caseId, this.relationshipId)
+                                .getEntityRelationship(this.outbreakId, this.entityType, this.entityId, this.relationshipId)
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
 
-                                    // Relationship not found; navigate back to Case Relationships list
-                                    this.router.navigate([`/cases/${this.caseId}/relationships`]);
+                                    // Relationship not found; navigate back to Entity Relationships list
+                                    this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
 
                                     return ErrorObservable.create(err);
                                 })
@@ -121,12 +140,12 @@ export class ModifyCaseRelationshipComponent implements OnInit {
                                     this.relationshipData = relationshipData;
 
                                     // get related entity
-                                    const relatedEntityModel = _.get(relationshipData.relatedEntity(this.caseId), 'model', {});
+                                    const relatedEntityModel = _.get(relationshipData.relatedEntity(this.entityId), 'model', {});
 
                                     // add new breadcrumb: page title
                                     this.breadcrumbs.push(
                                         new BreadcrumbItemModel(
-                                            'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TITLE',
+                                            'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
                                             null,
                                             true,
                                             {},
@@ -148,14 +167,14 @@ export class ModifyCaseRelationshipComponent implements OnInit {
             return;
         }
 
-        // modify the case
+        // modify the relationship
         this.relationshipDataService
             .modifyRelationship(
                 this.outbreakId,
-                EntityType.CASE,
-                this.caseId,
+                this.entityType,
+                this.entityId,
                 this.relationshipId,
-                dirtyFields
+                dirtyFields.relationship
             )
             .catch((err) => {
                 this.snackbarService.showError(err.message);
@@ -163,10 +182,10 @@ export class ModifyCaseRelationshipComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
-                // navigate back to Case Relationships list
-                this.router.navigate([`/cases/${this.caseId}/relationships`]);
+                // navigate back to Entity Relationships list
+                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
     }
 

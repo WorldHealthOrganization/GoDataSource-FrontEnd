@@ -64,6 +64,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_CREATE': 'Create',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
+        'LNG_COMMON_BUTTON_SELECT': 'Select',
 
         /**
          * Dialogs
@@ -163,6 +164,18 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
 
         /**
+         * Entity Fields
+         */
+        'LNG_ENTITY_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_ENTITY_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_ENTITY_FIELD_LABEL_AGE': 'Age',
+        'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
+        'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
+        'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
+        'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
+        'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
+
+        /**
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',
@@ -235,27 +248,33 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Case lab results',
 
         /**
-         * Case Relationships list page
+         * Entity Relationships list page
          */
-        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_TITLE': 'Relationships',
-        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
-        'LNG_PAGE_LIST_CASE_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
 
         /**
-         * Create Case Relationship page
+         * Modify Entity Relationship page
          */
-        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TITLE': 'Create New Relationship',
-        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_PERSON': 'Person',
-        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_TAB_DETAILS': 'Details',
-        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP': 'Create Relationship',
-        'LNG_PAGE_CREATE_CASE_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified!',
 
         /**
-         * Modify Case Relationship page
+         * Available Entities for Relationship page
          */
-        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TITLE': 'Modify {{name}}',
-        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TAB_DETAILS': 'Details',
-        'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified!',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available Entities',
+
+        /**
+         * Create Entity Relationship page
+         */
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE': 'Create New Relationship',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS': 'Relationships',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP': 'Create Relationship',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
+        'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
 
         /**
          * Contact Fields
@@ -297,7 +316,8 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
         'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
-        'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_NAME': 'Name',
+        'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME': 'First Name',
+        'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME': 'Last Name',
 
         /**
          * Entity Types

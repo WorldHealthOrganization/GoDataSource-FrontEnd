@@ -14,9 +14,9 @@ export class FormHelperService {
     /**
      * Get all fields of a form, with their values
      * @param {NgForm} form
-     * @returns {{}}
+     * @returns {any}
      */
-    getFields(form: NgForm) {
+    getFields(form: NgForm): any {
         const fields = {};
 
         _.forEach(form.controls, (control: FormControl, controlName: string) => {

@@ -282,7 +282,7 @@
 
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'relationships']">
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id]">
             {{ 'LNG_PAGE_ACTION_RELATIONSHIPS' | translate }}
         </button>
         <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
