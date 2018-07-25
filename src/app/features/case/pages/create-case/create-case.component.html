@@ -283,13 +283,31 @@
             </form>
         </mat-step>
 
+        <!-- Questionnaire step -->
+        <mat-step [stepControl]="questionnaireForm">
+            <form #questionnaireForm="ngForm">
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
+
+                <!-- Questionnaire section -->
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="caseData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.caseInvestigationTemplate">
+                </app-form-fill-questionnaire>
+
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
         <!-- Final step -->
         <mat-step>
             <ng-template matStepLabel>Done</ng-template>
             You are now done.
             <div>
                 <button mat-button matStepperPrevious>Back</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm])">Create Case</button>
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">Create Case</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

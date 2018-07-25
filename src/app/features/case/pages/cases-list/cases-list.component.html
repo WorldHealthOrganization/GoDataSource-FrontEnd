@@ -154,12 +154,8 @@
                         </button>
                     </ng-container>
 
-                    <button *app-selected-outbreak-is-active mat-menu-item>
-                        Add lab data
-                    </button>
-
-                    <button *app-selected-outbreak-is-active mat-menu-item>
-                        Add investigation
+                    <button *app-selected-outbreak-is-active mat-menu-item [routerLink]="['.', item.id, 'lab-results', 'create']">
+                        {{'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT' | translate}}
                     </button>
 
                     <mat-divider *app-selected-outbreak-is-active></mat-divider>
@@ -174,16 +170,12 @@
 
                     <mat-divider *app-selected-outbreak-is-active></mat-divider>
 
-                    <button *app-selected-outbreak-is-active mat-menu-item>
-                        Mark as dead
-                    </button>
-
                     <button *app-selected-outbreak-is-active mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
+                        {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                     </button>
 
-                    <button *app-selected-outbreak-is-active mat-menu-item (click)="deleteCase(item)">
-                        Delete
+                    <button *app-selected-outbreak-is-active mat-menu-item class="mat-menu-item-delete" (click)="deleteCase(item)">
+                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                     </button>
                 </mat-menu>
             </mat-cell>

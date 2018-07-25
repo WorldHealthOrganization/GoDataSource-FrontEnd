@@ -10,8 +10,12 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs/Observable';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Constants } from '../../../../core/models/constants';
-import * as moment from 'moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { DialogConfirmAnswer } from '../../../../shared/components';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -26,7 +30,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     ];
 
     // case
-    caseData: CaseModel;
+    caseId: string;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -42,7 +46,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
-        private labResultDataService: LabResultDataService
+        private labResultDataService: LabResultDataService,
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
@@ -61,10 +68,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     this.caseDataService
                         .getCase(this.selectedOutbreak.id, params.caseId)
                         .subscribe((caseData: CaseModel) => {
-                            this.caseData = caseData;
+                            this.caseId = caseData.id;
 
                             // setup breadcrumbs
-                            this.breadcrumbs.push(new BreadcrumbItemModel(this.caseData.name, `/cases/${this.caseData.id}/modify`));
+                            this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`));
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
                             // retrieve lab data
@@ -80,18 +87,26 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     refreshList() {
         if (
             this.selectedOutbreak &&
-            this.caseData &&
-            this.caseData.id
+            this.caseId
         ) {
-            // display only unresolved followups
-            this.queryBuilder.filter.where({
-                dateOfResult: {
-                    lte: moment()
-                }
-            }, true);
+            this.genericDataService.getServerUTCCurrentDateTime()
+                .subscribe((serverDateTime: string) => {
+                    // display only unresolved followups
+                    this.queryBuilder.filter.where({
+                        or: [{
+                                dateOfResult: {
+                                    lte: serverDateTime
+                                }
+                            }, {
+                                dateOfResult: {
+                                    eq: null
+                                }
+                        }]
+                    }, true);
 
-            // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseData.id, this.queryBuilder);
+                    // retrieve the list of lab results
+                    this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder);
+                });
         }
     }
 
@@ -101,14 +116,40 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         return [
-            'id',
+            'sampleIdentifier',
             'dateSampleTaken',
             'dateSampleDelivered',
             'dateOfResult',
             'labName',
             'sampleType',
             'testType',
-            'result'
+            'result',
+
+            // since we have writeCase permission because of module.routing we don't need to check anything else
+            'actions'
         ];
+    }
+
+    deleteLabResult(labResult: LabResultModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
+            .subscribe((answer: DialogConfirmAnswer) => {
+                if (answer === DialogConfirmAnswer.Yes) {
+                    // delete lab result
+                    this.labResultDataService
+                        .deleteLabResult(this.selectedOutbreak.id, this.caseId, labResult.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
     }
 }

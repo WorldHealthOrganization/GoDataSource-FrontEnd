@@ -91,6 +91,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
 
         /**
          * Login page
@@ -203,7 +204,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
         'LNG_CASE_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
-        'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Ocupation',
+        'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Occupation',
         'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
         'LNG_CASE_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
         'LNG_CASE_FIELD_LABEL_ISOLATION_DATES': 'Isolation Dates',
@@ -216,36 +217,60 @@ export const EnglishUsLang = {
          * Cases list page
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
-        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
+        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
+        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Data',
 
         /**
          * Create Case page
          */
         'LNG_PAGE_CREATE_CASE_TITLE': 'Create New Case',
         'LNG_PAGE_CREATE_CASE_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
         /**
          * Modify Case page
          */
-        'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify Case',
-        'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab results',
+        'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
         /**
          * Case lab results fields
          */
-        'LNG_CASE_LAB_RESULT_FIELD_LABEL_ID': 'Sample Lab Id',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': 'Sample delivered to lab',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING': 'Date testing',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': 'Date of the result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME': 'Lab name',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE': 'Test type',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT': 'Result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
 
         /**
-         * Case lab results list page
+         * Case Lab results list page
          */
-        'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Case lab results',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Lab results',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT': 'Add',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
+
+        /**
+         * Create Case Lab result page
+         */
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE': 'Create New Lab Result',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT': 'Create Lab Result',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result created!',
+
+        /**
+         * Modify Case Lab Result page
+         */
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE': 'Modify result {{sampleIdentifier}}',
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
 
         /**
          * Entity Relationships list page
@@ -299,7 +324,7 @@ export const EnglishUsLang = {
         /**
          * Modify Contact page
          */
-        'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify Contact',
+        'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
 
         /**
@@ -325,6 +350,12 @@ export const EnglishUsLang = {
         'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
         'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
         'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
+
+        /**
+         * Progress Options
+         */
+        'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS': 'In progress',
+        'LNG_PROGRESS_OPTION_LABEL_COMPLETED': 'Completed',
 
         /**
          * Follow-up fields
@@ -358,12 +389,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
-        'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up added!',
+        'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up created!',
 
         /**
          * Modify Follow-up page
          */
-        'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up {{dateFormatted}}',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
@@ -378,6 +409,11 @@ export const EnglishUsLang = {
          * Create Event page
          */
         'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
+         * Modify Event page
+         */
+        'LNG_PAGE_MODIFY_EVENT_TITLE': 'Modify {{name}}',
 
         /**
          * Permissions
@@ -572,7 +608,7 @@ export const EnglishUsLang = {
         /**
          * Modify Outbreak page
          */
-        'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify Outbreak',
+        'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',

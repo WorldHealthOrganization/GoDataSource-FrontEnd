@@ -28,5 +28,53 @@ export class LabResultDataService {
             LabResultModel
         );
     }
+
+    /**
+     * Retrieve Lab Result
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @param {string} labResultId
+     * @returns {Observable<LabResultModel>}
+     */
+    getLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<LabResultModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`),
+            LabResultModel
+        );
+    }
+
+    /**
+     * Create Lab Result
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @param labResultData
+     * @returns {Observable<any>}
+     */
+    createLabResult(outbreakId: string, caseId: string, labResultData): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/lab-results`, labResultData);
+    }
+
+    /**
+     * Modify Lab Result
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @param {string} labResultId
+     * @param labResultData
+     * @returns {Observable<any>}
+     */
+    modifyLabResult(outbreakId: string, caseId: string, labResultId: string, labResultData): Observable<any> {
+        return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`, labResultData);
+    }
+
+    /**
+     * Delete Lab Result
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @param {string} labResultId
+     * @returns {Observable<any>}
+     */
+    deleteLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`);
+    }
 }
 

@@ -267,10 +267,13 @@
 
             </mat-tab>
 
-            <!--<mat-tab label="Lab data"></mat-tab>-->
-
-            <!--<mat-tab label="Exposures"></mat-tab>-->
-
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
+                <app-form-fill-questionnaire
+                    name="questionnaireAnswers"
+                    [ngModel]="caseData.questionnaireAnswers"
+                    [questions]="selectedOutbreak.caseInvestigationTemplate">
+                </app-form-fill-questionnaire>
+            </mat-tab>
         </mat-tab-group>
     </div>
 

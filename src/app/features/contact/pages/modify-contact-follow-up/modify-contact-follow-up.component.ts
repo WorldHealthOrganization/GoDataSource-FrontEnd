@@ -29,6 +29,8 @@ export class ModifyContactFollowUpComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
+    displayOnlyMissedFollowUps: boolean = false;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -48,14 +50,12 @@ export class ModifyContactFollowUpComponent implements OnInit {
                 this.route.queryParams
                     .subscribe(queryParams => {
                         // display missed follow-ups or upcoming follow-ups link
-                        if (queryParams.displayOnlyMissedFollowUps) {
+                        this.displayOnlyMissedFollowUps = queryParams.displayOnlyMissedFollowUps;
+                        if (this.displayOnlyMissedFollowUps) {
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE', '/contacts/follow-ups/missed'));
                         } else {
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'));
                         }
-
-                        // modify link
-                        this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', '.', true));
 
                         // get selected outbreak
                         this.outbreakDataService
@@ -78,6 +78,15 @@ export class ModifyContactFollowUpComponent implements OnInit {
                                     .subscribe((followUpData: FollowUpModel) => {
                                         // initialize follow-up
                                         this.followUpData = new FollowUpModel(followUpData);
+                                        this.breadcrumbs.push(
+                                            new BreadcrumbItemModel(
+                                                'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+                                                '.',
+                                                true,
+                                                {},
+                                                this.followUpData
+                                            )
+                                        );
                                     });
                             });
                     });

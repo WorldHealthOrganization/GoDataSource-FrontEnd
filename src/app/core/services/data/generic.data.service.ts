@@ -3,9 +3,25 @@ import { Observable } from 'rxjs/Observable';
 import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class GenericDataService {
+    constructor(
+        private http: HttpClient
+    ) {}
+
+    /**
+     * Retrieve server date & time
+     * @returns {Observable<string>}
+     */
+    getServerUTCCurrentDateTime(): Observable<string> {
+        return this.http.get('system-settings/utc-date')
+            .map((dateObject: { date }) => {
+                return _.get(dateObject, 'date');
+            });
+    }
+
     /**
      * Retrieve the list of Gender options
      * @returns {Observable<any[]>}
@@ -44,6 +60,14 @@ export class GenericDataService {
      */
     getQuestionCategoriesList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.QUESTION_CATEGORIES));
+    }
+
+    /**
+     * Retrieve the list of Progress Options
+     * @returns {Observable<any[]>}
+     */
+    getProgressOptionsList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.PROGRESS_OPTIONS));
     }
 
     /**

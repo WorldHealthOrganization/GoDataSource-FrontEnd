@@ -5,7 +5,6 @@ import { Observable } from 'rxjs/Observable';
 import { GroupBase } from '../../xt-forms/core';
 import { DocumentModel } from '../../../core/models/document.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { Constants } from '../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 
 @Component({

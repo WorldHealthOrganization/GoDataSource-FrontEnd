@@ -25,8 +25,7 @@ export class ModifyContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_CONTACT_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
     contactId: string;
@@ -69,7 +68,16 @@ export class ModifyContactComponent implements OnInit {
                     this.contactDataService
                         .getContact(selectedOutbreak.id, this.contactId)
                         .subscribe(contactDataReturned => {
-                            this.contactData = contactDataReturned;
+                            this.contactData = new ContactModel(contactDataReturned);
+                            this.breadcrumbs.push(
+                                new BreadcrumbItemModel(
+                                    'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                                    '.',
+                                    true,
+                                    {},
+                                    this.contactData
+                                )
+                            );
                         });
                 });
         });

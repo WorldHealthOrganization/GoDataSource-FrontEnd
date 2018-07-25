@@ -20,8 +20,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class ModifyEventComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Events', '/events'),
-        new BreadcrumbItemModel('Modify Event', '.', true)
+        new BreadcrumbItemModel('Events', '/events')
     ];
 
     eventId: string;
@@ -55,7 +54,16 @@ export class ModifyEventComponent implements OnInit {
                     this.eventDataService
                         .getEvent(selectedOutbreak.id, this.eventId)
                         .subscribe(eventDataReturned => {
-                            this.eventData = eventDataReturned;
+                            this.eventData = new EventModel(eventDataReturned);
+                            this.breadcrumbs.push(
+                                new BreadcrumbItemModel(
+                                    'LNG_PAGE_MODIFY_EVENT_TITLE',
+                                    '.',
+                                    true,
+                                    {},
+                                    this.eventData
+                                )
+                            );
                         });
                 });
         });

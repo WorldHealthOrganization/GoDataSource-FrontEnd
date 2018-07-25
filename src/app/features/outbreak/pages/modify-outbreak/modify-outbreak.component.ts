@@ -24,8 +24,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 export class ModifyOutbreakComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY', '.', true)
+        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
     ];
 
     // id of the outbreak to modify
@@ -66,6 +65,15 @@ export class ModifyOutbreakComponent implements OnInit {
                 .getOutbreak(this.outbreakId)
                 .subscribe(outbreakData => {
                     this.outbreak = outbreakData;
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                            '.',
+                            true,
+                            {},
+                            this.outbreak
+                        )
+                    );
 
                     // set questions and answers to new property to false.
                     this.setNewFalse(this.outbreak.caseInvestigationTemplate);

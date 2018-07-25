@@ -104,4 +104,14 @@ export class Constants {
         }
     };
 
+    static PROGRESS_OPTIONS = {
+        IN_PROGRESS: {
+            label: 'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS',
+            value: 'inProgress'
+        },
+        COMPLETED: {
+            label: 'LNG_PROGRESS_OPTION_LABEL_COMPLETED',
+            value: 'completed'
+        }
+    };
 }

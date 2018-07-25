@@ -41,6 +41,8 @@ export class CreateCaseComponent implements OnInit {
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
 
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
+
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
@@ -65,6 +67,13 @@ export class CreateCaseComponent implements OnInit {
         this.caseData.hospitalizationDates.push(new DateRangeModel());
         // ...and an isolation date range
         this.caseData.isolationDates.push(new DateRangeModel());
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+            });
     }
 
     /**

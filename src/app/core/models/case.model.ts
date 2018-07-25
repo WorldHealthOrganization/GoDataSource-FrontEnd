@@ -29,6 +29,7 @@ export class CaseModel {
     hospitalizationDates: DateRangeModel[];
     isolationDates: DateRangeModel[];
     incubationDates: DateRangeModel[];
+    questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
 
     constructor(data = null) {
@@ -56,6 +57,8 @@ export class CaseModel {
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
         this.incubationDates = _.get(data, 'incubationDates', []);
+
+        this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
 
     /**

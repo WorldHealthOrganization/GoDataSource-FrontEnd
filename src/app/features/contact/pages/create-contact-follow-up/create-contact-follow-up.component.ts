@@ -108,7 +108,7 @@ export class CreateContactFollowUpComponent implements OnInit {
 
                             return ErrorObservable.create(err);
                         })
-                        .subscribe((contactData: ContactModel) => {
+                        .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
                             // navigate to listing page

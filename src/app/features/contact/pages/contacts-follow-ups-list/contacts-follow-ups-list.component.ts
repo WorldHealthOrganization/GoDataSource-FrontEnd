@@ -18,7 +18,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute } from '@angular/router';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as moment from 'moment';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -88,19 +87,21 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     refreshList() {
         if (this.selectedOutbreak) {
-            // display only unresolved followups
-            this.queryBuilder.filter.where({
-                performed: false
-            }, true).where({
-                date: {
-                    // #TODO to be replaced when we change the API endpoint to allow us to use the server time & timezone
-                    gte: moment()
-                }
-            }, true);
+            this.genericDataService.getServerUTCCurrentDateTime()
+                .subscribe((serverDateTime: string) => {
+                    // display only unresolved followups
+                    this.queryBuilder.filter.where({
+                        performed: false
+                    }, true).where({
+                        date: {
+                            gte: serverDateTime
+                        }
+                    }, true);
 
-            // retrieve the list of Follow Ups
-            this.followUpsList$ = this.followUpsDataService
-                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                    // retrieve the list of Follow Ups
+                    this.followUpsList$ = this.followUpsDataService
+                        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                });
         }
     }
 

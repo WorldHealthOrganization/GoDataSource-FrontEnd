@@ -38,6 +38,24 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE]
         }
+    },
+    // Create Case Lab Result
+    {
+        path: ':caseId/lab-results/create',
+        component: fromPages.CreateCaseLabResultComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
+    },
+    // Modify Case Lab Result
+    {
+        path: ':caseId/lab-results/:labResultId/modify',
+        component: fromPages.ModifyCaseLabResultComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
     }
 ];
 

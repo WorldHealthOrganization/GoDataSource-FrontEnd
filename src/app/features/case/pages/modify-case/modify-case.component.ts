@@ -28,11 +28,10 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class ModifyCaseComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_CASE_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
     ];
 
-    outbreakId: string;
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
     caseId: string;
 
     caseData: CaseModel = new CaseModel();
@@ -70,20 +69,22 @@ export class ModifyCaseComponent implements OnInit {
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.outbreakId = selectedOutbreak.id;
+                    this.selectedOutbreak = selectedOutbreak;
 
                     // get case
                     this.caseDataService
                         .getCase(selectedOutbreak.id, this.caseId)
                         .subscribe(caseDataReturned => {
-                            this.caseData = caseDataReturned;
-                            // convert dates into ISO format with moment
-                            // let hospitalDatesArray = this.caseData.hospitalizationDates;
-                            // // moment(hospitalDate).format("YYYY-MM-DD")
-                            // this.caseData.hospitalizationDates = hospitalDatesArray
-                            //     .map(
-                            //         hospitalDate => moment(hospitalDate).format("YYYY-MM-DD")
-                            //     );
+                            this.caseData = new CaseModel(caseDataReturned);
+                            this.breadcrumbs.push(
+                                new BreadcrumbItemModel(
+                                    'LNG_PAGE_MODIFY_CASE_TITLE',
+                                    '.',
+                                    true,
+                                    {},
+                                    this.caseData
+                                )
+                            );
                         });
                 });
 
