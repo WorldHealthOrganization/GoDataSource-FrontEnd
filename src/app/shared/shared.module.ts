@@ -5,12 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
-
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
+import * as fromSharedPipes from './pipes';
 
 @NgModule({
     imports: [
@@ -24,7 +23,8 @@ import * as fromSharedDirectives from './directives';
     ],
     declarations: [
         ...fromSharedComponents.components,
-        ...fromSharedDirectives.directives
+        ...fromSharedDirectives.directives,
+        ...fromSharedPipes.pipes,
     ],
     providers: [],
     exports: [
@@ -35,8 +35,9 @@ import * as fromSharedDirectives from './directives';
         TranslateModule,
         XtFormsModule,
         AngularMaterialModule,
+        ...fromSharedDirectives.directives,
+        ...fromSharedPipes.pipes,
         ...fromSharedComponents.components,
-        ...fromSharedDirectives.directives
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent,

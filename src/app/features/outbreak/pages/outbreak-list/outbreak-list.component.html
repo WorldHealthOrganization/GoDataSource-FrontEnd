@@ -89,7 +89,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.startDate | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
+                {{outbreak.startDate | dateMDY }}
             </mat-cell>
         </ng-container>
 
@@ -105,7 +105,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.endDate | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
+                {{outbreak.endDate | dateMDY }}
             </mat-cell>
         </ng-container>
 

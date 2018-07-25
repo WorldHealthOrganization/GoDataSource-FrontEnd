@@ -17,7 +17,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.firstRelationship?.contactDate | date: Constants.DEFAULT_DATE_DISPLAY_FORMAT }}
+                {{ item.firstRelationship?.contactDate | dateMDY }}
             </mat-cell>
         </ng-container>
 

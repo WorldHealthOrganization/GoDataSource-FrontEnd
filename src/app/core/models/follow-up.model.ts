@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
-import { DatePipe } from '@angular/common';
-import { Constants } from './constants';
+import { CustomDatePipe } from '../../shared/pipes/date-pipe/date-pipe.pipe';
 
 export class FollowUpModel {
     id: string;
@@ -33,7 +32,7 @@ export class FollowUpModel {
     }
 
     get dateFormatted() {
-        const pD = new DatePipe('en-US');
-        return pD.transform(this.date, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const pD = new CustomDatePipe();
+        return pD.transform(this.date);
     }
 }

@@ -78,7 +78,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
             .subscribe((answer: DialogConfirmAnswer) => {
                 if (answer === DialogConfirmAnswer.Yes) {
-
                     this.outbreakDataService
                         .deleteOutbreak(outbreak.id)
                         .catch((err) => {
