@@ -140,8 +140,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     deleteFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
@@ -167,8 +167,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     restoreFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
@@ -222,8 +222,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
                         .getSelectedOutbreak()
                         .subscribe((selectedOutbreak: OutbreakModel) => {

@@ -17,6 +17,7 @@ import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 
 @Component({
@@ -62,7 +63,7 @@ export class ModifyCaseComponent implements OnInit {
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
-        this.route.params.subscribe(params => {
+        this.route.params.subscribe((params: { caseId }) => {
             this.caseId = params.caseId;
 
             // get current outbreak
@@ -105,8 +106,8 @@ export class ModifyCaseComponent implements OnInit {
     deleteHospitalizationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.caseData.hospitalizationDates.splice(index, 1);
                 }
             });
@@ -125,8 +126,8 @@ export class ModifyCaseComponent implements OnInit {
     deleteIsolationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.caseData.isolationDates.splice(index, 1);
                 }
             });

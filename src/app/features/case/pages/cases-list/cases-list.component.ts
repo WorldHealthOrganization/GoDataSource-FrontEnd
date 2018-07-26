@@ -21,6 +21,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -138,8 +139,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
      */
     deleteCase(caseModel: CaseModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', caseModel)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete case
                     this.caseDataService
                         .deleteCase(this.selectedOutbreak.id, caseModel.id)

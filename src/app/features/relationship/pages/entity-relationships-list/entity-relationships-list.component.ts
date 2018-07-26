@@ -23,6 +23,7 @@ import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -85,7 +86,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe(params => {
+        this.route.params.subscribe((params: { entityType, entityId }) => {
             this.entityType = params.entityType;
             this.entityId = params.entityId;
 
@@ -182,8 +183,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // get related entity
         const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.entityId), 'model', {});
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntityModel)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete relationship
                     this.relationshipDataService
                         .deleteRelationship(this.outbreakId, this.entityType, this.entityId, relationshipModel.id)

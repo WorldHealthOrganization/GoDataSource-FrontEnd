@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -26,18 +26,16 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
     categoryId: ReferenceDataCategory;
 
     constructor(
-        private router: Router,
         private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
         private dialogService: DialogService
     ) {
     }
 
     ngOnInit() {
         // get the route params
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe((params: { categoryId }) => {
             this.categoryId = params.categoryId;
 
             this.refreshList();
@@ -66,8 +64,8 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
 
     deleteEntry(entry: ReferenceDataEntryModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete entry
                     this.referenceDataDataService
                         .deleteEntry(entry.id)

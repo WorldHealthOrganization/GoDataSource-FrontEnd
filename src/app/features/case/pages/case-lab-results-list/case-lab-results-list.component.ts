@@ -15,7 +15,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -56,7 +56,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     ngOnInit() {
         // retrieve case information
-        this.route.params.subscribe(params => {
+        this.route.params.subscribe((params: { caseId }) => {
             // get selected outbreak
             this.outbreakDataService
                 .getSelectedOutbreak()
@@ -133,8 +133,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
                     this.labResultDataService
                         .deleteLabResult(this.selectedOutbreak.id, this.caseId, labResult.id)

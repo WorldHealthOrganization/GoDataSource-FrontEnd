@@ -13,6 +13,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-roles-list',
@@ -59,8 +60,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
     deleteRole(userRole: UserRoleModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER_ROLE', userRole)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete the role
                     this.userRoleDataService
                         .deleteRole(userRole.id)

@@ -6,6 +6,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { AnswerModel } from '../../../../core/models/answer.model';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { Subscriber } from 'rxjs/Subscriber';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-form-answer-list',
@@ -42,8 +43,8 @@ export class FormAnswerListComponent extends ListBase<AnswerModel> implements On
         // handle remove item confirmation
         this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER')
-                .subscribe((answer: DialogAnswerButton) => {
-                    if (answer === DialogAnswerButton.Yes) {
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
                         observer.next();
                     }
                 });

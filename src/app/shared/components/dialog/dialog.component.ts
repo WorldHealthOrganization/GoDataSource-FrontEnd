@@ -35,7 +35,7 @@ export class DialogConfiguration {
             this.cancelLabel = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
         }
         if (!placeholder) {
-            this.cancelLabel = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
+            this.placeholder = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
         }
         if (!translateData) {
             this.translateData = {};

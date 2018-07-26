@@ -13,6 +13,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-user-list',
@@ -87,8 +88,8 @@ export class UserListComponent extends ListComponent implements OnInit {
     deleteUser(user: UserModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER', user)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete the user
                     this.userDataService
                         .deleteUser(user.id)

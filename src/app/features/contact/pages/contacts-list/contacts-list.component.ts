@@ -21,10 +21,10 @@ import { CountedItemsListItem } from '../../../../shared/components/counted-item
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-contacts-list',
@@ -67,7 +67,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private followUpDataService: FollowUpsDataService,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService
     ) {
@@ -173,8 +172,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     deleteContact(contact: ContactModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CONTACT', contact)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
                     this.contactDataService
                         .deleteContact(this.selectedOutbreak.id, contact.id)

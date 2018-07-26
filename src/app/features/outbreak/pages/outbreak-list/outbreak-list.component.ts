@@ -17,6 +17,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -76,8 +77,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     delete(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
                         .deleteOutbreak(outbreak.id)
                         .catch((err) => {
@@ -100,8 +101,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     setActive(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     const userData = {'activeOutbreakId': outbreak.id};
                     const userId = this.authUser.id;
                     this.userDataService

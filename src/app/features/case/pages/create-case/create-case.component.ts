@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-create-case',
@@ -89,8 +90,8 @@ export class CreateCaseComponent implements OnInit {
     deleteHospitalizationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.caseData.hospitalizationDates.splice(index, 1);
                 }
             });
@@ -109,8 +110,8 @@ export class CreateCaseComponent implements OnInit {
     deleteIsolationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     this.caseData.isolationDates.splice(index, 1);
                 }
             });

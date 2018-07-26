@@ -15,6 +15,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-events-list',
@@ -108,8 +109,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
     deleteEvent(event: EventModel) {
         // show confirm dialog
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_EVENT', event)
-            .subscribe((answer: DialogAnswerButton) => {
-                if (answer === DialogAnswerButton.Yes) {
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
                     this.eventDataService
                         .deleteEvent(this.selectedOutbreak.id, event.id)
