@@ -11,7 +11,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -105,8 +105,8 @@ export class ModifyCaseComponent implements OnInit {
     deleteHospitalizationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.caseData.hospitalizationDates.splice(index, 1);
                 }
             });
@@ -125,8 +125,8 @@ export class ModifyCaseComponent implements OnInit {
     deleteIsolationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.caseData.isolationDates.splice(index, 1);
                 }
             });

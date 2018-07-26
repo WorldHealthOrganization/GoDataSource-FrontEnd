@@ -21,11 +21,9 @@ export class FollowUpsDataService {
      * @param {HttpClient} http
      * @param {ModelHelperService} modelHelper
      */
-    constructor(
-        private http: HttpClient,
-        private modelHelper: ModelHelperService,
-        private locationDataService: LocationDataService
-    ) {
+    constructor(private http: HttpClient,
+                private modelHelper: ModelHelperService,
+                private locationDataService: LocationDataService) {
     }
 
     /**
@@ -34,7 +32,7 @@ export class FollowUpsDataService {
      * @param {number} followUpPeriod
      * @returns {Observable<ContactFollowUpsModel[]>}
      */
-    generateFollowUps(outbreakId: string, followUpPeriod: number = Constants.DEFAULT_FOLLOWUP_PERIOD_DAYS): Observable<ContactFollowUpsModel[]> {
+    generateFollowUps(outbreakId: string, followUpPeriod: number): Observable<ContactFollowUpsModel[]> {
         return this.modelHelper.mapObservableListToModel(
             this.http.post(`outbreaks/${outbreakId}/generate-followups`, {followUpPeriod: followUpPeriod}),
             ContactFollowUpsModel

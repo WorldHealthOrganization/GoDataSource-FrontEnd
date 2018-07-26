@@ -41,7 +41,7 @@ import * as fromSharedPipes from './pipes';
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent,
-        fromSharedComponents.DialogConfirmComponent
+        fromSharedComponents.DialogComponent
     ]
 })
 export class SharedModule {

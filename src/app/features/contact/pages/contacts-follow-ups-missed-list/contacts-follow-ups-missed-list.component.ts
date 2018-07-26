@@ -13,7 +13,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute } from '@angular/router';
@@ -132,8 +132,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     deleteFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
@@ -159,8 +159,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     restoreFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)

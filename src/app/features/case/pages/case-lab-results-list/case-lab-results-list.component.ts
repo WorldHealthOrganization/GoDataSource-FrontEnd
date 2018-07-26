@@ -11,11 +11,11 @@ import { Observable } from 'rxjs/Observable';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { DialogConfirmAnswer } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -133,8 +133,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete lab result
                     this.labResultDataService
                         .deleteLabResult(this.selectedOutbreak.id, this.caseId, labResult.id)

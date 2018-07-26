@@ -12,11 +12,10 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ActivatedRoute } from '@angular/router';
+import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
@@ -46,16 +45,12 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
 
-    constructor(
-        private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService,
-        private snackbarService: SnackbarService,
-        private locationDataService: LocationDataService,
-        private dialogService: DialogService,
-        private route: ActivatedRoute,
-        private genericDataService: GenericDataService
-    ) {
+    constructor(private authDataService: AuthDataService,
+                private outbreakDataService: OutbreakDataService,
+                private followUpsDataService: FollowUpsDataService,
+                private snackbarService: SnackbarService,
+                private dialogService: DialogService,
+                private genericDataService: GenericDataService) {
         super();
     }
 
@@ -145,8 +140,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     deleteFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .deleteFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
@@ -172,8 +167,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     restoreFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete follow up
                     this.followUpsDataService
                         .restoreFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id)
@@ -197,17 +192,25 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     generateFollowUps() {
         if (this.selectedOutbreak) {
-            this.followUpsDataService
-                .generateFollowUps(this.selectedOutbreak.id)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((data) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+            this.dialogService.showInput(new DialogConfiguration(
+                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                undefined,
+                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
+            )).subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((data) => {
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
-                    // reload data
-                    this.refreshList();
+                                // reload data
+                                this.refreshList();
+                            });
+                    }
                 });
         }
     }
@@ -219,8 +222,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.outbreakDataService
                         .getSelectedOutbreak()
                         .subscribe((selectedOutbreak: OutbreakModel) => {

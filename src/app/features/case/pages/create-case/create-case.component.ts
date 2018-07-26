@@ -13,7 +13,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 import * as _ from 'lodash';
@@ -89,8 +89,8 @@ export class CreateCaseComponent implements OnInit {
     deleteHospitalizationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.caseData.hospitalizationDates.splice(index, 1);
                 }
             });
@@ -109,8 +109,8 @@ export class CreateCaseComponent implements OnInit {
     deleteIsolationDate(index) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.caseData.isolationDates.splice(index, 1);
                 }
             });

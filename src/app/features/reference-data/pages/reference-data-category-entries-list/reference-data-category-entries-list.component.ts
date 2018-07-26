@@ -8,7 +8,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -66,8 +66,8 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
 
     deleteEntry(entry: ReferenceDataEntryModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete entry
                     this.referenceDataDataService
                         .deleteEntry(entry.id)

@@ -1,31 +1,71 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { DialogConfirmComponent, DialogConfirmData } from '../../../shared/components/dialog-confirm/dialog-confirm.component';
-import { I18nService } from './i18n.service';
+import {
+    DialogAnswer,
+    DialogComponent,
+    DialogConfiguration
+} from '../../../shared/components/dialog/dialog.component';
 import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
 @Injectable()
 export class DialogService {
-
-
-    constructor(
-        private dialog: MatDialog,
-        private i18nService: I18nService
-    ) {}
+    /**
+     * Constructor
+     * @param dialog
+     */
+    constructor(private dialog: MatDialog) {}
 
     /**
      * Show a Confirm Dialog
-     * @param message Can be either a message ( string ) or an object of type DialogConfirmData
+     * @param message Can be either a message ( string ) or an object of type DialogConfiguration
      * @returns {Observable<R | undefined>}
      */
-    showConfirm(messageToken: DialogConfirmData | string, translateData = {}) {
+    showConfirm(messageToken: DialogConfiguration | string, translateData = {}) {
         // construct dialog message data
-        const dialogMessage = DialogConfirmComponent.defaultConfigWithData(messageToken);
-        (dialogMessage.data as DialogConfirmData).translateData = translateData;
+        const dialogMessage = DialogComponent.defaultConfigWithData(messageToken);
+        (dialogMessage.data as DialogConfiguration).translateData = translateData;
 
         // open dialog
         return this.dialog.open(
-            DialogConfirmComponent,
+            DialogComponent,
+            dialogMessage
+        ).afterClosed();
+    }
+
+    /**
+     * Show o custom dialog
+     * @param messageToken
+     * @returns {Observable<undefined|R>}
+     */
+    showInput(messageToken: DialogConfiguration | string,
+              required: boolean = true,
+              translateData = {}): Observable<DialogAnswer> {
+        // create input dialog configuration
+        let dialogConf: DialogConfiguration = null;
+        if (_.isString(messageToken)) {
+            dialogConf = new DialogConfiguration(
+                messageToken as string,
+                undefined,
+                undefined,
+                undefined,
+                translateData,
+                true,
+                required
+            );
+        } else {
+            dialogConf = messageToken as DialogConfiguration;
+            dialogConf.required = required;
+            dialogConf.customInput = true;
+            dialogConf.translateData = Object.keys(translateData).length > 0 ? translateData : dialogConf.translateData;
+        }
+
+        // construct dialog message data
+        const dialogMessage = DialogComponent.defaultConfigWithData(dialogConf);
+
+        // open dialog
+        return this.dialog.open(
+            DialogComponent,
             dialogMessage
         ).afterClosed();
     }

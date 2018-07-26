@@ -4,7 +4,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 import { ListBase } from '../../../../shared/xt-forms/core/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { QuestionModel } from '../../../../core/models/question.model';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DomService } from '../../../../core/services/helper/dom.service';
 
@@ -36,8 +36,8 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
         // handle remove item confirmation
         this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION')
-                .subscribe((answer: DialogConfirmAnswer) => {
-                    if (answer === DialogConfirmAnswer.Yes) {
+                .subscribe((answer: DialogAnswerButton) => {
+                    if (answer === DialogAnswerButton.Yes) {
                         observer.next();
                     }
                 });

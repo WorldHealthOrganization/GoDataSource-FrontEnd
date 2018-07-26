@@ -10,7 +10,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -76,8 +76,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     delete(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK', outbreak)
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     this.outbreakDataService
                         .deleteOutbreak(outbreak.id)
                         .catch((err) => {
@@ -100,8 +100,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     setActive(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     const userData = {'activeOutbreakId': outbreak.id};
                     const userId = this.authUser.id;
                     this.userDataService

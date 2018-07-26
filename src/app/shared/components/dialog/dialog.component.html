@@ -1,0 +1,29 @@
+<div
+    class="dialog-main">
+    <div
+        class="dialog-main-msg" [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
+    </div>
+
+    <div *ngIf="confirmData?.customInput">
+        <app-form-input
+            [(ngModel)]="dialogAnswerInputValue.value"
+            [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
+            [required]="confirmData.required"
+            type="number">
+        </app-form-input>
+    </div>
+
+
+    <div
+        fxFlex fxLayout="row" fxLayoutAlign="end">
+        <button class="dialog-button" mat-button (click)="cancel()">
+            {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
+        </button>
+        <button class="dialog-button" mat-button
+                [disabled]="confirmData?.customInput && confirmData.required && !dialogAnswerInputValue.value"
+                (click)="yes()">
+            {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
+        </button>
+
+    </div>
+</div>

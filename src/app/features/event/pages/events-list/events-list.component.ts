@@ -11,7 +11,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -108,8 +108,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
     deleteEvent(event: EventModel) {
         // show confirm dialog
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_EVENT', event)
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete contact
                     this.eventDataService
                         .deleteEvent(this.selectedOutbreak.id, event.id)

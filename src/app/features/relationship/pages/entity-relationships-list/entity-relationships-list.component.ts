@@ -17,7 +17,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { DialogConfirmAnswer } from '../../../../shared/components';
+import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -182,8 +182,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // get related entity
         const relatedEntityModel = _.get(relationshipModel.relatedEntity(this.entityId), 'model', {});
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP', relatedEntityModel)
-            .subscribe((answer: DialogConfirmAnswer) => {
-                if (answer === DialogConfirmAnswer.Yes) {
+            .subscribe((answer: DialogAnswerButton) => {
+                if (answer === DialogAnswerButton.Yes) {
                     // delete relationship
                     this.relationshipDataService
                         .deleteRelationship(this.outbreakId, this.entityType, this.entityId, relationshipModel.id)

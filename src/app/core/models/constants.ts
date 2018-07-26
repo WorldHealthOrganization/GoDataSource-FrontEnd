@@ -2,9 +2,6 @@ export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'MM/DD/YYYY';
 
-    // Follow-ups
-    static DEFAULT_FOLLOWUP_PERIOD_DAYS = 1;
-
     // #TODO replace with Reference Data
     static QUESTION_CATEGORIES = {
         PHYSICAL_EXAMINATION: {

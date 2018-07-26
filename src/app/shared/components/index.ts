@@ -8,7 +8,7 @@ import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormDocumentListComponent } from './form-document-list/form-document-list.component';
 import { FormRangeComponent } from './form-range/form-range.component';
 import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.component';
-import { DialogConfirmComponent } from './dialog-confirm/dialog-confirm.component';
+import { DialogComponent } from './dialog/dialog.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { SideFiltersComponent } from './side-filters/side-filters.component';
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
@@ -18,7 +18,7 @@ import { ReferenceDataLabelComponent } from './reference-data-label/reference-da
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
-export * from './dialog-confirm/dialog-confirm.component';
+export * from './dialog/dialog.component';
 export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
@@ -27,7 +27,7 @@ export const components: any[] = [
     TopnavComponent,
     BreadcrumbsComponent,
     NotAuthTemplateComponent,
-    DialogConfirmComponent,
+    DialogComponent,
     FormAddressComponent,
     FormAddressListComponent,
     FormDocumentComponent,
