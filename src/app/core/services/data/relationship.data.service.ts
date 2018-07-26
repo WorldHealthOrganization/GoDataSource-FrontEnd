@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { MetricContactsPerCaseModel } from '../../models/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
 
 @Injectable()
@@ -137,6 +138,18 @@ export class RelationshipDataService {
         return this.http.put(
             `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
             relationshipData
+        );
+    }
+
+    /**
+     * Get metrics for contacts per case
+     * @param {string} outbreakId
+     * @returns {Observable<MetricContactsPerCaseModel>}
+     */
+    getMetricsOfContactsPerCase(outbreakId: string): Observable<MetricContactsPerCaseModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count`),
+            MetricContactsPerCaseModel
         );
     }
 }

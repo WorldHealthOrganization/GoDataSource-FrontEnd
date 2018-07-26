@@ -14,6 +14,16 @@
             <!-- other KPI section content -->
             <div fxLayout="row">
 
+                <!-- Contacts per case mean -->
+                <app-contacts-per-case-mean-dashlet
+                    *ngIf="hasReadContactPermissions()">
+                </app-contacts-per-case-mean-dashlet>
+
+                <!-- Contacts per case median -->
+                <app-contacts-per-case-median-dashlet
+                    *ngIf="hasReadContactPermissions()">
+                </app-contacts-per-case-median-dashlet>
+
                 <!-- Contacts on the follow-up list -->
                 <app-contacts-on-followup-list-dashlet
                     *ngIf="hasReadContactPermissions()">
