@@ -111,7 +111,7 @@ export class SnackbarService {
             });
     }
 
-    dismissAll(){
+    dismissAll() {
         this.snackbar.dismiss();
     }
 }

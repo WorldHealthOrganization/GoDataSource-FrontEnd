@@ -5,8 +5,7 @@ import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatSidenav } from '@angular/material';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
-import { OutbreakModel } from "../../models/outbreak.model";
-import { SnackbarService } from "../../services/helper/snackbar.service";
+import { SnackbarService } from '../../services/helper/snackbar.service';
 import { ReferenceDataDataService } from '../../services/data/reference-data.data.service';
 
 @Component({
@@ -53,7 +52,7 @@ export class AuthenticatedComponent implements OnInit {
             .determineSelectedOutbreak()
             .subscribe(() => {
                 this.outbreakDataService.getSelectedOutbreakSubject()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                    .subscribe(() => {
                         this.outbreakDataService.checkActiveSelectedOutbreak();
                     });
             });

@@ -12,7 +12,7 @@ import * as _ from 'lodash';
     templateUrl: './side-filters.component.html',
     styleUrls: ['./side-filters.component.less']
 })
-export class SideFiltersComponent implements OnInit {
+export class SideFiltersComponent {
 
     // available columns to be displayed
     @Input() columns: any[] = [];
@@ -41,10 +41,6 @@ export class SideFiltersComponent implements OnInit {
     constructor(
         private formHelper: FormHelperService
     ) {}
-
-    ngOnInit() {
-        const test = this.sideNav;
-    }
 
     addFilter() {
         this.appliedFilters.push(new AppliedFilterModel());

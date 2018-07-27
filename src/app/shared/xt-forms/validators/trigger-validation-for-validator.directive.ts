@@ -1,8 +1,6 @@
 import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
-import * as _ from 'lodash';
-
 @Directive({
     selector: '[app-triggerValidationFor][ngModel]',
     providers: [

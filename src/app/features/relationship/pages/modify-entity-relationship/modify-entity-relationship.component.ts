@@ -53,7 +53,6 @@ export class ModifyEntityRelationshipComponent implements OnInit {
     entityId: string;
     relationshipId: string;
 
-    relatedEntityType: string;
     relationshipData: RelationshipModel = new RelationshipModel();
 
     certaintyLevelOptions$: Observable<any[]>;

@@ -73,7 +73,7 @@ export class AuthDataService {
      */
     logout(): Observable<any> {
         return this.http.post(`users/logout`, null)
-            .do((res) => {
+            .do(() => {
                 // remove auth info from local storage
                 this.storageService.remove(StorageKey.AUTH_DATA);
                 // remove selected outbreak from local storage

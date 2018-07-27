@@ -238,7 +238,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                 this.snackbarService.showError(err.message);
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe((data) => {
+                            .subscribe(() => {
                                 this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                                 // reload data

@@ -11,13 +11,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogAnswerButton } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 
 
 @Component({
@@ -53,8 +49,7 @@ export class ModifyCaseComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private dialogService: DialogService
+        private formHelper: FormHelperService
     ) {
     }
 
@@ -91,46 +86,6 @@ export class ModifyCaseComponent implements OnInit {
 
 
         });
-    }
-
-    /**
-     * Add a new Hospitalization Date slot in UI
-     */
-    addHospitalizationDate() {
-        this.caseData.hospitalizationDates.push(new DateRangeModel());
-    }
-
-    /**
-     * Remove a Hospitalization Date from the list
-     */
-    deleteHospitalizationDate(index) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.caseData.hospitalizationDates.splice(index, 1);
-                }
-            });
-    }
-
-    /**
-     * Add a new Isolation Date slot in UI
-     */
-    addIsolationDate() {
-        this.caseData.isolationDates.push(new DateRangeModel());
-    }
-
-    /**
-     * Remove an Isolation Date from the list
-     */
-    deleteIsolationDate(index) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.caseData.isolationDates.splice(index, 1);
-                }
-            });
     }
 
     /**

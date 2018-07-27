@@ -115,7 +115,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showError(err.message);
                             return ErrorObservable.create(err);
                         })
-                        .subscribe(response => {
+                        .subscribe(() => {
                             // reload user data to save the new active outbreak
                             this.authDataService
                                 .reloadAndPersistAuthUser()

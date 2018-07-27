@@ -76,8 +76,6 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE': 'Are you sure you want to delete this hospitalization date?',
-        'LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE': 'Are you sure you want to delete this isolation date?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',

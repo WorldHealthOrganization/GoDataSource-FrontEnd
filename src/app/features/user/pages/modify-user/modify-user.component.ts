@@ -89,7 +89,7 @@ export class ModifyUserComponent {
                     // reload user auth data in case he's changing the active outbreaqk
                     this.authDataService
                         .reloadAndPersistAuthUser()
-                        .subscribe((authenticatedUser) => {
+                        .subscribe(() => {
                             this.snackbarService.showSuccess('User modified!');
                             // navigate to listing page
                             this.router.navigate(['/users']);

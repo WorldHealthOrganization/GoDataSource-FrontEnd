@@ -6,13 +6,9 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactFollowUpsModel } from '../../models/contact-follow-ups.model';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { Constants } from '../../models/constants';
 import { LocationDataService } from './location.data.service';
-import { LocationModel } from '../../models/location.model';
 import 'rxjs/add/operator/mergeMap';
-import { AddressModel } from '../../models/address.model';
 import { MetricContactsFollowUpModel } from '../../models/metric-contacts-follow-up.model';
-import { OutbreakModel } from '../../models/outbreak.model';
 
 @Injectable()
 export class FollowUpsDataService {

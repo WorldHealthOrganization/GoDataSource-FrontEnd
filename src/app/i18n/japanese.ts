@@ -31,8 +31,6 @@ export const JapaneseLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_YES': '[言語] Yes',
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': '[言語] Cancel',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': '[言語] Are you sure you want to delete this case: {{firstName}} {{lastName}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_HOSPITALIZATION_DATE': '[言語] Are you sure you want to delete this hospitalization date?',
-        'LNG_DIALOG_CONFIRM_DELETE_ISOLATION_DATE': '[言語] Are you sure you want to delete this isolation date?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': '[言語] Are you sure you want to delete this contact: {{firstName}} {{lastName}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': '[言語] Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': '[言語] Are you sure you want to delete this document?',

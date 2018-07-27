@@ -3,7 +3,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { StorageKey, StorageService } from './storage.service';
 import { LanguageDataService } from '../data/language.data.service';
-import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';

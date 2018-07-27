@@ -10,7 +10,6 @@ import { ModelHelperService } from '../../../../core/services/helper/model-helpe
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { AuthModel } from '../../../../core/models/auth.model';
 
 @Component({
     selector: 'app-change-password',
@@ -54,14 +53,14 @@ export class ChangePasswordComponent {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe((auth: AuthModel) => {
+                .subscribe(() => {
 
                     // check if user was required to change password
                     if (this.authUser.passwordChange) {
                         // update user details so next time it's not required to change its password again
                         this.userDataService
                             .modifyUser(this.authUser.id, {passwordChange: false})
-                            .subscribe(()=>{
+                            .subscribe(() => {
                                 this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE');
                                 // set passwordChanged to true so we can display the security questions notification.
                                 this.passwordChanged = true;

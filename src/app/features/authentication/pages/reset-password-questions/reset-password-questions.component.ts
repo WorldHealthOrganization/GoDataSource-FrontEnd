@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -9,8 +9,8 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
-import { Observable } from "rxjs/Observable";
-import { SecurityQuestionModel } from "../../../../core/models/securityQuestion.model";
+import { Observable } from 'rxjs/Observable';
+import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 
 @Component({
     selector: 'app-reset-password-questions',
@@ -18,7 +18,7 @@ import { SecurityQuestionModel } from "../../../../core/models/securityQuestion.
     templateUrl: './reset-password-questions.component.html',
     styleUrls: ['./reset-password-questions.component.less']
 })
-export class ResetPasswordQuestionsComponent{
+export class ResetPasswordQuestionsComponent {
 
     dataModel = {
         email: null,

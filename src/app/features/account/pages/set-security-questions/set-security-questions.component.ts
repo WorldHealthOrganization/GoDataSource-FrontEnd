@@ -60,7 +60,7 @@ export class SetSecurityQuestionsComponent {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
-                .subscribe(response => {
+                .subscribe(() => {
                     this.authDataService
                         .reloadAndPersistAuthUser()
                         .subscribe((authenticatedUser) => {
