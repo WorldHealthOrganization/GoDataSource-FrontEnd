@@ -4,7 +4,8 @@
         <span class="xt-icon">filter</span>
     </button>
 
-    <div class="page-overlay mat-drawer-backdrop" [class.mat-drawer-shown]="sideNav.opened" (click)="closeSideNav()"></div>
+    <div class="page-overlay mat-drawer-backdrop" [class.mat-drawer-shown]="sideNav.opened"
+         (click)="closeSideNav()"></div>
 
     <mat-sidenav-container>
 
@@ -16,7 +17,7 @@
                 <div *ngIf="columns.length > 0" class="section columns-section">
 
                     <div class="title">
-                        Columns to display
+                        {{'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate}}
                     </div>
 
                     <div class="actions">
@@ -29,7 +30,7 @@
                 <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
                     <div class="title">
-                        Filters
+                        {{'LNG_SIDE_FILTERS_TITLE' | translate}}
                     </div>
 
                     <div class="actions">
@@ -38,15 +39,15 @@
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
                                     (click)="setFilterOperator(RequestFilterOperator.AND)">
-                                AND
+                                {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND' | translate}}
                             </button>
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.OR) ? 'primary' : ''"
                                     (click)="setFilterOperator(RequestFilterOperator.OR)">
-                                OR
+                                {{'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR' | translate}}
                             </button>
 
-                            <input type="hidden" name="filter[operator]" [(ngModel)]="appliedFilterOperator" />
+                            <input type="hidden" name="filter[operator]" [(ngModel)]="appliedFilterOperator"/>
                         </div>
                     </div>
 
@@ -62,7 +63,7 @@
                                 <app-form-select
                                     [name]="'filter[filters][' + i + '][filter]'"
                                     [(ngModel)]="filter.filter"
-                                    placeholder="Filter"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filterOptions"
                                     optionLabelKey="fieldName"
                                     optionValueKey="self">
@@ -73,7 +74,7 @@
                                     *ngIf="filter.filter?.type === FilterType.TEXT"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
-                                    placeholder="Filter">
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate">
                                 </app-form-input>
 
                                 <!-- SELECT / MULTI-SELECT Filter -->
@@ -81,7 +82,7 @@
                                     *ngIf="filter.filter?.type === FilterType.SELECT || filter.filter?.type === FilterType.MULTISELECT"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
-                                    placeholder="Filter"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
                                     [multiple]="filter.filter.type === FilterType.MULTISELECT">
                                 </app-form-select>
@@ -97,13 +98,15 @@
                             </mat-card>
 
                             <button type="button" mat-icon-button (click)="deleteFilter(i)">
-                                <span class="xt-icon">delete</span>
+                                <span class="xt-icon">{{'LNG_PAGE_ACTION_DELETE' | translate}}</span>
                             </button>
                         </div>
 
                     </div>
 
-                    <button fxFlex="50" type="button" mat-button color="primary" (click)="addFilter()">Add another filter</button>
+                    <button fxFlex="50" type="button" mat-button color="primary" (click)="addFilter()">
+                        {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                    </button>
 
                 </div>
 
@@ -111,7 +114,7 @@
                 <div *ngIf="sortOptions.length > 0" class="section sort-section">
 
                     <div class="title">
-                        Sort
+                        {{'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate}}
                     </div>
 
                     <div class="actions">
@@ -122,7 +125,7 @@
 
                 <button *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
                         type="submit" class="button-primary" mat-raised-button color="primary">
-                    Apply filters
+                    {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
                 </button>
 
             </form>

@@ -653,7 +653,18 @@ export const EnglishUsLang = {
         /**
          * Transmission Chains List page
          */
-        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission'
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
 
+
+        /**
+         * Side filter
+         */
+        'LNG_SIDE_FILTERS_TITLE': 'Filters',
+        'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
+        'LNG_SIDE_FILTERS_SECTION_SORT_TITLE': 'Sort',
+        'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add another filter',
+        'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
+        'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
+        'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
     }
 };
