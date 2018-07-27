@@ -35,12 +35,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     // authenticated user
     authUser: UserModel;
-
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
+    // display past follow-ups or upcoming follow-ups?
+    showPastFollowUps: boolean = false;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -62,7 +63,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+                'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE',
                 '.',
                 true
             )
@@ -87,9 +88,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     // display only unresolved followups
                     this.queryBuilder.filter.where({
                         performed: false
-                    }, true).where({
+                    }, true);
+
+                    // show upcoming or past follow ups?
+                    const operator = this.showPastFollowUps ? 'lt' : 'gte';
+                    this.queryBuilder.filter.where({
                         date: {
-                            gte: serverDateTime
+                            [operator]: serverDateTime
                         }
                     }, true);
 
@@ -98,6 +103,36 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
                 });
         }
+    }
+
+    switchToPastFollowUps() {
+        this.showPastFollowUps = true;
+        this.refreshList();
+
+        // update breadcrumbs
+        this.breadcrumbs.pop();
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE',
+                '.',
+                true
+            )
+        );
+    }
+
+    switchToUpcomingFollowUps() {
+        this.showPastFollowUps = false;
+        this.refreshList();
+
+        // update breadcrumbs
+        this.breadcrumbs.pop();
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     /**

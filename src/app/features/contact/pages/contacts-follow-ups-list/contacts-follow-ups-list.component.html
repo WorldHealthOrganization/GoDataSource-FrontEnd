@@ -9,6 +9,13 @@
                         {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
                     </button>
                 </ng-container>
+
+                <button *ngIf="!showPastFollowUps" mat-raised-button (click)="switchToPastFollowUps()">
+                    {{'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_PAST_FOLLOW_UPS' | translate}}
+                </button>
+                <button *ngIf="showPastFollowUps" mat-raised-button (click)="switchToUpcomingFollowUps()">
+                    {{'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_UPCOMING_FOLLOW_UPS' | translate}}
+                </button>
             </div>
         </div>
     </ng-container>

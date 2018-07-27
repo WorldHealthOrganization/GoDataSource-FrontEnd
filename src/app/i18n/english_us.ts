@@ -370,10 +370,14 @@ export const EnglishUsLang = {
         /**
          * Follow-ups list page
          */
-        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Upcoming Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE': 'Upcoming Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE': 'Past Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE': 'Missed Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
+        'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_UPCOMING_FOLLOW_UPS': 'Show upcoming Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_PAST_FOLLOW_UPS': 'Show past Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up marked as missed!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING': 'Mark contact as missed',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Follow-up deleted!',
