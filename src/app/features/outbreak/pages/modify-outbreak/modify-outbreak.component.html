@@ -38,8 +38,7 @@
                                 optionLabelKey="label"
                                 optionValueKey="value"
                                 multiple="true"
-                                required="true"
-                            >
+                                required="true">
                             </app-form-select>
                             <div fxFlex>
                                 <!-- placeholder -->
@@ -147,7 +146,8 @@
                 <app-form-question-list
                     name="caseInvestigationTemplate"
                     [ngModel]="outbreak.caseInvestigationTemplate"
-                    [viewOnly]="viewOnly">
+                    [viewOnly]="viewOnly"
+                    [minItems]="1">
                 </app-form-question-list>
             </mat-tab>
 
@@ -159,7 +159,8 @@
                 <app-form-question-list
                     name="contactFollowUpTemplate"
                     [ngModel]="outbreak.contactFollowUpTemplate"
-                    [viewOnly]="viewOnly">
+                    [viewOnly]="viewOnly"
+                    [minItems]="1">
                 </app-form-question-list>
             </mat-tab>
 
@@ -171,7 +172,8 @@
                 <app-form-question-list
                     name="labResultsTemplate"
                     [(ngModel)]="outbreak.labResultsTemplate"
-                    [viewOnly]="viewOnly">
+                    [viewOnly]="viewOnly"
+                    [minItems]="1">
                 </app-form-question-list>
             </mat-tab>
 

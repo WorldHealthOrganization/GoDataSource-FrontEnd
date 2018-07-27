@@ -42,7 +42,7 @@
                         required="false">
                     </app-form-slide-toggle>
 
-                    <button mat-icon-button type="button" (click)="delete()" color="warn">
+                    <button *ngIf="displayRemove" mat-icon-button type="button" (click)="delete()" color="warn">
                         <span class="xt-icon">delete</span>
                     </button>
 

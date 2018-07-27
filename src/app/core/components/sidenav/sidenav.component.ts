@@ -1,11 +1,12 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { PERMISSION } from '../../models/permission.model';
-
 import * as _ from 'lodash';
 import { ChildNavItem, NavItem } from './nav-item.class';
+import { OutbreakDataService } from '../../services/data/outbreak.data.service';
+import { OutbreakModel } from '../../models/outbreak.model';
+import { SnackbarService } from '../../services/helper/snackbar.service';
 
 @Component({
     selector: 'app-sidenav',
@@ -13,10 +14,13 @@ import { ChildNavItem, NavItem } from './nav-item.class';
     templateUrl: './sidenav.component.html',
     styleUrls: ['./sidenav.component.less']
 })
-export class SidenavComponent {
+export class SidenavComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+
+    // selected Outbreak
+    selectedOutbreak: OutbreakModel;
 
     // Nav Item - Account
     accountItem: NavItem = new NavItem(
@@ -118,25 +122,34 @@ export class SidenavComponent {
             'contacts-group',
             'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
             'people',
-            [PERMISSION.READ_CONTACT],
+            [],
             [
                 new ChildNavItem(
                     'contacts',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
-                    [],
-                    '/contacts'
+                    [PERMISSION.READ_CONTACT],
+                    '/contacts',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'contact-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
-                    [PERMISSION.READ_FOLLOWUP],
-                    '/contacts/follow-ups'
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/follow-ups',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'contact-missed-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL',
-                    [PERMISSION.READ_FOLLOWUP],
-                    '/contacts/follow-ups/missed'
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/follow-ups/missed',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]
         ),
@@ -146,7 +159,8 @@ export class SidenavComponent {
             'addFolder',
             [PERMISSION.READ_CASE],
             [],
-            '/cases'
+            '/cases',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
             'events',
@@ -154,24 +168,26 @@ export class SidenavComponent {
             'event',
             [PERMISSION.READ_EVENT],
             [],
-            '/events'
+            '/events',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
-        new NavItem(
-            'duplicated-records',
-            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-            'fileCopy',
-            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
-            [],
-            [],
-            '/users'
-        ),
+        // new NavItem(
+        //     'duplicated-records',
+        //     'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
+        //     'fileCopy',
+        //     // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
+        //     [],
+        //     [],
+        //     '/users'
+        // ),
         new NavItem(
             'transmission-chains',
             'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
             'barChart',
             [],
             [],
-            '/transmission-chains'
+            '/transmission-chains',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         {
             separator: true
@@ -183,28 +199,56 @@ export class SidenavComponent {
             [PERMISSION.WRITE_REFERENCE_DATA],
             [],
             '/reference-data'
-        ),
-        new NavItem(
-            'help',
-            'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
-            'help',
-            [],
-            [],
-            '/help'
         )
+        // new NavItem(
+        //     'help',
+        //     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
+        //     'help',
+        //     [],
+        //     [],
+        //     '/help'
+        // )
     ];
 
     constructor(
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
+    ngOnInit() {
+        // retrieve list of outbreaks
+        this.outbreakDataService.getOutbreaksList().subscribe((outbreaks) => {
+            // no outbreak ?
+            if (outbreaks.length < 1) {
+                this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
+            }
+        });
+
+        // subscribe to the selected outbreak stream
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((outbreak: OutbreakModel) => {
+                if (outbreak) {
+                    // update the selected outbreak
+                    this.selectedOutbreak = outbreak;
+                }
+            });
+    }
+
     /**
      * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
      */
-    shouldDisplayItem(item) {
+    shouldDisplayItem(item: NavItem | ChildNavItem) {
+        // do we need to check permissions ?
+        if (!item.isVisible) {
+            return false;
+        }
+
+        // check permissions
         switch (item.id) {
             case 'duplicated-records':
                 return (
@@ -214,15 +258,27 @@ export class SidenavComponent {
 
             default:
                 // check if it is an item with a Submenu list
-                if (item.children && item.children.length > 0) {
+                if (
+                    item instanceof NavItem &&
+                    (item as NavItem).children &&
+                    item.children.length > 0) {
                     // check if there is any visible Child Item
                     return _.filter(item.children, (childItem) => {
-                        return this.authUser.hasPermissions(...childItem.permissions);
+                        return childItem.isVisible &&
+                            this.authUser.hasPermissions(...childItem.permissions);
                     }).length > 0;
                 }
 
                 return this.authUser.hasPermissions(...item.permissions);
         }
+    }
+
+    /**
+     * Check if we have an outbreak
+     * @returns {boolean}
+     */
+    hasOutbreak(): boolean {
+        return this.selectedOutbreak && !_.isEmpty(this.selectedOutbreak.id);
     }
 
 }

@@ -150,7 +150,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreak.caseInvestigationTemplate">
+                    [ngModel]="newOutbreak.caseInvestigationTemplate"
+                    [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
@@ -164,7 +165,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreak.contactFollowUpTemplate">
+                    [ngModel]="newOutbreak.contactFollowUpTemplate"
+                    [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
@@ -178,7 +180,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="labResultsTemplate"
-                    [ngModel]="newOutbreak.labResultsTemplate">
+                    [ngModel]="newOutbreak.labResultsTemplate"
+                    [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>

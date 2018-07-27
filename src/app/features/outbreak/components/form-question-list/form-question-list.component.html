@@ -1,5 +1,5 @@
-<div class="form-element "
-     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+<div class="form-element"
+    [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <div fxLayout="row">
         <!-- btn to add a new question -->
@@ -24,7 +24,8 @@
                     [title]="('LNG_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) "
                     (deleteQuestion)="delete(i)"
                     (duplicateQuestion)="duplicateQuestion(question)"
-                    (groupValidated)="validateGroup()">
+                    (groupValidated)="validateGroup()"
+                    [displayRemove]="values.length > minItems">
                 </app-form-question>
             </mat-card>
         </div>

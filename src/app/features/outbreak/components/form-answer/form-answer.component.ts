@@ -29,7 +29,7 @@ export class FormAnswerComponent extends GroupBase<AnswerModel> implements OnIni
     @Input() viewOnly: boolean;
     @Input() name: string;
     @Output() deleteAnswer = new EventEmitter();
-
+    @Input() displayRemove: boolean = true;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

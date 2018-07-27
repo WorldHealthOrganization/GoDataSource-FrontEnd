@@ -42,7 +42,6 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
      * Validate a custom form control
      */
     protected validate() {
-
         setTimeout(() => {
             // wait for the next tick so angular can update the form control value
             // before we run the validations
@@ -55,7 +54,6 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
                     return res;
                 });
         });
-
     }
 
     /**

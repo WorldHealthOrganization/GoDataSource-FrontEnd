@@ -45,11 +45,15 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
         });
     }
 
+    protected generateNewItem(): QuestionModel {
+        return new QuestionModel();
+    }
+
     /**
      * Adds a new form-question
      */
     addNewQuestion() {
-        super.add(new QuestionModel());
+        super.add(this.generateNewItem());
         this.domService.scrollItemIntoView('app-form-question-list');
     }
 

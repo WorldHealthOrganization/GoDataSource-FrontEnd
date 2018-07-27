@@ -31,12 +31,16 @@ export class FormAnswerListComponent extends ListBase<AnswerModel> implements On
         super(controlContainer, validators, asyncValidators);
     }
 
+    protected generateNewItem(): AnswerModel {
+        return new AnswerModel();
+    }
+
     /**
      * Adds a new form-answer
      */
     addAnswer() {
         // push a new empty form-answer to the array of answers for that form-question
-        super.add(new AnswerModel());
+        super.add(this.generateNewItem());
     }
 
     ngOnInit() {

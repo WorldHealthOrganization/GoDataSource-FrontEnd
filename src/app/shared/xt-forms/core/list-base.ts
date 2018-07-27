@@ -1,4 +1,4 @@
-import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
+import { AfterViewInit, EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 /**
  * Base class to be extended by components that implement lists of group components or single components
  */
-export abstract class ListBase<T> extends GroupValidator<T[]> {
+export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterViewInit {
     static _identifier: number = 0;
 
     // element unique ID
@@ -15,6 +15,9 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
 
     // group input name
     @Input() name: string;
+
+    // limits
+    @Input() minItems: number = 0;
 
     // handler for when one of the group value has changed
     @Output() changed = new EventEmitter<T[]>();
@@ -41,16 +44,34 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     }
 
     /**
+     * Create new item
+     */
+    protected generateNewItem(): T {
+        return {} as T;
+    }
+
+    /**
      * Add a new model
      */
-    add(newItem: T = {} as T) {
+    add(newItem: T | T[] = null) {
         // do we need to initialize the list ?
         if (!this.values) {
             this.value = [];
         }
 
+        // do we need to generate new item ?
+        if (newItem === null) {
+            newItem = this.generateNewItem();
+        }
+
         // add new model
-        this.values.push(newItem);
+        if (_.isArray(newItem)) {
+            (newItem as T[]).forEach((item: T) => {
+                this.values.push(item);
+            });
+        } else {
+            this.values.push(newItem);
+        }
 
         // mark as dirty
         this.control.markAsDirty();
@@ -95,6 +116,12 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
             });
         };
 
+        // are we allowed to remove this item ?
+        // if not there is no point in continuing
+        if ((this.values as any[]).length <= this.minItems) {
+            return;
+        }
+
         // show confirm dialog to confirm the action
         if (!_.values(this.values[index]).some(x => x !== undefined && x !== '') || overrideConfirm ) {
             deleteItem();
@@ -123,5 +150,33 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
 
         // call changed event
         this.changed.emit(this.value);
+    }
+
+    /**
+     * Initialize List
+     */
+    ngAfterViewInit() {
+        // init parent
+        super.ngAfterViewInit();
+
+        // init list if necessary
+        // wait for the Form object to be initialized with form controls,
+        // then get the current form control object
+        setTimeout(() => {
+            // add minimum number of items to the list ?
+            const valuesArray = (this.values ? this.values : []) as any[];
+            if (valuesArray.length < this.minItems) {
+                // create list of items to add
+                let itemsToAdd = this.minItems - valuesArray.length;
+                const items: T[] = [];
+                while (itemsToAdd > 0) {
+                    items.push(this.generateNewItem());
+                    itemsToAdd--;
+                }
+
+                // add items
+                this.add(items);
+            }
+        });
     }
 }

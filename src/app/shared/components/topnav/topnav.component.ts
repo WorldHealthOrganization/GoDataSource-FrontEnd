@@ -2,7 +2,6 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/takeUntil';
 import { UserModel } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../core/models/permission.model';
@@ -105,7 +104,8 @@ export class TopnavComponent implements OnInit {
      * Display the Selected Outbreak dropdown only for users that have the right access
      */
     showSelectedOutbreakDropdown() {
-        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
+        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) &&
+            this.selectedOutbreak && this.selectedOutbreak.id;
     }
 
 }

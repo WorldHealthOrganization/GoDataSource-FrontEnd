@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LanguageModel, LanguageTokenModel } from '../../models/language.model';
 import { StorageKey, StorageService } from './storage.service';
@@ -8,11 +8,14 @@ import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import 'rxjs/add/operator/mergeMap';
+import { Subscriber } from 'rxjs';
 
 @Injectable()
 export class I18nService {
 
     private defaultLanguageId = 'english_us';
+
+    private languageLoadedEvent = new EventEmitter<void>();
 
     constructor(
         private translateService: TranslateService,
@@ -62,7 +65,6 @@ export class I18nService {
 
                 // configure the TranslateService
                 this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
-
                 this.translateService.use(selectedLanguage.id);
 
                 return this.persistUserLanguage(language.id);
@@ -116,6 +118,9 @@ export class I18nService {
                         this.translateService.setTranslation(language.id, language.getTokensObject());
                         this.translateService.use(language.id);
 
+                        // translation initialized
+                        this.languageLoadedEvent.emit();
+
                         return language;
                     });
             });
@@ -141,6 +146,16 @@ export class I18nService {
         return this.translateService.instant(token, data);
     }
 
-
+    /**
+     * Language loaded
+     */
+    public waitForLanguageInitialization(): Observable<void> {
+        return Observable.create((observer: Subscriber<void>) => {
+            this.languageLoadedEvent.subscribe(() => {
+                observer.next();
+                observer.complete();
+            });
+        });
+    }
 }
 

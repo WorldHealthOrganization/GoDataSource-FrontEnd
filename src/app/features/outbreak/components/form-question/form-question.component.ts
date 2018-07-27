@@ -39,6 +39,7 @@ export class FormQuestionComponent extends GroupBase<QuestionModel> implements O
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    @Input() displayRemove: boolean = true;
     @Input() viewOnly: string;
     @Input() title: string;
     @Input() name: string;
@@ -106,7 +107,9 @@ export class FormQuestionComponent extends GroupBase<QuestionModel> implements O
             // call delete on the child components for validation
             const self = this;
             _.forEach(self.question.answers, function (answer, keyAnswer) {
-                self.answersList.delete(keyAnswer, true);
+                if (self.answersList) {
+                    self.answersList.delete(keyAnswer, true);
+                }
             });
             this.question.answers = [];
         }
@@ -124,9 +127,9 @@ export class FormQuestionComponent extends GroupBase<QuestionModel> implements O
         }
 
         // call onChange from GroupBase
-        this.onChange();
-        // call onChange on answers list child component to validate the answers
-        this.answersList.onChange();
+        setTimeout(() => {
+            this.onChange();
+        });
     }
 
     /**

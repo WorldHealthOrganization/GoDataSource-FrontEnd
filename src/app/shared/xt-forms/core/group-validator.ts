@@ -53,7 +53,7 @@ export abstract class GroupValidator<T> extends ElementBase<T> implements AfterV
                 if (valid) {
                     this.control.setErrors(null);
                 } else {
-                    this.control.setErrors({groupInvalid: true});
+                    this.control.setErrors({ groupInvalid: true });
                 }
             } else {
                 this.control.setErrors(null);

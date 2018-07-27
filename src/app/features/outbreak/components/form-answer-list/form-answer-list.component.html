@@ -26,7 +26,8 @@
                 [viewOnly]="viewOnly"
                 [title]="('LNG_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) "
                 (deleteAnswer)="delete(i)"
-                (groupValidated)="validateGroup()">
+                (groupValidated)="validateGroup()"
+                [displayRemove]="values.length > minItems">
             </app-form-answer>
         </div>
     </form>

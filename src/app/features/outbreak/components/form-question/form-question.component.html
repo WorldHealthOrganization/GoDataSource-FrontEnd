@@ -75,7 +75,7 @@
                 <button mat-icon-button type="button" color="primary" (click)="duplicate()">
                     <span class="xt-icon">fileCopy</span>
                 </button>
-                <button mat-icon-button type="button" color="warn" (click)="delete()">
+                <button *ngIf="displayRemove" mat-icon-button type="button" color="warn" (click)="delete()">
                     <span class="xt-icon">delete</span>
                 </button>
             </div>
@@ -88,12 +88,13 @@
             <!-- answers list -->
             <app-form-answer-list
                 class="app-form-answer-list-container"
-                [fxShow]="( question.answerType === answerTypes.MULTIPLE_OPTIONS.value || question.answerType === answerTypes.SINGLE_SELECTION.value)"
+                *ngIf="question.answerType === answerTypes.MULTIPLE_OPTIONS.value || question.answerType === answerTypes.SINGLE_SELECTION.value"
                 [name]="name + '[answers]'"
                 [ngModel]="question.answers"
                 [viewOnly]="viewOnly"
                 (changed)="onChange(false)"
-                (groupValidated)="validateGroup()">
+                (groupValidated)="validateGroup()"
+                [minItems]="2">
             </app-form-answer-list>
         </div>
 
