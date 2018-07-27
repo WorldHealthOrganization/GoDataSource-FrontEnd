@@ -163,35 +163,37 @@ export abstract class ListComponent {
     protected applyListFilters(queryParams: Params): void {
         // check params for apply list filter
         switch (queryParams.applyListFilter) {
+            // Filter contacts on the followup list
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpListsFromDashboard()
+                this.listFilterDataService.filterContactsOnFollowUpLists()
                     .subscribe((filterQueryBuilder) => {
-                        // remove property 'id' to not duplicate the conditions
-                        this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
                         this.refreshList();
                     });
                 break;
+            // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
 
-                // get the correct query builder and merge with the existing one
-                const filterQueryBuilder = new RequestQueryBuilder();
-
                 // add condition for deceased cases
-                filterQueryBuilder.filter.where({
+                this.queryBuilder.filter.where({
                     deceased: true
                 }, true);
 
-                // removed deceased condition so it will not be added twice
-                this.queryBuilder.filter.remove('deceased');
-                // merge with existing query builder
-                this.queryBuilder.merge(filterQueryBuilder);
-
                 // refresh list
                 this.refreshList();
+                break;
+            // filter cases hospitalised
+            case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterCasesHospitalized()
+                    .subscribe((filterQueryBuilder) => {
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
                 break;
         }
     }

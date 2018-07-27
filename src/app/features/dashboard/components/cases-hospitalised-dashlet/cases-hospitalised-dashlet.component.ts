@@ -1,21 +1,20 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
-    selector: 'app-cases-deceased',
+    selector: 'app-cases-hospitalised-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './cases-deceased.component.html',
-    styleUrls: ['./cases-deceased.component.less']
+    templateUrl: './cases-hospitalised-dashlet.component.html',
+    styleUrls: ['./cases-hospitalised-dashlet.component.less']
 })
-export class CasesDeceasedComponent implements OnInit {
+export class CasesHospitalisedDashletComponent implements OnInit {
 
-    // number of deceased cases
-    casesDeceasedCount: number;
-    // constants to be used for contactsFilter
+    // number of hospitalised cases
+    casesHospitalisedCount: number;
+    // constants to be used for applyListFilters
     Constants: any = Constants;
 
     constructor(
@@ -24,16 +23,16 @@ export class CasesDeceasedComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // get contacts on followup list count
+        // get number of hospitalised cases
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // get the results for contacts on the follow up list
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.caseDataService
-                        .getDeceasedCasesCount(selectedOutbreak.id)
+                        .getHospitalisedCasesCount(selectedOutbreak.id)
                         .subscribe((result) => {
-                            this.casesDeceasedCount = result.count;
+                            this.casesHospitalisedCount = result.count;
                         });
                 }
             });

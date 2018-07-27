@@ -12,7 +12,7 @@
             <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}</div>
 
             <!-- other KPI section content -->
-            <div fxLayout="row">
+            <div class="other-kpi-content">
 
                 <!-- Contacts per case mean -->
                 <app-contacts-per-case-mean-dashlet
@@ -26,16 +26,23 @@
 
                 <!-- Contacts on the follow-up list -->
                 <app-contacts-on-followup-list-dashlet
-                    *ngIf="hasReadContactPermissions()">
+                    *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
                 </app-contacts-on-followup-list-dashlet>
 
                 <!-- Cases who have died -->
-                <app-cases-deceased
-                    *ngIf="hasReadContactPermissions()"
-                    fxFlexOffset="10px">
-                </app-cases-deceased>
+                <app-cases-deceased-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-cases-deceased-dashlet>
+
+                <!-- Cases hospitalised -->
+                <app-cases-hospitalised-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-cases-hospitalised-dashlet>
+
+                <div class="other-kpi-content-bottom"></div>
 
             </div>
+
         </mat-card>
 
     </div>

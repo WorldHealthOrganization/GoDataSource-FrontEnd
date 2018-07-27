@@ -66,6 +66,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
+        'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
 
         /**
          * Dialogs
@@ -94,6 +95,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
+        'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
 
         /**
          * Login page
@@ -628,6 +630,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE': 'CONTACTS PER CASE (MEAN)',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE': 'CONTACTS PER CASE (MEDIAN)',
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
 
         /**
          * Transmission Chain Fields

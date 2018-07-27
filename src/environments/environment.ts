@@ -6,5 +6,5 @@ export const environment = {
     // log messages on server?
     enableApiLogging: false,
     // log messages in browser's console?
-    enableClientLogging: false
+    enableClientLogging: true
 };

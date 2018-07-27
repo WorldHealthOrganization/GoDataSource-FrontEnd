@@ -5,6 +5,8 @@ import { FormSelectComponent } from './form-select/form-select.component';
 import { FormDatepickerComponent } from './form-datepicker/form-datepicker.component';
 import { FormSlideToggleComponent } from './form-slide-toggle/form-slide-toggle.component';
 import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
+import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
+import { FormDaterangeListComponent } from './form-daterange-list/form-daterange-list.component';
 
 export const components: any[] = [
     FormValidationComponent,
@@ -13,5 +15,7 @@ export const components: any[] = [
     FormSelectComponent,
     FormDatepickerComponent,
     FormSlideToggleComponent,
-    FormCheckboxComponent
+    FormCheckboxComponent,
+    FormDaterangeComponent,
+    FormDaterangeListComponent
 ];

@@ -4,13 +4,17 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { CaseModel } from '../../models/case.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { GenericDataService } from './generic.data.service';
+import { ListFilterDataService } from './list-filter.data.service';
 
 @Injectable()
 export class CaseDataService {
 
     constructor(
         private http: HttpClient,
-        private modelHelper: ModelHelperService
+        private modelHelper: ModelHelperService,
+        private genericDataService: GenericDataService,
+        private listFilterDataService: ListFilterDataService
     ) {
     }
 
@@ -88,5 +92,21 @@ export class CaseDataService {
         // call endpoint
         return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
     }
+
+    /**
+     * Return count of hospitalised cases
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getHospitalisedCasesCount(outbreakId: string): Observable<any> {
+         // get the query builder and call the endpoint
+         return this.listFilterDataService.filterCasesHospitalized()
+            .mergeMap((filterQueryBuilder) => {
+                const filter = filterQueryBuilder.buildQuery();
+                // call endpoint
+                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
+            });
+    }
+
 }
 

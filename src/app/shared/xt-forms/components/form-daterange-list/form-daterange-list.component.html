@@ -1,0 +1,28 @@
+<div class="daterange-list-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div *ngFor="let daterange of values; let i = index" fxFlex fxLayout="row"
+             fxLayoutAlign="start center">
+            <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                <app-form-daterange
+                    [name]="name + '[' + i + ']'"
+                    [ngModel]="values[i]"
+                    (changed)="onChange(false)"
+                    [required]="false"
+                    (groupValidated)="validateGroup()">
+                </app-form-daterange>
+
+            </mat-card>
+
+            <button type="button" mat-icon-button (click)="delete(i)">
+                <span class="xt-icon">delete</span>
+            </button>
+
+        </div>
+
+        <button type="button" mat-button color="primary" (click)="add()">
+            {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
+        </button>
+    </form>
+</div>

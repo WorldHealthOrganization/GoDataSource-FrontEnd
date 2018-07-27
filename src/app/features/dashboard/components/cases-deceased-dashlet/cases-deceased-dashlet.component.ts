@@ -1,42 +1,41 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
-    selector: 'app-contacts-on-followup-list-dashlet',
+    selector: 'app-cases-deceased-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-on-followup-list-dashlet.component.html',
-    styleUrls: ['./contacts-on-followup-list-dashlet.component.less']
+    templateUrl: './cases-deceased-dashlet.component.html',
+    styleUrls: ['./cases-deceased-dashlet.component.less']
 })
-export class ContactsOnFollowupListDashletComponent implements OnInit {
+export class CasesDeceasedDashletComponent implements OnInit {
 
-    // number of contacts on the followup list
-    contactsOnFollowUpListCount: number;
-    // constants to be used for applyListFilters
-    Constants = Constants;
+    // number of deceased cases
+    casesDeceasedCount: number;
+    // constants to be used for applyListFilter
+    Constants: any = Constants;
 
     constructor(
-        private followUpDataService: FollowUpsDataService,
+        private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService
     ) {}
 
     ngOnInit() {
-        // get contacts on followup list count
+        // get number of deceased cases
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // get the results for contacts on the follow up list
                 if (selectedOutbreak && selectedOutbreak.id) {
-                    this.followUpDataService
-                        .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id)
+                    this.caseDataService
+                        .getDeceasedCasesCount(selectedOutbreak.id)
                         .subscribe((result) => {
-                            this.contactsOnFollowUpListCount = result.contactsCount;
+                            this.casesDeceasedCount = result.count;
                         });
                 }
             });
-
     }
 
 }

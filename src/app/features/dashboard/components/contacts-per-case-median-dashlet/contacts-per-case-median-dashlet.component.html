@@ -1,8 +1,5 @@
-<div class="dashboard-box">
-    <div class="dashboard-box-header">
-        {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE' | translate}}
-    </div>
-    <div class="dashboard-box-content">
-        {{medianNoContactsPerCase}}
-    </div>
-</div>
+<app-dashboard-metric-dashlet
+    metricTitle="LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE"
+    [value]="medianNoContactsPerCase">
+</app-dashboard-metric-dashlet>
+

@@ -1,10 +1,6 @@
-<div class="dashboard-box">
-    <div class="dashboard-box-header"
-         [routerLink]="['/contacts']"
-         [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST}">
-        {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE' | translate}}
-    </div>
-    <div class="dashboard-box-content">
-        {{contactsOnFollowUpListCount}}
-    </div>
-</div>
+<app-dashboard-metric-dashlet
+    metricTitle="LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE"
+    link="/contacts"
+    [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST}"
+    [value]="contactsOnFollowUpListCount">
+</app-dashboard-metric-dashlet>

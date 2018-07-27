@@ -1,0 +1,28 @@
+<div class="daterange-container form-element "
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="row">
+            <app-form-datepicker
+                [name]="name + '[startDate]'"
+                [(ngModel)]="dateRange.startDate"
+                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()"
+                (optionChanged)="onChange()">
+            </app-form-datepicker>
+
+            <app-form-datepicker
+                fxFlexOffset="10px"
+                [name]="name + '[endDate]'"
+                [(ngModel)]="dateRange.endDate"
+                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
+                [disabled]="disabled"
+                [required]="required"
+                (input)="onChange()"
+                (optionChanged)="onChange()">
+            </app-form-datepicker>
+        </div>
+    </form>
+</div>

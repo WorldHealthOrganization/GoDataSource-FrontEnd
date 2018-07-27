@@ -35,6 +35,22 @@ export class DashboardComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
     }
 
+    /**
+     * Check if the user has read access to cases
+     * @returns {boolean}
+     */
+    hasReadCasePermissions(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    }
+
+    /**
+     * Check if the user has read report permission
+     * @returns {boolean}
+     */
+    hasReadReportPermissions(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
+    }
+
 }
 
 
