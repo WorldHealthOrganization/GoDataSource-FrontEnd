@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
@@ -19,12 +19,15 @@ import * as _ from 'lodash';
     templateUrl: './create-event.component.html',
     styleUrls: ['./create-event.component.less']
 })
-export class CreateEventComponent {
+export class CreateEventComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Events', '/events'),
         new BreadcrumbItemModel('Create New Event', '.', true)
     ];
+
+    // selected outbreak ID
+    outbreakId: string;
 
     eventData: EventModel = new EventModel();
 
@@ -34,7 +37,17 @@ export class CreateEventComponent {
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
-    ) {}
+    ) {
+    }
+
+    ngOnInit() {
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.outbreakId = selectedOutbreak.id;
+            });
+    }
 
     /**
      * Create Event
@@ -43,28 +56,24 @@ export class CreateEventComponent {
     createNewEvent(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Event
-                    this.eventDataService
-                        .createEvent(selectedOutbreak.id, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+            // add the new Event
+            this.eventDataService
+                .createEvent(this.outbreakId, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('Event added!');
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('Event added!');
 
-                            // navigate to listing page
-                            this.router.navigate(['/events']);
-                        });
+                    // navigate to listing page
+                    this.router.navigate(['/events']);
                 });
         }
     }

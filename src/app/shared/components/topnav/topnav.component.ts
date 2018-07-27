@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
@@ -18,6 +18,8 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
     styleUrls: ['./topnav.component.less']
 })
 export class TopnavComponent implements OnInit {
+
+    @Input() activeOutbreakEditable: boolean = true;
 
     // authenticated user
     authUser: UserModel;

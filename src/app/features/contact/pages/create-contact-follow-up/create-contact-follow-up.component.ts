@@ -96,24 +96,19 @@ export class CreateContactFollowUpComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Contact
-                    this.followUpsDataService
-                        .createFollowUp(selectedOutbreak.id, this.contactData.id, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+            // add the new Follow-up
+            this.followUpsDataService
+                .createFollowUp(this.selectedOutbreak.id, this.contactData.id, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
-                            // navigate to listing page
-                            this.router.navigate(['/contacts/follow-ups']);
-                        });
+                    // navigate to listing page
+                    this.router.navigate(['/contacts/follow-ups']);
                 });
         }
     }

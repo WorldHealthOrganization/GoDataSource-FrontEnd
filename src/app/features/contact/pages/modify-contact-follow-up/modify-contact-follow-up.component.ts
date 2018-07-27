@@ -106,25 +106,19 @@ export class ModifyContactFollowUpComponent implements OnInit {
             return;
         }
 
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
+        // modify follow-up
+        this.followUpsDataService
+            .modifyFollowUp(this.selectedOutbreak.id, this.followUpData.personId, this.followUpData.id, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-                // modify follow-up
-                this.followUpsDataService
-                    .modifyFollowUp(selectedOutbreak.id, this.followUpData.personId, this.followUpData.id, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
 
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
-
-                        // navigate to listing page
-                        this.router.navigate(['/contacts/follow-ups']);
-                    });
+                // navigate to listing page
+                this.router.navigate(['/contacts/follow-ups']);
             });
     }
 }

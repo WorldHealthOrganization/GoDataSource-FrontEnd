@@ -104,25 +104,19 @@ export class ModifyContactComponent implements OnInit {
             return;
         }
 
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
+        // modify the contact
+        this.contactDataService
+            .modifyContact(this.outbreakId, this.contactId, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-                // modify the contact
-                this.contactDataService
-                    .modifyContact(selectedOutbreak.id, this.contactId, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('Contact saved!');
 
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('Contact saved!');
-
-                        // navigate to listing page
-                        this.router.navigate(['/contacts']);
-                    });
+                // navigate to listing page
+                this.router.navigate(['/contacts']);
             });
     }
 }

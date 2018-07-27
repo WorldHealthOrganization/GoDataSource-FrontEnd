@@ -107,24 +107,19 @@ export class CreateCaseLabResultComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Contact
-                    this.labResultDataService
-                        .createLabResult(selectedOutbreak.id, this.caseId, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+            // add new Lab Result
+            this.labResultDataService
+                .createLabResult(this.selectedOutbreak.id, this.caseId, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
-                            // navigate to listing page
-                            this.router.navigate([`/cases/${this.caseId}/lab-results`]);
-                        });
+                    // navigate to listing page
+                    this.router.navigate([`/cases/${this.caseId}/lab-results`]);
                 });
         }
     }

@@ -76,25 +76,19 @@ export class ModifyEventComponent implements OnInit {
             return;
         }
 
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
+        // modify the event
+        this.eventDataService
+            .modifyEvent(this.outbreakId, this.eventId, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-                // modify the contact
-                this.eventDataService
-                    .modifyEvent(selectedOutbreak.id, this.eventId, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('Event saved!');
 
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('Event saved!');
-
-                        // navigate to listing page
-                        this.router.navigate(['/events']);
-                    });
+                // navigate to listing page
+                this.router.navigate(['/events']);
             });
     }
 }

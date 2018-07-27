@@ -54,12 +54,13 @@ export class CreateCaseComponent implements OnInit {
         private formHelper: FormHelperService,
         private dialogService: DialogService
     ) {
-        this.genderList$ = this.genericDataService.getGenderList();
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
     }
 
     ngOnInit() {
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
         // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());
         // ...and a document
@@ -140,24 +141,19 @@ export class CreateCaseComponent implements OnInit {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Case
-                    this.caseDataService
-                        .createCase(selectedOutbreak.id, dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+            // add the new Case
+            this.caseDataService
+                .createCase(this.selectedOutbreak.id, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('Case added!');
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('Case added!');
 
-                            // navigate to listing page
-                            this.router.navigate(['/cases']);
-                        });
+                    // navigate to listing page
+                    this.router.navigate(['/cases']);
                 });
         }
     }

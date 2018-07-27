@@ -34,6 +34,9 @@ export class CreateContactComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
+    // selected outbreak ID
+    outbreakId: string;
+
     contactData: ContactModel = new ContactModel();
     ageSelected: boolean = true;
 
@@ -90,6 +93,8 @@ export class CreateContactComponent implements OnInit {
                         return ErrorObservable.create(err);
                     })
                     .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakId = selectedOutbreak.id;
+
                         // retrieve case information
                         this.caseDataService
                             .getCase(selectedOutbreak.id, params.caseId)
@@ -144,47 +149,42 @@ export class CreateContactComponent implements OnInit {
             !_.isEmpty(dirtyFields) &&
             !_.isEmpty(relationship)
         ) {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // add the new Contact
-                    this.contactDataService
-                        .createContact(selectedOutbreak.id, dirtyFields)
+            // add the new Contact
+            this.contactDataService
+                .createContact(this.outbreakId, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((contactData: ContactModel) => {
+                    this.relationshipDataService
+                        .createRelationship(
+                            this.outbreakId,
+                            EntityType.CONTACT,
+                            contactData.id,
+                            relationship
+                        )
                         .catch((err) => {
+                            // display error message
                             this.snackbarService.showError(err.message);
 
+                            // remove contact
+                            this.contactDataService
+                                .deleteContact(this.outbreakId, contactData.id)
+                                .catch((errDC) => {
+                                    return ErrorObservable.create(errDC);
+                                })
+                                .subscribe();
+
+                            // finished
                             return ErrorObservable.create(err);
                         })
-                        .subscribe((contactData: ContactModel) => {
-                            this.relationshipDataService
-                                .createRelationship(
-                                    selectedOutbreak.id,
-                                    EntityType.CONTACT,
-                                    contactData.id,
-                                    relationship
-                                )
-                                .catch((err) => {
-                                    // display error message
-                                    this.snackbarService.showError(err.message);
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('Contact added!');
 
-                                    // remove contact
-                                    this.contactDataService
-                                        .deleteContact(selectedOutbreak.id, contactData.id)
-                                        .catch((errDC) => {
-                                            return ErrorObservable.create(errDC);
-                                        })
-                                        .subscribe();
-
-                                    // finished
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('Contact added!');
-
-                                    // navigate to listing page
-                                    this.router.navigate(['/contacts']);
-                                });
+                            // navigate to listing page
+                            this.router.navigate(['/contacts']);
                         });
                 });
         }

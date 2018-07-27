@@ -154,25 +154,19 @@ export class ModifyCaseComponent implements OnInit {
             return;
         }
 
-        // get selected outbreak
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
+        // modify the Case
+        this.caseDataService
+            .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-                // modify the case
-                this.caseDataService
-                    .modifyCase(selectedOutbreak.id, this.caseId, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('Case saved!');
 
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('Case saved!');
-
-                        // navigate to listing page
-                        this.router.navigate(['/cases']);
-                    });
+                // navigate to listing page
+                this.router.navigate(['/cases']);
             });
     }
 
