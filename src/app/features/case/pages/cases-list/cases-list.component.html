@@ -77,7 +77,10 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.classification }}
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                    [value]="item.classification">
+                </app-reference-data-label>
             </mat-cell>
         </ng-container>
 
@@ -149,8 +152,9 @@
                 <mat-menu #actionsMenu="matMenu">
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create" [queryParams]="{ caseId: item.id }">
-                            Add contact
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create"
+                                [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
+                            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                         </button>
                     </ng-container>
 

@@ -23,7 +23,6 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 export class CreateContactFollowUpComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
@@ -47,7 +46,7 @@ export class CreateContactFollowUpComponent implements OnInit {
     ngOnInit() {
         // retrieve query params
         this.route.params
-            .subscribe(params => {
+            .subscribe((params: {contactId}) => {
                 // update breadcrumbs
                 this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true));
 

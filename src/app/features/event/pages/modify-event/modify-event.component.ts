@@ -41,32 +41,33 @@ export class ModifyEventComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.route.params.subscribe(params => {
-            this.eventId = params.eventId;
+        this.route.params
+            .subscribe((params: {eventId}) => {
+                this.eventId = params.eventId;
 
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.outbreakId = selectedOutbreak.id;
+                // get current outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakId = selectedOutbreak.id;
 
-                    // get contact
-                    this.eventDataService
-                        .getEvent(selectedOutbreak.id, this.eventId)
-                        .subscribe(eventDataReturned => {
-                            this.eventData = new EventModel(eventDataReturned);
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_MODIFY_EVENT_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.eventData
-                                )
-                            );
-                        });
-                });
-        });
+                        // get contact
+                        this.eventDataService
+                            .getEvent(selectedOutbreak.id, this.eventId)
+                            .subscribe(eventDataReturned => {
+                                this.eventData = new EventModel(eventDataReturned);
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        'LNG_PAGE_MODIFY_EVENT_TITLE',
+                                        '.',
+                                        true,
+                                        {},
+                                        this.eventData
+                                    )
+                                );
+                            });
+                    });
+            });
     }
 
     modifyContact(form: NgForm) {

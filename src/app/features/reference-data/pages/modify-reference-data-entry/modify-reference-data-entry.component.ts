@@ -37,32 +37,33 @@ export class ModifyReferenceDataEntryComponent implements OnInit {
 
     ngOnInit() {
         // get the route params
-        this.route.params.subscribe((params) => {
-            this.categoryId = params.categoryId;
-            this.entryId = params.entryId;
+        this.route.params
+            .subscribe((params: {categoryId, entryId}) => {
+                this.categoryId = params.categoryId;
+                this.entryId = params.entryId;
 
-            // retrieve Reference Data Entry info
-            this.referenceDataDataService
-                .getEntry(params.entryId)
-                .subscribe((entry: ReferenceDataEntryModel) => {
-                    this.entry = entry;
+                // retrieve Reference Data Entry info
+                this.referenceDataDataService
+                    .getEntry(params.entryId)
+                    .subscribe((entry: ReferenceDataEntryModel) => {
+                        this.entry = entry;
 
-                    // add new breadcrumbs
-                    const categoryName = _.get(entry, 'category.name');
-                    if (categoryName) {
-                        // link to Category
+                        // add new breadcrumbs
+                        const categoryName = _.get(entry, 'category.name');
+                        if (categoryName) {
+                            // link to Category
+                            this.breadcrumbs.push(
+                                new BreadcrumbItemModel(categoryName, `/reference-data/${params.categoryId}`)
+                            );
+                        }
+
+                        // current page title
                         this.breadcrumbs.push(
-                            new BreadcrumbItemModel(categoryName, `/reference-data/${params.categoryId}`)
+                            new BreadcrumbItemModel(entry.value, '.', true)
                         );
-                    }
 
-                    // current page title
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(entry.value, '.', true)
-                    );
-
-                });
-        });
+                    });
+            });
     }
 
     modifyEntry(form: NgForm) {

@@ -24,7 +24,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class ModifyContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
@@ -55,32 +54,33 @@ export class ModifyContactComponent implements OnInit {
         this.genderList$ = this.genericDataService.getGenderList();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
-        this.route.params.subscribe(params => {
-            this.contactId = params.contactId;
+        this.route.params
+            .subscribe((params: {contactId}) => {
+                this.contactId = params.contactId;
 
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.outbreakId = selectedOutbreak.id;
+                // get current outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakId = selectedOutbreak.id;
 
-                    // get contact
-                    this.contactDataService
-                        .getContact(selectedOutbreak.id, this.contactId)
-                        .subscribe(contactDataReturned => {
-                            this.contactData = new ContactModel(contactDataReturned);
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_MODIFY_CONTACT_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.contactData
-                                )
-                            );
-                        });
-                });
-        });
+                        // get contact
+                        this.contactDataService
+                            .getContact(selectedOutbreak.id, this.contactId)
+                            .subscribe(contactDataReturned => {
+                                this.contactData = new ContactModel(contactDataReturned);
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                                        '.',
+                                        true,
+                                        {},
+                                        this.contactData
+                                    )
+                                );
+                            });
+                    });
+            });
     }
 
     /**

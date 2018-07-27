@@ -57,30 +57,31 @@ export class ModifyOutbreakComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.genericDataService.getCountriesList();
 
-        this.route.params.subscribe(params => {
-            this.outbreakId = params.outbreakId;
+        this.route.params
+            .subscribe((params: {outbreakId}) => {
+                this.outbreakId = params.outbreakId;
 
-            // get the outbreak to modify
-            this.outbreakDataService
-                .getOutbreak(this.outbreakId)
-                .subscribe(outbreakData => {
-                    this.outbreak = outbreakData;
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
-                            '.',
-                            true,
-                            {},
-                            this.outbreak
-                        )
-                    );
+                // get the outbreak to modify
+                this.outbreakDataService
+                    .getOutbreak(this.outbreakId)
+                    .subscribe(outbreakData => {
+                        this.outbreak = outbreakData;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                                '.',
+                                true,
+                                {},
+                                this.outbreak
+                            )
+                        );
 
-                    // set questions and answers to new property to false.
-                    this.setNewFalse(this.outbreak.caseInvestigationTemplate);
-                    this.setNewFalse(this.outbreak.contactFollowUpTemplate);
-                    this.setNewFalse(this.outbreak.labResultsTemplate);
-                });
-        });
+                        // set questions and answers to new property to false.
+                        this.setNewFalse(this.outbreak.caseInvestigationTemplate);
+                        this.setNewFalse(this.outbreak.contactFollowUpTemplate);
+                        this.setNewFalse(this.outbreak.labResultsTemplate);
+                    });
+            });
     }
 
     /**

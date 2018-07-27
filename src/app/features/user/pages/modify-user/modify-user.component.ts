@@ -53,7 +53,7 @@ export class ModifyUserComponent {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // get the route params
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe((params: {userId}) => {
             // get the ID of the User being modified
             this.userId = params.userId;
 

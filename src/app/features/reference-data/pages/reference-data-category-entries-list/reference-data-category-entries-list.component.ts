@@ -35,21 +35,22 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
 
     ngOnInit() {
         // get the route params
-        this.route.params.subscribe((params: { categoryId }) => {
-            this.categoryId = params.categoryId;
+        this.route.params
+            .subscribe((params: { categoryId }) => {
+                this.categoryId = params.categoryId;
 
-            this.refreshList();
+                this.refreshList();
 
-            // retrieve Reference Data Category info
-            this.referenceDataDataService
-                .getReferenceDataByCategory(params.categoryId)
-                .subscribe((category: ReferenceDataCategoryModel) => {
-                    // add new breadcrumb
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(category.name, '.', true)
-                    );
-                });
-        });
+                // retrieve Reference Data Category info
+                this.referenceDataDataService
+                    .getReferenceDataByCategory(params.categoryId)
+                    .subscribe((category: ReferenceDataCategoryModel) => {
+                        // add new breadcrumb
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(category.name, '.', true)
+                        );
+                    });
+            });
     }
 
     refreshList() {

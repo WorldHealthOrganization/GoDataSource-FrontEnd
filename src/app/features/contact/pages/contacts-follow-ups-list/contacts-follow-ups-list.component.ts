@@ -26,7 +26,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 })
 export class ContactsFollowUpsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 

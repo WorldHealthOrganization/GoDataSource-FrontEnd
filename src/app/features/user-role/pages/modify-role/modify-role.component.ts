@@ -37,7 +37,7 @@ export class ModifyRoleComponent {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe((params: {roleId}) => {
             // get the ID of the Role being modified
             this.userRoleId = params.roleId;
 

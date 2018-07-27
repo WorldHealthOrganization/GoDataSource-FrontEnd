@@ -34,10 +34,11 @@ export class ResetPasswordComponent implements OnInit {
         private formHelper: FormHelperService
     ) {
         // get the route params
-        this.route.queryParams.subscribe((params) => {
-            // get the ID of the User being modified
-            this.passwordResetToken = params.token;
-        });
+        this.route.queryParams
+            .subscribe((queryParams: {token}) => {
+                // get the ID of the User being modified
+                this.passwordResetToken = queryParams.token;
+            });
     }
 
     ngOnInit() {

@@ -136,7 +136,10 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
-                {{ item.riskLevel }}
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.RISK_LEVEL"
+                    [value]="item.riskLevel">
+                </app-reference-data-label>
             </mat-cell>
         </ng-container>
 

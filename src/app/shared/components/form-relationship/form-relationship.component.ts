@@ -11,6 +11,7 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { EntityType } from '../../../core/models/entity-type';
 
 @Component({
     selector: 'app-form-relationship',
@@ -27,7 +28,6 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
-    @Input() relatedTitle: string;
     @Input() relatedObject: any;
 
     certaintyLevelOptions$: Observable<any[]>;
@@ -39,6 +39,9 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

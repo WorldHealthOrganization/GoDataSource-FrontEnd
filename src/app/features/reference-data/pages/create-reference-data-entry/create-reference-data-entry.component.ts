@@ -35,23 +35,24 @@ export class CreateReferenceDataEntryComponent implements OnInit {
 
     ngOnInit() {
         // get the route params
-        this.route.params.subscribe((params) => {
-            this.categoryId = params.categoryId;
+        this.route.params
+            .subscribe((params: {categoryId}) => {
+                this.categoryId = params.categoryId;
 
-            // retrieve Reference Data Category info
-            this.referenceDataDataService
-                .getReferenceDataByCategory(params.categoryId)
-                .subscribe((category: ReferenceDataCategoryModel) => {
-                    // add new breadcrumb: Category page
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`)
-                    );
-                    // add new breadcrumb: page title
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE', '.', true)
-                    );
-                });
-        });
+                // retrieve Reference Data Category info
+                this.referenceDataDataService
+                    .getReferenceDataByCategory(params.categoryId)
+                    .subscribe((category: ReferenceDataCategoryModel) => {
+                        // add new breadcrumb: Category page
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(category.name, `/reference-data/${this.categoryId}`)
+                        );
+                        // add new breadcrumb: page title
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE', '.', true)
+                        );
+                    });
+            });
     }
 
     createNewEntry(form: NgForm) {

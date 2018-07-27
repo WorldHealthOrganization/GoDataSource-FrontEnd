@@ -86,49 +86,50 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.route.params.subscribe((params: { entityType, entityId }) => {
-            this.entityType = params.entityType;
-            this.entityId = params.entityId;
+        this.route.params
+            .subscribe((params: { entityType, entityId }) => {
+                this.entityType = params.entityType;
+                this.entityId = params.entityId;
 
-            // add new breadcrumb: Entity List page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-            );
+                // add new breadcrumb: Entity List page
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                );
 
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.outbreakId = selectedOutbreak.id;
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakId = selectedOutbreak.id;
 
-                    this.refreshList();
+                        this.refreshList();
 
-                    // get entity data
-                    this.entityDataService
-                        .getEntity(this.entityType, this.outbreakId, this.entityId)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        // get entity data
+                        this.entityDataService
+                            .getEntity(this.entityType, this.outbreakId, this.entityId)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
 
-                            // Entity not found; navigate back to Entities list
-                            this.router.navigate([this.entityMap[this.entityType].link]);
+                                // Entity not found; navigate back to Entities list
+                                this.router.navigate([this.entityMap[this.entityType].link]);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                            // add new breadcrumb: Entity Modify page
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    entityData.name,
-                                    `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
-                                )
-                            );
-                            // add new breadcrumb: page title
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE', null, true)
-                            );
-                        });
-                });
-        });
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                                // add new breadcrumb: Entity Modify page
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        entityData.name,
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                    )
+                                );
+                                // add new breadcrumb: page title
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE', null, true)
+                                );
+                            });
+                    });
+            });
     }
 
     /**

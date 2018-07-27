@@ -21,7 +21,6 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 export class ModifyContactFollowUpComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
@@ -45,10 +44,10 @@ export class ModifyContactFollowUpComponent implements OnInit {
     ngOnInit() {
         // retrieve route params
         this.route.params
-            .subscribe(params => {
+            .subscribe((params: {contactId, followUpId}) => {
                 // retrieve query params
                 this.route.queryParams
-                    .subscribe(queryParams => {
+                    .subscribe((queryParams: {displayOnlyMissedFollowUps}) => {
                         // display missed follow-ups or upcoming follow-ups link
                         this.displayOnlyMissedFollowUps = queryParams.displayOnlyMissedFollowUps;
                         if (this.displayOnlyMissedFollowUps) {

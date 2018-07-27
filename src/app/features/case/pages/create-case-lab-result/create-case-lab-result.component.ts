@@ -61,43 +61,44 @@ export class CreateCaseLabResultComponent implements OnInit {
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
 
-        this.route.params.subscribe(params => {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // outbreak
-                    this.selectedOutbreak = selectedOutbreak;
+        this.route.params
+            .subscribe((params: {caseId}) => {
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // outbreak
+                        this.selectedOutbreak = selectedOutbreak;
 
-                    // get case data
-                    this.caseDataService
-                        .getCase(this.selectedOutbreak.id, params.caseId)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        // get case data
+                        this.caseDataService
+                            .getCase(this.selectedOutbreak.id, params.caseId)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
 
-                            // Case not found; navigate back to Cases list
-                            this.router.navigate(['/cases']);
+                                // Case not found; navigate back to Cases list
+                                this.router.navigate(['/cases']);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe((caseData: CaseModel) => {
-                            this.caseId = caseData.id;
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((caseData: CaseModel) => {
+                                this.caseId = caseData.id;
 
-                            // add new breadcrumb: Case Modify page
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`),
-                            );
-                            // add new breadcrumb: Lab Results list page
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseId}/lab-results`)
-                            );
-                            // add new breadcrumb: page title
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE', '.', true)
-                            );
-                        });
-                });
-        });
+                                // add new breadcrumb: Case Modify page
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`),
+                                );
+                                // add new breadcrumb: Lab Results list page
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseId}/lab-results`)
+                                );
+                                // add new breadcrumb: page title
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE', '.', true)
+                                );
+                            });
+                    });
+            });
     }
 
     createLabResult(stepForms: NgForm[]) {

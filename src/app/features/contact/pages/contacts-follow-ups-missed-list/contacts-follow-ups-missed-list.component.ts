@@ -26,7 +26,6 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 })
 export class ContactsFollowUpsMissedListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 

@@ -51,6 +51,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
+    ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(
         private caseDataService: CaseDataService,

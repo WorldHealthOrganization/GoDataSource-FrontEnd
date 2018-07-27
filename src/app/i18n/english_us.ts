@@ -53,6 +53,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
         'LNG_PAGE_ACTION_RELATIONSHIPS': 'Relationships',
+        'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
 
         /**
          * Common buttons
@@ -167,6 +168,13 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
         'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
+
+        /**
+         * Entity Types
+         */
+        'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
+        'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
+        'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
 
         /**
          * Entity Fields
@@ -321,9 +329,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_CONTACT_TITLE': 'Create New Contact',
         'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE': 'Address',
-        'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_REQUIRED': 'You can add a contact only though a case!',
+        'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
-        'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
 
         /**
          * Modify Contact page

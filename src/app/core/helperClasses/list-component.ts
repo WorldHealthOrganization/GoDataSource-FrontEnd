@@ -147,10 +147,10 @@ export abstract class ListComponent {
         if (!_.isEmpty(this.queryParams) && !_.isEmpty(this.listFilterDataService)) {
             // get query params
             this.queryParams
-                .subscribe(params => {
-                    if (!_.isEmpty(params)) {
+                .subscribe((queryParams) => {
+                    if (!_.isEmpty(queryParams)) {
                         // call function to apply filters - update query buiilder
-                        this.applyListFilters(params);
+                        this.applyListFilters(queryParams);
                     }
                 });
         }

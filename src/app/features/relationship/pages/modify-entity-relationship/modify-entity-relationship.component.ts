@@ -82,81 +82,82 @@ export class ModifyEntityRelationshipComponent implements OnInit {
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
-        this.route.params.subscribe(params => {
-            this.entityType = params.entityType;
-            this.entityId = params.entityId;
-            this.relationshipId = params.relationshipId;
+        this.route.params
+            .subscribe((params: {entityType, entityId, relationshipId}) => {
+                this.entityType = params.entityType;
+                this.entityId = params.entityId;
+                this.relationshipId = params.relationshipId;
 
-            // add new breadcrumb: Entity List page
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-            );
+                // add new breadcrumb: Entity List page
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+                );
 
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.outbreakId = selectedOutbreak.id;
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.outbreakId = selectedOutbreak.id;
 
-                    // get entity data
-                    this.entityDataService
-                        .getEntity(this.entityType, this.outbreakId, this.entityId)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        // get entity data
+                        this.entityDataService
+                            .getEntity(this.entityType, this.outbreakId, this.entityId)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
 
-                            // Entity not found; navigate back to Entities list
-                            this.router.navigate([this.entityMap[this.entityType].link]);
+                                // Entity not found; navigate back to Entities list
+                                this.router.navigate([this.entityMap[this.entityType].link]);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
-                            // add new breadcrumb: Entity Modify page
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    entityData.name,
-                                    `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
-                                )
-                            );
-                            // add new breadcrumb: Relationships list page
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                    `/relationships/${this.entityType}/${this.entityId}`
-                                )
-                            );
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                                // add new breadcrumb: Entity Modify page
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        entityData.name,
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                    )
+                                );
+                                // add new breadcrumb: Relationships list page
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
+                                        `/relationships/${this.entityType}/${this.entityId}`
+                                    )
+                                );
 
-                            // get relationship data
-                            this.relationshipDataService
-                                .getEntityRelationship(this.outbreakId, this.entityType, this.entityId, this.relationshipId)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                                // get relationship data
+                                this.relationshipDataService
+                                    .getEntityRelationship(this.outbreakId, this.entityType, this.entityId, this.relationshipId)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                                    // Relationship not found; navigate back to Entity Relationships list
-                                    this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                                        // Relationship not found; navigate back to Entity Relationships list
+                                        this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe((relationshipData) => {
-                                    this.relationshipData = relationshipData;
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe((relationshipData) => {
+                                        this.relationshipData = relationshipData;
 
-                                    // get related entity
-                                    const relatedEntityModel = _.get(relationshipData.relatedEntity(this.entityId), 'model', {});
+                                        // get related entity
+                                        const relatedEntityModel = _.get(relationshipData.relatedEntity(this.entityId), 'model', {});
 
-                                    // add new breadcrumb: page title
-                                    this.breadcrumbs.push(
-                                        new BreadcrumbItemModel(
-                                            'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
-                                            null,
-                                            true,
-                                            {},
-                                            relatedEntityModel
-                                        )
-                                    );
-                                });
+                                        // add new breadcrumb: page title
+                                        this.breadcrumbs.push(
+                                            new BreadcrumbItemModel(
+                                                'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+                                                null,
+                                                true,
+                                                {},
+                                                relatedEntityModel
+                                            )
+                                        );
+                                    });
 
-                        });
-                });
-        });
+                            });
+                    });
+            });
     }
 
     modifyRelationship(form: NgForm) {

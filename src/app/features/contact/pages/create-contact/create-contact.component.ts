@@ -16,10 +16,11 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { EventModel } from '../../../../core/models/event.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -30,7 +31,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class CreateContactComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
 
@@ -42,18 +42,18 @@ export class CreateContactComponent implements OnInit {
 
     genderList$: Observable<any[]>;
 
-    caseData: CaseModel;
+    relatedEntityData: CaseModel|EventModel;
     relationship: RelationshipModel = new RelationshipModel();
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private contactDataService: ContactDataService,
+        private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private caseDataService: CaseDataService,
         private relationshipDataService: RelationshipDataService
     ) {
         this.genderList$ = this.genericDataService.getGenderList();
@@ -68,18 +68,29 @@ export class CreateContactComponent implements OnInit {
 
         // retrieve query params
         this.route.queryParams
-            .subscribe(params => {
-                // check if we have proper values ( case & outbreak )
-                if (!params.caseId) {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_REQUIRED');
+            .subscribe((params: {entityType, entityId}) => {
+                const entityType: EntityType = _.get(params, 'entityType');
+                const entityId: string = _.get(params, 'entityId');
 
-                    // navigate to case listing page
-                    this.router.navigate(['/cases']);
+                // check if we have proper values ( case or event ID )
+                if (
+                    !entityType ||
+                    !entityId
+                ) {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
+
+                    // navigate to Cases/Events listing page
+                    if (entityType === EntityType.EVENT) {
+                        this.router.navigate(['/events']);
+                    } else {
+                        this.router.navigate(['/cases']);
+                    }
+
                     return;
                 }
 
                 // update breadcrumbs
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true, { caseId: params.caseId }));
+                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true));
 
                 // get selected outbreak
                 this.outbreakDataService
@@ -95,24 +106,28 @@ export class CreateContactComponent implements OnInit {
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        // retrieve case information
-                        this.caseDataService
-                            .getCase(selectedOutbreak.id, params.caseId)
+                        // retrieve Case/Event information
+                        this.entityDataService
+                            .getEntity(entityType, selectedOutbreak.id, entityId)
                             .catch((err) => {
                                 // show error message
                                 this.snackbarService.showError(err.message);
 
-                                // redirect to cases
-                                this.router.navigate(['/cases']);
+                                // navigate to Cases/Events listing page
+                                if (entityType === EntityType.EVENT) {
+                                    this.router.navigate(['/events']);
+                                } else {
+                                    this.router.navigate(['/cases']);
+                                }
+
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe((caseData: CaseModel) => {
-                                // initialize case
-                                // add case to list
-                                this.caseData = caseData;
+                            .subscribe((relatedEntityData: CaseModel|EventModel) => {
+                                // initialize Case/Event
+                                this.relatedEntityData = relatedEntityData;
                                 this.relationship.persons.push(
                                     new RelationshipPersonModel({
-                                        id: this.caseData.id
+                                        id: entityId
                                     })
                                 );
                             });

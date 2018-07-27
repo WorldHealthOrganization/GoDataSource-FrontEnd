@@ -63,61 +63,62 @@ export class ModifyCaseLabResultComponent implements OnInit {
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
 
-        this.route.params.subscribe(params => {
-            // get selected outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.selectedOutbreak = selectedOutbreak;
+        this.route.params
+            .subscribe((params: {caseId, labResultId}) => {
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.selectedOutbreak = selectedOutbreak;
 
-                    // get case data
-                    this.caseDataService
-                        .getCase(this.selectedOutbreak.id, params.caseId)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        // get case data
+                        this.caseDataService
+                            .getCase(this.selectedOutbreak.id, params.caseId)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
 
-                            // Case not found; navigate back to Cases list
-                            this.router.navigate(['/cases']);
+                                // Case not found; navigate back to Cases list
+                                this.router.navigate(['/cases']);
 
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe((caseData: CaseModel) => {
-                            this.caseData = caseData;
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(caseData.name, `/cases/${params.caseId}/modify`),
-                            );
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${params.caseId}/lab-results`)
-                            );
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((caseData: CaseModel) => {
+                                this.caseData = caseData;
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(caseData.name, `/cases/${params.caseId}/modify`),
+                                );
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${params.caseId}/lab-results`)
+                                );
 
-                            // get relationship data
-                            this.labResultDataService
-                                .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                                // get relationship data
+                                this.labResultDataService
+                                    .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                                    this.router.navigate([`/cases/${params.caseId}/lab-results`]);
+                                        this.router.navigate([`/cases/${params.caseId}/lab-results`]);
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe((labResultData) => {
-                                    this.labResultData = new LabResultModel(labResultData);
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe((labResultData) => {
+                                        this.labResultData = new LabResultModel(labResultData);
 
-                                    // add new breadcrumb: page title
-                                    this.breadcrumbs.push(
-                                        new BreadcrumbItemModel(
-                                            'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
-                                            null,
-                                            true,
-                                            {},
-                                            this.labResultData
-                                        )
-                                    );
-                                });
+                                        // add new breadcrumb: page title
+                                        this.breadcrumbs.push(
+                                            new BreadcrumbItemModel(
+                                                'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                                                null,
+                                                true,
+                                                {},
+                                                this.labResultData
+                                            )
+                                        );
+                                    });
 
-                        });
-                });
-        });
+                            });
+                    });
+            });
     }
 
     modifyLabResult(form: NgForm) {
