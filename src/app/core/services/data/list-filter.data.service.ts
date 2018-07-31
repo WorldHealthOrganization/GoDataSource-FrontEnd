@@ -5,6 +5,7 @@ import { FollowUpsDataService } from './follow-ups.data.service';
 import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { GenericDataService } from './generic.data.service';
+import { RelationshipDataService } from './relationship.data.service';
 
 @Injectable()
 export class ListFilterDataService {
@@ -12,7 +13,8 @@ export class ListFilterDataService {
     constructor(
         private outbreakDataService: OutbreakDataService,
         private followUpDataService: FollowUpsDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
 
@@ -49,6 +51,10 @@ export class ListFilterDataService {
         });
     }
 
+    /**
+     * Create the query builder for filtering the list of cases
+     * @returns {Observable<RequestQueryBuilder>}
+     */
     filterCasesHospitalized(): Observable<RequestQueryBuilder> {
         // get server current time to compare with hospitalisation dates
         return this.genericDataService
@@ -78,6 +84,27 @@ export class ListFilterDataService {
                 }, true);
                 return filterQueryBuilder;
             });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesLessThanContacts(): Observable<RequestQueryBuilder> {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
+            return this.relationshipDataService
+                .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id)
+                .map((result) => {
+                    // update queryBuilder filter with desired contacts ids
+                    const filterQueryBuilder = new RequestQueryBuilder();
+                    filterQueryBuilder.filter.where({
+                        id: {
+                            'inq': result.caseIDs
+                        }
+                    }, true);
+                    return filterQueryBuilder;
+                });
+        });
     }
 
 }

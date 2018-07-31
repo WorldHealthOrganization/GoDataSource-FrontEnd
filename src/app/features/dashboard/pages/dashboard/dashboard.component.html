@@ -39,6 +39,10 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-hospitalised-dashlet>
 
+                <app-cases-less-contacts-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-cases-less-contacts-dashlet>
+
                 <div class="other-kpi-content-bottom"></div>
 
             </div>

@@ -33,7 +33,8 @@ export class Constants {
     static APPLY_LIST_FILTER = {
         CONTACTS_FOLLOWUP_LIST: 'contacts_followup_list',
         CASES_DECEASED: 'cases_deceased',
-        CASES_HOSPITALISED: 'cases_hospitalised'
+        CASES_HOSPITALISED: 'cases_hospitalised',
+        CASES_LESS_CONTACTS: 'cases_less_contacts'
     };
 
     // #TODO replace with Reference Data

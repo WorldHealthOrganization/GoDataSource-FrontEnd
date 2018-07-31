@@ -6,6 +6,8 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
+import { MetricContactsFollowUpModel } from '../../models/metric-contacts-follow-up.model';
+import { MetricCasesWithContactsModel } from '../../models/metric-cases-contacts.model';
 
 @Injectable()
 export class RelationshipDataService {
@@ -151,6 +153,18 @@ export class RelationshipDataService {
             this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count`),
             MetricContactsPerCaseModel
         );
+    }
+
+    /**
+     * Get count and ids of cases with less than x contacts
+     * @param {string} outbreakId
+     * @returns {Observable<MetricCasesWithContactsModel>}
+     */
+    getCountIdsOfCasesLessThanXContacts(outbreakId: string): Observable<MetricCasesWithContactsModel> {
+            return this.modelHelper.mapObservableToModel(
+                this.http.get(`outbreaks/${outbreakId}/relationships/cases-with-less-than-x-contacts/count`),
+                MetricCasesWithContactsModel
+            );
     }
 }
 

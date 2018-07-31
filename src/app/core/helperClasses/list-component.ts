@@ -195,6 +195,16 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
                 break;
+            // filter cases with less than x contacts
+            case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterCasesLessThanContacts()
+                    .subscribe((filterQueryBuilder) => {
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+                break;
         }
     }
 
