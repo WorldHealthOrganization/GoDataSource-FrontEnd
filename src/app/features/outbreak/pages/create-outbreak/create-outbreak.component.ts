@@ -72,7 +72,7 @@ export class CreateOutbreakComponent implements OnInit {
                         return ErrorObservable.create(err);
                     })
                     .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE');
+                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
                         // load language tokens so they will be available
                         this.i18nService.loadUserLanguage().subscribe();
                         // navigate to listing page

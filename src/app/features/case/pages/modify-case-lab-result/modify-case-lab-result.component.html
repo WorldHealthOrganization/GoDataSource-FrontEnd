@@ -9,7 +9,7 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_RELATIONSHIP_TAB_DETAILS' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE' | translate">
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -115,7 +115,7 @@
 
             </mat-tab>
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE' | translate">
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
@@ -129,7 +129,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *app-selected-outbreak-is-active mat-raised-button color="primary">
+        <button mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']" mat-raised-button>

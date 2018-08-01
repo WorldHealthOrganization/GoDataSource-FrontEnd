@@ -137,7 +137,7 @@
                 </mat-card>
 
                 <div>
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
             </form>
@@ -154,7 +154,7 @@
                     [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
             </form>
         </mat-step>
 
@@ -169,7 +169,7 @@
                     [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
             </form>
         </mat-step>
 
@@ -184,7 +184,7 @@
                     [minItems]="1">
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_COMMON_BUTTON_NEXT' | translate}}</button>
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
             </form>
         </mat-step>
 
@@ -193,14 +193,14 @@
             <ng-template matStepLabel>{{'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE' | translate}}</ng-template>
             <br><br><br>
             <div fxLayout="row" fxLayoutGap="50px" fxFlex fxFlexAlign="center">
-                {{'LNG_COMMON_LABEL_DONE' | translate}}
+                {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             </div>
             <br><br><br>
             <div>
-                <button matStepperPrevious mat-raised-button>{{'LNG_COMMON_BUTTON_BACK' | translate}}</button>
+                <button matStepperPrevious mat-raised-button>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-raised-button color="primary" class="button-primary"
                         (click)="createOutbreak([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
-                    {{'LNG_COMMON_BUTTON_CREATE' | translate}}
+                    {{'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

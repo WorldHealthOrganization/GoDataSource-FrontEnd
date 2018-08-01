@@ -19,7 +19,7 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
-                                placeholder="First name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'| translate"
                                 required="true"
                                 maxlength="200">
                             </app-form-input>
@@ -27,21 +27,21 @@
                             <app-form-input
                                 name="middleName"
                                 [(ngModel)]="contactData.middleName"
-                                placeholder="Middle name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME'| translate"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
                                 [(ngModel)]="contactData.lastName"
-                                placeholder="Last name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-select
                                 name="gender"
                                 [(ngModel)]="contactData.gender"
-                                placeholder="Sex"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
                                 required="true"
                                 [options]="genderList$ | async">
                             </app-form-select>
@@ -51,25 +51,25 @@
                             <app-form-input
                                 name="phoneNumber"
                                 [(ngModel)]="contactData.phoneNumber"
-                                placeholder="Phone number"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER' | translate"
                                 maxlength="50">
                             </app-form-input>
 
                             <app-form-input
                                 name="occupation"
                                 [(ngModel)]="contactData.occupation"
-                                placeholder="Occupation"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                 maxlength="500">
                             </app-form-input>
 
                             <div fxFlex fxLayout="row">
                                 <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''"
                                         (click)="switchAgeDob(true)">
-                                    Age
+                                    {{'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON' | translate}}
                                 </button>
                                 <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"
                                         (click)="switchAgeDob(false)">
-                                    Date of birth
+                                    {{'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
                                 </button>
                             </div>
 
@@ -77,13 +77,13 @@
                                 <app-form-input [fxHide]="!ageSelected"
                                                 name="age"
                                                 [(ngModel)]="contactData.age"
-                                                placeholder="Age">
+                                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate">
                                 </app-form-input>
 
                                 <app-form-datepicker [fxHide]="ageSelected"
                                                      name="dob"
                                                      [(ngModel)]="contactData.dob"
-                                                     placeholder="Date of birth">
+                                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate">
                                 </app-form-datepicker>
                             </div>
 
@@ -93,7 +93,9 @@
                 </mat-card>
 
                 <!-- Flag contact section -->
-                <div class="section-title">{{ 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}</div>
+                <div class="section-title">
+                    {{ 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE' | translate }}
+                </div>
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
@@ -118,7 +120,7 @@
                 </mat-card>
 
                 <!-- Documents section -->
-                <div class="section-title">Documents</div>
+                <div class="section-title">{{'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE'| translate}}</div>
                 <app-form-document-list
                     name="documents"
                     [(ngModel)]="contactData.documents">
@@ -139,15 +141,15 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *app-selected-outbreak-is-active mat-raised-button color="primary">Save</button>
-        <button type="button" [routerLink]="'/contacts'" mat-raised-button>Cancel</button>
+        <button mat-raised-button color="primary" class="button-primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+        <button type="button" [routerLink]="'/contacts'" mat-raised-button>{{'LNG_COMMON_BUTTON_CANCEL' | translate}}</button>
 
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id]">
-            {{ 'LNG_PAGE_ACTION_RELATIONSHIPS' | translate }}
+            {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
     </div>
-
-
 </form>

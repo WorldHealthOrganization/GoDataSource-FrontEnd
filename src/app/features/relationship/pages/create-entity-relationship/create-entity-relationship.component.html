@@ -26,7 +26,7 @@
 
                 <div>
                     <button mat-button matStepperNext>
-                        {{'LNG_STEPPER_LABEL_NEXT' | translate}}
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
                 </div>
             </form>
@@ -34,12 +34,12 @@
 
         <!-- Final step -->
         <mat-step>
-            <ng-template matStepLabel>Done</ng-template>
-            You are now done.
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
-                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-button (click)="createNewRelationship(relationshipsForm)">
-                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP' | translate}}
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

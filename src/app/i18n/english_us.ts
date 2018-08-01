@@ -34,8 +34,10 @@ export const EnglishUsLang = {
         /**
          * Stepper buttons
          */
-        'LNG_STEPPER_LABEL_NEXT': 'Next',
-        'LNG_STEPPER_LABEL_BACK': 'Back',
+        'LNG_STEPPER_BUTTON_NEXT': 'Next',
+        'LNG_STEPPER_BUTTON_BACK': 'Back',
+        'LNG_STEPPER_FINAL_STEP_LABEL': 'Done',
+        'LNG_STEPPER_FINAL_STEP_TEXT': 'You are now done',
 
         /**
          * Common labels
@@ -43,17 +45,15 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_YES': 'Yes',
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
-        'LNG_COMMON_LABEL_DONE': 'You are now done',
 
         /**
          * General Actions
          */
         'LNG_PAGE_ACTION_DELETE': 'Delete',
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
-        'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
-        'LNG_PAGE_ACTION_RELATIONSHIPS': 'Relationships',
         'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
+        'LNG_PAGE_ACTION_MODIFY': 'Modify',
 
         /**
          * Common buttons
@@ -61,13 +61,11 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
         'LNG_COMMON_BUTTON_ADD': 'Add',
-        'LNG_COMMON_BUTTON_NEXT': 'Next',
-        'LNG_COMMON_BUTTON_BACK': 'Back',
-        'LNG_COMMON_BUTTON_CREATE': 'Create',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
+        'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
 
         /**
          * Dialogs
@@ -196,7 +194,9 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_AGE': 'Age',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of Onset',
+        'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE': 'Is date of onset approximate?',
         'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk Reason',
+        'LNG_CASE_FIELD_LABEL_RISK_LEVEL': 'Risk level',
         'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': 'Hospitalization Dates',
         'LNG_CASE_FIELD_LABEL_ID': 'ID',
         'LNG_CASE_FIELD_LABEL_UPDATED_AT': 'Updated At',
@@ -205,7 +205,6 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_CREATED_BY': 'Created By',
         'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE': 'Date of Becoming case',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle Name',
-        'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
         'LNG_CASE_FIELD_LABEL_DELETED_AT': 'Deleted At',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LNG': 'Fill Geo-Location Longitude',
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
@@ -217,26 +216,32 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
         'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Occupation',
         'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
-        'LNG_CASE_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
-        'LNG_CASE_FIELD_LABEL_ISOLATION_DATES': 'Isolation Dates',
         'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
+        'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
+        'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
+        'LNG_CASE_FIELD_LABEL_ISOLATION_DATES': 'Isolation Dates',
+        'LNG_CASE_FIELD_LABEL_DOCUMENTS': 'Documents',
 
         /**
          * Cases list page
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
-        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
+        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
         'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Data',
 
         /**
          * Create Case page
          */
         'LNG_PAGE_CREATE_CASE_TITLE': 'Create New Case',
+        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE': 'Infection',
         'LNG_PAGE_CREATE_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
 
         /**
          * Modify Case page
@@ -273,7 +278,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE': 'Create New Lab Result',
         'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_DETAILS': 'Details',
-        'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT': 'Create Lab Result',
+        'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON': 'Create Lab Result',
         'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result created!',
 
@@ -281,6 +286,8 @@ export const EnglishUsLang = {
          * Modify Case Lab Result page
          */
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE': 'Modify result {{sampleIdentifier}}',
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
 
         /**
@@ -307,7 +314,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TITLE': 'Create New Relationship',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS': 'Relationships',
-        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP': 'Create Relationship',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create Relationship',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
         'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
@@ -315,13 +322,26 @@ export const EnglishUsLang = {
         /**
          * Contact Fields
          */
+        'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
+        'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
+        'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
+        'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
+        'LNG_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
+        'LNG_CONTACT_FIELD_LABEL_DOCUMENTS': 'Documents',
+        'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
 
         /**
          * Contacts list page
          */
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
 
         /**
          * Create Contact page
@@ -329,13 +349,17 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_TITLE': 'Create New Contact',
         'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
+        'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
+        'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
+        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact',
 
         /**
          * Modify Contact page
          */
         'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',
 
         /**
          * Relationship Fields
@@ -398,6 +422,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_FOLLOW_UP_TITLE': 'Create New Follow-up',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON': 'Create Follow-up',
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up created!',
 
@@ -413,12 +438,17 @@ export const EnglishUsLang = {
         /**
          * Event fields
          */
+        'LNG_EVENT_FIELD_LABEL_NAME': 'Name',
+        'LNG_EVENT_FIELD_LABEL_DATE': 'Date',
+        'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
         'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
 
         /**
          * Create Event page
          */
         'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON': 'Create event',
 
         /**
          * Modify Event page
@@ -612,7 +642,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE': 'Done',
-        'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak created',
+        'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak',
+        'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak created',
         'LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR': 'End date needs to be greater than start date',
 
         /**

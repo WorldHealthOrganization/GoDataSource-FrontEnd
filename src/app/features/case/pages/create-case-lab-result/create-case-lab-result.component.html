@@ -117,10 +117,10 @@
 
                 <div>
                     <button mat-button matStepperPrevious>
-                        {{'LNG_STEPPER_LABEL_BACK' | translate}}
+                        {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                     </button>
                     <button mat-button matStepperNext>
-                        {{'LNG_STEPPER_LABEL_NEXT' | translate}}
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
                     </button>
                 </div>
             </form>
@@ -139,19 +139,20 @@
                 </app-form-fill-questionnaire>
 
                 <div>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
 
         <!-- Final step -->
         <mat-step>
-            <ng-template matStepLabel>Done</ng-template>
-            You are now done.
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
-                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-button (click)="createLabResult([detailsForm, questionnaireForm])">
-                    {{'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT' | translate}}
+                    {{'LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

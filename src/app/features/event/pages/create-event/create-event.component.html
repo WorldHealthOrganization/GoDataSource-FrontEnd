@@ -11,7 +11,7 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>Details</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' | translate}}</ng-template>
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -21,15 +21,15 @@
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="eventData.name"
-                                placeholder="Name"
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
                                 required="true"
                                 maxlength="100">
                             </app-form-input>
 
                             <app-form-datepicker
-                                 name="date"
-                                 [(ngModel)]="eventData.date"
-                                 placeholder="Event Date"
+                                name="date"
+                                [(ngModel)]="eventData.date"
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE'| translate"
                                 required="true">
                             </app-form-datepicker>
                         </div>
@@ -38,7 +38,7 @@
                             <app-form-textarea
                                 name="description"
                                 [(ngModel)]="eventData.description"
-                                placeholder="Description"
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
                                 maxlength="500">
                             </app-form-textarea>
                         </div>
@@ -46,7 +46,7 @@
                 </mat-card>
 
                 <div>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -64,19 +64,21 @@
                 </mat-card>
 
                 <div>
-                    <button mat-button matStepperPrevious>Back</button>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                 </div>
             </form>
         </mat-step>
 
         <!-- Final step -->
         <mat-step>
-            <ng-template matStepLabel>Done</ng-template>
-            You are now done.
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
-                <button mat-button matStepperPrevious>Back</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">Create Event</button>
+                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">
+                    {{'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON' | translate}}
+                </button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

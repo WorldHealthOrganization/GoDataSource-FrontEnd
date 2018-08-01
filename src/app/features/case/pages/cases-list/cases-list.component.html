@@ -5,8 +5,9 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                        Add <span class="xt-icon">addCircle</span>
+                    <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                            [routerLink]="'./create'">
+                        {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
             </div>
@@ -22,12 +23,12 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>First Name</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('firstName', $event)">
                         </app-form-input>
                     </div>
@@ -43,12 +44,12 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>Last Name</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
@@ -63,12 +64,12 @@
         <ng-container matColumnDef="classification">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Classification</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="classificationFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterBySelectField('classification', $event)"
                             multiple="true">
@@ -88,7 +89,7 @@
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Age</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_AGE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
@@ -107,12 +108,12 @@
         <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Gender</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_GENDER' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="genderFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true">
@@ -129,7 +130,7 @@
         <ng-container matColumnDef="dateOfOnset">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Date of onset</div>
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -158,7 +159,8 @@
                         </button>
                     </ng-container>
 
-                    <button *app-selected-outbreak-is-active mat-menu-item [routerLink]="['.', item.id, 'lab-results', 'create']">
+                    <button *app-selected-outbreak-is-active mat-menu-item
+                            [routerLink]="['.', item.id, 'lab-results', 'create']">
                         {{'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT' | translate}}
                     </button>
 
@@ -178,7 +180,8 @@
                         {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                     </button>
 
-                    <button *app-selected-outbreak-is-active mat-menu-item class="mat-menu-item-delete" (click)="deleteCase(item)">
+                    <button *app-selected-outbreak-is-active mat-menu-item class="mat-menu-item-delete"
+                            (click)="deleteCase(item)">
                         {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                     </button>
                 </mat-menu>

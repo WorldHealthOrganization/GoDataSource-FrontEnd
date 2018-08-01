@@ -5,8 +5,9 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEventWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                        Add <span class="xt-icon">addCircle</span>
+                    <button *ngIf="hasEventWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                            [routerLink]="'./create'">
+                        {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
             </div>
@@ -22,12 +23,12 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Name</div>
+                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
@@ -39,11 +40,11 @@
             </mat-cell>
         </ng-container>
 
-         <!-- Date -->
+        <!-- Date -->
         <ng-container matColumnDef="date">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Date</div>
+                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
                     <div class="column-filter">
                         <!-- @TODO later -->
                     </div>
@@ -58,12 +59,12 @@
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Description</div>
+                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="descriptionFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             (optionChanged)="filterByTextField('description', $event)">
                         </app-form-input>
                     </div>
@@ -96,29 +97,28 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                <mat-menu #actionsMenu="matMenu">
+                    <mat-menu #actionsMenu="matMenu">
 
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create"
-                                [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
-                            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                        <ng-container *app-selected-outbreak-is-active>
+                            <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create"
+                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
+                                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                            </button>
+                        </ng-container>
+
+                        <mat-divider *app-selected-outbreak-is-active></mat-divider>
+
+                        <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
-                    </ng-container>
 
-                    <mat-divider *app-selected-outbreak-is-active></mat-divider>
-
-                    <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
-                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
-                    </button>
+                        <mat-divider></mat-divider>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        </button>
 
                         <button mat-menu-item class="mat-menu-item-delete" (click)="deleteEvent(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
                         </button>
                     </mat-menu>
                 </div>

@@ -11,7 +11,7 @@
         <!-- Personal step -->
         <mat-step [stepControl]="personalForm">
             <form #personalForm="ngForm">
-                <ng-template matStepLabel>Personal</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE'| translate}}</ng-template>
 
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
@@ -21,7 +21,7 @@
                             <app-form-input
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
-                                placeholder="First name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
                                 required="true"
                                 maxlength="200">
                             </app-form-input>
@@ -29,21 +29,21 @@
                             <app-form-input
                                 name="middleName"
                                 [(ngModel)]="contactData.middleName"
-                                placeholder="Middle name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME' | translate"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
                                 [(ngModel)]="contactData.lastName"
-                                placeholder="Last name"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
                                 maxlength="200">
                             </app-form-input>
 
                             <app-form-select
                                 name="gender"
                                 [(ngModel)]="contactData.gender"
-                                placeholder="Gender"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
                                 required="true"
                                 [options]="genderList$ | async">
                             </app-form-select>
@@ -53,23 +53,25 @@
                             <app-form-input
                                 name="phoneNumber"
                                 [(ngModel)]="contactData.phoneNumber"
-                                placeholder="Phone number"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER' | translate"
                                 maxlength="50">
                             </app-form-input>
 
                             <app-form-input
                                 name="occupation"
                                 [(ngModel)]="contactData.occupation"
-                                placeholder="Occupation"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                 maxlength="500">
                             </app-form-input>
 
                             <div fxFlex fxLayout="row">
-                                <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''" (click)="switchAgeDob(true)">
-                                    Age
+                                <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''"
+                                        (click)="switchAgeDob(true)">
+                                    {{'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON'| translate}}
                                 </button>
-                                <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"  (click)="switchAgeDob(false)">
-                                    Date of birth
+                                <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"
+                                        (click)="switchAgeDob(false)">
+                                    {{'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
                                 </button>
                             </div>
 
@@ -77,13 +79,13 @@
                                 <app-form-input [fxHide]="!ageSelected"
                                                 name="age"
                                                 [(ngModel)]="contactData.age"
-                                                placeholder="Age">
+                                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate">
                                 </app-form-input>
 
                                 <app-form-datepicker [fxHide]="ageSelected"
-                                                name="dob"
-                                                [(ngModel)]="contactData.dob"
-                                                placeholder="Date of birth">
+                                                     name="dob"
+                                                     [(ngModel)]="contactData.dob"
+                                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate ">
                                 </app-form-datepicker>
                             </div>
 
@@ -93,14 +95,15 @@
                 </mat-card>
 
                 <!-- Documents section -->
-                <div class="section-title">Documents</div>
+                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
+                </div>
                 <app-form-document-list
                     name="documents"
                     [(ngModel)]="contactData.documents">
                 </app-form-document-list>
 
                 <div>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -116,8 +119,8 @@
                 </app-form-address-list>
 
                 <div>
-                    <button mat-button matStepperPrevious>Back</button>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -125,7 +128,8 @@
         <!-- Relationship step -->
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}
+                </ng-template>
 
                 <mat-card class="page-section">
                     <app-form-relationship
@@ -137,19 +141,22 @@
                 </mat-card>
 
                 <div>
-                    <button mat-button matStepperPrevious>Back</button>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
 
         <!-- Final step -->
         <mat-step>
-            <ng-template matStepLabel>Done</ng-template>
-            You are now done.
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
-                <button mat-button matStepperPrevious>Back</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewContact([personalForm, addressForm, relationshipForm])">Create Contact</button>
+                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-button
+                        (click)="createNewContact([personalForm, addressForm, relationshipForm])">
+                    {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
+                </button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

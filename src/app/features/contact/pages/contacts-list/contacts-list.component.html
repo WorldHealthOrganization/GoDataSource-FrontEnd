@@ -20,12 +20,12 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>First Name</div>
+                    <div mat-sort-header>{{ "LNG_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('firstName', $event)">
                         </app-form-input>
                     </div>
@@ -41,12 +41,12 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>Last Name</div>
+                    <div mat-sort-header>{{ 'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
@@ -57,11 +57,11 @@
             </mat-cell>
         </ng-container>
 
-         <!-- Age -->
+        <!-- Age -->
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Age</div>
+                    <div mat-sort-header>{{'LNG_CONTACT_FIELD_LABEL_AGE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
@@ -80,12 +80,12 @@
         <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Gender</div>
+                    <div mat-sort-header>{{ "LNG_CONTACT_FIELD_LABEL_GENDER" | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="genderFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true">
@@ -102,12 +102,12 @@
         <ng-container matColumnDef="phoneNumber">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>Phone</div>
+                    <div mat-sort-header>{{'LNG_CONTACT_FIELD_LABEL_PHONE'| translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="phoneNumberFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('phoneNumber', $event)">
                         </app-form-input>
                     </div>
@@ -153,23 +153,23 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item *ngIf="hasFollowUpWriteAccess()" [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
-                            Add Follow-up
+                        <button mat-menu-item *ngIf="hasFollowUpWriteAccess()"
+                                [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
+                            {{'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP' | translate}}
                         </button>
-
                         <mat-divider *ngIf="hasFollowUpWriteAccess()"></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
-                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                    </button>
+                        <button mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
+                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                        </button>
 
-                    <mat-divider></mat-divider>
+                        <mat-divider></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
-                    </button>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                        </button>
 
-                        <button mat-menu-item  class="mat-menu-item-delete" (click)="deleteContact(item)">
+                        <button mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
                     </mat-menu>

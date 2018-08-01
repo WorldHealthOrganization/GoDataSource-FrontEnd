@@ -65,7 +65,9 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *app-selected-outbreak-is-active mat-raised-button color="primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}</button>
+        <button mat-raised-button color="primary" class="button-primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
         <button type="button" [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
     </div>
 </form>
