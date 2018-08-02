@@ -71,11 +71,10 @@ export class ModelHelperService {
                 );
 
                 // collect all User permissions from its assigned Roles
-                const permissionIdsFromRoles = _.concat(
-                    ..._.map(user.roles, (role) => {
-                        return role.permissionIds;
-                    })
-                );
+                const permissionIdsFromRoles = _.flatten(_.map(user.roles, (role) => {
+                    return role.permissionIds;
+                }));
+
                 // keep only unique permissions
                 user.permissionIds = _.uniq(permissionIdsFromRoles);
 

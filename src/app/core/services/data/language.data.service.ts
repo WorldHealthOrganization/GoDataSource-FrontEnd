@@ -84,7 +84,7 @@ export class LanguageDataService {
             const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
 
             // merge local tokens with the tokens received from server
-            tokens = [...localLanguageTokens, ...tokens];
+            tokens = [...localLanguageTokens as any[], ...tokens];
 
             return tokens;
         });

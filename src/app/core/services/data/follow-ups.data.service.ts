@@ -65,7 +65,9 @@ export class FollowUpsDataService {
                             followUp.address &&
                             followUp.address.locationId
                         ) {
-                            followUp.address.location = locationsMapped[followUp.address.locationId];
+                            followUp.address.location = locationsMapped[followUp.address.locationId] ?
+                                locationsMapped[followUp.address.locationId][0] :
+                                null;
                         }
 
                         // finished
@@ -105,7 +107,9 @@ export class FollowUpsDataService {
                             followUp.address &&
                             followUp.address.locationId
                         ) {
-                            followUp.address.location = locationsMapped[followUp.address.locationId];
+                            followUp.address.location = locationsMapped[followUp.address.locationId] ?
+                                locationsMapped[followUp.address.locationId][0] :
+                                null;
                         }
 
                         // finished

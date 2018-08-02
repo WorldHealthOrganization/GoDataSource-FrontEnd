@@ -57,7 +57,8 @@ export class DialogComponent {
         disableClose: true,
         hasBackdrop: true,
         width: '600px',
-        maxWidth: '600px'
+        maxWidth: '600px',
+        data: undefined
     };
 
     confirmData: DialogConfiguration;
