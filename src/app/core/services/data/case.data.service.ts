@@ -88,7 +88,7 @@ export class CaseDataService {
         filterQueryBuilder.filter.where({
             deceased: true
         }, true);
-        const filter = filterQueryBuilder.buildQuery(true);
+        const filter = filterQueryBuilder.filter.generateCondition(true);
         // call endpoint
         return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
     }

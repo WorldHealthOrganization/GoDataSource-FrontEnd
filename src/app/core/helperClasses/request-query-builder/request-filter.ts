@@ -267,11 +267,13 @@ export class RequestFilter {
      * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
      * @returns {{}}
      */
-    generateCondition() {
-        return this.isEmpty() ?
+    generateCondition(stringified: boolean = false) {
+        const condition = this.isEmpty() ?
             {} :
             {
                 [this.operator]: this.conditions
             };
+
+        return stringified ? JSON.stringify(condition) : condition;
     }
 }

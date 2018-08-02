@@ -4,6 +4,8 @@ import { ListFilterDataService } from '../services/data/list-filter.data.service
 import { Params } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Constants } from '../models/constants';
+import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
+import { DateRangeModel } from '../models/date-range.model';
 
 export abstract class ListComponent {
     /**
@@ -81,10 +83,30 @@ export abstract class ListComponent {
     /**
      * Filter the list by a range field ('from' / 'to')
      * @param {string} property
-     * @param value Object with 'from' and 'to' properties
+     * @param {FormRangeModel} value Object with 'from' and 'to' properties
      */
-    filterByRangeField(property: string, value: any) {
+    filterByRangeField(property: string, value: FormRangeModel) {
         this.queryBuilder.filter.byRange(property, value);
+
+        // refresh list
+        this.refreshList();
+    }
+
+    /**
+     * Filter the list by a date range field ('startDate' / 'endDate')
+     * @param {string} property
+     * @param value Object with 'startDate' and 'endDate' properties
+     */
+    filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
+        const rangeValue: any = {};
+        if (value.startDate) {
+            rangeValue.from = value.startDate.toISOString();
+        }
+        if (value.endDate) {
+            rangeValue.to = value.endDate.toISOString();
+        }
+
+        this.queryBuilder.filter.byRange(property, rangeValue);
 
         // refresh list
         this.refreshList();

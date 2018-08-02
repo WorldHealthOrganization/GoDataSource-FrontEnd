@@ -204,4 +204,35 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             });
     }
 
+    /**
+     * Filter by related entity first name
+     * @param {string} value
+     */
+    filterByFirstName(value: string) {
+        const peopleQueryBuilder = this.queryBuilder.include('people');
+        peopleQueryBuilder.queryBuilder.filter
+            .where({
+                or: [
+                    {
+                        firstName: {
+                            regexp: `/^${value}/i`
+                        }
+                    },
+                    {
+                        name: {
+                            regexp: `/^${value}/i`
+                        }
+                    },
+                ]
+            }, true)
+            .where({
+                id: {
+                    neq: this.entityId
+                }
+            }, true);
+
+        // refresh list
+        this.refreshList();
+    }
+
 }

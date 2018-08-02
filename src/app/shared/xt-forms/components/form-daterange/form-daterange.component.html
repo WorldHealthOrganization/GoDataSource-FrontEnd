@@ -2,8 +2,9 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <form #groupForm="ngForm">
-        <div fxLayout="row">
+        <div fxLayout="row" fxLayoutAlign="space-between">
             <app-form-datepicker
+                fxFlex="47"
                 [name]="name + '[startDate]'"
                 [(ngModel)]="dateRange.startDate"
                 [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
@@ -14,7 +15,7 @@
             </app-form-datepicker>
 
             <app-form-datepicker
-                fxFlexOffset="10px"
+                fxFlex="47"
                 [name]="name + '[endDate]'"
                 [(ngModel)]="dateRange.endDate"
                 [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"

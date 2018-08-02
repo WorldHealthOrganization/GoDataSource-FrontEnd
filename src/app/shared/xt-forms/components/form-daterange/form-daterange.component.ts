@@ -1,4 +1,4 @@
-import { Component, Host, Inject, Input, OnInit, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { Component, Host, Inject, Input, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
 import { GroupBase } from '../../core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
@@ -15,7 +15,7 @@ import { DateRangeModel } from '../../../../core/models/date-range.model';
     }]
 })
 
-export class FormDaterangeComponent extends GroupBase<DateRangeModel> implements OnInit {
+export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
 
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
@@ -26,15 +26,23 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> implements
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        // init value
+        this.value = new DateRangeModel(this.value);
     }
 
     /**
-     * Initialize component elements
+     * In this case value always needs to be a DateRangeModel
+     * @param {DateRangeModel} value
      */
-    ngOnInit() {
+    writeValue(value: DateRangeModel) {
+        // in this case we always need to handle an object since we always bind further the properties of this object ( startDate & endDate )
+        if (!value) {
+            value = new DateRangeModel(value);
+        }
 
-        // init value
-        this.value = new DateRangeModel();
+        // let parent handle the binding value
+        super.writeValue(value);
     }
 
     /**

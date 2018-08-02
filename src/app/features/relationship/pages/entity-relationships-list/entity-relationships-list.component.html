@@ -27,7 +27,12 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByFirstName($event)">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -71,7 +76,11 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('contactDate', $event)">
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>

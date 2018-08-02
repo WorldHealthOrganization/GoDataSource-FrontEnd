@@ -42,7 +42,9 @@ export abstract class GroupBase<T> extends GroupValidator<T> {
             this.control.markAsDirty();
         }
 
-        // call changed event
-        this.changed.emit(this.value);
+        setTimeout(() => {
+            // call changed event
+            this.changed.emit(this.value);
+        });
     }
 }

@@ -4,7 +4,7 @@ import { RequestSort } from './request-sort';
 
 export class RequestQueryBuilder {
     // Relations to include
-    public includedRelations: any[] = [];
+    public includedRelations: any = {};
     // Where conditions
     public filter: RequestFilter = new RequestFilter();
     // Order fields
@@ -28,27 +28,22 @@ export class RequestQueryBuilder {
     }
 
     /**
-     * Include one or many relations
-     * @param {string|any} relations
-     * @returns {RequestQueryBuilder}
+     * Include a relation
+     * @param {string} relationName
+     * @returns {RequestRelationBuilder}
      */
-    include(...relations: any[]) {
-        // keep all relations as objects
-        relations = _.map(relations, (relation) => {
-            return _.isString(relation) ? {relation: relation} : relation;
-        });
+    include(relationName: string): RequestRelationBuilder {
+        // check if relation already exists
+        const relation: RequestRelationBuilder = this.includedRelations[relationName];
 
-        // overwrite relations that are already included
-        this.includedRelations = _.filter(this.includedRelations, (includedRelation) => {
-            // remove already included relations that are going to be overwritten
-            return !_.find(relations, (relation) => {
-                return includedRelation.relation === relation.relation;
-            });
-        });
+        if (relation) {
+            return relation;
+        } else {
+            // add new relation
+            this.includedRelations[relationName] = new RequestRelationBuilder(relationName);
 
-        this.includedRelations = [...this.includedRelations, ...relations];
-
-        return this;
+            return this.includedRelations[relationName];
+        }
     }
 
     /**
@@ -64,7 +59,7 @@ export class RequestQueryBuilder {
 
     /**
      * Include deleted records
-     * @returns {this}
+     * @returns {RequestQueryBuilder}
      */
     includeDeleted() {
         this.deleted = true;
@@ -73,7 +68,7 @@ export class RequestQueryBuilder {
 
     /**
      * Exclude deleted records ( this is the default behaviour )
-     * @returns {this}
+     * @returns {RequestQueryBuilder}
      */
     excludeDeleted() {
         this.deleted = false;
@@ -84,19 +79,19 @@ export class RequestQueryBuilder {
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
-    buildQuery(countFormat: boolean = false) {
+    buildQuery(stringified: boolean = true) {
         const filter: any = {};
 
         if (!this.filter.isEmpty()) {
             filter.where = this.filter.generateCondition();
-
-            if (countFormat) {
-                return JSON.stringify(filter.where);
-            }
         }
 
-        if (this.includedRelations.length > 0) {
-            filter.include = this.includedRelations;
+        // get included relations
+        const relations: RequestRelationBuilder[] = Object.values(this.includedRelations);
+        if (relations.length > 0) {
+            filter.include = _.map(relations, (relation: RequestRelationBuilder) => {
+                return relation.buildRelation();
+            });
         }
 
         if (this.fieldsInResponse.length > 0) {
@@ -115,7 +110,7 @@ export class RequestQueryBuilder {
             filter.deleted = true;
         }
 
-        return JSON.stringify(filter);
+        return stringified ? JSON.stringify(filter) : filter;
     }
 
     /**
@@ -126,7 +121,7 @@ export class RequestQueryBuilder {
      */
     merge(queryBuilder: RequestQueryBuilder) {
         // merge includes
-        this.include(...queryBuilder.includedRelations);
+        this.includedRelations = {...this.includedRelations, ...queryBuilder.includedRelations};
 
         // merge fields
         this.fields(...queryBuilder.fieldsInResponse);
@@ -159,6 +154,7 @@ export class RequestQueryBuilder {
 
     /**
      * Check if the query builder is empty
+     * @returns {boolean}
      */
     isEmpty(): boolean {
         return _.isEmpty(this.includedRelations) &&
@@ -169,3 +165,31 @@ export class RequestQueryBuilder {
     }
 }
 
+export class RequestRelationBuilder {
+    public filterParent: boolean = true;
+
+    constructor(
+        // relation name
+        public name: string,
+        // query builder to be applied on the relation
+        public queryBuilder?: RequestQueryBuilder
+    ) {
+        if (!this.queryBuilder) {
+            this.queryBuilder = new RequestQueryBuilder();
+        }
+    }
+
+    /**
+     * Generates a new "include" criteria for Loopback API
+     * @returns {{}}
+     */
+    buildRelation() {
+        return {
+            relation: this.name,
+            scope: {
+                ...this.queryBuilder.buildQuery(false),
+                filterParent: this.filterParent
+            }
+        };
+    }
+}
