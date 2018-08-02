@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
+import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 
 @Injectable()
 export class ListFilterDataService {
@@ -100,6 +101,27 @@ export class ListFilterDataService {
                     filterQueryBuilder.filter.where({
                         id: {
                             'inq': result.caseIDs
+                        }
+                    }, true);
+                    return filterQueryBuilder;
+                });
+        });
+    }
+
+    /**
+     * Create the query builder for filtering the list of contacts that are lost to follow-up
+     * @returns {RequestQueryBuilder}
+     */
+    filterContactsLostToFollowUp(): Observable<RequestQueryBuilder> {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
+            return this.followUpDataService
+                .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id)
+                .map((result: MetricContactsLostToFollowUpModel) => {
+                    // update queryBuilder filter with desired contacts ids
+                    const filterQueryBuilder = new RequestQueryBuilder();
+                    filterQueryBuilder.filter.where({
+                        id: {
+                            'inq': result.contactIDs
                         }
                     }, true);
                     return filterQueryBuilder;

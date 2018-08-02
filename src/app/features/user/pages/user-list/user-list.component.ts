@@ -43,12 +43,12 @@ export class UserListComponent extends ListComponent implements OnInit {
         private userRoleDataService: UserRoleDataService
     ) {
         super();
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
         this.refreshList();

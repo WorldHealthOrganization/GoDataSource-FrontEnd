@@ -8,18 +8,17 @@ import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { LocationDataService } from './location.data.service';
 import 'rxjs/add/operator/mergeMap';
-import { MetricContactsFollowUpModel } from '../../models/metric-contacts-follow-up.model';
+import { MetricContactsFollowUpModel } from '../../models/metrics/metric-contacts-follow-up.model';
+import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 
 @Injectable()
 export class FollowUpsDataService {
-    /**
-     * Constructor
-     * @param {HttpClient} http
-     * @param {ModelHelperService} modelHelper
-     */
-    constructor(private http: HttpClient,
-                private modelHelper: ModelHelperService,
-                private locationDataService: LocationDataService) {
+
+    constructor(
+        private http: HttpClient,
+        private modelHelper: ModelHelperService,
+        private locationDataService: LocationDataService
+    ) {
     }
 
     /**
@@ -199,6 +198,18 @@ export class FollowUpsDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count`),
             MetricContactsFollowUpModel
+        );
+    }
+
+    /**
+     * Get the number of contacts who are lost to followup
+     * @param outbreakId
+     * @returns {Observable<Object>}
+     */
+    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string): Observable<any> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count`),
+            MetricContactsLostToFollowUpModel
         );
     }
 }

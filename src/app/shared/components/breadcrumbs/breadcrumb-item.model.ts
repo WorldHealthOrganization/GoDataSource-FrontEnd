@@ -7,7 +7,8 @@ export class BreadcrumbItemModel {
         public link: string = '.',
         public active: boolean = false,
         public params: {} = {},
-        public translateData: {} = {}
+        public translateData: {} = {},
+        public onClick: () => void = () => {}
     ) {
     }
 }

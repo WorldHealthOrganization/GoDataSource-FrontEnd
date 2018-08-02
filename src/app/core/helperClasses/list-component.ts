@@ -5,9 +5,12 @@ import { Params } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
-import { DateRangeModel } from '../models/date-range.model';
+import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 export abstract class ListComponent {
+
+    public breadcrumbs: BreadcrumbItemModel[];
+
     /**
      * Query builder
      * @type {RequestQueryBuilder}
@@ -27,9 +30,11 @@ export abstract class ListComponent {
         protected listFilterDataService: ListFilterDataService = null,
         protected queryParams: Observable<Params> = null
     ) {
-        this.checkListFilters();
+        // check the filter after creating the List Component instance
+        setTimeout(() => {
+            this.checkListFilters();
+        });
     }
-
 
     /**
      * Refresh list
@@ -169,7 +174,7 @@ export abstract class ListComponent {
         if (!_.isEmpty(this.queryParams) && !_.isEmpty(this.listFilterDataService)) {
             // get query params
             this.queryParams
-                .subscribe((queryParams) => {
+                .subscribe((queryParams: any) => {
                     if (!_.isEmpty(queryParams)) {
                         // call function to apply filters - update query buiilder
                         this.applyListFilters(queryParams);
@@ -179,10 +184,48 @@ export abstract class ListComponent {
     }
 
     /**
+     * Update page breadcrumbs based on the applied filter
+     * @param {string} listFilter
+     */
+    protected setListFilterBreadcrumbs(listFilter: string) {
+        const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
+
+        if (breadcrumbToken) {
+            // clone current breadcrumbs
+            const currentBreadcrumbs = _.cloneDeep(this.breadcrumbs);
+
+            // get the breadcrumb representing the list page
+            const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
+
+            if (listPageBreadcrumb) {
+                // update the breadcrumb
+                listPageBreadcrumb.active = false;
+                listPageBreadcrumb.onClick = () => {
+                    // clear all filters
+                    this.queryBuilder = new RequestQueryBuilder();
+                    this.refreshList();
+
+                    // revert breadcrumbs
+                    this.breadcrumbs = currentBreadcrumbs;
+                };
+            }
+
+            // add new breadcrumb
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(breadcrumbToken, '.', true)
+            );
+        }
+    }
+
+    /**
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: Params): void {
+    protected applyListFilters(queryParams: {applyListFilter}): void {
+
+        // update breadcrumbs
+        this.setListFilterBreadcrumbs(queryParams.applyListFilter);
+
         // check params for apply list filter
         switch (queryParams.applyListFilter) {
             // Filter contacts on the followup list
@@ -196,6 +239,7 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
                 break;
+
             // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
 
@@ -207,6 +251,7 @@ export abstract class ListComponent {
                 // refresh list
                 this.refreshList();
                 break;
+
             // filter cases hospitalised
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
                 // get the correct query builder and merge with the existing one
@@ -221,6 +266,18 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesLessThanContacts()
+                    .subscribe((filterQueryBuilder) => {
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+                break;
+
+            // Filter contacts lost to follow-up
+            case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
+
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterContactsLostToFollowUp()
                     .subscribe((filterQueryBuilder) => {
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list

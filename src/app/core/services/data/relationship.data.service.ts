@@ -4,10 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import { RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { MetricContactsPerCaseModel } from '../../models/metric-contacts-per-case.model';
+import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
-import { MetricContactsFollowUpModel } from '../../models/metric-contacts-follow-up.model';
-import { MetricCasesWithContactsModel } from '../../models/metric-cases-contacts.model';
+import { MetricContactsFollowUpModel } from '../../models/metrics/metric-contacts-follow-up.model';
+import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
 
 @Injectable()
 export class RelationshipDataService {

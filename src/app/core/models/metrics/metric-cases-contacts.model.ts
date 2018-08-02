@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { CasesWithContactsModel } from './cases-with-contacts.model';
+import { CasesWithContactsModel } from '../cases-with-contacts.model';
 
 export class MetricCasesWithContactsModel {
     casesCount: number;

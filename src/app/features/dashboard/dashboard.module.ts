@@ -6,6 +6,7 @@ import { SharedModule } from '../../shared/shared.module';
 
 // components
 import * as fromPages from './pages';
+import * as fromComponents from './components';
 
 @NgModule({
     imports: [
@@ -14,7 +15,8 @@ import * as fromPages from './pages';
 
     ],
     declarations: [
-        ...fromPages.pageComponents
+        ...fromPages.pageComponents,
+        ...fromComponents.components
     ],
     entryComponents: []
 })

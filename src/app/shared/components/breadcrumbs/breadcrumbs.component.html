@@ -5,7 +5,9 @@
         <ng-container *ngFor="let item of items; let last = last;">
 
             <mat-list-item class="breadcrumb-item" [ngClass]="{'active': item.active}">
-                <a *ngIf="!item.active" [routerLink]="item.link" [queryParams]="item.params" class="a-no-style">
+                <a *ngIf="!item.active" class="a-no-style"
+                    [routerLink]="item.link" [queryParams]="item.params"
+                    (click)="item.onClick()">
                     {{item.label | translate: item.translateData}}
                 </a>
                 <div *ngIf="item.active">

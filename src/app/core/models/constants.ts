@@ -34,7 +34,16 @@ export class Constants {
         CONTACTS_FOLLOWUP_LIST: 'contacts_followup_list',
         CASES_DECEASED: 'cases_deceased',
         CASES_HOSPITALISED: 'cases_hospitalised',
-        CASES_LESS_CONTACTS: 'cases_less_contacts'
+        CASES_LESS_CONTACTS: 'cases_less_contacts',
+        CONTACTS_LOST_TO_FOLLOW_UP: 'contacts_lost_to_follow_up'
+    };
+
+    static LIST_FILTER_TITLE = {
+        [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST]: 'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST',
+        [Constants.APPLY_LIST_FILTER.CASES_DECEASED]: 'LNG_PAGE_LIST_FILTER_CASES_DECEASED',
+        [Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_HOSPITALISED',
+        [Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS',
+        [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP'
     };
 
     // #TODO replace with Reference Data

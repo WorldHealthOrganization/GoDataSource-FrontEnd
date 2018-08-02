@@ -684,6 +684,16 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
+
+        /**
+         * List Filters page titles
+         */
+        'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST': 'Contacts on the follow-up list',
+        'LNG_PAGE_LIST_FILTER_CASES_DECEASED': 'Cases who have died',
+        'LNG_PAGE_LIST_FILTER_CASES_HOSPITALISED': 'Cases currently hospitalised',
+        'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS': 'Cases with less than X contacts',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP': 'Contacts lost to follow-up',
 
         /**
          * Transmission Chain Fields
@@ -709,6 +719,6 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add another filter',
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
-        'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
+        'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR'
     }
 };
