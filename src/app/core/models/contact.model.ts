@@ -18,6 +18,8 @@ export class ContactModel {
     riskLevel: string;
     riskReason: string;
     type: EntityType = EntityType.CONTACT;
+    dateOfReporting: string;
+    isDateOfReportingApproximate: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -33,6 +35,8 @@ export class ContactModel {
         this.addresses = _.get(data, 'addresses', []);
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
+        this.dateOfReporting = _.get(data, 'dateOfReporting');
+        this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     }
 
     /**

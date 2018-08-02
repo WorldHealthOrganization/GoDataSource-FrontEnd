@@ -225,6 +225,8 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
         'LNG_CASE_FIELD_LABEL_ISOLATION_DATES': 'Isolation Dates',
         'LNG_CASE_FIELD_LABEL_DOCUMENTS': 'Documents',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
 
         /**
          * Cases list page
@@ -336,6 +338,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON': 'Age',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
 
         /**
          * Contacts list page
@@ -442,6 +446,8 @@ export const EnglishUsLang = {
         'LNG_EVENT_FIELD_LABEL_DATE': 'Date',
         'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
         'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
+        'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
 
         /**
          * Create Event page

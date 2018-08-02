@@ -17,14 +17,29 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
 
-                        <div fxLayout="row">
-                            <app-form-select fxFlex="25"
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-select
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
                                 required="true"
                                 [options]="caseRiskLevelsList$ | async">
                             </app-form-select>
+
+                            <app-form-datepicker
+                                name="dateOfReporting"
+                                [(ngModel)]="caseData.dateOfReporting"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                required="true">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfReportingApproximate"
+                                [(ngModel)]="caseData.isDateOfReportingApproximate"
+                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                         <app-form-textarea

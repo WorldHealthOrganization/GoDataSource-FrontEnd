@@ -31,6 +31,8 @@ export class CaseModel {
     incubationDates: DateRangeModel[];
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
+    dateOfReporting: string;
+    isDateOfReportingApproximate: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -57,6 +59,8 @@ export class CaseModel {
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
         this.incubationDates = _.get(data, 'incubationDates', []);
+        this.dateOfReporting = _.get(data, 'dateOfReporting');
+        this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }

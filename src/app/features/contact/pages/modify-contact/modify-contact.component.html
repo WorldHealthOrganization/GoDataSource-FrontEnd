@@ -86,7 +86,24 @@
                                                      [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate">
                                 </app-form-datepicker>
                             </div>
+                        </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-datepicker
+                                name="dateOfReporting"
+                                [(ngModel)]="contactData.dateOfReporting"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                required="true">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfReportingApproximate"
+                                [(ngModel)]="contactData.isDateOfReportingApproximate"
+                                [label]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">
+                            </app-form-slide-toggle>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>
