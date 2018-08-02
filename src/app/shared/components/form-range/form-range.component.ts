@@ -50,4 +50,19 @@ export class FormRangeComponent extends GroupBase<FormRangeModel> {
         // finished
         return this.value;
     }
+
+    /**
+     * Handle on change
+     * @param validateGroup
+     */
+    onChange(validateGroup: boolean = true) {
+        // format values
+        if (this.range) {
+            if (this.range.from) { this.range.from = Number(this.range.from); }
+            if (this.range.to) { this.range.to = Number(this.range.to); }
+        }
+
+        // parent
+        super.onChange(validateGroup);
+    }
 }

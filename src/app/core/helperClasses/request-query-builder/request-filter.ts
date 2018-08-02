@@ -84,7 +84,10 @@ export class RequestFilter {
         const fromValue = _.get(value, 'from');
         const toValue = _.get(value, 'to');
 
-        if (_.isEmpty(fromValue) && _.isEmpty(toValue)) {
+        const fromValueIsEmpty: boolean = !_.isNumber(fromValue) && _.isEmpty(fromValue);
+        const toValueIsEmpty: boolean = !_.isNumber(toValue) && _.isEmpty(toValue);
+
+        if (fromValueIsEmpty && toValueIsEmpty) {
             // remove filter
             this.remove(property);
         } else {
@@ -93,10 +96,10 @@ export class RequestFilter {
             // determine operator & value
             let operator;
             let valueToCompare;
-            if (!_.isEmpty(fromValue) && !_.isEmpty(toValue)) {
+            if (!fromValueIsEmpty && !toValueIsEmpty) {
                 operator = 'between';
                 valueToCompare = [fromValue, toValue];
-            } else if (!_.isEmpty(fromValue)) {
+            } else if (!fromValueIsEmpty) {
                 operator = 'gte';
                 valueToCompare = fromValue;
             } else {
