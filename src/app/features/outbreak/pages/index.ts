@@ -2,8 +2,6 @@
 import { OutbreakListComponent } from './outbreak-list/outbreak-list.component';
 import { CreateOutbreakComponent } from './create-outbreak/create-outbreak.component';
 import { ModifyOutbreakComponent } from './modify-outbreak/modify-outbreak.component';
-import { FormQuestionComponent } from '../components/form-question/form-question.component';
-import { FormAnswerComponent } from '../components/form-answer/form-answer.component';
 import { FormQuestionListComponent } from '../components/form-question-list/form-question-list.component';
 import { FormAnswerListComponent } from '../components/form-answer-list/form-answer-list.component';
 
@@ -11,8 +9,6 @@ import { FormAnswerListComponent } from '../components/form-answer-list/form-ans
 export * from './outbreak-list/outbreak-list.component';
 export * from './create-outbreak/create-outbreak.component';
 export * from './modify-outbreak/modify-outbreak.component';
-export * from '../components/form-question/form-question.component';
-export * from '../components/form-answer/form-answer.component';
 export * from '../components/form-answer-list/form-answer-list.component';
 export * from '../components/form-question-list/form-question-list.component';
 
@@ -21,8 +17,6 @@ export const pageComponents: any[] = [
     CreateOutbreakComponent,
     ModifyOutbreakComponent,
     OutbreakListComponent,
-    FormQuestionComponent,
-    FormAnswerComponent,
     FormQuestionListComponent,
     FormAnswerListComponent
 ];

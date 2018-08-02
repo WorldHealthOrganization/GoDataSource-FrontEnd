@@ -147,7 +147,8 @@
                     name="caseInvestigationTemplate"
                     [ngModel]="outbreak.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1">
+                    [minItems]="1"
+                    [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -160,7 +161,8 @@
                     name="contactFollowUpTemplate"
                     [ngModel]="outbreak.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1">
+                    [minItems]="1"
+                    [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -171,9 +173,10 @@
                 </ng-template>
                 <app-form-question-list
                     name="labResultsTemplate"
-                    [(ngModel)]="outbreak.labResultsTemplate"
+                    [ngModel]="outbreak.labResultsTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1">
+                    [minItems]="1"
+                    [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -184,13 +187,13 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <!-- buttons for details tab -->
-        <button fxShow="{{currentTabIndex == 0 }}"
+        <button *ngIf="currentTabIndex == 0"
                 mat-raised-button
                 color="primary"
                 class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
-        <button fxShow="{{currentTabIndex == 0 }}"
+        <button *ngIf="currentTabIndex == 0"
                 type="button"
                 [routerLink]="'/outbreaks'"
                 mat-raised-button>
@@ -198,13 +201,13 @@
         </button>
 
         <!-- buttons for case questionnaires tab -->
-        <button [fxShow]="!viewOnly && currentTabIndex != 0"
+        <button *ngIf="!viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 color="primary"
                 class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
-        <button [fxShow]="viewOnly && currentTabIndex != 0"
+        <button *ngIf="viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 type="button"
                 color="primary"
@@ -212,7 +215,7 @@
                 (click)="enableEdit()">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
-        <button [fxShow]="!viewOnly && currentTabIndex != 0"
+        <button *ngIf="!viewOnly && currentTabIndex != 0"
                 mat-raised-button
                 type="button"
                 (click)="disableEdit()">

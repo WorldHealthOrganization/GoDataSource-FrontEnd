@@ -116,6 +116,11 @@ export const EnglishUsLang = {
         'LNG_FORM_WARNING_NO_CHANGES': 'There are no changes to be saved!',
 
         /**
+         * Form input validation errors
+         */
+        'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE': 'Duplicate value',
+
+        /**
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': 'Something went wrong! Please contact an administrator.',

@@ -34,6 +34,8 @@ export class ErrorMessage {
                 return 'E-mail does already exist.';
             case 'uniquePageUrl':
                 return 'Page name does already exist';
+            case 'notUniqueValidator':
+                return 'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE';
         }
 
         switch (typeof this.validator[this.key]) {

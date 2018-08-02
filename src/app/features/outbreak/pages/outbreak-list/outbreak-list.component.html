@@ -146,7 +146,7 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button fxShow="{{ (item.id != authUser.activeOutbreakId) }}" mat-menu-item
+                    <button *ngIf="item.id != authUser.activeOutbreakId" mat-menu-item
                             (click)="setActive(item)">
                         {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE' | translate}}
                     </button>

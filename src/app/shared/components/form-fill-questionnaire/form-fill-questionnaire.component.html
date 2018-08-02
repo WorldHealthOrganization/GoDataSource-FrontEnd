@@ -30,8 +30,8 @@
                                 <!-- Free text -->
                                 <app-form-input
                                     *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
-                                    [name]="name + '[' + question.text + ']'"
-                                    [(ngModel)]="value[question.text]"
+                                    [name]="name + '[' + question.variable + ']'"
+                                    [(ngModel)]="value[question.variable]"
                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
                                     [required]="question.required"
                                     (optionChanged)="onChange()">
@@ -40,8 +40,8 @@
                                 <!-- Multiple selections -->
                                 <app-form-select
                                     *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
-                                    [name]="name + '[' + question.text + ']'"
-                                    [(ngModel)]="value[question.text]"
+                                    [name]="name + '[' + question.variable + ']'"
+                                    [(ngModel)]="value[question.variable]"
                                     [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
                                     [required]="question.required"
                                     [options]="question.answers"

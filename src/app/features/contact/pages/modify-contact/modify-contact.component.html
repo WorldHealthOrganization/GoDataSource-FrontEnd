@@ -74,13 +74,13 @@
                             </div>
 
                             <div fxFlex>
-                                <app-form-input [fxHide]="!ageSelected"
+                                <app-form-input *ngIf="ageSelected"
                                                 name="age"
                                                 [(ngModel)]="contactData.age"
                                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate">
                                 </app-form-input>
 
-                                <app-form-datepicker [fxHide]="ageSelected"
+                                <app-form-datepicker *ngIf="!ageSelected"
                                                      name="dob"
                                                      [(ngModel)]="contactData.dob"
                                                      [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate">

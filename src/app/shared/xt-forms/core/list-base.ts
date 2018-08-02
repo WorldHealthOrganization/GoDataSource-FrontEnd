@@ -1,4 +1,4 @@
-import { AfterViewInit, EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
+import { EventEmitter, Host, Inject, Input, Optional, Output, SkipSelf } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS } from '@angular/forms';
 import { GroupValidator } from './group-validator';
 import * as _ from 'lodash';
@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 /**
  * Base class to be extended by components that implement lists of group components or single components
  */
-export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterViewInit {
+export abstract class ListBase<T> extends GroupValidator<T[]> {
     static _identifier: number = 0;
 
     // element unique ID
@@ -33,6 +33,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterVi
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
+        // parent
         super(controlContainer, validators, asyncValidators);
     }
 
@@ -48,6 +49,21 @@ export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterVi
      */
     protected generateNewItem(): T {
         return {} as T;
+    }
+
+    /**
+     * Handle minimum number of items from the list
+     * @param value
+     */
+    writeValue(value: T[]) {
+        // add minimum number of items to the list ?
+        const valuesArray = value ? value : [];
+        while (valuesArray.length < this.minItems) {
+            valuesArray.push(this.generateNewItem());
+        }
+
+        // write value
+        super.writeValue(valuesArray);
     }
 
     /**
@@ -135,6 +151,34 @@ export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterVi
     }
 
     /**
+     * Remove all items from the list
+     */
+    clear() {
+        // if the list is already empty there is no point in clearing it
+        if (
+            !this.values ||
+            this.values.length < 1
+        ) {
+            return;
+        }
+
+        // clear array of items
+        this.value = [];
+
+        // mark as dirty
+        this.control.markAsDirty();
+
+        // validate groups & inputs
+        setTimeout(() => {
+            // validate
+            this.validateGroup();
+
+            // call on change
+            this.changed.emit(this.value);
+        });
+    }
+
+    /**
      * Function triggered when the input value is changed
      */
     onChange(validateGroup: boolean = true) {
@@ -150,33 +194,5 @@ export abstract class ListBase<T> extends GroupValidator<T[]> implements AfterVi
 
         // call changed event
         this.changed.emit(this.value);
-    }
-
-    /**
-     * Initialize List
-     */
-    ngAfterViewInit() {
-        // init parent
-        super.ngAfterViewInit();
-
-        // init list if necessary
-        // wait for the Form object to be initialized with form controls,
-        // then get the current form control object
-        setTimeout(() => {
-            // add minimum number of items to the list ?
-            const valuesArray = (this.values ? this.values : []) as any[];
-            if (valuesArray.length < this.minItems) {
-                // create list of items to add
-                let itemsToAdd = this.minItems - valuesArray.length;
-                const items: T[] = [];
-                while (itemsToAdd > 0) {
-                    items.push(this.generateNewItem());
-                    itemsToAdd--;
-                }
-
-                // add items
-                this.add(items);
-            }
-        });
     }
 }

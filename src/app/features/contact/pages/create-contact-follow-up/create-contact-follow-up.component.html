@@ -83,7 +83,7 @@
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
                 <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK'| translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewFollowUp([detailsForm])">
+                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewFollowUp([detailsForm, questionnaireForm])">
                     {{'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON' | translate}}
                 </button>
             </div>

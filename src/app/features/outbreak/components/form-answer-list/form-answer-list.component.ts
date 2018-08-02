@@ -54,4 +54,27 @@ export class FormAnswerListComponent extends ListBase<AnswerModel> implements On
                 });
         });
     }
+
+    /**
+     * Handle two way binding setup for translate items
+     * @param {string} key
+     * @param {string} value
+     */
+    onChangeBind(index: number, key: string, value: any) {
+        // "bind value"
+        this.values[index][key] = value;
+
+        // value changed
+        this.onChange();
+    }
+
+    /**
+     * Handle two way binding setup for translate items - at initialization - to not loose values in case they are not changed
+     * @param {string} key
+     * @param {string} value
+     */
+    onInitializeBind(index: number, key: string, value: any) {
+        // "bind value"
+        this.values[index][key] = value;
+    }
 }

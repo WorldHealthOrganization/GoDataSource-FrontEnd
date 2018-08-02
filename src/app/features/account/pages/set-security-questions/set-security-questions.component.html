@@ -9,16 +9,16 @@
         <form #form="ngForm" (submit)="save(form)">
 
             <div fxLayout="column">
-                <div fxShow="{{alreadySet && !viewForm}}" class="questions-display"> You already set your security questions.
+                <div *ngIf="alreadySet && !viewForm" class="questions-display"> You already set your security questions.
                     <div>Question 1: {{authUser.securityQuestions[0].question | translate}}</div>
                     <div>Answer 1: ***</div>
                     <div>Question 2: {{authUser.securityQuestions[1].question | translate}}</div>
                     <div>Answer 2: ***</div>
-                    <button fxShow="{{!viewForm}}" mat-raised-button color="primary" (click)="allowEdit()" class="edit-questions-btn"> Edit
+                    <button *ngIf="!viewForm" mat-raised-button color="primary" (click)="allowEdit()" class="edit-questions-btn"> Edit
                     </button>
                 </div>
 
-                <div fxShow="{{viewForm}}">
+                <div *ngIf="viewForm">
                     <div>Select the questions below and add an answer for each of them!</div>
 
                    <app-form-select

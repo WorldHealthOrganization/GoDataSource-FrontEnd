@@ -89,13 +89,13 @@ export class ModifyOutbreakComponent implements OnInit {
      * @param form
      */
     modifyOutbreak(form: NgForm) {
-        // const dirtyFields: any = this.formHelper.getFields(form);
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
         // validate form
-        if (!form.valid) {
-            this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+        if (!this.formHelper.validateForm(form)) {
             return;
         }
+
+        // const dirtyFields: any = this.formHelper.getFields(form);
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // validate end date to be greater than start date
         if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
