@@ -4,12 +4,16 @@ import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
+import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
+import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
+import { ModelHelperService } from '../helper/model-helper.service';
 
 @Injectable()
 export class TransmissionChainDataService {
 
     constructor(
-        private http: HttpClient
+        private http: HttpClient,
+        private modelHelper: ModelHelperService
     ) {
     }
 
@@ -38,6 +42,18 @@ export class TransmissionChainDataService {
                     return new TransmissionChainModel(chain, nodes, Object.values(edges));
                 });
             });
+    }
+
+    /**
+     * Get length of independent transmission chains
+     * @param {string} outbreakId
+     * @returns {Observable<MetricIndependentTransmissionChainsModel>}
+     */
+    getCountIndependentTransmissionChains(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count`),
+            MetricIndependentTransmissionChainsModel
+        );
     }
 }
 

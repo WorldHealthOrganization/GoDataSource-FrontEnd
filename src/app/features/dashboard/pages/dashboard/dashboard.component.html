@@ -47,6 +47,11 @@
                     *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
                 </app-contacts-lost-to-follow-up-dashlet>
 
+                <!-- number of independent chains of transmission -->
+                <app-independent-transmission-chains-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-independent-transmission-chains-dashlet>
+
                 <div class="other-kpi-content-bottom"></div>
 
             </div>
