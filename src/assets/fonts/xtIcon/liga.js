@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'location': '&#xe917;',
             'barChart': '&#xe915;',
             'timelineChart': '&#xe916;',
             'filter': '&#xe914;',

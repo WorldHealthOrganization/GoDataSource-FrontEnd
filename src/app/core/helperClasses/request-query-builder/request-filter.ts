@@ -10,6 +10,29 @@ export class RequestFilter {
     private conditions: any[] = [];
     // operator to be applied between conditions
     private operator: RequestFilterOperator = RequestFilterOperator.AND;
+    // flags
+    private flags: { [key: string]: any } = {};
+
+    /**
+     * Set flag
+     * @param property
+     * @param value
+     * @returns {RequestFilter}
+     */
+    flag(property: string, value: any) {
+        this.flags[property] = value;
+        return this;
+    }
+
+    /**
+     * Remove flag
+     * @param property
+     * @returns {RequestFilter}
+     */
+    removeFlag(property: string) {
+        delete this.flags[property];
+        return this;
+    }
 
     /**
      * Filter by a text field
@@ -44,7 +67,7 @@ export class RequestFilter {
             this.remove(property);
 
             // remove OR condition
-            this.removeOperation(RequestFilterOperator.OR, [property]);
+            this.removeOperation(RequestFilterOperator.OR, [property, property]);
         };
 
         // nothing to filter ?
@@ -271,11 +294,17 @@ export class RequestFilter {
      * @returns {{}}
      */
     generateCondition(stringified: boolean = false) {
-        const condition = this.isEmpty() ?
+        let condition = this.isEmpty() ?
             {} :
             {
                 [this.operator]: this.conditions
             };
+
+        // append flags
+        condition = Object.assign(
+            condition,
+            this.flags
+        );
 
         return stringified ? JSON.stringify(condition) : condition;
     }

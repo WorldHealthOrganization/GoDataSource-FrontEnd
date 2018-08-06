@@ -23,6 +23,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
         'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL': 'Duplicated Records',
         'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL': 'Reference Data',
+        'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL': 'Locations',
         'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & Support',
         'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL': 'Dashboard',
         'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL': 'Chains of Transmission',
@@ -335,6 +336,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
         'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
+
+        /**
+         * Location Field
+         */
+        'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
+        'LNG_LOCATION_FIELD_LABEL_SYNONYMS': 'Synonyms',
+        'LNG_LOCATION_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
+        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION': 'Parent Location',
+
+        /**
+         * Locations list page
+         */
+        'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
 
         /**
          * Contact Fields

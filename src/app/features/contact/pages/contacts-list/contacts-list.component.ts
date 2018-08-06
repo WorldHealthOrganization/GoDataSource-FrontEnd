@@ -18,13 +18,14 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
 import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-contacts-list',
@@ -54,6 +55,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // risk level
     riskLevelsList$: Observable<any[]>;
+    riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
 
     // provide constants to template
     EntityType = EntityType;
@@ -78,7 +80,23 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.genericDataService.getGenderList();
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
+        this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
+            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                new LabelValuePair(entry.value, entry.id)
+            );
+        });
+        riskLevel$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
+            this.riskLevelsListMap = _.transform(
+                riskCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -154,18 +172,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * @param item
      */
     getRiskColor(item: ContactModel) {
-        switch (item.riskLevel) {
-            // #TODO - replace with reference data logic when implemented
-            case 'low':
-                return '#5ec800';
-            case 'medium':
-                return '#f69a0c';
-            case 'high':
-                return '#F90909';
-
-            default:
-                return '';
+        // get risk data color
+        const riskData = _.get(this.riskLevelsListMap, item.riskLevel);
+        if (riskData) {
+            return riskData.colorCode ? riskData.colorCode : '';
         }
+
+        // if we don't have risk data?
+        return '';
     }
 
     /**

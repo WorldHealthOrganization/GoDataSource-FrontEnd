@@ -99,6 +99,15 @@ const routes: Routes = [
                     permissions: [PERMISSION.WRITE_REFERENCE_DATA]
                 }
             },
+            // Locations Module routes
+            {
+                path: 'locations',
+                loadChildren: './features/location/location.module#LocationModule',
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+                }
+            },
             // Dashboard Module routes
             {
                 path: 'dashboard',

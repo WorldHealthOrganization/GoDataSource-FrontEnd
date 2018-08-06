@@ -22,6 +22,7 @@ export class ReferenceDataEntryModel {
     readonly: boolean;
     active: boolean;
     category: ReferenceDataCategoryModel;
+    colorCode: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -30,6 +31,7 @@ export class ReferenceDataEntryModel {
         this.description = _.get(data, 'description');
         this.readonly = _.get(data, 'readOnly', false);
         this.active = _.get(data, 'active', true);
+        this.colorCode = _.get(data, 'colorCode');
 
         // add category
         const categoryData = _.get(data, 'category');

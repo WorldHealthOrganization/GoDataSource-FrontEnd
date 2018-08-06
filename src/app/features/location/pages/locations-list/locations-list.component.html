@@ -1,0 +1,108 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+    <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Synonyms -->
+        <ng-container matColumnDef="synonyms">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
+                    <div class="column-filter">
+                        <!-- Placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.synonymsAsString }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Active -->
+        <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="activeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('active', $event.value)">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.active"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Population density -->
+        <ng-container matColumnDef="populationDensity">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="populationDensityFilter"
+                            ngModel
+                            (changed)="filterByRangeField('populationDensity', $event)">
+                        </app-form-range>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.populationDensity }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
+                    </button>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+</mat-card>

@@ -199,6 +199,14 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.WRITE_REFERENCE_DATA],
             [],
             '/reference-data'
+        ),
+        new NavItem(
+            'locations',
+            'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL',
+            'location',
+            [PERMISSION.READ_SYS_CONFIG],
+            [],
+            '/locations'
         )
         // new NavItem(
         //     'help',
