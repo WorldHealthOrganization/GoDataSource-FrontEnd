@@ -34,7 +34,8 @@
                                     [(ngModel)]="value[question.variable]"
                                     [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
                                     [required]="question.required"
-                                    (optionChanged)="onChange()">
+                                    (optionChanged)="onChange()"
+                                    [disabled]="disabled">
                                 </app-form-input>
 
                                 <!-- Multiple selections -->
@@ -48,7 +49,8 @@
                                     optionLabelKey="label"
                                     optionValueKey="value"
                                     [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
-                                    (optionChanged)="onChange()">
+                                    (optionChanged)="onChange()"
+                                    [disabled]="disabled">
                                 </app-form-select>
                             </div>
                         </div>

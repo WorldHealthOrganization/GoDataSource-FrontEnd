@@ -10,7 +10,8 @@
                     [ngModel]="values[i]"
                     (changed)="onChange(false)"
                     [required]="false"
-                    (groupValidated)="validateGroup()">
+                    (groupValidated)="validateGroup()"
+                    [disabled]="disabled">
                 </app-form-daterange>
 
             </mat-card>
@@ -21,7 +22,7 @@
 
         </div>
 
-        <button type="button" mat-button color="primary" (click)="add()">
+        <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
             {{'LNG_COMMON_BUTTON_ADD_DATE_RANGE' | translate}}
         </button>
     </form>

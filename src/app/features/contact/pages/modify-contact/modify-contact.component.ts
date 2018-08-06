@@ -14,6 +14,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-contact',
@@ -21,7 +22,7 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './modify-contact.component.html',
     styleUrls: ['./modify-contact.component.less']
 })
-export class ModifyContactComponent implements OnInit {
+export class ModifyContactComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
@@ -42,13 +43,15 @@ export class ModifyContactComponent implements OnInit {
     constructor(
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private contactDataService: ContactDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router
-    ) {}
+    ) {
+        super(route);
+    }
 
     ngOnInit() {
         this.genderList$ = this.genericDataService.getGenderList();
@@ -71,7 +74,7 @@ export class ModifyContactComponent implements OnInit {
                                 this.contactData = new ContactModel(contactDataReturned);
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
-                                        'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                                        this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
                                         '.',
                                         true,
                                         {},

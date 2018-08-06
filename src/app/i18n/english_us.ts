@@ -53,6 +53,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
         'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
+        'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
 
         /**
@@ -141,6 +142,16 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
+        'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS': 'Add another address',
+        'LNG_ADDRESS_LABEL_NO_ADDRESSES': 'No addresses',
+
+        /**
+         * Document Fields
+         */
+        'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
+        'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
+        'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT': 'Add another document',
+        'LNG_DOCUMENT_LABEL_NO_DOCUMENTS': 'No documents',
 
         /**
          * Questionnaire
@@ -220,11 +231,9 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
         'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Occupation',
-        'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
         'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
-        'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
@@ -253,6 +262,7 @@ export const EnglishUsLang = {
         /**
          * Modify Case page
          */
+        'LNG_PAGE_VIEW_CASE_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab Results',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
@@ -366,6 +376,7 @@ export const EnglishUsLang = {
         /**
          * Modify Contact page
          */
+        'LNG_PAGE_VIEW_CONTACT_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',

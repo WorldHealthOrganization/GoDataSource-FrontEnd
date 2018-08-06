@@ -147,33 +147,39 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div *app-selected-outbreak-is-active>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
 
-                    <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item *ngIf="hasFollowUpWriteAccess()"
+                <mat-menu #actionsMenu="matMenu">
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button mat-menu-item *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()"
                                 [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
                             {{'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP' | translate}}
                         </button>
-                        <mat-divider *ngIf="hasFollowUpWriteAccess()"></mat-divider>
+                        <mat-divider *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()"></mat-divider>
+                    </ng-container>
 
-                        <button mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
-                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                        </button>
+                    <button mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
+                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                    </button>
 
-                        <mat-divider></mat-divider>
+                    <mat-divider></mat-divider>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                    </button>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                         </button>
 
-                        <button mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
-                    </mat-menu>
-                </div>
+                    </ng-container>
+                </mat-menu>
             </mat-cell>
         </ng-container>
 

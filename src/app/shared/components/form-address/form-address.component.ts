@@ -47,6 +47,6 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      * Address Model
      */
     get address(): AddressModel {
-        return this.value;
+        return this.value ? this.value : {} as AddressModel;
     }
 }

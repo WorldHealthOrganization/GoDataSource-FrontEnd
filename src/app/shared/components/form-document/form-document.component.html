@@ -6,7 +6,7 @@
             <app-form-select
                 [name]="name + '[type]'"
                 [(ngModel)]="document.type"
-                placeholder="Document type"
+                [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE' | translate"
                 [options]="documentTypesList$ | async"
                 [disabled]="disabled"
                 [required]="required"
@@ -18,7 +18,7 @@
             <app-form-input
                 [name]="name + '[number]'"
                 [(ngModel)]="document.number"
-                placeholder="Document number"
+                [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER' | translate"
                 [disabled]="disabled"
                 [required]="required"
                 (input)="onChange()">

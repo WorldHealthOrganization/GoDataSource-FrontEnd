@@ -14,6 +14,10 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 
 @Component({
@@ -22,11 +26,13 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './modify-case.component.html',
     styleUrls: ['./modify-case.component.less']
 })
-export class ModifyCaseComponent implements OnInit {
-
+export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
     caseId: string;
@@ -43,7 +49,8 @@ export class ModifyCaseComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
+        private authDataService: AuthDataService,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -51,9 +58,13 @@ export class ModifyCaseComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.genderList$ = this.genericDataService.getGenderList();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
@@ -74,7 +85,7 @@ export class ModifyCaseComponent implements OnInit {
                             this.caseData = new CaseModel(caseDataReturned);
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
-                                    'LNG_PAGE_MODIFY_CASE_TITLE',
+                                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
                                     '.',
                                     true,
                                     {},
@@ -89,6 +100,14 @@ export class ModifyCaseComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    /**
      * Switch between Age and Date of birth
      */
     switchAgeDob(ageSelected: boolean = true) {
@@ -96,8 +115,8 @@ export class ModifyCaseComponent implements OnInit {
     }
 
     modifyCase(form: NgForm) {
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
         // omit fields that are NOT visible
         if (this.ageSelected) {
             delete dirtyFields.dob;

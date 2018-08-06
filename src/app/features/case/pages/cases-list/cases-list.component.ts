@@ -124,12 +124,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'classification', 'age', 'gender', 'dateOfOnset'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasCaseWriteAccess()) {
-            columns.push('actions');
-        }
+        const columns = [
+            'firstName',
+            'lastName',
+            'classification',
+            'age',
+            'gender',
+            'dateOfOnset',
+            'actions'
+        ];
 
         return columns;
     }

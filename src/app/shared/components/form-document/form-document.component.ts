@@ -48,6 +48,6 @@ export class FormDocumentComponent extends GroupBase<DocumentModel> implements O
      * Document Model
      */
     get document(): DocumentModel {
-        return this.value;
+        return this.value ? this.value : {} as DocumentModel;
     }
 }

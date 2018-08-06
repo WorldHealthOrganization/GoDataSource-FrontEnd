@@ -84,6 +84,13 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
         const formControl = _.get(this.controlContainer, 'control', null);
         if (formControl) {
             this.control = formControl.get(this.name);
+            if (!this.control) {
+                // try again later
+                setTimeout(() => {
+                    this.getControl();
+                });
+                return;
+            }
 
             // run validations when form control value is changed
             this.control.valueChanges

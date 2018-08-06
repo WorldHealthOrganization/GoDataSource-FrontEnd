@@ -19,7 +19,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
     }]
 })
 export class FormDocumentListComponent extends ListBase<DocumentModel> implements OnInit {
-    @Input() viewOnly: boolean = false;
+    @Input() disabled: boolean = false;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

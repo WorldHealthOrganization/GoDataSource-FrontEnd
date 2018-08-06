@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Cases list
@@ -20,13 +21,24 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_CASE]
         }
     },
-    // Edit Case
+    // View Case
+    {
+        path: ':caseId/view',
+        component: fromPages.ModifyCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Case
     {
         path: ':caseId/modify',
         component: fromPages.ModifyCaseComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [PERMISSION.WRITE_CASE],
+            action: ViewModifyComponentAction.MODIFY
         }
     },
 

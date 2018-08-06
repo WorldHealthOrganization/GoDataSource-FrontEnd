@@ -19,22 +19,25 @@
                             <app-form-select
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL ' | translate"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
                                 required="true"
-                                [options]="caseRiskLevelsList$ | async">
+                                [options]="caseRiskLevelsList$ | async"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-datepicker
                                 name="dateOfReporting"
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                required="true">
+                                required="true"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -43,7 +46,8 @@
                         <app-form-textarea
                             name="riskReason"
                             [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate">
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                            [disabled]="viewOnly">
                         </app-form-textarea>
 
                     </div>
@@ -59,21 +63,24 @@
                                 [(ngModel)]="caseData.firstName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
                                 required="true"
-                                maxlength="200">
+                                maxlength="200"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-input
                                 name="middleName"
                                 [(ngModel)]="caseData.middleName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
-                                maxlength="200">
+                                maxlength="200"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-input
                                 name="lastName"
                                 [(ngModel)]="caseData.lastName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
-                                maxlength="200">
+                                maxlength="200"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-select
@@ -81,7 +88,8 @@
                                 [(ngModel)]="caseData.gender"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
                                 required="true"
-                                [options]="genderList$ | async">
+                                [options]="genderList$ | async"
+                                [disabled]="viewOnly">
                             </app-form-select>
                         </div>
 
@@ -90,39 +98,53 @@
                                 name="phoneNumber"
                                 [(ngModel)]="caseData.phoneNumber"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
-                                maxlength="50">
+                                maxlength="50"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-input
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION'| translate"
-                                maxlength="500">
+                                maxlength="500"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
 
                             <div fxFlex fxLayout="row">
-                                <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''"
-                                        (click)="switchAgeDob(true)">
+                                <button
+                                    fxFlex
+                                    mat-raised-button
+                                    type="button"
+                                    [color]="ageSelected ? 'primary' : ''"
+                                    (click)="switchAgeDob(true)">
                                     {{'LNG_CASE_FIELD_LABEL_AGE_BUTTON' | translate}}
                                 </button>
-                                <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"
-                                        (click)="switchAgeDob(false)">
+                                <button
+                                    fxFlex
+                                    mat-raised-button
+                                    type="button"
+                                    [color]="!ageSelected ? 'primary' : ''"
+                                    (click)="switchAgeDob(false)">
                                     {{'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
                                 </button>
                             </div>
 
                             <div fxFlex>
-                                <app-form-input *ngIf="ageSelected"
-                                                name="age"
-                                                [(ngModel)]="caseData.age"
-                                                [placeholder]="'LNG_CASE_FIELD_LABEL_AGE' | translate">
+                                <app-form-input
+                                    *ngIf="ageSelected"
+                                    name="age"
+                                    [(ngModel)]="caseData.age"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_AGE' | translate"
+                                    [disabled]="viewOnly">
                                 </app-form-input>
 
-                                <app-form-datepicker *ngIf="!ageSelected"
-                                                     name="dob"
-                                                     [(ngModel)]="caseData.dob"
-                                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate">
+                                <app-form-datepicker
+                                    *ngIf="!ageSelected"
+                                    name="dob"
+                                    [(ngModel)]="caseData.dob"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
+                                    [disabled]="viewOnly">
                                 </app-form-datepicker>
                             </div>
 
@@ -135,7 +157,8 @@
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate}}</div>
                 <app-form-document-list
                     name="documents"
-                    [(ngModel)]="caseData.documents">
+                    [(ngModel)]="caseData.documents"
+                    [disabled]="viewOnly">
                 </app-form-document-list>
 
 
@@ -145,7 +168,8 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="caseData.addresses"
-                    required="true">
+                    required="true"
+                    [disabled]="viewOnly">
                 </app-form-address-list>
             </mat-tab>
 
@@ -160,25 +184,29 @@
                                 [(ngModel)]="caseData.classification"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
                                 required="true"
-                                [options]="caseClassificationsList$ | async">
+                                [options]="caseClassificationsList$ | async"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-datepicker
                                 name="dateBecomeCase"
                                 [(ngModel)]="caseData.dateBecomeCase"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate">
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfInfection"
                                 [(ngModel)]="caseData.dateOfInfection"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate">
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfOutcome"
                                 [(ngModel)]="caseData.dateOfOutcome"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate">
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
                         </div>
 
@@ -187,26 +215,29 @@
                             <app-form-datepicker
                                 name="dateOfOnset"
                                 [(ngModel)]="caseData.dateOfOnset"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate">
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
                                 name="isDateOfOnsetApproximate"
                                 [(ngModel)]="caseData.isDateOfOnsetApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="deceased"
                                 [(ngModel)]="caseData.deceased"
-                                [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <div fxFlex>
                                 <app-form-datepicker
                                     name="dateDeceased"
                                     [(ngModel)]="caseData.dateDeceased"
-                                    [disabled]="!caseData.deceased"
+                                    [disabled]="!caseData.deceased || viewOnly"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate">
                                 </app-form-datepicker>
                             </div>
@@ -221,7 +252,8 @@
 
                 <app-form-daterange-list
                     name="hospitalizationDates"
-                    [(ngModel)]="caseData.hospitalizationDates">
+                    [(ngModel)]="caseData.hospitalizationDates"
+                    [disabled]="viewOnly">
                 </app-form-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES'| translate}}</div>
@@ -229,7 +261,8 @@
 
                 <app-form-daterange-list
                     name="isolationDates"
-                    [(ngModel)]="caseData.isolationDates">
+                    [(ngModel)]="caseData.isolationDates"
+                    [disabled]="viewOnly">
                 </app-form-daterange-list>
 
             </mat-tab>
@@ -238,7 +271,8 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="caseData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.caseInvestigationTemplate">
+                    [questions]="selectedOutbreak.caseInvestigationTemplate"
+                    [disabled]="viewOnly">
                 </app-form-fill-questionnaire>
             </mat-tab>
         </mat-tab-group>
@@ -246,7 +280,7 @@
 
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
-        <button mat-raised-button color="primary" class="button-primary">
+        <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button type="button" [routerLink]="'/cases'" mat-raised-button>{{'LNG_COMMON_BUTTON_CANCEL'| translate}}</button>
@@ -256,7 +290,7 @@
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
-        <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
+        <button *ngIf="hasCaseWriteAccess()" mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
         </button>
 

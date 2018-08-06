@@ -2,7 +2,7 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <!-- Edit Mode -->
-    <form *ngIf="!viewOnly" #groupForm="ngForm">
+    <form *ngIf="!disabled" #groupForm="ngForm">
         <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
@@ -20,24 +20,27 @@
             </button>
         </div>
 
-        <button type="button" mat-button color="primary" (click)="add()">Add another address</button>
+        <button type="button" mat-button color="primary" (click)="add()">{{ 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS' | translate }}</button>
     </form>
     <!-- End of Edit Mode -->
 
     <!-- View Only Mode -->
-    <ng-container *ngIf="viewOnly">
-        <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+    <ng-container *ngIf="disabled">
+        <ng-container *ngIf="values && values.length > 0; else noAddresses">
             <div *ngFor="let address of values; let i = index" fxFlex fxLayout="row"
                  fxLayoutAlign="start center">
-                <app-form-address
-                    [name]="name + '[' + i + ']'"
-                    [ngModel]="values[i]"
-                    (changed)="onChange(false)"
-                    (groupValidated)="validateGroup()"
-                    <!-- @TODO add readonly property -->>
-                </app-form-address>
+                <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+                    <app-form-address
+                        [name]="name + '[' + i + ']'"
+                        [ngModel]="values[i]"
+                        [disabled]="disabled">
+                    </app-form-address>
+                </mat-card>
             </div>
-        </mat-card>
+        </ng-container>
+        <ng-template #noAddresses>
+            {{ 'LNG_ADDRESS_LABEL_NO_ADDRESSES' | translate }}
+        </ng-template>
     </ng-container>
     <!-- End of View Only Mode -->
 </div>

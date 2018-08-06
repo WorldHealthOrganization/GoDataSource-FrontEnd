@@ -65,27 +65,37 @@
                             </app-form-input>
 
                             <div fxFlex fxLayout="row">
-                                <button fxFlex type="button" mat-raised-button [color]="ageSelected ? 'primary' : ''"
-                                        (click)="switchAgeDob(true)">
+                                <button
+                                    fxFlex
+                                    type="button"
+                                    mat-raised-button
+                                    [color]="ageSelected ? 'primary' : ''"
+                                    (click)="switchAgeDob(true)">
                                     {{'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON'| translate}}
                                 </button>
-                                <button fxFlex type="button" mat-raised-button [color]="!ageSelected ? 'primary' : ''"
-                                        (click)="switchAgeDob(false)">
+                                <button
+                                    fxFlex
+                                    type="button"
+                                    mat-raised-button
+                                    [color]="!ageSelected ? 'primary' : ''"
+                                    (click)="switchAgeDob(false)">
                                     {{'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
                                 </button>
                             </div>
 
                             <div fxFlex>
-                                <app-form-input *ngIf="ageSelected"
-                                                name="age"
-                                                [(ngModel)]="contactData.age"
-                                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate">
+                                <app-form-input
+                                    *ngIf="ageSelected"
+                                    name="age"
+                                    [(ngModel)]="contactData.age"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate">
                                 </app-form-input>
 
-                                <app-form-datepicker *ngIf="!ageSelected"
-                                                     name="dob"
-                                                     [(ngModel)]="contactData.dob"
-                                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate ">
+                                <app-form-datepicker
+                                    *ngIf="!ageSelected"
+                                    name="dob"
+                                    [(ngModel)]="contactData.dob"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate ">
                                 </app-form-datepicker>
                             </div>
 

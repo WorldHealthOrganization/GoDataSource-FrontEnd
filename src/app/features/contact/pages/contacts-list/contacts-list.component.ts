@@ -136,12 +136,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'age', 'gender', 'phoneNumber', 'riskLevel'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasContactWriteAccess()) {
-            columns.push('actions');
-        }
+        const columns = [
+            'firstName',
+            'lastName',
+            'age',
+            'gender',
+            'phoneNumber',
+            'riskLevel',
+            'actions'
+        ];
 
         return columns;
     }

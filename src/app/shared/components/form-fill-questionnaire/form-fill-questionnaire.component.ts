@@ -17,6 +17,8 @@ import { Constants } from '../../../core/models/constants';
     }]
 })
 export class FormFillQuestionnaireComponent extends GroupBase<{}> {
+    @Input() disabled: boolean = false;
+
     questionsGroupedByCategory: { category: string, questions: QuestionModel[] }[];
 
     // import constants into template
