@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
-import { CustomDatePipe } from '../../shared/pipes/date-pipe/date-pipe.pipe';
+import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 
 export class FollowUpModel {
     id: string;
@@ -32,7 +32,7 @@ export class FollowUpModel {
     }
 
     get dateFormatted() {
-        const pD = new CustomDatePipe();
+        const pD = new DateDefaultPipe();
         return pD.transform(this.date);
     }
 }

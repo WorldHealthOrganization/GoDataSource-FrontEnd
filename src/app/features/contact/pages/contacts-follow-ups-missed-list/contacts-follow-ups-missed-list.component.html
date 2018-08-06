@@ -50,7 +50,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.date | dateMDY }}
+                {{ item.date | dateDefault }}
             </mat-cell>
         </ng-container>
 

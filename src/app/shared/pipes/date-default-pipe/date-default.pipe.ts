@@ -3,9 +3,9 @@ import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 
 @Pipe({
-    name: 'dateMDY'
+    name: 'dateDefault'
 })
-export class CustomDatePipe implements PipeTransform {
+export class DateDefaultPipe implements PipeTransform {
 
     transform(value: any): any {
         return value ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';

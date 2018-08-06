@@ -1,6 +1,6 @@
 export class Constants {
     // default display constants
-    static DEFAULT_DATE_DISPLAY_FORMAT = 'MM/DD/YYYY';
+    static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
 
     // #TODO replace with Reference Data
     static QUESTION_CATEGORIES = {
