@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'app-dashboard-metric-dashlet',
@@ -8,13 +8,14 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 })
 export class DashboardMetricDashletComponent {
     // title
-    @Input() metricTitle: string;
+    @Input() metricTitle: string | string[];
     // link
     @Input() link: string | string[];
     // link
     @Input() queryParams: any;
     // value to display in the box
     @Input() value: number;
+
 }
 
 

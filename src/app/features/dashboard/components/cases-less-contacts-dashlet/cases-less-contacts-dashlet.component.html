@@ -1,6 +1,8 @@
-<app-dashboard-metric-dashlet
-    metricTitle="{{'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE' | translate:{x: xLessContacts} }}"
+<app-dashboard-dynamic-metric-dashlet
+    [metricTitle]="['LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE','LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE']"
     link="/cases"
-    [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS}"
-    [value]="casesLessContactsCount">
-</app-dashboard-metric-dashlet>
+    [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS, x: xLessContacts }"
+    [value]="casesLessContactsCount"
+    [settingValue]="xLessContacts"
+    (settingChanged)="onChangeSetting($event)">
+</app-dashboard-dynamic-metric-dashlet>

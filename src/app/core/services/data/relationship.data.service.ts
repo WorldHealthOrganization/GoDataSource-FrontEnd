@@ -6,8 +6,8 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
-import { MetricContactsFollowUpModel } from '../../models/metrics/metric-contacts-follow-up.model';
 import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class RelationshipDataService {
@@ -158,13 +158,22 @@ export class RelationshipDataService {
     /**
      * Get count and ids of cases with less than x contacts
      * @param {string} outbreakId
+     * @param {number} noLessContacts
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
-    getCountIdsOfCasesLessThanXContacts(outbreakId: string): Observable<MetricCasesWithContactsModel> {
-            return this.modelHelper.mapObservableToModel(
-                this.http.get(`outbreaks/${outbreakId}/relationships/cases-with-less-than-x-contacts/count`),
-                MetricCasesWithContactsModel
-            );
+    getCountIdsOfCasesLessThanXContacts(outbreakId: string, noLessContacts: number = null): Observable<MetricCasesWithContactsModel> {
+        // convert noLessContacts to number as the API expects
+        noLessContacts = _.parseInt(noLessContacts);
+        // create filter for daysNotSeen
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.where(
+            {noLessContacts: noLessContacts}
+        );
+        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/cases-with-less-than-x-contacts/count?filter=${filter}`),
+            MetricCasesWithContactsModel
+        );
     }
 }
 

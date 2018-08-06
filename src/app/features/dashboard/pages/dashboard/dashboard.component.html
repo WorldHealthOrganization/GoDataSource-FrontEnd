@@ -39,6 +39,11 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-hospitalised-dashlet>
 
+                <!-- Contacts Not Seen -->
+                <app-contacts-not-seen-dashlet
+                    *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
+                </app-contacts-not-seen-dashlet>
+
                 <app-cases-less-contacts-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-less-contacts-dashlet>

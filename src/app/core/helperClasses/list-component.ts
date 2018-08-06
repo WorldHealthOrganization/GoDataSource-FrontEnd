@@ -186,8 +186,9 @@ export abstract class ListComponent {
     /**
      * Update page breadcrumbs based on the applied filter
      * @param {string} listFilter
+     * @param listFilterData
      */
-    protected setListFilterBreadcrumbs(listFilter: string) {
+    protected setListFilterBreadcrumbs(listFilter: string, listFilterData: any = {}) {
         const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
 
         if (breadcrumbToken) {
@@ -212,7 +213,7 @@ export abstract class ListComponent {
 
             // add new breadcrumb
             this.breadcrumbs.push(
-                new BreadcrumbItemModel(breadcrumbToken, '.', true)
+                new BreadcrumbItemModel(breadcrumbToken, '.', true, {}, listFilterData)
             );
         }
     }
@@ -221,10 +222,9 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter}): void {
-
+    protected applyListFilters(queryParams: {applyListFilter, x}): void {
         // update breadcrumbs
-        this.setListFilterBreadcrumbs(queryParams.applyListFilter);
+        this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
 
         // check params for apply list filter
         switch (queryParams.applyListFilter) {
@@ -234,6 +234,8 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsOnFollowUpLists()
                     .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
                         this.refreshList();
@@ -262,11 +264,31 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
                 break;
+
+            // Filter contacts not seen
+            case Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN:
+                // get the number of days if it was updated
+                const noDaysNotSeen = _.get(queryParams, 'x', null);
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterContactsNotSeen(noDaysNotSeen)
+                    .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+                break;
+
             // filter cases with less than x contacts
             case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
-                // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesLessThanContacts()
+                // get the number of contacts if it was updated
+                const noLessContacts = _.get(queryParams, 'x', null);
+                  // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterCasesLessThanContacts(noLessContacts)
                     .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
                         this.refreshList();
@@ -279,6 +301,8 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsLostToFollowUp()
                     .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
                         this.refreshList();

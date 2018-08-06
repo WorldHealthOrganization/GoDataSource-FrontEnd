@@ -8,8 +8,8 @@ import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { LocationDataService } from './location.data.service';
 import 'rxjs/add/operator/mergeMap';
-import { MetricContactsFollowUpModel } from '../../models/metrics/metric-contacts-follow-up.model';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
+import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -192,12 +192,33 @@ export class FollowUpsDataService {
     /**
      * Get metrics for contacts on follow-up lists
      * @param {string} outbreakId
-     * @returns {Observable<any>}
+     * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string): Observable<MetricContactsFollowUpModel> {
+    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string): Observable<MetricContactsModel> {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count`),
-            MetricContactsFollowUpModel
+            MetricContactsModel
+        );
+    }
+
+    /**
+     * Get metrics for contacts not seen
+     * @param {string} outbreakId
+     * @param {number} daysNotSeen
+     * @returns {Observable<MetricContactsModel>}
+     */
+    getCountIdsOfContactsNotSeen(outbreakId: string, daysNotSeen: number): Observable<MetricContactsModel> {
+        // convert daysNotSeen to number as the API expects
+        daysNotSeen = Number(daysNotSeen);
+        // create filter for daysNotSeen
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.where(
+            {noDaysNotSeen: daysNotSeen}
+        );
+        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-not-seen/count?filter=${filter}`),
+            MetricContactsModel
         );
     }
 

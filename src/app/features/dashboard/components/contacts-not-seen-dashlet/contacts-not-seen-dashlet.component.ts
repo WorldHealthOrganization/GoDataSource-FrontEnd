@@ -2,49 +2,51 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 
 @Component({
-    selector: 'app-cases-less-contacts-dashlet',
+    selector: 'app-contacts-not-seen-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './cases-less-contacts-dashlet.component.html',
-    styleUrls: ['./cases-less-contacts-dashlet.component.less']
+    templateUrl: './contacts-not-seen-dashlet.component.html',
+    styleUrls: ['./contacts-not-seen-dashlet.component.less']
 })
-export class CasesLessContactsDashletComponent implements OnInit {
+export class ContactsNotSeenDashletComponent implements OnInit {
 
-    // number of cases with less than x contacts
-    casesLessContactsCount: number;
-    // x metric set on outbreak
-    xLessContacts: number;
+    // number of days defined on outbreak (x)
+    xDaysNotSeen: number;
+    // number of contacts not seen in x days
+    contactsNotSeenCount: number;
     // constants to be used for applyListFilters
-    Constants = Constants;
+    Constants: any = Constants;
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
     constructor(
-        private relationshipDataService: RelationshipDataService,
+        private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService
     ) {}
 
     ngOnInit() {
-        // get contacts on followup list count
+        // get number of not seen contacts
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
+                // get the results for contacts not seen
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
-                    this.xLessContacts = selectedOutbreak.noLessContacts;
+                    this.xDaysNotSeen = selectedOutbreak.noDaysNotSeen;
                     this.updateValues();
                 }
             });
     }
 
     /**
-     * Triggers when the value of the no of contacts is changed in UI
-     * @param newXLessContacts
+     * Triggers when the value of the no of days not seen is changed in UI
+     * @param newXDaysNotSeen
      */
-    onChangeSetting(newXLessContacts) {
-        this.xLessContacts = newXLessContacts;
+    onChangeSetting(newXDaysNotSeen) {
+        this.xDaysNotSeen = newXDaysNotSeen;
+        // get number of not seen contacts
         this.updateValues();
     }
 
@@ -54,11 +56,10 @@ export class CasesLessContactsDashletComponent implements OnInit {
     updateValues() {
         // get the results for contacts not seen
         if (this.selectedOutbreak && this.selectedOutbreak.id) {
-            // get the number of days used to filter not seen contacts
-            this.relationshipDataService
-                .getCountIdsOfCasesLessThanXContacts(this.selectedOutbreak.id, this.xLessContacts)
+            this.followUpDataService
+                .getCountIdsOfContactsNotSeen(this.selectedOutbreak.id, this.xDaysNotSeen)
                 .subscribe((result) => {
-                    this.casesLessContactsCount = result.casesCount;
+                    this.contactsNotSeenCount = result.contactsCount;
                 });
         }
     }

@@ -1,16 +1,19 @@
 <div class="dashboard-box">
-
+    <!-- Header with link -->
     <div *ngIf="link"
          class="dashboard-box-header"
          [routerLink]="link"
          [queryParams]="queryParams">
-        {{metricTitle | translate}}
+         {{metricTitle | translate}}
     </div>
 
+    <!-- Header without link -->
     <div *ngIf="!link"
          class="dashboard-box-header">
         {{metricTitle | translate}}
     </div>
+
+    <!-- Content -->
     <div class="dashboard-box-content">
         {{value}}
     </div>

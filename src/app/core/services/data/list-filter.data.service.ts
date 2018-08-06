@@ -53,8 +53,30 @@ export class ListFilterDataService {
     }
 
     /**
-     * Create the query builder for filtering the list of cases
+     * Create the query builder for filtering the list of contacts
+     * @param {number} noDaysNotSeen
      * @returns {Observable<RequestQueryBuilder>}
+     */
+    filterContactsNotSeen(noDaysNotSeen: number = null): Observable<RequestQueryBuilder> {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
+            return this.followUpDataService
+                .getCountIdsOfContactsNotSeen(selectedOutbreak.id, noDaysNotSeen)
+                .map((result) => {
+                    // update queryBuilder filter with desired contacts ids
+                    const filterQueryBuilder = new RequestQueryBuilder();
+                    filterQueryBuilder.filter.where({
+                        id: {
+                            'inq': result.contactIDs
+                        }
+                    }, true);
+                    return filterQueryBuilder;
+                });
+        });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
+     * @returns {RequestQueryBuilder}
      */
     filterCasesHospitalized(): Observable<RequestQueryBuilder> {
         // get server current time to compare with hospitalisation dates
@@ -89,12 +111,13 @@ export class ListFilterDataService {
 
     /**
      * Create the query builder for filtering the list of cases
-     * @returns {RequestQueryBuilder}
+     * @param {number} noLessContacts
+     * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesLessThanContacts(): Observable<RequestQueryBuilder> {
+    filterCasesLessThanContacts(noLessContacts: number = null): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             return this.relationshipDataService
-                .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id)
+                .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id, noLessContacts)
                 .map((result) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();

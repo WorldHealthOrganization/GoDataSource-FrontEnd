@@ -89,8 +89,8 @@ export class RequestFilter {
                 // filter
                 this.where({
                     or: [
-                        { [property]: false },
-                        { [property]: { eq: null } }
+                        {[property]: false},
+                        {[property]: {eq: null}}
                     ]
                 });
             }
@@ -291,6 +291,7 @@ export class RequestFilter {
 
     /**
      * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
+     * @param {boolean} stringified
      * @returns {{}}
      */
     generateCondition(stringified: boolean = false) {
@@ -308,4 +309,26 @@ export class RequestFilter {
 
         return stringified ? JSON.stringify(condition) : condition;
     }
+
+    /**
+     * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
+     * Only first condition is returned
+     * @param {boolean} stringified
+     * @param {boolean} includeWhere
+     * @returns {{}}
+     */
+    generateFirstCondition(stringified: boolean = false, includeWhere: boolean = false ) {
+        let returnCondition: any;
+        const condition = this.isEmpty() ?
+            {} : this.conditions[0];
+        // include or not the 'where' property
+        if (includeWhere) {
+            returnCondition = { where: condition };
+        } else {
+            returnCondition = condition;
+        }
+        return stringified ? JSON.stringify(returnCondition) : returnCondition;
+    }
+
+
 }
