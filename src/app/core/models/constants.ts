@@ -36,7 +36,8 @@ export class Constants {
         CASES_HOSPITALISED: 'cases_hospitalised',
         CONTACTS_LOST_TO_FOLLOW_UP: 'contacts_lost_to_follow_up',
         CONTACTS_NOT_SEEN: 'contacts_not_seen',
-        CASES_LESS_CONTACTS: 'cases_less_contacts'
+        CASES_LESS_CONTACTS: 'cases_less_contacts',
+        CASES_PREVIOUS_DAYS_CONTACTS: 'cases_previous_days_contacts'
     };
 
     static LIST_FILTER_TITLE = {

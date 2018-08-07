@@ -308,6 +308,20 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
                 break;
+            // filter cases among contacts
+            case Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS:
+                // get the number of days  if it was updated
+                const noDaysAmongContacts = _.get(queryParams, 'x', null);
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterCasesAmongKnownContacts(noDaysAmongContacts)
+                    .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+                break;
         }
     }
 

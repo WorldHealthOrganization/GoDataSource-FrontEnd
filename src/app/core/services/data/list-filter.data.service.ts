@@ -152,4 +152,26 @@ export class ListFilterDataService {
         });
     }
 
+    /**
+     * Create the query builder for filtering the list of cases
+     * @param {number} noDaysAmongContacts
+     * @returns {Observable<RequestQueryBuilder>}
+     */
+    filterCasesAmongKnownContacts(noDaysAmongContacts: number = null): Observable<RequestQueryBuilder> {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
+            return this.relationshipDataService
+                .getCountIdsOfCasesAmongKnownContacts(selectedOutbreak.id, noDaysAmongContacts)
+                .map((result) => {
+                    // update queryBuilder filter with desired contacts ids
+                    const filterQueryBuilder = new RequestQueryBuilder();
+                    filterQueryBuilder.filter.where({
+                        id: {
+                            'inq': result.newCasesAmongKnownContactsIDs
+                        }
+                    }, true);
+                    return filterQueryBuilder;
+                });
+        });
+    }
+
 }

@@ -48,6 +48,11 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-less-contacts-dashlet>
 
+                <!-- New cases detected in the previous x days among contacts -->
+                <app-new-cases-previous-days-contacts-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-new-cases-previous-days-contacts-dashlet>
+
                 <app-contacts-lost-to-follow-up-dashlet
                     *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
                 </app-contacts-lost-to-follow-up-dashlet>

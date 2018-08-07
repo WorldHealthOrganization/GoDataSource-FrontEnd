@@ -7,6 +7,7 @@ import { CasesDeceasedDashletComponent } from '../components/cases-deceased-dash
 import { CasesHospitalisedDashletComponent } from '../components/cases-hospitalised-dashlet/cases-hospitalised-dashlet.component';
 import { ContactsNotSeenDashletComponent } from '../components/contacts-not-seen-dashlet/contacts-not-seen-dashlet.component';
 import { CasesLessContactsDashletComponent } from '../components/cases-less-contacts-dashlet/cases-less-contacts-dashlet.component';
+import { NewCasesPreviousDaysContactsDashletComponent } from '../components/new-cases-previous-days-contacts-dashlet/new-cases-previous-days-contacts-dashlet.component';
 
 // export each page component individually
 export * from './dashboard/dashboard.component';
@@ -20,7 +21,8 @@ export const pageComponents: any[] = [
    ContactsPerCaseMeanDashletComponent,
    ContactsPerCaseMedianDashletComponent,
    ContactsNotSeenDashletComponent,
-   CasesLessContactsDashletComponent
+   CasesLessContactsDashletComponent,
+   NewCasesPreviousDaysContactsDashletComponent
 
 ];
 
