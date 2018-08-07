@@ -105,7 +105,7 @@ const routes: Routes = [
                 loadChildren: './features/location/location.module#LocationModule',
                 canActivate: [AuthGuard],
                 data: {
-                    permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
             },
             // Dashboard Module routes

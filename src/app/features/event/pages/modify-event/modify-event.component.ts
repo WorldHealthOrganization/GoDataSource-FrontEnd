@@ -86,7 +86,7 @@ export class ModifyEventComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess('Event saved!');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.router.navigate(['/events']);

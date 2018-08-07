@@ -11,9 +11,12 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
-    selector: 'app-contacts-list',
+    selector: 'app-locations-list',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './locations-list.component.html',
     styleUrls: ['./locations-list.component.less']
@@ -25,8 +28,12 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     yesNoOptionsList$: Observable<any[]>;
     parentId: string;
 
+    // authenticated user
+    authUser: UserModel;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
         private route: ActivatedRoute
@@ -35,6 +42,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
       }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // lists
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
@@ -119,5 +129,13 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // finished
         return columns;
+    }
+
+    /**
+     * Check if we have write access to locations
+     * @returns {boolean}
+     */
+    hasLocationWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 }

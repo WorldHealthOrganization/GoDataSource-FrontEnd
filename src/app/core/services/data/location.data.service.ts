@@ -100,5 +100,17 @@ export class LocationDataService {
             HierarchicalLocationModel
         );
     }
+
+    /**
+     * Add a new Location
+     * @param locationData
+     * @returns {Observable<any>}
+     */
+    createLocation(locationData: {}): Observable<any> {
+        return this.http.post('locations', locationData).do(() => {
+            // refresh location cache
+            this.cacheService.remove(CacheKey.LOCATIONS);
+        });
+    }
 }
 

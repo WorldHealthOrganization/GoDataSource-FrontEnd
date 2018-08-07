@@ -78,6 +78,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
+        'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: {{name}}',
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
@@ -153,6 +154,11 @@ export const EnglishUsLang = {
         'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
         'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT': 'Add another document',
         'LNG_DOCUMENT_LABEL_NO_DOCUMENTS': 'No documents',
+
+        /**
+         * Input Fields
+         */
+        'LNG_INPUT_LABEL_ADD_INPUT': 'Add Input',
 
         /**
          * Questionnaire
@@ -259,6 +265,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
+        'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
 
         /**
          * Modify Case page
@@ -267,6 +274,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab Results',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
 
         /**
          * Case lab results fields
@@ -342,6 +350,7 @@ export const EnglishUsLang = {
          */
         'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
         'LNG_LOCATION_FIELD_LABEL_SYNONYMS': 'Synonyms',
+        'LNG_LOCATION_FIELD_LABEL_SYNONYM': 'Synonym',
         'LNG_LOCATION_FIELD_LABEL_ACTIVE': 'Active',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
         'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION': 'Parent Location',
@@ -351,6 +360,15 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
+
+        /**
+         * Create Location page
+         */
+        'LNG_PAGE_CREATE_LOCATION_TITLE': 'Create New Location',
+        'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON': 'Create location',
+        'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE': 'Location created!',
 
         /**
          * Contact Fields
@@ -388,6 +406,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact',
+        'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE': 'Contact created!',
 
         /**
          * Modify Contact page
@@ -396,6 +415,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
 
         /**
          * Relationship Fields
@@ -487,11 +507,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON': 'Create event',
+        'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE': 'Event created!',
 
         /**
          * Modify Event page
          */
         'LNG_PAGE_MODIFY_EVENT_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE': 'Event saved!',
 
         /**
          * Permissions

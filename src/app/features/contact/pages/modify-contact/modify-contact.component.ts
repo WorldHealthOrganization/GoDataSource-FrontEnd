@@ -116,7 +116,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess('Contact saved!');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.router.navigate(['/contacts']);

@@ -116,7 +116,7 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     delete(index, overrideConfirm: boolean = false) {
         // delete method
         const deleteItem = () => {
-            // remove document
+            // remove item
             this.values.splice(index, 1);
 
             // mark as dirty

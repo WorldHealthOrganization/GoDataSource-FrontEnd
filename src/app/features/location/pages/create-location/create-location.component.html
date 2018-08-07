@@ -1,0 +1,85 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
+
+                <!-- Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="name"
+                                [(ngModel)]="locationData.name"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_NAME' | translate"
+                                required="true">
+                            </app-form-input>
+
+                            <app-form-slide-toggle
+                                name="active"
+                                [(ngModel)]="locationData.active"
+                                [label]="'LNG_LOCATION_FIELD_LABEL_ACTIVE' | translate">
+                            </app-form-slide-toggle>
+
+                            <app-form-input
+                                name="populationDensity"
+                                [(ngModel)]="locationData.populationDensity"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY' | translate"
+                                type="number">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <!-- Synonyms section -->
+                <div class="section-title">{{ 'LNG_LOCATION_FIELD_LABEL_SYNONYMS' | translate }}</div>
+                <app-form-input-list
+                    name="synonyms"
+                    [ngModel]="locationData.synonyms"
+                    type="text"
+                    [placeholder]="'LNG_LOCATION_FIELD_LABEL_SYNONYM' | translate"
+                    [required]="true"
+                    [unique]="true">
+                </app-form-input-list>
+
+                <div>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div>
+                <button mat-button matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-button
+                    (click)="createNewLocation([detailsForm])">
+                    {{'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

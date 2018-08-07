@@ -3,6 +3,13 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
         </div>
+
+        <div class="topnav-actions">
+            <button *ngIf="hasLocationWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                    [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+                {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+            </button>
+        </div>
     </ng-container>
 </app-topnav>
 
@@ -95,6 +102,10 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'create']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
+                    </button>
+
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
                     </button>

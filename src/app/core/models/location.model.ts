@@ -18,6 +18,6 @@ export class LocationModel {
     }
 
     get synonymsAsString(): string {
-        return this.synonyms.join(', ');
+        return this.synonyms.join(' / ');
     }
 }

@@ -16,6 +16,7 @@ import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-fill-questionnaire.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { DashboardMetricDashletComponent } from './dashboard-metric-dashlet/dashboard-metric-dashlet.component';
+import { FormInputListComponent } from './form-input-list/form-input-list.component';
 import { DashboardDynamicMetricDashletComponent } from './dashboard-dynamic-metric-dashlet/dashboard-dynamic-metric-dashlet.component';
 
 // export necessary components individually
@@ -37,6 +38,7 @@ export const components: any[] = [
     FormRangeComponent,
     FormRangeComponent,
     FormRelationshipComponent,
+    FormInputListComponent,
     SideFiltersComponent,
     CountedItemsListComponent,
     YesNoLabelComponent,

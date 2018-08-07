@@ -70,7 +70,7 @@ export class CreateEventComponent implements OnInit {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('Event added!');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.router.navigate(['/events']);

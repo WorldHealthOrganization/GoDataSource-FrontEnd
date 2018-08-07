@@ -106,7 +106,7 @@ export class CreateCaseComponent implements OnInit {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('Case added!');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.router.navigate(['/cases']);

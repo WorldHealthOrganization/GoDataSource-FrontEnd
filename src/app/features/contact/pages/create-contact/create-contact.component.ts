@@ -196,7 +196,7 @@ export class CreateContactComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('Contact added!');
+                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
                             // navigate to listing page
                             this.router.navigate(['/contacts']);
