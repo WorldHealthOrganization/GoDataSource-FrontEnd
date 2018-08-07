@@ -33,6 +33,15 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_SYS_CONFIG]
         }
+    },
+    // Modify Location
+    {
+        path: ':locationId/modify',
+        component: fromPages.ModifyLocationComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        }
     }
 ];
 

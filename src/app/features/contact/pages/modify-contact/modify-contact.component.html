@@ -9,7 +9,7 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab label="Personal">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE' | translate">
 
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
@@ -168,7 +168,7 @@
 
             </mat-tab>
 
-            <mat-tab label="Address">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE' | translate">
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="contactData.addresses"

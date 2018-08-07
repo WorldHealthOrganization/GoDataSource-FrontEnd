@@ -273,6 +273,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_VIEW_CASE_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_CASE_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
 
@@ -371,6 +373,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE': 'Location created!',
 
         /**
+         * Modify Location page
+         */
+        'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
+
+        /**
          * Contact Fields
          */
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
@@ -415,6 +424,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_FLAG_CONTACT_TITLE': 'Flag contact with a risk for additional attention',
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_DOCUMENTS_TITLE': 'Documents',
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
 
         /**
@@ -514,6 +525,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MODIFY_EVENT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE': 'Event saved!',
+        'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE': 'Address',
 
         /**
          * Permissions

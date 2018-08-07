@@ -8,7 +8,6 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -65,19 +64,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
                 // retrieve parents of this parent and create breadcrumbs if necessary
                 if (this.parentId) {
-                    // construct query builder that we need
-                    const queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
-                    queryBuilder.filter
-                        .where({
-                            id: this.parentId
-                        }, true)
-                        .flag(
-                            'includeChildren',
-                            false
-                        );
-
                     // retrieve parent locations
-                    this.locationDataService.getLocationsHierarchicalList(queryBuilder).subscribe((locationParents) => {
+                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
                         if (locationParents && locationParents.length > 0) {
                             let locationP = locationParents[0];
                             while (!_.isEmpty(locationP.location)) {

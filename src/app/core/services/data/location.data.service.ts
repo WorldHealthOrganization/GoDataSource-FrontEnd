@@ -102,12 +102,55 @@ export class LocationDataService {
     }
 
     /**
+     * Retrieve the Hierarchical parent list of a specific Location
+     * @returns {Observable<HierarchicalLocationModel[]>}
+     */
+    getHierarchicalParentListOfLocation(locationId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HierarchicalLocationModel[]> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            id: locationId
+        }, true).flag(
+            'includeChildren',
+            false
+        );
+        qb.merge(queryBuilder);
+
+        // retrieve parent locations
+        return this.getLocationsHierarchicalList(qb);
+    }
+
+    /**
      * Add a new Location
      * @param locationData
      * @returns {Observable<any>}
      */
     createLocation(locationData: {}): Observable<any> {
         return this.http.post('locations', locationData).do(() => {
+            // refresh location cache
+            this.cacheService.remove(CacheKey.LOCATIONS);
+        });
+    }
+
+    /**
+     * Retrieve Location
+     * @param {string} locationId
+     * @returns {Observable<LocationModel>}
+     */
+    getLocation(locationId: string): Observable<LocationModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`locations/${locationId}`),
+            LocationModel
+        );
+    }
+
+    /**
+     * Modify Location
+     * @param {string} locationId
+     * @param locationData
+     * @returns {Observable<any>}
+     */
+    modifyLocation(locationId: string, locationData): Observable<any> {
+        return this.http.put(`locations/${locationId}`, locationData).do(() => {
             // refresh location cache
             this.cacheService.remove(CacheKey.LOCATIONS);
         });

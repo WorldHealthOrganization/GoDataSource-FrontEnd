@@ -8,7 +8,6 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 
 @Component({
@@ -50,17 +49,8 @@ export class CreateLocationComponent implements OnInit {
 
                 // retrieve parents of this parent and create breadcrumbs if necessary
                 if (this.parentId) {
-                    // construct query builder that we need
-                    const queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
-                    queryBuilder.filter.where({
-                        id: this.parentId
-                    }, true).flag(
-                        'includeChildren',
-                        false
-                    );
-
                     // retrieve parent locations
-                    this.locationDataService.getLocationsHierarchicalList(queryBuilder).subscribe((locationParents) => {
+                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
                         if (locationParents && locationParents.length > 0) {
                             let locationP = locationParents[0];
                             while (!_.isEmpty(locationP.location)) {

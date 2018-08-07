@@ -9,7 +9,7 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab label="Details">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE' | translate">
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -57,7 +57,7 @@
 
             </mat-tab>
 
-            <mat-tab label="Address">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE' | translate">
                 <mat-card class="page-section">
                     <app-form-address
                         name="address"

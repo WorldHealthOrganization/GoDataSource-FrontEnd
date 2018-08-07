@@ -43,7 +43,12 @@
                 <div class="table-header-cell">
                     <div>{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-input
+                            name="synonymsFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('synonyms', $event)">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -102,12 +107,20 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button mat-menu-item [routerLink]="['/locations', item.id, 'create']">
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'create']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
                     </button>
 
+                    <mat-divider *ngIf="hasLocationWriteAccess()"></mat-divider>
+
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'modify']">
+                        {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                     </button>
                 </mat-menu>
             </mat-cell>
