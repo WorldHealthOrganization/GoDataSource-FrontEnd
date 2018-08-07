@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -6,23 +5,23 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
-    selector: 'app-new-cases-previous-days-contacts-dashlet',
+    selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './new-cases-previous-days-contacts-dashlet.component.html',
-    styleUrls: ['./new-cases-previous-days-contacts-dashlet.component.less']
+    templateUrl: './new-cases-previous-days-transmission-chains-dashlet.component.html',
+    styleUrls: ['./new-cases-previous-days-transmission-chains-dashlet.component.less']
 })
-export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
+export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements OnInit {
 
-    // number of cases with less than x contacts
-    casesAmongContactsCount: number;
-    // number of new cases
-    newCases: number;
+    // number of cases in previous x days in known transmission chains
+    casesKnownTransmissionChainsCount: number;
+    // nr of new cases
+    totalCases: number;
     // x metric set on outbreak
-    xDaysAmongContacts: number;
+    xPreviousDays: number;
     // constants to be used for applyListFilters
     Constants = Constants;
     // selected outbreak
-    selectedOutbreak;
+    selectedOutbreak: OutbreakModel;
 
     constructor(
         private relationshipDataService: RelationshipDataService,
@@ -30,13 +29,13 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // get contacts on followup list count
+        // get number of cases in previous x days in known transmission chains
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
-                    this.xDaysAmongContacts = selectedOutbreak.noDaysAmongContacts;
+                    this.xPreviousDays = selectedOutbreak.noDaysInChains;
                     this.updateValues();
                 }
             });
@@ -44,36 +43,36 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
 
     /**
      * Triggers when the value of the no of days is changed in UI
-     * @param newXDaysAmongContacts
+     * @param newXPreviousDays
      */
-    onChangeSetting(newXDaysAmongContacts) {
-        this.xDaysAmongContacts = newXDaysAmongContacts;
+    onChangeSetting(newXPreviousDays) {
+        this.xPreviousDays = newXPreviousDays;
+        // get number of cases in previous x days in known transmission chains
         this.updateValues();
     }
 
     /**
      * Handles the call to the API to get the count
-     *
      */
     updateValues() {
-        // get the results for contacts not seen
+        // get the results for cases in previous x days in known transmission chains
         if (this.selectedOutbreak && this.selectedOutbreak.id) {
             this.relationshipDataService
-                .getCountIdsOfCasesAmongKnownContacts(this.selectedOutbreak.id, this.xDaysAmongContacts)
+                .getCountOfCasesInKnownTransmissionChains(this.selectedOutbreak.id, this.xPreviousDays)
                 .subscribe((result) => {
-                    this.casesAmongContactsCount = result.newCasesAmongKnownContactsCount;
-                    this.newCases = result.newCasesCount;
+                    this.casesKnownTransmissionChainsCount = result.newCases;
+                    this.totalCases = result.total;
                 });
         }
     }
 
     /**
-     * Calculate percentage of new cases among contacts
+     * Calculate percentage of new cases in transmission chains
      * @returns {number}
      */
     percentageCases() {
-        return this.newCases ?
-            Math.round(this.casesAmongContactsCount / this.newCases * 100) :
+        return this.totalCases ?
+            Math.round(this.casesKnownTransmissionChainsCount / this.totalCases * 100) :
             0;
     }
 

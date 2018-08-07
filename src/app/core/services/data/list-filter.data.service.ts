@@ -119,7 +119,7 @@ export class ListFilterDataService {
             return this.relationshipDataService
                 .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id, noLessContacts)
                 .map((result) => {
-                    // update queryBuilder filter with desired contacts ids
+                    // update queryBuilder filter with desired case ids
                     const filterQueryBuilder = new RequestQueryBuilder();
                     filterQueryBuilder.filter.where({
                         id: {
@@ -145,6 +145,28 @@ export class ListFilterDataService {
                     filterQueryBuilder.filter.where({
                         id: {
                             'inq': result.contactIDs
+                        }
+                    }, true);
+                    return filterQueryBuilder;
+                });
+        });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
+     * @param {number} noDaysInChains
+     * @returns {Observable<RequestQueryBuilder>}
+     */
+    filterCasesInKnownChains(noDaysInChains: number = null): Observable<RequestQueryBuilder> {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
+            return this.relationshipDataService
+                .getCountOfCasesInKnownTransmissionChains(selectedOutbreak.id, noDaysInChains)
+                .map((result) => {
+                    // update queryBuilder filter with desired case ids
+                    const filterQueryBuilder = new RequestQueryBuilder();
+                    filterQueryBuilder.filter.where({
+                        id: {
+                            'inq': result.caseIDs
                         }
                     }, true);
                     return filterQueryBuilder;

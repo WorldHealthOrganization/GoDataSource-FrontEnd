@@ -1,0 +1,8 @@
+<app-dashboard-dynamic-metric-dashlet
+    [metricTitle]="['LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE','LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_AFTER_VALUE']"
+    link="/cases"
+    [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS, x: xPreviousDays}"
+    [value]="(this.percentageCases()) + '%'"
+    [settingValue]="xPreviousDays"
+    (settingChanged)="onChangeSetting($event)">
+</app-dashboard-dynamic-metric-dashlet>

@@ -308,6 +308,22 @@ export abstract class ListComponent {
                         this.refreshList();
                     });
                 break;
+
+            // Filter cases in known transmission chains
+            case Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS:
+                // get the number of days if it was updated
+                const noDaysInChains = _.get(queryParams, 'x', null);
+                // get the correct query builder and merge with the existing one
+                this.listFilterDataService.filterCasesInKnownChains(noDaysInChains)
+                    .subscribe((filterQueryBuilder) => {
+                        // remove condition on property 'id' to not duplicate it
+                        this.queryBuilder.filter.remove('id');
+                        this.queryBuilder.merge(filterQueryBuilder);
+                        // refresh list
+                        this.refreshList();
+                    });
+                break;
+
             // filter cases among contacts
             case Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS:
                 // get the number of days  if it was updated

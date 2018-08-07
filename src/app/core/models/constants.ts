@@ -37,6 +37,7 @@ export class Constants {
         CONTACTS_LOST_TO_FOLLOW_UP: 'contacts_lost_to_follow_up',
         CONTACTS_NOT_SEEN: 'contacts_not_seen',
         CASES_LESS_CONTACTS: 'cases_less_contacts',
+        CASES_IN_KNOWN_TRANSMISSION_CHAINS: 'cases_in_known_transmission_chains',
         CASES_PREVIOUS_DAYS_CONTACTS: 'cases_previous_days_contacts'
     };
 
@@ -46,7 +47,8 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_HOSPITALISED',
         [Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
-        [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN'
+        [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
+        [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS'
     };
 
     // #TODO replace with Reference Data

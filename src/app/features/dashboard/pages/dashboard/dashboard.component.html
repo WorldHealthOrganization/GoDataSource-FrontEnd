@@ -44,6 +44,7 @@
                     *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
                 </app-contacts-not-seen-dashlet>
 
+                <!-- Cases with Less than x Contacts -->
                 <app-cases-less-contacts-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-less-contacts-dashlet>
@@ -53,9 +54,15 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-new-cases-previous-days-contacts-dashlet>
 
+                <!-- Contacts Lost to follow-up -->
                 <app-contacts-lost-to-follow-up-dashlet
                     *ngIf="hasReadContactPermissions() && hasReadReportPermissions()">
                 </app-contacts-lost-to-follow-up-dashlet>
+
+                <!-- New cases in previous x days in known transmission chains -->
+                <app-new-cases-previous-days-transmission-chains-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-new-cases-previous-days-transmission-chains-dashlet>
 
                 <!-- number of independent chains of transmission -->
                 <app-independent-transmission-chains-dashlet
