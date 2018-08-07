@@ -31,12 +31,13 @@ import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
 import { DialogService } from './helper/dialog.service';
 import { DomService } from './helper/dom.service';
-import { LanguageResolverService } from './resolvers/language-resolver.service';
+import { LanguageResolver } from './resolvers/language.resolver';
+import { PasswordChangeGuard } from './helper/password-change-guard.service';
 
 // export the list of services
 export const services: any[] = [
     // resolvers services
-    LanguageResolverService,
+    LanguageResolver,
 
     // data services
     AuthDataService,
@@ -63,6 +64,7 @@ export const services: any[] = [
     StorageService,
     LoggerService,
     AuthGuard,
+    PasswordChangeGuard,
     SnackbarService,
     ModelHelperService,
     RouterHelperService,

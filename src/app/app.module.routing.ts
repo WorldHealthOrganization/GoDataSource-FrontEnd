@@ -5,15 +5,17 @@ import { AuthGuard } from './core/services/helper/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
 
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
-import { LanguageResolverService } from './core/services/resolvers/language-resolver.service';
+import { LanguageResolver } from './core/services/resolvers/language.resolver';
+import { ModulePath } from './core/enums/module-path.enum';
+import { PasswordChangeGuard } from './core/services/helper/password-change-guard.service';
 
 const routes: Routes = [
     // Authentication Module routes
     {
-        path: 'auth',
+        path: ModulePath.AuthenticationModule,
         loadChildren: './features/authentication/authentication.module#AuthenticationModule',
         resolve: {
-            res: LanguageResolverService
+            language: LanguageResolver
         }
     },
 
@@ -22,86 +24,114 @@ const routes: Routes = [
         path: '',
         component: AuthenticatedComponent,
         resolve: {
-            res: LanguageResolverService
+            language: LanguageResolver
         },
         children: [
             // Account Module routes
             {
-                path: 'account',
+                path: ModulePath.AccountModule,
                 loadChildren: './features/account/account.module#AccountModule',
-                canActivate: [AuthGuard]
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ]
             },
             // User Module routes
             {
-                path: 'users',
+                path: ModulePath.UserModule,
                 loadChildren: './features/user/user.module#UserModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_USER_ACCOUNT]
                 }
             },
             // User Role Module routes
             {
-                path: 'user-roles',
+                path: ModulePath.UserRoleModule,
                 loadChildren: './features/user-role/user-role.module#UserRoleModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_ROLE]
                 }
             },
             // Outbreak Module routes
             {
-                path: 'outbreaks',
+                path: ModulePath.OutbreakModule,
                 loadChildren: './features/outbreak/outbreak.module#OutbreakModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_OUTBREAK]
                 }
             },
             // Contacts Module routes
             {
-                path: 'contacts',
+                path: ModulePath.ContactModule,
                 loadChildren: './features/contact/contact.module#ContactModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_CONTACT]
                 }
             },
             // Case Module routes
             {
-                path: 'cases',
+                path: ModulePath.CaseModule,
                 loadChildren: './features/case/case.module#CaseModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_CASE]
                 }
             },
             // Event Module routes
             {
-                path: 'events',
+                path: ModulePath.EventModule,
                 loadChildren: './features/event/event.module#EventModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_EVENT]
                 }
             },
             // Relationship Module routes
             {
-                path: 'relationships',
-                loadChildren: './features/relationship/relationship.module#RelationshipModule'
+                path: ModulePath.RelationshipModule,
+                loadChildren: './features/relationship/relationship.module#RelationshipModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ]
             },
             // Reference Data Module routes
             {
-                path: 'reference-data',
+                path: ModulePath.ReferenceDataModule,
                 loadChildren: './features/reference-data/reference-data.module#ReferenceDataModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.WRITE_REFERENCE_DATA]
                 }
             },
             // Locations Module routes
             {
-                path: 'locations',
+                path: ModulePath.LocationModule,
                 loadChildren: './features/location/location.module#LocationModule',
                 canActivate: [AuthGuard],
                 data: {
@@ -110,13 +140,21 @@ const routes: Routes = [
             },
             // Dashboard Module routes
             {
-                path: 'dashboard',
-                loadChildren: './features/dashboard/dashboard.module#DashboardModule'
+                path: ModulePath.DashboardModule,
+                loadChildren: './features/dashboard/dashboard.module#DashboardModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ]
             },
             // Transmission Chain Module routes
             {
-                path: 'transmission-chains',
-                loadChildren: './features/transmission-chain/transmission-chain.module#TransmissionChainModule'
+                path: ModulePath.TransmissionChainModule,
+                loadChildren: './features/transmission-chain/transmission-chain.module#TransmissionChainModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ]
             }
         ]
     },

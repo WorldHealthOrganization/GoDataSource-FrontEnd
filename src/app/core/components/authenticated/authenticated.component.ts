@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
 
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
@@ -60,9 +60,23 @@ export class AuthenticatedComponent implements OnInit {
         // cache reference data
         this.referenceDataDataService.getReferenceData().subscribe();
 
-        if (this.router.url === '/') {
+        // redirect root to dashboard
+        const redirectRootToDashboard = () => {
             // redirect to default landing page
-            return this.router.navigate(['/dashboard']);
+            this.router.navigate(['/dashboard']);
+        };
+
+        // subscribe to uri changes
+        this.router.events.subscribe((navStart: NavigationStart) => {
+            // redirect root to dashboard
+            if (navStart.url === '/') {
+                redirectRootToDashboard();
+            }
+        });
+
+        // redirect root to dashboard
+        if (this.router.url === '/') {
+            redirectRootToDashboard();
         }
     }
 

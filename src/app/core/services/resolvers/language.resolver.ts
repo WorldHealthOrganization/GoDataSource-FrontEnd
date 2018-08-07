@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Resolve } from '@angular/router';
-import { Observable, Subscriber } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../helper/i18n.service';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
-export class LanguageResolverService implements Resolve<any> {
+export class LanguageResolver implements Resolve<any> {
     constructor(
        private translateService: TranslateService,
        private i18nService: I18nService

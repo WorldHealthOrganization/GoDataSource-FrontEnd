@@ -61,9 +61,16 @@ export class ChangePasswordComponent {
                         this.userDataService
                             .modifyUser(this.authUser.id, {passwordChange: false})
                             .subscribe(() => {
-                                this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE');
-                                // set passwordChanged to true so we can display the security questions notification.
-                                this.passwordChanged = true;
+                                // refresh user data
+                                this.authDataService
+                                    .reloadAndPersistAuthUser()
+                                    .subscribe((authenticatedUser) => {
+                                        this.authUser = authenticatedUser.user;
+                                        this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+
+                                        // set passwordChanged to true so we can display the security questions notification.
+                                        this.passwordChanged = true;
+                                    });
                             });
                     }
 
