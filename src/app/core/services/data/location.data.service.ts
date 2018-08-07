@@ -159,5 +159,17 @@ export class LocationDataService {
             this.cacheService.remove(CacheKey.LOCATIONS);
         });
     }
+
+    /**
+     * Delete Location
+     * @param {string} locationId
+     * @returns {Observable<any>}
+     */
+    deleteLocation(locationId: string): Observable<any> {
+        return this.http.delete(`locations/${locationId}`).do(() => {
+            // refresh location cache
+            this.cacheService.remove(CacheKey.LOCATIONS);
+        });
+    }
 }
 

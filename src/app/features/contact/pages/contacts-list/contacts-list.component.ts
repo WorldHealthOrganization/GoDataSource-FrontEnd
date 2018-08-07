@@ -200,7 +200,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('Contact deleted!');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.refreshList();

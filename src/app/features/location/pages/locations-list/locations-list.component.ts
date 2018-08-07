@@ -13,6 +13,11 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswerButton } from '../../../../shared/components';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -35,7 +40,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private dialogService: DialogService,
+        private snackbarService: SnackbarService
     ) {
         super();
       }
@@ -117,6 +124,31 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // finished
         return columns;
+    }
+
+    /**
+     * Delete location
+     */
+    deleteLocation(location: LocationModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LOCATION', location)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete record
+                    this.locationDataService
+                        .deleteLocation(location.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
     }
 
     /**

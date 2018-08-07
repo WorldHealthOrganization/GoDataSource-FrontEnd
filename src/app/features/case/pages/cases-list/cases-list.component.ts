@@ -154,7 +154,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('Case deleted!');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.refreshList();

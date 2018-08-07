@@ -77,6 +77,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
@@ -256,6 +257,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
         'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
         'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Data',
+        'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
 
         /**
          * Create Case page
@@ -364,6 +366,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
 
         /**
          * Create Location page
@@ -405,6 +408,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
 
         /**
          * Create Contact page
@@ -512,6 +516,11 @@ export const EnglishUsLang = {
         'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+
+        /**
+         * Events list page
+         */
+        'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Event deleted!',
 
         /**
          * Create Event page
