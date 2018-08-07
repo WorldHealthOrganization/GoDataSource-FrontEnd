@@ -19,6 +19,7 @@ import { DialogService } from '../../../core/services/helper/dialog.service';
     }]
 })
 export class FormAddressListComponent extends ListBase<AddressModel> implements OnInit {
+    @Input() required: boolean = false;
     @Input() disabled: boolean = false;
 
     constructor(

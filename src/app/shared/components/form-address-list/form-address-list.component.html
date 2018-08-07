@@ -10,7 +10,8 @@
                     [name]="name + '[' + i + ']'"
                     [ngModel]="values[i]"
                     (changed)="onChange(false)"
-                    [required]="true"
+                    [required]="required"
+                    [disabled]="disabled"
                     (groupValidated)="validateGroup()">
                 </app-form-address>
             </mat-card>

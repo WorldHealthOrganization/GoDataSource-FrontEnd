@@ -158,6 +158,7 @@
                 <app-form-document-list
                     name="documents"
                     [(ngModel)]="caseData.documents"
+                    [required]="true"
                     [disabled]="viewOnly">
                 </app-form-document-list>
 
@@ -168,7 +169,7 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="caseData.addresses"
-                    required="true"
+                    [required]="true"
                     [disabled]="viewOnly">
                 </app-form-address-list>
             </mat-tab>

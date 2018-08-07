@@ -127,7 +127,8 @@
                 </div>
                 <app-form-document-list
                     name="documents"
-                    [(ngModel)]="contactData.documents">
+                    [(ngModel)]="contactData.documents"
+                    [required]="true">
                 </app-form-document-list>
 
                 <div>
@@ -143,7 +144,8 @@
 
                 <app-form-address-list
                     name="addresses"
-                    [(ngModel)]="contactData.addresses">
+                    [(ngModel)]="contactData.addresses"
+                    [required]="true">
                 </app-form-address-list>
 
                 <div>

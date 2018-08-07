@@ -146,7 +146,8 @@
                 <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>
                 <app-form-document-list
                     name="documents"
-                    [(ngModel)]="caseData.documents">
+                    [(ngModel)]="caseData.documents"
+                    [required]="true">
                 </app-form-document-list>
 
                 <div>
@@ -163,7 +164,7 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="caseData.addresses"
-                    required="true">
+                    [required]="true">
                 </app-form-address-list>
 
                 <div>

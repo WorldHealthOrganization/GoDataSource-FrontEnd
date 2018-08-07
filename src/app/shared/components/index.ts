@@ -17,6 +17,7 @@ import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-f
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { DashboardMetricDashletComponent } from './dashboard-metric-dashlet/dashboard-metric-dashlet.component';
 import { FormInputListComponent } from './form-input-list/form-input-list.component';
+import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
 import { DashboardDynamicMetricDashletComponent } from './dashboard-dynamic-metric-dashlet/dashboard-dynamic-metric-dashlet.component';
 
 // export necessary components individually
@@ -39,6 +40,7 @@ export const components: any[] = [
     FormRangeComponent,
     FormRelationshipComponent,
     FormInputListComponent,
+    FormLocationDropdownComponent,
     SideFiltersComponent,
     CountedItemsListComponent,
     YesNoLabelComponent,

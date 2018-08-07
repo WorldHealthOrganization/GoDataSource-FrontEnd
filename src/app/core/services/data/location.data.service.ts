@@ -13,6 +13,7 @@ import { HierarchicalLocationModel } from '../../models/hierarchical-location.mo
 export class LocationDataService {
 
     locationList$: Observable<any>;
+    groupedLocations$: Observable<any>;
 
     constructor(
         private http: HttpClient,
@@ -20,6 +21,7 @@ export class LocationDataService {
         private cacheService: CacheService
     ) {
         this.locationList$ = this.http.get(`locations`).share();
+        this.groupedLocations$ = this.http.get('locations/hierarchical?filter={"order":["name asc"]}').share();
     }
 
     /**
@@ -96,7 +98,9 @@ export class LocationDataService {
     getLocationsHierarchicalList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HierarchicalLocationModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
-            this.http.get(`locations/hierarchical?filter=${filter}`),
+            queryBuilder.isEmpty() ?
+                this.groupedLocations$ :
+                this.http.get(`locations/hierarchical?filter=${filter}`),
             HierarchicalLocationModel
         );
     }

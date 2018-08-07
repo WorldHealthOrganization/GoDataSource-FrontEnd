@@ -163,6 +163,7 @@
                 <app-form-document-list
                     name="documents"
                     [(ngModel)]="contactData.documents"
+                    [required]="true"
                     [disabled]="viewOnly">
                 </app-form-document-list>
 
@@ -172,6 +173,7 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="contactData.addresses"
+                    [required]="true"
                     [disabled]="viewOnly">
                 </app-form-address-list>
             </mat-tab>

@@ -9,6 +9,8 @@
                 <app-form-document
                     [name]="name + '[' + i + ']'"
                     [ngModel]="values[i]"
+                    [required]="required"
+                    [disabled]="disabled"
                     (changed)="onChange(false)"
                     (groupValidated)="validateGroup()">
                 </app-form-document>

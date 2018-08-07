@@ -11,7 +11,7 @@ export class ErrorMessage {
     getMessage(): string {
         switch (this.key) {
             case 'required':
-                return 'This field is required';
+                return 'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED';
             case 'pattern':
                 return 'Value does not match required pattern';
             case 'minlength':

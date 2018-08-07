@@ -10,11 +10,13 @@ import { AngularMaterialModule } from './angular-material/angular-material.modul
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     imports: [
         CommonModule,
         RouterModule,
+        NgSelectModule,
         FormsModule,
         FlexLayoutModule,
         XtFormsModule,
@@ -30,6 +32,7 @@ import * as fromSharedPipes from './pipes';
     exports: [
         CommonModule,
         RouterModule,
+        NgSelectModule,
         FormsModule,
         FlexLayoutModule,
         TranslateModule,

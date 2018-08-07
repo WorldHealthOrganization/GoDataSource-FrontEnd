@@ -121,6 +121,7 @@ export const EnglishUsLang = {
         /**
          * Form input validation errors
          */
+        'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
         'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE': 'Duplicate value',
 
         /**
@@ -793,6 +794,14 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add another filter',
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
-        'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR'
+        'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
+
+        /**
+         * Location auto-complete search
+         */
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT': 'Loading...',
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT': 'Type to search',
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT': 'No items found',
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time'
     }
 };

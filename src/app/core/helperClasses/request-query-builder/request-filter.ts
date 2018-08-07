@@ -39,6 +39,7 @@ export class RequestFilter {
      * @param {string} property
      * @param {string} value
      * @param {boolean} replace
+     * @returns {RequestFilter}
      */
     byText(property: string, value: string, replace: boolean = true) {
         if (_.isEmpty(value)) {
@@ -52,6 +53,8 @@ export class RequestFilter {
                 }
             }, replace);
         }
+
+        return this;
     }
 
     /**
@@ -59,6 +62,7 @@ export class RequestFilter {
      * @param {string} property
      * @param {boolean | null | undefined} value
      * @param {boolean} replace
+     * @returns {RequestFilter}
      */
     byBoolean(property: string, value: boolean | null | undefined, replace: boolean = true) {
         // handle property removal
@@ -95,6 +99,8 @@ export class RequestFilter {
                 });
             }
         }
+
+        return this;
     }
 
     /**
@@ -102,6 +108,7 @@ export class RequestFilter {
      * @param {string} property
      * @param value Object with 'from' and 'to' properties
      * @param {boolean} replace
+     * @returns {RequestFilter}
      */
     byRange(property: string, value: any, replace: boolean = true) {
         const fromValue = _.get(value, 'from');
@@ -137,6 +144,8 @@ export class RequestFilter {
                 }
             }, replace);
         }
+
+        return this;
     }
 
     /**
@@ -145,6 +154,7 @@ export class RequestFilter {
      * @param {any | any[]} values
      * @param {string} valueKey
      * @param {boolean} replace
+     * @returns {RequestFilter}
      */
     bySelect(property: string, values: any | any[], replace: boolean = true, valueKey: string = 'value') {
         // sanitize the 'values' to filter by
@@ -168,6 +178,8 @@ export class RequestFilter {
                 }
             }, replace);
         }
+
+        return this;
     }
 
     /**
@@ -286,7 +298,8 @@ export class RequestFilter {
      * @returns {boolean}
      */
     isEmpty() {
-        return this.conditions.length === 0;
+        return this.conditions.length === 0 &&
+            _.isEmpty(this.flags);
     }
 
     /**
@@ -295,7 +308,7 @@ export class RequestFilter {
      * @returns {{}}
      */
     generateCondition(stringified: boolean = false) {
-        let condition = this.isEmpty() ?
+        let condition = this.conditions.length === 0 ?
             {} :
             {
                 [this.operator]: this.conditions

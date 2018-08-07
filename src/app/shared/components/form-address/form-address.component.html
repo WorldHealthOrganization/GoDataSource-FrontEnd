@@ -20,18 +20,18 @@
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <app-form-select
+                <app-form-location-dropdown
+                    fxFlex
                     [name]="name + '[locationId]'"
                     [(ngModel)]="address.locationId"
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
-                    [options]="locationsList$ | async"
                     [disabled]="disabled"
                     [required]="required"
-                    optionLabelKey="name"
-                    optionValueKey="id"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                    (changed)="onChange()">
+                </app-form-location-dropdown>
+            </div>
 
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <app-form-input
                     [name]="name + '[city]'"
                     [(ngModel)]="address.city"
@@ -58,6 +58,8 @@
                     [required]="required"
                     (input)="onChange()">
                 </app-form-input>
+
+                <div fxFlex><!-- placeholder --></div>
             </div>
         </div>
     </form>

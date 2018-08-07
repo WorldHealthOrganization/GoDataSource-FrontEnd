@@ -1,4 +1,5 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import "~@ng-select/ng-select/themes/material.theme.css";
 
 //Imports:
 @import '_fonts';
@@ -184,5 +185,27 @@ html, body, ul, li, div, span {
     &.mat-menu-item-delete,
     &.mat-menu-item-restore {
         color: darkred;
+    }
+}
+
+
+/* Ng Select Invalid Styles */
+@material-invalid-color: #f44336;
+ng-select {
+    &.ng-invalid {
+        &.ng-touched {
+            .ng-select-container {
+                .ng-value-container {
+                    .ng-placeholder {
+                        color: @material-invalid-color;
+                    }
+                }
+
+                input {
+                    color: @material-invalid-color;
+                    caret-color: @material-invalid-color;
+                }
+            }
+        }
     }
 }
