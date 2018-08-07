@@ -83,7 +83,10 @@ export class SideFiltersComponent {
         const queryBuilder = new RequestQueryBuilder();
 
         // apply filters
-        const filters = _.get(fields, 'filter.filters', []);
+        const filters = _.chain(fields)
+            .get('filter.filters', [])
+            .filter('filter')
+            .value();
         const filterOperator = _.get(fields, 'filter.operator', RequestFilterOperator.AND);
         // set operator
         queryBuilder.filter.setOperator(filterOperator);

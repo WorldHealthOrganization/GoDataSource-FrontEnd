@@ -6,10 +6,25 @@ import { Observable } from 'rxjs/Observable';
 import { Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
+import { MatSort, MatSortable } from '@angular/material';
 
 export abstract class ListComponent {
+    /**
+     * Determine all children that we need to reset when side filters are being applied
+     */
+    @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
+
+    /**
+     * Retrieve Mat Table
+     */
+    @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
 
     public breadcrumbs: BreadcrumbItemModel[];
+
+    // The ID value of the timer
+    protected refreshTimeoutID: number = null;
 
     /**
      * Query builder
@@ -42,6 +57,43 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
+     * Clear previous refresh request
+     */
+    protected clearRefreshTimeout() {
+        if (this.refreshTimeoutID) {
+            clearTimeout(this.refreshTimeoutID);
+            this.refreshTimeoutID = null;
+        }
+    }
+
+    /**
+     * Tell list that we need to refresh list
+     */
+    protected needsRefreshList(instant: boolean = false) {
+        // do we want to execute refresh instantly ?
+        if (instant) {
+            // stop the previous one
+            this.clearRefreshTimeout();
+
+            // refresh list
+            this.refreshList();
+        } else {
+            // stop previous request
+            this.clearRefreshTimeout();
+
+            // wait for debounce time
+            // make new request
+            this.refreshTimeoutID = setTimeout(() => {
+                // refresh data
+                this.refreshList();
+
+                // timeout executed - clear
+                this.refreshTimeoutID = null;
+            }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
+        }
+    }
+
+    /**
      * Sort asc / desc by specific fields
      * @param data
      */
@@ -49,16 +101,17 @@ export abstract class ListComponent {
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
 
+        // remove previous sort columns, we can sort only by one column at a time
+        this.queryBuilder.sort.clear();
+
+        // sort
         if (direction) {
             // apply sort
             this.queryBuilder.sort.by(property, direction);
-        } else {
-            // remove sort
-            this.queryBuilder.sort.remove(property);
         }
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -70,7 +123,7 @@ export abstract class ListComponent {
         this.queryBuilder.filter.byText(property, value);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -82,7 +135,7 @@ export abstract class ListComponent {
         this.queryBuilder.filter.byBoolean(property, value);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -94,7 +147,7 @@ export abstract class ListComponent {
         this.queryBuilder.filter.byRange(property, value);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -114,7 +167,7 @@ export abstract class ListComponent {
         this.queryBuilder.filter.byRange(property, rangeValue);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -127,7 +180,7 @@ export abstract class ListComponent {
         this.queryBuilder.filter.bySelect(property, values, true, valueKey);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -153,7 +206,7 @@ export abstract class ListComponent {
         }
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
     /**
@@ -161,10 +214,23 @@ export abstract class ListComponent {
      * @param {RequestQueryBuilder} queryBuilder
      */
     applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear table filters without triggering search for all the changes
+        if (this.filterInputs) {
+            this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
+                input.reset();
+            });
+        }
+
+        // reset table sort columns
+        this.matTableSort.sort({
+            id: null
+        } as MatSortable);
+
+        // replace query builder with side filters
         this.queryBuilder = queryBuilder;
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -204,7 +270,7 @@ export abstract class ListComponent {
                 listPageBreadcrumb.onClick = () => {
                     // clear all filters
                     this.queryBuilder = new RequestQueryBuilder();
-                    this.refreshList();
+                    this.needsRefreshList(true);
 
                     // revert breadcrumbs
                     this.breadcrumbs = currentBreadcrumbs;
@@ -238,7 +304,7 @@ export abstract class ListComponent {
                         this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -251,7 +317,7 @@ export abstract class ListComponent {
                 }, true);
 
                 // refresh list
-                this.refreshList();
+                this.needsRefreshList(true);
                 break;
 
             // filter cases hospitalised
@@ -261,7 +327,7 @@ export abstract class ListComponent {
                     .subscribe((filterQueryBuilder) => {
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -291,7 +357,7 @@ export abstract class ListComponent {
                         this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -335,7 +401,7 @@ export abstract class ListComponent {
                         this.queryBuilder.filter.remove('id');
                         this.queryBuilder.merge(filterQueryBuilder);
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
         }

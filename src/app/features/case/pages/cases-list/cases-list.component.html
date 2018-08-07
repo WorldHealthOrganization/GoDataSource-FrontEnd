@@ -15,6 +15,11 @@
     </ng-container>
 </app-topnav>
 
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
+
 <mat-card class="page-section page-content">
 
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event)">
@@ -29,7 +34,8 @@
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('firstName', $event)">
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -50,7 +56,8 @@
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('lastName', $event)">
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -72,7 +79,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterBySelectField('classification', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -94,7 +102,8 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterByRangeField('age', $event)">
+                            (changed)="filterByRangeField('age', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-range>
                     </div>
                 </div>
@@ -116,7 +125,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -198,6 +208,3 @@
     </mat-table>
 
 </mat-card>
-
-
-<app-side-filters [filterOptions]="availableSideFilters" (filtersApplied)="applySideFilters($event)"></app-side-filters>

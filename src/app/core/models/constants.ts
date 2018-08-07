@@ -2,6 +2,9 @@ export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
 
+    // default configurations
+    static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+
     // #TODO replace with Reference Data
     static QUESTION_CATEGORIES = {
         PHYSICAL_EXAMINATION: {
