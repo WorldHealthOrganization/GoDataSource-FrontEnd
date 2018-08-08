@@ -15,6 +15,17 @@ import {
 import { ErrorMessage } from './error-message';
 
 /**
+ * class ElementBaseFailure
+ * Allow to set both message token and translate data for validation messages
+ */
+export class ElementBaseFailure {
+    constructor (
+        public messageToken: string,
+        public messageData: { [key: string]: string } = {}
+    ) {}
+}
+
+/**
  * Base class to be extended by custom form controls
  */
 export abstract class ElementBase<T> extends ValueAccessorBase<T> implements AfterViewInit {
@@ -68,9 +79,9 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     /**
      * Getter for 'failures' property of a custom form control
      * Returns a list of validation error messages for a custom form control.
-     * @returns {Array<string>}
+     * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): Array<string> {
+    protected get failures(): Array<ElementBaseFailure> {
         return Object.keys(this.validationResult || {}).map(k => {
             const errorMessage = new ErrorMessage(this.validationResult, k);
             return errorMessage.getMessage();

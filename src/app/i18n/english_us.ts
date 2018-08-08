@@ -123,7 +123,19 @@ export const EnglishUsLang = {
          * Form input validation errors
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
+        'LNG_FORM_VALIDATION_ERROR_PATTERN': 'Value does not match required pattern',
+        'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH': 'Must contain a minimum of {{length}} characters',
+        'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH': 'Must contain a maximum of {{length}} characters',
+        'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE': 'Value must match password',
+        'LNG_FORM_VALIDATION_ERROR_NOT_EQUAL_QUESTION_VALUE': 'The questions need to be different',
+        'LNG_FORM_VALIDATION_ERROR_TERMS_CONDITIONS': 'Terms and conditions must be accepted',
+        'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL': 'Invalid email address',
+        'LNG_FORM_VALIDATION_ERROR_FIELD_PASSWORD': 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol',
+        'LNG_FORM_VALIDATION_ERROR_EXTENSION': 'Please upload a valid file: {{extensions}}',
+        'LNG_FORM_VALIDATION_EMAIL_UNIQUE': 'E-mail does already exist.',
+        'LNG_FORM_VALIDATION_PAGE_UNIQUE': 'Page name does already exist',
         'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE': 'Duplicate value',
+        'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
 
         /**
          * API Errors

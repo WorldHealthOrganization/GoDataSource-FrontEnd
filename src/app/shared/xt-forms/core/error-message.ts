@@ -1,4 +1,5 @@
 import { ValidationResult } from './validate';
+import { ElementBaseFailure } from './element-base';
 
 export class ErrorMessage {
 
@@ -8,41 +9,81 @@ export class ErrorMessage {
     ) {
     }
 
-    getMessage(): string {
+    /**
+     * Get the error message for each validator
+     * Support sending data array for translation
+     * @returns {ElementBaseFailure}
+     */
+    getMessage(): ElementBaseFailure {
         switch (this.key) {
             case 'required':
-                return 'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED'
+                );
             case 'pattern':
-                return 'Value does not match required pattern';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_PATTERN'
+                );
             case 'minlength':
-                return 'Value must be N characters';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH',
+                    {length: this.validator.minlength['requiredLength']}
+                );
             case 'maxlength':
-                return `Must contain a maximum of ${this.validator.maxlength['requiredLength']} characters`;
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH',
+                    {length: this.validator.maxlength['requiredLength']}
+                );
             case 'equalValidator':
-                return 'Value must match password';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE'
+                );
             case 'notEqualValidator':
-                return 'The questions need to be different';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_NOT_EQUAL_QUESTION_VALUE'
+                );
             case 'truthyValidator-terms':
-                return 'Terms and conditions must be accepted';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_TERMS_CONDITIONS'
+                );
             case 'emailValidator':
-                return 'Invalid email address';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL'
+                );
             case 'passwordValidator':
-                return 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_FIELD_PASSWORD'
+                );
             case 'extensionValidator':
-                return 'Please upload a valid file: ' + this.validator.extensionValidator;
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_EXTENSION',
+                    {extensions: this.validator.extensionValidator['extensions']}
+                );
             case 'uniqueEmail':
-                return 'E-mail does already exist.';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_EMAIL_UNIQUE'
+                );
             case 'uniquePageUrl':
-                return 'Page name does already exist';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_PAGE_UNIQUE'
+                );
             case 'notUniqueValidator':
-                return 'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE';
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE'
+                );
         }
 
+        // Get default message if no validator matched
         switch (typeof this.validator[this.key]) {
             case 'string':
-                return <string> this.validator[this.key];
+                return new ElementBaseFailure(
+                    <string> this.validator[this.key]
+                );
             default:
-                return `Validation failed: ${this.key}`;
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_DEFAULT',
+                    {validation: this.key}
+                );
         }
     }
 }
