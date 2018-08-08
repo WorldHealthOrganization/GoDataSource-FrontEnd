@@ -24,7 +24,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 export class UserListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Users', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -99,7 +99,7 @@ export class UserListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('User deleted!');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
 
                             // reload data
                             this.refreshList();

@@ -22,8 +22,8 @@ import * as _ from 'lodash';
 export class ModifyRoleComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Roles', '/user-roles'),
-        new BreadcrumbItemModel('Modify Role', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
+        new BreadcrumbItemModel('LNG_PAGE_MODIFY_USER_ROLES_TITLE', '.', true)
     ];
 
     userRoleId: string;
@@ -68,7 +68,7 @@ export class ModifyRoleComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('Role modified!');
+                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.router.navigate(['/user-roles']);

@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <button *ngIf="hasUserWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                    Add <span class="xt-icon">addCircle</span>
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
         </div>
@@ -20,12 +20,12 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>First Name</div>
+                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('firstName', $event)">
                         </app-form-input>
                     </div>
@@ -41,12 +41,12 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>Last Name</div>
+                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)">
                         </app-form-input>
                     </div>
@@ -61,7 +61,7 @@
         <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div>Email</div>
+                    <div>{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -76,7 +76,7 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div mat-sort-header>Role</div>
+                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -101,12 +101,12 @@
                 <mat-menu #actionsMenu="matMenu">
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        Modify
+                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                     </button>
 
                     <span [matTooltip]="(item.id === authUser.id ? 'You cannot delete your own account' : '')">
                         <button mat-menu-item [disabled]="item.id === authUser.id" (click)="deleteUser(item)">
-                            Delete
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
                         </button>
                     </span>
 

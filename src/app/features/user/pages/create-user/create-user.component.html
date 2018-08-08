@@ -12,21 +12,21 @@
             <app-form-input
                 name="firstName"
                 [(ngModel)]="newUser.firstName"
-                placeholder="First Name"
+                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
                 required="true">
             </app-form-input>
 
             <app-form-input
                 name="lastName"
                 [(ngModel)]="newUser.lastName"
-                placeholder="Last Name"
+                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
                 required="true">
             </app-form-input>
 
             <app-form-input
                 name="email"
                 [(ngModel)]="newUser.email"
-                placeholder="Email"
+                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
                 required="true"
                 app-emailValidator>
             </app-form-input>
@@ -34,7 +34,7 @@
             <app-form-select
                 name="roleIds"
                 [(ngModel)]="newUser.roleIds"
-                placeholder="Roles"
+                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
                 required="true"
                 [options]="rolesList$ | async"
                 optionLabelKey="name"
@@ -47,7 +47,7 @@
                 type="password"
                 name="password"
                 [(ngModel)]="newUser.password"
-                placeholder="New Password"
+                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
                 required="true"
                 app-passwordValidator
                 app-triggerValidationFor="passwordConfirm">
@@ -57,12 +57,12 @@
                 type="password"
                 name="passwordConfirm"
                 [(ngModel)]="passwordConfirmModel"
-                placeholder="Confirm New Password"
+                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
                 required="true"
                 app-equalValidator="password">
             </app-form-input>
 
-            <button mat-raised-button color="primary">Save</button>
+            <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
         </div>
 
     </form>
