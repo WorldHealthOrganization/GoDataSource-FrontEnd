@@ -1,5 +1,5 @@
 import { ValidationResult } from './validate';
-import { ElementBaseFailure } from './element-base';
+import { ElementBaseFailure } from './element-base-failure';
 
 export class ErrorMessage {
 
