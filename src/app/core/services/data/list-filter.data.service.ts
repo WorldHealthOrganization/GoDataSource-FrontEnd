@@ -7,6 +7,7 @@ import { OutbreakModel } from '../../models/outbreak.model';
 import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
+import { Constants } from '../../models/constants';
 
 @Injectable()
 export class ListFilterDataService {
@@ -194,6 +195,27 @@ export class ListFilterDataService {
                     return filterQueryBuilder;
                 });
         });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesRefusingTreatment(): RequestQueryBuilder {
+        // generate a query builder for cases refusing treatment
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.where({
+            'and': [
+                {
+                    'transferRefused': true
+                },
+                {
+                    'classification': Constants.CASE_CLASSIFICATION.SUSPECT
+                }
+            ]
+        }, true);
+        return filterQueryBuilder;
+
     }
 
 }

@@ -39,7 +39,11 @@
                                 [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="transferRefused"
+                                [(ngModel)]="caseData.transferRefused"
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate">
+                            </app-form-slide-toggle>
                         </div>
 
                         <app-form-textarea

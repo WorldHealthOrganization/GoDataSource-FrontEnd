@@ -33,6 +33,7 @@ export class CaseModel {
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
+    transferRefused: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -61,6 +62,7 @@ export class CaseModel {
         this.incubationDates = _.get(data, 'incubationDates', []);
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
+        this.transferRefused = _.get(data, 'transferRefused');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }

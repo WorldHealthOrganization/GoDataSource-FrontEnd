@@ -41,7 +41,8 @@ export class Constants {
         CONTACTS_NOT_SEEN: 'contacts_not_seen',
         CASES_LESS_CONTACTS: 'cases_less_contacts',
         CASES_IN_KNOWN_TRANSMISSION_CHAINS: 'cases_in_known_transmission_chains',
-        CASES_PREVIOUS_DAYS_CONTACTS: 'cases_previous_days_contacts'
+        CASES_PREVIOUS_DAYS_CONTACTS: 'cases_previous_days_contacts',
+        CASES_REFUSING_TREATMENT: 'cases_refusing_treatment',
     };
 
     static LIST_FILTER_TITLE = {
@@ -52,7 +53,8 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
         [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
         [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS',
-        [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS'
+        [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
+        [Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT]: 'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT'
     };
 
     // #TODO replace with Reference Data
@@ -130,4 +132,13 @@ export class Constants {
             value: 'completed'
         }
     };
+
+    /**
+     * Used to match suspect or confirmed cases in the logic ( ex: metrics )
+     * @type {{SUSPECT: string; CONFIRMED: string}}
+     */
+    static CASE_CLASSIFICATION = {
+        SUSPECT: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT',
+        CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED'
+    }
 }

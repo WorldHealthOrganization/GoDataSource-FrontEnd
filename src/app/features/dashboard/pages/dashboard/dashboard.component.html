@@ -69,6 +69,11 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-independent-transmission-chains-dashlet>
 
+                <!-- Cases refusing to be transferred to a treatment unit -->
+                <app-cases-refusing-treatment-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-cases-refusing-treatment-dashlet>
+
                 <div class="other-kpi-content-bottom"></div>
 
             </div>

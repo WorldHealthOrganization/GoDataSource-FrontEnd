@@ -404,6 +404,14 @@ export abstract class ListComponent {
                         this.needsRefreshList(true);
                     });
                 break;
+
+            // filter suspect cases refusing treatment
+            case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
+                // get the correct query builder and merge with the existing one
+                const filterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
+                this.queryBuilder.merge(filterQueryBuilder);
+                this.needsRefreshList(true);
+                break;
         }
     }
 

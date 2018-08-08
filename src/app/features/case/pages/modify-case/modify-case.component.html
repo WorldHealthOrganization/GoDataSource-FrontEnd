@@ -40,7 +40,12 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-slide-toggle
+                                name="transferRefused"
+                                [(ngModel)]="caseData.transferRefused"
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                [disabled]="viewOnly">
+                            </app-form-slide-toggle>
                         </div>
 
                         <app-form-textarea

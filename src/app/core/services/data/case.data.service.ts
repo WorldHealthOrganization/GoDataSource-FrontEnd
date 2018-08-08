@@ -99,13 +99,26 @@ export class CaseDataService {
      * @returns {Observable<any>}
      */
     getHospitalisedCasesCount(outbreakId: string): Observable<any> {
-         // get the query builder and call the endpoint
-         return this.listFilterDataService.filterCasesHospitalized()
+        // get the query builder and call the endpoint
+        return this.listFilterDataService.filterCasesHospitalized()
             .mergeMap((filterQueryBuilder) => {
                 const filter = filterQueryBuilder.buildQuery();
                 // call endpoint
                 return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
             });
+    }
+
+    /**
+     * Return count of cases refusing to be transferred to a treatment unit
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getCasesRefusingTreatmentCount(outbreakId: string): Observable<any> {
+        // generate a query builder for cases refusing treatment
+        const filterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
+        const filter = filterQueryBuilder.buildQuery();
+        // call endpoint
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
 }

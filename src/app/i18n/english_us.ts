@@ -250,6 +250,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
 
         /**
          * Cases list page
@@ -835,6 +836,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE': 'NEW CASES IN THE PREVIOUS ',
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE': ' DAYS AMONG KNOWN CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'SUSPECT CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
 
         /**
          * List Filters page titles
@@ -847,6 +849,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
+        'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
 
         /**
          * Transmission Chain Fields
