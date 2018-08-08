@@ -533,6 +533,7 @@ export const EnglishUsLang = {
         /**
          * Modify Event page
          */
+        'LNG_PAGE_VIEW_EVENT_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_EVENT_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE': 'Event saved!',
         'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
