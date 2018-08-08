@@ -69,6 +69,11 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-independent-transmission-chains-dashlet>
 
+                <!-- Suspect Cases where the lab result is pending -->
+                <app-cases-pending-lab-results-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-cases-pending-lab-results-dashlet>
+
                 <!-- Cases refusing to be transferred to a treatment unit -->
                 <app-cases-refusing-treatment-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">

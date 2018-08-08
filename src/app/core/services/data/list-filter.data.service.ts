@@ -199,6 +199,26 @@ export class ListFilterDataService {
 
     /**
      * Create the query builder for filtering the list of cases
+     * @returns RequestQueryBuilder
+     */
+    filterCasesPendingLabResult(): RequestQueryBuilder {
+        // generate a query builder for cases pending lab result
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.where({
+            classification: Constants.CASE_CLASSIFICATION.SUSPECT
+        }, true);
+
+        const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
+        labResultsQueryBuilder.queryBuilder.filter
+            .where(
+                {
+                    status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
+                }, true);
+        return filterQueryBuilder;
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
      * @returns {RequestQueryBuilder}
      */
     filterCasesRefusingTreatment(): RequestQueryBuilder {
@@ -207,10 +227,10 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             'and': [
                 {
-                    'transferRefused': true
+                    transferRefused: true
                 },
                 {
-                    'classification': Constants.CASE_CLASSIFICATION.SUSPECT
+                    classification: Constants.CASE_CLASSIFICATION.SUSPECT
                 }
             ]
         }, true);

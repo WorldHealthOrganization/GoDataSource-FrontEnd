@@ -405,11 +405,20 @@ export abstract class ListComponent {
                     });
                 break;
 
+            // filter suspect cases with pending lab result
+            case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
+                // get the correct query builder and merge with the existing one
+                const filterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
+                this.queryBuilder.merge(filterQueryBuilder);
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
             // filter suspect cases refusing treatment
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
                 // get the correct query builder and merge with the existing one
-                const filterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
-                this.queryBuilder.merge(filterQueryBuilder);
+                const filterQueryBuilderRefusingTreatment = this.listFilterDataService.filterCasesRefusingTreatment();
+                this.queryBuilder.merge(filterQueryBuilderRefusingTreatment);
                 this.needsRefreshList(true);
                 break;
         }
