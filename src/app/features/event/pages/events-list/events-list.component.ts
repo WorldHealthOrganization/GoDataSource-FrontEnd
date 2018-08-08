@@ -86,6 +86,14 @@ export class EventsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have access to read events
+     * @returns {boolean}
+     */
+    hasEventReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_EVENT);
+    }
+
+    /**
      * Check if we have access to create a contact
      * @returns {boolean}
      */

@@ -185,7 +185,7 @@
 
                     <mat-divider></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                    <button *ngIf="hasCaseReadAccess()" mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 

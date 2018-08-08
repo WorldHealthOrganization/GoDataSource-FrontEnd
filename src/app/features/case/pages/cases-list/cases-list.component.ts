@@ -112,6 +112,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have read access to cases
+     * @returns {boolean}
+     */
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    }
+
+    /**
      * Check if we have access to create a contact
      * @returns {boolean}
      */

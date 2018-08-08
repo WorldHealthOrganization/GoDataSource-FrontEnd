@@ -142,6 +142,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have read access to contacts
+     * @returns {boolean}
+     */
+    hasContactReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
+
+    /**
      * Check if we have write access to follow-ups
      * @returns {boolean}
      */

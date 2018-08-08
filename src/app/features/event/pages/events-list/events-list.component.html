@@ -112,7 +112,7 @@
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        <button *ngIf="hasEventReadAccess()" mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 

@@ -166,7 +166,7 @@
 
                     <mat-divider></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                    <button *ngIf="hasContactReadAccess()" mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 
@@ -175,7 +175,8 @@
                             {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                         </button>
 
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                                (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
                     </ng-container>
