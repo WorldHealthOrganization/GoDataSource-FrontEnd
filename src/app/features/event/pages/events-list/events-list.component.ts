@@ -42,13 +42,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
     Constants = Constants;
     EntityType = EntityType;
 
-    constructor(
-        private eventDataService: EventDataService,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
-        private dialogService: DialogService
-    ) {
+    constructor(private eventDataService: EventDataService,
+                private outbreakDataService: OutbreakDataService,
+                private authDataService: AuthDataService,
+                private snackbarService: SnackbarService,
+                private dialogService: DialogService) {
         super();
     }
 
@@ -86,14 +84,6 @@ export class EventsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Check if we have access to read events
-     * @returns {boolean}
-     */
-    hasEventReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_EVENT);
-    }
-
-    /**
      * Check if we have access to create a contact
      * @returns {boolean}
      */
@@ -106,13 +96,13 @@ export class EventsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        // allways visible columns
-        const columns = ['name', 'date', 'description', 'address'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasEventWriteAccess()) {
-            columns.push('actions');
-        }
+        // always visible columns
+        const columns = [
+            'name',
+            'date',
+            'description',
+            'address',
+            'actions'];
 
         // finished
         return columns;
