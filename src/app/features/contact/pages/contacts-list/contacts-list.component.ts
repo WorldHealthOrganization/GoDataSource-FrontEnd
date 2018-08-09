@@ -18,7 +18,11 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
 import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import {
+    ReferenceDataCategory,
+    ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/filter';
@@ -61,19 +65,17 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
-    constructor(
-        private contactDataService: ContactDataService,
-        private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private route: ActivatedRoute,
-        private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService
-    ) {
+    constructor(private contactDataService: ContactDataService,
+                private authDataService: AuthDataService,
+                private snackbarService: SnackbarService,
+                private outbreakDataService: OutbreakDataService,
+                private genericDataService: GenericDataService,
+                private referenceDataDataService: ReferenceDataDataService,
+                private route: ActivatedRoute,
+                private dialogService: DialogService,
+                protected listFilterDataService: ListFilterDataService) {
         super(listFilterDataService, route.queryParams);
-      }
+    }
 
     ngOnInit() {
         // get the authenticated user
@@ -139,14 +141,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     hasContactWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Check if we have read access to contacts
-     * @returns {boolean}
-     */
-    hasContactReadAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
     }
 
     /**
