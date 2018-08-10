@@ -14,9 +14,17 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <!--if we're coming from a modify action -->
+                        <div *ngIf="!viewOnly" fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a [routerLink]="['/contacts', followUpData.personId, 'modify']">{{ followUpData.contact.name }}</a>
+                            <a [routerLink]="['/contacts', followUpData.personId, 'modify']">{{
+                                followUpData.contact.name }}</a>
+                        </div>
+                        <!--if we're coming from a view action -->
+                        <div *ngIf="viewOnly" fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
+                            <a [routerLink]="['/contacts', followUpData.personId, 'view']">{{
+                                followUpData.contact.name }}</a>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
@@ -24,19 +32,22 @@
                                 name="date"
                                 [(ngModel)]="followUpData.date"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                                required="true">
+                                required="true"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
                                 name="performed"
                                 [(ngModel)]="followUpData.performed"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate">
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="lostToFollowUp"
                                 [(ngModel)]="followUpData.lostToFollowUp"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate">
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
                         </div>
                     </div>
@@ -46,7 +57,8 @@
                 <mat-card class="page-section">
                     <app-form-address
                         name="address"
-                        [ngModel]="followUpData.address">
+                        [ngModel]="followUpData.address"
+                        [disabled]="viewOnly">
                     </app-form-address>
                 </mat-card>
             </mat-tab>
@@ -55,7 +67,8 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="followUpData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.contactFollowUpTemplate">
+                    [questions]="selectedOutbreak.contactFollowUpTemplate"
+                    [disabled]="viewOnly">
                 </app-form-fill-questionnaire>
             </mat-tab>
 
@@ -65,9 +78,12 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button color="primary" class="button-primary">
+        <button [disabled]="viewOnly" mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
-        <button type="button" [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
+        <button type="button"
+                [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'"
+                mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
+        </button>
     </div>
 </form>

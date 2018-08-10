@@ -69,13 +69,24 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_FOLLOWUP]
         }
     },
+    // View Follow Up
+    {
+        path: ':contactId/follow-ups/:followUpId/view',
+        component: fromPages.ModifyContactFollowUpComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_FOLLOWUP],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Modify Follow Up
     {
         path: ':contactId/follow-ups/:followUpId/modify',
         component: fromPages.ModifyContactFollowUpComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_FOLLOWUP]
+            permissions: [PERMISSION.WRITE_FOLLOWUP],
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];

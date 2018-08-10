@@ -155,13 +155,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'area',
             'fullAddress',
             'lostToFollowUp',
-            'deleted'
+            'deleted',
+            'actions'
         ];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasFollowUpsWriteAccess()) {
-            columns.push('actions');
-        }
 
         // return columns that should be visible
         return columns;
@@ -232,20 +228,20 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 undefined,
                 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
             )).subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe(() => {
-                                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
-                                // reload data
-                                this.refreshList();
-                            });
-                    }
-                });
+                            // reload data
+                            this.refreshList();
+                        });
+                }
+            });
         }
     }
 
@@ -281,6 +277,5 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         });
                 }
             });
-
     }
 }

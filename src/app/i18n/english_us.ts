@@ -501,6 +501,7 @@ export const EnglishUsLang = {
         /**
          * Modify Follow-up page
          */
+        'LNG_PAGE_VIEW_FOLLOW_UP_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up {{dateFormatted}}',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
