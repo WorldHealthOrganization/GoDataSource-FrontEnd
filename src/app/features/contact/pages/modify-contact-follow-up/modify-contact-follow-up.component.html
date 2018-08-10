@@ -14,19 +14,11 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <!--if we're coming from a modify action -->
-                        <div *ngIf="!viewOnly" fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a [routerLink]="['/contacts', followUpData.personId, 'modify']">{{
+                            <a [routerLink]="['/contacts', followUpData.personId, viewOnly? 'view' : 'modify']">{{
                                 followUpData.contact.name }}</a>
                         </div>
-                        <!--if we're coming from a view action -->
-                        <div *ngIf="viewOnly" fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a [routerLink]="['/contacts', followUpData.personId, 'view']">{{
-                                followUpData.contact.name }}</a>
-                        </div>
-
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
                                 name="date"

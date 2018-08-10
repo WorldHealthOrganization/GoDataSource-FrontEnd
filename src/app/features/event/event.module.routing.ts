@@ -38,7 +38,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_EVENT],
-            action: ViewModifyComponentAction.MODIFY,
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];

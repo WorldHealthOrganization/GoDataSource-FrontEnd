@@ -65,15 +65,16 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
-    constructor(private contactDataService: ContactDataService,
-                private authDataService: AuthDataService,
-                private snackbarService: SnackbarService,
-                private outbreakDataService: OutbreakDataService,
-                private genericDataService: GenericDataService,
-                private referenceDataDataService: ReferenceDataDataService,
-                private route: ActivatedRoute,
-                private dialogService: DialogService,
-                protected listFilterDataService: ListFilterDataService) {
+    constructor(
+        private contactDataService: ContactDataService,
+        private authDataService: AuthDataService,
+        private snackbarService: SnackbarService,
+        private outbreakDataService: OutbreakDataService,
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private route: ActivatedRoute,
+        private dialogService: DialogService,
+        protected listFilterDataService: ListFilterDataService) {
         super(listFilterDataService, route.queryParams);
     }
 

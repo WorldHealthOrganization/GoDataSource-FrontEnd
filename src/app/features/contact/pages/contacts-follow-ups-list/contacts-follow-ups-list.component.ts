@@ -45,12 +45,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
 
-    constructor(private authDataService: AuthDataService,
-                private outbreakDataService: OutbreakDataService,
-                private followUpsDataService: FollowUpsDataService,
-                private snackbarService: SnackbarService,
-                private dialogService: DialogService,
-                private genericDataService: GenericDataService) {
+    constructor(
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService,
+        private followUpsDataService: FollowUpsDataService,
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService) {
         super();
     }
 
@@ -228,19 +229,19 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 undefined,
                 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
             )).subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe(() => {
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
-                            // reload data
-                            this.refreshList();
-                        });
-                }
+                                // reload data
+                                this.refreshList();
+                            });
+                    }
             });
         }
     }
