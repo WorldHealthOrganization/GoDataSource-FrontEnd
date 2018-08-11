@@ -16,8 +16,9 @@
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a [routerLink]="['/contacts', followUpData.personId, viewOnly? 'view' : 'modify']">{{
-                                followUpData.contact.name }}</a>
+                            <a [routerLink]="['/contacts', followUpData.personId, viewOnly ? 'view' : 'modify']">
+                                {{ followUpData.contact.name }}
+                            </a>
                         </div>
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
@@ -67,15 +68,18 @@
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div class="form-actions" *ngIf="!viewOnly">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button [disabled]="viewOnly" mat-raised-button color="primary" class="button-primary">
+        <button mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
-        <button type="button"
-                [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'"
-                mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
+
+        <button
+            type="button"
+            [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'"
+            mat-raised-button>
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
         </button>
     </div>
 </form>

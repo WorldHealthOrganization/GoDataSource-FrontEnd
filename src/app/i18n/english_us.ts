@@ -566,7 +566,7 @@ export const EnglishUsLang = {
         /**
          * Modify Follow-up page
          */
-        'LNG_PAGE_VIEW_FOLLOW_UP_TITLE': 'View {{name}}',
+        'LNG_PAGE_VIEW_FOLLOW_UP_TITLE': 'View {{dateFormatted}}',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE': 'Modify Follow-up {{dateFormatted}}',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
@@ -586,6 +586,7 @@ export const EnglishUsLang = {
         /**
          * Events list page
          */
+        'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
         'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Event deleted!',
 
         /**

@@ -98,32 +98,34 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create"
                                     [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
                                 {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                             </button>
-                        </ng-container>
 
-                        <mat-divider *app-selected-outbreak-is-active></mat-divider>
+                            <mat-divider></mat-divider>
+                        </ng-container>
 
                         <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
 
+                        <mat-divider></mat-divider>
+
                         <button mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
-                        <mat-divider></mat-divider>
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="hasEventWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                                 {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                             </button>
 
-                            <button *ngIf="hasEventWriteAccess()" mat-menu-item class="mat-menu-item-delete"
-                                    (click)="deleteEvent(item)">
+                            <button
+                                *ngIf="hasEventWriteAccess()"
+                                mat-menu-item class="mat-menu-item-delete"
+                                (click)="deleteEvent(item)">
                                 {{'LNG_PAGE_ACTION_DELETE' | translate}}
                             </button>
                         </ng-container>

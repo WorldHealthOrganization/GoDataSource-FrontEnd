@@ -42,11 +42,13 @@ export class EventsListComponent extends ListComponent implements OnInit {
     Constants = Constants;
     EntityType = EntityType;
 
-    constructor(private eventDataService: EventDataService,
-                private outbreakDataService: OutbreakDataService,
-                private authDataService: AuthDataService,
-                private snackbarService: SnackbarService,
-                private dialogService: DialogService) {
+    constructor(
+        private eventDataService: EventDataService,
+        private outbreakDataService: OutbreakDataService,
+        private authDataService: AuthDataService,
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
+    ) {
         super();
     }
 
@@ -102,7 +104,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
             'date',
             'description',
             'address',
-            'actions'];
+            'actions'
+        ];
 
         // finished
         return columns;
