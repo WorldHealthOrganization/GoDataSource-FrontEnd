@@ -24,6 +24,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -56,13 +57,31 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
     // authenticated user
     authUser: UserModel;
+
     // selected outbreak ID
     outbreakId: string;
+
     // route params
     entityType: EntityType;
     entityId: string;
+
     // list of relationships
     relationshipsList$: Observable<RelationshipModel[]>;
+
+    // list of certainty levels
+    certaintyLevelList$: Observable<any>;
+
+    // list of exposure types
+    exposureTypeList$: Observable<any>;
+
+    // list of exposures frequency
+    exposuresFrequencyList$: Observable<any>;
+
+    // list of exposures durations
+    exposureDurationList$: Observable<any>;
+
+    // list of relationships
+    relationshipTypeList$: Observable<any>;
 
     // provide constants to template
     Constants = Constants;
@@ -77,6 +96,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
+        private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
         super();
@@ -85,6 +105,12 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.certaintyLevelList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
+        this.exposureTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
+        this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
+        this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
+        this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION)
 
         this.route.params
             .subscribe((params: { entityType, entityId }) => {
@@ -115,7 +141,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                            .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                                 // add new breadcrumb: Entity Modify page
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
@@ -140,9 +166,15 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
             // include related people in response
             const qb = new RequestQueryBuilder();
-            qb.include('people');
-
             qb.merge(this.queryBuilder);
+
+            const peopleQueryBuilder = qb.include('people');
+            peopleQueryBuilder.queryBuilder.filter.where({
+                id: {
+                    neq: this.entityId
+                }
+            }, true)
+
 
             // retrieve the list of Relationships
             this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(
@@ -205,34 +237,32 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     }
 
     /**
-     * Filter by related entity first name
+     * Filter by related entity name
      * @param {string} value
      */
-    filterByFirstName(value: string) {
+    filterByName(property: string, value: string) {
+        // create condition for filter
         const peopleQueryBuilder = this.queryBuilder.include('people');
-        peopleQueryBuilder.queryBuilder.filter
-            .where({
-                or: [
-                    {
-                        firstName: {
-                            regexp: `/^${value}/i`
-                        }
-                    },
-                    {
-                        name: {
-                            regexp: `/^${value}/i`
-                        }
-                    },
-                ]
-            }, true)
-            .where({
-                id: {
-                    neq: this.entityId
+        const condition = {
+            or: [{
+                [property]: {
+                    regexp: `/^${value}/i`
                 }
-            }, true);
+            }, {
+                name: {
+                    regexp: `/^${value}/i`
+                }
+            }]
+        };
 
+        // if the value is empty we remove de condition
+        if (_.isEmpty(value)) {
+            peopleQueryBuilder.queryBuilder.filter.removeCondition(condition);
+        } else {
+            peopleQueryBuilder.queryBuilder.filter
+                .where(condition, true);
+        }
         // refresh list
         this.needsRefreshList();
     }
-
 }
