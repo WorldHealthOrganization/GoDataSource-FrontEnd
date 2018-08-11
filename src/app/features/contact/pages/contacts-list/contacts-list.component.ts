@@ -18,7 +18,11 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
 import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import {
+    ReferenceDataCategory,
+    ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/filter';
@@ -73,7 +77,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         protected listFilterDataService: ListFilterDataService
     ) {
         super(listFilterDataService, route.queryParams);
-      }
+    }
 
     ngOnInit() {
         // get the authenticated user

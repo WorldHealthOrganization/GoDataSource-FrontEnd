@@ -4,6 +4,7 @@ import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 
 import * as fromPages from './pages';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Events list
@@ -20,13 +21,24 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_EVENT]
         }
     },
+    // View Event
+    {
+        path: ':eventId/view',
+        component: fromPages.ModifyEventComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_EVENT],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Modify Event
     {
         path: ':eventId/modify',
         component: fromPages.ModifyEventComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_EVENT]
+            permissions: [PERMISSION.WRITE_EVENT],
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];

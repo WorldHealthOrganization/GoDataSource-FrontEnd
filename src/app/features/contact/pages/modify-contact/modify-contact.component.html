@@ -184,12 +184,17 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">
-            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-        </button>
-        <button type="button" [routerLink]="'/contacts'" mat-raised-button>{{'LNG_COMMON_BUTTON_CANCEL' | translate}}</button>
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="primary" class="button-primary">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
 
-        <div class="page-tabs-navbar-placeholder"></div>
+            <button type="button" [routerLink]="'/contacts'" mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}

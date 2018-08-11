@@ -10,6 +10,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-event',
@@ -17,7 +18,7 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './modify-event.component.html',
     styleUrls: ['./modify-event.component.less']
 })
-export class ModifyEventComponent implements OnInit {
+export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Events', '/events')
@@ -32,13 +33,15 @@ export class ModifyEventComponent implements OnInit {
     EntityType = EntityType;
 
     constructor(
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private eventDataService: EventDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router
-    ) {}
+    ) {
+        super(route);
+    }
 
     ngOnInit() {
         this.route.params
@@ -58,7 +61,7 @@ export class ModifyEventComponent implements OnInit {
                                 this.eventData = new EventModel(eventDataReturned);
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
-                                        'LNG_PAGE_MODIFY_EVENT_TITLE',
+                                        this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
                                         '.',
                                         true,
                                         {},
