@@ -22,8 +22,8 @@ import * as _ from 'lodash';
 export class CreateUserComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Users', '..'),
-        new BreadcrumbItemModel('Create New User', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '..'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true)
     ];
 
     newUser: UserModel = new UserModel();
@@ -56,7 +56,7 @@ export class CreateUserComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('User created!');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.router.navigate(['/users']);

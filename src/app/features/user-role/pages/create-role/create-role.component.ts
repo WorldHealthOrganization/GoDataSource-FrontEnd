@@ -22,8 +22,8 @@ import * as _ from 'lodash';
 export class CreateRoleComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Roles', '..'),
-        new BreadcrumbItemModel('Create New Role', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '..'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_ROLE_TITLE', '.', true)
     ];
 
     newUserRole: UserRoleModel = new UserRoleModel();
@@ -54,7 +54,7 @@ export class CreateRoleComponent {
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('Role created!');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.router.navigate(['/user-roles']);

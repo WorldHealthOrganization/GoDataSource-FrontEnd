@@ -1,6 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
+import { ElementBaseFailure } from '../../core';
 
 @Component({
     selector: 'app-form-validation',
@@ -9,7 +10,7 @@ import * as _ from 'lodash';
     styleUrls: ['./form-validation.component.less']
 })
 export class FormValidationComponent {
-    @Input() messages: Array<string>;
+    @Input() messages: Array<ElementBaseFailure>;
     @Input() controlContainer: ControlContainer;
     @Input() controlName: string;
 

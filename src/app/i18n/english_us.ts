@@ -102,7 +102,7 @@ export const EnglishUsLang = {
          * Login page
          */
         'LNG_PAGE_LOGIN_WELCOME_MESSAGE': 'Welcome!',
-        'LNG_PAGE_LOGIN_LOGIN_LABEL': 'Login',
+        'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON': 'Login',
         'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL': 'Forgot Password?',
         'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE': `Welcome, {{name}}!`,
 
@@ -123,7 +123,19 @@ export const EnglishUsLang = {
          * Form input validation errors
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
+        'LNG_FORM_VALIDATION_ERROR_PATTERN': 'Value does not match required pattern',
+        'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH': 'Must contain a minimum of {{length}} characters',
+        'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH': 'Must contain a maximum of {{length}} characters',
+        'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE': 'Value must match password',
+        'LNG_FORM_VALIDATION_ERROR_NOT_EQUAL_QUESTION_VALUE': 'The questions need to be different',
+        'LNG_FORM_VALIDATION_ERROR_TERMS_CONDITIONS': 'Terms and conditions must be accepted',
+        'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL': 'Invalid email address',
+        'LNG_FORM_VALIDATION_ERROR_FIELD_PASSWORD': 'Password must contain at least 6 characters, 1 lowercase, 1 uppercase, 1 number and 1 symbol',
+        'LNG_FORM_VALIDATION_ERROR_EXTENSION': 'Please upload a valid file: {{extensions}}',
+        'LNG_FORM_VALIDATION_EMAIL_UNIQUE': 'E-mail does already exist.',
+        'LNG_FORM_VALIDATION_PAGE_UNIQUE': 'Page name does already exist',
         'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE': 'Duplicate value',
+        'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
 
         /**
          * API Errors
@@ -250,6 +262,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
 
         /**
          * Cases list page
@@ -382,6 +395,58 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
+
+        /**
+         * User fields
+         */
+        'LNG_USER_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_USER_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_USER_FIELD_LABEL_EMAIL': 'Email',
+        'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
+        'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
+
+        /**
+         * List Users page
+         */
+        'LNG_PAGE_LIST_USERS_TITLE': 'Users',
+        'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE': 'User deleted!',
+
+        /**
+         * Create User page
+         */
+        'LNG_PAGE_CREATE_USER_TITLE': 'Create New User',
+        'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE': 'User created!',
+
+        /**
+         * Modify User page
+         */
+        'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
+        'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
+
+        /**
+         * User Role fields
+         */
+        'LNG_USER_ROLE_FIELD_LABEL_NAME': 'Name',
+        'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS': 'Options',
+
+        /**
+         * List User Role page
+         */
+        'LNG_PAGE_LIST_USER_ROLES_TITLE': 'Roles',
+        'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE': 'Role deleted!',
+
+        /**
+         * Create User Role Page
+         */
+        'LNG_PAGE_CREATE_USER_ROLE_TITLE': 'Create New Role',
+        'LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE': 'Role created!',
+
+        /**
+         * Modify User Role page
+         */
+        'LNG_PAGE_MODIFY_USER_ROLES_TITLE': 'Modify Role',
+        'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE': 'Role updated!',
 
         /**
          * Contact Fields
@@ -676,12 +741,28 @@ export const EnglishUsLang = {
         'LNG_SECURITY_QUESTION_7': 'What is your spouse or partner\'s mother\'s maiden name?',
 
         /**
+         * Set Security Questions Page
+         */
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_TITLE': 'Set Security Questions',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE': 'Security Questions were updated',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET': 'You already set your security questions.',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION': 'Select the questions below and add an answer for each of them.',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1': 'Question 1',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2': 'Question 2',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1': 'Answer 1',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2': 'Answer 2',
+
+
+
+
+        /**
          * Forgot Password Page
          */
         'LNG_PAGE_FORGOT_PASSWORD_TITLE': 'Reset Password',
         'LNG_PAGE_FORGOT_PASSWORD_DESCRIPTION': 'In order to reset your password, please input the email address associated with your account and press Reset Password button.',
         'LNG_PAGE_FORGOT_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Use Security Questions',
         'LNG_PAGE_FORGOT_PASSWORD_BUTTON': 'Reset Password',
+        'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE': 'Reset password instructions were sent to {{email}}, if the email address is associated with an account.',
 
         /**
          * Reset Password Using Security Questions Page
@@ -705,11 +786,12 @@ export const EnglishUsLang = {
         /**
          * Change Password Page
          */
+        'LNG_PAGE_CHANGE_PASSWORD_TITLE': 'Change Password',
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_NOTIFICATION': 'We recommend setting the security questions which will allow you to change your password even if there are connectivity issues. However, this can be done later as well from the user menu.',
         'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION': 'You must change your password to be different from the default one!',
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
         'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
-        'LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
+        'LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
 
         /**
          * Outbreaks List Page
@@ -768,6 +850,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE': 'NEW CASES IN THE PREVIOUS ',
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE': ' DAYS AMONG KNOWN CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'SUSPECT CASES WITH PENDING LAB RESULT',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'SUSPECT CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
 
         /**
          * List Filters page titles
@@ -780,6 +864,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
+        'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
+        'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
 
         /**
          * Transmission Chain Fields

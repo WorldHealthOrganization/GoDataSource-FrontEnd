@@ -4,9 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary"
-                        [routerLink]="'./create'">
-                    Add <span class="xt-icon">addCircle</span>
+                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
         </div>
@@ -21,12 +20,12 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef fxFlex="20">
                 <div class="table-header-cell">
-                    <div mat-sort-header>Name</div>
+                    <div mat-sort-header>{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)">
                         </app-form-input>
                     </div>
@@ -42,7 +41,7 @@
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    Description
+                    {{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -57,7 +56,7 @@
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
                 <div class="table-header-cell">
-                    Permissions
+                    {{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -87,14 +86,14 @@
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
                                 [routerLink]="['.', item.id, 'modify']">
-                            Modify
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>
                     </span>
 
                     <span
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)">
-                            Delete
+                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)" class="mat-menu-item-delete">
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
                         </button>
                     </span>
 

@@ -232,7 +232,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             }, true);
 
         // refresh list
-        this.refreshList();
+        this.needsRefreshList();
     }
 
 }

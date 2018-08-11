@@ -26,7 +26,7 @@
                         <app-form-input
                             name="nameFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('name', $event)">
                         </app-form-input>
                     </div>
@@ -47,7 +47,7 @@
                         <app-form-select
                             name="diseaseFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="diseasesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"
@@ -121,7 +121,7 @@
                         <app-form-select
                             name="activeFilter"
                             ngModel
-                            placeholder="Filter"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="activeOptionsList$ | async"
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
                         >

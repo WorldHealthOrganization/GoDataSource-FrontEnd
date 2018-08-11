@@ -5,15 +5,15 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
-    selector: 'app-cases-hospitalised-dashlet',
+    selector: 'app-cases-refusing-treatment-dashlet',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './cases-hospitalised-dashlet.component.html',
-    styleUrls: ['./cases-hospitalised-dashlet.component.less']
+    templateUrl: './cases-refusing-treatment-dashlet.component.html',
+    styleUrls: ['./cases-refusing-treatment-dashlet.component.less']
 })
-export class CasesHospitalisedDashletComponent implements OnInit {
+export class CasesRefusingTreatmentDashletComponent implements OnInit {
 
-    // number of hospitalised cases
-    casesHospitalisedCount: number;
+    // number of cases refusing treatment
+    casesRefusingTreatmentCount: number;
     // constants to be used for applyListFilters
     Constants: any = Constants;
 
@@ -23,16 +23,16 @@ export class CasesHospitalisedDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // get number of hospitalised cases
+        // get number of cases refusing treatment
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for hospitalised cases
+                // get the results for cases refusing treatment
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.caseDataService
-                        .getHospitalisedCasesCount(selectedOutbreak.id)
+                        .getCasesRefusingTreatmentCount(selectedOutbreak.id)
                         .subscribe((result) => {
-                            this.casesHospitalisedCount = result.count;
+                            this.casesRefusingTreatmentCount = result.count;
                         });
                 }
             });

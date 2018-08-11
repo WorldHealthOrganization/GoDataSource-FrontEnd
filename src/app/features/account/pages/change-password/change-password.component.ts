@@ -20,7 +20,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 export class ChangePasswordComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Change Password', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_CHANGE_PASSWORD_TITLE', '.', true)
     ];
 
     authUser: UserModel;
@@ -55,6 +55,15 @@ export class ChangePasswordComponent {
                 })
                 .subscribe(() => {
 
+                    const refreshUserAndShowMessage = () => {
+                        this.authDataService
+                            .reloadAndPersistAuthUser()
+                            .subscribe((authenticatedUser) => {
+                                this.authUser = authenticatedUser.user;
+                                this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+                            });
+                    };
+
                     // check if user was required to change password
                     if (this.authUser.passwordChange) {
                         // update user details so next time it's not required to change its password again
@@ -62,16 +71,14 @@ export class ChangePasswordComponent {
                             .modifyUser(this.authUser.id, {passwordChange: false})
                             .subscribe(() => {
                                 // refresh user data
-                                this.authDataService
-                                    .reloadAndPersistAuthUser()
-                                    .subscribe((authenticatedUser) => {
-                                        this.authUser = authenticatedUser.user;
-                                        this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+                                refreshUserAndShowMessage();
+                                // set passwordChanged to true so we can display the security questions notification.
+                                this.passwordChanged = true;
 
-                                        // set passwordChanged to true so we can display the security questions notification.
-                                        this.passwordChanged = true;
-                                    });
                             });
+                    } else {
+                        // refresh user data
+                        refreshUserAndShowMessage();
                     }
 
                 });

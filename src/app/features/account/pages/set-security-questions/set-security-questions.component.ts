@@ -24,7 +24,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 export class SetSecurityQuestionsComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Set Security Questions', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_SET_SECURITY_QUESTIONS_TITLE', '.', true)
     ];
 
     authUser: UserModel;
@@ -65,7 +65,7 @@ export class SetSecurityQuestionsComponent {
                         .reloadAndPersistAuthUser()
                         .subscribe((authenticatedUser) => {
                             this.authUser = authenticatedUser.user;
-                            this.snackbarService.showSuccess('Security Questions were updated!');
+                            this.snackbarService.showSuccess('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
                             this.viewForm = false;
                             this.alreadySet = true;
                         });
