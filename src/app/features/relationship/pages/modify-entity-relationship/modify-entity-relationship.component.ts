@@ -19,6 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -26,7 +27,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
     templateUrl: './modify-entity-relationship.component.html',
     styleUrls: ['./modify-entity-relationship.component.less']
 })
-export class ModifyEntityRelationshipComponent implements OnInit {
+export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -63,7 +64,7 @@ export class ModifyEntityRelationshipComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
@@ -72,6 +73,7 @@ export class ModifyEntityRelationshipComponent implements OnInit {
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
+        super(route);
     }
 
     ngOnInit() {
@@ -145,7 +147,7 @@ export class ModifyEntityRelationshipComponent implements OnInit {
                                         // add new breadcrumb: page title
                                         this.breadcrumbs.push(
                                             new BreadcrumbItemModel(
-                                                'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+                                                this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
                                                 null,
                                                 true,
                                                 {},

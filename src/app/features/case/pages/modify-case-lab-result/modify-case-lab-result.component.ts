@@ -15,6 +15,7 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -22,7 +23,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     templateUrl: './modify-case-lab-result.component.html',
     styleUrls: ['./modify-case-lab-result.component.less']
 })
-export class ModifyCaseLabResultComponent implements OnInit {
+export class ModifyCaseLabResultComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -44,7 +45,7 @@ export class ModifyCaseLabResultComponent implements OnInit {
     progressOptionsList$: Observable<any[]>;
 
     constructor(
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
         private snackbarService: SnackbarService,
@@ -54,6 +55,7 @@ export class ModifyCaseLabResultComponent implements OnInit {
         private genericDataService: GenericDataService,
         private labResultDataService: LabResultDataService
     ) {
+        super(route);
     }
 
     ngOnInit() {
@@ -107,7 +109,7 @@ export class ModifyCaseLabResultComponent implements OnInit {
                                         // add new breadcrumb: page title
                                         this.breadcrumbs.push(
                                             new BreadcrumbItemModel(
-                                                'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                                                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
                                                 null,
                                                 true,
                                                 {},

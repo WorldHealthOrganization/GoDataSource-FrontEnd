@@ -199,20 +199,26 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div *app-selected-outbreak-is-active>
+                <div>
                     <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                            {{'LNG_PAGE_ACTION_VIEW' | translate}}
                         </button>
 
-                        <button mat-menu-item class="mat-menu-item-delete" (click)="deleteRelationship(item)">
-                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
-                        </button>
+                        <ng-container *app-selected-outbreak-is-active>
+                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                                {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            </button>
+
+                            <button *ngIf="hasEntityWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteRelationship(item)">
+                                {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            </button>
+                        </ng-container>
 
                     </mat-menu>
                 </div>

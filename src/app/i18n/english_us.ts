@@ -329,6 +329,7 @@ export const EnglishUsLang = {
         /**
          * Modify Case Lab Result page
          */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'View {{name}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE': 'Modify result {{sampleIdentifier}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
@@ -344,6 +345,7 @@ export const EnglishUsLang = {
         /**
          * Modify Entity Relationship page
          */
+        'LNG_PAGE_VIEW_RELATIONSHIP_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_DETAILS': 'Details',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified!',
