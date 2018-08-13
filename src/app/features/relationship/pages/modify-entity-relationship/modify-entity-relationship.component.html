@@ -27,10 +27,10 @@
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div *ngIf="!viewOnly" class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">
+        <button mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button type="button" [routerLink]="['/relationships', entityType, entityId]" mat-raised-button>

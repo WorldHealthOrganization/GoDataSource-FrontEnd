@@ -336,7 +336,7 @@ export const EnglishUsLang = {
         /**
          * Modify Case Lab Result page
          */
-        'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'View {{name}}',
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'View result {{sampleIdentifier}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE': 'Modify result {{sampleIdentifier}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
