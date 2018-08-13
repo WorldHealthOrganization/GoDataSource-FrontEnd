@@ -16,6 +16,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -40,6 +41,8 @@ export class CreateCaseLabResultComponent implements OnInit {
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     caseId: string;
+
+    Constants = Constants;
 
     constructor(
         private route: ActivatedRoute,

@@ -21,6 +21,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EventModel } from '../../../../core/models/event.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-contact',
@@ -44,6 +45,8 @@ export class CreateContactComponent implements OnInit {
 
     relatedEntityData: CaseModel|EventModel;
     relationship: RelationshipModel = new RelationshipModel();
+
+    Constants = Constants;
 
     constructor(
         private router: Router,

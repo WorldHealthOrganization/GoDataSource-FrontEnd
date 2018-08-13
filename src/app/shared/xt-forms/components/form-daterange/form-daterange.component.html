@@ -10,8 +10,9 @@
                 [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
                 [disabled]="disabled"
                 [required]="required"
-                (input)="onChange()"
-                (optionChanged)="onChange()">
+                (optionChanged)="onChange()"
+                app-date-validator
+                [dateSameOrBefore]="name + '[endDate]'">
             </app-form-datepicker>
 
             <app-form-datepicker
@@ -21,8 +22,9 @@
                 [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
                 [disabled]="disabled"
                 [required]="required"
-                (input)="onChange()"
-                (optionChanged)="onChange()">
+                (optionChanged)="onChange()"
+                app-date-validator
+                [dateSameOrAfter]="name + '[startDate]'">
             </app-form-datepicker>
         </div>
     </form>

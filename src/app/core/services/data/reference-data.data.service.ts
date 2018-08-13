@@ -15,6 +15,7 @@ import { LabelValuePair } from '../../models/label-value-pair';
 export class ReferenceDataDataService {
 
     categoriesList$: Observable<any>;
+    referenceDataListMap$: Observable<any>;
 
     constructor(
         private http: HttpClient,
@@ -23,6 +24,28 @@ export class ReferenceDataDataService {
         private i18nService: I18nService
     ) {
         this.categoriesList$ = this.http.get(`reference-data/available-categories`).share();
+
+        // retrieve categories
+        this.referenceDataListMap$ = this.getCategoriesList()
+            .mergeMap((categories: ReferenceDataCategoryModel[]) => {
+                return this.modelHelper.mapObservableListToModel(
+                    this.http.get(`reference-data`),
+                    ReferenceDataEntryModel
+                ).map((referenceData: ReferenceDataEntryModel[]) => {
+                    // map entries by category id
+                    const entriesMap = _.groupBy(referenceData, 'categoryId');
+
+                    // group entries by category
+                    return _.map(categories, (category: ReferenceDataCategoryModel) => {
+                        // find all entries for current category
+                        category.entries = entriesMap[category.id];
+
+                        return category;
+                    });
+                }).do((referenceDataResult) => {
+                    this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
+                });
+            }).share();
     }
 
     /**
@@ -30,7 +53,6 @@ export class ReferenceDataDataService {
      * @returns {Observable<ReferenceDataCategoryModel[]>}
      */
     getCategoriesList(): Observable<ReferenceDataCategoryModel[]> {
-
         return this.modelHelper.mapObservableListToModel(
             this.categoriesList$,
             ReferenceDataCategoryModel
@@ -42,38 +64,13 @@ export class ReferenceDataDataService {
      * @returns {Observable<ReferenceDataCategoryModel[]>}
      */
     getReferenceData(): Observable<ReferenceDataCategoryModel[]> {
-
         // get reference data from cache
         const referenceDataCache = this.cacheService.get(CacheKey.REFERENCE_DATA);
         if (referenceDataCache) {
             return Observable.of(referenceDataCache);
         } else {
-            // retrieve categories
-            return this.getCategoriesList()
-                .mergeMap((categories: ReferenceDataCategoryModel[]) => {
-
-                    // get reference data entries from API
-                    return this.modelHelper.mapObservableListToModel(
-                        this.http.get(`reference-data`),
-                        ReferenceDataEntryModel
-                    )
-                        .map((referenceData: ReferenceDataEntryModel[]) => {
-
-                            // map entries by category id
-                            const entriesMap = _.groupBy(referenceData, 'categoryId');
-
-                            // group entries by category
-                            return _.map(categories, (category: ReferenceDataCategoryModel) => {
-                                // find all entries for current category
-                                category.entries = entriesMap[category.id];
-
-                                return category;
-                            });
-                        })
-                        .do((referenceDataResult) => {
-                            this.cacheService.set(CacheKey.REFERENCE_DATA, referenceDataResult);
-                        });
-                });
+            // get reference data entries from API
+            return this.referenceDataListMap$;
         }
     }
 
@@ -111,7 +108,6 @@ export class ReferenceDataDataService {
      * @returns {Observable<ReferenceDataEntryModel>}
      */
     getEntry(entryId: string): Observable<ReferenceDataEntryModel> {
-
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
         qb.include('category');

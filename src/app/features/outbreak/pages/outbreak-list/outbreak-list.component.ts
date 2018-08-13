@@ -18,7 +18,6 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-outbreak-list',

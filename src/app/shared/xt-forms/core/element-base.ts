@@ -22,7 +22,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     // form control name
     protected abstract name: string;
     // form control object
-    protected control: AbstractControl;
+    public control: AbstractControl;
 
     public validationResult = null;
 

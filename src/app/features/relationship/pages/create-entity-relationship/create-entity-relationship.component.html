@@ -18,7 +18,7 @@
 
                     <app-form-relationship
                         [name]="'relationships[' + i + '][relationship]'"
-                        ngModel
+                        [ngModel]="relationship"
                         [relatedObject]="person"
                         required="true">
                     </app-form-relationship>

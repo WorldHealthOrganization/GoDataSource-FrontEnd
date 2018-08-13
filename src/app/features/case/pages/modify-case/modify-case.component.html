@@ -30,7 +30,11 @@
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()"
+                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -149,7 +153,10 @@
                                     name="dob"
                                     [(ngModel)]="caseData.dob"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [maxDate]="Constants.today()"
+                                    app-date-validator
+                                    [dateSameOrBefore]="Constants.today()">
                                 </app-form-datepicker>
                             </div>
 
@@ -198,21 +205,29 @@
                                 name="dateBecomeCase"
                                 [(ngModel)]="caseData.dateBecomeCase"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfInfection"
                                 [(ngModel)]="caseData.dateOfInfection"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()"
+                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfOutcome"
                                 [(ngModel)]="caseData.dateOfOutcome"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                app-date-validator>
                             </app-form-datepicker>
                         </div>
 
@@ -229,7 +244,9 @@
                                 name="isDateOfOnsetApproximate"
                                 [(ngModel)]="caseData.isDateOfOnsetApproximate"
                                 [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                app-date-validator
+                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
@@ -244,7 +261,15 @@
                                     name="dateDeceased"
                                     [(ngModel)]="caseData.dateDeceased"
                                     [disabled]="!caseData.deceased || viewOnly"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate">
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
+                                    [maxDate]="Constants.today()"
+                                    app-date-validator
+                                    [dateSameOrBefore]="Constants.today()"
+                                    [dateSameOrAfter]="[
+                                        [caseData.dateOfReporting, 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING' | translate],
+                                        [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate],
+                                        [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
+                                    ]">
                                 </app-form-datepicker>
                             </div>
 
@@ -259,7 +284,8 @@
                 <app-form-daterange-list
                     name="hospitalizationDates"
                     [(ngModel)]="caseData.hospitalizationDates"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [required]="true">
                 </app-form-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES'| translate}}</div>
@@ -268,7 +294,8 @@
                 <app-form-daterange-list
                     name="isolationDates"
                     [(ngModel)]="caseData.isolationDates"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [required]="true">
                 </app-form-daterange-list>
 
             </mat-tab>

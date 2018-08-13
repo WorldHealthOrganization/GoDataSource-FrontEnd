@@ -9,7 +9,7 @@
                     [name]="name + '[' + i + ']'"
                     [ngModel]="values[i]"
                     (changed)="onChange(false)"
-                    [required]="false"
+                    [required]="required"
                     (groupValidated)="validateGroup()"
                     [disabled]="disabled">
                 </app-form-daterange>
