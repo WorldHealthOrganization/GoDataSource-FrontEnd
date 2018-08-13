@@ -7,6 +7,8 @@ import { TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
+import { GraphNodeModel } from '../../models/graph-node.model';
+import { GraphEdgeModel } from '../../models/graph-edge.model';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -55,18 +57,35 @@ export class TransmissionChainDataService {
             MetricIndependentTransmissionChainsModel
         );
     }
-//  {data: {id: 'j', name: 'Jerry', nodeColor: '#6FB1FC', faveShape: 'triangle'}},
-    convertChainToGraphElements(transmissionChain: TransmissionChainModel) {
-       let graphData: any = {};
+
+    /**
+     * convert transmission chain model to the format needed by the graph
+     * @param {TransmissionChainModel} transmissionChain
+     * @returns {any}
+     */
+    convertChainToGraphElements(transmissionChain: TransmissionChainModel): any {
+       const graphData: any = {nodes: [], edges: []};
        if ( !_.isEmpty(transmissionChain) ) {
-           if( !_.isEmpty ( transmissionChain.nodes) ) {
+           if ( !_.isEmpty ( transmissionChain.nodes) ) {
                _.forEach( transmissionChain.nodes, function(node, key) {
-                   graphData.nodes.
+                   graphData.nodes.push({data: new GraphNodeModel(node.model)});
                });
            }
-
+           if ( !_.isEmpty ( transmissionChain.relationships) ) {
+               _.forEach( transmissionChain.relationships, function(relationship, key) {
+                   const graphEdge = new GraphEdgeModel();
+                   if ( relationship.persons[0].source ) {
+                       graphEdge.source = relationship.persons[0].id;
+                       graphEdge.target = relationship.persons[1].id;
+                   } else {
+                       graphEdge.source = relationship.persons[1].id;
+                       graphEdge.target = relationship.persons[0].id;
+                   }
+                   graphData.edges.push({data: graphEdge});
+               });
+           }
        }
-
+       return graphData;
     }
 }
 

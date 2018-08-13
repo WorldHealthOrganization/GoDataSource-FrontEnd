@@ -7,6 +7,17 @@
 
     <div class="page-content">
 
+        <mat-card class="dashboard-section">
+
+            <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE' | translate}}</div>
+
+            <!-- Chains of transmission -->
+            <app-transmission-chains-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-transmission-chains-dashlet>
+
+        </mat-card>
+
         <mat-card>
             <!-- other KPI section header -->
             <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}</div>
@@ -85,13 +96,6 @@
 
         </mat-card>
 
-        <mat-card>
-
-            <app-cytoscape-graph></app-cytoscape-graph>
-
-            <div class="other-kpi-content-bottom"></div>
-
-        </mat-card>
 
     </div>
 </div>

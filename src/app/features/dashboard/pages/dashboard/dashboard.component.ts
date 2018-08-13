@@ -19,6 +19,7 @@ export class DashboardComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+
    constructor(
         private authDataService: AuthDataService
     ) {}
