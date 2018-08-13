@@ -70,7 +70,7 @@ export class ResetPasswordComponent implements OnInit {
                 })
                 .subscribe(() => {
 
-                    this.snackbarService.showSuccess('Password changed!');
+                    this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
                     // redirect to login page
                     this.router.navigate(['/auth/login']);

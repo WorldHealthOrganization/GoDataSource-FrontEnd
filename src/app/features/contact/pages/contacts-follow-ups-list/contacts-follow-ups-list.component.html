@@ -145,28 +145,37 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div *app-selected-outbreak-is-active>
+                <div>
                     <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item *ngIf="!item.deleted && item.personId && !item.lostToFollowUp" (click)="markContactAsMissedFromFollowUp(item)">
-                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate }}
+                        <ng-container *app-selected-outbreak-is-active>
+                            <button mat-menu-item *ngIf="!item.deleted && item.personId && !item.lostToFollowUp && hasFollowUpsWriteAccess()" (click)="markContactAsMissedFromFollowUp(item)">
+                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate }}
+                            </button>
+
+                            <mat-divider *ngIf="!item.deleted && item.personId && !item.lostToFollowUp"></mat-divider>
+                        </ng-container>
+
+                        <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
-                        <mat-divider *ngIf="!item.deleted && item.personId && !item.lostToFollowUp"></mat-divider>
+                        <ng-container *app-selected-outbreak-is-active>
+                            <button *ngIf="!item.deleted && item.personId && hasFollowUpsWriteAccess()" mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]">
+                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            </button>
 
-                        <button *ngIf="!item.deleted && item.personId" mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                        </button>
-                        <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="deleteFollowUp(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
+                            <button *ngIf="!item.deleted && hasFollowUpsWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteFollowUp(item)">
+                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            </button>
 
-                        <button *ngIf="item.deleted" mat-menu-item class="mat-menu-item-restore" (click)="restoreFollowUp(item)">
-                            {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
-                        </button>
+                            <button *ngIf="item.deleted && hasFollowUpsWriteAccess()" mat-menu-item class="mat-menu-item-restore" (click)="restoreFollowUp(item)">
+                                {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
+                            </button>
+                        </ng-container>
                     </mat-menu>
                 </div>
             </mat-cell>

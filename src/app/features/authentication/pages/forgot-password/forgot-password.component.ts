@@ -56,8 +56,8 @@ export class ForgotPasswordComponent implements OnInit {
                 .subscribe(() => {
 
                     this.snackbarService.showSuccess(
-                        `Reset password instructions were sent to ${dirtyFields.email}, if the email address is associated with an account.`,
-                        10000
+                        `LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE`,
+                        {email: dirtyFields.email}
                     );
 
                     // redirect to login page

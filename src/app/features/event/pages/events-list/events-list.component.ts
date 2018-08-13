@@ -98,13 +98,14 @@ export class EventsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        // allways visible columns
-        const columns = ['name', 'date', 'description', 'address'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasEventWriteAccess()) {
-            columns.push('actions');
-        }
+        // always visible columns
+        const columns = [
+            'name',
+            'date',
+            'description',
+            'address',
+            'actions'
+        ];
 
         // finished
         return columns;

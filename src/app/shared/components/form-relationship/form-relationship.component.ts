@@ -12,6 +12,7 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-form-relationship',
@@ -42,6 +43,8 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
 
     // provide constants to template
     EntityType = EntityType;
+
+    Constants = Constants;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -81,10 +84,10 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     }
 
     ngAfterViewInit() {
-        setTimeout(() => {
-            // (re-)init value
-            this.value = new RelationshipModel(this.value);
+        // call parent
+        super.ngAfterViewInit();
 
+        setTimeout(() => {
             // set default values on relationship
             this.certaintyLevelOptions$
                 .subscribe((options: LabelValuePair[]) => {

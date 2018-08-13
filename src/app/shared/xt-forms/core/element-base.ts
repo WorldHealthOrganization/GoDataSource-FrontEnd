@@ -13,6 +13,7 @@ import {
     validate,
 } from './validate';
 import { ErrorMessage } from './error-message';
+import { ElementBaseFailure } from './element-base-failure';
 
 /**
  * Base class to be extended by custom form controls
@@ -21,7 +22,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     // form control name
     protected abstract name: string;
     // form control object
-    protected control: AbstractControl;
+    public control: AbstractControl;
 
     public validationResult = null;
 
@@ -68,9 +69,9 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     /**
      * Getter for 'failures' property of a custom form control
      * Returns a list of validation error messages for a custom form control.
-     * @returns {Array<string>}
+     * @returns {Array<ElementBaseFailure>}
      */
-    protected get failures(): Array<string> {
+    protected get failures(): Array<ElementBaseFailure> {
         return Object.keys(this.validationResult || {}).map(k => {
             const errorMessage = new ErrorMessage(this.validationResult, k);
             return errorMessage.getMessage();

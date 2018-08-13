@@ -97,26 +97,20 @@ export class ModifyOutbreakComponent implements OnInit {
         // const dirtyFields: any = this.formHelper.getFields(form);
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // validate end date to be greater than start date
-        if (dirtyFields.endDate && dirtyFields.endDate < dirtyFields.startDate) {
-            this.snackbarService.showError('LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR');
-        } else {
-
-            // modify the outbreak
-            this.outbreakDataService
-                .modifyOutbreak(this.outbreakId, dirtyFields)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                    // update language tokens to get the translation of submitted questions and answers
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to listing page
-                    this.router.navigate(['/outbreaks']);
-                });
-        }
+        // modify the outbreak
+        this.outbreakDataService
+            .modifyOutbreak(this.outbreakId, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+                // update language tokens to get the translation of submitted questions and answers
+                this.i18nService.loadUserLanguage().subscribe();
+                // navigate to listing page
+                this.router.navigate(['/outbreaks']);
+            });
     }
 
     /**

@@ -11,6 +11,9 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import * as moment from 'moment';
+import { Constants } from '../../../../core/models/constants';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -18,7 +21,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
     templateUrl: './modify-contact-follow-up.component.html',
     styleUrls: ['./modify-contact-follow-up.component.less']
 })
-export class ModifyContactFollowUpComponent implements OnInit {
+export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
@@ -32,14 +35,16 @@ export class ModifyContactFollowUpComponent implements OnInit {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService
-    ) {}
+    ) {
+        super(route);
+    }
 
     ngOnInit() {
         // retrieve route params
@@ -79,7 +84,7 @@ export class ModifyContactFollowUpComponent implements OnInit {
                                         this.followUpData = new FollowUpModel(followUpData);
                                         this.breadcrumbs.push(
                                             new BreadcrumbItemModel(
-                                                'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+                                                this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
                                                 '.',
                                                 true,
                                                 {},
@@ -119,5 +124,25 @@ export class ModifyContactFollowUpComponent implements OnInit {
                 // navigate to listing page
                 this.router.navigate(['/contacts/follow-ups']);
             });
+    }
+
+    /**
+     * If date is in the future we need to reset performed & lost to follow-up
+     */
+    dateInTheFuture(): boolean {
+        const date = this.followUpData.date ?
+            moment(this.followUpData.date) :
+            null;
+
+        if (
+            date &&
+            date.isAfter(Constants.today())
+        ) {
+            this.followUpData.performed = false;
+            this.followUpData.lostToFollowUp = false;
+            return true;
+        }
+
+        return false;
     }
 }

@@ -17,7 +17,10 @@
                     [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
                     [disabled]="disabled"
                     [required]="required"
-                    (optionChanged)="onChange()">
+                    (optionChanged)="onChange()"
+                    [maxDate]="Constants.today()"
+                    app-date-validator
+                    [dateSameOrBefore]="Constants.today()">
                 </app-form-datepicker>
 
                 <app-form-slide-toggle

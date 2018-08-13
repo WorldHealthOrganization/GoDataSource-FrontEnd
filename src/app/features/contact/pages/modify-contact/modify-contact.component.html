@@ -101,7 +101,10 @@
                                     name="dob"
                                     [(ngModel)]="contactData.dob"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [maxDate]="Constants.today()"
+                                    app-date-validator
+                                    [dateSameOrBefore]="Constants.today()">
                                 </app-form-datepicker>
                             </div>
                         </div>
@@ -112,7 +115,10 @@
                                 [(ngModel)]="contactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -184,12 +190,17 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">
-            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
-        </button>
-        <button type="button" [routerLink]="'/contacts'" mat-raised-button>{{'LNG_COMMON_BUTTON_CANCEL' | translate}}</button>
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="primary" class="button-primary">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
 
-        <div class="page-tabs-navbar-placeholder"></div>
+            <button type="button" [routerLink]="'/contacts'" mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+
+            <div class="page-tabs-navbar-placeholder"></div>
+        </ng-container>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CONTACT, contactData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}

@@ -26,19 +26,22 @@
                                 name="date"
                                 [(ngModel)]="followUpData.date"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                                required="true">
+                                required="true"
+                                app-date-validator>
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
                                 name="performed"
                                 [(ngModel)]="followUpData.performed"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate">
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
+                                [disabled]="dateInTheFuture()">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="lostToFollowUp"
                                 [(ngModel)]="followUpData.lostToFollowUp"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate">
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
+                                [disabled]="dateInTheFuture()">
                             </app-form-slide-toggle>
                         </div>
                     </div>

@@ -95,7 +95,10 @@
                                     *ngIf="!ageSelected"
                                     name="dob"
                                     [(ngModel)]="contactData.dob"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate ">
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate"
+                                    [maxDate]="Constants.today()"
+                                    app-date-validator
+                                    [dateSameOrBefore]="Constants.today()">
                                 </app-form-datepicker>
                             </div>
 
@@ -106,7 +109,10 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="contactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                required="true">
+                                required="true"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -123,7 +129,8 @@
                 </mat-card>
 
                 <!-- Documents section -->
-                <div class="section-title">{{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
+                <div class="section-title">
+                    {{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
                 </div>
                 <app-form-document-list
                     name="documents"
@@ -140,7 +147,9 @@
         <!-- Address step -->
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
+                <ng-template matStepLabel>
+                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}
+                </ng-template>
 
                 <app-form-address-list
                     name="addresses"
@@ -158,7 +167,8 @@
         <!-- Relationship step -->
         <mat-step [stepControl]="relationshipForm">
             <form #relationshipForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}
+                <ng-template matStepLabel>
+                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE' | translate }}
                 </ng-template>
 
                 <mat-card class="page-section">
@@ -179,8 +189,12 @@
 
         <!-- Final step -->
         <mat-step>
-            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
             <div>
                 <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-button

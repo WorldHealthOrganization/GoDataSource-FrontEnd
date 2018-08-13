@@ -31,7 +31,7 @@
                             name="firstNameFilter"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByFirstName($event)">
+                            (optionChanged)="filterByName('firstName', $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -55,6 +55,12 @@
                     </div>
                     <div class="column-filter">
                         <!-- Placeholder -->
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByName('lastName', $event)">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -98,7 +104,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-select
+                            name="certaintyLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="certaintyLevelList$ | async"
+                            (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -119,7 +132,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-select
+                            name="exposureType"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposureTypeList$ | async"
+                            (optionChanged)="filterBySelectField('exposureTypeId', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -140,7 +160,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-select
+                            name="exposureFrequency"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposuresFrequencyList$ | async"
+                            (optionChanged)="filterBySelectField('exposureFrequencyId', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -161,7 +188,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-select
+                            name="exposureDuration"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="exposureDurationList$ | async"
+                            (optionChanged)="filterBySelectField('exposureDurationId', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -182,7 +216,14 @@
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
                     </div>
                     <div class="column-filter">
-                        <!-- Placeholder -->
+                        <app-form-select
+                            name="relation"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="relationshipTypeList$ | async"
+                            (optionChanged)="filterBySelectField('socialRelationshipTypeId', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>

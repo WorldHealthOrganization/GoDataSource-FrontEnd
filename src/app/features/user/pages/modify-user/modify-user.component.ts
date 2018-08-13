@@ -26,8 +26,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 export class ModifyUserComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Users', '/users'),
-        new BreadcrumbItemModel('Modify User', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
+        new BreadcrumbItemModel('LNG_PAGE_MODIFY_USER_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -90,7 +90,7 @@ export class ModifyUserComponent {
                     this.authDataService
                         .reloadAndPersistAuthUser()
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('User modified!');
+                            this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
                             // navigate to listing page
                             this.router.navigate(['/users']);
                         });

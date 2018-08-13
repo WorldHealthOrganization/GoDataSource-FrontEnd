@@ -45,12 +45,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
 
-    constructor(private authDataService: AuthDataService,
-                private outbreakDataService: OutbreakDataService,
-                private followUpsDataService: FollowUpsDataService,
-                private snackbarService: SnackbarService,
-                private dialogService: DialogService,
-                private genericDataService: GenericDataService) {
+    constructor(
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService,
+        private followUpsDataService: FollowUpsDataService,
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService) {
         super();
     }
 
@@ -155,13 +156,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'area',
             'fullAddress',
             'lostToFollowUp',
-            'deleted'
+            'deleted',
+            'actions'
         ];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasFollowUpsWriteAccess()) {
-            columns.push('actions');
-        }
 
         // return columns that should be visible
         return columns;
@@ -245,7 +242,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                 this.refreshList();
                             });
                     }
-                });
+            });
         }
     }
 
@@ -281,6 +278,5 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         });
                 }
             });
-
     }
 }

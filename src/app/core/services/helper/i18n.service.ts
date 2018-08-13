@@ -8,7 +8,7 @@ import { ModelHelperService } from './model-helper.service';
 import { UserDataService } from '../data/user.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import 'rxjs/add/operator/mergeMap';
-import { Subscriber } from 'rxjs';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
 export class I18nService {

@@ -17,7 +17,8 @@ class LocationAutoItem {
     constructor(
         public id: string,
         public label: string,
-        public level: number
+        public level: number,
+        public disabled: boolean = false
     ) {}
 }
 
@@ -159,7 +160,8 @@ export class FormLocationDropdownComponent extends GroupBase<string> implements 
                         ),
                         currentItem.location.parentLocationId ?
                             levels[currentItem.location.parentLocationId] + 1 :
-                            0
+                            0,
+                        !currentItem.location.active
                     );
 
                     // add item to list

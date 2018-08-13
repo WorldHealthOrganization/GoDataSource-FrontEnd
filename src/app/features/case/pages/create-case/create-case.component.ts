@@ -13,11 +13,11 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-
 import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-case',
@@ -41,6 +41,8 @@ export class CreateCaseComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
+    Constants = Constants;
+
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
@@ -49,8 +51,7 @@ export class CreateCaseComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.genderList$ = this.genericDataService.getGenderList();

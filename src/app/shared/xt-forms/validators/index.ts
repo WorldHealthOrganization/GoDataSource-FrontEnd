@@ -7,6 +7,7 @@ import { TriggerValidationForValidatorDirective } from './trigger-validation-for
 import { PasswordValidatorDirective } from './password-validator.directive';
 import { NotEqualValidatorDirective } from './not-equal-validator.directive';
 import { UniqueValidatorDirective } from './unique-validator.directive';
+import { DateValidatorDirective } from './date-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -17,5 +18,6 @@ export const validatorDirectives: any[] = [
     TriggerValidationForValidatorDirective,
     PasswordValidatorDirective,
     NotEqualValidatorDirective,
-    UniqueValidatorDirective
+    UniqueValidatorDirective,
+    DateValidatorDirective
 ];

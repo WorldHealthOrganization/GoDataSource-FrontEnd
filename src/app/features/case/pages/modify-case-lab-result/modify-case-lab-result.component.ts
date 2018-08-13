@@ -15,6 +15,7 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -42,6 +43,8 @@ export class ModifyCaseLabResultComponent implements OnInit {
     resultTypesList$: Observable<any[]>;
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
+
+    Constants = Constants;
 
     constructor(
         private route: ActivatedRoute,

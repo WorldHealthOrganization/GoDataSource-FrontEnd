@@ -1,30 +1,29 @@
-<div class="set-security-questions">
-    <app-topnav>
-        <ng-container dynamic-section>
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-        </ng-container>
-    </app-topnav>
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
 
     <mat-card class="page-section page-content">
         <form #form="ngForm" (submit)="save(form)">
 
             <div fxLayout="column">
-                <div *ngIf="alreadySet && !viewForm" class="questions-display"> You already set your security questions.
-                    <div>Question 1: {{authUser.securityQuestions[0].question | translate}}</div>
-                    <div>Answer 1: ***</div>
-                    <div>Question 2: {{authUser.securityQuestions[1].question | translate}}</div>
-                    <div>Answer 2: ***</div>
-                    <button *ngIf="!viewForm" mat-raised-button color="primary" (click)="allowEdit()" class="edit-questions-btn"> Edit
+                <div *ngIf="alreadySet && !viewForm" class="questions-display"> {{ 'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET' | translate }}
+                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate}}: {{authUser.securityQuestions[0].question | translate}}</div>
+                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate}}: ***</div>
+                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate}}: {{authUser.securityQuestions[1].question | translate}}</div>
+                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate}}: ***</div>
+                    <button *ngIf="!viewForm" mat-raised-button color="primary" (click)="allowEdit()" class="edit-questions-btn"> {{'LNG_COMMON_BUTTON_EDIT' | translate}}
                     </button>
                 </div>
 
                 <div *ngIf="viewForm">
-                    <div>Select the questions below and add an answer for each of them!</div>
+                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION' | translate}}</div>
 
                    <app-form-select
                         name="securityQuestions[0][question]"
                         [(ngModel)]="authUser.securityQuestions[0].question"
-                        placeholder="Question 1"
+                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate"
                         [options]="securityQuestionsList$ | async"
                         optionLabelKey="question"
                         optionValueKey="question"
@@ -35,13 +34,13 @@
                     <app-form-input
                         name="securityQuestions[0][answer]"
                         [(ngModel)]="answers[0]"
-                        placeholder="Answer 1"
+                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate"
                         required="true">
                     </app-form-input>
                     <app-form-select
                         name="securityQuestions[1][question]"
                         [(ngModel)]="authUser.securityQuestions[1].question"
-                        placeholder="Question 2"
+                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate"
                         [options]="securityQuestionsList$ | async"
                         optionLabelKey="question"
                         optionValueKey="question"
@@ -51,13 +50,13 @@
                     <app-form-input
                         name="securityQuestions[1][answer]"
                         [(ngModel)]="answers[1]"
-                        placeholder="Answer 2"
+                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate"
                         required="true">
                     </app-form-input>
 
-                    <button mat-raised-button color="primary">Save</button>
+                    <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
                 </div>
             </div>
         </form>
     </mat-card>
-</div>
+
