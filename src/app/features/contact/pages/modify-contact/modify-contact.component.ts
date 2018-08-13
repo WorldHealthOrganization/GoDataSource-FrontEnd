@@ -15,6 +15,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-contact',
@@ -39,6 +40,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     // provide constants to template
     EntityType = EntityType;
+
+    Constants = Constants;
 
     constructor(
         private genericDataService: GenericDataService,

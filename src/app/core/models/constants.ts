@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
@@ -142,4 +144,12 @@ export class Constants {
         SUSPECT: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT',
         CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED'
     };
+
+    /**
+     * Returns today's date
+     * @returns Moment
+     */
+    static today() {
+        return moment().startOf('day');
+    }
 }

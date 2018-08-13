@@ -18,6 +18,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { Constants } from '../../../../core/models/constants';
 
 
 @Component({
@@ -46,6 +47,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     // provide constants to template
     EntityType = EntityType;
+
+    Constants = Constants;
 
     constructor(
         private router: Router,

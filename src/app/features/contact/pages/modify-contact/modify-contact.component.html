@@ -101,7 +101,10 @@
                                     name="dob"
                                     [(ngModel)]="contactData.dob"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate"
-                                    [disabled]="viewOnly">
+                                    [disabled]="viewOnly"
+                                    [maxDate]="Constants.today()"
+                                    app-date-validator
+                                    [dateSameOrBefore]="Constants.today()">
                                 </app-form-datepicker>
                             </div>
                         </div>
@@ -112,7 +115,10 @@
                                 [(ngModel)]="contactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle

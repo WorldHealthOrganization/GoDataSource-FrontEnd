@@ -60,25 +60,19 @@ export class CreateOutbreakComponent implements OnInit {
         ) {
             const outbreakData = new OutbreakModel(dirtyFields);
 
-            // validate end date to be greater than start date
-            if (outbreakData.endDate && outbreakData.endDate < outbreakData.startDate) {
-                this.snackbarService.showError('LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR');
-            } else {
-
-                this.outbreakDataService
-                    .createOutbreak(outbreakData)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
-                        // load language tokens so they will be available
-                        this.i18nService.loadUserLanguage().subscribe();
-                        // navigate to listing page
-                        this.router.navigate(['/outbreaks']);
-                    });
-            }
+            this.outbreakDataService
+                .createOutbreak(outbreakData)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+                    // load language tokens so they will be available
+                    this.i18nService.loadUserLanguage().subscribe();
+                    // navigate to listing page
+                    this.router.navigate(['/outbreaks']);
+                });
         }
     }
 

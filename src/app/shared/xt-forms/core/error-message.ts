@@ -71,6 +71,15 @@ export class ErrorMessage {
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE'
                 );
+            case 'invalidDateValidator':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_INVALID_DATE'
+                );
+            case 'dateValidator':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',
+                    this.validator[this.key] as {}
+                );
         }
 
         // Get default message if no validator matched

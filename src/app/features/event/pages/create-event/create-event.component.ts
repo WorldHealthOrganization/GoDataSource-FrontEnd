@@ -11,6 +11,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 
 import * as _ from 'lodash';
+import { Constants } from '../../../../core/models/constants';
 
 
 @Component({
@@ -30,6 +31,8 @@ export class CreateEventComponent implements OnInit {
     outbreakId: string;
 
     eventData: EventModel = new EventModel();
+
+    Constants = Constants;
 
     constructor(
         private router: Router,

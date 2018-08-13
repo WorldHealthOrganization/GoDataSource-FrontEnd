@@ -27,6 +27,15 @@
                                 [ngModel]="labResultData.dateSampleTaken"
                                 required="true"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    Constants.today(),
+                                    'dateSampleDelivered',
+                                    'dateTesting',
+                                    'dateOfResult'
+                                ]">
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
                                 [disabled]="viewOnly">
                             </app-form-datepicker>
 
@@ -34,12 +43,34 @@
                                 name="dateSampleDelivered"
                                 [ngModel]="labResultData.dateSampleDelivered"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    Constants.today(),
+                                    'dateTesting',
+                                    'dateOfResult'
+                                ]"
+                                [dateSameOrAfter]="[
+                                    'dateSampleTaken'
+                                ]">
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
                                 [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateTesting"
                                 [ngModel]="labResultData.dateTesting"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    Constants.today(),
+                                    'dateOfResult'
+                                ]"
+                                [dateSameOrAfter]="[
+                                    'dateSampleDelivered',
+                                    'dateSampleTaken'
+                                ]">
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
                                 [disabled]="viewOnly">
                             </app-form-datepicker>
@@ -49,6 +80,15 @@
                             <app-form-datepicker
                                 name="dateOfResult"
                                 [ngModel]="labResultData.dateOfResult"
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()"
+                                [dateSameOrAfter]="[
+                                    'dateTesting',
+                                    'dateSampleDelivered',
+                                    'dateSampleTaken'
+                                ]">
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
                                 [disabled]="viewOnly">
                             </app-form-datepicker>

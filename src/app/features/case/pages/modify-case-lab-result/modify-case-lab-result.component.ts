@@ -15,6 +15,7 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
@@ -43,6 +44,8 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     resultTypesList$: Observable<any[]>;
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
+
+    Constants = Constants;
 
     constructor(
         protected route: ActivatedRoute,

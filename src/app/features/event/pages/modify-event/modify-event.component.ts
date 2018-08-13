@@ -10,6 +10,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
@@ -31,6 +32,8 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
     // provide constants to template
     EntityType = EntityType;
+
+    Constants = Constants;
 
     constructor(
         protected route: ActivatedRoute,

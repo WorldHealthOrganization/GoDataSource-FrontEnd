@@ -29,7 +29,10 @@
                                 [(ngModel)]="eventData.date"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-datepicker
@@ -37,7 +40,10 @@
                                 [(ngModel)]="eventData.dateOfReporting"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [maxDate]="Constants.today()"
+                                app-date-validator
+                                [dateSameOrBefore]="Constants.today()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle

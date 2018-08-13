@@ -15,6 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ElementBase } from '../../core/index';
 import {MomentDateAdapter} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
+import { Moment } from 'moment';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -39,8 +40,10 @@ export const DEFAULT_FORMAT = {
         useExisting: FormDatepickerComponent,
         multi: true
     },
-       {provide: DateAdapter, useClass: MomentDateAdapter},
-       {provide: MAT_DATE_FORMATS, useValue: DEFAULT_FORMAT}
+        // tried adding a custom adapter for validations, but the system wasn't picking up the issue and there was no way to set a validation error message
+        // this is way we implemented a custom validator directive
+       { provide: DateAdapter, useClass: MomentDateAdapter },
+       { provide: MAT_DATE_FORMATS, useValue: DEFAULT_FORMAT }
     ]
 })
 export class FormDatepickerComponent extends ElementBase<string> {
@@ -51,6 +54,9 @@ export class FormDatepickerComponent extends ElementBase<string> {
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() name: string;
+
+    @Input() maxDate: string | Moment;
+    @Input() minDate: string | Moment;
 
     public identifier = `form-datepicker-${identifier++}`;
 
@@ -76,7 +82,10 @@ export class FormDatepickerComponent extends ElementBase<string> {
      */
     onChange() {
         // emit the current value
-        return this.optionChanged.emit(this.value);
+        // wait for binding to occur
+        setTimeout(() => {
+            this.optionChanged.emit(this.value);
+        });
     }
 }
 

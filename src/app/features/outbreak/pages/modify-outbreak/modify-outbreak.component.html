@@ -57,12 +57,16 @@
                                 name="startDate"
                                 [(ngModel)]="outbreak.startDate"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate"
-                                required="true">
+                                required="true"
+                                app-date-validator
+                                [dateSameOrBefore]="'endDate'">
                             </app-form-datepicker>
                             <app-form-datepicker
                                 name="endDate"
                                 [(ngModel)]="outbreak.endDate"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate">
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate"
+                                app-date-validator
+                                [dateSameOrAfter]="'startDate'">
                             </app-form-datepicker>
                             <app-form-input
                                 name="periodOfFollowup"

@@ -136,6 +136,13 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_PAGE_UNIQUE': 'Page name does already exist',
         'LNG_FORM_VALIDATION_ERROR_DUPLICATE_VALUE': 'Duplicate value',
         'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
+        'LNG_FORM_VALIDATION_ERROR_INVALID_DATE': 'Invalid date',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE': 'Date needs to be {{comparator}} {{field}}',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER': 'after',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER': 'same or after',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE': 'before',
+        'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
 
         /**
          * API Errors
@@ -814,7 +821,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE': 'Done',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak created',
-        'LNG_PAGE_CREATE_OUTBREAK_END_DATE_START_DATE_ERROR': 'End date needs to be greater than start date',
 
         /**
          * Modify Outbreak page
