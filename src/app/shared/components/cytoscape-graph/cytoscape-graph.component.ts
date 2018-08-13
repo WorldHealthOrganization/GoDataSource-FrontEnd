@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
-// import coseBilkent from 'cytoscape-cose-bilkent';
 import * as coseBilkent from 'cytoscape-cose-bilkent';
 
 
@@ -23,8 +22,6 @@ export class CytoscapeGraphComponent implements OnChanges {
         max: 1.8
     };
 
-    png64: string;
-
     defaultStyle: any = [ // the stylesheet for the graph
         {
             selector: 'node',
@@ -36,7 +33,6 @@ export class CytoscapeGraphComponent implements OnChanges {
         {
             selector: 'edge',
             style: {
-                'width': 3,
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
                 'target-arrow-shape': 'triangle'
@@ -50,21 +46,19 @@ export class CytoscapeGraphComponent implements OnChanges {
             this.style ?
                 this.style :
                 this.defaultStyle;
+        // use the coseBilkent layout
         cytoscape.use(coseBilkent);
     }
 
     public ngOnChanges(): any {
-        // initialize cytoscape object
+        // render cytoscape object
         this.render();
-
-
     }
 
     /**
      * Render cytoscape graph
      */
     public render() {
-
         this.cy = cytoscape({
             container: document.getElementById(this.container),
             layout: this.layout,
