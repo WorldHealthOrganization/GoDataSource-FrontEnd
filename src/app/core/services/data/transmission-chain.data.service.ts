@@ -55,5 +55,18 @@ export class TransmissionChainDataService {
             MetricIndependentTransmissionChainsModel
         );
     }
+//  {data: {id: 'j', name: 'Jerry', nodeColor: '#6FB1FC', faveShape: 'triangle'}},
+    convertChainToGraphElements(transmissionChain: TransmissionChainModel) {
+       let graphData: any = {};
+       if ( !_.isEmpty(transmissionChain) ) {
+           if( !_.isEmpty ( transmissionChain.nodes) ) {
+               _.forEach( transmissionChain.nodes, function(node, key) {
+                   graphData.nodes.
+               });
+           }
+
+       }
+
+    }
 }
 

@@ -27,6 +27,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     // list of transmission chains
     transmissionChains$: Observable<TransmissionChainModel[]>;
 
+    chains: TransmissionChainModel[];
+
     // provide constants to template
     Constants = Constants;
 
@@ -56,6 +58,13 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     refreshList() {
         if (this.selectedOutbreak) {
             this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder);
+
+            this.transmissionChainDataService.getTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder).subscribe((chains) => {
+                this.chains = chains;
+
+                const graphElements = this.transmissionChainDataService.convertChainToGraphElements(this.chains[0]);
+                console.log(chains);
+            });
         }
     }
 
