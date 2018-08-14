@@ -401,6 +401,7 @@ export const EnglishUsLang = {
         /**
          * Modify Location page
          */
+        'LNG_PAGE_VIEW_LOCATION_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
@@ -429,6 +430,7 @@ export const EnglishUsLang = {
         /**
          * Modify User page
          */
+        'LNG_PAGE_VIEW_USER_TITLE': 'View User',
         'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
@@ -825,6 +827,7 @@ export const EnglishUsLang = {
         /**
          * Modify Outbreak page
          */
+        'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'View {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',

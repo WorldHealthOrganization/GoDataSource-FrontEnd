@@ -14,6 +14,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -21,7 +22,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     templateUrl: './modify-outbreak.component.html',
     styleUrls: ['./modify-outbreak.component.less']
 })
-export class ModifyOutbreakComponent implements OnInit {
+export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
@@ -43,7 +44,7 @@ export class ModifyOutbreakComponent implements OnInit {
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private router: Router,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -51,6 +52,7 @@ export class ModifyOutbreakComponent implements OnInit {
         private i18nService: I18nService,
         private formHelper: FormHelperService
     ) {
+        super(route);
     }
 
     ngOnInit() {
@@ -60,7 +62,6 @@ export class ModifyOutbreakComponent implements OnInit {
         this.route.params
             .subscribe((params: {outbreakId}) => {
                 this.outbreakId = params.outbreakId;
-
                 // get the outbreak to modify
                 this.outbreakDataService
                     .getOutbreak(this.outbreakId)
@@ -68,7 +69,7 @@ export class ModifyOutbreakComponent implements OnInit {
                         this.outbreak = outbreakData;
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
                                 '.',
                                 true,
                                 {},

@@ -9,6 +9,7 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-contact',
@@ -16,7 +17,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
     templateUrl: './modify-location.component.html',
     styleUrls: ['./modify-location.component.less']
 })
-export class ModifyLocationComponent implements OnInit {
+export class ModifyLocationComponent extends  ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -28,8 +29,10 @@ export class ModifyLocationComponent implements OnInit {
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private route: ActivatedRoute
-    ) {}
+        protected route: ActivatedRoute
+    ) {
+        super(route);
+    }
 
     ngOnInit() {
         this.route.params
@@ -90,7 +93,7 @@ export class ModifyLocationComponent implements OnInit {
                             // add modify
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
-                                    'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                                    this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
                                     '.',
                                     true,
                                     {},

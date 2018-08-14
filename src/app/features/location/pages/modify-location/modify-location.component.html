@@ -19,20 +19,23 @@
                                 name="name"
                                 [(ngModel)]="locationData.name"
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_NAME' | translate"
-                                required="true">
+                                required="true"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-slide-toggle
                                 name="active"
                                 [(ngModel)]="locationData.active"
-                                [label]="'LNG_LOCATION_FIELD_LABEL_ACTIVE' | translate">
+                                [label]="'LNG_LOCATION_FIELD_LABEL_ACTIVE' | translate"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
                             <app-form-input
                                 name="populationDensity"
                                 [(ngModel)]="locationData.populationDensity"
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY' | translate"
-                                type="number">
+                                type="number"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>
@@ -50,14 +53,15 @@
                     type="text"
                     [placeholder]="'LNG_LOCATION_FIELD_LABEL_SYNONYM' | translate"
                     [required]="true"
-                    [unique]="true">
+                    [unique]="true"
+                    [disabled]="viewOnly">
                 </app-form-input-list>
             </mat-tab>
 
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div *ngIf="!viewOnly" class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button mat-raised-button color="primary" class="button-primary">

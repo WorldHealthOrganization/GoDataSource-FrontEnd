@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Outbreaks list
@@ -20,13 +21,24 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_OUTBREAK]
         }
     },
+    // View Outbreak
+    {
+        path: ':outbreakId/view',
+        component: fromPages.ModifyOutbreakComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_OUTBREAK],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Edit Outbreak
     {
         path: ':outbreakId/modify',
         component: fromPages.ModifyOutbreakComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
+            permissions: [PERMISSION.WRITE_OUTBREAK],
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];
