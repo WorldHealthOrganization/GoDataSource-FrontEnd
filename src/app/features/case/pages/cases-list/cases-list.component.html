@@ -15,12 +15,19 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
 <mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+    </div>
 
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -154,8 +161,8 @@
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
 
+            <mat-cell *matCellDef="let item" fxFlex="70px">
                 <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>

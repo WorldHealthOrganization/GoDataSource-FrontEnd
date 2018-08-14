@@ -9,6 +9,7 @@ import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcr
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatSort, MatSortable } from '@angular/material';
+import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 
 export abstract class ListComponent {
     /**
@@ -20,6 +21,11 @@ export abstract class ListComponent {
      * Retrieve Mat Table
      */
     @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
+
+    /**
+     * Retrieve Side Filters
+     */
+    @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
 
     public breadcrumbs: BreadcrumbItemModel[];
 
@@ -105,7 +111,10 @@ export abstract class ListComponent {
         this.queryBuilder.sort.clear();
 
         // sort
-        if (direction) {
+        if (
+            property &&
+            direction
+        ) {
             // apply sort
             this.queryBuilder.sort.by(property, direction);
         }
@@ -203,21 +212,76 @@ export abstract class ListComponent {
     }
 
     /**
-     * Apply the filters selected from the Side Filters section
-     * @param {RequestQueryBuilder} queryBuilder
+     * Clear query builder of conditions & include & ....
      */
-    applySideFilters(queryBuilder: RequestQueryBuilder) {
-        // clear table filters without triggering search for all the changes
+    clearQueryBuilder() {
+        // clear query filters
+        this.queryBuilder.clear();
+    }
+
+    /**
+     * Clear table filters
+     */
+    clearHeaderFilters() {
+        // clear header filters
         if (this.filterInputs) {
             this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
                 input.reset();
             });
         }
 
-        // reset table sort columns
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Reset table sort columns
+     */
+    clearHeaderSort() {
         this.matTableSort.sort({
             id: null
         } as MatSortable);
+
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Clear header filters & sort
+     */
+    resetFiltersToSideFilters() {
+        // clear query builder
+        this.clearQueryBuilder();
+
+        // clear table filters
+        this.clearHeaderFilters();
+
+        // reset table sort columns
+        this.clearHeaderSort();
+
+        // retrieve Side filters
+        let queryBuilder;
+        if (
+            this.sideFilter &&
+            (queryBuilder = this.sideFilter.getQueryBuilder())
+        ) {
+            this.queryBuilder = queryBuilder;
+        }
+
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Apply the filters selected from the Side Filters section
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear table filters
+        this.clearHeaderFilters();
+
+        // reset table sort columns
+        this.clearHeaderSort();
 
         // replace query builder with side filters
         this.queryBuilder = queryBuilder;

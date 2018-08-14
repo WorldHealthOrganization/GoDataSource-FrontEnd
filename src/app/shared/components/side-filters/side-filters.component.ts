@@ -37,6 +37,9 @@ export class SideFiltersComponent {
     FilterType = FilterType;
     FilterComparator = FilterComparator;
 
+    // keep query builder
+    queryBuilder: RequestQueryBuilder;
+
     @ViewChild('sideNav') sideNav: MatSidenav;
 
     constructor(
@@ -74,6 +77,12 @@ export class SideFiltersComponent {
 
     openSideNav() {
         this.sideNav.open();
+    }
+
+    getQueryBuilder(): RequestQueryBuilder {
+        return this.queryBuilder ?
+            _.cloneDeep(this.queryBuilder) :
+            null;
     }
 
     apply(form: NgForm) {
@@ -127,7 +136,8 @@ export class SideFiltersComponent {
         });
 
         // emit the Request Query Builder
-        this.filtersApplied.emit(_.cloneDeep(queryBuilder));
+        this.queryBuilder = queryBuilder;
+        this.filtersApplied.emit(this.getQueryBuilder());
 
         this.closeSideNav();
     }
