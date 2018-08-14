@@ -24,13 +24,13 @@ export class SideFiltersComponent {
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
 
     // selected columns for being displayed
-    selectedColumns: string[] = [];
+    selectedColumns: string[];
     // applied filters
-    appliedFilters: AppliedFilterModel[] = [new AppliedFilterModel()];
+    appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
-    appliedFilterOperator: RequestFilterOperator = RequestFilterOperator.AND;
+    appliedFilterOperator: RequestFilterOperator;
     // applied sorting criteria
-    appliedSort: any[] = [];
+    appliedSort: any[];
 
     // provide constants to template
     RequestFilterOperator = RequestFilterOperator;
@@ -44,7 +44,10 @@ export class SideFiltersComponent {
 
     constructor(
         private formHelper: FormHelperService
-    ) {}
+    ) {
+        // initialize data
+        this.clear();
+    }
 
     addFilter() {
         this.appliedFilters.push(new AppliedFilterModel());
@@ -83,6 +86,21 @@ export class SideFiltersComponent {
         return this.queryBuilder ?
             _.cloneDeep(this.queryBuilder) :
             null;
+    }
+
+    clear() {
+        this.selectedColumns = [];
+        this.appliedFilters = [new AppliedFilterModel()];
+        this.appliedFilterOperator = RequestFilterOperator.AND;
+        this.appliedSort = [];
+    }
+
+    reset() {
+        this.clear();
+        this.queryBuilder = new RequestQueryBuilder();
+        this.filtersApplied.emit(this.getQueryBuilder());
+
+        this.closeSideNav();
     }
 
     apply(form: NgForm) {
@@ -130,7 +148,12 @@ export class SideFiltersComponent {
 
                 case FilterType.SELECT:
                 case FilterType.MULTISELECT:
-                    queryBuilder.filter.bySelect(filter.fieldName, appliedFilter.value, false);
+                    queryBuilder.filter.bySelect(
+                        filter.fieldName,
+                        appliedFilter.value,
+                        false,
+                        null
+                    );
                     break;
             }
         });

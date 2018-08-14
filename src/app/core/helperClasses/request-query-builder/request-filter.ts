@@ -227,9 +227,11 @@ export class RequestFilter {
         }
 
         // convert Objects returned by the Select element to string values
-        values = _.map(values, (value) => {
-            return value[valueKey];
-        });
+        if (valueKey) {
+            values = _.map(values, (value) => {
+                return value[valueKey];
+            });
+        }
 
         if (_.isEmpty(values)) {
             // remove filter

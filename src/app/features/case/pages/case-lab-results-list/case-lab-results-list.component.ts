@@ -16,6 +16,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -95,7 +96,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     this.queryBuilder.filter.where({
                         or: [{
                                 dateOfResult: {
-                                    lte: serverDateTime
+                                    lte: moment(serverDateTime).endOf('day').toISOString()
                                 }
                             }, {
                                 dateOfResult: {

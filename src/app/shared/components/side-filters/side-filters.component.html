@@ -151,9 +151,21 @@
 
                 </div>
 
-                <button *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
-                        type="submit" class="button-primary" mat-raised-button color="primary">
+                <button
+                    *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    type="submit">
                     {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
+                </button>
+
+                <button
+                    mat-raised-button
+                    class="side-filters-reset-button"
+                    type="button"
+                    (click)="reset()">
+                    {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                 </button>
 
             </form>
