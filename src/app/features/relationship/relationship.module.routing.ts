@@ -2,6 +2,7 @@ import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import * as fromPages from './pages';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Entity Relationships list
@@ -19,10 +20,21 @@ const routes: Routes = [
         path: ':entityType/:entityId/create',
         component: fromPages.CreateEntityRelationshipComponent
     },
+    // View Entity Relationship
+    {
+        path: ':entityType/:entityId/:relationshipId/view',
+        component: fromPages.ModifyEntityRelationshipComponent,
+        data: {
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Modify Entity Relationship
     {
         path: ':entityType/:entityId/:relationshipId/modify',
-        component: fromPages.ModifyEntityRelationshipComponent
+        component: fromPages.ModifyEntityRelationshipComponent,
+        data: {
+            action: ViewModifyComponentAction.MODIFY
+        }
     }
 ];
 

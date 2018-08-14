@@ -18,7 +18,8 @@
                             <app-form-input
                                 name="sampleIdentifier"
                                 [ngModel]="labResultData.sampleIdentifier"
-                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate">
+                                [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate"
+                                [disabled]="viewOnly">
                             </app-form-input>
 
                             <app-form-datepicker
@@ -33,7 +34,8 @@
                                     'dateSampleDelivered',
                                     'dateTesting',
                                     'dateOfResult'
-                                ]">
+                                ]"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-datepicker
@@ -49,7 +51,8 @@
                                 ]"
                                 [dateSameOrAfter]="[
                                     'dateSampleTaken'
-                                ]">
+                                ]"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-datepicker
@@ -65,7 +68,8 @@
                                 [dateSameOrAfter]="[
                                     'dateSampleDelivered',
                                     'dateSampleTaken'
-                                ]">
+                                ]"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
                         </div>
 
@@ -81,7 +85,8 @@
                                     'dateTesting',
                                     'dateSampleDelivered',
                                     'dateSampleTaken'
-                                ]">
+                                ]"
+                                [disabled]="viewOnly">
                             </app-form-datepicker>
 
                             <app-form-select
@@ -90,7 +95,8 @@
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate"
                                 [options]="labNameOptionsList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-select
@@ -99,7 +105,8 @@
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate"
                                 [options]="sampleTypesList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-select
@@ -108,7 +115,8 @@
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate"
                                 [options]="testTypesList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="viewOnly">
                             </app-form-select>
                         </div>
 
@@ -119,14 +127,16 @@
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT' | translate"
                                 [options]="resultTypesList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-textarea
                                 name="notes"
                                 [ngModel]="labResultData.notes"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
-                                minRows="1">
+                                minRows="1"
+                                [disabled]="viewOnly">
                             </app-form-textarea>
 
                             <app-form-select
@@ -135,14 +145,16 @@
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS' | translate"
                                 [options]="progressOptionsList$ | async"
                                 optionLabelKey="label"
-                                optionValueKey="value">
+                                optionValueKey="value"
+                                [disabled]="viewOnly">
                             </app-form-select>
 
                             <app-form-textarea
                                 name="quantitativeResult"
                                 [ngModel]="labResultData.quantitativeResult"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT' | translate"
-                                minRows="1">
+                                minRows="1"
+                                [disabled]="viewOnly">
                             </app-form-textarea>
                         </div>
 
@@ -155,16 +167,16 @@
                 <app-form-fill-questionnaire
                     name="questionnaireAnswers"
                     [ngModel]="labResultData.questionnaireAnswers"
-                    [questions]="selectedOutbreak.labResultsTemplate">
+                    [questions]="selectedOutbreak.labResultsTemplate"
+                    [disabled]="viewOnly">
                 </app-form-fill-questionnaire>
             </mat-tab>
 
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div *ngIf="!viewOnly" class="form-actions" >
         <div class="page-tabs-navbar-placeholder"></div>
-
         <button mat-raised-button color="primary" class="button-primary">
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
