@@ -1,1 +1,6 @@
-{{ entry.value | translate }}
+<span *ngFor="let entry of entries; let first = first;">
+    <span *ngIf="!first">
+        {{ listSplitter }}
+    </span>
+    {{ entry.value | translate }}
+</span>

@@ -4,14 +4,15 @@
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <app-form-input
+                <app-form-select
                     [name]="name + '[name]'"
                     [(ngModel)]="address.name"
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
                     [disabled]="disabled"
                     [required]="required"
+                    [options]="addressTypes$ | async"
                     (optionChanged)="onChange()">
-                </app-form-input>
+                </app-form-select>
 
                 <div fxFlex><!-- placeholder --></div>
                 <div fxFlex><!-- placeholder --></div>

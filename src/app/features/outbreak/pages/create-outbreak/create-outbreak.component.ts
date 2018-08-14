@@ -46,7 +46,7 @@ export class CreateOutbreakComponent implements OnInit {
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.genericDataService.getCountriesList();
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
     }
 
     createOutbreak(stepForms: NgForm[]) {
