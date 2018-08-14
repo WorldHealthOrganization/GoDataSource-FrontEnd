@@ -93,9 +93,12 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     // show upcoming or past follow ups?
                     const operator = this.showPastFollowUps ? 'lt' : 'gte';
                     this.queryBuilder.filter.where({
-                        date: {
-                            [operator]: serverDateTime
-                        }
+                        // trick remove condition, so we can have filter on dates as well
+                        or: [{
+                            date: {
+                                [operator]: serverDateTime
+                            }
+                        }]
                     }, true);
 
                     // retrieve the list of Follow Ups

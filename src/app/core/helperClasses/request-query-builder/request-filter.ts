@@ -41,17 +41,31 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byText(property: string, value: string, replace: boolean = true) {
-        if (_.isEmpty(value)) {
-            // remove filter
-            this.remove(property);
-        } else {
-            // filter with 'startsWith' criteria
-            this.where({
-                [property]: {
+    byText(
+        property: string | string[],
+        value: string,
+        replace: boolean = true
+    ) {
+        // construct or condition if necessary
+        const condition = _.isString(property) ?
+            {
+                [property as string]: {
                     regexp: `/^${value}/i`
                 }
-            }, replace);
+            } : {
+                or: _.map(property as string[], (prop) => ({
+                    [prop]: {
+                        regexp: `/^${value}/i`
+                    }
+                }))
+            };
+
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.removeCondition(condition);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where(condition, replace);
         }
 
         return this;

@@ -2,6 +2,8 @@ import { Component, Host, Inject, Input, Optional, SkipSelf, ViewEncapsulation }
 import { GroupBase } from '../../core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-form-daterange',
@@ -74,6 +76,37 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
      */
     get dateRange(): DateRangeModel {
         return this.value;
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange(validateGroup: boolean = true) {
+        // wait for bindings to take effect
+        setTimeout(() => {
+            // do we need to replace start date time with start of the day?
+            if (
+                this.dateRange.startDate && (
+                    !(this.dateRange.startDate instanceof moment) ||
+                    !(this.dateRange.startDate as Moment).isSame((this.dateRange.startDate as Moment).startOf('day'))
+                )
+            ) {
+                this.dateRange.startDate = moment(this.dateRange.startDate).startOf('day');
+            }
+
+            // do we need to replace end date time with end of the day?
+            if (
+                this.dateRange.endDate && (
+                    !(this.dateRange.endDate instanceof moment) ||
+                    !(this.dateRange.endDate as Moment).isSame((this.dateRange.endDate as Moment).endOf('day'))
+                )
+            ) {
+                this.dateRange.endDate = moment(this.dateRange.endDate).endOf('day');
+            }
+
+            // trigger parent
+            super.onChange(validateGroup);
+        });
     }
 }
 
