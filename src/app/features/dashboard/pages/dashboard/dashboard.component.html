@@ -90,6 +90,10 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-refusing-treatment-dashlet>
 
+                <app-number-of-active-chains-of-transmission-dashlet
+                    *ngIf="hasReadReportPermissions()">
+                </app-number-of-active-chains-of-transmission-dashlet>
+
                 <div class="other-kpi-content-bottom"></div>
 
             </div>

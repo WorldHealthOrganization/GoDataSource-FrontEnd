@@ -60,13 +60,24 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_CASE]
         }
     },
+    // View Case Lab Result
+    {
+        path: ':caseId/lab-results/:labResultId/view',
+        component: fromPages.ModifyCaseLabResultComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Modify Case Lab Result
     {
         path: ':caseId/lab-results/:labResultId/modify',
         component: fromPages.ModifyCaseLabResultComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_CASE]
+            permissions: [PERMISSION.WRITE_CASE],
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];

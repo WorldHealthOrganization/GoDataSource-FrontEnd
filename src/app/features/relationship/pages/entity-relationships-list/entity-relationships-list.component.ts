@@ -197,13 +197,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     getTableColumns(): string[] {
         const columns = [
             'firstName', 'lastName', 'contactDate', 'certaintyLevel', 'exposureType',
-            'exposureFrequency', 'exposureDuration', 'relation'
+            'exposureFrequency', 'exposureDuration', 'relation', 'actions'
         ];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasEntityWriteAccess()) {
-            columns.push('actions');
-        }
 
         return columns;
     }

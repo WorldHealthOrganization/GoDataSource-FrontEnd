@@ -16,7 +16,8 @@
                     <app-form-relationship
                         name="relationship"
                         [ngModel]="relationshipData"
-                        required="true">
+                        required="true"
+                        [disabled]="viewOnly">
                     </app-form-relationship>
 
                 </mat-card>
@@ -26,7 +27,7 @@
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div *ngIf="!viewOnly" class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button mat-raised-button color="primary" class="button-primary">

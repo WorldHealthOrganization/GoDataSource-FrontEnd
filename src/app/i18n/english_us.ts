@@ -336,6 +336,7 @@ export const EnglishUsLang = {
         /**
          * Modify Case Lab Result page
          */
+        'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'View result {{sampleIdentifier}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE': 'Modify result {{sampleIdentifier}}',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
@@ -351,6 +352,7 @@ export const EnglishUsLang = {
         /**
          * Modify Entity Relationship page
          */
+        'LNG_PAGE_VIEW_RELATIONSHIP_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_DETAILS': 'Details',
         'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship modified!',
@@ -848,6 +850,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
+        'LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS': 'NUMBER OF ACTIVE CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE': 'CONTACTS NOT SEEN IN ',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_AFTER_VALUE': ' DAYS',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE': 'CASES WITH LESS THAN ',
@@ -874,6 +877,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Number of active chains of transmission',
 
         /**
          * Transmission Chain Fields
@@ -900,6 +904,14 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL': 'Condition',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL': 'Greater or equal',
 
         /**
          * Location auto-complete search

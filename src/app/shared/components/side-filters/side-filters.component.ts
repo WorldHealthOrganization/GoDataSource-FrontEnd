@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material';
-import { AppliedFilterModel, FilterType, FilterModel } from './model';
+import { AppliedFilterModel, FilterType, FilterModel, FilterComparator } from './model';
 import { RequestFilterOperator, RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
@@ -29,12 +29,13 @@ export class SideFiltersComponent {
     appliedFilters: AppliedFilterModel[] = [new AppliedFilterModel()];
     // selected operator to be used between filters
     appliedFilterOperator: RequestFilterOperator = RequestFilterOperator.AND;
-    // applied sorting criterias
+    // applied sorting criteria
     appliedSort: any[] = [];
 
     // provide constants to template
     RequestFilterOperator = RequestFilterOperator;
     FilterType = FilterType;
+    FilterComparator = FilterComparator;
 
     @ViewChild('sideNav') sideNav: MatSidenav;
 
@@ -91,16 +92,31 @@ export class SideFiltersComponent {
         // set operator
         queryBuilder.filter.setOperator(filterOperator);
         // set conditions
-        _.each(filters, (appliedFilter) => {
+        _.each(filters, (appliedFilter: AppliedFilterModel) => {
             const filter: FilterModel = appliedFilter.filter;
+            const comparator: FilterComparator = appliedFilter.comparator;
 
             switch (filter.type) {
                 case FilterType.TEXT:
-                    queryBuilder.filter.byText(filter.fieldName, appliedFilter.value, false);
+                    switch (comparator) {
+                        case FilterComparator.IS:
+                            queryBuilder.filter.byEquality(filter.fieldName, appliedFilter.value, false);
+                            break;
+
+                        // FilterComparator.TEXT_STARTS_WITH
+                        default:
+                            queryBuilder.filter.byText(filter.fieldName, appliedFilter.value, false);
+                    }
                     break;
 
-                case FilterType.RANGE:
+                case FilterType.RANGE_NUMBER:
+                    // between / from / to
                     queryBuilder.filter.byRange(filter.fieldName, appliedFilter.value, false);
+                    break;
+
+                case FilterType.RANGE_DATE:
+                    // between / before / after
+                    queryBuilder.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
                     break;
 
                 case FilterType.SELECT:
