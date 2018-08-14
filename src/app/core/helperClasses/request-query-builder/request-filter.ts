@@ -58,6 +58,29 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by comparing a field if it is equal to the provided value
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byEquality(property: string, value: string, replace: boolean = true) {
+        if (_.isEmpty(value)) {
+            // remove filter
+            this.remove(property);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where({
+                [property]: {
+                    eq: value
+                }
+            }, replace);
+        }
+
+        return this;
+    }
+
+    /**
      * Filter by a boolean field
      * @param {string} property
      * @param {boolean | null | undefined} value
@@ -145,6 +168,33 @@ export class RequestFilter {
             }, replace);
         }
 
+        return this;
+    }
+
+    /**
+     * Filter by date range
+     * @param property
+     * @param value
+     * @param replace
+     */
+    byDateRange(property: string, value: any, replace: boolean = true) {
+        // convert date range to simple range
+        const rangeValue: any = {};
+        if (value.startDate) {
+            rangeValue.from = value.startDate.toISOString();
+        }
+        if (value.endDate) {
+            rangeValue.to = value.endDate.toISOString();
+        }
+
+        // filter by range
+        this.byRange(
+            property,
+            rangeValue,
+            replace
+        );
+
+        // finished
         return this;
     }
 

@@ -156,15 +156,8 @@ export abstract class ListComponent {
      * @param value Object with 'startDate' and 'endDate' properties
      */
     filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
-        const rangeValue: any = {};
-        if (value.startDate) {
-            rangeValue.from = value.startDate.toISOString();
-        }
-        if (value.endDate) {
-            rangeValue.to = value.endDate.toISOString();
-        }
-
-        this.queryBuilder.filter.byRange(property, rangeValue);
+        // filter by date range
+        this.queryBuilder.filter.byDateRange(property, value);
 
         // refresh list
         this.needsRefreshList();

@@ -30,6 +30,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -64,6 +65,16 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+
+    // available side filters
+    availableSideFilters: FilterModel[] = [
+        new FilterModel('firstName', 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', FilterType.TEXT),
+        new FilterModel('lastName', 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', FilterType.TEXT),
+        new FilterModel('occupation', 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', FilterType.TEXT),
+        new FilterModel('age', 'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON', FilterType.RANGE_NUMBER),
+        new FilterModel('dateOfReporting', 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', FilterType.RANGE_DATE),
+        new FilterModel('dob', 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', FilterType.RANGE_DATE)
+    ];
 
     constructor(
         private contactDataService: ContactDataService,

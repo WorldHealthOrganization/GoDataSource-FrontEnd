@@ -86,10 +86,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
             });
 
         this.availableSideFilters = [
-            new FilterModel('firstName', FilterType.TEXT),
-            new FilterModel('lastName', FilterType.TEXT),
-            new FilterModel('gender', FilterType.MULTISELECT, this.genderList$),
-            new FilterModel('age', FilterType.RANGE),
+            new FilterModel( 'firstName', 'LNG_CASE_FIELD_LABEL_FIRST_NAME', FilterType.TEXT),
+            new FilterModel('lastName', 'LNG_CASE_FIELD_LABEL_LAST_NAME', FilterType.TEXT),
+            new FilterModel('gender', 'LNG_CASE_FIELD_LABEL_GENDER', FilterType.MULTISELECT, this.genderList$),
+            new FilterModel('age', 'LNG_CASE_FIELD_LABEL_AGE', FilterType.RANGE_NUMBER)
         ];
     }
 

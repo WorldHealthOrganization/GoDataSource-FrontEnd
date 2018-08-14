@@ -903,6 +903,14 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL': 'Condition',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL': 'Greater or equal',
 
         /**
          * Location auto-complete search

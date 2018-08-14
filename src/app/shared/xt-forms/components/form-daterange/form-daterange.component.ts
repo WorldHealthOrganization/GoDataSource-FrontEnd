@@ -20,6 +20,30 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    // start date
+    private _startDateVisible: boolean = true;
+    @Input() set startDateVisible(value: boolean) {
+        this._startDateVisible = value;
+        if (!this._startDateVisible) {
+            this.dateRange.startDate = null;
+        }
+    }
+    get startDateVisible(): boolean {
+        return this._startDateVisible;
+    }
+
+    // end date
+    private _endDateVisible: boolean = true;
+    @Input() set endDateVisible(value: boolean) {
+        this._endDateVisible = value;
+        if (!this._endDateVisible) {
+            this.dateRange.endDate = null;
+        }
+    }
+    get endDateVisible(): boolean {
+        return this._endDateVisible;
+    }
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,

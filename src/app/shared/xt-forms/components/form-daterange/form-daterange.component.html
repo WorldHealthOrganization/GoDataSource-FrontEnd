@@ -4,6 +4,7 @@
     <form #groupForm="ngForm">
         <div fxLayout="row" fxLayoutAlign="space-between">
             <app-form-datepicker
+                *ngIf="startDateVisible"
                 fxFlex="47"
                 [name]="name + '[startDate]'"
                 [(ngModel)]="dateRange.startDate"
@@ -12,10 +13,11 @@
                 [required]="required"
                 (optionChanged)="onChange()"
                 app-date-validator
-                [dateSameOrBefore]="name + '[endDate]'">
+                [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []">
             </app-form-datepicker>
 
             <app-form-datepicker
+                *ngIf="endDateVisible"
                 fxFlex="47"
                 [name]="name + '[endDate]'"
                 [(ngModel)]="dateRange.endDate"
@@ -24,7 +26,7 @@
                 [required]="required"
                 (optionChanged)="onChange()"
                 app-date-validator
-                [dateSameOrAfter]="name + '[startDate]'">
+                [dateSameOrAfter]="startDateVisible ? name + '[startDate]' : []">
             </app-form-datepicker>
         </div>
     </form>

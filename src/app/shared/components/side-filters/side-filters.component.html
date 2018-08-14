@@ -59,15 +59,35 @@
 
                         <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
                             <mat-card class="filter-details" fxFlex>
-                                <!-- Filter Type -->
-                                <app-form-select
-                                    [name]="'filter[filters][' + i + '][filter]'"
-                                    [(ngModel)]="filter.filter"
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    [options]="filterOptions"
-                                    optionLabelKey="fieldName"
-                                    optionValueKey="self">
-                                </app-form-select>
+                                <button
+                                    *ngIf="appliedFilters.length > 1"
+                                    class="filter-details-delete-button"
+                                    type="button" mat-icon-button
+                                    (click)="deleteFilter(i)">
+                                    <span class="xt-icon">delete</span>
+                                </button>
+
+                                <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                                    <!-- Filter Type -->
+                                    <app-form-select
+                                        [name]="'filter[filters][' + i + '][filter]'"
+                                        [(ngModel)]="filter.filter"
+                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                        [options]="filterOptions"
+                                        optionLabelKey="fieldLabel"
+                                        optionValueKey="self">
+                                    </app-form-select>
+
+                                    <!-- Filter Comparator -->
+                                    <app-form-select
+                                        *ngIf="filter.filter && filter.hasMoreThanOneComparator"
+                                        class="filter-comparator"
+                                        [name]="'filter[filters][' + i + '][comparator]'"
+                                        [(ngModel)]="filter.comparator"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
+                                        [options]="filter.allowedComparators[filter.filter.type]">
+                                    </app-form-select>
+                                </div>
 
                                 <!-- TEXT Filter -->
                                 <app-form-input
@@ -87,19 +107,27 @@
                                     [multiple]="filter.filter.type === FilterType.MULTISELECT">
                                 </app-form-select>
 
-                                <!-- RANGE Filter -->
+                                <!-- NUMBER RANGE Filter -->
                                 <app-form-range
-                                    *ngIf="filter.filter?.type === FilterType.RANGE"
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;">
+                                    (changed)="filter.value = $event;"
+                                    [fromVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                    [toVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
                                 </app-form-range>
 
-                            </mat-card>
+                                <!--DATE RANGE Filter-->
+                                <app-form-daterange
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [ngModel]="filter.value"
+                                    (changed)="filter.value = $event;"
+                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
+                                </app-form-daterange>
 
-                            <button type="button" mat-icon-button (click)="deleteFilter(i)">
-                                <span class="xt-icon">{{'LNG_PAGE_ACTION_DELETE' | translate}}</span>
-                            </button>
+                            </mat-card>
                         </div>
 
                     </div>
