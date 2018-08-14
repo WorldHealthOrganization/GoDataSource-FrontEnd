@@ -1,7 +1,6 @@
 import { Component, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
-import * as coseBilkent from 'cytoscape-cose-bilkent';
-
+// import * as coseBilkent from 'cytoscape-cose-bilkent';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -16,10 +15,23 @@ export class CytoscapeGraphComponent implements OnChanges {
 
     cy: any;
     container: string = 'cy';
-    layout: any = {name: 'cose-bilkent'};
+    // different layouts used for tests
+    // layout: any = {name: 'cose-bilkent'};
+    // layout: any = {name: 'breadthfirst'};
+    layout: any = {
+        name: 'cose',
+        fit: true,
+        padding: 30,
+        randomize: false,
+        coolingFactor: 0.99,
+        spacingFactor: 1.75,
+        avoidOverlap: true,
+        nodeDimensionsIncludeLabels: false,
+        animate: false
+    };
     zoom: any = {
-        min: 0.5,
-        max: 1.8
+        min: 0.2,
+        max: 4
     };
 
     defaultStyle: any = [ // the stylesheet for the graph
@@ -46,8 +58,8 @@ export class CytoscapeGraphComponent implements OnChanges {
             this.style ?
                 this.style :
                 this.defaultStyle;
-        // use the coseBilkent layout
-        cytoscape.use(coseBilkent);
+        // use the custom layout - for tests
+   //     cytoscape.use( dagre );
     }
 
     public ngOnChanges(): any {
