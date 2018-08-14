@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
-import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 
@@ -14,8 +13,7 @@ export class TransmissionChainDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Transmission Chains

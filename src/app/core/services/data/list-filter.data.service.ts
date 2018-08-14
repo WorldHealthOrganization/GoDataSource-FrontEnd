@@ -214,6 +214,7 @@ export class ListFilterDataService {
                 {
                     status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
                 }, true);
+
         return filterQueryBuilder;
     }
 
@@ -234,8 +235,21 @@ export class ListFilterDataService {
                 }
             ]
         }, true);
-        return filterQueryBuilder;
 
+        return filterQueryBuilder;
     }
 
+    /**
+     * Create the query builder for filtering the list of active chains of transmission
+     * @returns {RequestQueryBuilder}
+     */
+    filterActiveChainsOfTransmission(): RequestQueryBuilder {
+        // generate a query builder
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.flag(
+            'active',
+            true
+        );
+        return filterQueryBuilder;
+    }
 }
