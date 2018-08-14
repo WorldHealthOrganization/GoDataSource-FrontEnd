@@ -212,6 +212,32 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter by relation
+     * @param {string | string[]} relation
+     * @returns {RequestFilter}
+     */
+    filterByRelation(relation: string | string[]) {
+        // make sure we always have an array of relations
+        const relations: string[] = (_.isArray(relation) ?
+            relation :
+            [relation]
+        ) as string[];
+
+        // go through all the relations until we get the desired query builder
+        let relationQB: RequestQueryBuilder = this.queryBuilder;
+        _.each(relations, (rel: string) => {
+            relationQB = relationQB.include(rel).queryBuilder;
+        });
+
+        // refresh list
+        // this one isn't executed instantly, so there should be enough time to setup the relation filter
+        this.needsRefreshList();
+
+        // retrieve filter
+        return relationQB.filter;
+    }
+
+    /**
      * Clear query builder of conditions & include & ....
      */
     clearQueryBuilder() {

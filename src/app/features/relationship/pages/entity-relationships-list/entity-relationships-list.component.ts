@@ -110,7 +110,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         this.exposureTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
-        this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION)
+        this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
 
         this.route.params
             .subscribe((params: { entityType, entityId }) => {
@@ -173,7 +173,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 id: {
                     neq: this.entityId
                 }
-            }, true)
+            }, true);
 
 
             // retrieve the list of Relationships
@@ -229,35 +229,5 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                         });
                 }
             });
-    }
-
-    /**
-     * Filter by related entity name
-     * @param {string} value
-     */
-    filterByName(property: string, value: string) {
-        // create condition for filter
-        const peopleQueryBuilder = this.queryBuilder.include('people');
-        const condition = {
-            or: [{
-                [property]: {
-                    regexp: `/^${value}/i`
-                }
-            }, {
-                name: {
-                    regexp: `/^${value}/i`
-                }
-            }]
-        };
-
-        // if the value is empty we remove de condition
-        if (_.isEmpty(value)) {
-            peopleQueryBuilder.queryBuilder.filter.removeCondition(condition);
-        } else {
-            peopleQueryBuilder.queryBuilder.filter
-                .where(condition, true);
-        }
-        // refresh list
-        this.needsRefreshList();
     }
 }

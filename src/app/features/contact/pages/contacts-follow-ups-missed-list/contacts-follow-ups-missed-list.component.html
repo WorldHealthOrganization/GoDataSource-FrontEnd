@@ -14,7 +14,12 @@
                 <div class="table-header-cell">
                     <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-input
+                            name="firstContactFirstName"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByRelation('contact').byText(['firstName', 'name'], $event)">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -30,7 +35,12 @@
                 <div class="table-header-cell" fxLayout="column">
                     <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-input
+                            name="firstContactLastName"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByRelation('contact').byText(['lastName', 'name'], $event)">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -45,7 +55,11 @@
                 <div class="table-header-cell">
                     <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('date', $event)">
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
