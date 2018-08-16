@@ -9,7 +9,7 @@
 
 <app-counted-items-list
     [items]="countedNewContactsGroupedByExposureType$ | async"
-    (optionChanged)="filterByRelationshipExposureType($event)">
+    (optionChanged)="filterBySelectField('id', $event.ids, null)">
 </app-counted-items-list>
 
 <app-side-filters

@@ -1,5 +1,6 @@
 // filter operations
 import { Observable } from 'rxjs/Observable';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 // filter types
 export enum FilterType {
@@ -7,7 +8,8 @@ export enum FilterType {
     SELECT = 'select',
     MULTISELECT = 'multiselect',
     RANGE_NUMBER = 'range_number',
-    RANGE_DATE = 'range_date'
+    RANGE_DATE = 'range_date',
+    ADDRESS = 'address'
 }
 
 // comparator types
@@ -16,7 +18,9 @@ export enum FilterComparator {
     IS = 'is',
     BETWEEN = 'between',
     BEFORE = 'before',
-    AFTER = 'after'
+    AFTER = 'after',
+    CONTAINS = 'contains',
+    WITHIN = 'within'
 }
 
 // Model for Available Filter
@@ -32,7 +36,11 @@ export class FilterModel {
         // filter type
         public type: FilterType,
         // select options for SELECT and MULTISELECT filter types
-        public options$: Observable<any[]> = null
+        public options$: Observable<any[]> = null,
+        // relationship path in case we want to search inside a relationship
+        public relationshipPath: string[] = null,
+        public relationshipLabel: string = null,
+        public extraConditions: RequestQueryBuilder = null
     ) {
         this.self = this;
     }
@@ -79,13 +87,23 @@ export class AppliedFilterModel {
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER',
             value: FilterComparator.AFTER
+        }],
+
+        // address
+        [FilterType.ADDRESS]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
+            value: FilterComparator.CONTAINS
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
+            value: FilterComparator.WITHIN
         }]
     };
 
     // default comparators
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
-        [FilterType.RANGE_DATE]: FilterComparator.BETWEEN
+        [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
+        [FilterType.ADDRESS]: FilterComparator.CONTAINS
     };
 
     // applied filter

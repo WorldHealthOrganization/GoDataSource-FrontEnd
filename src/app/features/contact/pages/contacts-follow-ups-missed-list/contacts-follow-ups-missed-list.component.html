@@ -18,7 +18,7 @@
                             name="firstContactFirstName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('contact').byText(['firstName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['firstName', 'name'], $event)">
                         </app-form-input>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                             name="firstContactLastName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('contact').byText(['lastName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['lastName', 'name'], $event)">
                         </app-form-input>
                     </div>
                 </div>

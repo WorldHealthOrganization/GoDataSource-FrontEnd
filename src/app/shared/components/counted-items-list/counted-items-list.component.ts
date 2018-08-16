@@ -10,8 +10,15 @@ export class CountedItemsListItem {
     constructor(
         public count: number,
         public label: string,
+        private _ids: string[],
         public countBgColor: string = '#CCC'
     ) {}
+
+    public get ids(): string[] | boolean {
+        return this._ids && this._ids.length > 0 ?
+            this._ids :
+            false;
+    }
 }
 
 @Component({

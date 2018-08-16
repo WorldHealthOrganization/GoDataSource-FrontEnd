@@ -1,24 +1,37 @@
 <div class="daterange-container form-element "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <form #groupForm="ngForm">
-        <div fxLayout="row" fxLayoutAlign="space-between">
-            <app-form-datepicker
-                *ngIf="startDateVisible"
-                fxFlex="47"
-                [name]="name + '[startDate]'"
-                [(ngModel)]="dateRange.startDate"
-                [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
-                [disabled]="disabled"
-                [required]="required"
-                (optionChanged)="onChange()"
-                app-date-validator
-                [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []">
-            </app-form-datepicker>
+    <form
+        #groupForm="ngForm"
+        class="form-daterange"
+        fxLayout="row">
+        <div
+            *ngIf="startDateVisible"
+            fxFlex>
+                <app-form-datepicker
+                    [name]="name + '[startDate]'"
+                    [(ngModel)]="dateRange.startDate"
+                    [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
+                    [disabled]="disabled"
+                    [required]="required"
+                    (optionChanged)="onChange()"
+                    app-date-validator
+                    [dateSameOrBefore]="endDateVisible ? name + '[endDate]' : []">
+                </app-form-datepicker>
+        </div>
 
+        <div
+            *ngIf="startDateVisible && endDateVisible"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            class="form-range-separator">
+            -
+        </div>
+
+        <div
+            *ngIf="endDateVisible"
+            fxFlex>
             <app-form-datepicker
-                *ngIf="endDateVisible"
-                fxFlex="47"
                 [name]="name + '[endDate]'"
                 [(ngModel)]="dateRange.endDate"
                 [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
