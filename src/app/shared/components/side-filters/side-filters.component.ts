@@ -169,6 +169,8 @@ export class SideFiltersComponent {
                     // contains / within
                     switch (comparator) {
                         case FilterComparator.WITHIN:
+                            // #TODO - near not working because of some issues with loopback & mongo
+                            // #TODO also we need to replace lat and lng with real values pulled from somewhere...or allow user to enter / select the location...
                             qb.filter.where({
                                 [`${filter.fieldName}.geoLocation`]: {
                                     near: {

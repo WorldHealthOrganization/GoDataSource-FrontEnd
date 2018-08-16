@@ -132,7 +132,17 @@ export class AppliedFilterModel {
     public value: any;
 
     // selected comparator
-    public comparator: FilterComparator;
+    private _comparator: FilterComparator;
+    public set comparator(value: FilterComparator) {
+        // set comparator
+        this._comparator = value;
+
+        // reset value
+        this.value = null;
+    }
+    public get comparator(): FilterComparator {
+        return this._comparator;
+    }
 
     /**
      * Check to see if we have at least 2 comparators, to know if we need to display the comparators dropdown
