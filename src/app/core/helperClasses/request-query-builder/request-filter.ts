@@ -84,7 +84,7 @@ export class RequestFilter {
         properties: string[],
         value: string,
         replace: boolean = true,
-        operator: string = 'or'
+        operator: RequestFilterOperator = RequestFilterOperator.OR
     ) {
         // construct or condition if necessary
         const condition = {

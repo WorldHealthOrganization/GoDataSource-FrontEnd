@@ -1,4 +1,4 @@
-import { RequestFilter, RequestQueryBuilder } from './request-query-builder';
+import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
@@ -131,12 +131,20 @@ export abstract class ListComponent {
     filterByTextField(
         property: string | string[],
         value: string,
-        operator: string = 'or'
+        operator: RequestFilterOperator = RequestFilterOperator.OR
     ) {
         if (_.isArray(property)) {
-            this.queryBuilder.filter.byTextMultipleProperties(property as string[], value);
+            this.queryBuilder.filter.byTextMultipleProperties(
+                property as string[],
+                value,
+                true,
+                operator
+            );
         } else {
-            this.queryBuilder.filter.byText(property as string, value);
+            this.queryBuilder.filter.byText(
+                property as string,
+                value
+            );
         }
 
         // refresh list
