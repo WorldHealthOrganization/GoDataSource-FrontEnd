@@ -27,7 +27,14 @@ export class CytoscapeGraphComponent implements OnChanges {
         spacingFactor: 1.75,
         avoidOverlap: true,
         nodeDimensionsIncludeLabels: false,
-        animate: false
+        animate: false,
+        stop:  () => {
+            setTimeout(() => {
+                this.showLoading = false;
+            }, 500);
+        }
+
+
     };
     zoom: any = {
         min: 0.2,
@@ -52,12 +59,15 @@ export class CytoscapeGraphComponent implements OnChanges {
         }
     ];
 
+    showLoading: boolean = true;
+
     constructor() {
         // initialize style
         this.style =
             this.style ?
                 this.style :
                 this.defaultStyle;
+
         // use the custom layout - for tests
    //     cytoscape.use( dagre );
     }
@@ -79,6 +89,7 @@ export class CytoscapeGraphComponent implements OnChanges {
             minZoom: this.zoom.min,
             maxZoom: this.zoom.max
         });
+
     }
 
 }
