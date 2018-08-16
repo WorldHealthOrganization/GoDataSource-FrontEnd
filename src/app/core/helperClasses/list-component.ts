@@ -1,4 +1,4 @@
-import { RequestQueryBuilder } from './request-query-builder';
+import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
@@ -128,8 +128,24 @@ export abstract class ListComponent {
      * @param {string} property
      * @param {string} value
      */
-    filterByTextField(property: string, value: string) {
-        this.queryBuilder.filter.byText(property, value);
+    filterByTextField(
+        property: string | string[],
+        value: string,
+        operator: RequestFilterOperator = RequestFilterOperator.OR
+    ) {
+        if (_.isArray(property)) {
+            this.queryBuilder.filter.byTextMultipleProperties(
+                property as string[],
+                value,
+                true,
+                operator
+            );
+        } else {
+            this.queryBuilder.filter.byText(
+                property as string,
+                value
+            );
+        }
 
         // refresh list
         this.needsRefreshList();
@@ -216,7 +232,7 @@ export abstract class ListComponent {
      * @param {string | string[]} relation
      * @returns {RequestFilter}
      */
-    filterByRelation(relation: string | string[]) {
+    filterByRelation(relation: string | string[]): RequestFilter {
         // make sure we always have an array of relations
         const relations: string[] = (_.isArray(relation) ?
             relation :

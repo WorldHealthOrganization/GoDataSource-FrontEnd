@@ -10,23 +10,36 @@ import * as _ from 'lodash';
     styleUrls: ['./reference-data-label.component.less']
 })
 export class ReferenceDataLabelComponent {
+    @Input() listSplitter: string = ' / ';
     @Input() category: ReferenceDataCategory;
-    @Input() set value(entryId: string) {
+    @Input() set value(entriesIds: string | string[]) {
         // get the category
         this.referenceDataDataService
             .getReferenceDataByCategory(this.category)
             .subscribe((category: ReferenceDataCategoryModel) => {
                 // find the entry
-                const entry = _.find(category.entries, {id: entryId});
+                let entries: ReferenceDataEntryModel | ReferenceDataEntryModel[] = _.isArray(entriesIds) ?
+                    _.filter(category.entries, (entry) => _.indexOf(entriesIds as string[], entry.id) > -1) :
+                    _.find(category.entries, { id: entriesIds as string });
 
-                if (entry) {
-                    this.entry = entry;
+                if (
+                    entries &&
+                    !_.isArray(entries)
+                ) {
+                    entries = [entries as ReferenceDataEntryModel];
+                }
+
+                if (
+                    entries &&
+                    (entries as ReferenceDataEntryModel[]).length > 0
+                ) {
+                    this.entries = entries as ReferenceDataEntryModel[];
                 }
             });
     }
 
     // entry of given category having the id of the given value
-    entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
+    entries: ReferenceDataEntryModel[];
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService

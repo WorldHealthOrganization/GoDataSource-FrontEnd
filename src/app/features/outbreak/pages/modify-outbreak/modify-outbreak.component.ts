@@ -55,7 +55,7 @@ export class ModifyOutbreakComponent implements OnInit {
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.genericDataService.getCountriesList();
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
 
         this.route.params
             .subscribe((params: {outbreakId}) => {

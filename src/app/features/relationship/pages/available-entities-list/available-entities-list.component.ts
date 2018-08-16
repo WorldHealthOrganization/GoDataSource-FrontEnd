@@ -205,36 +205,4 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             }
         );
     }
-
-    /**
-     * Filter the Entities list by First Name (for Cases and Contacts) or Name (for Events)
-     * @param {string} value
-     */
-    filterByFirstName(value: string) {
-        const condition = {
-            or: [
-                {
-                    firstName: {
-                        regexp: `/^${value}/i`
-                    }
-                },
-                {
-                    name: {
-                        regexp: `/^${value}/i`
-                    }
-                },
-            ]
-        };
-
-        if (_.isEmpty(value)) {
-            // clear filter
-            this.queryBuilder.filter.removeCondition(condition);
-        } else {
-            // filter by firstName (for Case/Contact) or name (for Event)
-            this.queryBuilder.filter.where(condition, true);
-        }
-
-        this.refreshList();
-    }
-
 }

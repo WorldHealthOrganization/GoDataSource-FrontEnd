@@ -3,6 +3,9 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer
 
 import { GroupBase } from '../../xt-forms/core';
 import { AddressModel } from '../../../core/models/address.model';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { Observable } from '../../../../../node_modules/rxjs/Observable';
 
 @Component({
     selector: 'app-form-address',
@@ -19,10 +22,13 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    addressTypes$: Observable<any[]>;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -33,6 +39,8 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     ngOnInit() {
         // init value
         this.value = new AddressModel(this.value);
+
+        this.addressTypes$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.ADDRESS_TYPE);
     }
 
     /**

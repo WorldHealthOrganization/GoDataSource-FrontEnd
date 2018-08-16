@@ -8,6 +8,7 @@ import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
+import * as moment from 'moment';
 
 @Injectable()
 export class ListFilterDataService {
@@ -91,7 +92,7 @@ export class ListFilterDataService {
                     'and': [
                         {
                             'hospitalizationDates.startDate': {
-                                lte: serverDateTime
+                                lte: moment(serverDateTime).endOf('day').toISOString()
                             }
                         },
                         {
@@ -99,7 +100,7 @@ export class ListFilterDataService {
                                 {'hospitalizationDates.endDate': null},
                                 {
                                     'hospitalizationDates.endDate': {
-                                        gte: serverDateTime
+                                        gte: moment(serverDateTime).startOf('day').toISOString()
                                     }
                                 }
                             ]

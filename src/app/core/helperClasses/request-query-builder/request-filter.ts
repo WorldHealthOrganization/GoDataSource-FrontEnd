@@ -14,6 +14,17 @@ export class RequestFilter {
     private flags: { [key: string]: any } = {};
 
     /**
+     * Escape string
+     * @param value
+     */
+    static escapeStringForRegex(value: string) {
+        return value.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+        );
+    }
+
+    /**
      * Set flag
      * @param property
      * @param value
@@ -42,23 +53,47 @@ export class RequestFilter {
      * @returns {RequestFilter}
      */
     byText(
-        property: string | string[],
+        property: string,
         value: string,
         replace: boolean = true
     ) {
-        // construct or condition if necessary
-        const condition = _.isString(property) ?
-            {
-                [property as string]: {
-                    regexp: `/^${value}/i`
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where({
+                [property]: {
+                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
                 }
-            } : {
-                or: _.map(property as string[], (prop) => ({
-                    [prop]: {
-                        regexp: `/^${value}/i`
-                    }
-                }))
-            };
+            }, replace);
+        }
+
+        return this;
+    }
+
+    /**
+     * Filter by a text field
+     * @param {string[]} properties
+     * @param {string} value
+     * @param {boolean} replace
+     * @param {string} operator Default => 'or'
+     * @returns {RequestFilter}
+     */
+    byTextMultipleProperties(
+        properties: string[],
+        value: string,
+        replace: boolean = true,
+        operator: RequestFilterOperator = RequestFilterOperator.OR
+    ) {
+        // construct or condition if necessary
+        const condition = {
+            [operator]: _.map(properties, (prop) => ({
+                [prop]: {
+                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                }
+            }))
+        };
 
         // do we need to remove condition ?
         if (_.isEmpty(value)) {
@@ -192,6 +227,12 @@ export class RequestFilter {
      * @param replace
      */
     byDateRange(property: string, value: any, replace: boolean = true) {
+        // no point in continuing if we got an empty value
+        if (_.isEmpty(value)) {
+            this.remove(property);
+            return;
+        }
+
         // convert date range to simple range
         const rangeValue: any = {};
         if (value.startDate) {
@@ -227,9 +268,11 @@ export class RequestFilter {
         }
 
         // convert Objects returned by the Select element to string values
-        values = _.map(values, (value) => {
-            return value[valueKey];
-        });
+        if (valueKey) {
+            values = _.map(values, (value) => {
+                return value[valueKey];
+            });
+        }
 
         if (_.isEmpty(values)) {
             // remove filter

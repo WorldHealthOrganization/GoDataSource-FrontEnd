@@ -63,43 +63,6 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS]: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS'
     };
 
-    // #TODO replace with Reference Data
-    // #TODO add the whole list of countries
-    static COUNTRY = {
-        ALGERIA: {
-            label: 'Algeria',
-            value: 'Algeria'
-        },
-        CAMEROON: {
-            label: 'Cameroon',
-            value: 'Cameroon'
-        },
-        CONGO: {
-            label: 'Congo',
-            value: 'Congo'
-        },
-        ETHIOPIA: {
-            label: 'Ethiopia',
-            value: 'Ethiopia'
-        },
-        MADAGASCAR: {
-            label: 'Madagascar',
-            value: 'Madagascar'
-        },
-        NIGERIA: {
-            label: 'Nigeria',
-            value: 'Nigeria'
-        },
-        UGANDA: {
-            label: 'Uganda',
-            value: 'Uganda'
-        },
-        SUDAN: {
-            label: 'Sudan',
-            value: 'Sudan'
-        }
-    };
-
     // Gender
     static GENDER = {
         MALE: {

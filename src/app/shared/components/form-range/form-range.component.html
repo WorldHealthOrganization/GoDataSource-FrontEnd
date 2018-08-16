@@ -3,9 +3,9 @@
     class="form-range"
     [id]="identifier">
     <div
+        *ngIf="fromVisible"
         fxFlex>
         <app-form-input
-            *ngIf="fromVisible"
             [name]="name + '[from]'"
             [(ngModel)]="range.from"
             [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
@@ -13,14 +13,19 @@
             (input)="onChange()">
         </app-form-input>
     </div>
+
     <div
+        *ngIf="fromVisible && toVisible"
         fxLayout="row"
         fxLayoutAlign="center center"
-        class="form-range-separator">-</div>
+        class="form-range-separator">
+        -
+    </div>
+
     <div
+        *ngIf="toVisible"
         fxFlex>
         <app-form-input
-            *ngIf="toVisible"
             [name]="name + '[to]'"
             [(ngModel)]="range.to"
             [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"

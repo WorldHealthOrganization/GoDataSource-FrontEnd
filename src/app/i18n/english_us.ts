@@ -161,7 +161,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Name',
+        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
@@ -477,6 +477,9 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
+        'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
+        'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
 
         /**
          * Contacts list page
@@ -894,7 +897,6 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
 
-
         /**
          * Side filter
          */
@@ -913,6 +915,8 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL': 'Greater or equal',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS': 'Contains',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within ( miles )',
 
         /**
          * Location auto-complete search

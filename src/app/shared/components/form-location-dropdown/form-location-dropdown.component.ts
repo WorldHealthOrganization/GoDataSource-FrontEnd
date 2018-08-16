@@ -79,19 +79,7 @@ export class FormLocationDropdownComponent extends GroupBase<string> implements 
                     this.queryBuilder.filter
                         .remove('parentLocationId')
                         .remove('id')
-                        .where({
-                            or: [
-                                {
-                                    name: {
-                                        regexp: `/^${searchTerm}/i`
-                                    }
-                                }, {
-                                    synonyms: {
-                                        regexp: `/^${searchTerm}/i`
-                                    }
-                                }
-                            ]
-                        }, true)
+                        .byTextMultipleProperties(['name', 'synonyms'], searchTerm)
                         .flag(
                             'includeChildren',
                             true
