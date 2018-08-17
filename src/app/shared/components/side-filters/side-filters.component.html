@@ -59,8 +59,9 @@
 
                         <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
                             <mat-card class="filter-details" fxFlex>
+
+                                <!-- Delete filter item -->
                                 <button
-                                    *ngIf="appliedFilters.length > 1"
                                     class="filter-details-delete-button"
                                     type="button" mat-icon-button
                                     (click)="deleteFilter(i)">
@@ -81,7 +82,6 @@
                                 <!-- Filter Comparator -->
                                 <app-form-select
                                     *ngIf="filter.filter && filter.hasMoreThanOneComparator"
-                                    class="filter-comparator"
                                     [name]="'filter[filters][' + i + '][comparator]'"
                                     [(ngModel)]="filter.comparator"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
@@ -128,6 +128,16 @@
                                         filter.comparator === FilterComparator.WITHIN">
                                 </app-form-range>
 
+                                <!-- Address Location -->
+                                <app-form-location-dropdown
+                                    *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [ngModel]="filter.value"
+                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
+                                    [multiple]="true"
+                                    (changed)="filter.value = $event;">
+                                </app-form-location-dropdown>
+
                                 <!--DATE RANGE Filter-->
                                 <app-form-daterange
                                     *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
@@ -149,16 +159,67 @@
 
                 </div>
 
-                <!-- Sort Criterias -->
-                <div *ngIf="sortOptions.length > 0" class="section sort-section">
+                <!-- Sort Criteria -->
+                <div
+                    *ngIf="sortOptions.length > 0"
+                    class="section sort-section"
+                    fxLayout="column">
 
                     <div class="title">
                         {{'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate}}
                     </div>
 
-                    <div class="actions">
-                        <!-- #TODO -->
+                    <div
+                        *ngFor="let sort of appliedSort; let i = index"
+                        class="applied-sort"
+                        fxLayout="column">
+
+                        <div
+                            class="sort-container"
+                            fxLayout="row"
+                            fxLayoutAlign="start center">
+                            <mat-card
+                                class="sort-details"
+                                fxFlex>
+
+                                <!-- Delete sort item -->
+                                <button
+                                    class="sort-details-delete-button"
+                                    type="button" mat-icon-button
+                                    (click)="deleteSort(i)">
+                                    <span class="xt-icon">delete</span>
+                                </button>
+
+                                <!-- Sort By Field -->
+                                <app-form-select
+                                    [name]="'sortBy[items][' + i + '][sort]'"
+                                    [(ngModel)]="sort.sort"
+                                    [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
+                                    [options]="sortOptions"
+                                    optionLabelKey="fieldLabel"
+                                    optionValueKey="self">
+                                </app-form-select>
+
+                                <!-- Sort Direction ( ASC / DESC ) -->
+                                <app-form-select
+                                    *ngIf="sort.sort"
+                                    [name]="'sortBy[items][' + i + '][direction]'"
+                                    [(ngModel)]="sort.direction"
+                                    [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
+                                    [options]="sortDirections">
+                                </app-form-select>
+                            </mat-card>
+                        </div>
                     </div>
+
+                    <button
+                        fxFlex="50"
+                        type="button"
+                        mat-button
+                        color="primary"
+                        (click)="addSort()">
+                        {{'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON' | translate}}
+                    </button>
 
                 </div>
 

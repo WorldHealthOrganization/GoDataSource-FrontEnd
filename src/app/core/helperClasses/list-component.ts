@@ -85,6 +85,15 @@ export abstract class ListComponent {
         // remove previous sort columns, we can sort only by one column at a time
         this.queryBuilder.sort.clear();
 
+        // retrieve Side filters
+        let queryBuilder;
+        if (
+            this.sideFilter &&
+            (queryBuilder = this.sideFilter.getQueryBuilder())
+        ) {
+            this.queryBuilder.sort.merge(queryBuilder.sort);
+        }
+
         // sort
         if (
             property &&

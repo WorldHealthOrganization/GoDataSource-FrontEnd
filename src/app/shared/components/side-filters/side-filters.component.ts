@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav } from '@angular/material';
-import { AppliedFilterModel, FilterType, FilterModel, FilterComparator } from './model';
-import { RequestFilterOperator, RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { AppliedFilterModel, AppliedSortModel, FilterComparator, FilterModel, FilterType, SortModel } from './model';
+import { RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-side-filters',
@@ -17,11 +18,31 @@ export class SideFiltersComponent {
 
     // available columns to be displayed
     @Input() columns: any[] = [];
-    // available filters to be applied
-    @Input() filterOptions: FilterModel[] = [];
-    // available sort options to be applied
-    @Input() sortOptions: any[] = [];
 
+    // available filters to be applied
+    _filterOptions: FilterModel[] = [];
+    @Input() set filterOptions(values: FilterModel[]) {
+        this._filterOptions = values;
+        this.updateSortFields();
+    }
+    get filterOptions(): FilterModel[] {
+        return this._filterOptions;
+    }
+
+    // available sort options to be applied
+    sortOptions: SortModel[] = [];
+
+    // extra sort options from the ones provided in the filters
+    _extraSortOptions: SortModel[] = [];
+    @Input() set extraSortOptions(values: SortModel[]) {
+        this._extraSortOptions = values;
+        this.updateSortFields();
+    }
+    get extraSortOptions(): SortModel[] {
+        return this._extraSortOptions;
+    }
+
+    // apply filters handler
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
 
     // selected columns for being displayed
@@ -31,7 +52,7 @@ export class SideFiltersComponent {
     // selected operator to be used between filters
     appliedFilterOperator: RequestFilterOperator;
     // applied sorting criteria
-    appliedSort: any[];
+    appliedSort: AppliedSortModel[];
 
     // provide constants to template
     RequestFilterOperator = RequestFilterOperator;
@@ -41,10 +62,17 @@ export class SideFiltersComponent {
     // keep query builder
     queryBuilder: RequestQueryBuilder;
 
+    // sort directions
+    sortDirections: any[] = [
+        { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: RequestSortDirection.ASC },
+        { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: RequestSortDirection.DESC }
+    ];
+
     @ViewChild('sideNav') sideNav: MatSidenav;
 
     constructor(
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private i18nService: I18nService
     ) {
         // initialize data
         this.clear();
@@ -56,6 +84,14 @@ export class SideFiltersComponent {
 
     deleteFilter(index) {
         this.appliedFilters.splice(index, 1);
+    }
+
+    addSort() {
+        this.appliedSort.push(new AppliedSortModel());
+    }
+
+    deleteSort(index) {
+        this.appliedSort.splice(index, 1);
     }
 
     /**
@@ -102,6 +138,38 @@ export class SideFiltersComponent {
         this.filtersApplied.emit(this.getQueryBuilder());
 
         this.closeSideNav();
+    }
+
+    /**
+     * Update sort fields
+     */
+    private updateSortFields() {
+        this.sortOptions = [];
+
+        // add filter sort fields
+        const sortableFields = _.filter(this.filterOptions, (filter: FilterModel) => filter.sortable);
+        _.each(sortableFields, (filter: FilterModel) => {
+            // add only if no already in the list
+            if (!_.includes(this.sortOptions, { fieldName: filter.fieldName })) {
+                this.sortOptions.push(new SortModel(
+                    filter.fieldName,
+                    filter.fieldLabel
+                ));
+            }
+        });
+
+        // add filter extra sort fields
+        _.each(this.extraSortOptions, (sort: SortModel) => {
+            // add only if no already in the list
+            if (!_.includes(this.sortOptions, { fieldName: sort.fieldName })) {
+                this.sortOptions.push(sort);
+            }
+        });
+
+        // sort items
+        this.sortOptions = _.sortBy(this.sortOptions, (sort: SortModel) => {
+            return this.i18nService.instant(sort.fieldLabel);
+        });
     }
 
     apply(form: NgForm) {
@@ -169,8 +237,9 @@ export class SideFiltersComponent {
                     // contains / within
                     switch (comparator) {
                         case FilterComparator.WITHIN:
-                            // #TODO - near not working because of some issues with loopback & mongo
-                            // #TODO also we need to replace lat and lng with real values pulled from somewhere...or allow user to enter / select the location...
+                            // 1. #TODO - near not working because of some issues with loopback & mongo
+                            // 2. #TODO also we need to replace lat and lng with real values pulled from somewhere...or allow user to enter / select the location...
+                            // 3. #TODO in this case we need to allow user to pick location from  google maps that will populate two fields with lat & lng of the selected point which will be used to compare data
                             qb.filter.where({
                                 [`${filter.fieldName}.geoLocation`]: {
                                     near: {
@@ -178,6 +247,14 @@ export class SideFiltersComponent {
                                         lng: -72.6700016 // #TODO
                                     },
                                     maxDistance: appliedFilter.value.to
+                                }
+                            });
+                            break;
+
+                        case FilterComparator.LOCATION:
+                            qb.filter.where({
+                                [`${filter.fieldName}.locationId`]: {
+                                    inq: appliedFilter.value
                                 }
                             });
                             break;
@@ -208,6 +285,20 @@ export class SideFiltersComponent {
                     );
                     break;
             }
+        });
+
+        // apply sort
+        const sorts = _.chain(fields)
+            .get('sortBy.items', [])
+            .filter('sort')
+            .value();
+
+        // set sort by fields
+        _.each(sorts, (appliedSort: AppliedSortModel) => {
+            queryBuilder.sort.by(
+                appliedSort.sort.fieldName,
+                appliedSort.direction
+            );
         });
 
         // emit the Request Query Builder
