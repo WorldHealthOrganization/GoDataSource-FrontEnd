@@ -29,11 +29,12 @@ export class CytoscapeGraphComponent implements OnChanges {
         nodeDimensionsIncludeLabels: false,
         animate: false,
         stop:  () => {
-            setTimeout(() => {
+          setTimeout(() => {
                 this.showLoading = false;
-            }, 500);
+                this.cy.zoom( this.cy.minZoom());
+                this.cy.fit();
+          }, 500);
         }
-
 
     };
     zoom: any = {

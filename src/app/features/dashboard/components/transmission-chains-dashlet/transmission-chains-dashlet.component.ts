@@ -41,17 +41,17 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 /**
                  * Load the graph for tests
                  */
-                for ( var i = 0; i < 200; i++) {
-                    this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
-
-                    if ( i < 196) {
-                        this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+1})});
-                        if ( i % 2 === 0) {
-                            this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+2})});
-                        }
-                        this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+3})});
-                   }
-                }
+                // for ( var i = 0; i < 200; i++) {
+                //     this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
+                //
+                //     if ( i < 196) {
+                //         this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+1})});
+                //         if ( i % 2 === 0) {
+                //             this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+2})});
+                //         }
+                //         this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+3})});
+                //    }
+                // }
 
             });
         }
