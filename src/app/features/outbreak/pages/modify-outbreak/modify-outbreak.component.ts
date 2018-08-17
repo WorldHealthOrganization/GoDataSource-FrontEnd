@@ -15,6 +15,9 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -27,7 +30,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
     ];
-
+    // authenticated user
+    authUser: UserModel;
     // id of the outbreak to modify
     outbreakId: string;
     // outbreak to modify
@@ -37,10 +41,9 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     // list of countries
     countriesList$: Observable<any[]>;
 
-    // controls for switching between view and edit mode
-    viewOnly = true;
     // index of the current tab
     currentTabIndex = 0;
+
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -50,9 +53,13 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private authDataService: AuthDataService
     ) {
         super(route);
+
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     ngOnInit() {
@@ -115,17 +122,19 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     }
 
     /**
-     * Enable edit on questionnaires tabs
+     * Change page to modify
      */
-    enableEdit() {
-        this.viewOnly = false;
+    editOutbreak() {
+        const outbreakId = this.route.snapshot.params['outbreakId'];
+        this.router.navigate(['/outbreaks', outbreakId, 'modify']);
     }
 
     /**
-     * Disable edit on questionnaires tabs
+     * Check if we have write access to outbreaks
+     * @returns {boolean}
      */
-    disableEdit() {
-        this.viewOnly = true;
+    hasOutbreakWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
     }
 
     /**
@@ -134,7 +143,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
     }
-
     /**
      * Set attribute new to false for all questions and answers in the array.
      */
@@ -150,5 +158,4 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
             });
         }
     }
-
 }

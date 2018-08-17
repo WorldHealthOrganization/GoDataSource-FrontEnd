@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-role',
@@ -19,11 +20,10 @@ import * as _ from 'lodash';
     templateUrl: './modify-role.component.html',
     styleUrls: ['./modify-role.component.less']
 })
-export class ModifyRoleComponent {
+export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_USER_ROLES_TITLE', '.', true)
     ];
 
     userRoleId: string;
@@ -32,11 +32,12 @@ export class ModifyRoleComponent {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super(route);
         this.route.params.subscribe((params: {roleId}) => {
             // get the ID of the Role being modified
             this.userRoleId = params.roleId;
@@ -51,6 +52,16 @@ export class ModifyRoleComponent {
 
         // get the list of permissions to populate the dropdown in UI
         this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions();
+    }
+
+    ngOnInit() {
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_USER_ROLES_TITLE' : 'LNG_PAGE_MODIFY_USER_ROLES_TITLE',
+                '.',
+                true
+            )
+        );
     }
 
     modifyRole(form: NgForm) {

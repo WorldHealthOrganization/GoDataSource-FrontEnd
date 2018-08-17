@@ -9,6 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -16,7 +17,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
     templateUrl: './reference-data-category-entries-list.component.html',
     styleUrls: ['./reference-data-category-entries-list.component.less']
 })
-export class ReferenceDataCategoryEntriesListComponent implements OnInit {
+export class ReferenceDataCategoryEntriesListComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..')
@@ -26,11 +27,12 @@ export class ReferenceDataCategoryEntriesListComponent implements OnInit {
     categoryId: ReferenceDataCategory;
 
     constructor(
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
+        super(route);
     }
 
     ngOnInit() {

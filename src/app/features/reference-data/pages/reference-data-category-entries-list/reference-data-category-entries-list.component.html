@@ -3,8 +3,8 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-            <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+            <div *ngIf="!viewOnly" class="topnav-actions">
+                <button  class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -92,9 +92,7 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item [routerLink]="['.', item.id]">
-                        Modify
-                    </button>
+                    <button mat-menu-item [routerLink]="['.', item.categoryId, item.id]">asdasdasd</button>
 
                     <button mat-menu-item (click)="deleteEntry(item)">
                         Delete

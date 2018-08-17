@@ -456,6 +456,7 @@ export const EnglishUsLang = {
         /**
          * Modify User Role page
          */
+        'LNG_PAGE_VIEW_USER_ROLES_TITLE': 'View Role',
         'LNG_PAGE_MODIFY_USER_ROLES_TITLE': 'Modify Role',
         'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE': 'Role updated!',
 
