@@ -9,6 +9,10 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -16,22 +20,29 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
     templateUrl: './modify-location.component.html',
     styleUrls: ['./modify-location.component.less']
 })
-export class ModifyLocationComponent implements OnInit {
+export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
+    authUser: UserModel;
 
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private route: ActivatedRoute
-    ) {}
+        protected route: ActivatedRoute,
+        private authDataService: AuthDataService
+    ) {
+        super(route);
+    }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params
             .subscribe((params: { locationId }) => {
                 this.locationId = params.locationId;
@@ -90,7 +101,7 @@ export class ModifyLocationComponent implements OnInit {
                             // add modify
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
-                                    'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                                    this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
                                     '.',
                                     true,
                                     {},
@@ -126,5 +137,13 @@ export class ModifyLocationComponent implements OnInit {
                         ['/locations'])
                 ;
             });
+    }
+
+    /**
+     * Check if we have write access to locations
+     * @returns {boolean}
+     */
+    hasLocationWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 }

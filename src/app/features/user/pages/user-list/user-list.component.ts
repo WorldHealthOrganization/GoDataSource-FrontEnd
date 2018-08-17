@@ -75,12 +75,7 @@ export class UserListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'email', 'role'];
-
-        // check if the authenticated user has WRITE access
-        if (this.hasUserWriteAccess()) {
-            columns.push('actions');
-        }
+        const columns = ['firstName', 'lastName', 'email', 'role', 'actions'];
 
         return columns;
     }

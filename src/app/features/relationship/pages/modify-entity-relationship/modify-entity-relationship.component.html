@@ -30,12 +30,20 @@
     <div *ngIf="!viewOnly" class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button mat-raised-button color="primary" class="button-primary">
-            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        <button *ngIf="viewOnly && hasContactWriteAccess()"
+                mat-raised-button color="primary" class="button-primary"
+                [routerLink]="['/relationships', entityType, entityId, relationshipId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
-        <button type="button" [routerLink]="['/relationships', entityType, entityId]" mat-raised-button>
-            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="primary" class="button-primary">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button type="button" [routerLink]="['/relationships', entityType, entityId]" mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
     </div>
 
 
