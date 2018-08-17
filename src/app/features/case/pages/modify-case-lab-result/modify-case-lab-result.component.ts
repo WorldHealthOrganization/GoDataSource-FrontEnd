@@ -17,6 +17,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -30,6 +33,8 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
     ];
 
+    authUser: UserModel;
+
     // selected outbreak
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -38,6 +43,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
     // lab results
     labResultData: LabResultModel = new LabResultModel();
+    labResultId: string;
 
     sampleTypesList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;
@@ -56,12 +62,14 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         private formHelper: FormHelperService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private labResultDataService: LabResultDataService
+        private labResultDataService: LabResultDataService,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        this.authUser = this.authDataService.getAuthenticatedUser();
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
@@ -70,6 +78,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
         this.route.params
             .subscribe((params: {caseId, labResultId}) => {
+            this.labResultId = params.labResultId;
                 // get selected outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
@@ -154,5 +163,14 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 this.router.navigate([`/cases/${this.caseData.id}/lab-results`]);
             });
     }
+
+    /**
+     * Check if we have write access to cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
 
 }

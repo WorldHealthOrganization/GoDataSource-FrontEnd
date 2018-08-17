@@ -115,4 +115,11 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
     hasOutbreakReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
     }
+    /**
+     * Check if we have write access to users
+     * @returns {boolean}
+     */
+    hasUserWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
+    }
 }

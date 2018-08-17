@@ -68,7 +68,7 @@
             mat-raised-button color="primary" class="button-primary"
             *ngIf="hasLocationWriteAccess() && viewOnly"
             [routerLink]="['/locations', locationId, 'modify']">
-            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
             <button mat-raised-button color="primary" class="button-primary">

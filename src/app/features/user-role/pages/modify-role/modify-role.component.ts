@@ -13,6 +13,9 @@ import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-role',
@@ -25,7 +28,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),
     ];
-
+    authUser: UserModel;
     userRoleId: string;
     userRole: UserRoleModel = new UserRoleModel();
     availablePermissions$: Observable<any[]>;
@@ -35,7 +38,8 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
         protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private authDataService: AuthDataService
     ) {
         super(route);
         this.route.params.subscribe((params: {roleId}) => {
@@ -55,6 +59,7 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
     }
 
     ngOnInit() {
+        this.authUser = this.authDataService.getAuthenticatedUser();
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_USER_ROLES_TITLE' : 'LNG_PAGE_MODIFY_USER_ROLES_TITLE',
@@ -86,5 +91,11 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
                 });
         }
     }
-
+    /**
+     * Check if we have write access to users
+     * @returns {boolean}
+     */
+    hasUserRoleWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_ROLE);
+    }
 }

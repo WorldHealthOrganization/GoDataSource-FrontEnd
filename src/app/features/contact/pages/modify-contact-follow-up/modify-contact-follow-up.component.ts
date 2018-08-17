@@ -14,6 +14,9 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -33,6 +36,11 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
     displayOnlyMissedFollowUps: boolean = false;
 
+    contactId: string;
+    followUpId: string;
+
+    authUser: UserModel;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -41,15 +49,21 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private followUpsDataService: FollowUpsDataService
+        private followUpsDataService: FollowUpsDataService,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // retrieve route params
         this.route.params
             .subscribe((params: {contactId, followUpId}) => {
+            this.contactId = params.contactId;
+            this.followUpId = params.followUpId;
                 // retrieve query params
                 this.route.queryParams
                     .subscribe((queryParams: {displayOnlyMissedFollowUps}) => {
@@ -144,5 +158,13 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         }
 
         return false;
+    }
+
+    /**
+     * Check if we have access to create / generate follow-ups
+     * @returns {boolean}
+     */
+    hasFollowUpsWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 }

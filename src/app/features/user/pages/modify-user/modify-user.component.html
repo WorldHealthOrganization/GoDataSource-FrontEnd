@@ -80,6 +80,8 @@
                 [disabled]="viewOnly">
             </app-form-input>
 
+            <button *ngIf="viewOnly && hasUserWriteAccess()" mat-raised-button color="primary"
+            [routerLink]="['/users', userId, 'modify']">{{'LNG_COMMON_BUTTON_EDIT' | translate}}</button>
             <button *ngIf="!viewOnly" mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
         </div>
 

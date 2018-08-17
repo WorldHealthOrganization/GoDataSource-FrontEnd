@@ -20,6 +20,9 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-modify-entity-relationship',
@@ -53,6 +56,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
     entityType: EntityType;
     entityId: string;
     relationshipId: string;
+    authUser: UserModel;
 
     relationshipData: RelationshipModel = new RelationshipModel();
 
@@ -71,7 +75,8 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
@@ -82,6 +87,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
+        this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.params
             .subscribe((params: {entityType, entityId, relationshipId}) => {
@@ -189,6 +195,14 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 // navigate back to Entity Relationships list
                 this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
+    }
+
+    /**
+     * Check if we have access to create a contact
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
 }
