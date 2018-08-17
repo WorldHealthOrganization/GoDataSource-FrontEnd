@@ -20,6 +20,7 @@ import { FormInputListComponent } from './form-input-list/form-input-list.compon
 import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
 import { DashboardDynamicMetricDashletComponent } from './dashboard-dynamic-metric-dashlet/dashboard-dynamic-metric-dashlet.component';
 import { CytoscapeGraphComponent } from './cytoscape-graph/cytoscape-graph.component';
+import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -49,5 +50,6 @@ export const components: any[] = [
     ReferenceDataLabelComponent,
     DashboardMetricDashletComponent,
     DashboardDynamicMetricDashletComponent,
-    CytoscapeGraphComponent
+    CytoscapeGraphComponent,
+    DashboardCustomMetricDashletComponent
 ];

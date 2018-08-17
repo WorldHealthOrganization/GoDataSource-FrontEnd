@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 export enum RequestFilterOperator {
     AND = 'and',
@@ -236,10 +237,10 @@ export class RequestFilter {
         // convert date range to simple range
         const rangeValue: any = {};
         if (value.startDate) {
-            rangeValue.from = value.startDate.toISOString();
+            rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
         }
         if (value.endDate) {
-            rangeValue.to = value.endDate.toISOString();
+            rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
         }
 
         // filter by range

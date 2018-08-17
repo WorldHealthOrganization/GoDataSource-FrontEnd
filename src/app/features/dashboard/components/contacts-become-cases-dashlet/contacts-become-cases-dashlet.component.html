@@ -1,0 +1,31 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="['/cases']"
+    [params]="queryParams"
+    [value]="contactsBecomeCasesCount">
+
+    <div fxLayout="row" fxLayoutGap="10px">
+        <div>
+            {{'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD' | translate}}
+        </div>
+
+        <app-form-daterange
+            fxFlexOffset="5px"
+            name="dateRangeFilter"
+            [ngModel]="dateRange"
+            (changed)="onDateRangeChange($event)">
+        </app-form-daterange>
+
+        <div fxFlexOffset="5px">
+            {{'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD' | translate}}
+        </div>
+
+        <app-form-location-dropdown
+            fxFlexOffset="5px"
+            name="locationFilter"
+            [ngModel]="locationIds"
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+            [multiple]="true"
+            (changed)="onLocationChange($event)">
+        </app-form-location-dropdown>
+    </div>
+</app-dashboard-custom-metric-dashlet>

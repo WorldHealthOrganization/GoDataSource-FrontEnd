@@ -20,10 +20,12 @@
 
         <mat-card class="dashboard-section">
             <!-- other KPI section header -->
-            <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}</div>
+            <div class="other-kpi-header">
+                {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}
+            </div>
 
             <!-- other KPI section content -->
-            <div class="other-kpi-content">
+            <div class="other-kpi-content" fxLayout="row wrap">
 
                 <!-- Contacts per case mean -->
                 <app-contacts-per-case-mean-dashlet
@@ -94,7 +96,9 @@
                     *ngIf="hasReadReportPermissions()">
                 </app-number-of-active-chains-of-transmission-dashlet>
 
-                <div class="other-kpi-content-bottom"></div>
+                <app-contacts-become-cases-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-contacts-become-cases-dashlet>
 
             </div>
 

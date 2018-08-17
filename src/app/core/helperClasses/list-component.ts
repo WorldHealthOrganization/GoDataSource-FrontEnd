@@ -10,6 +10,9 @@ import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatSort, MatSortable } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
+import { DebounceTimeCaller } from './debounce-time-caller';
+import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
+import { DateRangeModel } from '../models/date-range.model';
 
 export abstract class ListComponent {
     /**
@@ -29,9 +32,6 @@ export abstract class ListComponent {
 
     public breadcrumbs: BreadcrumbItemModel[];
 
-    // The ID value of the timer
-    protected refreshTimeoutID: number = null;
-
     /**
      * Query builder
      * @type {RequestQueryBuilder}
@@ -46,6 +46,11 @@ export abstract class ListComponent {
         checkAll: false,
         individualCheck: []
     };
+
+    // refresh only after we finish changing data
+    private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshList();
+    }));
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
@@ -63,40 +68,10 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
-     * Clear previous refresh request
-     */
-    protected clearRefreshTimeout() {
-        if (this.refreshTimeoutID) {
-            clearTimeout(this.refreshTimeoutID);
-            this.refreshTimeoutID = null;
-        }
-    }
-
-    /**
      * Tell list that we need to refresh list
      */
     protected needsRefreshList(instant: boolean = false) {
-        // do we want to execute refresh instantly ?
-        if (instant) {
-            // stop the previous one
-            this.clearRefreshTimeout();
-
-            // refresh list
-            this.refreshList();
-        } else {
-            // stop previous request
-            this.clearRefreshTimeout();
-
-            // wait for debounce time
-            // make new request
-            this.refreshTimeoutID = setTimeout(() => {
-                // refresh data
-                this.refreshList();
-
-                // timeout executed - clear
-                this.refreshTimeoutID = null;
-            }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
-        }
+        this.triggerListRefresh.call(instant);
     }
 
     /**
@@ -387,7 +362,7 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter, x}): void {
+    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds}): void {
         // update breadcrumbs
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
 
@@ -525,6 +500,18 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
                 const qbFilterActiveChainsOfTransmission = this.listFilterDataService.filterActiveChainsOfTransmission();
                 this.queryBuilder.merge(qbFilterActiveChainsOfTransmission);
+                this.needsRefreshList(true);
+                break;
+
+            // filter contacts becoming cases overtime and place
+            case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
+                const dateRange: DateRangeModel = queryParams.dateRange ? JSON.parse(queryParams.dateRange) : undefined;
+                const locationIds: string[] = queryParams.locationIds;
+                const qbFilterCasesFromContactsOvertimeAndPlace = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
+                    dateRange,
+                    locationIds
+                );
+                this.queryBuilder.merge(qbFilterCasesFromContactsOvertimeAndPlace);
                 this.needsRefreshList(true);
                 break;
         }

@@ -1,0 +1,17 @@
+<div class="dashboard-box">
+    <!-- Dynamic title -->
+    <div
+        class="dashboard-box-header">
+        <ng-content></ng-content>
+    </div>
+
+    <!-- Content -->
+    <div
+        class="dashboard-box-content">
+        <span
+            [routerLink]="link"
+            [queryParams]="params">
+            {{ value }}
+        </span>
+    </div>
+</div>
