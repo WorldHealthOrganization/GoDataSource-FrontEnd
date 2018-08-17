@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div *ngIf="!viewOnly" class="topnav-actions">
-                <button  class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -92,10 +92,11 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item [routerLink]="['.', item.categoryId, item.id]">asdasdasd</button>
+                    <button mat-menu-item [routerLink]="['.', item.categoryId, item.id]">
+                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}</button>
 
                     <button mat-menu-item (click)="deleteEntry(item)">
-                        Delete
+                        {{'LNG_PAGE_ACTION_DELETE' | translate}}
                     </button>
 
                 </mat-menu>

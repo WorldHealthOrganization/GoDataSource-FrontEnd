@@ -218,7 +218,7 @@
                 type="button"
                 color="primary"
                 class="button-primary"
-                (click)="editOutbreak()">
+                [routerLink]="['/outbreaks', outbreakId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
     </div>

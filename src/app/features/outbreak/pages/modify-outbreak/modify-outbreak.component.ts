@@ -120,15 +120,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 this.router.navigate(['/outbreaks']);
             });
     }
-
-    /**
-     * Change page to modify
-     */
-    editOutbreak() {
-        const outbreakId = this.route.snapshot.params['outbreakId'];
-        this.router.navigate(['/outbreaks', outbreakId, 'modify']);
-    }
-
     /**
      * Check if we have write access to outbreaks
      * @returns {boolean}

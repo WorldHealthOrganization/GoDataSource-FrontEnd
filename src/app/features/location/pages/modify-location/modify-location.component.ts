@@ -10,6 +10,9 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -17,24 +20,29 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
     templateUrl: './modify-location.component.html',
     styleUrls: ['./modify-location.component.less']
 })
-export class ModifyLocationComponent extends  ViewModifyComponent implements OnInit {
+export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
+    authUser: UserModel;
 
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        protected route: ActivatedRoute
+        protected route: ActivatedRoute,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params
             .subscribe((params: { locationId }) => {
                 this.locationId = params.locationId;
@@ -129,5 +137,13 @@ export class ModifyLocationComponent extends  ViewModifyComponent implements OnI
                         ['/locations'])
                 ;
             });
+    }
+
+    /**
+     * Check if we have write access to locations
+     * @returns {boolean}
+     */
+    hasLocationWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 }
