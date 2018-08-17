@@ -2,6 +2,8 @@ import { Component, Host, Inject, Input, Optional, SkipSelf, ViewEncapsulation }
 import { GroupBase } from '../../core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-form-daterange',
@@ -19,6 +21,30 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
 
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
+
+    // start date
+    private _startDateVisible: boolean = true;
+    @Input() set startDateVisible(value: boolean) {
+        this._startDateVisible = value;
+        if (!this._startDateVisible) {
+            this.dateRange.startDate = null;
+        }
+    }
+    get startDateVisible(): boolean {
+        return this._startDateVisible;
+    }
+
+    // end date
+    private _endDateVisible: boolean = true;
+    @Input() set endDateVisible(value: boolean) {
+        this._endDateVisible = value;
+        if (!this._endDateVisible) {
+            this.dateRange.endDate = null;
+        }
+    }
+    get endDateVisible(): boolean {
+        return this._endDateVisible;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -50,6 +76,37 @@ export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
      */
     get dateRange(): DateRangeModel {
         return this.value;
+    }
+
+    /**
+     * Function triggered when the input value is changed
+     */
+    onChange(validateGroup: boolean = true) {
+        // wait for bindings to take effect
+        setTimeout(() => {
+            // do we need to replace start date time with start of the day?
+            if (
+                this.dateRange.startDate && (
+                    !(this.dateRange.startDate instanceof moment) ||
+                    !(this.dateRange.startDate as Moment).isSame((this.dateRange.startDate as Moment).startOf('day'))
+                )
+            ) {
+                this.dateRange.startDate = moment(this.dateRange.startDate).startOf('day');
+            }
+
+            // do we need to replace end date time with end of the day?
+            if (
+                this.dateRange.endDate && (
+                    !(this.dateRange.endDate instanceof moment) ||
+                    !(this.dateRange.endDate as Moment).isSame((this.dateRange.endDate as Moment).endOf('day'))
+                )
+            ) {
+                this.dateRange.endDate = moment(this.dateRange.endDate).endOf('day');
+            }
+
+            // trigger parent
+            super.onChange(validateGroup);
+        });
     }
 }
 

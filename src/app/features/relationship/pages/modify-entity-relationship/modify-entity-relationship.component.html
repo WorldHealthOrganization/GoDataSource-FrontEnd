@@ -27,7 +27,7 @@
         </mat-tab-group>
     </div>
 
-    <div class="form-actions">
+    <div *ngIf="!viewOnly" class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasContactWriteAccess()"

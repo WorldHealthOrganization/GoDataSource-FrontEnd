@@ -85,11 +85,66 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 this.refreshList();
             });
 
+        // set available side filters
         this.availableSideFilters = [
-            new FilterModel('firstName', FilterType.TEXT),
-            new FilterModel('lastName', FilterType.TEXT),
-            new FilterModel('gender', FilterType.MULTISELECT, this.genderList$),
-            new FilterModel('age', FilterType.RANGE),
+            // Case
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'middleName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'gender',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
+                type: FilterType.MULTISELECT,
+                options$: this.genderList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
+                type: FilterType.RANGE_NUMBER,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'dob',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DOB',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'phoneNumber',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'occupation',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+                type: FilterType.TEXT,
+                sortable: true
+            })
+
+            // Relations
+            // #TODO
         ];
     }
 

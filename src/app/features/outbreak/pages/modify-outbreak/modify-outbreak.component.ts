@@ -64,7 +64,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.genericDataService.getCountriesList();
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
 
         this.route.params
             .subscribe((params: {outbreakId}) => {

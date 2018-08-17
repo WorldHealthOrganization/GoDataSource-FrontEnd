@@ -7,12 +7,25 @@
 
     <div class="page-content">
 
-        <mat-card>
+        <mat-card class="dashboard-section">
+
+            <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE' | translate}}</div>
+
+            <!-- Chains of transmission -->
+            <app-transmission-chains-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-transmission-chains-dashlet>
+
+        </mat-card>
+
+        <mat-card class="dashboard-section">
             <!-- other KPI section header -->
-            <div class="other-kpi-header"> {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}</div>
+            <div class="other-kpi-header">
+                {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}
+            </div>
 
             <!-- other KPI section content -->
-            <div class="other-kpi-content">
+            <div class="other-kpi-content" fxLayout="row wrap">
 
                 <!-- Contacts per case mean -->
                 <app-contacts-per-case-mean-dashlet
@@ -79,11 +92,18 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-refusing-treatment-dashlet>
 
-                <div class="other-kpi-content-bottom"></div>
+                <app-number-of-active-chains-of-transmission-dashlet
+                    *ngIf="hasReadReportPermissions()">
+                </app-number-of-active-chains-of-transmission-dashlet>
+
+                <app-contacts-become-cases-dashlet
+                    *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                </app-contacts-become-cases-dashlet>
 
             </div>
 
         </mat-card>
+
 
     </div>
 </div>

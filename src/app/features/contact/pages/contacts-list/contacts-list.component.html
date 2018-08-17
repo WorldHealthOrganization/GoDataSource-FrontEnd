@@ -9,8 +9,13 @@
 
 <app-counted-items-list
     [items]="countedNewContactsGroupedByExposureType$ | async"
-    (optionChanged)="filterByRelationshipExposureType($event)">
+    (optionChanged)="filterBySelectField('id', $event.ids, null)">
 </app-counted-items-list>
+
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
 
 <mat-card class="page-section page-content">
 
@@ -26,7 +31,8 @@
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('firstName', $event)">
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -47,7 +53,8 @@
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('lastName', $event)">
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -66,7 +73,8 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterByRangeField('age', $event)">
+                            (changed)="filterByRangeField('age', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-range>
                     </div>
                 </div>
@@ -88,7 +96,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -108,7 +117,8 @@
                             name="phoneNumberFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('phoneNumber', $event)">
+                            (optionChanged)="filterByTextField('phoneNumber', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -130,7 +140,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="riskLevelsList$ | async"
                             (optionChanged)="filterBySelectField('riskLevel', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>

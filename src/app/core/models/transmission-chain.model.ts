@@ -3,6 +3,8 @@ import { EntityModel } from './entity.model';
 import { CaseModel } from './case.model';
 import { RelationshipModel, RelationshipPersonModel } from './relationship.model';
 import { EntityType } from './entity-type';
+import { GraphNodeModel } from './graph-node.model';
+import { GraphEdgeModel } from './graph-edge.model';
 
 export class TransmissionChainRelation {
 
@@ -107,6 +109,36 @@ export class TransmissionChainModel {
 
         // return the corresponding CaseModel
         return this.casesMap[firstCasePerson.id];
+    }
+
+    /**
+     * convert transmission chain model to the format needed by the graph
+     * @param {TransmissionChainModel} transmissionChain
+     * @returns {any}
+     */
+    convertChainToGraphElements(): any {
+        const graphData: any = {nodes: [], edges: []};
+        if ( !_.isEmpty(this) ) {
+            if ( !_.isEmpty ( this.nodes) ) {
+                _.forEach( this.nodes, function(node, key) {
+                    graphData.nodes.push({data: new GraphNodeModel(node.model)});
+                });
+            }
+            if ( !_.isEmpty ( this.relationships) ) {
+                _.forEach( this.relationships, function(relationship, key) {
+                    const graphEdge = new GraphEdgeModel();
+                    if ( relationship.persons[0].source ) {
+                        graphEdge.source = relationship.persons[0].id;
+                        graphEdge.target = relationship.persons[1].id;
+                    } else {
+                        graphEdge.source = relationship.persons[1].id;
+                        graphEdge.target = relationship.persons[0].id;
+                    }
+                    graphData.edges.push({data: graphEdge});
+                });
+            }
+        }
+        return graphData;
     }
 
 }

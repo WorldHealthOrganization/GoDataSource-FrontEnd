@@ -1,5 +1,5 @@
 import { GroupBase } from '../../xt-forms/core/group-base';
-import { Component, Host, HostBinding, Inject, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { Component, Host, HostBinding, Inject, Input, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { FormRangeModel } from './form-range.model';
 
@@ -16,6 +16,30 @@ import { FormRangeModel } from './form-range.model';
 })
 export class FormRangeComponent extends GroupBase<FormRangeModel> {
     @HostBinding('class.form-element-host') isFormElement = true;
+
+    // from
+    private _fromVisible: boolean = true;
+    @Input() set fromVisible(value: boolean) {
+        this._fromVisible = value;
+        if (!this._fromVisible) {
+            this.range.from = null;
+        }
+    }
+    get fromVisible(): boolean {
+        return this._fromVisible;
+    }
+
+    // to
+    private _toVisible: boolean = true;
+    @Input() set toVisible(value: boolean) {
+        this._toVisible = value;
+        if (!this._toVisible) {
+            this.range.to = null;
+        }
+    }
+    get toVisible(): boolean {
+        return this._toVisible;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

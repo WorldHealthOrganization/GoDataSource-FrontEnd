@@ -33,9 +33,10 @@ class LocationAutoItem {
         multi: true
     }]
 })
-export class FormLocationDropdownComponent extends GroupBase<string> implements OnInit {
+export class FormLocationDropdownComponent extends GroupBase<string | string[]> implements OnInit {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
+    @Input() multiple: boolean = false;
     @Input() placeholder: string = '';
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
@@ -79,19 +80,7 @@ export class FormLocationDropdownComponent extends GroupBase<string> implements 
                     this.queryBuilder.filter
                         .remove('parentLocationId')
                         .remove('id')
-                        .where({
-                            or: [
-                                {
-                                    name: {
-                                        regexp: `/^${searchTerm}/i`
-                                    }
-                                }, {
-                                    synonyms: {
-                                        regexp: `/^${searchTerm}/i`
-                                    }
-                                }
-                            ]
-                        }, true)
+                        .byTextMultipleProperties(['name', 'synonyms'], searchTerm)
                         .flag(
                             'includeChildren',
                             true

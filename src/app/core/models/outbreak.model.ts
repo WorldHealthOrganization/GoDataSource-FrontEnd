@@ -22,7 +22,7 @@ export class OutbreakModel {
     // TODO - need to allow to set case classifications on outbreak
     // caseClassification: any | null;
     caseIdMask: string;
-    countries: any | null;
+    countries: string[];
     longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {
@@ -32,7 +32,7 @@ export class OutbreakModel {
         this.disease = _.get(data, 'disease');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
-        this.countries = _.get(data, 'countries');
+        this.countries = _.get(data, 'countries', []);
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
         this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');

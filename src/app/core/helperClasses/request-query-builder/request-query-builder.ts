@@ -163,6 +163,15 @@ export class RequestQueryBuilder {
             _.isEmpty(this.limitResultsNumber) &&
             _.isEmpty(this.fieldsInResponse);
     }
+
+    /**
+     * Clear query
+     */
+    clear() {
+        this.filter.clear();
+        this.includedRelations = {};
+        this.sort.clear();
+    }
 }
 
 export class RequestRelationBuilder {

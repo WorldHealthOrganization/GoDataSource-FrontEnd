@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -8,6 +8,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -33,9 +34,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     constructor(
         private router: Router,
         private outbreakDataService: OutbreakDataService,
-        private transmissionChainDataService: TransmissionChainDataService
+        private transmissionChainDataService: TransmissionChainDataService,
+        private route: ActivatedRoute,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {

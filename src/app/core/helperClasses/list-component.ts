@@ -1,4 +1,4 @@
-import { RequestQueryBuilder } from './request-query-builder';
+import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
 import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
@@ -9,6 +9,10 @@ import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcr
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatSort, MatSortable } from '@angular/material';
+import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
+import { DebounceTimeCaller } from './debounce-time-caller';
+import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
+import { DateRangeModel } from '../models/date-range.model';
 
 export abstract class ListComponent {
     /**
@@ -21,10 +25,12 @@ export abstract class ListComponent {
      */
     @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
 
-    public breadcrumbs: BreadcrumbItemModel[];
+    /**
+     * Retrieve Side Filters
+     */
+    @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
 
-    // The ID value of the timer
-    protected refreshTimeoutID: number = null;
+    public breadcrumbs: BreadcrumbItemModel[];
 
     /**
      * Query builder
@@ -40,6 +46,11 @@ export abstract class ListComponent {
         checkAll: false,
         individualCheck: []
     };
+
+    // refresh only after we finish changing data
+    private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshList();
+    }));
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
@@ -57,40 +68,10 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
-     * Clear previous refresh request
-     */
-    protected clearRefreshTimeout() {
-        if (this.refreshTimeoutID) {
-            clearTimeout(this.refreshTimeoutID);
-            this.refreshTimeoutID = null;
-        }
-    }
-
-    /**
      * Tell list that we need to refresh list
      */
     protected needsRefreshList(instant: boolean = false) {
-        // do we want to execute refresh instantly ?
-        if (instant) {
-            // stop the previous one
-            this.clearRefreshTimeout();
-
-            // refresh list
-            this.refreshList();
-        } else {
-            // stop previous request
-            this.clearRefreshTimeout();
-
-            // wait for debounce time
-            // make new request
-            this.refreshTimeoutID = setTimeout(() => {
-                // refresh data
-                this.refreshList();
-
-                // timeout executed - clear
-                this.refreshTimeoutID = null;
-            }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
-        }
+        this.triggerListRefresh.call(instant);
     }
 
     /**
@@ -104,8 +85,20 @@ export abstract class ListComponent {
         // remove previous sort columns, we can sort only by one column at a time
         this.queryBuilder.sort.clear();
 
+        // retrieve Side filters
+        let queryBuilder;
+        if (
+            this.sideFilter &&
+            (queryBuilder = this.sideFilter.getQueryBuilder())
+        ) {
+            this.queryBuilder.sort.merge(queryBuilder.sort);
+        }
+
         // sort
-        if (direction) {
+        if (
+            property &&
+            direction
+        ) {
             // apply sort
             this.queryBuilder.sort.by(property, direction);
         }
@@ -119,8 +112,24 @@ export abstract class ListComponent {
      * @param {string} property
      * @param {string} value
      */
-    filterByTextField(property: string, value: string) {
-        this.queryBuilder.filter.byText(property, value);
+    filterByTextField(
+        property: string | string[],
+        value: string,
+        operator: RequestFilterOperator = RequestFilterOperator.OR
+    ) {
+        if (_.isArray(property)) {
+            this.queryBuilder.filter.byTextMultipleProperties(
+                property as string[],
+                value,
+                true,
+                operator
+            );
+        } else {
+            this.queryBuilder.filter.byText(
+                property as string,
+                value
+            );
+        }
 
         // refresh list
         this.needsRefreshList();
@@ -156,15 +165,8 @@ export abstract class ListComponent {
      * @param value Object with 'startDate' and 'endDate' properties
      */
     filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
-        const rangeValue: any = {};
-        if (value.startDate) {
-            rangeValue.from = value.startDate.toISOString();
-        }
-        if (value.endDate) {
-            rangeValue.to = value.endDate.toISOString();
-        }
-
-        this.queryBuilder.filter.byRange(property, rangeValue);
+        // filter by date range
+        this.queryBuilder.filter.byDateRange(property, value);
 
         // refresh list
         this.needsRefreshList();
@@ -210,21 +212,102 @@ export abstract class ListComponent {
     }
 
     /**
-     * Apply the filters selected from the Side Filters section
-     * @param {RequestQueryBuilder} queryBuilder
+     * Filter by relation
+     * @param {string | string[]} relation
+     * @returns {RequestFilter}
      */
-    applySideFilters(queryBuilder: RequestQueryBuilder) {
-        // clear table filters without triggering search for all the changes
+    filterByRelation(relation: string | string[]): RequestFilter {
+        // make sure we always have an array of relations
+        const relations: string[] = (_.isArray(relation) ?
+            relation :
+            [relation]
+        ) as string[];
+
+        // go through all the relations until we get the desired query builder
+        let relationQB: RequestQueryBuilder = this.queryBuilder;
+        _.each(relations, (rel: string) => {
+            relationQB = relationQB.include(rel).queryBuilder;
+        });
+
+        // refresh list
+        // this one isn't executed instantly, so there should be enough time to setup the relation filter
+        this.needsRefreshList();
+
+        // retrieve filter
+        return relationQB.filter;
+    }
+
+    /**
+     * Clear query builder of conditions & include & ....
+     */
+    clearQueryBuilder() {
+        // clear query filters
+        this.queryBuilder.clear();
+    }
+
+    /**
+     * Clear table filters
+     */
+    clearHeaderFilters() {
+        // clear header filters
         if (this.filterInputs) {
             this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
                 input.reset();
             });
         }
 
-        // reset table sort columns
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Reset table sort columns
+     */
+    clearHeaderSort() {
         this.matTableSort.sort({
             id: null
         } as MatSortable);
+
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Clear header filters & sort
+     */
+    resetFiltersToSideFilters() {
+        // clear query builder
+        this.clearQueryBuilder();
+
+        // clear table filters
+        this.clearHeaderFilters();
+
+        // reset table sort columns
+        this.clearHeaderSort();
+
+        // retrieve Side filters
+        let queryBuilder;
+        if (
+            this.sideFilter &&
+            (queryBuilder = this.sideFilter.getQueryBuilder())
+        ) {
+            this.queryBuilder = queryBuilder;
+        }
+
+        // refresh of the list is done automatically after debounce time
+        // #
+    }
+
+    /**
+     * Apply the filters selected from the Side Filters section
+     * @param {RequestQueryBuilder} queryBuilder
+     */
+    applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear table filters
+        this.clearHeaderFilters();
+
+        // reset table sort columns
+        this.clearHeaderSort();
 
         // replace query builder with side filters
         this.queryBuilder = queryBuilder;
@@ -288,7 +371,7 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter, x}): void {
+    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds}): void {
         // update breadcrumbs
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
 
@@ -299,10 +382,10 @@ export abstract class ListComponent {
 
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsOnFollowUpLists()
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterContactsOnFollowUpLists);
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -324,8 +407,8 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesHospitalized()
-                    .subscribe((filterQueryBuilder) => {
-                        this.queryBuilder.merge(filterQueryBuilder);
+                    .subscribe((qbFilterCasesHospitalized) => {
+                        this.queryBuilder.merge(qbFilterCasesHospitalized);
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -337,10 +420,10 @@ export abstract class ListComponent {
                 const noDaysNotSeen = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsNotSeen(noDaysNotSeen)
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterContactsNotSeen) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterContactsNotSeen);
                         // refresh list
                         this.refreshList();
                     });
@@ -352,10 +435,10 @@ export abstract class ListComponent {
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesLessThanContacts(noLessContacts)
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterCasesLessThanContacts) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterCasesLessThanContacts);
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -366,10 +449,10 @@ export abstract class ListComponent {
 
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsLostToFollowUp()
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterContactsLostToFollowUp) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterContactsLostToFollowUp);
                         // refresh list
                         this.refreshList();
                     });
@@ -381,10 +464,10 @@ export abstract class ListComponent {
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesInKnownChains(noDaysInChains)
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterCasesInKnownChains) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterCasesInKnownChains);
                         // refresh list
                         this.refreshList();
                     });
@@ -396,10 +479,10 @@ export abstract class ListComponent {
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesAmongKnownContacts(noDaysAmongContacts)
-                    .subscribe((filterQueryBuilder) => {
+                    .subscribe((qbFilterCasesAmongKnownContacts) => {
                         // remove condition on property 'id' to not duplicate it
                         this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(filterQueryBuilder);
+                        this.queryBuilder.merge(qbFilterCasesAmongKnownContacts);
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -408,8 +491,8 @@ export abstract class ListComponent {
             // filter suspect cases with pending lab result
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
                 // get the correct query builder and merge with the existing one
-                const filterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
-                this.queryBuilder.merge(filterQueryBuilder);
+                const qbFilterCasesPendingLabResult = this.listFilterDataService.filterCasesPendingLabResult();
+                this.queryBuilder.merge(qbFilterCasesPendingLabResult);
                 // refresh list
                 this.needsRefreshList(true);
                 break;
@@ -417,8 +500,27 @@ export abstract class ListComponent {
             // filter suspect cases refusing treatment
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
                 // get the correct query builder and merge with the existing one
-                const filterQueryBuilderRefusingTreatment = this.listFilterDataService.filterCasesRefusingTreatment();
-                this.queryBuilder.merge(filterQueryBuilderRefusingTreatment);
+                const qbFilterCasesRefusingTreatment = this.listFilterDataService.filterCasesRefusingTreatment();
+                this.queryBuilder.merge(qbFilterCasesRefusingTreatment);
+                this.needsRefreshList(true);
+                break;
+
+            // filter cases among contacts
+            case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+                const qbFilterActiveChainsOfTransmission = this.listFilterDataService.filterActiveChainsOfTransmission();
+                this.queryBuilder.merge(qbFilterActiveChainsOfTransmission);
+                this.needsRefreshList(true);
+                break;
+
+            // filter contacts becoming cases overtime and place
+            case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
+                const dateRange: DateRangeModel = queryParams.dateRange ? JSON.parse(queryParams.dateRange) : undefined;
+                const locationIds: string[] = queryParams.locationIds;
+                const qbFilterCasesFromContactsOvertimeAndPlace = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
+                    dateRange,
+                    locationIds
+                );
+                this.queryBuilder.merge(qbFilterCasesFromContactsOvertimeAndPlace);
                 this.needsRefreshList(true);
                 break;
         }

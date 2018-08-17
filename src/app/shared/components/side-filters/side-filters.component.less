@@ -20,10 +20,15 @@
         mat-sidenav {
             margin-top: 10vh;
             max-height: 80vh;
-            width: 350px;
+            width: 400px;
             padding: 15px;
             height: auto;
             bottom: unset !important;
+            overflow-x: hidden;
+
+            .side-filters-reset-button {
+                float: right;
+            }
         }
     }
 
@@ -55,6 +60,42 @@
 
             .filter-container {
                 margin: 10px 0;
+
+                .filter-details {
+                    min-width: 100%;
+
+                    .filter-details-delete-button {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                    }
+
+                    .mat-form-field-infix {
+                        width: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .sort-section {
+        .applied-sort {
+            .sort-container {
+                margin: 10px 0;
+
+                .sort-details {
+                    min-width: 100%;
+
+                    .sort-details-delete-button {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                    }
+
+                    .mat-form-field-infix {
+                        width: auto;
+                    }
+                }
             }
         }
     }

@@ -76,7 +76,10 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let outbreak">
-                {{outbreak.countries}}
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.COUNTRY"
+                    [value]="outbreak.countries">
+                </app-reference-data-label>
             </mat-cell>
         </ng-container>
 

@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 export enum RequestFilterOperator {
     AND = 'and',
@@ -12,6 +13,17 @@ export class RequestFilter {
     private operator: RequestFilterOperator = RequestFilterOperator.AND;
     // flags
     private flags: { [key: string]: any } = {};
+
+    /**
+     * Escape string
+     * @param value
+     */
+    static escapeStringForRegex(value: string) {
+        return value.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+        );
+    }
 
     /**
      * Set flag
@@ -41,7 +53,68 @@ export class RequestFilter {
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byText(property: string, value: string, replace: boolean = true) {
+    byText(
+        property: string,
+        value: string,
+        replace: boolean = true
+    ) {
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where({
+                [property]: {
+                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                }
+            }, replace);
+        }
+
+        return this;
+    }
+
+    /**
+     * Filter by a text field
+     * @param {string[]} properties
+     * @param {string} value
+     * @param {boolean} replace
+     * @param {string} operator Default => 'or'
+     * @returns {RequestFilter}
+     */
+    byTextMultipleProperties(
+        properties: string[],
+        value: string,
+        replace: boolean = true,
+        operator: RequestFilterOperator = RequestFilterOperator.OR
+    ) {
+        // construct or condition if necessary
+        const condition = {
+            [operator]: _.map(properties, (prop) => ({
+                [prop]: {
+                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                }
+            }))
+        };
+
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.removeCondition(condition);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where(condition, replace);
+        }
+
+        return this;
+    }
+
+    /**
+     * Filter by comparing a field if it is equal to the provided value
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byEquality(property: string, value: string, replace: boolean = true) {
         if (_.isEmpty(value)) {
             // remove filter
             this.remove(property);
@@ -49,7 +122,7 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    regexp: `/^${value}/i`
+                    eq: value
                 }
             }, replace);
         }
@@ -149,6 +222,39 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by date range
+     * @param property
+     * @param value
+     * @param replace
+     */
+    byDateRange(property: string, value: any, replace: boolean = true) {
+        // no point in continuing if we got an empty value
+        if (_.isEmpty(value)) {
+            this.remove(property);
+            return;
+        }
+
+        // convert date range to simple range
+        const rangeValue: any = {};
+        if (value.startDate) {
+            rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
+        }
+        if (value.endDate) {
+            rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
+        }
+
+        // filter by range
+        this.byRange(
+            property,
+            rangeValue,
+            replace
+        );
+
+        // finished
+        return this;
+    }
+
+    /**
      * Filter by a Select / Multi-Select field
      * @param {string} property
      * @param {any | any[]} values
@@ -163,9 +269,11 @@ export class RequestFilter {
         }
 
         // convert Objects returned by the Select element to string values
-        values = _.map(values, (value) => {
-            return value[valueKey];
-        });
+        if (valueKey) {
+            values = _.map(values, (value) => {
+                return value[valueKey];
+            });
+        }
 
         if (_.isEmpty(values)) {
             // remove filter

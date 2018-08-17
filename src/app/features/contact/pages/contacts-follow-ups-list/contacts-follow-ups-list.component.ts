@@ -17,6 +17,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -91,11 +92,15 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     }, true);
 
                     // show upcoming or past follow ups?
-                    const operator = this.showPastFollowUps ? 'lt' : 'gte';
                     this.queryBuilder.filter.where({
-                        date: {
-                            [operator]: serverDateTime
-                        }
+                        // trick remove condition, so we can have filter on dates as well
+                        or: [{
+                            date: {
+                                [this.showPastFollowUps ? 'lt' : 'gte']: this.showPastFollowUps ?
+                                    moment(serverDateTime).endOf('day').toISOString() :
+                                    moment(serverDateTime).startOf('day').toISOString()
+                            }
+                        }]
                     }, true);
 
                     // retrieve the list of Follow Ups

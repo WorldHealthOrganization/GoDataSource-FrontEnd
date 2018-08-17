@@ -31,14 +31,6 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Countries
-     * @returns {Observable<any[]>}
-     */
-    getCountriesList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.COUNTRY));
-    }
-
-    /**
      * Retrieve the list of Filter Yes / No options
      * @returns {Observable<any[]>}
      */

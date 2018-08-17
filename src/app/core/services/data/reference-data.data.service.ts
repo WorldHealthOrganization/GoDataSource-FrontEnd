@@ -97,7 +97,11 @@ export class ReferenceDataDataService {
         return this.getReferenceDataByCategory(categoryId)
             .map((data: ReferenceDataCategoryModel) => {
                 return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                    new LabelValuePair(entry.value, entry.id)
+                    new LabelValuePair(
+                        entry.value,
+                        entry.id,
+                        !entry.active
+                    )
                 );
             });
     }

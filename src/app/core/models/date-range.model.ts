@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 
 export class DateRangeModel {
-    startDate: string;
-    endDate: string;
+    startDate: string | Moment;
+    endDate: string | Moment;
 
     constructor(data = null) {
         this.startDate = _.get(data, 'startDate');

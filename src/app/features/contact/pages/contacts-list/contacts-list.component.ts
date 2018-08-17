@@ -30,6 +30,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-contacts-list',
@@ -64,6 +66,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+
+    // yes / no / all options
+    yesNoOptionsList$: Observable<any[]>;
+
+    // available side filters
+    availableSideFilters: FilterModel[];
 
     constructor(
         private contactDataService: ContactDataService,
@@ -102,6 +110,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             );
         });
 
+        // yes / no
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -116,7 +127,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
                                 return new CountedItemsListItem(
                                     item.count,
-                                    item.id
+                                    item.id,
+                                    item.contactIDs
                                 );
                             });
                         });
@@ -125,6 +137,113 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
             });
+
+        // case condition
+        const caseCondition = new RequestQueryBuilder();
+        caseCondition.filter.byEquality(
+            'type',
+            EntityType.CASE
+        );
+
+        // set available side filters
+        this.availableSideFilters = [
+            // Contact
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'occupation',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON',
+                type: FilterType.RANGE_NUMBER
+            }),
+            new FilterModel({
+                fieldName: 'dateOfReporting',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'dob',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+                type: FilterType.ADDRESS
+            }),
+
+            // Relation - Follow-up
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                type: FilterType.RANGE_DATE,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
+            new FilterModel({
+                fieldName: 'performed',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
+            new FilterModel({
+                fieldName: 'lostToFollowUp',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
+
+            // Relation - Cases
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'gender',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
+                type: FilterType.MULTISELECT,
+                options$: this.genderList$,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
+                type: FilterType.RANGE_NUMBER,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            })
+        ];
     }
 
     /**
@@ -212,15 +331,4 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 }
             });
     }
-
-    /**
-     * #TODO
-     */
-    filterByRelationshipExposureType(item) {
-        // #TODO
-        // this function will be replaced by search criteria inside a relationship
-        // we can't do this right now since we can't search by relationship data
-        console.log('#TODO', item);
-    }
-
 }

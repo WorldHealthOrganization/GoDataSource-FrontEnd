@@ -52,7 +52,7 @@
                                     name="firstNameFilter"
                                     ngModel
                                     placeholder="Filter"
-                                    (optionChanged)="filterByFirstName($event)">
+                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)">
                                 </app-form-input>
                             </div>
                         </div>

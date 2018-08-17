@@ -8,6 +8,10 @@ import { GenericDataService } from './generic.data.service';
 import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
+import * as moment from 'moment';
+import { DateRangeModel } from '../../models/date-range.model';
+import * as _ from 'lodash';
+import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 
 @Injectable()
 export class ListFilterDataService {
@@ -88,21 +92,21 @@ export class ListFilterDataService {
                 const filterQueryBuilder = new RequestQueryBuilder();
                 // compare hospitalisation dates start and end with current date
                 filterQueryBuilder.filter.where({
-                    'and': [
+                    [RequestFilterOperator.AND]: [
                         {
                             'hospitalizationDates.startDate': {
-                                lte: serverDateTime
+                                lte: moment(serverDateTime).endOf('day').toISOString()
                             }
-                        },
-                        {
-                            'or': [
-                                {'hospitalizationDates.endDate': null},
-                                {
-                                    'hospitalizationDates.endDate': {
-                                        gte: serverDateTime
-                                    }
+                        }, {
+                            [RequestFilterOperator.OR]: [{
+                                'hospitalizationDates.endDate': {
+                                    eq: null
                                 }
-                            ]
+                            }, {
+                                'hospitalizationDates.endDate': {
+                                    gte: moment(serverDateTime).startOf('day').toISOString()
+                                }
+                            }]
                         }
                     ]
                 }, true);
@@ -214,6 +218,7 @@ export class ListFilterDataService {
                 {
                     status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
                 }, true);
+
         return filterQueryBuilder;
     }
 
@@ -225,17 +230,68 @@ export class ListFilterDataService {
         // generate a query builder for cases refusing treatment
         const filterQueryBuilder = new RequestQueryBuilder();
         filterQueryBuilder.filter.where({
-            'and': [
-                {
-                    transferRefused: true
-                },
-                {
-                    classification: Constants.CASE_CLASSIFICATION.SUSPECT
-                }
-            ]
+            [RequestFilterOperator.AND]: [{
+                transferRefused: true
+            }, {
+                classification: Constants.CASE_CLASSIFICATION.SUSPECT
+            }]
         }, true);
-        return filterQueryBuilder;
 
+        return filterQueryBuilder;
     }
 
+    /**
+     * Create the query builder for filtering the list of active chains of transmission
+     * @returns {RequestQueryBuilder}
+     */
+    filterActiveChainsOfTransmission(): RequestQueryBuilder {
+        // generate a query builder
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.flag(
+            'active',
+            true
+        );
+        return filterQueryBuilder;
+    }
+
+    /**
+     * Create the query builder for contacts becoming cases overtime and place
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesFromContactsOvertimeAndPlace(
+        dateRange: DateRangeModel = null,
+        locationIds: string[] = null
+    ): RequestQueryBuilder {
+        // generate a query builder
+        const qb = new RequestQueryBuilder();
+
+        // filter by date range?
+        if (
+            !_.isEmpty(dateRange) && (
+                !_.isEmpty(dateRange.startDate) ||
+                !_.isEmpty(dateRange.endDate)
+            )
+        ) {
+            // filter by date range
+            qb.filter.byDateRange('dateBecomeCase', dateRange);
+        } else {
+            // any date
+            qb.filter.where({
+                'dateBecomeCase': {
+                    neq: null
+                }
+            });
+        }
+
+        // filter by location?
+        if (!_.isEmpty(locationIds)) {
+            qb.filter.where({
+                'addresses.locationId': {
+                    inq: locationIds
+                }
+            });
+        }
+
+        return qb;
+    }
 }

@@ -3,6 +3,7 @@
     class="form-range"
     [id]="identifier">
     <div
+        *ngIf="fromVisible"
         fxFlex>
         <app-form-input
             [name]="name + '[from]'"
@@ -12,11 +13,17 @@
             (input)="onChange()">
         </app-form-input>
     </div>
+
     <div
+        *ngIf="fromVisible && toVisible"
         fxLayout="row"
         fxLayoutAlign="center center"
-        class="form-range-separator">-</div>
+        class="form-range-separator">
+        -
+    </div>
+
     <div
+        *ngIf="toVisible"
         fxFlex>
         <app-form-input
             [name]="name + '[to]'"

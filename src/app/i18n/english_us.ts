@@ -68,6 +68,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_SELECT': 'Select',
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
+        'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
 
         /**
          * Dialogs
@@ -160,7 +161,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Name',
+        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
@@ -270,6 +271,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
+        'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
 
         /**
          * Cases list page
@@ -479,6 +481,9 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
+        'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
+        'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
 
         /**
          * Contacts list page
@@ -854,6 +859,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
+        'LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS': 'NUMBER OF ACTIVE CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE': 'CONTACTS NOT SEEN IN ',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_AFTER_VALUE': ' DAYS',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE': 'CASES WITH LESS THAN ',
@@ -865,6 +871,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'SUSPECT CASES WITH PENDING LAB RESULT',
         'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'SUSPECT CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE': 'Chains of Transmission',
+        'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
+        'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
 
         /**
          * List Filters page titles
@@ -879,6 +888,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
+        'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Number of active chains of transmission',
 
         /**
          * Transmission Chain Fields
@@ -894,7 +905,6 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
 
-
         /**
          * Side filter
          */
@@ -902,9 +912,25 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
         'LNG_SIDE_FILTERS_SECTION_SORT_TITLE': 'Sort',
         'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add another filter',
+        'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON': 'Add another sort',
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL': 'Condition',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL': 'Greater or equal',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS': 'Contains',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION': 'Place',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within ( miles )',
+        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Direction',
+        'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER': 'Sort By',
+        'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
+        'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
 
         /**
          * Location auto-complete search
