@@ -78,7 +78,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
         this.route.params
             .subscribe((params: {caseId, labResultId}) => {
-            this.labResultId = params.labResultId;
+                this.labResultId = params.labResultId;
                 // get selected outbreak
                 this.outbreakDataService
                     .getSelectedOutbreak()
