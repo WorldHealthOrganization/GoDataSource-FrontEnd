@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 // import * as coseBilkent from 'cytoscape-cose-bilkent';
 
@@ -17,7 +17,14 @@ export class CytoscapeGraphComponent implements OnChanges {
     container: string = 'cy';
     // different layouts used for tests
     // layout: any = {name: 'cose-bilkent'};
-    // layout: any = {name: 'breadthfirst'};
+    // layout: any = {
+    //      name: 'breadthfirst',
+    //      stop:  () => {
+    //                  this.showLoading = false;
+    //                  this.cy.zoom( this.cy.minZoom());
+    //                  this.cy.fit();
+    //              }
+    //  };
     layout: any = {
         name: 'cose',
         fit: true,
@@ -29,13 +36,10 @@ export class CytoscapeGraphComponent implements OnChanges {
         nodeDimensionsIncludeLabels: false,
         animate: false,
         stop:  () => {
-          setTimeout(() => {
-                this.showLoading = false;
-                this.cy.zoom( this.cy.minZoom());
-                this.cy.fit();
-          }, 500);
+            this.showLoading = false;
+            this.cy.zoom( this.cy.minZoom());
+            this.cy.fit();
         }
-
     };
     zoom: any = {
         min: 0.2,
@@ -62,7 +66,7 @@ export class CytoscapeGraphComponent implements OnChanges {
 
     showLoading: boolean = true;
 
-    constructor() {
+    constructor(private el: ElementRef) {
         // initialize style
         this.style =
             this.style ?
@@ -82,8 +86,11 @@ export class CytoscapeGraphComponent implements OnChanges {
      * Render cytoscape graph
      */
     public render() {
+        const nativeElement = this.el.nativeElement;
+        const container = nativeElement.getElementsByClassName(this.container);
+
         this.cy = cytoscape({
-            container: document.getElementById(this.container),
+            container: container[0],
             layout: this.layout,
             style: this.style,
             elements: this.elements,

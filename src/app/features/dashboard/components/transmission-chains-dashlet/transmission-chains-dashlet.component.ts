@@ -36,7 +36,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
     displayChainsOfTransmission() {
         if ( this.selectedOutbreak) {
             this.transmissionChainDataService.getTransmissionChainsList(this.selectedOutbreak.id).subscribe((chains) => {
-                this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains[0]);
+
+                this.graphElements = chains[0].convertChainToGraphElements();
 
                 /**
                  * Load the graph for tests

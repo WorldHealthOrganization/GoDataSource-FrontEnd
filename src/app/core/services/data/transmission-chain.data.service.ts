@@ -56,34 +56,5 @@ export class TransmissionChainDataService {
         );
     }
 
-    /**
-     * convert transmission chain model to the format needed by the graph
-     * @param {TransmissionChainModel} transmissionChain
-     * @returns {any}
-     */
-    convertChainToGraphElements(transmissionChain: TransmissionChainModel): any {
-       const graphData: any = {nodes: [], edges: []};
-       if ( !_.isEmpty(transmissionChain) ) {
-           if ( !_.isEmpty ( transmissionChain.nodes) ) {
-               _.forEach( transmissionChain.nodes, function(node, key) {
-                   graphData.nodes.push({data: new GraphNodeModel(node.model)});
-               });
-           }
-           if ( !_.isEmpty ( transmissionChain.relationships) ) {
-               _.forEach( transmissionChain.relationships, function(relationship, key) {
-                   const graphEdge = new GraphEdgeModel();
-                   if ( relationship.persons[0].source ) {
-                       graphEdge.source = relationship.persons[0].id;
-                       graphEdge.target = relationship.persons[1].id;
-                   } else {
-                       graphEdge.source = relationship.persons[1].id;
-                       graphEdge.target = relationship.persons[0].id;
-                   }
-                   graphData.edges.push({data: graphEdge});
-               });
-           }
-       }
-       return graphData;
-    }
 }
 
