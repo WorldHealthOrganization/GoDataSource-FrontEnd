@@ -11,6 +11,7 @@ import { IndependentTransmissionChainsDashletComponent } from './independent-tra
 import { CasesPendingLabResultsDashletComponent } from './cases-pending-lab-results-dashlet/cases-pending-lab-results-dashlet.component';
 import { CasesRefusingTreatmentDashletComponent } from './cases-refusing-treatment-dashlet/cases-refusing-treatment-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
+import { ContactsBecomeCasesDashletComponent } from './contacts-become-cases-dashlet/contacts-become-cases-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -27,6 +28,7 @@ export const components: any[] = [
     CasesPendingLabResultsDashletComponent,
     CasesRefusingTreatmentDashletComponent,
     IndependentTransmissionChainsDashletComponent,
-    NumberOfActiveChainsOfTransmissionComponent
+    NumberOfActiveChainsOfTransmissionComponent,
+    ContactsBecomeCasesDashletComponent
 ];
 

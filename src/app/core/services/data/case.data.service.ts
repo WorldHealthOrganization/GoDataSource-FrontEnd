@@ -78,6 +78,21 @@ export class CaseDataService {
     }
 
     /**
+     * Return count of cases
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getCasesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
+    }
+
+    /**
      * Return count of deceased cases
      * @param {string} outbreakId
      * @returns {Observable<any>}
