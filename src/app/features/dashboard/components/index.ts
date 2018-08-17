@@ -13,6 +13,7 @@ import { CasesRefusingTreatmentDashletComponent } from './cases-refusing-treatme
 import { TransmissionChainsDashletComponent } from './transmission-chains-dashlet/transmission-chains-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
 import { ContactsBecomeCasesDashletComponent } from './contacts-become-cases-dashlet/contacts-become-cases-dashlet.component';
+import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from './new-chains-of-transmission-from-registered-contacts-dashlet/new-chains-of-transmission-from-registered-contacts-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -24,13 +25,12 @@ export const components: any[] = [
     CasesLessContactsDashletComponent,
     ContactsLostToFollowUpDashletComponent,
     NewCasesPreviousDaysTransmissionChainsDashletComponent,
-    ContactsLostToFollowUpDashletComponent,
-    IndependentTransmissionChainsDashletComponent,
     CasesPendingLabResultsDashletComponent,
     CasesRefusingTreatmentDashletComponent,
     TransmissionChainsDashletComponent,
     IndependentTransmissionChainsDashletComponent,
     NumberOfActiveChainsOfTransmissionComponent,
-    ContactsBecomeCasesDashletComponent
+    ContactsBecomeCasesDashletComponent,
+    NewChainsOfTransmissionFromRegisteredContactsDashletComponent
 ];
 

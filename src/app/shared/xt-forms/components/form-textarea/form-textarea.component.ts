@@ -15,6 +15,7 @@ import { ElementBase } from '../../core/index';
     }]
 })
 export class FormTextareaComponent extends ElementBase<string> {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -30,7 +31,7 @@ export class FormTextareaComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
-    public identifier = `form-textarea-${identifier++}`;
+    public identifier = `form-textarea-${FormTextareaComponent.identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -55,5 +56,3 @@ export class FormTextareaComponent extends ElementBase<string> {
         return this.optionChanged.emit(this.value);
     }
 }
-
-let identifier = 0;

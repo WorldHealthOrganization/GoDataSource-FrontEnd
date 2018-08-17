@@ -34,7 +34,7 @@
                             [name]="'entityIds[' + item.id + ']'"
                             [ngModel]="checkboxModels.individualCheck[item.id]"
                             (optionChanged)="individualCheck()"
-                            (onInit)="initIndividualCheckbox(item.id)">
+                            (afterInitialize)="initIndividualCheckbox(item.id)">
                         </app-form-checkbox>
 
                     </mat-cell>

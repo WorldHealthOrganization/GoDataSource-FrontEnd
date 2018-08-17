@@ -16,6 +16,7 @@ import * as _ from 'lodash';
     }]
 })
 export class FormSelectComponent extends ElementBase<string> {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -33,7 +34,7 @@ export class FormSelectComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
-    public identifier = `form-select-${identifier++}`;
+    public identifier = `form-select-${FormSelectComponent.identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -79,5 +80,3 @@ export class FormSelectComponent extends ElementBase<string> {
 
     }
 }
-
-let identifier = 0;
