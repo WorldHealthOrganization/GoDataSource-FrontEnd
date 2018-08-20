@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { ListFilterDataService } from '../services/data/list-filter.data.service';
 import { Params } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Constants } from '../models/constants';
+import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
@@ -37,6 +37,11 @@ export abstract class ListComponent {
      * @type {RequestQueryBuilder}
      */
     public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+
+    /**
+     * Applied list filter on this list page
+     */
+    protected appliedListFilter: ApplyListFilter;
 
     /**
      * Models for the checkbox functionality
@@ -320,13 +325,23 @@ export abstract class ListComponent {
      *  Check if list filter applies
      */
     protected checkListFilters() {
-        if (!_.isEmpty(this.queryParams) && !_.isEmpty(this.listFilterDataService)) {
+        if (
+            !_.isEmpty(this.queryParams) &&
+            !_.isEmpty(this.listFilterDataService)
+        ) {
             // get query params
             this.queryParams
                 .subscribe((queryParams: any) => {
+                    // apply query params
                     if (!_.isEmpty(queryParams)) {
-                        // call function to apply filters - update query buiilder
+                        // call function to apply filters - update query builder
                         this.applyListFilters(queryParams);
+                    } else {
+                        // reset value
+                        this.appliedListFilter = null;
+
+                        // needs refresh
+                        this.needsRefreshList(true);
                     }
                 });
         }
@@ -376,7 +391,8 @@ export abstract class ListComponent {
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
 
         // check params for apply list filter
-        switch (queryParams.applyListFilter) {
+        this.appliedListFilter = queryParams.applyListFilter;
+        switch (this.appliedListFilter) {
             // Filter contacts on the followup list
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
@@ -521,6 +537,11 @@ export abstract class ListComponent {
                     locationIds
                 );
                 this.queryBuilder.merge(qbFilterCasesFromContactsOvertimeAndPlace);
+                this.needsRefreshList(true);
+                break;
+
+            // refresh list on query params changes ( example browser back button was pressed )
+            case Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
                 this.needsRefreshList(true);
                 break;
         }
