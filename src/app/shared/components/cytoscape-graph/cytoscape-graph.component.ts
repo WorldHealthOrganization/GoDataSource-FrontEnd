@@ -15,7 +15,9 @@ export class CytoscapeGraphComponent implements OnChanges {
 
     cy: any;
     container: string = 'cy';
-    // different layouts used for tests
+    /**
+     * different layouts used for tests
+     */
     // layout: any = {name: 'cose-bilkent'};
     // layout: any = {
     //      name: 'breadthfirst',
