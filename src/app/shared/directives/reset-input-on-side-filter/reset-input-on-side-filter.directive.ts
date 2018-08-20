@@ -5,11 +5,17 @@ import { NgControl } from '@angular/forms';
     selector: '[app-reset-input-on-side-filter]'
 })
 export class ResetInputOnSideFilterDirective {
+    private pristineValue: any = undefined;
+
     constructor(
         private control: NgControl
-    ) {}
+    ) {
+        setTimeout(() => {
+            this.pristineValue = control.value;
+        });
+    }
 
     public reset() {
-        this.control.reset();
+        this.control.reset(this.pristineValue);
     }
 }

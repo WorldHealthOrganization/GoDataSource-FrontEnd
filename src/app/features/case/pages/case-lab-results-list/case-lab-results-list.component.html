@@ -13,6 +13,15 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
 
     <mat-table #table [dataSource]="labResultsList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -26,7 +35,8 @@
                             name="sampleIdentifierFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('sampleIdentifier', $event)">
+                            (optionChanged)="filterByTextField('sampleIdentifier', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
