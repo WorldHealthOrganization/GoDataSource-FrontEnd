@@ -119,4 +119,16 @@ export class Constants {
     static today() {
         return moment().startOf('day');
     }
+
+    //  transsmission chain view types
+    static TRANSMISSION_CHAIN_VIEW_TYPES = {
+        BUBBLE_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
+            value: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW'
+        },
+        HIERARCHICAL_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
+            value: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW'
+        }
+    };
 }

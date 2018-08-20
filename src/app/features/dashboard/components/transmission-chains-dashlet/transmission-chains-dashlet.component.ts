@@ -4,6 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -15,6 +16,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
     graphElements: any;
+    Constants = Constants;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -39,22 +41,28 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 this.graphElements = chains[0].convertChainToGraphElements();
 
-                /**
-                 * Load the graph for tests
-                 */
-                // for ( var i = 0; i < 200; i++) {
-                //     this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
-                //
-                //     if ( i < 196) {
-                //         this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+1})});
-                //         if ( i % 2 === 0) {
-                //             this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+2})});
-                //         }
-                //         this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i+3})});
-                //    }
-                // }
+                // Load the graph for tests
+            //    this.loadGraphWithNodesAndEdges(400);
 
             });
+        }
+    }
+
+    /**
+     * Load the graph for tests
+     * @param {number} maxNodes
+     */
+    loadGraphWithNodesAndEdges(maxNodes: number) {
+        for ( var i = 0; i < maxNodes; i++) {
+            this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
+
+            if ( i < maxNodes - 4) {
+                this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 1})});
+                if ( i % 2 === 0) {
+                    this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 2})});
+                }
+                this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 3})});
+            }
         }
     }
 

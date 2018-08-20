@@ -871,6 +871,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
 
         /**
+         * Chains of Transmission
+         */
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW': 'Hierarchical Network',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
+
+        /**
          * List Filters page titles
          */
         'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST': 'Contacts on the follow-up list',
