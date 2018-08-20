@@ -52,6 +52,17 @@ export class RequestSort {
     }
 
     /**
+     * Merge sort criteria
+     * @param sort
+     */
+    merge(sort: RequestSort) {
+        this.criterias = {
+            ...this.criterias,
+            ...sort.criterias
+        };
+    }
+
+    /**
      * Generates a new "order" criteria for Loopback API
      * @returns {{}}
      */

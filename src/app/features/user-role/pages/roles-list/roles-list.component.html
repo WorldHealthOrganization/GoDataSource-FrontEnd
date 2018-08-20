@@ -4,7 +4,8 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasUserRoletWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                        [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -82,6 +83,12 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
+                    <button
+                        mat-menu-item
+                        [routerLink]="['.', item.id, 'view']">
+                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                    </button>
+
                     <span
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
@@ -92,7 +99,8 @@
 
                     <span
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
-                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)" class="mat-menu-item-delete">
+                        <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)"
+                                class="mat-menu-item-delete">
                             {{'LNG_PAGE_ACTION_DELETE' | translate}}
                         </button>
                     </span>

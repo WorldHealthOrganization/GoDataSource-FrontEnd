@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { NgForm } from '@angular/forms';
@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 
 @Component({
     selector: 'app-modify-user',
@@ -23,11 +24,10 @@ import { PERMISSION } from '../../../../core/models/permission.model';
     templateUrl: './modify-user.component.html',
     styleUrls: ['./modify-user.component.less']
 })
-export class ModifyUserComponent {
+export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
-        new BreadcrumbItemModel('LNG_PAGE_MODIFY_USER_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -41,7 +41,7 @@ export class ModifyUserComponent {
 
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private userDataService: UserDataService,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
@@ -49,6 +49,7 @@ export class ModifyUserComponent {
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService
     ) {
+        super(route);
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -68,6 +69,15 @@ export class ModifyUserComponent {
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
+    }
+
+    ngOnInit() {
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_USER_TITLE' : 'LNG_PAGE_MODIFY_USER_TITLE',
+                '.'
+            )
+        );
     }
 
     modifyUser(form: NgForm) {
@@ -104,5 +114,12 @@ export class ModifyUserComponent {
      */
     hasOutbreakReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
+    }
+    /**
+     * Check if we have write access to users
+     * @returns {boolean}
+     */
+    hasUserWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
     }
 }

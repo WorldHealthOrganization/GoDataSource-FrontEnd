@@ -14,6 +14,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -21,12 +25,13 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     templateUrl: './modify-outbreak.component.html',
     styleUrls: ['./modify-outbreak.component.less']
 })
-export class ModifyOutbreakComponent implements OnInit {
+export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
     ];
-
+    // authenticated user
+    authUser: UserModel;
     // id of the outbreak to modify
     outbreakId: string;
     // outbreak to modify
@@ -36,21 +41,25 @@ export class ModifyOutbreakComponent implements OnInit {
     // list of countries
     countriesList$: Observable<any[]>;
 
-    // controls for switching between view and edit mode
-    viewOnly = true;
     // index of the current tab
     currentTabIndex = 0;
 
+
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private router: Router,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private authDataService: AuthDataService
     ) {
+        super(route);
+
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     ngOnInit() {
@@ -60,7 +69,6 @@ export class ModifyOutbreakComponent implements OnInit {
         this.route.params
             .subscribe((params: {outbreakId}) => {
                 this.outbreakId = params.outbreakId;
-
                 // get the outbreak to modify
                 this.outbreakDataService
                     .getOutbreak(this.outbreakId)
@@ -68,7 +76,7 @@ export class ModifyOutbreakComponent implements OnInit {
                         this.outbreak = outbreakData;
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
                                 '.',
                                 true,
                                 {},
@@ -112,19 +120,12 @@ export class ModifyOutbreakComponent implements OnInit {
                 this.router.navigate(['/outbreaks']);
             });
     }
-
     /**
-     * Enable edit on questionnaires tabs
+     * Check if we have write access to outbreaks
+     * @returns {boolean}
      */
-    enableEdit() {
-        this.viewOnly = false;
-    }
-
-    /**
-     * Disable edit on questionnaires tabs
-     */
-    disableEdit() {
-        this.viewOnly = true;
+    hasOutbreakWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
     }
 
     /**
@@ -133,7 +134,6 @@ export class ModifyOutbreakComponent implements OnInit {
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
     }
-
     /**
      * Set attribute new to false for all questions and answers in the array.
      */
@@ -149,5 +149,4 @@ export class ModifyOutbreakComponent implements OnInit {
             });
         }
     }
-
 }

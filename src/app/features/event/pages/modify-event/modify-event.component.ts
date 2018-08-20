@@ -12,6 +12,9 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { EntityType } from '../../../../core/models/entity-type';
 import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { UserModel } from '../../../../core/models/user.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-event',
@@ -24,6 +27,9 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Events', '/events')
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     eventId: string;
     outbreakId: string;
@@ -41,12 +47,16 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
         private eventDataService: EventDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router
+        private router: Router,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         this.route.params
             .subscribe((params: {eventId}) => {
                 this.eventId = params.eventId;
@@ -97,5 +107,13 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 // navigate to listing page
                 this.router.navigate(['/events']);
             });
+    }
+
+    /**
+     * Check if we have write access to events
+     * @returns {boolean}
+     */
+    hasEventWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
     }
 }

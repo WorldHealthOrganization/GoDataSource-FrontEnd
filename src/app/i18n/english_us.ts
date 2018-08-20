@@ -271,6 +271,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
+        'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
 
         /**
          * Cases list page
@@ -402,6 +403,7 @@ export const EnglishUsLang = {
         /**
          * Modify Location page
          */
+        'LNG_PAGE_VIEW_LOCATION_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
@@ -430,6 +432,7 @@ export const EnglishUsLang = {
         /**
          * Modify User page
          */
+        'LNG_PAGE_VIEW_USER_TITLE': 'View User',
         'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
@@ -455,6 +458,7 @@ export const EnglishUsLang = {
         /**
          * Modify User Role page
          */
+        'LNG_PAGE_VIEW_USER_ROLES_TITLE': 'View Role',
         'LNG_PAGE_MODIFY_USER_ROLES_TITLE': 'Modify Role',
         'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE': 'Role updated!',
 
@@ -829,6 +833,7 @@ export const EnglishUsLang = {
         /**
          * Modify Outbreak page
          */
+        'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'View {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
@@ -869,6 +874,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE': 'Chains of Transmission',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
+        'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'NEW CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECOME CASES',
 
         /**
          * Chains of Transmission
@@ -913,6 +919,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
         'LNG_SIDE_FILTERS_SECTION_SORT_TITLE': 'Sort',
         'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add another filter',
+        'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON': 'Add another sort',
         'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON': 'Apply filters',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_AND': 'AND',
         'LNG_SIDE_FILTERS_OPERATOR_LABEL_OR': 'OR',
@@ -925,7 +932,12 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL': 'Greater or equal',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS': 'Contains',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION': 'Place',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within ( miles )',
+        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Direction',
+        'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER': 'Sort By',
+        'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
+        'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
 
         /**
          * Location auto-complete search

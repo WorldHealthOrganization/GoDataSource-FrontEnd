@@ -1,6 +1,6 @@
 // filter operations
 import { Observable } from 'rxjs/Observable';
-import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 
 // filter types
 export enum FilterType {
@@ -20,29 +20,83 @@ export enum FilterComparator {
     BEFORE = 'before',
     AFTER = 'after',
     CONTAINS = 'contains',
-    WITHIN = 'within'
+    WITHIN = 'within',
+    LOCATION = 'location'
 }
+
+// Model for Available Filter
+export class SortModel {
+    self: SortModel;
+
+    constructor(
+        // name of the field that the sort applies to
+        public fieldName: string,
+
+        // label of the field that the sort applies to
+        public fieldLabel: string
+    ) {
+        // set handler
+        this.self = this;
+    }
+}
+
+// Model for Applied Sort
+export class AppliedSortModel {
+    // applied sort
+    public sort: SortModel;
+
+    // direction
+    public direction: RequestSortDirection = RequestSortDirection.ASC;
+}
+
 
 // Model for Available Filter
 export class FilterModel {
 
     self: FilterModel;
 
-    constructor(
-        // name of the field that the filter applies to
-        public fieldName: string,
-        // label of the field that the filter applies to
-        public fieldLabel: string,
-        // filter type
-        public type: FilterType,
-        // select options for SELECT and MULTISELECT filter types
-        public options$: Observable<any[]> = null,
-        // relationship path in case we want to search inside a relationship
-        public relationshipPath: string[] = null,
-        public relationshipLabel: string = null,
-        public extraConditions: RequestQueryBuilder = null
-    ) {
+    // name of the field that the filter applies to
+    fieldName: string;
+
+    // label of the field that the filter applies to
+    fieldLabel: string;
+
+    // filter type
+    type: FilterType;
+
+    // select options for SELECT and MULTISELECT filter types
+    options$: Observable<any[]> = null;
+
+    // sortable field / relationship field ( default false )
+    sortable: boolean = false;
+
+    // relationship path in case we want to search inside a relationship
+    relationshipPath: string[] = null;
+    relationshipLabel: string = null;
+    extraConditions: RequestQueryBuilder = null;
+
+    /**
+     * Constructor
+     * @param data ( fieldName / fieldLabel / type are required )
+     */
+    constructor(data: {
+        fieldName: string,
+        fieldLabel: string,
+        type: FilterType,
+        options$?: Observable<any[]>,
+        sortable?: boolean,
+        relationshipPath?: string[],
+        relationshipLabel?: string,
+        extraConditions?: RequestQueryBuilder
+    }) {
+        // set handler
         this.self = this;
+
+        // assign properties
+        Object.assign(
+            this.self,
+            data
+        );
     }
 }
 
@@ -93,6 +147,9 @@ export class AppliedFilterModel {
         [FilterType.ADDRESS]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
             value: FilterComparator.CONTAINS
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
+            value: FilterComparator.LOCATION
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
             value: FilterComparator.WITHIN

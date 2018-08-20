@@ -47,6 +47,7 @@ export const DEFAULT_FORMAT = {
     ]
 })
 export class FormDatepickerComponent extends ElementBase<string> {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -58,7 +59,7 @@ export class FormDatepickerComponent extends ElementBase<string> {
     @Input() maxDate: string | Moment;
     @Input() minDate: string | Moment;
 
-    public identifier = `form-datepicker-${identifier++}`;
+    public identifier = `form-datepicker-${FormDatepickerComponent.identifier++}`;
 
     @Output() optionChanged = new EventEmitter<any>();
 
@@ -88,5 +89,3 @@ export class FormDatepickerComponent extends ElementBase<string> {
         });
     }
 }
-
-let identifier = 0;

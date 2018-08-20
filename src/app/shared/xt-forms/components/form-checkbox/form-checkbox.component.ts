@@ -27,6 +27,7 @@ import { ElementBase } from '../../core/index';
     }]
 })
 export class FormCheckboxComponent extends ElementBase<boolean> implements OnInit {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -38,10 +39,10 @@ export class FormCheckboxComponent extends ElementBase<boolean> implements OnIni
     @Input() readonly: boolean = false;
     @Input() disabled: boolean = false;
 
-    public identifier = `form-checkbox-${identifier++}`;
+    public identifier = `form-checkbox-${FormCheckboxComponent.identifier++}`;
 
     @Output() optionChanged = new EventEmitter<any>();
-    @Output() onInit = new EventEmitter<any>();
+    @Output() afterInitialize = new EventEmitter<any>();
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -52,7 +53,7 @@ export class FormCheckboxComponent extends ElementBase<boolean> implements OnIni
     }
 
     ngOnInit() {
-        return this.onInit.emit();
+        return this.afterInitialize.emit();
     }
 
     /**
@@ -70,5 +71,3 @@ export class FormCheckboxComponent extends ElementBase<boolean> implements OnIni
         return this.optionChanged.emit(this.value);
     }
 }
-
-let identifier = 0;

@@ -9,7 +9,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
-export interface ValidationResult { [validator: string]: string | boolean }
+export interface ValidationResult { [validator: string]: string | boolean; }
 
 export type AsyncValidatorArray = Array<Validator | AsyncValidatorFn>;
 

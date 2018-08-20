@@ -2,6 +2,7 @@ import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import * as fromPages from './pages';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Reference Data Categories List
@@ -9,10 +10,21 @@ const routes: Routes = [
         path: '',
         component: fromPages.ReferenceDataCategoriesListComponent
     },
-    // Reference Data Category Entries List
+    // View Reference Data Category Entries List
     {
-        path: ':categoryId',
-        component: fromPages.ReferenceDataCategoryEntriesListComponent
+        path: ':categoryId/view',
+        component: fromPages.ReferenceDataCategoryEntriesListComponent,
+        data : {
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
+    // Modify Reference Data Category Entries List
+    {
+        path: ':categoryId/modify',
+        component: fromPages.ReferenceDataCategoryEntriesListComponent,
+        data : {
+            action: ViewModifyComponentAction.MODIFY
+        }
     },
     // Create new Reference Data entry
     {

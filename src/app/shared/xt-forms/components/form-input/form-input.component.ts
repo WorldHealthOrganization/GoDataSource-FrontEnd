@@ -27,6 +27,7 @@ import { ElementBase } from '../../core/index';
     }]
 })
 export class FormInputComponent extends ElementBase<string> implements AfterViewInit {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -44,7 +45,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
 
-    public identifier = `form-input-${identifier++}`;
+    public identifier = `form-input-${FormInputComponent.identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -80,5 +81,3 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         super.ngAfterViewInit();
     }
 }
-
-let identifier = 0;

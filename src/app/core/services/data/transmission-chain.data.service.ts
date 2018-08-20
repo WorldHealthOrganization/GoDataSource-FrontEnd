@@ -56,5 +56,15 @@ export class TransmissionChainDataService {
         );
     }
 
+    /**
+     * Get the number of new chains of transmission from registered contacts who became cases
+     * @param {string} outbreakId
+     * @returns {Observable<MetricIndependentTransmissionChainsModel>}
+     */
+    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
+            MetricIndependentTransmissionChainsModel);
+    }
 }
 

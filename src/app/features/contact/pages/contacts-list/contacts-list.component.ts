@@ -148,105 +148,101 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // set available side filters
         this.availableSideFilters = [
             // Contact
-            new FilterModel(
-                'firstName',
-                'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-                FilterType.TEXT
-            ),
-            new FilterModel(
-                'lastName',
-                'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-                FilterType.TEXT
-            ),
-            new FilterModel(
-                'occupation',
-                'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                FilterType.TEXT
-            ),
-            new FilterModel(
-                'age',
-                'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON',
-                FilterType.RANGE_NUMBER
-            ),
-            new FilterModel(
-                'dateOfReporting',
-                'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-                FilterType.RANGE_DATE
-            ),
-            new FilterModel(
-                'dob',
-                'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-                FilterType.RANGE_DATE
-            ),
-            new FilterModel(
-                'addresses',
-                'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-                FilterType.ADDRESS
-            ),
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'occupation',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON',
+                type: FilterType.RANGE_NUMBER
+            }),
+            new FilterModel({
+                fieldName: 'dateOfReporting',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'dob',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+                type: FilterType.ADDRESS
+            }),
 
-            // Relationship - Follow-up
-            new FilterModel(
-                'date',
-                'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-                FilterType.RANGE_DATE,
-                null,
-                ['followUps'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-            ),
-            new FilterModel(
-                'performed',
-                'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
-                FilterType.SELECT,
-                this.yesNoOptionsList$,
-                ['followUps'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-            ),
-            new FilterModel(
-                'lostToFollowUp',
-                'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
-                FilterType.SELECT,
-                this.yesNoOptionsList$,
-                ['followUps'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
-            ),
+            // Relation - Follow-up
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                type: FilterType.RANGE_DATE,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
+            new FilterModel({
+                fieldName: 'performed',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
+            new FilterModel({
+                fieldName: 'lostToFollowUp',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$,
+                relationshipPath: ['followUps'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+            }),
 
-            // Relationship - Cases
-            new FilterModel(
-                'firstName',
-                'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-                FilterType.TEXT,
-                null,
-                ['relationships', 'people'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-                caseCondition
-            ),
-            new FilterModel(
-                'lastName',
-                'LNG_CASE_FIELD_LABEL_LAST_NAME',
-                FilterType.TEXT,
-                null,
-                ['relationships', 'people'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-                caseCondition
-            ),
-            new FilterModel(
-                'gender',
-                'LNG_CASE_FIELD_LABEL_GENDER',
-                FilterType.MULTISELECT,
-                this.genderList$,
-                ['relationships', 'people'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-                caseCondition
-            ),
-            new FilterModel(
-                'age',
-                'LNG_CASE_FIELD_LABEL_AGE',
-                FilterType.RANGE_NUMBER,
-                null,
-                ['relationships', 'people'],
-                'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-                caseCondition
-            )
+            // Relation - Cases
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'gender',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
+                type: FilterType.MULTISELECT,
+                options$: this.genderList$,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
+                type: FilterType.RANGE_NUMBER,
+                relationshipPath: ['relationships', 'people'],
+                relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+                extraConditions: caseCondition
+            })
         ];
     }
 

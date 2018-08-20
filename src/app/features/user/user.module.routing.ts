@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     // Users list
@@ -25,13 +26,24 @@ const routes: Routes = [
         path: ':userId',
         component: fromPages.ViewUserComponent
     },
+    // View User
+    {
+        path: ':userId/view',
+        component: fromPages.ModifyUserComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_USER_ACCOUNT],
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Edit user
     {
         path: ':userId/modify',
         component: fromPages.ModifyUserComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_USER_ACCOUNT]
+            permissions: [PERMISSION.WRITE_USER_ACCOUNT],
+            action: ViewModifyComponentAction.MODIFY
         }
     }
 ];
