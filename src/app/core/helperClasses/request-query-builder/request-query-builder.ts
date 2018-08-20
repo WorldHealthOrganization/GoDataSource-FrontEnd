@@ -40,6 +40,7 @@ export class RequestQueryBuilder {
             return relation;
         } else {
             // add new relation
+            // tslint:disable-next-line:no-use-before-declare
             this.includedRelations[relationName] = new RequestRelationBuilder(relationName);
 
             return this.includedRelations[relationName];

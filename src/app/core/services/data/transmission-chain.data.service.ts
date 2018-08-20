@@ -6,8 +6,6 @@ import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { GraphNodeModel } from '../../models/graph-node.model';
-import { GraphEdgeModel } from '../../models/graph-edge.model';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -56,5 +54,15 @@ export class TransmissionChainDataService {
         );
     }
 
+    /**
+     * Get the number of new chains of transmission from registered contacts who became cases
+     * @param {string} outbreakId
+     * @returns {Observable<MetricIndependentTransmissionChainsModel>}
+     */
+    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
+            MetricIndependentTransmissionChainsModel);
+    }
 }
 

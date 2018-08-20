@@ -92,6 +92,7 @@
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-refusing-treatment-dashlet>
 
+                <!-- Number of active chains of transmission -->
                 <app-number-of-active-chains-of-transmission-dashlet
                     *ngIf="hasReadReportPermissions()">
                 </app-number-of-active-chains-of-transmission-dashlet>
@@ -99,7 +100,10 @@
                 <app-contacts-become-cases-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-contacts-become-cases-dashlet>
-
+                <!-- Number of new chains of transmission from registered contacts who have became cases-->
+                <app-new-chains-of-transmission-from-registered-contacts-dashlet
+                    *ngIf="hasReadReportPermissions()">
+                </app-new-chains-of-transmission-from-registered-contacts-dashlet>
             </div>
 
         </mat-card>

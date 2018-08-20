@@ -46,7 +46,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
         this.authUser = this.authDataService.getAuthenticatedUser();
         // get the route params
         this.route.params
-            .subscribe((params: { categoryId, phase }) => {
+            .subscribe((params: { categoryId }) => {
                 this.categoryId = params.categoryId;
 
                 this.refreshList();

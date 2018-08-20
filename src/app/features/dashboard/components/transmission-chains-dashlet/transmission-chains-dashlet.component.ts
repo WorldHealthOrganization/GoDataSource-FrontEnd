@@ -2,8 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
-import { GraphNodeModel } from '../../../../core/models/graph-node.model';
-import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',

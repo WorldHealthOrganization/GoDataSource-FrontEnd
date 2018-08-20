@@ -15,6 +15,7 @@ import { ElementBase } from '../../core/index';
     }]
 })
 export class FormSlideToggleComponent extends ElementBase<string> {
+    static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -26,7 +27,7 @@ export class FormSlideToggleComponent extends ElementBase<string> {
     @Input() readonly: boolean = false;
     @Input() disabled: boolean = false;
 
-    public identifier = `form-slide-toggle-${identifier++}`;
+    public identifier = `form-slide-toggle-${FormSlideToggleComponent.identifier++}`;
 
     @Output() optionChanged = new EventEmitter<any>();
 
@@ -53,5 +54,3 @@ export class FormSlideToggleComponent extends ElementBase<string> {
         return this.optionChanged.emit(this.value);
     }
 }
-
-let identifier = 0;

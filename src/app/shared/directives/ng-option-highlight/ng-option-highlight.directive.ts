@@ -12,6 +12,7 @@ import {
 })
 export class NgOptionHighlightFixedDirective implements OnChanges, AfterViewInit {
 
+    // tslint:disable-next-line:no-input-rename
     @Input('app-ng-option-highlight') term: string;
 
     private diacritics = {
@@ -856,6 +857,15 @@ export class NgOptionHighlightFixedDirective implements OnChanges, AfterViewInit
         '\u03C2': '\u03C3'
     };
 
+    private element: HTMLElement;
+    private label: string;
+
+    constructor(
+        private elementRef: ElementRef,
+        private renderer: Renderer2) {
+        this.element = this.elementRef.nativeElement;
+    }
+
     isDefined(value: any) {
         return value !== undefined && value !== null;
     }
@@ -865,15 +875,6 @@ export class NgOptionHighlightFixedDirective implements OnChanges, AfterViewInit
             return this.diacritics[a] || a;
         };
         return text.replace(/[^\u0000-\u007E]/g, match);
-    }
-
-    private element: HTMLElement;
-    private label: string;
-
-    constructor(
-        private elementRef: ElementRef,
-        private renderer: Renderer2) {
-        this.element = this.elementRef.nativeElement;
     }
 
     ngOnChanges() {
