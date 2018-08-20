@@ -337,7 +337,7 @@ export abstract class ListComponent {
                         // call function to apply filters - update query builder
                         this.applyListFilters(queryParams);
 
-                    // handle browser back button
+                    // handle browser back / forwards buttons
                     } else {
                         // reset value
                         this.appliedListFilter = null;
