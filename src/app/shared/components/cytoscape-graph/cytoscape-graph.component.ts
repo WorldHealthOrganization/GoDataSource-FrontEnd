@@ -74,7 +74,7 @@ export class CytoscapeGraphComponent implements OnChanges {
     // selected layout
     layout: any;
 
-    deafultZoom: any = {
+    defaultZoom: any = {
         min: 0.1,
         max: 4
     };
@@ -142,8 +142,8 @@ export class CytoscapeGraphComponent implements OnChanges {
             layout: this.layout,
             style: this.style,
             elements: this.elements,
-            minZoom: this.deafultZoom.min,
-            maxZoom: this.deafultZoom.max,
+            minZoom: this.defaultZoom.min,
+            maxZoom: this.defaultZoom.max,
             ready: () => {
                 // show spinner when layout starts to draw
                 this.showLoading = true;
