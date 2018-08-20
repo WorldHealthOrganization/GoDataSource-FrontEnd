@@ -151,32 +151,38 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'firstName',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-                type: FilterType.TEXT
+                type: FilterType.TEXT,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'lastName',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-                type: FilterType.TEXT
+                type: FilterType.TEXT,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                type: FilterType.TEXT
+                type: FilterType.TEXT,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'age',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON',
-                type: FilterType.RANGE_NUMBER
+                type: FilterType.RANGE_NUMBER,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateOfReporting',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-                type: FilterType.RANGE_DATE
+                type: FilterType.RANGE_DATE,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'dob',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-                type: FilterType.RANGE_DATE
+                type: FilterType.RANGE_DATE,
+                sortable: true
             }),
             new FilterModel({
                 fieldName: 'addresses',

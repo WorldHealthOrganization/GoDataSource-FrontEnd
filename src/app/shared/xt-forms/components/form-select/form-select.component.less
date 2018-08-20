@@ -2,6 +2,18 @@
 
     .mat-form-field {
         width: 100%;
+
+        &.clearable {
+            width: ~"calc(100% - 24px)";
+            box-sizing: border-box;
+
+            .clear-dropdown {
+                position: absolute;
+                right: -20px;
+                top: 8px;
+                font-size: 18px;
+            }
+        }
     }
 
 }
