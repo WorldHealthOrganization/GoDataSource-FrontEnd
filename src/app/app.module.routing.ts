@@ -124,10 +124,7 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ],
-                data: {
-                    permissions: [PERMISSION.WRITE_REFERENCE_DATA]
-                }
+                ]
             },
             // Locations Module routes
             {

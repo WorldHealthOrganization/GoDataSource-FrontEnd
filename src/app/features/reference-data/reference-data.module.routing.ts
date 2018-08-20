@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 
 const routes: Routes = [
     // Reference Data Categories List
@@ -12,29 +14,32 @@ const routes: Routes = [
     },
     // View Reference Data Category Entries List
     {
-        path: ':categoryId/view',
+        path: ':categoryId',
         component: fromPages.ReferenceDataCategoryEntriesListComponent,
-        data : {
-            action: ViewModifyComponentAction.VIEW
-        }
-    },
-    // Modify Reference Data Category Entries List
-    {
-        path: ':categoryId/modify',
-        component: fromPages.ReferenceDataCategoryEntriesListComponent,
-        data : {
-            action: ViewModifyComponentAction.MODIFY
-        }
     },
     // Create new Reference Data entry
     {
         path: ':categoryId/create',
         component: fromPages.CreateReferenceDataEntryComponent
     },
+    // View Reference Data Entry
+    {
+        path: ':categoryId/:entryId/view',
+        component: fromPages.ModifyReferenceDataEntryComponent,
+        canActivate: [AuthGuard],
+        data: {
+            action: ViewModifyComponentAction.VIEW
+        }
+    },
     // Modify Reference Data entry
     {
-        path: ':categoryId/:entryId',
-        component: fromPages.ModifyReferenceDataEntryComponent
+        path: ':categoryId/:entryId/modify',
+        component: fromPages.ModifyReferenceDataEntryComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_REFERENCE_DATA],
+            action: ViewModifyComponentAction.MODIFY
+        }
     }
 ];
 

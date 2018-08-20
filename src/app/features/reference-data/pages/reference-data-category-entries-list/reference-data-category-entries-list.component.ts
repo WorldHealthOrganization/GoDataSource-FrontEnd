@@ -10,6 +10,9 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -20,25 +23,30 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 export class ReferenceDataCategoryEntriesListComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..')
+        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '.')
     ];
 
     categoryEntries$: Observable<ReferenceDataEntryModel[]>;
     categoryId: ReferenceDataCategory;
 
+    authUser: UserModel;
+
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
         // get the route params
         this.route.params
-            .subscribe((params: { categoryId }) => {
+            .subscribe((params: { categoryId, phase }) => {
                 this.categoryId = params.categoryId;
 
                 this.refreshList();
@@ -95,5 +103,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
         const columns = ['label', 'description', 'icon', 'color', 'active', 'actions'];
 
         return columns;
+    }
+    /**
+     * Check if we have access to modify reference data
+     * @returns {boolean}
+     */
+    hasReferenceDataWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 }
