@@ -112,15 +112,7 @@ export class Constants {
         CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED'
     };
 
-    /**
-     * Returns today's date
-     * @returns Moment
-     */
-    static today() {
-        return moment().startOf('day');
-    }
-
-    //  transsmission chain view types
+    //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
             label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
@@ -131,4 +123,13 @@ export class Constants {
             value: 'HIERARCHICAL_NETWORK'
         }
     };
+
+    /**
+     * Returns today's date
+     * @returns Moment
+     */
+    static today() {
+        return moment().startOf('day');
+    }
+
 }

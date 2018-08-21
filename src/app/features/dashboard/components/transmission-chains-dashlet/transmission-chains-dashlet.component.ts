@@ -53,7 +53,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * @param {number} maxNodes
      */
     loadGraphWithNodesAndEdges(maxNodes: number) {
-        for ( var i = 0; i < maxNodes; i++) {
+        for ( let i = 0; i < maxNodes; i++) {
             this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
 
             if ( i < maxNodes - 4) {
