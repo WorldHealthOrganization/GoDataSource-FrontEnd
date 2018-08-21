@@ -19,7 +19,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() style;
     @Input() transmissionChainViewType: string;
 
-    tempElements: any;
     cy: any;
     container: string = 'cy';
 
@@ -122,9 +121,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     }
 
     public ngOnChanges(): any {
-        if ( _.isEmpty(this.tempElements) ) {
-            this.tempElements = _.cloneDeep(this.elements);
-        }
         // render cytoscape object
         this.render();
     }
@@ -169,16 +165,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
             cytoscape.use(cola);
             this.layout = this.layoutCola;
-            if ( this.tempElements ) {
-                this.elements.edges = this.tempElements.edges;
-            }
         } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
             cytoscape.use(dagre);
             this.layout = this.layoutDagre;
-            // if hierarchical view - display only one incoming edge per node.
-            if ( this.tempElements ) {
-                this.elements.edges = this.tempElements.edgesHierarchical;
-            }
         }
     }
 

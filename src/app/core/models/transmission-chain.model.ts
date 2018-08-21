@@ -138,14 +138,6 @@ export class TransmissionChainModel {
                         graphEdge.target = relationship.persons[0].id;
                     }
 
-                    // for hierarchical view, only add one incoming edge.
-                    const existingIncomingEdges = _.filter(graphData.edges, function(item) {
-                        return item.data.target === graphEdge.target;
-                    });
-
-                    if ( existingIncomingEdges.length === 0 ) {
-                        graphData.edgesHierarchical.push({data: graphEdge});
-                    }
                     graphData.edges.push({data: graphEdge});
 
                 });
