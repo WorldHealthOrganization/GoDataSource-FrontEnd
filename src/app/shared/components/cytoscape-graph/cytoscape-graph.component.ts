@@ -12,7 +12,7 @@ import { Constants } from '../../../core/models/constants';
     templateUrl: './cytoscape-graph.component.html',
     styleUrls: ['./cytoscape-graph.component.less']
 })
-export class CytoscapeGraphComponent implements OnChanges {
+export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     @Input() elements: any;
     @Input() style;
@@ -99,8 +99,12 @@ export class CytoscapeGraphComponent implements OnChanges {
 
     showLoading: boolean = true;
 
-    constructor(private genericDataService: GenericDataService,
-                private el: ElementRef) {
+    constructor(
+        private genericDataService: GenericDataService,
+        private el: ElementRef
+    ) {}
+
+    ngOnInit() {
         // initialize style
         this.style =
             this.style ?
@@ -112,7 +116,6 @@ export class CytoscapeGraphComponent implements OnChanges {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
-
     }
 
     public ngOnChanges(): any {
@@ -127,14 +130,7 @@ export class CytoscapeGraphComponent implements OnChanges {
         const nativeElement = this.el.nativeElement;
         const container = nativeElement.getElementsByClassName(this.container);
 
-        // Decide what layout to use based on the view type selected or send at initialization
-        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
-            cytoscape.use(cola);
-            this.layout = this.layoutCola;
-        } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
-            cytoscape.use(dagre);
-            this.layout = this.layoutDagre;
-        }
+        this.configureGraphViewType();
 
         // initialize the cytoscape object
         this.cy = cytoscape({
@@ -157,6 +153,20 @@ export class CytoscapeGraphComponent implements OnChanges {
      */
     updateView() {
         this.render();
+    }
+
+    /**
+     * Configure the view type for graph
+     */
+    configureGraphViewType() {
+        // Decide what layout to use based on the view type selected or send at initialization
+        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
+            cytoscape.use(cola);
+            this.layout = this.layoutCola;
+        } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
+            cytoscape.use(dagre);
+            this.layout = this.layoutDagre;
+        }
     }
 
 }

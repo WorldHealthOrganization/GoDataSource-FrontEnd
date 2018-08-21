@@ -8,7 +8,7 @@
 </app-form-select>
 <!-- spinner -->
 <div class="spinnerGraph"
-     [fxShow]="showLoading">
+     *ngIf="showLoading">
     <mat-spinner>
     </mat-spinner>
 </div>
