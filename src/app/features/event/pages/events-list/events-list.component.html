@@ -16,6 +16,15 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
 
     <mat-table #table [dataSource]="eventsList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -29,7 +38,8 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('lastName', $event)">
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -65,7 +75,8 @@
                             name="descriptionFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('description', $event)">
+                            (optionChanged)="filterByTextField('description', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>

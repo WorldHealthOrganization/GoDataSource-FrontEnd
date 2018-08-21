@@ -264,9 +264,11 @@ export abstract class ListComponent {
      * Reset table sort columns
      */
     clearHeaderSort() {
-        this.matTableSort.sort({
-            id: null
-        } as MatSortable);
+        if (this.matTableSort) {
+            this.matTableSort.sort({
+                id: null
+            } as MatSortable);
+        }
 
         // refresh of the list is done automatically after debounce time
         // #
