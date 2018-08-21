@@ -10,6 +10,8 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
+import {ReferenceDataCategory} from '../../../../core/models/reference-data.model';
+import {ReferenceDataDataService} from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-form-question-list',
@@ -41,14 +43,15 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private domService: DomService
+        private domService: DomService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
 
     ngOnInit() {
         this.answerTypesList$ = this.genericDataService.getAnswerTypesList();
-        this.questionCategoriesList$ = this.genericDataService.getQuestionCategoriesList();
+        this.questionCategoriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY);
 
         // handle remove item confirmation
         this.deleteConfirm.subscribe((observer: Subscriber<void>) => {

@@ -1,9 +1,10 @@
 <div class="form-select-container form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <mat-form-field>
+    <mat-form-field
+        [class.clearable]="clearable && !multiple && !disabled">
         <mat-select
-            #selectElement
+            #selectElement="ngModel"
             [(ngModel)]="value"
             [attr.name]="name"
             [required]="required"
@@ -21,6 +22,13 @@
                 {{option[optionLabelKey] | translate}}
             </mat-option>
         </mat-select>
+
+        <span
+            *ngIf="clearable && !multiple && !disabled && value"
+            class="xt-icon clear-dropdown"
+            (click)="selectElement.reset(); $event.stopPropagation();">
+            delete
+        </span>
     </mat-form-field>
 
     <app-form-validation

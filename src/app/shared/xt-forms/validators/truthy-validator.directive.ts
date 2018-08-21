@@ -2,7 +2,7 @@ import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 @Directive({
-    selector: '[app-truthyValidator][ngModel]',
+    selector: '[app-truthy-validator][ngModel]',
     providers: [
         {
             provide: NG_VALIDATORS,
@@ -17,7 +17,7 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
  */
 export class TruthyValidatorDirective implements Validator {
     constructor(
-        @Attribute('app-truthyValidator') public errorMessageKey: string
+        @Attribute('app-truthy-validator') public errorMessageKey: string
     ) {
     }
 

@@ -7,18 +7,8 @@ export class Constants {
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
 
-    // #TODO replace with Reference Data
-    static QUESTION_CATEGORIES = {
-        PHYSICAL_EXAMINATION: {
-            label: 'Physical Examination',
-            value: 'Physical Examination'
-        },
-        CLINICAL: {
-            label: 'Clinical',
-            value: 'Clinical'
-        }
-    };
-
+    // these need to be hardcoded, this is why we don't pull them from reference data
+    // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {
         FREE_TEXT: {
             label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT',

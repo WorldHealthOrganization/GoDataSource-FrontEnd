@@ -47,14 +47,6 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Question Categories
-     * @returns {Observable<any[]>}
-     */
-    getQuestionCategoriesList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.QUESTION_CATEGORIES));
-    }
-
-    /**
      * Retrieve the list of Progress Options
      * @returns {Observable<any[]>}
      */
