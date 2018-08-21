@@ -97,9 +97,11 @@
                     *ngIf="hasReadReportPermissions()">
                 </app-number-of-active-chains-of-transmission-dashlet>
 
+                <!-- Number of contacts becoming cases in period & location -->
                 <app-contacts-become-cases-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-contacts-become-cases-dashlet>
+
                 <!-- Number of new chains of transmission from registered contacts who have became cases-->
                 <app-new-chains-of-transmission-from-registered-contacts-dashlet
                     *ngIf="hasReadReportPermissions()">
