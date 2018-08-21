@@ -117,13 +117,16 @@ export class TransmissionChainModel {
      * @returns {any}
      */
     convertChainToGraphElements(): any {
-        const graphData: any = {nodes: [], edges: []};
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         if ( !_.isEmpty(this) ) {
             if ( !_.isEmpty ( this.nodes) ) {
                 _.forEach( this.nodes, function(node, key) {
-                    graphData.nodes.push({data: new GraphNodeModel(node.model)});
+
+                    const nodeData = new GraphNodeModel(node.model);
+                    graphData.nodes.push({data: nodeData});
                 });
             }
+
             if ( !_.isEmpty ( this.relationships) ) {
                 _.forEach( this.relationships, function(relationship, key) {
                     const graphEdge = new GraphEdgeModel();
@@ -134,7 +137,17 @@ export class TransmissionChainModel {
                         graphEdge.source = relationship.persons[1].id;
                         graphEdge.target = relationship.persons[0].id;
                     }
+
+                    // for hierarchical view, only add one incoming edge.
+                    const existingIncomingEdges = _.filter(graphData.edges, function(item) {
+                        return item.data.target === graphEdge.target;
+                    });
+
+                    if ( existingIncomingEdges.length === 0 ) {
+                        graphData.edgesHierarchical.push({data: graphEdge});
+                    }
                     graphData.edges.push({data: graphEdge});
+
                 });
             }
         }

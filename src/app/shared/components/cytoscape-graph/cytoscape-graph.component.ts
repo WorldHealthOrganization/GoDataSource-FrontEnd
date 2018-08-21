@@ -5,6 +5,7 @@ import * as dagre from 'cytoscape-dagre';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -18,6 +19,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() style;
     @Input() transmissionChainViewType: string;
 
+    tempElements: any;
     cy: any;
     container: string = 'cy';
 
@@ -55,8 +57,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         nodeSep: 50, // the separation between adjacent nodes in the same rank
         edgeSep: 10, // the separation between adjacent edges in the same rank
         rankSep: 50, // the separation between adjacent nodes in the same rank
-        rankDir: 'BT', // 'TB' for top to bottom flow, 'LR' for left to right,
+        rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right,
         ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
+        // transform: function( node, pos ) { return pos; },
         minLen: function (edge) {
             return 1;
         }, // number of ranks to keep between the source and target of the edge
@@ -119,6 +122,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     }
 
     public ngOnChanges(): any {
+        if ( _.isEmpty(this.tempElements) ) {
+            this.tempElements = _.cloneDeep(this.elements);
+        }
         // render cytoscape object
         this.render();
     }
@@ -163,9 +169,16 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
             cytoscape.use(cola);
             this.layout = this.layoutCola;
+            if ( this.tempElements ) {
+                this.elements.edges = this.tempElements.edges;
+            }
         } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
             cytoscape.use(dagre);
             this.layout = this.layoutDagre;
+            // if hierarchical view - display only one incoming edge per node.
+            if ( this.tempElements ) {
+                this.elements.edges = this.tempElements.edgesHierarchical;
+            }
         }
     }
 
