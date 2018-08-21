@@ -5,6 +5,7 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { Constants } from '../../../../core/models/constants';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -39,7 +40,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         if ( this.selectedOutbreak) {
             this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id).subscribe((chains) => {
 
-               this.graphElements = chains[0].convertChainToGraphElements();
+                if ( !_.isEmpty(chains) ) {
+                    this.graphElements = chains[0].convertChainToGraphElements();
+                } else {
+                    this.graphElements = [];
+                }
 
             // Load the graph for tests
             //    this.loadGraphWithNodesAndEdges(400);
