@@ -16,6 +16,15 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
 
     <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
 
@@ -31,7 +40,8 @@
                             name="firstNameFilter"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -59,7 +69,8 @@
                             name="lastNameFilter"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['lastName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['lastName', 'name'], $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -85,7 +96,8 @@
                         <app-form-daterange
                             name="dateFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('contactDate', $event)">
+                            (changed)="filterByDateRangeField('contactDate', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
                 </div>
@@ -110,7 +122,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="certaintyLevelList$ | async"
                             (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -138,7 +151,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureTypeList$ | async"
                             (optionChanged)="filterBySelectField('exposureTypeId', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -166,7 +180,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposuresFrequencyList$ | async"
                             (optionChanged)="filterBySelectField('exposureFrequencyId', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -194,7 +209,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="exposureDurationList$ | async"
                             (optionChanged)="filterBySelectField('exposureDurationId', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
@@ -222,7 +238,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="relationshipTypeList$ | async"
                             (optionChanged)="filterBySelectField('socialRelationshipTypeId', $event)"
-                            multiple="true">
+                            multiple="true"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>

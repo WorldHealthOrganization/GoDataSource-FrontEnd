@@ -7,7 +7,7 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Constants } from '../../../../core/models/constants';
+import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
@@ -58,7 +58,11 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder);
+            if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
+                this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsFromContactsWhoBecameCasesList(this.selectedOutbreak.id, this.queryBuilder);
+            } else {
+                this.transmissionChains$ = this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder);
+            }
         }
     }
 
@@ -67,8 +71,12 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstContactDate', 'rootCase', 'noCases', 'noAliveCases', 'active'];
-
-        return columns;
+        return [
+            'firstContactDate',
+            'rootCase',
+            'noCases',
+            'noAliveCases',
+            'active'
+        ];
     }
 }

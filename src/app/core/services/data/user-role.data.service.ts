@@ -62,7 +62,9 @@ export class UserRoleDataService {
                 })
                 .do((roles) => {
                     // cache the list
-                    this.cacheService.set(CacheKey.AUTH_ROLES, roles);
+                    if (queryBuilder.isEmpty()) {
+                        this.cacheService.set(CacheKey.AUTH_ROLES, roles);
+                    }
                 });
 
         }

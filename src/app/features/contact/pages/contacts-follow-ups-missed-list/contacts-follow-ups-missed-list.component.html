@@ -7,7 +7,17 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
-    <mat-table #table [dataSource]="followUpsList$ | async">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
         <!-- Contact First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
@@ -18,7 +28,8 @@
                             name="firstContactFirstName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['firstName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['firstName', 'name'], $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -39,7 +50,8 @@
                             name="firstContactLastName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['lastName', 'name'], $event)">
+                            (optionChanged)="filterByRelation('contact').byTextMultipleProperties(['lastName', 'name'], $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
                 </div>
@@ -58,7 +70,8 @@
                         <app-form-daterange
                             name="dateFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('date', $event)">
+                            (changed)="filterByDateRangeField('date', $event)"
+                            app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
                 </div>
@@ -109,7 +122,8 @@
                             [ngModel]="false"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByDeletedField($event.value)">
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter>
                         </app-form-select>
                     </div>
                 </div>
