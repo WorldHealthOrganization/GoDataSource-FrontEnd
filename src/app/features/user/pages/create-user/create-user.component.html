@@ -28,7 +28,7 @@
                 [(ngModel)]="newUser.email"
                 [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
                 required="true"
-                app-emailValidator>
+                app-email-validator>
             </app-form-input>
 
             <app-form-select
@@ -49,8 +49,8 @@
                 [(ngModel)]="newUser.password"
                 [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
                 required="true"
-                app-passwordValidator
-                app-triggerValidationFor="passwordConfirm">
+                app-password-validator
+                app-trigger-validation-for="passwordConfirm">
             </app-form-input>
 
             <app-form-input
@@ -59,7 +59,7 @@
                 [(ngModel)]="passwordConfirmModel"
                 [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
                 required="true"
-                app-equalValidator="password">
+                app-equal-validator="password">
             </app-form-input>
 
             <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>

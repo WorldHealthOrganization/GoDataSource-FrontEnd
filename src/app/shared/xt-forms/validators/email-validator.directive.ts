@@ -4,7 +4,7 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 import * as _ from 'lodash';
 
 @Directive({
-    selector: '[app-emailValidator][ngModel]',
+    selector: '[app-email-validator][ngModel]',
     providers: [
         {
             provide: NG_VALIDATORS,

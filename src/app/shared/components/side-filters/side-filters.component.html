@@ -76,7 +76,8 @@
                                     [options]="filterOptions"
                                     optionLabelKey="fieldLabel"
                                     optionLabelPrefixKey="relationshipLabel"
-                                    optionValueKey="self">
+                                    optionValueKey="self"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <!-- Filter Comparator -->
@@ -85,7 +86,8 @@
                                     [name]="'filter[filters][' + i + '][comparator]'"
                                     [(ngModel)]="filter.comparator"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                                    [options]="filter.allowedComparators[filter.filter.type]">
+                                    [options]="filter.allowedComparators[filter.filter.type]"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <!-- TEXT Filter -->
@@ -197,7 +199,8 @@
                                     [placeholder]="'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER' | translate"
                                     [options]="sortOptions"
                                     optionLabelKey="fieldLabel"
-                                    optionValueKey="self">
+                                    optionValueKey="self"
+                                    [clearable]="false">
                                 </app-form-select>
 
                                 <!-- Sort Direction ( ASC / DESC ) -->
@@ -206,7 +209,8 @@
                                     [name]="'sortBy[items][' + i + '][direction]'"
                                     [(ngModel)]="sort.direction"
                                     [placeholder]="'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL' | translate"
-                                    [options]="sortDirections">
+                                    [options]="sortDirections"
+                                    [clearable]="false">
                                 </app-form-select>
                             </mat-card>
                         </div>
