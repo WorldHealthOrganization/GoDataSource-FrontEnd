@@ -23,7 +23,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
     templateUrl: './modify-role.component.html',
     styleUrls: ['./modify-role.component.less']
 })
-export class ModifyRoleComponent extends ViewModifyComponent implements OnInit{
+export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'),

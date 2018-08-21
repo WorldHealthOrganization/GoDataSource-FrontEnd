@@ -31,6 +31,7 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
+    @Input() clearable: boolean = true;
 
     @Output() optionChanged = new EventEmitter<any>();
 

@@ -4,7 +4,7 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 import * as _ from 'lodash';
 
 @Directive({
-    selector: '[app-notEqualValidator][ngModel]',
+    selector: '[app-not-equal-validator][ngModel]',
     providers: [
         {
             provide: NG_VALIDATORS,
@@ -19,7 +19,7 @@ import * as _ from 'lodash';
  */
 export class NotEqualValidatorDirective implements Validator {
     constructor(
-        @Attribute('app-notEqualValidator') public notEqualValidator: string
+        @Attribute('app-not-equal-validator') public notEqualValidator: string
     ) {
     }
 

@@ -69,6 +69,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
+        'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
 
         /**
          * Dialogs
