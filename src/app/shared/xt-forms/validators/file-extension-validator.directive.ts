@@ -4,7 +4,7 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 import * as _ from 'lodash';
 
 @Directive({
-    selector: '[app-fileExtensionValidator][ngModel]',
+    selector: '[app-file-extension-validator][ngModel]',
     providers: [
         {
             provide: NG_VALIDATORS,
@@ -19,7 +19,7 @@ import * as _ from 'lodash';
  */
 export class FileExtensionValidatorDirective implements Validator {
     constructor(
-        @Attribute('app-extensionValidator') public fileExtensions: string
+        @Attribute('app-file-extension-validator') public fileExtensions: string
     ) {
     }
 

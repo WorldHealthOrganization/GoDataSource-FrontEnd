@@ -2,7 +2,7 @@ import { Directive, forwardRef, Attribute } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 @Directive({
-    selector: '[app-triggerValidationFor][ngModel]',
+    selector: '[app-trigger-validation-for][ngModel]',
     providers: [
         {
             provide: NG_VALIDATORS,
@@ -18,7 +18,7 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
  */
 export class TriggerValidationForValidatorDirective implements Validator {
     constructor(
-        @Attribute('app-triggerValidationFor') public target: string
+        @Attribute('app-trigger-validation-for') public target: string
     ) {
     }
 
