@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
+import { environment } from '../environments/environment';
 
 @Component({
     selector: 'app-root',
@@ -16,5 +17,13 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         // load the default language
         this.i18nService.loadUserLanguage().subscribe();
+
+        // setup google api with key retrieved from env
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.defer = true;
+        script.async = true;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleApiKey}`;
+        document.head.appendChild(script);
     }
 }

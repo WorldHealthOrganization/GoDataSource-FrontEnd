@@ -1,0 +1,40 @@
+<div
+    fxFlex fxLayout="row" fxLayoutGap="10px">
+    <div
+        fxFlex="450px"
+        class="location-timeline">
+        <div
+            class="movement-timeline-title">
+            {{ 'LNG_GOOGLE_MAP_MOVEMENT_TITLE' | translate }}
+        </div>
+        <div
+            class="movement-timeline-locations">
+            <div
+                *ngFor="let address of addresses; let index = index"
+                class="movement-timeline-locations-item"
+                (click)="gotoLocation(index)">
+                {{ (index + 1) + '. [' + (address.date | dateDefault) + '] ' + (address.fullAddress | translate)}}
+            </div>
+        </div>
+    </div>
+    <div
+        fxFlex>
+        <app-google-map
+            *ngIf="addresses.length > 0"
+            [width]="width"
+            [height]="height"
+            [centerLocation]="selectedGeoPoint"
+            [markers]="markers"
+            [lines]="arrowLines">
+        </app-google-map>
+
+        <div
+            *ngIf="addresses.length < 1"
+            fxFlex
+            class="movement-map-no-data">
+            <span>
+                {{ 'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA' | translate }}
+            </span>
+        </div>
+    </div>
+</div>

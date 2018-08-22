@@ -6,5 +6,9 @@ export const environment = {
     // log messages on server?
     enableApiLogging: false,
     // log messages in browser's console?
-    enableClientLogging: true
+    enableClientLogging: true,
+
+    // google API key used by google maps ( in the future we might add other APIs from google that will use this key as well )
+    // dev key => AM Google account
+    googleApiKey: 'AIzaSyCE2De3ZfXCSORA0L2CDDQ7O0CJhJpuctM'
 };

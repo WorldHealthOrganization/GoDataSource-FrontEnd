@@ -140,6 +140,8 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
         'LNG_FORM_VALIDATION_ERROR_INVALID_DATE': 'Invalid date',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE': 'Date needs to be {{comparator}} {{field}}',
+        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED': 'Enter {{field}} too',
+        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED_IF_FIELD_IS_SET': 'Required if {{field}} is set',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER': 'after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER': 'same or after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
@@ -163,6 +165,9 @@ export const EnglishUsLang = {
          * Address Fields
          */
         'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
@@ -278,8 +283,9 @@ export const EnglishUsLang = {
          * Cases list page
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
-        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
-        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Data',
+        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
+        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
 
         /**
@@ -303,6 +309,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
+
+        /**
+         * Movement Case page
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
 
         /**
          * Case lab results fields
@@ -491,6 +502,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
 
         /**
@@ -515,6 +527,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
+
+        /**
+         * Movement Contact page
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
 
         /**
          * Relationship Fields
@@ -941,6 +958,12 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT': 'Loading...',
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT': 'Type to search',
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT': 'No items found',
-        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time'
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time',
+
+        /**
+         * Google maps movement
+         */
+        'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
+        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses provided'
     }
 };
