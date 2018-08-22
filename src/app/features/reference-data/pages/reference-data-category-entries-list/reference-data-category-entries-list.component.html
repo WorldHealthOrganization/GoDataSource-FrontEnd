@@ -3,7 +3,7 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-            <div *ngIf="!viewOnly" class="topnav-actions">
+            <div *ngIf="hasReferenceDataWriteAccess()" class="topnav-actions">
                 <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                     Add <span class="xt-icon">addCircle</span>
                 </button>
@@ -92,7 +92,10 @@
 
                 <mat-menu #actionsMenu="matMenu">
 
-                    <button mat-menu-item [routerLink]="['.', item.categoryId, item.id]">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        {{'LNG_PAGE_ACTION_VIEW' | translate}}</button>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY' | translate}}</button>
 
                     <button mat-menu-item (click)="deleteEntry(item)">
