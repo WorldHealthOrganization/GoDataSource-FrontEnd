@@ -46,6 +46,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_YES': 'Yes',
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
+        'LNG_COMMON_LABEL_NONE': 'None',
 
         /**
          * General Actions
