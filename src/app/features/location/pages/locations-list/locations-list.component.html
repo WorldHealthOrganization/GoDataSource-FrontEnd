@@ -1,7 +1,7 @@
 <app-topnav>
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+            <app-breadcrumbs [items]="breadcrumb"></app-breadcrumbs>
         </div>
 
         <div class="topnav-actions">
@@ -14,6 +14,15 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+
+    <ng-container dynamic-section>
+        <div
+            fxLayout="row" fxFlex fxLayoutAlign="space-between center"
+            class="location-breadcrumbs">
+            <app-breadcrumbs [items]="locationBreadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+
     <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->

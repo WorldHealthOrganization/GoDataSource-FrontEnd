@@ -15,14 +15,21 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
-    selector: 'app-modify-contact',
+    selector: 'app-modify-location',
     encapsulation: ViewEncapsulation.None,
     templateUrl: './modify-location.component.html',
     styleUrls: ['./modify-location.component.less']
 })
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [];
+    // breadcrumb header
+    public breadcrumb: BreadcrumbItemModel[] =  [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_LOCATIONS_TITLE',
+            '/locations'
+        )
+    ];
+    // locations breadcrumbs
+    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
@@ -48,12 +55,13 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 this.locationId = params.locationId;
 
                 // reset breadcrumbs
-                this.breadcrumbs = [
+                this.breadcrumb = [
                     new BreadcrumbItemModel(
                         'LNG_PAGE_LIST_LOCATIONS_TITLE',
                         '/locations'
                     )
                 ];
+                this.locationBreadcrumbs = [];
 
                 // retrieve location
                 this.locationDataService
@@ -73,11 +81,14 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                                 if (locationParents && locationParents.length > 0) {
                                     let locationP = locationParents[0];
                                     while (!_.isEmpty(locationP.location)) {
+                                        if (this.locationBreadcrumbs.length) {
+                                            this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
+                                        }
                                         // add breadcrumb
-                                        this.breadcrumbs.push(
+                                        this.locationBreadcrumbs.push(
                                             new BreadcrumbItemModel(
                                                 locationP.location.name,
-                                                `/locations/${locationP.location.id}/children`
+                                                `/locations/${locationP.location.id}/children`,
                                             )
                                         );
 
@@ -87,7 +98,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                                 }
 
                                 // add create
-                                this.breadcrumbs.push(
+                                this.locationBreadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         'LNG_PAGE_MODIFY_LOCATION_TITLE',
                                         '.',
@@ -99,7 +110,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                             });
                         } else {
                             // add modify
-                            this.breadcrumbs.push(
+                            this.locationBreadcrumbs.push(
                                 new BreadcrumbItemModel(
                                     this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
                                     '.',

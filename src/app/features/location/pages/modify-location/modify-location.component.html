@@ -1,12 +1,19 @@
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <app-breadcrumbs [items]="breadcrumb"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
 
 <form class="page-content form-section" #form="ngForm" (submit)="modifyLocation(form)">
 
     <div class="form-content">
+        <ng-container dynamic-section>
+            <div
+                fxLayout="row" fxFlex fxLayoutAlign="space-between center"
+                class="location-breadcrumbs">
+                <app-breadcrumbs [items]="locationBreadcrumbs"></app-breadcrumbs>
+            </div>
+        </ng-container>
         <mat-tab-group class="page-tabs-navbar">
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE'| translate">

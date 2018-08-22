@@ -26,7 +26,15 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
     styleUrls: ['./locations-list.component.less']
 })
 export class LocationsListComponent extends ListComponent implements OnInit {
-    public breadcrumbs: BreadcrumbItemModel[] = [];
+    // breadcrumb header
+    public breadcrumb: BreadcrumbItemModel[] =  [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_LOCATIONS_TITLE',
+            '/locations'
+        )
+    ];
+    // locations breadcrumbs
+    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
     locationsList$: Observable<LocationModel[]>;
     yesNoOptionsList$: Observable<any[]>;
@@ -61,13 +69,13 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 this.parentId = params.parentId;
 
                 // reset breadcrumbs
-                this.breadcrumbs = [
+                this.breadcrumb = [
                     new BreadcrumbItemModel(
                         'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations',
-                        true
+                        '/locations'
                     )
                 ];
+                this.locationBreadcrumbs = [];
 
                 // retrieve parents of this parent and create breadcrumbs if necessary
                 if (this.parentId) {
@@ -77,17 +85,17 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                             let locationP = locationParents[0];
                             while (!_.isEmpty(locationP.location)) {
                                 // make previous breadcrumb not the active one
-                                this.breadcrumbs[this.breadcrumbs.length - 1].active = false;
-
+                                if (this.locationBreadcrumbs.length) {
+                                    this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
+                                }
                                 // add breadcrumb
-                                this.breadcrumbs.push(
+                                this.locationBreadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         locationP.location.name,
                                         `/locations/${locationP.location.id}/children`,
                                         true
                                     )
                                 );
-
                                 // next location
                                 locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
                             }

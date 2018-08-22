@@ -17,8 +17,15 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
     styleUrls: ['./create-location.component.less']
 })
 export class CreateLocationComponent implements OnInit {
-
-    public breadcrumbs: BreadcrumbItemModel[] = [];
+    // breadcrumb header
+    public breadcrumb: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_LOCATIONS_TITLE',
+            '/locations'
+        )
+    ];
+    // location breadcrumbs
+    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
     locationData: LocationModel = new LocationModel();
 
@@ -40,7 +47,7 @@ export class CreateLocationComponent implements OnInit {
                 this.parentId = params.parentId;
 
                 // reset breadcrumbs
-                this.breadcrumbs = [
+                this.breadcrumb = [
                     new BreadcrumbItemModel(
                         'LNG_PAGE_LIST_LOCATIONS_TITLE',
                         '/locations'
@@ -54,8 +61,11 @@ export class CreateLocationComponent implements OnInit {
                         if (locationParents && locationParents.length > 0) {
                             let locationP = locationParents[0];
                             while (!_.isEmpty(locationP.location)) {
+                                if (this.locationBreadcrumbs.length) {
+                                    this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
+                                }
                                 // add breadcrumb
-                                this.breadcrumbs.push(
+                                this.locationBreadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         locationP.location.name,
                                         `/locations/${locationP.location.id}/children`
@@ -68,7 +78,7 @@ export class CreateLocationComponent implements OnInit {
                         }
 
                         // add create
-                        this.breadcrumbs.push(
+                        this.locationBreadcrumbs.push(
                             new BreadcrumbItemModel(
                                 'LNG_PAGE_CREATE_LOCATION_TITLE',
                                 '.',
@@ -78,7 +88,7 @@ export class CreateLocationComponent implements OnInit {
                     });
                 } else {
                     // add create
-                    this.breadcrumbs.push(
+                    this.locationBreadcrumbs.push(
                         new BreadcrumbItemModel(
                             'LNG_PAGE_CREATE_LOCATION_TITLE',
                             '.',
