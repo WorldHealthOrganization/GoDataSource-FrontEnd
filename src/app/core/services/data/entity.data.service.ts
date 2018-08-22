@@ -95,11 +95,13 @@ export class EntityDataService {
         // entity type = Case
         if (entity instanceof CaseModel) {
 
+            // dialog title: Case Details
             lightObject.push(new LabelValuePair(
                 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
+            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
                 entity.firstName
@@ -162,7 +164,7 @@ export class EntityDataService {
                         moment(entity.dateDeceased).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
             ));
-            // insert link:
+            // insert link to full resource
             lightObject.push(new LabelValuePair(
                 'LINK',
                 `/cases/${entity.id}/view`
@@ -172,11 +174,13 @@ export class EntityDataService {
         // entity type = Contact
         if (entity instanceof ContactModel) {
 
+            // dialog title: Contact Details
             lightObject.push(new LabelValuePair(
                 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
+            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
                 entity.firstName
@@ -212,7 +216,7 @@ export class EntityDataService {
                 entity.riskReason
             ));
 
-            // insert link:
+            // link to full resource
             lightObject.push(new LabelValuePair(
                 'LINK',
                 `/contacts/${entity.id}/view`
@@ -222,11 +226,13 @@ export class EntityDataService {
         // entity type = Event
         if (entity instanceof EventModel) {
 
+            // dialog title: Event Details
             lightObject.push(new LabelValuePair(
                 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
+            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_EVENT_FIELD_LABEL_NAME',
                 entity.name
@@ -248,7 +254,7 @@ export class EntityDataService {
                         ''
             ));
 
-            // insert link:
+            // link to full resource
             lightObject.push(new LabelValuePair(
                 'LINK',
                 `/events/${entity.id}/view`

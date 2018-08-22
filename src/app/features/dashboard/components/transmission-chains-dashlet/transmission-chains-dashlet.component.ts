@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -5,18 +6,12 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { Constants } from '../../../../core/models/constants';
-import * as _ from 'lodash';
-import { RelationshipPersonModel } from '../../../../core/models/relationship.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton } from '../../../../shared/components';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
@@ -69,10 +64,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
     }
 
     /**
-     *  Handle tap on a node
-      * @param entity
+     * Handle tap on a node
+     * @param {GraphNodeModel} entity
+     * @returns {IterableIterator<any>}
      */
-    onNodeTap(entity: {type: EntityType, id: string}) {
+     onNodeTap(entity: GraphNodeModel) {
         // retrieve Case/Event/Contact information
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
@@ -82,10 +78,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe((entityData: CaseModel|EventModel|ContactModel) => {
-
+                // show dialog with data
                 const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
                 this.dialogService.showDataDialog(dialogData);
-
             });
     }
 

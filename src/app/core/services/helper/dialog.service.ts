@@ -1,5 +1,5 @@
-import { Inject, Injectable } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import {
     DialogAnswer,
     DialogComponent,
@@ -11,6 +11,7 @@ import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class DialogService {
+
     /**
      * Constructor
      * @param dialog
@@ -18,9 +19,10 @@ export class DialogService {
     constructor(private dialog: MatDialog) {}
 
     /**
-     * Show a Confirm Dialog
-     * @param message Can be either a message ( string ) or an object of type DialogConfiguration
-     * @returns {Observable<R | undefined>}
+     * * Show a Confirm Dialog
+     * @param {DialogConfiguration | string} messageToken - Can be either a message ( string ) or an object of type DialogConfiguration
+     * @param {{}} translateData
+     * @returns {Observable<any>}
      */
     showConfirm(messageToken: DialogConfiguration | string, translateData = {}) {
         // construct dialog message data
@@ -35,9 +37,11 @@ export class DialogService {
     }
 
     /**
-     * Show o custom dialog
-     * @param messageToken
-     * @returns {Observable<undefined|R>}
+     * Show o custom dialog with an input
+     * @param {DialogConfiguration | string} messageToken
+     * @param {boolean} required
+     * @param {{}} translateData
+     * @returns {Observable<DialogAnswer>}
      */
     showInput(messageToken: DialogConfiguration | string,
               required: boolean = true,
@@ -72,7 +76,7 @@ export class DialogService {
     }
 
     /**
-     * Show a dialog containing data - array { key: value }
+     * Show a dialog containing data - array of objects with label and value
      * @param {any[]} data
      * @returns {Observable<any>}
      */

@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
+import { EntityType } from './entity-type';
 
 export class GraphNodeModel {
     id: string;
     name: string;
-    type: string;
+    type: EntityType;
 
     // default node color
     nodeColor: string;

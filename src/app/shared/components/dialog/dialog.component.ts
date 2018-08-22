@@ -28,7 +28,7 @@ export class DialogConfiguration {
                 public translateData?: {},
                 public customInput?: boolean,
                 public required?: boolean,
-                public elements?: LabelValuePair[]) {
+                public data?: LabelValuePair[]) {
         // default values since we can't do this from the parameters
         if (!yesLabel) {
             this.yesLabel = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
