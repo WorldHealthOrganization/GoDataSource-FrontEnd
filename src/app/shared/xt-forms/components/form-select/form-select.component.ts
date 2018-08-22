@@ -18,8 +18,6 @@ import * as _ from 'lodash';
 export class FormSelectComponent extends ElementBase<string> {
     static identifier: number = 0;
 
-    pristineValue: any = undefined;
-
     @HostBinding('class.form-element-host') isFormElement = true;
 
     @Input() placeholder: string;
@@ -45,13 +43,6 @@ export class FormSelectComponent extends ElementBase<string> {
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        // save pristine value
-        setTimeout(() => {
-            // we don't want the previous selected values when we modify a record, because the entire point of this button is to clear teh select
-            // so this functionality is used only by filters
-            this.pristineValue = this.value;
-        });
     }
 
     /**
@@ -87,19 +78,5 @@ export class FormSelectComponent extends ElementBase<string> {
 
         // emit the currently selected option(s)
         return this.optionChanged.emit(selectedOptions);
-    }
-
-    /**
-     * Reset select value to default one
-     */
-    clearSelectedValue(selectElement: NgModel, $event) {
-        // reset
-        selectElement.reset(this.pristineValue);
-
-        // trigger change since reseting value doesn't trigger change
-        this.onChange(selectElement.value);
-
-        // don't call parent
-        $event.stopPropagation();
     }
 }

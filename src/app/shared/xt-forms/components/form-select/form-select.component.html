@@ -14,6 +14,9 @@
             [disabled]="disabled"
             (selectionChange)="onChange(selectElement.value)">
             <mat-option
+                *ngIf="clearable && !multiple && !disabled">
+            </mat-option>
+            <mat-option
                 *ngFor="let option of options"
                 [value]="option[optionValueKey]"
                 [matTooltip]="option[optionTooltipKey] | translate"
@@ -22,13 +25,6 @@
                 {{option[optionLabelKey] | translate}}
             </mat-option>
         </mat-select>
-
-        <span
-            *ngIf="clearable && !multiple && !disabled && value !== pristineValue"
-            class="xt-icon clear-dropdown"
-            (click)="clearSelectedValue(selectElement, $event)">
-            delete
-        </span>
     </mat-form-field>
 
     <app-form-validation
