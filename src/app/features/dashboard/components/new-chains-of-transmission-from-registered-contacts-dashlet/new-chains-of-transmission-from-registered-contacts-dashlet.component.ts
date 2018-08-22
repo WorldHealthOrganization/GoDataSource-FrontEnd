@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -12,6 +13,11 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent imple
 
     // number of new chains of transmission from registered contacts who became cases
     numOfNewChainsOfTransmissionFromRegContactsBecomeCases: number;
+
+    // query params
+    queryParams: any = {
+        applyListFilter: Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES
+    };
 
     constructor(
         private outbreakDataService: OutbreakDataService,

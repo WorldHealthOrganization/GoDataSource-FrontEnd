@@ -16,12 +16,25 @@ export class TransmissionChainDataService {
     ) {}
 
     /**
-     * Retrieve the list of Transmission Chains
+     * Map Transmission chain to Chain model
+     */
+    private mapTransmissionChainToModel(result) {
+        const nodes = _.get(result, 'nodes', {});
+        const edges = _.get(result, 'edges', {});
+        const transmissionChains = _.get(result, 'transmissionChains.chains', []);
+
+        return _.map(transmissionChains, (chain) => {
+            return new TransmissionChainModel(chain, nodes, Object.values(edges));
+        });
+    }
+
+    /**
+     * Retrieve the list of Independent Transmission Chains
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<TransmissionChainModel[]>}
      */
-    getTransmissionChainsList(
+    getIndependentTransmissionChainsList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
@@ -30,16 +43,25 @@ export class TransmissionChainDataService {
 
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
-        )
-            .map((result) => {
-                const nodes = _.get(result, 'nodes', {});
-                const edges = _.get(result, 'edges', {});
-                const transmissionChains = _.get(result, 'transmissionChains.chains', []);
+        ).map(this.mapTransmissionChainToModel);
+    }
 
-                return _.map(transmissionChains, (chain) => {
-                    return new TransmissionChainModel(chain, nodes, Object.values(edges));
-                });
-            });
+    /**
+     * Retrieve the list of New Transmission Chains from contacts who became cases
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<TransmissionChainModel[]>}
+     */
+    getTransmissionChainsFromContactsWhoBecameCasesList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<TransmissionChainModel[]> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(
+            `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
+        ).map(this.mapTransmissionChainToModel);
     }
 
     /**

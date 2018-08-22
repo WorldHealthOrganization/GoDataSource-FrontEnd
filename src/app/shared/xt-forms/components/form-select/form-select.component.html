@@ -24,9 +24,9 @@
         </mat-select>
 
         <span
-            *ngIf="clearable && !multiple && !disabled && value"
+            *ngIf="clearable && !multiple && !disabled && value !== pristineValue"
             class="xt-icon clear-dropdown"
-            (click)="selectElement.reset(); $event.stopPropagation();">
+            (click)="clearSelectedValue(selectElement, $event)">
             delete
         </span>
     </mat-form-field>
