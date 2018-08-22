@@ -13,7 +13,9 @@ export class GoogleMapComponent {
     @Input() height: string = '400px';
     @Input() zoom: number = 10;
     @Input() mapType: google.maps.MapTypeId = google.maps.MapTypeId.HYBRID;
+    @Input() fitMapOnMarkersChnage: boolean = false;
 
+    private markerBounds: google.maps.LatLngBounds;
     private _centerLocation: google.maps.LatLng;
     private _markers: google.maps.Marker[] = [];
     private _lines: google.maps.Polyline[] = [];
@@ -68,7 +70,13 @@ export class GoogleMapComponent {
             this.map &&
             this.centerLocation
         ) {
+            // set position
             this.map.setCenter(this.centerLocation);
+
+            // zoom
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(this.centerLocation);
+            this.map.fitBounds(bounds);
         }
     }
 
@@ -88,9 +96,29 @@ export class GoogleMapComponent {
      */
     private setMarkers() {
         if (this.map) {
+            // set markers
+            this.markerBounds = new google.maps.LatLngBounds();
             _.each(this._markers, (marker: google.maps.Marker) => {
                 marker.setMap(this.map);
+                this.markerBounds.extend(marker.getPosition());
             });
+
+            // fit map bounds
+            if (this.fitMapOnMarkersChnage) {
+                this.fitMarkerBounds();
+            }
+        }
+    }
+
+    /**
+     * Zoom in / out & center to view all markers
+     */
+    public fitMarkerBounds() {
+        if (
+            this.map &&
+            this.markerBounds
+        ) {
+            this.map.fitBounds(this.markerBounds);
         }
     }
 
@@ -135,9 +163,9 @@ export class GoogleMapComponent {
             // init map
             this.map = new google.maps.Map(
                 this.googleMapElement.nativeElement, {
-                    center: this.centerLocation ?
-                        this.centerLocation :
-                        new google.maps.LatLng(33.448376, -112.074036), // Phoenix in USA,
+                    // Phoenix in USA - Default value - since we need to provide one...
+                    // as soon as data is loaded center will be changed so we can see all markers ( addresses )
+                    center: new google.maps.LatLng(33.448376, -112.074036),
                     zoom: this.zoom,
                     mapTypeId: this.mapType
                 }

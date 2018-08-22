@@ -970,6 +970,7 @@ export const EnglishUsLang = {
          * Google maps movement
          */
         'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
-        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses provided'
+        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
+        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses'
     }
 };

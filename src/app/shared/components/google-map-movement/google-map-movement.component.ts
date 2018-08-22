@@ -1,8 +1,9 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AddressModel } from '../../../core/models/address.model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { } from '@types/googlemaps';
+import { GoogleMapComponent } from '../google-map/google-map.component';
 
 @Component({
     selector: 'app-google-map-movement',
@@ -13,6 +14,8 @@ import { } from '@types/googlemaps';
 export class GoogleMapMovementComponent {
     @Input() width: string = '100%';
     @Input() height: string = '400px';
+
+    @ViewChild(GoogleMapComponent) googleMapComponent: GoogleMapComponent;
 
     markers: google.maps.Marker[] = [];
     arrowLines: google.maps.Polyline[] = [];
@@ -75,7 +78,20 @@ export class GoogleMapMovementComponent {
         return this._addresses;
     }
 
+    /**
+     * Change map position
+     * @param index
+     */
     gotoLocation(index: number) {
         this.selectedGeoPoint = this.markers[index].getPosition();
+    }
+
+    /**
+     * Zoom in / out & center to view all markers
+     */
+    public fitMarkerBounds() {
+        if (this.googleMapComponent) {
+            this.googleMapComponent.fitMarkerBounds();
+        }
     }
 }

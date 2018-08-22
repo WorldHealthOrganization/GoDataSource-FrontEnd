@@ -15,6 +15,19 @@
                 (click)="gotoLocation(index)">
                 {{ (index + 1) + '. [' + (address.date | dateDefault) + '] ' + (address.fullAddress | translate)}}
             </div>
+
+            <div
+                class="movement-timeline-view-all"
+                *ngIf="addresses.length > 0">
+
+                <hr />
+
+                <button
+                    mat-raised-button color="primary" class="button-primary"
+                    (click)="fitMarkerBounds()">
+                    {{'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON' | translate}}
+                </button>
+            </div>
         </div>
     </div>
     <div
@@ -25,7 +38,8 @@
             [height]="height"
             [centerLocation]="selectedGeoPoint"
             [markers]="markers"
-            [lines]="arrowLines">
+            [lines]="arrowLines"
+            [fitMapOnMarkersChnage]="true">
         </app-google-map>
 
         <div
