@@ -68,8 +68,6 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                         }
                         // current page title
                         this.breadcrumbs.push(
-                            this.viewOnly ?
-                                new BreadcrumbItemModel(entry.value, '.', true) :
                                 new BreadcrumbItemModel(entry.value, '.', true)
                         );
 
