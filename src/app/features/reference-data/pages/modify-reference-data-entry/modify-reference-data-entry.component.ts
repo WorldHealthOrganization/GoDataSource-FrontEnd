@@ -70,7 +70,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                         this.breadcrumbs.push(
                             this.viewOnly ?
                                 new BreadcrumbItemModel(entry.value, '.', true) :
-                                new BreadcrumbItemModel(`Modify ` + entry.value, '.', true)
+                                new BreadcrumbItemModel(entry.value, '.', true)
                         );
 
                     });
