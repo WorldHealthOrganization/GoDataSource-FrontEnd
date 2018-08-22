@@ -1,4 +1,5 @@
 <app-cytoscape-graph
     [elements]="graphElements"
-    [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value">
+    [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+    (nodeTapped)="onNodeTap($event)">
 </app-cytoscape-graph>

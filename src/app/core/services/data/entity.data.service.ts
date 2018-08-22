@@ -12,6 +12,9 @@ import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/mergeMap';
 import * as _ from 'lodash';
 import { EntityModel } from '../../models/entity.model';
+import { LabelValuePair } from '../../models/label-value-pair';
+import * as moment from 'moment';
+import { Constants } from '../../models/constants';
 
 @Injectable()
 export class EntityDataService {
@@ -42,12 +45,13 @@ export class EntityDataService {
     /**
      * Retrieve the list of Cases, Contacts and Events for an Outbreak
      * @param {string} outbreakId
-     * @returns {Observable<(CaseModel|ContactModel|EventModel)[]>}
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
      */
     getEntitiesList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<(CaseModel|ContactModel|EventModel)[]> {
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
 
         const filter = queryBuilder.buildQuery();
 
@@ -70,12 +74,189 @@ export class EntityDataService {
         entityType: EntityType,
         outbreakId: string,
         entityId: string
-    ): Observable<CaseModel|ContactModel|EventModel> {
+    ): Observable<CaseModel | ContactModel | EventModel> {
 
         const dataService = this.entityMap[entityType].dataService;
         const method = this.entityMap[entityType].getMethod;
 
         return dataService[method](outbreakId, entityId);
     }
+
+    /**
+     * Return label - value pair of Entity objects
+     * @param {EntityModel} entity
+     * @returns {LabelValuePair[]}
+     */
+    getLightObjectDisplay(
+        entity: CaseModel | EventModel | ContactModel
+    ): LabelValuePair[] {
+
+        const lightObject = [];
+        // entity type = Case
+        if (entity instanceof CaseModel) {
+
+            lightObject.push(new LabelValuePair(
+                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE',
+                ''
+            ));
+
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                entity.firstName
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                entity.lastName
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_AGE',
+                String(entity.age)
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_GENDER',
+                entity.gender
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_OCCUPATION',
+                entity.occupation
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                entity.classification
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+                entity.riskLevel
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_RISK_REASON',
+                entity.riskReason
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+                entity.dateOfOnset ?
+                        moment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+                entity.dateBecomeCase ?
+                        moment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+                entity.dateOfInfection ?
+                        moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+                entity.dateOfReporting ?
+                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
+                entity.dateDeceased ?
+                        moment(entity.dateDeceased).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            // insert link:
+            lightObject.push(new LabelValuePair(
+                'LINK',
+                `/cases/${entity.id}/view`
+            ));
+        }
+
+        // entity type = Contact
+        if (entity instanceof ContactModel) {
+
+            lightObject.push(new LabelValuePair(
+                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE',
+                ''
+            ));
+
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                entity.firstName
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                entity.lastName
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_AGE',
+                String(entity.age)
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_GENDER',
+                entity.gender
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                entity.occupation
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+                entity.dateOfReporting ?
+                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+                entity.riskLevel
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+                entity.riskReason
+            ));
+
+            // insert link:
+            lightObject.push(new LabelValuePair(
+                'LINK',
+                `/contacts/${entity.id}/view`
+            ));
+        }
+
+        // entity type = Event
+        if (entity instanceof EventModel) {
+
+            lightObject.push(new LabelValuePair(
+                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE',
+                ''
+            ));
+
+            lightObject.push(new LabelValuePair(
+                'LNG_EVENT_FIELD_LABEL_NAME',
+                entity.name
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_EVENT_FIELD_LABEL_DATE',
+                entity.date ?
+                    moment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                    ''
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+                entity.description
+            ));
+            lightObject.push(new LabelValuePair(
+                'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+                entity.dateOfReporting ?
+                        moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                        ''
+            ));
+
+            // insert link:
+            lightObject.push(new LabelValuePair(
+                'LINK',
+                `/events/${entity.id}/view`
+            ));
+        }
+
+        return lightObject;
+    }
+
 }
 

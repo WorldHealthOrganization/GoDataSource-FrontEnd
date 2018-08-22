@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { Inject, Injectable } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import {
     DialogAnswer,
     DialogComponent,
@@ -7,6 +7,7 @@ import {
 } from '../../../shared/components/dialog/dialog.component';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
+import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class DialogService {
@@ -69,5 +70,32 @@ export class DialogService {
             dialogMessage
         ).afterClosed();
     }
+
+    /**
+     * Show a dialog containing data - array { key: value }
+     * @param {any[]} data
+     * @returns {Observable<any>}
+     */
+    showDataDialog(data: LabelValuePair[]) {
+        // construct dialog message data
+        const dialogConfig = new DialogConfiguration(
+            '',
+            undefined,
+            undefined,
+            undefined,
+            {},
+            false,
+            false,
+            data
+        );
+        const dialogComp = DialogComponent.defaultConfigWithData(dialogConfig);
+
+        // open dialog
+        return this.dialog.open(
+            DialogComponent,
+            dialogComp
+        ).afterClosed();
+    }
 }
+
 

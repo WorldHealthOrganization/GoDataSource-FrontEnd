@@ -2,6 +2,7 @@ import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import * as _ from 'lodash';
+import { LabelValuePair } from '../../../core/models/label-value-pair';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -26,7 +27,8 @@ export class DialogConfiguration {
                 public placeholder?: string,
                 public translateData?: {},
                 public customInput?: boolean,
-                public required?: boolean) {
+                public required?: boolean,
+                public elements?: LabelValuePair[]) {
         // default values since we can't do this from the parameters
         if (!yesLabel) {
             this.yesLabel = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
@@ -85,6 +87,7 @@ export class DialogComponent {
 
         // finished
         return configs;
+
     }
 
     constructor(private dialogRef: MatDialogRef<DialogComponent>,

@@ -4,6 +4,29 @@
         class="dialog-main-msg" [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
+    <div *ngIf="confirmData?.elements">
+        <mat-card>
+            <mat-list>
+                <mat-list-item *ngFor="let element of confirmData?.elements">
+                    <div *ngIf="element.label !== 'LINK'">
+                        <span class="dialog-data-label">
+                            {{ element.label | translate }}:
+                        </span>
+                        {{element.value | translate}}
+                    </div>
+
+                    <!-- custom case for displaying link -->
+                    <div *ngIf="element.label === 'LINK'">
+                        <a href="{{element.value}}"
+                           target="_blank">
+                            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
+                        </a>
+                    </div>
+                </mat-list-item>
+            </mat-list>
+        </mat-card>
+    </div>
+
     <div *ngIf="confirmData?.customInput">
         <app-form-input
             [(ngModel)]="dialogAnswerInputValue.value"
@@ -14,8 +37,9 @@
     </div>
 
 
-    <div
-        fxFlex fxLayout="row" fxLayoutAlign="end">
+    <!-- section to be displayed when an array of data is received -->
+    <div *ngIf="!confirmData?.elements"
+         fxFlex fxLayout="row" fxLayoutAlign="end">
         <button class="dialog-button" mat-button (click)="cancel()">
             {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
         </button>
@@ -26,4 +50,15 @@
         </button>
 
     </div>
+
+    <!-- only display cancel button for data dialogs -->
+    <div *ngIf="confirmData?.elements"
+         fxFlex fxLayout="row" fxLayoutAlign="end">
+        <button class="dialog-button" mat-button
+                (click)="cancel()">
+            {{ confirmData?.cancelLabel | translate }}
+        </button>
+
+    </div>
+
 </div>

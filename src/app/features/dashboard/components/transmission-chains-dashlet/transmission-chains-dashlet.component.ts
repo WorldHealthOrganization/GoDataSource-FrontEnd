@@ -6,6 +6,18 @@ import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { Constants } from '../../../../core/models/constants';
 import * as _ from 'lodash';
+import { RelationshipPersonModel } from '../../../../core/models/relationship.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswerButton } from '../../../../shared/components';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -21,7 +33,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private transmissionChainDataService: TransmissionChainDataService
+        private transmissionChainDataService: TransmissionChainDataService,
+        private entityDataService: EntityDataService,
+        private snackbarService: SnackbarService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -51,6 +66,27 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
             });
         }
+    }
+
+    /**
+     *  Handle tap on a node
+      * @param entity
+     */
+    onNodeTap(entity: {type: EntityType, id: string}) {
+        // retrieve Case/Event/Contact information
+        this.entityDataService
+            .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+            .catch((err) => {
+                // show error message
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((entityData: CaseModel|EventModel|ContactModel) => {
+
+                const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
+                this.dialogService.showDataDialog(dialogData);
+
+            });
     }
 
     /**
