@@ -309,6 +309,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
+        'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
 
         /**
          * Movement Case page
@@ -527,6 +528,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
 
         /**
          * Movement Contact page
