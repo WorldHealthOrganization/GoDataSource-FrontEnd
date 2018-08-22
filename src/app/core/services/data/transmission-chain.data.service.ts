@@ -6,6 +6,8 @@ import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
+import { GraphNodeModel } from '../../models/graph-node.model';
+import { GraphEdgeModel } from '../../models/graph-edge.model';
 
 @Injectable()
 export class TransmissionChainDataService {

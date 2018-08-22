@@ -1,6 +1,11 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
-// import * as coseBilkent from 'cytoscape-cose-bilkent';
+import * as cola from 'cytoscape-cola';
+import * as dagre from 'cytoscape-dagre';
+import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../core/services/data/generic.data.service';
+import { Constants } from '../../../core/models/constants';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -8,41 +13,71 @@ import * as cytoscape from 'cytoscape';
     templateUrl: './cytoscape-graph.component.html',
     styleUrls: ['./cytoscape-graph.component.less']
 })
-export class CytoscapeGraphComponent implements OnChanges {
+export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     @Input() elements: any;
     @Input() style;
+    @Input() transmissionChainViewType: string;
 
     cy: any;
     container: string = 'cy';
-    // different layouts used for tests
-    // layout: any = {name: 'cose-bilkent'};
-    // layout: any = {
-    //      name: 'breadthfirst',
-    //      stop:  () => {
-    //                  this.showLoading = false;
-    //                  this.cy.zoom( this.cy.minZoom());
-    //                  this.cy.fit();
-    //              }
-    //  };
-    layout: any = {
-        name: 'cose',
+
+    transmissionChainViewTypes$: Observable<any[]>;
+
+    /**
+     *  layout cola - bubble view
+     */
+    layoutCola: any = {
+        name: 'cola',
         fit: true,
-        padding: 30,
-        randomize: false,
-        coolingFactor: 0.99,
-        spacingFactor: 1.75,
+        flow: {axis: 'y', minSeparation: 30},
+        padding: 10,
+        nodeDimensionsIncludeLabels: true,
+        maxSimulationTime: 2000,
         avoidOverlap: true,
-        nodeDimensionsIncludeLabels: false,
-        animate: false,
-        stop:  () => {
+        unconstrIter: 10,
+        userConstIter: 20,
+        stop: () => {
             this.showLoading = false;
-            this.cy.zoom( this.cy.minZoom());
-            this.cy.fit();
+            if (this.cy) {
+                this.cy.fit();
+            }
         }
     };
-    zoom: any = {
-        min: 0.2,
+
+    /**
+     *  layout dagre - tree
+     */
+    layoutDagre: any = {
+        name: 'dagre',
+        fit: true,
+        padding: 10,
+        avoidOverlap: true,
+        nodeSep: 50, // the separation between adjacent nodes in the same rank
+        edgeSep: 10, // the separation between adjacent edges in the same rank
+        rankSep: 50, // the separation between adjacent nodes in the same rank
+        rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right,
+        ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
+        // transform: function( node, pos ) { return pos; },
+        minLen: function (edge) {
+            return 1;
+        }, // number of ranks to keep between the source and target of the edge
+        edgeWeight: function (edge) {
+            return 1;
+        }, // higher weight edges are generally made shorter and straighter than lower weight edges
+        stop: () => {
+            this.showLoading = false;
+            if (this.cy) {
+                this.cy.fit();
+            }
+        }
+    };
+
+    // selected layout
+    layout: any;
+
+    defaultZoom: any = {
+        min: 0.1,
         max: 4
     };
 
@@ -66,15 +101,23 @@ export class CytoscapeGraphComponent implements OnChanges {
 
     showLoading: boolean = true;
 
-    constructor(private el: ElementRef) {
+    constructor(
+        private genericDataService: GenericDataService,
+        private el: ElementRef
+    ) {}
+
+    ngOnInit() {
         // initialize style
         this.style =
             this.style ?
                 this.style :
                 this.defaultStyle;
-
-        // use the custom layout - for tests
-   //     cytoscape.use( dagre );
+        // load view types
+        this.transmissionChainViewTypes$ = this.genericDataService.getTransmissionChainViewTypes();
+        // default to bubble
+        if (!this.transmissionChainViewType) {
+            this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
+        }
     }
 
     public ngOnChanges(): any {
@@ -85,19 +128,47 @@ export class CytoscapeGraphComponent implements OnChanges {
     /**
      * Render cytoscape graph
      */
-    public render() {
+    render() {
         const nativeElement = this.el.nativeElement;
         const container = nativeElement.getElementsByClassName(this.container);
 
+        this.configureGraphViewType();
+
+        // initialize the cytoscape object
         this.cy = cytoscape({
             container: container[0],
             layout: this.layout,
             style: this.style,
             elements: this.elements,
-            minZoom: this.zoom.min,
-            maxZoom: this.zoom.max
+            minZoom: this.defaultZoom.min,
+            maxZoom: this.defaultZoom.max,
+            ready: () => {
+                // show spinner when layout starts to draw
+                this.showLoading = true;
+            }
         });
 
+    }
+
+    /**
+     * re-render the layout on view type change
+     */
+    updateView() {
+        this.render();
+    }
+
+    /**
+     * Configure the view type for graph
+     */
+    configureGraphViewType() {
+        // Decide what layout to use based on the view type selected or send at initialization
+        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
+            cytoscape.use(cola);
+            this.layout = this.layoutCola;
+        } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
+            cytoscape.use(dagre);
+            this.layout = this.layoutDagre;
+        }
     }
 
 }

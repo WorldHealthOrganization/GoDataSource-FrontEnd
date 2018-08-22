@@ -8,6 +8,10 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -15,7 +19,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     templateUrl: './modify-reference-data-entry.component.html',
     styleUrls: ['./modify-reference-data-entry.component.less']
 })
-export class ModifyReferenceDataEntryComponent implements OnInit {
+export class ModifyReferenceDataEntryComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
@@ -26,16 +30,22 @@ export class ModifyReferenceDataEntryComponent implements OnInit {
     // new Entry model
     entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
 
+    authUser: UserModel;
+
     constructor(
         private router: Router,
-        private route: ActivatedRoute,
+        protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private authDataService: AuthDataService
     ) {
+        super(route);
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
         // get the route params
         this.route.params
             .subscribe((params: {categoryId, entryId}) => {
@@ -56,10 +66,9 @@ export class ModifyReferenceDataEntryComponent implements OnInit {
                                 new BreadcrumbItemModel(categoryName, `/reference-data/${params.categoryId}`)
                             );
                         }
-
                         // current page title
                         this.breadcrumbs.push(
-                            new BreadcrumbItemModel(entry.value, '.', true)
+                                new BreadcrumbItemModel(entry.value, '.', true)
                         );
 
                     });
@@ -88,5 +97,13 @@ export class ModifyReferenceDataEntryComponent implements OnInit {
                 // navigate to listing page
                 this.router.navigate([`/reference-data/${this.categoryId}`]);
             });
+    }
+
+    /**
+     * Check if we have access to modify reference data
+     * @returns {boolean}
+     */
+    hasReferenceDataWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
 }

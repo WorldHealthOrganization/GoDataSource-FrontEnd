@@ -895,6 +895,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'NEW CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECOME CASES',
 
         /**
+         * Chains of Transmission
+         */
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW': 'Hierarchical Network',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
+
+        /**
          * List Filters page titles
          */
         'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST': 'Contacts on the follow-up list',
