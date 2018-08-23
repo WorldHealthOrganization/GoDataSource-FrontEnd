@@ -19,8 +19,6 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
-import { ComponentCanDeactivate } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-
 
 @Component({
     selector: 'app-modify-case',
@@ -28,7 +26,7 @@ import { ComponentCanDeactivate } from '../../../../core/services/guards/page-ch
     templateUrl: './modify-case.component.html',
     styleUrls: ['./modify-case.component.less']
 })
-export class ModifyCaseComponent extends ViewModifyComponent implements OnInit, ComponentCanDeactivate {
+export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
     ];
@@ -146,15 +144,5 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit, 
                 // navigate to listing page
                 this.router.navigate(['/cases']);
             });
-    }
-
-    /**
-     * Can we deactivate page ?
-     */
-    canDeactivate(): boolean | Observable<boolean> {
-        return Observable.create((obs) => {
-           obs.next();
-           obs.complete();
-        });
     }
 }

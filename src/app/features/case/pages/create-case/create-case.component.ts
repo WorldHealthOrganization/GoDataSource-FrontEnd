@@ -18,6 +18,7 @@ import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { FormComponentCanDeactivate } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-case',
@@ -25,7 +26,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './create-case.component.html',
     styleUrls: ['./create-case.component.less']
 })
-export class CreateCaseComponent implements OnInit {
+export class CreateCaseComponent extends FormComponentCanDeactivate implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -51,7 +52,9 @@ export class CreateCaseComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         this.genderList$ = this.genericDataService.getGenderList();

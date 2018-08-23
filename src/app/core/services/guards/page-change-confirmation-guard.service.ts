@@ -1,20 +1,57 @@
 import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
-import { Injectable } from '@angular/core';
+import { HostListener, Injectable, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { Observer } from 'rxjs/Observer';
 import { DialogService } from '../helper/dialog.service';
-import { DialogAnswer } from '../../../shared/components';
+import { DialogAnswer, DialogAnswerButton } from '../../../shared/components';
+import { NgForm } from '@angular/forms';
 
 /**
- * Implemented by components that need confirmation before leaving a page
+ * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
  */
-export interface ComponentCanDeactivate {
-    canDeactivate: () => boolean | Observable<boolean>;
+export class FormComponentCanDeactivate {
+    /**
+     * Children forms
+     */
+    @ViewChildren(NgForm) protected canDeactivateForms: QueryList<NgForm>;
+
+    /**
+     * Check if we have changes on our forms
+     */
+    @HostListener('window:beforeunload')
+    canDeactivate(): boolean | Observable<boolean> {
+        // there are no forms to check for changes
+        if (
+            !this.canDeactivateForms ||
+            this.canDeactivateForms.length < 1
+        ) {
+            return true;
+        }
+
+        // check if we have forms with changes
+        let foundChanges: boolean = false;
+        this.canDeactivateForms.forEach((form: NgForm) => {
+            // do we need to ignore this form ?
+            // check if form has ignore attribute / directive - NOT needed until now, so it wasn't implemented
+            // #TODO
+
+            // determine if we have changes
+            // should we check if form was touched as well ?
+            if (form.dirty) {
+                // we found changes, there is no point in going through the rest of the forms
+                foundChanges = true;
+                return false;
+            }
+        });
+
+        // do we have changes, if not user can leave page without confirmation ?
+        return !foundChanges;
+    }
 }
 
 @Injectable()
-export class PageChangeConfirmationGuardService implements CanDeactivate<ComponentCanDeactivate> {
+export class PageChangeConfirmationGuardService implements CanDeactivate<FormComponentCanDeactivate> {
     constructor(
        private dialogService: DialogService
     ) {}
@@ -27,15 +64,13 @@ export class PageChangeConfirmationGuardService implements CanDeactivate<Compone
      * @param nextState
      */
     canDeactivate(
-        component: ComponentCanDeactivate,
+        component: FormComponentCanDeactivate,
         currentRoute: ActivatedRouteSnapshot,
         currentState: RouterStateSnapshot,
         nextState?: RouterStateSnapshot
     ): Observable<boolean> | boolean {
         // no guard set here
-        // since interfaces can't be used like "component instanceof ComponentCanDeactivate"...
-        // we need another way without using classes since we can't extend more than one class which could complicate things
-        if (!component.canDeactivate) {
+        if (!(component instanceof FormComponentCanDeactivate)) {
             return true;
         }
 
@@ -71,8 +106,12 @@ export class PageChangeConfirmationGuardService implements CanDeactivate<Compone
      * @param observer Will be called with true, false accordingly to what options was selected
      */
     private displayConfirmationPopup(observer: Observer<boolean>) {
-        this.dialogService.showConfirm('aaaa').subscribe((dialogAnswer: DialogAnswer) => {
-           console.log(dialogAnswer);
-        });
+        this.dialogService
+            .showConfirm('LNG_DIALOG_CONFIRM_UNSAVED_DATA')
+            .subscribe((dialogAnswer: DialogAnswer) => {
+                observer.next(dialogAnswer.button === DialogAnswerButton.Yes);
+                observer.complete();
+            }
+        );
     }
 }
