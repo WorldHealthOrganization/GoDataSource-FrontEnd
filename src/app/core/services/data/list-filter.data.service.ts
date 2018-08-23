@@ -310,10 +310,10 @@ export class ListFilterDataService {
     }
 
     /**
-     * Create the query builder for filtering the list of contacts without relationships
+     * Create the query builder for filtering the list of events without relationships
      * @returns {RequestQueryBuilder}
      */
-    filterContactsWithoutRelationships(): RequestQueryBuilder {
+    filterEventsWithoutRelationships(): RequestQueryBuilder {
         // generate a query builder
         const filterQueryBuilder = new RequestQueryBuilder();
         filterQueryBuilder.filter.flag(

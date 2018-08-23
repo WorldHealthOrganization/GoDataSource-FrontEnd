@@ -642,9 +642,9 @@ export abstract class ListComponent {
                 this.needsRefreshList(true);
                 break;
 
-            // filter contacts without relationships
-            case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_RELATIONSHIPS:
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterContactsWithoutRelationships();
+            // filter events without relationships
+            case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS:
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterEventsWithoutRelationships();
                 this.applyListFilter();
 
                 // refresh list

@@ -2,17 +2,6 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-                <button
-                    *ngIf="!appliedListFilter"
-                    class="button-primary"
-                    mat-raised-button color="primary"
-                    [routerLink]="['/contacts']"
-                    [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_RELATIONSHIPS }">
-                    {{'LNG_PAGE_LIST_CONTACTS_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
-                </button>
-            </div>
         </div>
     </ng-container>
 </app-topnav>

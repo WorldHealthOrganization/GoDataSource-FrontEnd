@@ -493,7 +493,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
-        'LNG_PAGE_LIST_CONTACTS_ACTION_NO_RELATIONSHIPS_BUTTON': 'See contacts without relationships',
 
         /**
          * Create Contact page
@@ -608,6 +607,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
         'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Event deleted!',
+        'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON': 'See events without relationships',
 
         /**
          * Create Event page
@@ -902,7 +902,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Number of active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who become cases',
         'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS': 'Cases without relationships',
-        'LNG_PAGE_DASHBOARD_CONTACTS_WITHOUT_RELATIONSHIPS': 'Contacts without relationships',
+        'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS': 'Events without relationships',
 
         /**
          * Transmission Chain Fields

@@ -32,7 +32,6 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-contacts-list',
@@ -67,7 +66,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
-    Constants = Constants;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
