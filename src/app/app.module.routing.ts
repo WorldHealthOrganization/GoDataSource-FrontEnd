@@ -130,7 +130,10 @@ const routes: Routes = [
             {
                 path: ModulePath.LocationModule,
                 loadChildren: './features/location/location.module#LocationModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
