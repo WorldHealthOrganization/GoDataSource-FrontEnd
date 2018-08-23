@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
@@ -18,6 +18,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() elements: any;
     @Input() style;
     @Input() transmissionChainViewType: string;
+
+    @Output() nodeTapped = new EventEmitter<any>();
 
     cy: any;
     container: string = 'cy';
@@ -146,6 +148,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 // show spinner when layout starts to draw
                 this.showLoading = true;
             }
+        });
+        // add tap event
+        this.cy.on('tap', 'node', (evt) => {
+            const node = evt.target;
+            this.nodeTapped.emit(node.json().data);
         });
 
     }

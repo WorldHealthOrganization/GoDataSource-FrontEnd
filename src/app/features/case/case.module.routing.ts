@@ -48,6 +48,15 @@ const routes: Routes = [
             PageChangeConfirmationGuardService
         ]
     },
+    // View Case movement
+    {
+        path: ':caseId/movement',
+        component: fromPages.ViewMovementCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE]
+        }
+    },
 
     // Lab results
     {

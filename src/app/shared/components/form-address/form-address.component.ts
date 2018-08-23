@@ -6,6 +6,7 @@ import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Observable } from '../../../../../node_modules/rxjs/Observable';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-form-address',
@@ -23,6 +24,8 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     @Input() required: boolean = false;
 
     addressTypes$: Observable<any[]>;
+
+    Constants = Constants;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -48,5 +51,36 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      */
     get address(): AddressModel {
         return this.value ? this.value : {} as AddressModel;
+    }
+
+    /**
+     * Geo location changed
+     */
+    onChangeGeo(
+        latOrLng: string,
+        event: any
+    ) {
+        // do we need to add a geo location object ?
+        if (!this.address.geoLocation) {
+            this.address.geoLocation = {
+                lat: '',
+                lng: ''
+            };
+        }
+
+        // set value
+        const value: string = event.target.value;
+        this.address.geoLocation[latOrLng] = value.length > 0 ? parseFloat(value) : value;
+
+        // if both values are empty then we need to remove point because api will fail
+        if (
+            (this.address.geoLocation.lat === null || this.address.geoLocation.lat === '') &&
+            (this.address.geoLocation.lng === null || this.address.geoLocation.lng === '')
+        ) {
+            this.address.geoLocation = undefined;
+        }
+
+        // call on change
+        this.onChange();
     }
 }

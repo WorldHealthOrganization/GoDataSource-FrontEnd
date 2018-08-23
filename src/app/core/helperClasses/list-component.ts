@@ -41,7 +41,12 @@ export abstract class ListComponent {
     /**
      * Applied list filter on this list page
      */
-    protected appliedListFilter: ApplyListFilter;
+    public appliedListFilter: ApplyListFilter;
+
+    /**
+     * List Filter Query Builder
+     */
+    protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
     /**
      * Models for the checkbox functionality
@@ -75,7 +80,7 @@ export abstract class ListComponent {
     /**
      * Tell list that we need to refresh list
      */
-    protected needsRefreshList(instant: boolean = false) {
+    public needsRefreshList(instant: boolean = false) {
         this.triggerListRefresh.call(instant);
     }
 
@@ -248,6 +253,9 @@ export abstract class ListComponent {
     clearQueryBuilder() {
         // clear query filters
         this.queryBuilder.clear();
+
+        // apply list filters which is mandatory
+        this.mergeListFilterToMainFilter();
     }
 
     /**
@@ -301,6 +309,9 @@ export abstract class ListComponent {
             this.queryBuilder = queryBuilder;
         }
 
+        // apply list filters which is mandatory
+        this.mergeListFilterToMainFilter();
+
         // refresh of the list is done automatically after debounce time
         // #
     }
@@ -319,8 +330,21 @@ export abstract class ListComponent {
         // replace query builder with side filters
         this.queryBuilder = queryBuilder;
 
+        // apply list filters which is mandatory
+        this.mergeListFilterToMainFilter();
+
         // refresh list
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Apply list filter
+     */
+    protected mergeListFilterToMainFilter() {
+        // merge filter query builder
+        if (this.appliedListFilterQueryBuilder) {
+            this.queryBuilder.merge(_.cloneDeep(this.appliedListFilterQueryBuilder));
+        }
     }
 
     /**
@@ -334,6 +358,10 @@ export abstract class ListComponent {
             // get query params
             this.queryParams
                 .subscribe((queryParams: any) => {
+                    // reset values
+                    this.appliedListFilter = null;
+                    this.appliedListFilterQueryBuilder = null;
+
                     // apply query params
                     if (!_.isEmpty(queryParams)) {
                         // call function to apply filters - update query builder
@@ -341,9 +369,6 @@ export abstract class ListComponent {
 
                     // handle browser back / forwards buttons
                     } else {
-                        // reset value
-                        this.appliedListFilter = null;
-
                         // needs refresh
                         this.needsRefreshList(true);
                     }
@@ -403,9 +428,10 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsOnFollowUpLists()
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterContactsOnFollowUpLists);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -413,11 +439,14 @@ export abstract class ListComponent {
 
             // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
-
                 // add condition for deceased cases
-                this.queryBuilder.filter.where({
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
                     deceased: true
                 }, true);
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
 
                 // refresh list
                 this.needsRefreshList(true);
@@ -428,7 +457,9 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesHospitalized()
                     .subscribe((qbFilterCasesHospitalized) => {
-                        this.queryBuilder.merge(qbFilterCasesHospitalized);
+                        this.appliedListFilterQueryBuilder = qbFilterCasesHospitalized;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -441,11 +472,12 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsNotSeen(noDaysNotSeen)
                     .subscribe((qbFilterContactsNotSeen) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterContactsNotSeen);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -456,9 +488,10 @@ export abstract class ListComponent {
                   // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesLessThanContacts(noLessContacts)
                     .subscribe((qbFilterCasesLessThanContacts) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterCasesLessThanContacts);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -470,11 +503,12 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterContactsLostToFollowUp()
                     .subscribe((qbFilterContactsLostToFollowUp) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterContactsLostToFollowUp);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -485,11 +519,12 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesInKnownChains(noDaysInChains)
                     .subscribe((qbFilterCasesInKnownChains) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterCasesInKnownChains);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
-                        this.refreshList();
+                        this.needsRefreshList(true);
                     });
                 break;
 
@@ -500,9 +535,10 @@ export abstract class ListComponent {
                 // get the correct query builder and merge with the existing one
                 this.listFilterDataService.filterCasesAmongKnownContacts(noDaysAmongContacts)
                     .subscribe((qbFilterCasesAmongKnownContacts) => {
-                        // remove condition on property 'id' to not duplicate it
-                        this.queryBuilder.filter.remove('id');
-                        this.queryBuilder.merge(qbFilterCasesAmongKnownContacts);
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
+                        this.mergeListFilterToMainFilter();
+
                         // refresh list
                         this.needsRefreshList(true);
                     });
@@ -511,8 +547,9 @@ export abstract class ListComponent {
             // filter suspect cases with pending lab result
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
                 // get the correct query builder and merge with the existing one
-                const qbFilterCasesPendingLabResult = this.listFilterDataService.filterCasesPendingLabResult();
-                this.queryBuilder.merge(qbFilterCasesPendingLabResult);
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
+                this.mergeListFilterToMainFilter();
+
                 // refresh list
                 this.needsRefreshList(true);
                 break;
@@ -520,15 +557,19 @@ export abstract class ListComponent {
             // filter suspect cases refusing treatment
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
                 // get the correct query builder and merge with the existing one
-                const qbFilterCasesRefusingTreatment = this.listFilterDataService.filterCasesRefusingTreatment();
-                this.queryBuilder.merge(qbFilterCasesRefusingTreatment);
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
                 this.needsRefreshList(true);
                 break;
 
             // filter cases among contacts
             case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
-                const qbFilterActiveChainsOfTransmission = this.listFilterDataService.filterActiveChainsOfTransmission();
-                this.queryBuilder.merge(qbFilterActiveChainsOfTransmission);
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterActiveChainsOfTransmission();
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
                 this.needsRefreshList(true);
                 break;
 
@@ -536,16 +577,36 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
                 const dateRange: DateRangeModel = queryParams.dateRange ? JSON.parse(queryParams.dateRange) : undefined;
                 const locationIds: string[] = queryParams.locationIds;
-                const qbFilterCasesFromContactsOvertimeAndPlace = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
                     dateRange,
                     locationIds
                 );
-                this.queryBuilder.merge(qbFilterCasesFromContactsOvertimeAndPlace);
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
                 this.needsRefreshList(true);
                 break;
 
             // refresh list on query params changes ( example browser back button was pressed )
             case Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                this.needsRefreshList(true);
+                break;
+
+            // filter cases without relationships
+            case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS:
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesWithoutRelationships();
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            // filter events without relationships
+            case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS:
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterEventsWithoutRelationships();
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
                 this.needsRefreshList(true);
                 break;
         }

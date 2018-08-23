@@ -16,6 +16,8 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-events-list',
@@ -47,9 +49,11 @@ export class EventsListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        protected listFilterDataService: ListFilterDataService,
+        private route: ActivatedRoute
     ) {
-        super();
+        super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {

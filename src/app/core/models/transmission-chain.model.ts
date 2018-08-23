@@ -121,8 +121,8 @@ export class TransmissionChainModel {
         if ( !_.isEmpty(this) ) {
             if ( !_.isEmpty ( this.nodes) ) {
                 _.forEach( this.nodes, function(node, key) {
-
                     const nodeData = new GraphNodeModel(node.model);
+                    nodeData.type = node.type;
                     graphData.nodes.push({data: nodeData});
                 });
             }

@@ -31,7 +31,8 @@
                     optionLabelKey="name"
                     optionValueKey="id"
                     optionTooltipKey="description"
-                    (optionChanged)="selectOutbreak($event)">
+                    (optionChanged)="selectOutbreak($event)"
+                    [clearable]="false">
                 </app-form-select>
             </mat-list-item>
         </ng-container>
@@ -46,7 +47,8 @@
                 [options]="languagesList$ | async"
                 optionLabelKey="name"
                 optionValueKey="id"
-                (optionChanged)="selectLanguage($event)">
+                (optionChanged)="selectLanguage($event)"
+                [clearable]="false">
             </app-form-select>
         </mat-list-item>
 

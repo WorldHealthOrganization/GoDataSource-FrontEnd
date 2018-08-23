@@ -46,6 +46,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_YES': 'Yes',
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
+        'LNG_COMMON_LABEL_NONE': 'None',
 
         /**
          * General Actions
@@ -140,6 +141,8 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
         'LNG_FORM_VALIDATION_ERROR_INVALID_DATE': 'Invalid date',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE': 'Date needs to be {{comparator}} {{field}}',
+        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED': 'Enter {{field}} too',
+        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED_IF_FIELD_IS_SET': 'Required if {{field}} is set',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER': 'after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER': 'same or after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
@@ -163,6 +166,9 @@ export const EnglishUsLang = {
          * Address Fields
          */
         'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
@@ -278,9 +284,11 @@ export const EnglishUsLang = {
          * Cases list page
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
-        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See lab results',
-        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Data',
+        'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
+        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
+        'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
 
         /**
          * Create Case page
@@ -303,6 +311,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
+        'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
+
+        /**
+         * Movement Case page
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
 
         /**
          * Case lab results fields
@@ -491,6 +505,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CONTACTS_TITLE': 'Contacts',
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
 
         /**
@@ -515,6 +530,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
+
+        /**
+         * Movement Contact page
+         */
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
 
         /**
          * Relationship Fields
@@ -606,6 +627,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
         'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Event deleted!',
+        'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON': 'See events without relationships',
 
         /**
          * Create Event page
@@ -882,6 +904,11 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW': 'Hierarchical Network',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE': 'View Full Resource',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE': 'Contact Details',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE': 'Case Details',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
+
 
         /**
          * List Filters page titles
@@ -899,6 +926,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Number of active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who become cases',
+        'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS': 'Cases without relationships',
+        'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS': 'Events without relationships',
 
         /**
          * Transmission Chain Fields
@@ -936,6 +965,9 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS': 'Contains',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION': 'Place',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within ( miles )',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_LATITUDE': 'Latitude',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_LONGITUDE': 'Longitude',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE': 'Max Distance',
         'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Direction',
         'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER': 'Sort By',
         'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
@@ -947,6 +979,13 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT': 'Loading...',
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT': 'Type to search',
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT': 'No items found',
-        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time'
+        'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time',
+
+        /**
+         * Google maps movement
+         */
+        'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
+        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
+        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses'
     }
 };
