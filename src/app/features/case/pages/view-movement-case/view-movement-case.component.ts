@@ -34,8 +34,8 @@ export class ViewMovementCaseComponent implements OnInit {
                     // get case
                     this.caseDataService
                         .getCase(selectedOutbreak.id, params.caseId)
-                        .subscribe(caseDataReturned => {
-                            this.caseData = new CaseModel(caseDataReturned);
+                        .subscribe((caseDataReturned) => {
+                            this.caseData = caseDataReturned;
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
                                     'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',

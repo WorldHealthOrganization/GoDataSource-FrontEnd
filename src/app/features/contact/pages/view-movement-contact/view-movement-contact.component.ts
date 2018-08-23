@@ -34,8 +34,8 @@ export class ViewMovementContactComponent implements OnInit {
                     // get contact
                     this.contactDataService
                         .getContact(selectedOutbreak.id, params.contactId)
-                        .subscribe(contactDataReturned => {
-                            this.contactData = new ContactModel(contactDataReturned);
+                        .subscribe((contactDataReturned) => {
+                            this.contactData = contactDataReturned;
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
                                     'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
