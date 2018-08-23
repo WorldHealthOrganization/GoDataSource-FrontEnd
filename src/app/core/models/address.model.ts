@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { LocationModel } from './location.model';
 import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-query-builder';
+import * as moment from 'moment';
 
 export class AddressModel {
     name: string;
@@ -9,6 +10,8 @@ export class AddressModel {
     addressLine1: string;
     locationId: string;
     location: LocationModel;
+    date: string;
+    geoLocation: { lat: number | string, lng: number | string } | null;
 
     constructor(data = null) {
         this.name = _.get(data, 'name');
@@ -17,6 +20,8 @@ export class AddressModel {
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
         this.location = _.get(data, 'location');
+        this.date = _.get(data, 'date', moment().toISOString());
+        this.geoLocation = _.get(data, 'geoLocation', {});
     }
 
     get fullAddress() {

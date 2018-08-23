@@ -1,8 +1,18 @@
-<div class="spinnerGraph">
-    <mat-spinner
-        [fxShow]="showLoading">
+<!-- dropdown with view types -->
+<app-form-select
+    name="chainView"
+    [(ngModel)]="transmissionChainViewType"
+    required="true"
+    [options]="transmissionChainViewTypes$ | async"
+    (optionChanged)="updateView()">
+</app-form-select>
+<!-- spinner -->
+<div class="spinnerGraph"
+     *ngIf="showLoading">
+    <mat-spinner>
     </mat-spinner>
 </div>
+<!-- cytoscape element -->
 <div class="cy"
      [fxShow]="!showLoading">
 </div>

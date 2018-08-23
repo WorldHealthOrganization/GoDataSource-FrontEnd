@@ -81,5 +81,13 @@ export class GenericDataService {
 
         return availableTypes;
     }
+
+    /**
+     * Retrieve the list of transmission chain view types
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainViewTypes(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_VIEW_TYPES));
+    }
 }
 

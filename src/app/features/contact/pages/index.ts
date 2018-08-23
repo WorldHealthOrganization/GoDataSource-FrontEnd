@@ -6,6 +6,7 @@ import { ContactsFollowUpsListComponent } from './contacts-follow-ups-list/conta
 import { CreateContactFollowUpComponent } from './create-contact-follow-up/create-contact-follow-up.component';
 import { ModifyContactFollowUpComponent } from './modify-contact-follow-up/modify-contact-follow-up.component';
 import { ContactsFollowUpsMissedListComponent } from './contacts-follow-ups-missed-list/contacts-follow-ups-missed-list.component';
+import { ViewMovementContactComponent } from './view-movement-contact/view-movement-contact.component';
 
 // export each page component individually
 export * from './contacts-list/contacts-list.component';
@@ -15,12 +16,14 @@ export * from './contacts-follow-ups-list/contacts-follow-ups-list.component';
 export * from './contacts-follow-ups-missed-list/contacts-follow-ups-missed-list.component';
 export * from './create-contact-follow-up/create-contact-follow-up.component';
 export * from './modify-contact-follow-up/modify-contact-follow-up.component';
+export * from './view-movement-contact/view-movement-contact.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
     ContactsListComponent,
     CreateContactComponent,
     ModifyContactComponent,
+    ViewMovementContactComponent,
 
     ContactsFollowUpsListComponent,
     ContactsFollowUpsMissedListComponent,

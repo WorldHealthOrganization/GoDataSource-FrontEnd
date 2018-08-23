@@ -14,9 +14,40 @@
                     (optionChanged)="onChange()">
                 </app-form-select>
 
-                <div fxFlex><!-- placeholder --></div>
-                <div fxFlex><!-- placeholder --></div>
-                <div fxFlex><!-- placeholder --></div>
+                <app-form-datepicker
+                    [name]="name + '[date]'"
+                    [(ngModel)]="address.date"
+                    [required]="required"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
+                    [maxDate]="Constants.today()"
+                    app-date-validator
+                    [dateSameOrBefore]="Constants.today()"
+                    (optionChanged)="onChange()">
+                </app-form-datepicker>
+
+                <app-form-input
+                    [name]="name + '[geoLocation][lat]'"
+                    [ngModel]="address.geoLocation?.lat"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT' | translate"
+                    [required]="false"
+                    [disabled]="disabled"
+                    (input)="onChangeGeo('lat', $event)"
+                    type="number"
+                    app-all-or-none-required-validator
+                    [requiredList]="[name + '[geoLocation][lng]']">
+                </app-form-input>
+
+                <app-form-input
+                    [name]="name + '[geoLocation][lng]'"
+                    [ngModel]="address.geoLocation?.lng"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG' | translate"
+                    [required]="false"
+                    [disabled]="disabled"
+                    (input)="onChangeGeo('lng', $event)"
+                    type="number"
+                    app-all-or-none-required-validator
+                    [requiredList]="[name + '[geoLocation][lat]']">
+                </app-form-input>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>

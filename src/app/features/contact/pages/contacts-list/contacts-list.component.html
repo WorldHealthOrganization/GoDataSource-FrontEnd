@@ -2,7 +2,6 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
         </div>
     </ng-container>
 </app-topnav>
@@ -188,6 +187,10 @@
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                    </button>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'movement']">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT' | translate }}
                     </button>
 
                     <ng-container *app-selected-outbreak-is-active>

@@ -4,6 +4,31 @@
         class="dialog-main-msg" [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
+    <!-- section for showDataDialog: display a list of label: value objects -->
+    <div *ngIf="confirmData?.data">
+        <mat-card>
+            <mat-list>
+                <mat-list-item *ngFor="let dataItem of confirmData?.data">
+                    <!-- if the label is not LINK display the label and the value-->
+                    <div *ngIf="dataItem.label !== 'LINK'">
+                        <span class="dialog-data-label">
+                            {{ dataItem.label | translate }}:
+                        </span>
+                        {{dataItem.value | translate}}
+                    </div>
+
+                    <!-- custom case for displaying link so the user can navigate to the full resource page -->
+                    <div *ngIf="dataItem.label === 'LINK'">
+                        <a href="{{dataItem.value}}"
+                           target="_blank">
+                            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
+                        </a>
+                    </div>
+                </mat-list-item>
+            </mat-list>
+        </mat-card>
+    </div>
+
     <div *ngIf="confirmData?.customInput">
         <app-form-input
             [(ngModel)]="dialogAnswerInputValue.value"
@@ -13,9 +38,8 @@
         </app-form-input>
     </div>
 
-
-    <div
-        fxFlex fxLayout="row" fxLayoutAlign="end">
+    <div *ngIf="!confirmData?.data"
+         fxFlex fxLayout="row" fxLayoutAlign="end">
         <button class="dialog-button" mat-button (click)="cancel()">
             {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
         </button>
@@ -24,6 +48,16 @@
                 (click)="yes()">
             {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
         </button>
+    </div>
+
+    <!-- only display cancel button for data dialogs -->
+    <div *ngIf="confirmData?.data"
+         fxFlex fxLayout="row" fxLayoutAlign="end">
+        <button class="dialog-button" mat-button
+                (click)="cancel()">
+            {{ confirmData?.cancelLabel | translate }}
+        </button>
 
     </div>
+
 </div>

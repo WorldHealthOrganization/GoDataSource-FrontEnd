@@ -41,6 +41,15 @@ const routes: Routes = [
             action: ViewModifyComponentAction.MODIFY
         }
     },
+    // View Contact movement
+    {
+        path: ':contactId/movement',
+        component: fromPages.ViewMovementContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CONTACT]
+        }
+    },
 
     // Follow-ups list
     {

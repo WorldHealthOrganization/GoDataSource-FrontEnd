@@ -31,6 +31,13 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
         super(controlContainer, validators, asyncValidators);
     }
 
+    /**
+     * Create new item
+     */
+    protected generateNewItem(): AddressModel {
+        return new AddressModel();
+    }
+
     ngOnInit() {
         // handle remove item confirmation
         this.deleteConfirm.subscribe((observer: Subscriber<void>) => {

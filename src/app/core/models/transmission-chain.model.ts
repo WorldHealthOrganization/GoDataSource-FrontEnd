@@ -117,13 +117,16 @@ export class TransmissionChainModel {
      * @returns {any}
      */
     convertChainToGraphElements(): any {
-        const graphData: any = {nodes: [], edges: []};
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         if ( !_.isEmpty(this) ) {
             if ( !_.isEmpty ( this.nodes) ) {
                 _.forEach( this.nodes, function(node, key) {
-                    graphData.nodes.push({data: new GraphNodeModel(node.model)});
+                    const nodeData = new GraphNodeModel(node.model);
+                    nodeData.type = node.type;
+                    graphData.nodes.push({data: nodeData});
                 });
             }
+
             if ( !_.isEmpty ( this.relationships) ) {
                 _.forEach( this.relationships, function(relationship, key) {
                     const graphEdge = new GraphEdgeModel();
@@ -134,7 +137,9 @@ export class TransmissionChainModel {
                         graphEdge.source = relationship.persons[1].id;
                         graphEdge.target = relationship.persons[0].id;
                     }
+
                     graphData.edges.push({data: graphEdge});
+
                 });
             }
         }

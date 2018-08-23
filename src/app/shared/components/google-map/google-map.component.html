@@ -1,0 +1,16 @@
+<!-- Draw google map -->
+<div
+    #googleMap
+    *ngIf="isMapsInitialized()"
+    [style.width]="width"
+    [style.height]="height">
+</div>
+
+<!-- Still loading google map -->
+<div
+    class="google-map-loading"
+    *ngIf="!isMapsInitialized()"
+    [style.width]="width"
+    [style.height]="height">
+    <mat-spinner></mat-spinner>
+</div>

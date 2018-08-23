@@ -16,7 +16,9 @@ export enum ApplyListFilter {
     CASES_REFUSING_TREATMENT = 'cases_refusing_treatment',
     CONTACTS_BECOME_CASES = 'contacts_become_cases',
     NO_OF_ACTIVE_TRANSMISSION_CHAINS = 'number_of_active_chains',
-    NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES = 'no_of_new_chains_of_transmission_from_contacts_who_become_cases'
+    NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES = 'no_of_new_chains_of_transmission_from_contacts_who_become_cases',
+    CASES_WITHOUT_RELATIONSHIPS  = 'cases_without_relationships',
+    EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships'
 }
 
 export class Constants {
@@ -61,7 +63,9 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT]: 'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT',
         [Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE',
         [Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS]: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS',
-        [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES'
+        [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES',
+        [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
+        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'
     };
 
     // Gender
@@ -111,6 +115,18 @@ export class Constants {
         CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED'
     };
 
+    //  transmission chain view types
+    static TRANSMISSION_CHAIN_VIEW_TYPES = {
+        BUBBLE_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
+            value: 'BUBBLE_NETWORK'
+        },
+        HIERARCHICAL_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
+            value: 'HIERARCHICAL_NETWORK'
+        }
+    };
+
     /**
      * Returns today's date
      * @returns Moment
@@ -118,4 +134,5 @@ export class Constants {
     static today() {
         return moment().startOf('day');
     }
+
 }
