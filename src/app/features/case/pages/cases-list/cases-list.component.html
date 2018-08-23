@@ -199,6 +199,10 @@
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 
+                    <button mat-menu-item [routerLink]="['.', item.id, 'movement']">
+                        {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT' | translate }}
+                    </button>
+
                     <ng-container *app-selected-outbreak-is-active>
                         <button *ngIf="hasCaseWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}

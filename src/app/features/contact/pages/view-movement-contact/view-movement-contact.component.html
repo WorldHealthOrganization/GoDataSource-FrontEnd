@@ -1,0 +1,12 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card
+    class="page-section page-content">
+    <app-google-map-movement
+        height="100%"
+        [addresses]="contactData?.addresses"></app-google-map-movement>
+</mat-card>
