@@ -10,7 +10,7 @@ import { NgForm } from '@angular/forms';
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
  */
-export class FormComponentCanDeactivate {
+export class ConfirmOnFormChanges {
     /**
      * Children forms
      */
@@ -51,7 +51,7 @@ export class FormComponentCanDeactivate {
 }
 
 @Injectable()
-export class PageChangeConfirmationGuardService implements CanDeactivate<FormComponentCanDeactivate> {
+export class PageChangeConfirmationGuardService implements CanDeactivate<ConfirmOnFormChanges> {
     constructor(
        private dialogService: DialogService
     ) {}
@@ -64,13 +64,13 @@ export class PageChangeConfirmationGuardService implements CanDeactivate<FormCom
      * @param nextState
      */
     canDeactivate(
-        component: FormComponentCanDeactivate,
+        component: ConfirmOnFormChanges,
         currentRoute: ActivatedRouteSnapshot,
         currentState: RouterStateSnapshot,
         nextState?: RouterStateSnapshot
     ): Observable<boolean> | boolean {
         // no guard set here
-        if (!(component instanceof FormComponentCanDeactivate)) {
+        if (!(component instanceof ConfirmOnFormChanges)) {
             return true;
         }
 

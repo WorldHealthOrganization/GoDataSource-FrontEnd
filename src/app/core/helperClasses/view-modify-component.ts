@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { FormComponentCanDeactivate } from '../services/guards/page-change-confirmation-guard.service';
+import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 
 /**
  * View / Modify Action Types
@@ -12,7 +12,7 @@ export enum ViewModifyComponentAction {
 /**
  * Base class to be extended by components that need to implement view / modify behaviour
  */
-export abstract class ViewModifyComponent extends FormComponentCanDeactivate {
+export abstract class ViewModifyComponent extends ConfirmOnFormChanges {
     public viewOnly: boolean = false;
 
     protected constructor(

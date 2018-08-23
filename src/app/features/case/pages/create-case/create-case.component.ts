@@ -18,7 +18,7 @@ import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { FormComponentCanDeactivate } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-case',
@@ -26,7 +26,7 @@ import { FormComponentCanDeactivate } from '../../../../core/services/guards/pag
     templateUrl: './create-case.component.html',
     styleUrls: ['./create-case.component.less']
 })
-export class CreateCaseComponent extends FormComponentCanDeactivate implements OnInit {
+export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
