@@ -24,9 +24,6 @@ export class CreateLocationComponent implements OnInit {
             '/locations'
         )
     ];
-    // location breadcrumbs
-    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
-
     locationData: LocationModel = new LocationModel();
 
     parentId: string;
@@ -53,49 +50,6 @@ export class CreateLocationComponent implements OnInit {
                         '/locations'
                     )
                 ];
-
-                // retrieve parents of this parent and create breadcrumbs if necessary
-                if (this.parentId) {
-                    // retrieve parent locations
-                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                        if (locationParents && locationParents.length > 0) {
-                            let locationP = locationParents[0];
-                            while (!_.isEmpty(locationP.location)) {
-                                if (this.locationBreadcrumbs.length) {
-                                    this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
-                                }
-                                // add breadcrumb
-                                this.locationBreadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        locationP.location.name,
-                                        `/locations/${locationP.location.id}/children`
-                                    )
-                                );
-
-                                // next location
-                                locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                            }
-                        }
-
-                        // add create
-                        this.locationBreadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_CREATE_LOCATION_TITLE',
-                                '.',
-                                true
-                            )
-                        );
-                    });
-                } else {
-                    // add create
-                    this.locationBreadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_CREATE_LOCATION_TITLE',
-                            '.',
-                            true
-                        )
-                    );
-                }
             });
     }
 

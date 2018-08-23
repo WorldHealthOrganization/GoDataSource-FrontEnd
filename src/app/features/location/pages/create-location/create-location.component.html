@@ -6,13 +6,9 @@
 
 <div class="page-content">
 
-    <ng-container dynamic-section>
-        <div
-            fxLayout="row" fxFlex fxLayoutAlign="space-between center"
-            class="location-breadcrumbs">
-            <app-breadcrumbs [items]="locationBreadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
+    <!-- location breadcrumb -->
+    <app-location-breadcrumbs></app-location-breadcrumbs>
+
     <mat-horizontal-stepper linear #stepper>
 
         <!-- Details step -->

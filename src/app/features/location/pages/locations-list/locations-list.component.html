@@ -15,13 +15,8 @@
 
 <mat-card class="page-section page-content">
 
-    <ng-container dynamic-section>
-        <div
-            fxLayout="row" fxFlex fxLayoutAlign="space-between center"
-            class="location-breadcrumbs">
-            <app-breadcrumbs [items]="locationBreadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
+    <!-- location breadcrumb -->
+    <app-location-breadcrumbs></app-location-breadcrumbs>
 
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -132,7 +127,8 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'create']">
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                            [routerLink]="['/locations', item.id, 'create']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
                     </button>
 
@@ -148,7 +144,8 @@
                         {{'LNG_PAGE_ACTION_VIEW'| translate}}
                     </button>
 
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'modify']">
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                            [routerLink]="['/locations', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                     </button>
 

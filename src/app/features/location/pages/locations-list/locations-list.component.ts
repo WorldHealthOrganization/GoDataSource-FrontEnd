@@ -33,8 +33,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             '/locations'
         )
     ];
-    // locations breadcrumbs
-    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
     locationsList$: Observable<LocationModel[]>;
     yesNoOptionsList$: Observable<any[]>;
@@ -68,54 +66,10 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 // set parent
                 this.parentId = params.parentId;
 
-                // reset breadcrumbs
-                this.breadcrumb = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
-                    )
-                ];
-                this.locationBreadcrumbs = [];
-
-                // retrieve parents of this parent and create breadcrumbs if necessary
-                if (this.parentId) {
-                    // retrieve parent locations
-                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                        if (locationParents && locationParents.length > 0) {
-                            let locationP = locationParents[0];
-                            while (!_.isEmpty(locationP.location)) {
-                                // make previous breadcrumb not the active one
-                                if (this.locationBreadcrumbs.length) {
-                                    this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
-                                }
-                                // add breadcrumb
-                                this.locationBreadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        locationP.location.name,
-                                        `/locations/${locationP.location.id}/children`,
-                                        true
-                                    )
-                                );
-                                // next location
-                                locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                            }
-                        }
-                    });
-                }
-
                 // refresh list
                 this.refreshList();
             });
     }
-
-    /**
-     * Re(load) the Contacts list
-     */
-    refreshList() {
-        // retrieve the list of Contacts
-        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
-    }
-
     /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
@@ -165,5 +119,13 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      */
     hasLocationWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    }
+
+    /**
+     * Re(load) the Contacts list
+     */
+    refreshList() {
+        // retrieve the list of Contacts
+        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
     }
 }

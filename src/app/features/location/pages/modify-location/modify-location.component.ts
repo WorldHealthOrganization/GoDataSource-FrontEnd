@@ -62,65 +62,6 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                     )
                 ];
                 this.locationBreadcrumbs = [];
-
-                // retrieve location
-                this.locationDataService
-                    .getLocation(this.locationId)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        this.router.navigate(['/locations']);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe((locationData: {}) => {
-                        // location data
-                        this.locationData = new LocationModel(locationData);
-
-                        // retrieve parent locations
-                        if (this.locationData.parentLocationId) {
-                            this.locationDataService.getHierarchicalParentListOfLocation(this.locationData.parentLocationId).subscribe((locationParents) => {
-                                if (locationParents && locationParents.length > 0) {
-                                    let locationP = locationParents[0];
-                                    while (!_.isEmpty(locationP.location)) {
-                                        if (this.locationBreadcrumbs.length) {
-                                            this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1 ].active = false;
-                                        }
-                                        // add breadcrumb
-                                        this.locationBreadcrumbs.push(
-                                            new BreadcrumbItemModel(
-                                                locationP.location.name,
-                                                `/locations/${locationP.location.id}/children`,
-                                            )
-                                        );
-
-                                        // next location
-                                        locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                                    }
-                                }
-
-                                // add create
-                                this.locationBreadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_MODIFY_LOCATION_TITLE',
-                                        '.',
-                                        true,
-                                        {},
-                                        this.locationData
-                                    )
-                                );
-                            });
-                        } else {
-                            // add modify
-                            this.locationBreadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.locationData
-                                )
-                            );
-                        }
-                    });
             });
     }
 
