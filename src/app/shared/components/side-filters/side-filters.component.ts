@@ -237,17 +237,34 @@ export class SideFiltersComponent {
                     // contains / within
                     switch (comparator) {
                         case FilterComparator.WITHIN:
-                            // 1. #TODO - near not working because of some issues with loopback & mongo
-                            // 2. #TODO also we need to replace lat and lng with real values pulled from somewhere...or allow user to enter / select the location...
-                            // 3. #TODO in this case we need to allow user to pick location from  google maps that will populate two fields with lat & lng of the selected point which will be used to compare data
-                            qb.filter.where({
-                                [`${filter.fieldName}.geoLocation`]: {
-                                    near: {
-                                        lat: 42.266271, // #TODO
-                                        lng: -72.6700016 // #TODO
-                                    },
-                                    maxDistance: appliedFilter.value.to
+                            // both lat * lng are required
+                            const lat: number = appliedFilter.value.lat || appliedFilter.value.lat === 0 ? parseFloat(appliedFilter.value.lat) : null;
+                            const lng: number = appliedFilter.value.lng || appliedFilter.value.lng === 0 ? parseFloat(appliedFilter.value.lng) : null;
+                            if (
+                                lat === null ||
+                                lng === null
+                            ) {
+                                break;
+                            }
+
+                            // construct near query
+                            const nearQuery = {
+                                near: {
+                                    lat: lat,
+                                    lng: lng
                                 }
+                            };
+
+                            // add max distance if provided
+                            const maxDistance: number = appliedFilter.value.maxDistance ? parseFloat(appliedFilter.value.maxDistance) : null;
+                            if (maxDistance !== null) {
+                                // convert miles to meters
+                                (nearQuery as any).maxDistance = maxDistance * 1609.34;
+                            }
+
+                            // add filter
+                            qb.filter.where({
+                                [`${filter.fieldName}.geoLocation`]: nearQuery
                             });
                             break;
 
@@ -306,5 +323,19 @@ export class SideFiltersComponent {
         this.filtersApplied.emit(this.getQueryBuilder());
 
         this.closeSideNav();
+    }
+
+    /**
+     * Set object value property
+     */
+    setObjectValue(
+        filter: AppliedFilterModel,
+        prop: string,
+        value: string) {
+        if (!_.isObject(filter.value)) {
+            filter.value = {};
+        }
+
+        filter.value[prop] = value ? parseFloat(value) : null;
     }
 }
