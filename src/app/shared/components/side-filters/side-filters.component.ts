@@ -238,8 +238,8 @@ export class SideFiltersComponent {
                     switch (comparator) {
                         case FilterComparator.WITHIN:
                             // both lat * lng are required
-                            const lat: number = appliedFilter.value.lat ? parseFloat(appliedFilter.value.lat) : null;
-                            const lng: number = appliedFilter.value.lng ? parseFloat(appliedFilter.value.lng) : null;
+                            const lat: number = appliedFilter.value.lat || appliedFilter.value.lat === 0 ? parseFloat(appliedFilter.value.lat) : null;
+                            const lng: number = appliedFilter.value.lng || appliedFilter.value.lng === 0 ? parseFloat(appliedFilter.value.lng) : null;
                             if (
                                 lat === null ||
                                 lng === null
