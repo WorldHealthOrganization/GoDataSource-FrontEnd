@@ -294,4 +294,32 @@ export class ListFilterDataService {
 
         return qb;
     }
+
+    /**
+     * Create the query builder for filtering the list of cases without relationships
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesWithoutRelationships(): RequestQueryBuilder {
+        // generate a query builder
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.flag(
+            'noRelationships',
+            true
+        );
+        return filterQueryBuilder;
+    }
+
+    /**
+     * Create the query builder for filtering the list of contacts without relationships
+     * @returns {RequestQueryBuilder}
+     */
+    filterContactsWithoutRelationships(): RequestQueryBuilder {
+        // generate a query builder
+        const filterQueryBuilder = new RequestQueryBuilder();
+        filterQueryBuilder.filter.flag(
+            'noRelationships',
+            true
+        );
+        return filterQueryBuilder;
+    }
 }
