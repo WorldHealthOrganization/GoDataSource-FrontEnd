@@ -19,6 +19,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
+import { ComponentCanDeactivate } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 
 @Component({
@@ -27,7 +28,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './modify-case.component.html',
     styleUrls: ['./modify-case.component.less']
 })
-export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
+export class ModifyCaseComponent extends ViewModifyComponent implements OnInit, ComponentCanDeactivate {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
     ];
@@ -147,4 +148,13 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
     }
 
+    /**
+     * Can we deactivate page ?
+     */
+    canDeactivate(): boolean | Observable<boolean> {
+        return Observable.create((obs) => {
+           obs.next();
+           obs.complete();
+        });
+    }
 }

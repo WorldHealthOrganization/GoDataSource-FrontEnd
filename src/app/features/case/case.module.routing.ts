@@ -5,6 +5,7 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PageChangeConfirmationGuardService } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
     // Cases list
@@ -19,7 +20,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_CASE]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuardService
+        ]
     },
     // View Case
     {
@@ -39,7 +43,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuardService
+        ]
     },
 
     // Lab results

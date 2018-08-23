@@ -4,7 +4,7 @@ import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ListBase } from '../../core';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
-import { DialogAnswerButton } from '../../../components/dialog/dialog.component';
+import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dialog.component';
 
 @Component({
     selector: 'app-form-daterange-list',
@@ -34,8 +34,8 @@ export class FormDaterangeListComponent extends ListBase<DateRangeModel> impleme
         // handle remove item confirmation
         this.deleteConfirm.subscribe((observer: Subscriber<void>) => {
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE')
-                .subscribe((answer: DialogAnswerButton) => {
-                    if (answer === DialogAnswerButton.Yes) {
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
                         observer.next();
                     }
                 });

@@ -22,7 +22,6 @@ import { TransmissionChainDataService } from './data/transmission-chain.data.ser
 // import helper services
 import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
-import { AuthGuard } from './guards/auth-guard.service';
 import { SnackbarService } from './helper/snackbar.service';
 import { ModelHelperService } from './helper/model-helper.service';
 import { RouterHelperService } from './helper/router-helper.service';
@@ -31,8 +30,14 @@ import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
 import { DialogService } from './helper/dialog.service';
 import { DomService } from './helper/dom.service';
-import { LanguageResolver } from './resolvers/language.resolver';
+
+// guards
+import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
+import { PageChangeConfirmationGuardService } from './guards/page-change-confirmation-guard.service';
+
+// resolvers
+import { LanguageResolver } from './resolvers/language.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -63,6 +68,7 @@ export const services: any[] = [
     // guard services
     AuthGuard,
     PasswordChangeGuard,
+    PageChangeConfirmationGuardService,
 
     // helper services
     StorageService,
