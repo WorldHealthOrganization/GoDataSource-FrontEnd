@@ -41,7 +41,7 @@ export abstract class ListComponent {
     /**
      * Applied list filter on this list page
      */
-    protected appliedListFilter: ApplyListFilter;
+    public appliedListFilter: ApplyListFilter;
 
     /**
      * List Filter Query Builder
@@ -80,7 +80,7 @@ export abstract class ListComponent {
     /**
      * Tell list that we need to refresh list
      */
-    protected needsRefreshList(instant: boolean = false) {
+    public needsRefreshList(instant: boolean = false) {
         this.triggerListRefresh.call(instant);
     }
 
