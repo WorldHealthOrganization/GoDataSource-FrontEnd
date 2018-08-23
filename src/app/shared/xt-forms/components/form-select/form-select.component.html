@@ -14,7 +14,7 @@
             [disabled]="disabled"
             (selectionChange)="onChange(selectElement.value)">
             <mat-option
-                *ngIf="clearable && !multiple && !disabled"
+                *ngIf="clearable && !multiple"
                 [value]="null">
                 {{ noneLabel | translate }}
             </mat-option>
