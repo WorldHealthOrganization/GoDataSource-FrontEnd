@@ -56,7 +56,7 @@ export const components: any[] = [
     CytoscapeGraphComponent,
     DashboardCustomMetricDashletComponent,
     GoogleMapComponent,
-    GoogleMapMovementComponent
+    GoogleMapMovementComponent,
     DashboardCustomMetricDashletComponent,
     LocationBreadcrumbsComponent
 ];
