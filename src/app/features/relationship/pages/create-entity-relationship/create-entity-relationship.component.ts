@@ -84,11 +84,6 @@ export class CreateEntityRelationshipComponent implements OnInit {
                 } else {
                     this.selectedEntityIds = JSON.parse(queryParams.selectedEntityIds);
 
-                    this.relationships = [];
-                    _.each(this.selectedEntityIds, () => {
-                        this.relationships.push(new RelationshipModel());
-                    });
-
                     this.refreshSelectedEntitiesList();
                 }
             });
@@ -166,6 +161,11 @@ export class CreateEntityRelationshipComponent implements OnInit {
             .getEntitiesList(this.outbreakId, qb)
             .subscribe((entities) => {
                 this.selectedEntities = entities;
+
+                this.relationships = [];
+                _.each(this.selectedEntities, () => {
+                    this.relationships.push(new RelationshipModel());
+                });
             });
     }
 
