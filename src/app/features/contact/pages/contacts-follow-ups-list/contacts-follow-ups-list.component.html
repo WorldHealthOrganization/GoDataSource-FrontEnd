@@ -21,6 +21,11 @@
     </ng-container>
 </app-topnav>
 
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">

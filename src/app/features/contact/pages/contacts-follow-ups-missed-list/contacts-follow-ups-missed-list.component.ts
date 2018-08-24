@@ -17,6 +17,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -43,6 +44,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
+
+    availableSideFilters: FilterModel[];
 
     constructor(
         private authDataService: AuthDataService,
@@ -79,6 +82,22 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
             });
+
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['contact'],
+                relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+            })
+        ];
     }
 
     refreshList() {

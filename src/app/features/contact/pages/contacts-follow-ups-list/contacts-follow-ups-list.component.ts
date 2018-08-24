@@ -18,6 +18,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -45,6 +46,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
+
+    availableSideFilters: FilterModel[];
 
     constructor(
         private authDataService: AuthDataService,
@@ -80,6 +83,22 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
             });
+
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                relationshipPath: ['contact'],
+                relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+            })
+        ];
     }
 
     refreshList() {
