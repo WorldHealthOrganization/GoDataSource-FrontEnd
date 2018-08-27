@@ -3,6 +3,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -21,6 +23,11 @@ export class CasesLessContactsDashletComponent implements OnInit {
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    // refresh only after we finish changing data
+    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.updateValues();
+    }));
+
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService
@@ -35,6 +42,7 @@ export class CasesLessContactsDashletComponent implements OnInit {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xLessContacts = selectedOutbreak.noLessContacts;
                     this.updateValues();
+                    this.triggerUpdateValues.call(true);
                 }
             });
     }
@@ -45,7 +53,7 @@ export class CasesLessContactsDashletComponent implements OnInit {
      */
     onChangeSetting(newXLessContacts) {
         this.xLessContacts = newXLessContacts;
-        this.updateValues();
+        this.triggerUpdateValues.call();
     }
 
     /**
