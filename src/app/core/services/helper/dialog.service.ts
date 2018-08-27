@@ -16,7 +16,9 @@ export class DialogService {
      * Constructor
      * @param dialog
      */
-    constructor(private dialog: MatDialog) {}
+    constructor(
+        private dialog: MatDialog
+    ) {}
 
     /**
      * * Show a Confirm Dialog
@@ -78,9 +80,9 @@ export class DialogService {
     /**
      * Show a dialog containing data - array of objects with label and value
      * @param {any[]} data
-     * @returns {Observable<any>}
+     * @returns {Observable<DialogAnswer>}
      */
-    showDataDialog(data: LabelValuePair[]) {
+    showDataDialog(data: LabelValuePair[]): Observable<DialogAnswer> {
         // construct dialog message data
         const dialogConfig = new DialogConfiguration(
             '',

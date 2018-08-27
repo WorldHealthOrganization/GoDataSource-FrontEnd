@@ -152,6 +152,15 @@ const routes: Routes = [
                     AuthGuard,
                     PasswordChangeGuard
                 ]
+            },
+            // Import / Export Data Module routes
+            {
+                path: ModulePath.ImportExportDataModule,
+                loadChildren: './features/import-export-data/import-export-data.module#ImportExportDataModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ]
             }
         ]
     },

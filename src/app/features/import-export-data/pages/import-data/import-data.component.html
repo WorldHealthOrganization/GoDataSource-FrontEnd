@@ -1,0 +1,29 @@
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Select / Upload file -->
+        <mat-step [stepControl]="detailsForm">
+            <form #detailsForm="ngForm">
+                upload...
+                <div>
+                    <button mat-button matStepperNext>
+                        upload
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Map fields -->
+        <mat-step [stepControl]="addressForm">
+            <form #addressForm="ngForm">
+                map fields..
+                <div>
+                    <button mat-button matStepperNext>
+                        import
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

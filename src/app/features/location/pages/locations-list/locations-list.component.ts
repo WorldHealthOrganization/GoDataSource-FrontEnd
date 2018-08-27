@@ -18,6 +18,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-locations-list',
@@ -35,6 +36,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    // constants
+    Constants = Constants;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
@@ -45,7 +49,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private snackbarService: SnackbarService
     ) {
         super();
-      }
+    }
 
     ngOnInit() {
         // get the authenticated user

@@ -11,5 +11,6 @@ export enum ModulePath {
     ReferenceDataModule = 'reference-data',
     LocationModule = 'locations',
     DashboardModule = 'dashboard',
-    TransmissionChainModule = 'transmission-chains'
+    TransmissionChainModule = 'transmission-chains',
+    ImportExportDataModule = 'import-export-data'
 }

@@ -406,6 +406,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
+        'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON': 'Import Locations',
 
         /**
          * Create Location page

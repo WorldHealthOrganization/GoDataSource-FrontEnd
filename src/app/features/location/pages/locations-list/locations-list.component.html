@@ -4,9 +4,23 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
         </div>
 
-        <div class="topnav-actions">
-            <button *ngIf="hasLocationWriteAccess()" class="button-primary" mat-raised-button color="primary"
-                    [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+        <div
+            *ngIf="hasLocationWriteAccess()"
+            class="topnav-actions">
+            <button
+                *ngIf="!parentId"
+                class="button-primary"
+                mat-raised-button
+                color="primary"
+                [routerLink]="['/import-export-data', Constants.IMPORT_EXPORT_RECORD_TYPE.LOCATIONS, 'import']">
+                {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
+            </button>
+
+            <button
+                class="button-primary"
+                mat-raised-button
+                color="primary"
+                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
                 {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
             </button>
         </div>
