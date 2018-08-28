@@ -1,6 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
+import { ImportDataExtension } from '../import-data/import-data.component';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 @Component({
     selector: 'app-import-hierarchical-locations',
@@ -9,14 +11,17 @@ import { Router } from '@angular/router';
     styleUrls: ['./import-hierarchical-locations.component.less']
 })
 export class ImportHierarchicalLocationsComponent {
-    allowedMimeTypes: string[] = [
-        'text/xml',
-        'application/json'
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
+            '',
+            true
+        )
     ];
 
     allowedExtensions: string[] = [
-        '.xml',
-        '.json'
+        ImportDataExtension.XML,
+        ImportDataExtension.JSON
     ];
 
     importFileUrl: string = 'locations/import';

@@ -2,6 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { ImportDataExtension } from '../import-data/import-data.component';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 @Component({
     selector: 'app-import-case-lab-data',
@@ -10,22 +12,21 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
     styleUrls: ['./import-case-lab-data.component.less']
 })
 export class ImportCaseLabDataComponent implements OnInit {
-    allowedMimeTypes: string[] = [
-        'text/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/xml',
-        'application/vnd.oasis.opendocument.spreadsheet',
-        'application/json'
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+            '',
+            true
+        )
     ];
 
     allowedExtensions: string[] = [
-        '.csv',
-        '.xls',
-        '.xlsx',
-        '.xml',
-        '.ods',
-        '.json'
+        ImportDataExtension.CSV,
+        ImportDataExtension.XLS,
+        ImportDataExtension.XLSX,
+        ImportDataExtension.XML,
+        ImportDataExtension.ODS,
+        ImportDataExtension.JSON
     ];
 
     displayLoading: boolean = true;

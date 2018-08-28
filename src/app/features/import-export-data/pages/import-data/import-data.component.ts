@@ -1,9 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
+
+export enum ImportDataExtension {
+    CSV = '.csv',
+    XLS = '.xls',
+    XLSX = '.xlsx',
+    XML = '.xml',
+    ODS = '.ods',
+    JSON = '.json'
+}
 
 @Component({
     selector: 'app-import-data',
@@ -12,19 +20,16 @@ import { environment } from '../../../../../environments/environment';
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [];
-
     // mimes
-    private _allowedMimeTypes: string[];
-    @Input() set allowedMimeTypes(mimes: string[]) {
-        this._allowedMimeTypes = mimes;
-        if (this.uploader) {
-            this.uploader.options.allowedMimeType = this.allowedMimeTypes;
-        }
-    }
-    get allowedMimeTypes(): string[] {
-        return this._allowedMimeTypes ? this._allowedMimeTypes : [];
-    }
+    private allowedMimeTypes: string[] = [];
+    private allowedMimeTypesMap = {
+        [ImportDataExtension.CSV]: 'text/csv',
+        [ImportDataExtension.XLS]: 'application/vnd.ms-excel',
+        [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        [ImportDataExtension.XML]: 'text/xml',
+        [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
+        [ImportDataExtension.JSON]: 'application/json'
+    };
 
     // extensions
     private _allowedExtensions: string[];
@@ -32,27 +37,22 @@ export class ImportDataComponent implements OnInit {
         this._allowedExtensions = extensions;
 
         this.translationData.types = this.allowedExtensions.join(', ');
+
+        this.allowedMimeTypes = this.allowedExtensions.map((extension: string): string => {
+            return this.allowedMimeTypesMap[extension] ?
+                this.allowedMimeTypesMap[extension] :
+                extension;
+        });
+
+        if (this.uploader) {
+            this.uploader.options.allowedMimeType = this.allowedMimeTypes;
+        }
     }
     get allowedExtensions(): string[] {
         return this._allowedExtensions ? this._allowedExtensions : [];
     }
 
-    // title
-    private _title: string = ''
-    @Input() set title(value: string) {
-        this._title = value;
-
-        this.breadcrumbs = [
-            new BreadcrumbItemModel(
-                this.title,
-                '',
-                true
-            )
-        ];
-    }
-    get title(): string {
-        return this._title;
-    }
+    @Input() title: string = '';
 
     /**
      * Tell system if this doesn't need to go through map step, uploading file is enough
