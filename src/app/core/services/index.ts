@@ -34,7 +34,7 @@ import { DomService } from './helper/dom.service';
 // guards
 import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
-import { PageChangeConfirmationGuardService } from './guards/page-change-confirmation-guard.service';
+import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
 
 // resolvers
 import { LanguageResolver } from './resolvers/language.resolver';
@@ -68,7 +68,7 @@ export const services: any[] = [
     // guard services
     AuthGuard,
     PasswordChangeGuard,
-    PageChangeConfirmationGuardService,
+    PageChangeConfirmationGuard,
 
     // helper services
     StorageService,

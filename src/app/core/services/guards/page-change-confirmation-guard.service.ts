@@ -37,7 +37,6 @@ export class ConfirmOnFormChanges {
             // #TODO
 
             // determine if we have changes
-            // should we check if form was touched as well ?
             if (form.dirty) {
                 // we found changes, there is no point in going through the rest of the forms
                 foundChanges = true;
@@ -51,7 +50,7 @@ export class ConfirmOnFormChanges {
 }
 
 @Injectable()
-export class PageChangeConfirmationGuardService implements CanDeactivate<ConfirmOnFormChanges> {
+export class PageChangeConfirmationGuard implements CanDeactivate<ConfirmOnFormChanges> {
     constructor(
        private dialogService: DialogService
     ) {}
