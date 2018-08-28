@@ -58,7 +58,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
     selectedEntityIds: string[];
     selectedEntities: (CaseModel|ContactModel|EventModel)[];
 
-    relationship = new RelationshipModel();
+    relationships: RelationshipModel[] = [];
 
     constructor(
         private router: Router,
@@ -161,6 +161,11 @@ export class CreateEntityRelationshipComponent implements OnInit {
             .getEntitiesList(this.outbreakId, qb)
             .subscribe((entities) => {
                 this.selectedEntities = entities;
+
+                this.relationships = [];
+                _.each(this.selectedEntities, () => {
+                    this.relationships.push(new RelationshipModel());
+                });
             });
     }
 

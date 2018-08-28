@@ -3,6 +3,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',
@@ -21,6 +23,12 @@ export class ContactsNotSeenDashletComponent implements OnInit {
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    // refresh only after we finish changing data
+    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.updateValues();
+    }));
+
+
     constructor(
         private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService
@@ -35,7 +43,7 @@ export class ContactsNotSeenDashletComponent implements OnInit {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xDaysNotSeen = selectedOutbreak.noDaysNotSeen;
-                    this.updateValues();
+                    this.triggerUpdateValues.call(true);
                 }
             });
     }
@@ -47,7 +55,7 @@ export class ContactsNotSeenDashletComponent implements OnInit {
     onChangeSetting(newXDaysNotSeen) {
         this.xDaysNotSeen = newXDaysNotSeen;
         // get number of not seen contacts
-        this.updateValues();
+        this.triggerUpdateValues.call();
     }
 
     /**

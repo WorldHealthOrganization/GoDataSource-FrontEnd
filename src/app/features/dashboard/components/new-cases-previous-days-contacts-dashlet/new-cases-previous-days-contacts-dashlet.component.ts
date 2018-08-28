@@ -4,6 +4,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-new-cases-previous-days-contacts-dashlet',
@@ -24,6 +26,11 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
     // selected outbreak
     selectedOutbreak;
 
+    // refresh only after we finish changing data
+    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.updateValues();
+    }));
+
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService
@@ -37,7 +44,7 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xDaysAmongContacts = selectedOutbreak.noDaysAmongContacts;
-                    this.updateValues();
+                    this.triggerUpdateValues.call(true);
                 }
             });
     }
@@ -48,7 +55,7 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
      */
     onChangeSetting(newXDaysAmongContacts) {
         this.xDaysAmongContacts = newXDaysAmongContacts;
-        this.updateValues();
+        this.triggerUpdateValues.call();
     }
 
     /**

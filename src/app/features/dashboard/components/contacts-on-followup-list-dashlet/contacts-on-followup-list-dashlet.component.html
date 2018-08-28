@@ -1,6 +1,6 @@
-<app-dashboard-metric-dashlet
-    metricTitle="LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE"
-    link="/contacts"
-    [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST}"
+<app-dashboard-custom-metric-dashlet
+    [link]="'/contacts'"
+    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST}"
     [value]="contactsOnFollowUpListCount">
-</app-dashboard-metric-dashlet>
+    {{ "LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE" | translate}}
+</app-dashboard-custom-metric-dashlet>
