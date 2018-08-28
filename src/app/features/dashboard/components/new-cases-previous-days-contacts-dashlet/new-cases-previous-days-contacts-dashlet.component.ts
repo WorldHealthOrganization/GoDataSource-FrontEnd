@@ -44,7 +44,6 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xDaysAmongContacts = selectedOutbreak.noDaysAmongContacts;
-                    this.updateValues();
                     this.triggerUpdateValues.call(true);
                 }
             });

@@ -43,7 +43,6 @@ export class ContactsNotSeenDashletComponent implements OnInit {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xDaysNotSeen = selectedOutbreak.noDaysNotSeen;
-                    this.updateValues();
                     this.triggerUpdateValues.call(true);
                 }
             });

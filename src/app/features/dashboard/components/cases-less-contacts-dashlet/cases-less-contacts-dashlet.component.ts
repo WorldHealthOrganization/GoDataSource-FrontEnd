@@ -41,7 +41,6 @@ export class CasesLessContactsDashletComponent implements OnInit {
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xLessContacts = selectedOutbreak.noLessContacts;
-                    this.updateValues();
                     this.triggerUpdateValues.call(true);
                 }
             });

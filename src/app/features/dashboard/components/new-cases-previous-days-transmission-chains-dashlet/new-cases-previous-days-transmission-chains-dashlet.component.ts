@@ -43,7 +43,6 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements O
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xPreviousDays = selectedOutbreak.noDaysInChains;
-                    this.updateValues();
                     this.triggerUpdateValues.call(true);
                 }
             });
