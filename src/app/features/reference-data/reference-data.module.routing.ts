@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
-import { AuthGuard } from '../../core/services/helper/auth-guard.service';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 
 const routes: Routes = [
     // Reference Data Categories List
