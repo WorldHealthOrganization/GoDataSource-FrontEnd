@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -13,7 +13,7 @@ import { CoreModule } from './core/core.module';
 @NgModule({
     imports: [
         BrowserModule,
-        BrowserAnimationsModule,
+        NoopAnimationsModule,
         RouterModule,
         routing,
         CoreModule,

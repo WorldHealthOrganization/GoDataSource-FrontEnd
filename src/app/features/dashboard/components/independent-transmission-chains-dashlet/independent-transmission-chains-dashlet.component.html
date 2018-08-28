@@ -1,6 +1,6 @@
-<app-dashboard-metric-dashlet
-    metricTitle="LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS"
-    link="/transmission-chains"
-    [queryParams]=""
+<app-dashboard-custom-metric-dashlet
+    [link]="'/transmission-chains'"
+    [params]=""
     [value]="independentTransmissionChainsCount">
-</app-dashboard-metric-dashlet>
+    {{ 'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS' | translate }}
+</app-dashboard-custom-metric-dashlet>
