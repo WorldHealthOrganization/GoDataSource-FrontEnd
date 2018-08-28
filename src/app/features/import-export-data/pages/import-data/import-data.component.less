@@ -56,6 +56,7 @@ app-import-data {
         @app-import-data-bg-color-hover: #CCC;
         .import-data-file-input {
             margin: 0;
+            padding: 0;
             cursor: pointer;
 
             .import-data-file-input-label {
@@ -64,11 +65,13 @@ app-import-data {
                 border-radius: 5px 0 0 5px;
                 border: @app-import-data-border;
                 font-weight: bold;
+                box-sizing: border-box;
             }
 
             .import-data-file-input-file {
                 padding: @app-import-data-padding;
                 border: @app-import-data-border;
+                box-sizing: border-box;
             }
 
             .import-data-file-input-browse {
@@ -77,6 +80,7 @@ app-import-data {
                 border-radius: 0 5px 5px 0;
                 border: @app-import-data-border;
                 font-weight: bold;
+                box-sizing: border-box;
 
                 &:hover {
                     background-color: @app-import-data-bg-color-hover;

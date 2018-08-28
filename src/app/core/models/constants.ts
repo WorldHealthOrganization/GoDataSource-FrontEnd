@@ -21,14 +21,6 @@ export enum ApplyListFilter {
     EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships'
 }
 
-/**
- * Import / Export Record Type
- */
-export enum ImportExportRecordType {
-    HIERARCHICAL_LOCATIONS = 'hierarchical-locations',
-    CASE_LAB_DATA = 'case-lab-data'
-}
-
 export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
@@ -56,9 +48,6 @@ export class Constants {
 
     // keep functionality
     static APPLY_LIST_FILTER = ApplyListFilter;
-
-    // import / export record types
-    static IMPORT_EXPORT_RECORD_TYPE = ImportExportRecordType;
 
     // list breadcrumbs
     static LIST_FILTER_TITLE = {

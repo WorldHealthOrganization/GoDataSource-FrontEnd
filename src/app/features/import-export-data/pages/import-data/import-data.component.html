@@ -76,7 +76,7 @@
                 class="button-primary"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()">
-                {{ (type === ImportExportRecordType.HIERARCHICAL_LOCATIONS ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
+                {{ (isOneStep ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
             </button>
         </div>
     </div>
