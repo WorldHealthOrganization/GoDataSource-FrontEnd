@@ -3,13 +3,10 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/filter';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as _ from 'lodash';
-import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -42,7 +39,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
 
     constructor(
-        private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,

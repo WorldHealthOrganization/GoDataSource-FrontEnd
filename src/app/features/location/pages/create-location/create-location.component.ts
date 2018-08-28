@@ -18,7 +18,7 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 })
 export class CreateLocationComponent implements OnInit {
     // breadcrumb header
-    public breadcrumb: BreadcrumbItemModel[] = [
+    public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LOCATIONS_TITLE',
             '/locations'
@@ -33,8 +33,8 @@ export class CreateLocationComponent implements OnInit {
         private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private route: ActivatedRoute,
-        private formHelper: FormHelperService
-    ) {}
+        private formHelper: FormHelperService) {
+    }
 
     ngOnInit() {
         // reload data
@@ -43,13 +43,14 @@ export class CreateLocationComponent implements OnInit {
                 // set parent
                 this.parentId = params.parentId;
 
-                // reset breadcrumbs
-                this.breadcrumb = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
-                    )
-                ];
+                if (!this.parentId) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_CREATE_LOCATION_TITLE',
+                            '/locations'
+                        )
+                    );
+                }
             });
     }
 
