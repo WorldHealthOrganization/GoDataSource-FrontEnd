@@ -4,6 +4,8 @@ app-import-data {
         height: @app-import-data-height;
         text-align: center;
 
+        @mat-spinner-width: 64px;
+        @mat-spinner-height: 64px;
         mat-spinner {
             display: inline-block;
             position: absolute;
@@ -11,12 +13,12 @@ app-import-data {
             bottom: 0;
             margin: auto;
             vertical-align: middle;
-            width: 64px !important;
-            height: 64px !important;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
 
             svg {
-                width: 64px !important;
-                height: 64px !important;
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
             }
         }
 
@@ -27,7 +29,7 @@ app-import-data {
             bottom: 0;
             margin: auto;
             vertical-align: middle;
-            width: 64px;
+            width: @mat-spinner-width;
             height: 18px;
         }
     }
