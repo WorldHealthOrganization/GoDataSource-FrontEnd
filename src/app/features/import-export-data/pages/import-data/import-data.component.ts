@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportExportRecordType } from '../../../../core/models/constants';
-import { FileItem, FileLikeObject, FileUploader, ParsedResponseHeaders } from 'ng2-file-upload';
+import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -15,12 +15,6 @@ import { CacheKey, CacheService } from '../../../../core/services/helper/cache.s
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent implements OnInit {
-    // 'text/csv': [ '.csv' ],
-    // 'application/vnd.ms-excel': [ '.xls' ],
-    // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [ '.xlsx' ],
-    // 'text/xml': [ '.xml' ],
-    // 'application/vnd.oasis.opendocument.spreadsheet': [ '.ods' ],
-    // 'application/json': [ '.json' ]
     private _importConfiguration: {
         [ importKey: string ]: {
             mimes: string[],
@@ -31,6 +25,7 @@ export class ImportDataComponent implements OnInit {
             executeBeforeRedirect?: () => void
         }
     } = {
+        // locations
         [ImportExportRecordType.HIERARCHICAL_LOCATIONS]: {
             mimes: [
                 'text/xml',
@@ -46,6 +41,29 @@ export class ImportDataComponent implements OnInit {
                 this.cacheService.remove(CacheKey.LOCATIONS);
             },
             listPageUrl: '/locations'
+        },
+
+        // case lab data
+        [ImportExportRecordType.CASE_LAB_DATA]: {
+            mimes: [
+                'text/csv',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'text/xml',
+                'application/vnd.oasis.opendocument.spreadsheet',
+                'application/json'
+            ],
+            extensions: [
+                '.csv',
+                '.xls',
+                '.xlsx',
+                '.xml',
+                '.ods',
+                '.json'
+            ],
+            title: 'LNG_PAGE_IMPORT_DATA_TITLE_CASE_LAB_DATA',
+            importFileUrl: '/outbreaks/{id}/importable-files',
+            listPageUrl: '/cases'
         }
     };
 
@@ -125,6 +143,9 @@ export class ImportDataComponent implements OnInit {
                     !Object.values(ImportExportRecordType).includes(this.type) ||
                     !this._importConfiguration[this.type]
                 ) {
+                    // display error
+                    this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_INVALID_IMPORT_TYPE');
+
                     // invalid - redirect
                     this.router.navigate(['/']);
                 }

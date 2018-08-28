@@ -340,6 +340,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT': 'Add',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Create Case Lab result page
@@ -406,7 +407,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
-        'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON': 'Import Locations',
+        'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
 
         /**
          * Create Location page
@@ -994,11 +995,13 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE': 'Drag & drop a file of the following types here: {{types}}',
         'LNG_PAGE_IMPORT_DATA_TITLE_LOCATIONS': 'Import Locations',
+        'LNG_PAGE_IMPORT_DATA_TITLE_CASE_LAB_DATA': 'Import Case Lab Data',
         'LNG_PAGE_IMPORT_DATA_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
         'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
         'LNG_PAGE_IMPORT_DATA_FILE_PROCESSED_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_IMPORT_TYPE': 'Invalid import type',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',

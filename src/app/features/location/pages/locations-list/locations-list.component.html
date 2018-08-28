@@ -8,12 +8,12 @@
             *ngIf="hasLocationWriteAccess()"
             class="topnav-actions">
             <button
-                *ngIf="!parentId"
+                *ngIf="!parentId && !appliedListFilter"
                 class="button-primary"
                 mat-raised-button
                 color="primary"
                 [routerLink]="['/import-export-data', Constants.IMPORT_EXPORT_RECORD_TYPE.HIERARCHICAL_LOCATIONS, 'import']">
-                {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
+                {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
             </button>
 
             <button

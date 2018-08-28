@@ -25,7 +25,8 @@ export enum ApplyListFilter {
  * Import / Export Record Type
  */
 export enum ImportExportRecordType {
-    HIERARCHICAL_LOCATIONS = 'hierarchical-locations'
+    HIERARCHICAL_LOCATIONS = 'hierarchical-locations',
+    CASE_LAB_DATA = 'case-lab-data'
 }
 
 export class Constants {
