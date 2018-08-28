@@ -937,11 +937,14 @@ export const EnglishUsLang = {
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES': 'Number of Cases',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE': 'Number of Alive Cases',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_LENGTH': 'Length',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_DURATION': 'Duration',
 
         /**
          * Transmission Chains List page
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
 
         /**
          * Side filter
