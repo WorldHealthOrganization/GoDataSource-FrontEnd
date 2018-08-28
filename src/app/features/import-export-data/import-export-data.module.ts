@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FileUploadModule } from 'ng2-file-upload';
 
 // modules
 import { routing } from './import-export.module.routing';
@@ -10,12 +11,12 @@ import * as fromPages from './pages';
 @NgModule({
     imports: [
         routing,
-        SharedModule
+        SharedModule,
+        FileUploadModule
     ],
     declarations: [
         ...fromPages.pageComponents
     ],
     entryComponents: []
 })
-export class ImportExportDataModule {
-}
+export class ImportExportDataModule { }

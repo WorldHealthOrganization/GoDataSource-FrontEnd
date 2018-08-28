@@ -1,0 +1,87 @@
+app-import-data {
+    @app-import-data-height: 240px;
+    .import-data-loading {
+        height: @app-import-data-height;
+        text-align: center;
+
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 64px !important;
+            height: 64px !important;
+
+            svg {
+                width: 64px !important;
+                height: 64px !important;
+            }
+        }
+
+        .import-data-loading-progress {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 64px;
+            height: 18px;
+        }
+    }
+
+    .import-data {
+        height: @app-import-data-height;
+
+        .import-data-drop-zone {
+            border: dotted 3px lightgray;
+            height: 100px;
+
+            &.import-data-file-over {
+                border: dotted 3px red;
+            }
+        }
+
+        .import-data-file-or {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        // variables
+        @app-import-data-border: 1px solid #CCC;
+        @app-import-data-padding: 10px;
+        @app-import-data-bg-color: #EEE;
+        @app-import-data-bg-color-hover: #CCC;
+        .import-data-file-input {
+            margin: 0;
+            cursor: pointer;
+
+            .import-data-file-input-label {
+                padding: @app-import-data-padding;
+                background-color: @app-import-data-bg-color;
+                border-radius: 5px 0 0 5px;
+                border: @app-import-data-border;
+                font-weight: bold;
+            }
+
+            .import-data-file-input-file {
+                padding: @app-import-data-padding;
+                border: @app-import-data-border;
+            }
+
+            .import-data-file-input-browse {
+                padding: @app-import-data-padding;
+                background-color: @app-import-data-bg-color;
+                border-radius: 0 5px 5px 0;
+                border: @app-import-data-border;
+                font-weight: bold;
+
+                &:hover {
+                    background-color: @app-import-data-bg-color-hover;
+                }
+            }
+        }
+    }
+}

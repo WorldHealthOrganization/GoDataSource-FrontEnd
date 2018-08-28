@@ -987,6 +987,22 @@ export const EnglishUsLang = {
          */
         'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
         'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
-        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses'
+        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+
+        /**
+         * Import page
+         */
+        'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE': 'Drag & drop a file of the following types here: {{types}}',
+        'LNG_PAGE_IMPORT_DATA_TITLE_LOCATIONS': 'Import Locations',
+        'LNG_PAGE_IMPORT_DATA_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
+        'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
+        'LNG_PAGE_IMPORT_DATA_FILE_PROCESSED_SUCCESS_MESSAGE': 'Data imported',
+        'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
+        'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file'
     }
 };

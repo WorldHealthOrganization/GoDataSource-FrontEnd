@@ -1,29 +1,83 @@
-<div class="page-content">
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
 
-    <mat-horizontal-stepper linear #stepper>
+<mat-card class="page-section page-content">
 
-        <!-- Select / Upload file -->
-        <mat-step [stepControl]="detailsForm">
-            <form #detailsForm="ngForm">
-                upload...
-                <div>
-                    <button mat-button matStepperNext>
-                        upload
-                    </button>
-                </div>
-            </form>
-        </mat-step>
+    <!-- Uploading / Saving data -->
+    <div
+        class="import-data-loading"
+        *ngIf="displayLoading">
+        <mat-spinner></mat-spinner>
+        <span
+            *ngIf="progress !== null"
+            class="import-data-loading-progress">
+            {{ progress }} %
+        </span>
+    </div>
 
-        <!-- Map fields -->
-        <mat-step [stepControl]="addressForm">
-            <form #addressForm="ngForm">
-                map fields..
-                <div>
-                    <button mat-button matStepperNext>
-                        import
-                    </button>
-                </div>
-            </form>
-        </mat-step>
-    </mat-horizontal-stepper>
-</div>
+    <!-- Select / Upload file -->
+    <div
+        *ngIf="!displayLoading"
+        fxFlex fxLayout="column" fxLayoutGap="12px"
+        class="import-data">
+        <div>
+            <input
+                hidden
+                #importDataBtn
+                type="file"
+                ng2FileSelect
+                [uploader]="uploader"
+                [accept]="allowedExtensions"/>
+
+            <div
+                fxFlex fxLayoutAlign="center center"
+                class="import-data-drop-zone"
+                [class.import-data-file-over]="hasFileOver"
+                ng2FileDrop
+                [uploader]="uploader"
+                (fileOver)="hoverDropZone($event)"
+                (click)="importDataBtn.click()">
+                {{ 'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE' | translate:translationData }}
+            </div>
+        </div>
+
+        <div
+            class="import-data-file-or">
+            {{ 'LNG_PAGE_IMPORT_DATA_LABEL_OR' | translate }}
+        </div>
+
+        <div
+            class="import-data-file-input"
+            fxFlex fxLayout="row"
+            (click)="importDataBtn.click()">
+            <div
+                class="import-data-file-input-label">
+                {{ title | translate:translationData }}
+            </div>
+            <div
+                fxFlex
+                class="import-data-file-input-file">
+                {{ uploader?.queue.length > 0 ? uploader.queue[0].file.name : ('LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE' | translate) }}
+            </div>
+            <div
+                class="import-data-file-input-browse">
+                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE' | translate }}
+            </div>
+        </div>
+
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="end">
+            <button
+                mat-raised-button
+                color="primary"
+                class="button-primary"
+                [disabled]="!uploader || uploader.queue.length < 1"
+                (click)="uploadFile()">
+                {{ (type === ImportExportRecordType.HIERARCHICAL_LOCATIONS ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
+            </button>
+        </div>
+    </div>
+</mat-card>
