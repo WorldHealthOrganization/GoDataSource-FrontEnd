@@ -3,6 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
+import { ImportableFileModel } from './importable-file.model';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -83,7 +84,7 @@ export class ImportDataComponent implements OnInit {
     // handle upload files
     uploader: FileUploader;
 
-    // file over dropzone
+    // file over drop-zone
     hasFileOver: boolean = false;
 
     translationData: {
@@ -109,6 +110,8 @@ export class ImportDataComponent implements OnInit {
     get importFileUrl(): string {
         return this._importFileUrl;
     }
+
+    importableObject: ImportableFileModel;
 
     /**
      * Constructor
@@ -156,10 +159,7 @@ export class ImportDataComponent implements OnInit {
         this.uploader.onAfterAddingAll = (files: any[]) => {
             if (files.length > 1) {
                 // display error
-                this.snackbarService.showError(
-                    'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED',
-                    this.translationData
-                );
+                this.displayError('LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED');
 
                 // remove all items
                 this.uploader.clearQueue();
@@ -181,31 +181,21 @@ export class ImportDataComponent implements OnInit {
             switch (filter.name) {
                 case 'mimeType':
                     // display error
-                    this.snackbarService.showError(
-                        'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED',
-                        this.translationData
-                    );
+                    this.displayError('LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED');
                     break;
                 default:
                     // display error
-                    this.snackbarService.showError(
-                        'LNG_PAGE_IMPORT_DATA_ERROR_DEFAULT_ATTACH',
-                        this.translationData
-                    );
+                    this.displayError('LNG_PAGE_IMPORT_DATA_ERROR_DEFAULT_ATTACH');
             }
         };
 
         // handle server errors
         this.uploader.onErrorItem = () => {
             // display error
-            this.snackbarService.showError(
+            this.displayError(
                 'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
-                this.translationData
+                true
             );
-
-            // display form
-            this.displayLoading = false;
-            this.progress = null;
         };
 
         // handle file upload progress
@@ -231,10 +221,62 @@ export class ImportDataComponent implements OnInit {
                 // emit finished event - event should handle redirect
                 this.finished.emit();
             } else {
-                // #TODO
-                // this logic will be back on case lab
+                // we should get a ImportableFileModel object
+                let jsonResponse;
+                try { jsonResponse = JSON.parse(response); } catch {}
+                if (
+                    !response ||
+                    !jsonResponse
+                ) {
+                    this.displayError(
+                        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER',
+                        true
+                    );
+                    return;
+                }
+
+                // construct importable file object
+                this.importableObject = new ImportableFileModel(jsonResponse);
+
+                // we should have at least the headers of the file
+                if (this.importableObject.fileHeaders.length < 1) {
+                    this.importableObject = null;
+
+                    this.displayError(
+                        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS',
+                        true
+                    );
+
+                    return;
+                }
+
+                // display form
+                this.displayLoading = false;
+                this.progress = null;
             }
         };
+    }
+
+    /**
+     * Display error
+     * @param messageToken
+     */
+    private displayError(
+        messageToken: string,
+        hideLoading: boolean = false
+    ) {
+        // display toast
+        this.snackbarService.showError(
+            messageToken,
+            this.translationData
+        );
+
+        // hide loading ?
+        if (hideLoading) {
+            // display form
+            this.displayLoading = false;
+            this.progress = null;
+        }
     }
 
     /**

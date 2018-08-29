@@ -999,6 +999,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
         'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',

@@ -14,7 +14,7 @@
 
     <!-- Select / Upload file -->
     <div
-        *ngIf="!displayLoading"
+        *ngIf="!displayLoading && !importableObject"
         fxFlex fxLayout="column" fxLayoutGap="12px"
         class="import-data">
         <div>
@@ -73,5 +73,11 @@
                 {{ (isOneStep ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
             </button>
         </div>
+    </div>
+
+    <!-- Map fields -->
+    <div
+        *ngIf="!displayLoading && importableObject">
+        Map fields...
     </div>
 </mat-card>
