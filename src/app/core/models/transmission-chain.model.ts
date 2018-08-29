@@ -25,9 +25,12 @@ export class TransmissionChainModel {
     relationships: RelationshipModel[];
     // whether the Chain is active or inactive
     active: boolean;
+    // duration of the chain ( no of days )
+    duration: number;
 
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
+        this.duration = _.get(chainData, 'period.duration', 0);
 
         const chainRelationsData = _.get(chainData, 'chain', []);
 
@@ -60,6 +63,15 @@ export class TransmissionChainModel {
         this.relationships = _.map(relationshipsData, (relData) => {
             return new RelationshipModel(relData);
         });
+
+    }
+
+    /**
+     * Length of the chain - number of relations
+     * @returns {number}
+     */
+    get length(): number {
+        return this.chainRelations ? this.chainRelations.length : 0;
     }
 
     /**
@@ -89,10 +101,12 @@ export class TransmissionChainModel {
         return _.find(this.relationships, (relationship: RelationshipModel) => {
             const persons = relationship.persons;
 
+            // verify the 2 persons to be cases and at least one of them to be in the list of cases for this specific chain.
             return (
                 persons.length === 2 &&
                 persons[0].type === EntityType.CASE &&
-                persons[1].type === EntityType.CASE
+                persons[1].type === EntityType.CASE &&
+                this.casesMap[persons[0].id]
             );
         });
     }
