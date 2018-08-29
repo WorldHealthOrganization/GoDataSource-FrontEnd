@@ -1,7 +1,7 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AuthGuard } from '../../core/services/helper/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 
 import * as fromPages from './pages';
 
