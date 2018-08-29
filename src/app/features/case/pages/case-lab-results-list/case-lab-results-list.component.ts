@@ -9,7 +9,6 @@ import { ActivatedRoute } from '@angular/router';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { Observable } from 'rxjs/Observable';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -40,7 +39,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     labResultsList$: Observable<LabResultModel[]>;
 
     // constants
-    Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(

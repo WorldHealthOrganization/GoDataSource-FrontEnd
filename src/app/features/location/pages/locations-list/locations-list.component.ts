@@ -45,7 +45,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private snackbarService: SnackbarService
     ) {
         super();
-      }
+    }
 
     ngOnInit() {
         // get the authenticated user

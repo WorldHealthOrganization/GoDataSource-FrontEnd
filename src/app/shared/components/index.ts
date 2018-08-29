@@ -29,11 +29,26 @@ export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
 export const components: any[] = [
+    // popups
     SnackbarComponent,
+
+    // main layout
     TopnavComponent,
     BreadcrumbsComponent,
+    SideFiltersComponent,
+
+    // dashboard
+    DashboardCustomMetricDashletComponent,
+    CytoscapeGraphComponent,
+
+    // google
+    GoogleMapComponent,
+    GoogleMapMovementComponent,
+
+    // authentication - #TODO - this needs to be refactored & removed
     NotAuthTemplateComponent,
-    DialogComponent,
+
+    // inputs
     FormAddressComponent,
     FormAddressListComponent,
     FormDocumentComponent,
@@ -43,13 +58,13 @@ export const components: any[] = [
     FormRelationshipComponent,
     FormInputListComponent,
     FormLocationDropdownComponent,
-    SideFiltersComponent,
+    FormFillQuestionnaireComponent,
+
+    // display information
     CountedItemsListComponent,
     YesNoLabelComponent,
-    FormFillQuestionnaireComponent,
     ReferenceDataLabelComponent,
-    CytoscapeGraphComponent,
-    DashboardCustomMetricDashletComponent,
-    GoogleMapComponent,
-    GoogleMapMovementComponent
+
+    // dialogs
+    DialogComponent
 ];
