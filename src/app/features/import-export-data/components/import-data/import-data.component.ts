@@ -97,7 +97,24 @@ export class ImportDataComponent implements OnInit {
     constructor(
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {}
+    ) {
+        // fix mime issue
+        if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
+            (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;
+            FileLikeObject.prototype._createFromObject = (file: File) => {
+                (FileLikeObject.prototype as any)._createFromObjectPrev({
+                    size: file.size,
+                    type: file.type ?
+                        file.type : (
+                            file.name && file.name.lastIndexOf('.') > -1 ?
+                                this.allowedMimeTypesMap[file.name.substr(file.name.lastIndexOf('.')).toLowerCase()] :
+                                ''
+                        ),
+                    name: file.name
+                });
+            };
+        }
+    }
 
     /**
      * Component initialized
