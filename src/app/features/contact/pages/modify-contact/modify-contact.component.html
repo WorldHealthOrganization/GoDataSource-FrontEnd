@@ -204,7 +204,7 @@
 
         <button *ngIf="viewOnly && hasContactWriteAccess()"
                 mat-raised-button color="primary" class="button-primary"
-                [routerLink]="['/cases', contactData.id, 'modify']">
+                [routerLink]="['/contacts', contactData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
