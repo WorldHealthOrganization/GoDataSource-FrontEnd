@@ -11,6 +11,7 @@ import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { MglTimelineModule } from 'angular-mgl-timeline';
 
 @NgModule({
     imports: [
@@ -21,7 +22,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
         FlexLayoutModule,
         XtFormsModule,
         AngularMaterialModule,
-        TranslateModule
+        TranslateModule,
+        MglTimelineModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -38,6 +40,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
         TranslateModule,
         XtFormsModule,
         AngularMaterialModule,
+        MglTimelineModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components,
