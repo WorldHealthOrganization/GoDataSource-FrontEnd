@@ -325,15 +325,11 @@ export class ListFilterDataService {
         return filterQueryBuilder;
     }
 
-    // /**
-    //  * Create the query builder for filtering the list of contacts who were seen in each day
-    //  * @returns {RequestQueryBuilder}
-    //  */
-    // filterContactsSeen(date): RequestQueryBuilder {
-    //     const qb = new RequestQueryBuilder();
-    //     qb.filter.where(
-    //
-    //     );
-    //
-    // }
+    /**
+     * Create the query builder for filtering the list of contacts who were seen in each day
+     * @returns {RequestQueryBuilder}
+     */
+    filterContactsSeen(date) {
+        console.log('to debug', date);
+    }
 }

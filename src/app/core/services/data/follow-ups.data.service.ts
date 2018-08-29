@@ -233,5 +233,12 @@ export class FollowUpsDataService {
             MetricContactsLostToFollowUpModel
         );
     }
+
+    /**
+     * Retrieve the list of new Contacts who were seen each day
+     * @param {string} outbreakId
+     * @returns {Observable<ExposureTypeGroupModel>}
+     */
+
 }
 

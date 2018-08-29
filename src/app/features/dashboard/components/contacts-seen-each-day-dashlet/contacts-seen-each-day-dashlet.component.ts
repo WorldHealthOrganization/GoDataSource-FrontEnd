@@ -70,12 +70,12 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     }
 
     updateValues () {
-        // // get the results for contacts seen
-        // const qb = this.listFilterDataService.filterContactsSeen(this.date);
-        //
-        // this.contactDataService.getNumberOfContactsSeenEachDay(this.selectedOutbreakId, qb)
-        //     .subscribe((result) => {
-        //         console.log(result);
-        //     });
+        // get the results for contacts seen
+        const qb = this.listFilterDataService.filterContactsSeen(this.date);
+
+        this.contactDataService.getNumberOfContactsSeenEachDay(this.selectedOutbreakId, qb)
+            .subscribe((result) => {
+                console.log(result);
+            });
     }
 }
