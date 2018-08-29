@@ -1,6 +1,16 @@
 // filter operations
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
+
+// value types
+enum ValueType {
+    STRING = 'string',
+    SELECT = 'select',
+    RANGE_NUMBER = 'range_number',
+    RANGE_DATE = 'range_date',
+    LAT_LNG_WITHIN = 'address_within'
+}
 
 // filter types
 export enum FilterType {
@@ -14,8 +24,10 @@ export enum FilterType {
 
 // comparator types
 export enum FilterComparator {
+    NONE = 'none',
     TEXT_STARTS_WITH = 'start_with',
     IS = 'is',
+    CONTAINS_TEXT = 'contains_text',
     BETWEEN = 'between',
     BEFORE = 'before',
     AFTER = 'after',
@@ -103,67 +115,96 @@ export class FilterModel {
 // Model for Applied Filter
 export class AppliedFilterModel {
     // allowed comparators accordingly with filter type
-    public allowedComparators = {
+    public allowedComparators: {
+        [key: string]: {
+            label?: string,
+            value: FilterComparator,
+            valueType: ValueType
+        }[]
+    } = {
         // text
         [FilterType.TEXT]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH',
-            value: FilterComparator.TEXT_STARTS_WITH
+            value: FilterComparator.TEXT_STARTS_WITH,
+            valueType: ValueType.STRING
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
-            value: FilterComparator.IS
+            value: FilterComparator.IS,
+            valueType: ValueType.STRING
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT',
+            value: FilterComparator.CONTAINS_TEXT,
+            valueType: ValueType.STRING
         }],
 
         // select
-        [FilterType.SELECT]: [],
+        [FilterType.SELECT]: [{
+            value: FilterComparator.NONE,
+            valueType: ValueType.SELECT
+        }],
 
         // multi-select
-        [FilterType.MULTISELECT]: [],
+        [FilterType.MULTISELECT]: [{
+            value: FilterComparator.NONE,
+            valueType: ValueType.SELECT
+        }],
 
         // range number
         [FilterType.RANGE_NUMBER]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
-            value: FilterComparator.BETWEEN
+            value: FilterComparator.BETWEEN,
+            valueType: ValueType.RANGE_NUMBER
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
-            value: FilterComparator.BEFORE
+            value: FilterComparator.BEFORE,
+            valueType: ValueType.RANGE_NUMBER
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
-            value: FilterComparator.AFTER
+            value: FilterComparator.AFTER,
+            valueType: ValueType.RANGE_NUMBER
         }],
 
         // range date
         [FilterType.RANGE_DATE]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
-            value: FilterComparator.BETWEEN
+            value: FilterComparator.BETWEEN,
+            valueType: ValueType.RANGE_DATE
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE',
-            value: FilterComparator.BEFORE
+            value: FilterComparator.BEFORE,
+            valueType: ValueType.RANGE_DATE
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER',
-            value: FilterComparator.AFTER
+            value: FilterComparator.AFTER,
+            valueType: ValueType.RANGE_DATE
         }],
 
         // address
         [FilterType.ADDRESS]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
-            value: FilterComparator.CONTAINS
+            value: FilterComparator.CONTAINS,
+            valueType: ValueType.STRING
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
-            value: FilterComparator.LOCATION
+            value: FilterComparator.LOCATION,
+            valueType: ValueType.SELECT
         }, {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
-            value: FilterComparator.WITHIN
+            value: FilterComparator.WITHIN,
+            valueType: ValueType.LAT_LNG_WITHIN
         }]
     };
 
     // default comparators
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
+        [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
         [FilterType.ADDRESS]: FilterComparator.CONTAINS
     };
 
     // applied filter
+    private _previousFilter: FilterModel;
     private _filter: FilterModel;
     public get filter(): FilterModel {
         return this._filter;
@@ -171,9 +212,6 @@ export class AppliedFilterModel {
     public set filter(value: FilterModel) {
         // set filter
         this._filter = value;
-
-        // reset value
-        this.value = null;
 
         // determine the default comparator
         this.comparator = this.defaultComparator[this.filter.type] ?
@@ -183,22 +221,60 @@ export class AppliedFilterModel {
                     this.allowedComparators[this.filter.type][0].value :
                     null
             );
+
+        // reset value if necessary
+        this.resetValueIfNecessary();
     }
 
     // selected value for the filter
     public value: any;
 
     // selected comparator
+    private _previousComparator: FilterComparator;
     private _comparator: FilterComparator;
     public set comparator(value: FilterComparator) {
         // set comparator
         this._comparator = value;
 
-        // reset value
-        this.value = null;
+        // reset value if necessary
+        this.resetValueIfNecessary();
     }
     public get comparator(): FilterComparator {
         return this._comparator;
+    }
+
+    /**
+     * Reset value if necessary
+     */
+    private resetValueIfNecessary() {
+        // no previous filter ?
+        if (!this._previousFilter) { this._previousFilter = _.cloneDeep(this.filter); }
+        if (!this._previousComparator) { this._previousComparator = _.cloneDeep(this.comparator); }
+
+        // reset value only if necessary
+        if (
+            this.filter &&
+            this.comparator
+        ) {
+            const prevVT = _.find(this.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
+            const currentVT = _.find(this.allowedComparators[this.filter.type], { value: this.comparator });
+            if (
+                prevVT &&
+                currentVT &&
+                prevVT.valueType === currentVT.valueType
+            ) {
+                // don't reset value
+                // NOTHING TO DO
+            } else {
+                this.value = null;
+            }
+        } else {
+            this.value = null;
+        }
+
+        // set previous values
+        this._previousFilter = _.cloneDeep(this.filter);
+        this._previousComparator = _.cloneDeep(this.comparator);
     }
 
     /**
