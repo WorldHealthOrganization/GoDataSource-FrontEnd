@@ -25,16 +25,12 @@ export class TransmissionChainModel {
     relationships: RelationshipModel[];
     // whether the Chain is active or inactive
     active: boolean;
-    // length of the chain
-    length: number;
     // duration of the chain ( no of days )
     duration: number;
 
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
         this.duration = _.get(chainData, 'period.duration', 0);
-        this.length = chainData.chain.length;
-
 
         const chainRelationsData = _.get(chainData, 'chain', []);
 
@@ -68,6 +64,14 @@ export class TransmissionChainModel {
             return new RelationshipModel(relData);
         });
 
+    }
+
+    /**
+     * Length of the chain - number of relations
+     * @returns {number}
+     */
+    get length(): number {
+        return this.chainRelations ? this.chainRelations.length : 0;
     }
 
     /**
