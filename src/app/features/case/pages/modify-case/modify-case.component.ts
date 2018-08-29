@@ -20,7 +20,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
 
-
 @Component({
     selector: 'app-modify-case',
     encapsulation: ViewEncapsulation.None,
@@ -146,5 +145,4 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.router.navigate(['/cases']);
             });
     }
-
 }

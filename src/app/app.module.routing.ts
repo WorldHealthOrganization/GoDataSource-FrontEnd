@@ -1,13 +1,13 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { AuthGuard } from './core/services/helper/auth-guard.service';
+import { AuthGuard } from './core/services/guards/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
 
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
 import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
-import { PasswordChangeGuard } from './core/services/helper/password-change-guard.service';
+import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 
 const routes: Routes = [
     // Authentication Module routes
@@ -130,7 +130,10 @@ const routes: Routes = [
             {
                 path: ModulePath.LocationModule,
                 loadChildren: './features/location/location.module#LocationModule',
-                canActivate: [AuthGuard],
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }

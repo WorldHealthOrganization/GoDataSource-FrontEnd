@@ -21,12 +21,15 @@ export class DialogService {
     ) {}
 
     /**
-     * * Show a Confirm Dialog
+     * Show a Confirm Dialog
      * @param {DialogConfiguration | string} messageToken - Can be either a message ( string ) or an object of type DialogConfiguration
      * @param {{}} translateData
-     * @returns {Observable<any>}
+     * @returns {Observable<DialogAnswer>}
      */
-    showConfirm(messageToken: DialogConfiguration | string, translateData = {}) {
+    showConfirm(
+        messageToken: DialogConfiguration | string,
+        translateData = {}
+    ): Observable<DialogAnswer> {
         // construct dialog message data
         const dialogMessage = DialogComponent.defaultConfigWithData(messageToken);
         (dialogMessage.data as DialogConfiguration).translateData = translateData;
@@ -45,9 +48,11 @@ export class DialogService {
      * @param {{}} translateData
      * @returns {Observable<DialogAnswer>}
      */
-    showInput(messageToken: DialogConfiguration | string,
-              required: boolean = true,
-              translateData = {}): Observable<DialogAnswer> {
+    showInput(
+        messageToken: DialogConfiguration | string,
+        required: boolean = true,
+        translateData = {}
+    ): Observable<DialogAnswer> {
         // create input dialog configuration
         let dialogConf: DialogConfiguration = null;
         if (_.isString(messageToken)) {
