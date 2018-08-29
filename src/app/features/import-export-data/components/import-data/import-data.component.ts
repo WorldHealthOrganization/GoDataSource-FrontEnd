@@ -13,6 +13,13 @@ export enum ImportDataExtension {
     JSON = '.json'
 }
 
+export enum ImportServerModelNames {
+    CASE_LAB_RESULTS = 'labResult',
+    OUTBREAK = 'outbreak',
+    CASE = 'case',
+    CONTACT = 'contact'
+}
+
 @Component({
     selector: 'app-import-data',
     encapsulation: ViewEncapsulation.None,
@@ -58,6 +65,20 @@ export class ImportDataComponent implements OnInit {
      * Tell system if this doesn't need to go through map step, uploading file is enough
      */
     @Input() isOneStep: boolean = false;
+
+    /**
+     * Model provided to import for input
+     */
+    private _model: string = undefined;
+    @Input() set model(value: string) {
+        this._model = value;
+        if (this.uploader) {
+            this.uploader.options.additionalParameter.model = this._model;
+        }
+    }
+    get model(): string {
+        return this._model;
+    }
 
     // handle upload files
     uploader: FileUploader;
@@ -124,7 +145,10 @@ export class ImportDataComponent implements OnInit {
         this.uploader = new FileUploader({
             allowedMimeType: this.allowedMimeTypes,
             authToken: this.authDataService.getAuthToken(),
-            url: `${environment.apiUrl}/${this.importFileUrl}`
+            url: `${environment.apiUrl}/${this.importFileUrl}`,
+            additionalParameter: {
+                model: this._model
+            }
         });
 
         // don't allow multiple files to be added
