@@ -28,5 +28,49 @@ export class ClusterDataService {
             ClusterModel
         );
     }
+
+    /**
+     * Retrieve a Cluster of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} clusterId
+     * @returns {Observable<ClusterModel>}
+     */
+    getCluster(outbreakId: string, clusterId: string): Observable<ClusterModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/clusters/${clusterId}`),
+            ClusterModel
+        );
+    }
+
+    /**
+     * Add a new Cluster for an Outbreak
+     * @param {string} outbreakId
+     * @param clusterData
+     * @returns {Observable<any>}
+     */
+    createCluster(outbreakId: string, clusterData): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/clusters`, clusterData);
+    }
+
+    /**
+     * Modify an existing Cluster of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} clusterId
+     * @param clusterData
+     * @returns {Observable<any>}
+     */
+    modifyCluster(outbreakId: string, clusterId: string, clusterData): Observable<any> {
+        return this.http.put(`outbreaks/${outbreakId}/clusters/${clusterId}`, clusterData);
+    }
+
+    /**
+     * Delete an existing Cluster of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} clusterId
+     * @returns {Observable<any>}
+     */
+    deleteCluster(outbreakId: string, clusterId: string): Observable<any> {
+        return this.http.delete(`outbreaks/${outbreakId}/clusters/${clusterId}`);
+    }
 }
 
