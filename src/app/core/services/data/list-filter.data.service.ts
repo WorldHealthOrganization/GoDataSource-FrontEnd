@@ -12,6 +12,7 @@ import * as moment from 'moment';
 import { DateRangeModel } from '../../models/date-range.model';
 import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
+import { ContactDataService } from './contact.data.service';
 
 @Injectable()
 export class ListFilterDataService {
@@ -20,7 +21,8 @@ export class ListFilterDataService {
         private outbreakDataService: OutbreakDataService,
         private followUpDataService: FollowUpsDataService,
         private genericDataService: GenericDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private contactDataService: ContactDataService
     ) {}
 
 
@@ -322,4 +324,16 @@ export class ListFilterDataService {
         );
         return filterQueryBuilder;
     }
+
+    // /**
+    //  * Create the query builder for filtering the list of contacts who were seen in each day
+    //  * @returns {RequestQueryBuilder}
+    //  */
+    // filterContactsSeen(date): RequestQueryBuilder {
+    //     const qb = new RequestQueryBuilder();
+    //     qb.filter.where(
+    //
+    //     );
+    //
+    // }
 }

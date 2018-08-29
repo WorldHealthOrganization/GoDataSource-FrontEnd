@@ -1,0 +1,18 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="'/contacts'"
+    [params]=""
+    [value]="contactsSeenEachDay">
+
+
+    <app-form-datepicker
+        fxFlexOffset="5px"
+        name="dateFilter"
+        [ngModel]="date"
+        (optionChanged)="onDateChanged($event)">
+    </app-form-datepicker>
+
+    <div>
+        {{ 'LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY' | translate}}
+    </div>
+
+</app-dashboard-custom-metric-dashlet>

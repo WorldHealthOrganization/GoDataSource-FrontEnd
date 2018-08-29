@@ -108,5 +108,3 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
     }
 
 }
-
-

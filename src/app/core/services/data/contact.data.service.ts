@@ -84,5 +84,15 @@ export class ContactDataService {
             ExposureTypeGroupModel
         );
     }
+
+    /**
+     * Retrieve the list of new Contacts who were seen each day
+     * @param {string} outbreakId
+     * @returns {Observable<ExposureTypeGroupModel>}
+     */
+    getNumberOfContactsSeenEachDay(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-seen/count?filter=${filter}`);
+    }
 }
 
