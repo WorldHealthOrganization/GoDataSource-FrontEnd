@@ -77,7 +77,129 @@
 
     <!-- Map fields -->
     <div
-        *ngIf="!displayLoading && importableObject">
-        Map fields...
+        *ngIf="!displayLoading && importableObject"
+        fxFlex fxLayout="column" fxLayoutGap="30px"
+        class="import-data-map-fields">
+        <form #form="ngForm">
+            <div
+                fxFlex fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex>
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
+                </div>
+                <div fxFlex>
+                    {{ 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION' | translate }}
+                </div>
+                <div fxFlex="70px">
+                    <!-- placeholder -->
+                </div>
+            </div>
+            <div
+                *ngFor="let item of mappedFields; let indexMapField = index;">
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <app-form-select
+                        [name]="'mapObject[' + indexMapField + '][source]'"
+                        app-unique-validator="\]\[source\]$"
+                        [(ngModel)]="item.sourceField"
+                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                        [options]="importableObject.fileHeadersKeyValue"
+                        (optionChanged)="addMapOptionsIfNecessary(item)">
+                    </app-form-select>
+
+                    <app-form-select
+                        [name]="'mapObject[' + indexMapField + '][destination]'"
+                        [(ngModel)]="item.destinationField"
+                        [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                        [options]="importableObject.modelPropertiesKeyValue"
+                        (optionChanged)="addMapOptionsIfNecessary(item)">
+                    </app-form-select>
+
+                    <div
+                        fxFlex="70px">
+                        <button
+                            mat-icon-button
+                            color="warn"
+                            (click)="removeFieldMap(indexMapField)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div
+                    *ngIf="
+                        importableObject.modelPropertyValues &&
+                        importableObject.modelPropertyValues[item.destinationField] &&
+                        importableObject.distinctFileColumnValuesKeyValue &&
+                        importableObject.distinctFileColumnValuesKeyValue[item.sourceField]
+                    "
+                    class="import-data-map-fields-children">
+                    <div
+                        *ngFor="let mappedOpt of item.mappedOptions; let indexMapOption = index"
+                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        <app-form-select
+                            [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][sourceOption]'"
+                            app-unique-validator
+                            [appUniqueValidatorExpression]="'\\[' + indexMapField + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
+                            [(ngModel)]="mappedOpt.sourceOption"
+                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
+                            [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceField]">
+                        </app-form-select>
+
+                        <app-form-select
+                            [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][destinationOption]'"
+                            [(ngModel)]="mappedOpt.destinationOption"
+                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                            [options]="importableObject.modelPropertyValues[item.destinationField]"
+                            optionValueKey="id">
+                        </app-form-select>
+
+                        <div fxFlex="70px">
+                            <button
+                                mat-icon-button
+                                color="warn"
+                                (click)="removeOptionMap(indexMapField, indexMapOption)">
+                                <span class="xt-icon">delete</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        fxFlex fxLayout="row" fxLayoutAlign="center">
+                        <button
+                            *ngIf="importableObject.distinctFileColumnValuesKeyValue[item.sourceField] &&
+                                item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceField].length"
+                            mat-raised-button
+                            color="primary"
+                            class="button-primary"
+                            (click)="addNewOptionMap(indexMapField)">
+                            <span class="xt-icon">addCircle</span>
+                            {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                fxFlex fxLayout="row" fxLayoutAlign="center">
+                <button
+                    *ngIf="mappedFields.length < importableObject.fileHeadersKeyValue.length"
+                    mat-raised-button
+                    color="primary"
+                    class="button-primary"
+                    (click)="addNewFieldMap()">
+                    <span class="xt-icon">addCircle</span>
+                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate }}
+                </button>
+            </div>
+
+            <div
+                fxFlex fxLayout="row" fxLayoutAlign="end">
+                <button
+                    mat-raised-button
+                    color="primary"
+                    class="button-primary">
+                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
+                </button>
+            </div>
+        </form>
     </div>
 </mat-card>

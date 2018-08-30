@@ -101,6 +101,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
+        'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
 
         /**
          * Login page
@@ -1007,6 +1008,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
         'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
 
         /**
          * Import hierarchical locations

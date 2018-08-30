@@ -3,7 +3,11 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel } from './importable-file.model';
+import { ImportableFileModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import * as _ from 'lodash';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -91,8 +95,17 @@ export class ImportDataComponent implements OnInit {
         types?: string
     } = {};
 
-    @Input() displayLoading: boolean = false;
     progress: number = null;
+    private _displayLoading: boolean = false;
+    private _displayLoadingLocked: boolean = false;
+    @Input() set displayLoading(value: boolean) {
+        if (!this._displayLoadingLocked) {
+            this._displayLoading = value;
+        }
+    }
+    get displayLoading(): boolean {
+        return this._displayLoading;
+    }
 
     @Input() importSuccessMessage: string = 'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE';
 
@@ -113,6 +126,8 @@ export class ImportDataComponent implements OnInit {
 
     importableObject: ImportableFileModel;
 
+    mappedFields: ImportableMapField[] = [];
+
     /**
      * Constructor
      * @param router
@@ -120,7 +135,9 @@ export class ImportDataComponent implements OnInit {
      */
     constructor(
         private snackbarService: SnackbarService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -236,7 +253,12 @@ export class ImportDataComponent implements OnInit {
                 }
 
                 // construct importable file object
-                this.importableObject = new ImportableFileModel(jsonResponse);
+                this.importableObject = new ImportableFileModel(
+                    jsonResponse,
+                    (token: string): string => {
+                        return this.i18nService.instant(token);
+                    }
+                );
 
                 // we should have at least the headers of the file
                 if (this.importableObject.fileHeaders.length < 1) {
@@ -250,11 +272,69 @@ export class ImportDataComponent implements OnInit {
                     return;
                 }
 
+                // populate deducted mappings
+                _.each(this.importableObject.suggestedFieldMapping, (destinationField: string, sourceField: string) => {
+                    // create new possible map item
+                    const importableItem = new ImportableMapField(
+                        destinationField,
+                        sourceField
+                    );
+
+                    // add options if necessary
+                    this.addMapOptionsIfNecessary(importableItem);
+
+                    // add to list
+                    this.mappedFields.push(importableItem);
+                });
+
+// #TODO REMOVE ME
+console.log(this.importableObject);
+// #TODO END OF REMOVE ME
+
                 // display form
-                this.displayLoading = false;
+                this._displayLoading = false;
+                this._displayLoadingLocked = false;
                 this.progress = null;
             }
         };
+    }
+
+    /**
+     * Add drop-downs for mapping a drop-down type options
+     * @param importableItem
+     */
+    addMapOptionsIfNecessary(importableItem: ImportableMapField) {
+        // add all distinct source as items that we need to map
+        importableItem.mappedOptions = [];
+        const distinctValues: string[] = _.get(this.importableObject, `distinctFileColumnValuesKeyValue.${importableItem.sourceField}`, []);
+        _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
+            // create map option with source
+            const mapOpt: {
+                sourceOption: string,
+                destinationOption?: string
+            } = {
+                sourceOption: distinctVal.value
+            };
+
+            // check if we can find a proper destination option
+            const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
+            const destinationOpt = _.chain(this.importableObject)
+                .get(`modelPropertyValues.${importableItem.destinationField}`, [])
+                .find((modelItem: { id: string, label: string }) => {
+                    return sourceOptReduced === _.camelCase(this.i18nService.instant(modelItem.label)).toLowerCase() ||
+                        sourceOptReduced === _.camelCase(modelItem.id).toLowerCase() ||
+                        sourceOptReduced === _.camelCase(modelItem.label).toLowerCase();
+                })
+                .value();
+
+            // found a possible destination field
+            if (destinationOpt !== undefined) {
+                mapOpt.destinationOption = destinationOpt.id;
+            }
+
+            // add option
+            importableItem.mappedOptions.push(mapOpt);
+        });
     }
 
     /**
@@ -274,7 +354,8 @@ export class ImportDataComponent implements OnInit {
         // hide loading ?
         if (hideLoading) {
             // display form
-            this.displayLoading = false;
+            this._displayLoading = false;
+            this._displayLoadingLocked = false;
             this.progress = null;
         }
     }
@@ -292,10 +373,53 @@ export class ImportDataComponent implements OnInit {
      */
     public uploadFile() {
         // display loading
-        this.displayLoading = true;
+        this._displayLoading = true;
+        this._displayLoadingLocked = true;
         this.progress = 0;
 
         // start uploading data - upload all not working if an error occurred when trying to upload this file, so we couldn't try again
         this.uploader.queue[0].upload();
+    }
+
+    /**
+     * Add new field map
+     */
+    addNewFieldMap() {
+        // add new item
+        this.mappedFields.push(new ImportableMapField());
+    }
+
+    /**
+     * Add new field map option
+     */
+    addNewOptionMap(indexMapField: number) {
+        // add new item
+        this.mappedFields[indexMapField].mappedOptions.push({});
+    }
+
+    /**
+     * Remove field map
+     */
+    removeFieldMap(index: number) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // remove item
+                    this.mappedFields.splice(index, 1);
+                }
+            });
+    }
+
+    /**
+     * Remove field map option
+     */
+    removeOptionMap(indexMapField: number, indexMapOption: number) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // remove item
+                    this.mappedFields[indexMapField].mappedOptions.splice(indexMapOption, 1);
+                }
+            });
     }
 }
