@@ -92,13 +92,32 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 type: FilterType.ADDRESS
             }),
             new FilterModel({
-                fieldName: 'firstName',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-                type: FilterType.TEXT,
-                relationshipPath: ['contact'],
-                relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                fieldName: 'date',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                type: FilterType.RANGE_DATE
             })
         ];
+        if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
+            this.availableSideFilters = [
+                ...this.availableSideFilters,
+                ...[
+                    new FilterModel({
+                        fieldName: 'firstName',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'lastName',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    })
+                ]
+            ];
+        }
     }
 
     refreshList() {
