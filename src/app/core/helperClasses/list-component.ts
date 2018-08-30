@@ -13,6 +13,9 @@ import { SideFiltersComponent } from '../../shared/components/side-filters/side-
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
 import { DateRangeModel } from '../models/date-range.model';
+import { Moment } from 'moment';
+import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
+import * as moment from 'moment';
 
 export abstract class ListComponent {
     /**
@@ -415,7 +418,7 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds}): void {
+    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds, date}): void {
         // update breadcrumbs
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
 
@@ -608,6 +611,26 @@ export abstract class ListComponent {
 
                 // refresh list
                 this.needsRefreshList(true);
+                break;
+
+            // Filter contacts seen
+            case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
+
+                const date: Moment = moment(queryParams.date);
+                this.listFilterDataService.filterContactsSeen(date)
+                    .subscribe((result: MetricContactsSeenEachDays) => {
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                        this.appliedListFilterQueryBuilder.filter.where({
+                            id: {
+                                'inq': result.contactIDs
+                            }
+                        }, true);
+                        this.mergeListFilterToMainFilter();
+
+                        // refresh list
+                        this.needsRefreshList(true);
+                    });
                 break;
         }
     }

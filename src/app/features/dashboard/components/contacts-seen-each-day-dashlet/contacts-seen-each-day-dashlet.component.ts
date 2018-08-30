@@ -7,6 +7,8 @@ import { Constants } from '../../../../core/models/constants';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -20,7 +22,7 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     contactsSeenEachDay: number;
 
     // filter by date
-    date;
+    date: Moment = moment();
 
     // selected outbreak
     selectedOutbreakId: string;
@@ -50,12 +52,7 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreakId = selectedOutbreak.id;
-                    this.contactDataService
-                        .getNumberOfContactsSeenEachDay(selectedOutbreak.id)
-                        .subscribe((result: MetricContactsSeenEachDays) => {
-                            console.log(result);
-                            this.contactsSeenEachDay = result.contactsSeenCount;
-                        });
+                    this.triggerUpdateValues.call(true);
                 }
             });
     }
@@ -70,12 +67,12 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     }
 
     updateValues () {
-        // get the results for contacts seen
-        const qb = this.listFilterDataService.filterContactsSeen(this.date);
+        this.queryParams.date = this.date.toISOString();
 
-        this.contactDataService.getNumberOfContactsSeenEachDay(this.selectedOutbreakId, qb)
-            .subscribe((result) => {
-                console.log(result);
+        // get the results for contacts seen
+        this.listFilterDataService.filterContactsSeen(this.date)
+            .subscribe((result: MetricContactsSeenEachDays) => {
+                this.contactsSeenEachDay = result.contactsSeenCount;
             });
     }
 }

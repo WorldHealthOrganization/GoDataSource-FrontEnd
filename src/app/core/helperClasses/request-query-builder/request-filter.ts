@@ -227,7 +227,11 @@ export class RequestFilter {
      * @param value
      * @param replace
      */
-    byDateRange(property: string, value: any, replace: boolean = true) {
+    byDateRange(
+        property: string,
+        value: any,
+        replace: boolean = true
+    ) {
         // no point in continuing if we got an empty value
         if (_.isEmpty(value)) {
             this.remove(property);
