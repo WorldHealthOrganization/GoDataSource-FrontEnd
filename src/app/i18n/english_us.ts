@@ -281,6 +281,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Cases list page

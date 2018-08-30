@@ -80,9 +80,12 @@
         *ngIf="!displayLoading && importableObject"
         fxFlex fxLayout="column" fxLayoutGap="30px"
         class="import-data-map-fields">
-        <form #form="ngForm">
+        <form
+            #form="ngForm"
+            (submit)="importData(form)">
             <div
-                fxFlex fxLayout="row" fxLayoutGap="20px">
+                fxFlex fxLayout="row" fxLayoutGap="20px"
+                class="import-data-map-fields-header-columns">
                 <div fxFlex>
                     {{ 'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION' | translate }}
                 </div>
@@ -100,6 +103,7 @@
                     <app-form-select
                         [name]="'mapObject[' + indexMapField + '][source]'"
                         app-unique-validator="\]\[source\]$"
+                        [required]="true"
                         [(ngModel)]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
@@ -108,6 +112,7 @@
 
                     <app-form-select
                         [name]="'mapObject[' + indexMapField + '][destination]'"
+                        [required]="true"
                         [(ngModel)]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
@@ -126,10 +131,18 @@
                 </div>
                 <div
                     *ngIf="
-                        importableObject.modelPropertyValues &&
-                        importableObject.modelPropertyValues[item.destinationField] &&
                         importableObject.distinctFileColumnValuesKeyValue &&
-                        importableObject.distinctFileColumnValuesKeyValue[item.sourceField]
+                        importableObject.distinctFileColumnValuesKeyValue[item.sourceField] &&
+                        (
+                            (
+                                getModelPropertyValues(item.destinationField)
+                            ) || (
+                                importableObject.distinctFileColumnValuesKeyValue[item.sourceField].length > 0 && (
+                                    importableObject.distinctFileColumnValuesKeyValue[item.sourceField][0].value.indexOf('[object Object]') > -1 ||
+                                    importableObject.distinctFileColumnValuesKeyValue[item.sourceField][0].value.indexOf(',') > -1
+                                )
+                            )
+                        )
                     "
                     class="import-data-map-fields-children">
                     <div
@@ -139,16 +152,19 @@
                             [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][sourceOption]'"
                             app-unique-validator
                             [appUniqueValidatorExpression]="'\\[' + indexMapField + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
+                            [required]="true"
                             [(ngModel)]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                             [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceField]">
                         </app-form-select>
 
                         <app-form-select
+                            *ngIf="getModelPropertyValues(item.destinationField)"
                             [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][destinationOption]'"
+                            [required]="true"
                             [(ngModel)]="mappedOpt.destinationOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                            [options]="importableObject.modelPropertyValues[item.destinationField]"
+                            [options]="getModelPropertyValues(item.destinationField)"
                             optionValueKey="id">
                         </app-form-select>
 
@@ -196,7 +212,8 @@
                 <button
                     mat-raised-button
                     color="primary"
-                    class="button-primary">
+                    class="button-primary"
+                    type="submit">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
                 </button>
             </div>

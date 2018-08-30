@@ -35,6 +35,10 @@ export class ImportCaseLabDataComponent implements OnInit {
 
     ImportServerModelNames = ImportServerModelNames;
 
+    fieldsWithoutTokens = {
+        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+    };
+
     /**
      * Constructor
      * @param router

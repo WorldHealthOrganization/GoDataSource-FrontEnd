@@ -8,6 +8,8 @@ import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { NgForm } from '@angular/forms';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -124,9 +126,19 @@ export class ImportDataComponent implements OnInit {
         return this._importFileUrl;
     }
 
+    @Input() fieldsWithoutTokens: {
+        [property: string]: string
+    } = {};
+
     importableObject: ImportableFileModel;
 
     mappedFields: ImportableMapField[] = [];
+
+    fastMappedModelValues: {
+        [path: string]: {
+            value: any[] | null | undefined
+        }
+    } = {};
 
     /**
      * Constructor
@@ -137,7 +149,8 @@ export class ImportDataComponent implements OnInit {
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private formHelper: FormHelperService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -257,7 +270,8 @@ export class ImportDataComponent implements OnInit {
                     jsonResponse,
                     (token: string): string => {
                         return this.i18nService.instant(token);
-                    }
+                    },
+                    this.fieldsWithoutTokens
                 );
 
                 // we should have at least the headers of the file
@@ -421,5 +435,40 @@ console.log(this.importableObject);
                     this.mappedFields[indexMapField].mappedOptions.splice(indexMapOption, 1);
                 }
             });
+    }
+
+    /**
+     * Retrieve model possible values
+     * @param path
+     */
+    getModelPropertyValues(path: string) {
+        // construct the full path
+        path = '[' + path + ']';
+
+        // bring values only if we didn't bring them before already
+        if (!this.fastMappedModelValues[path]) {
+            // retrieve value
+            this.fastMappedModelValues[path] = {
+                value: _.get(this.importableObject.modelPropertyValues, path)
+            };
+        }
+
+        // return values
+        return this.fastMappedModelValues[path].value;
+    }
+
+    /**
+     * Import data
+     * @param form
+     */
+    importData(form: NgForm) {
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // display fields with data
+        const dirtyFields: any = this.formHelper.getFields(form);
+        console.log(dirtyFields);
     }
 }

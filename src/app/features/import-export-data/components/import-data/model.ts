@@ -42,7 +42,10 @@ export class ImportableFileModel {
 
     constructor(
         data = null,
-        translate: (string) => string = null
+        translate: (string) => string,
+        fieldsWithoutTokens: {
+            [property: string]: string
+        } = {}
     ) {
         this.id = _.get(data, 'id');
         this.fileHeaders = _.get(data, 'fileHeaders', []);
@@ -63,6 +66,52 @@ export class ImportableFileModel {
             })
             .value();
 
+        // recursive add value pair
+        const createImportableLabelValuePair = (
+            result: ImportableLabelValuePair[],
+            impLVPair: ImportableLabelValuePair,
+            labelPrefix: string = ''
+        ) => {
+            // if this is a string property then we can push it as it is
+            if (_.isString(impLVPair.label)) {
+                // add parent prefix to child one
+                impLVPair.label = labelPrefix + translate(impLVPair.label);
+
+                // add to list of filtres to which we can push data
+                result.push(impLVPair);
+            } else {
+                // otherwise we need to map it to multiple values
+                if (_.isObject(impLVPair.label)) {
+                    // add as parent drop-down as well
+                    // #TODO
+                    //
+
+                    // add child options
+                    let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
+                    parentTokenLabel = parentTokenLabel ? translate(parentTokenLabel) : parentTokenLabel;
+                    labelPrefix += parentTokenLabel ? parentTokenLabel + ' => ' : '';
+                    _.each(impLVPair.label, (token: string, prop: string) => {
+                        // //fieldsWithoutTokens
+                        createImportableLabelValuePair(
+                            result,
+                            new ImportableLabelValuePair(
+                                token,
+                                impLVPair.value + '][' + prop
+                            ),
+                            labelPrefix
+                        );
+                    });
+                } else {
+                    // something else - array etc
+                    // #TODO -  at this point we didn't encounter a case were we need this one
+                    // NOTHING TO DO HERE ?
+                }
+            }
+        };
+
+        // map properties to array of objects
+        // generate current list of properties ( & convert objects to to prop : value )
+        // add object properties that be either a parent drop-down or child drop-down with children of its own
         this.modelPropertiesKeyValue = _.chain(this.modelProperties)
             .map((tokenLabel: string, property: string) => {
                 return new ImportableLabelValuePair(
@@ -70,9 +119,12 @@ export class ImportableFileModel {
                     property
                 );
             })
-            .filter((item) => _.isString(item.label))
+            .transform((result: ImportableLabelValuePair[], value: ImportableLabelValuePair) => {
+                createImportableLabelValuePair(result, value);
+            }, [])
             .sortBy((item: { label: string }) => {
-                return translate ? translate(item.label) : item.label;
+                // this is already translated
+                return item.label;
             })
             .value();
 
