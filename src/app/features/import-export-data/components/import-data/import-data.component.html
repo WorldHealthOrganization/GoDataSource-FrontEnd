@@ -69,7 +69,8 @@
                 color="primary"
                 class="button-primary"
                 [disabled]="!uploader || uploader.queue.length < 1"
-                (click)="uploadFile()">
+                (click)="uploadFile()"
+                type="button">
                 {{ (isOneStep ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
             </button>
         </div>
@@ -116,15 +117,18 @@
                         [(ngModel)]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="addMapOptionsIfNecessary(item)">
+                        (optionChanged)="addMapOptionsIfNecessary(item)"
+                        [disabled]="item.readonly">
                     </app-form-select>
 
                     <div
                         fxFlex="70px">
                         <button
+                            *ngIf="!item.readonly"
                             mat-icon-button
                             color="warn"
-                            (click)="removeFieldMap(indexMapField)">
+                            (click)="removeFieldMap(indexMapField)"
+                            type="button">
                             <span class="xt-icon">delete</span>
                         </button>
                     </div>
@@ -163,7 +167,8 @@
                             <button
                                 mat-icon-button
                                 color="warn"
-                                (click)="removeOptionMap(indexMapField, indexMapOption)">
+                                (click)="removeOptionMap(indexMapField, indexMapOption)"
+                                type="button">
                                 <span class="xt-icon">delete</span>
                             </button>
                         </div>
@@ -177,7 +182,8 @@
                             mat-raised-button
                             color="primary"
                             class="button-primary"
-                            (click)="addNewOptionMap(indexMapField)">
+                            (click)="addNewOptionMap(indexMapField)"
+                            type="button">
                             <span class="xt-icon">addCircle</span>
                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION' | translate }}
                         </button>
@@ -192,7 +198,8 @@
                     mat-raised-button
                     color="primary"
                     class="button-primary"
-                    (click)="addNewFieldMap()">
+                    (click)="addNewFieldMap()"
+                    type="button">
                     <span class="xt-icon">addCircle</span>
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate }}
                 </button>

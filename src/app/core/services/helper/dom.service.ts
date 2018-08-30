@@ -7,9 +7,16 @@ export class DomService {
      * Scroll to the end of the list of elements with the given css selector
      * @param selector
      */
-    scrollItemIntoView(selector) {
+    scrollItemIntoView(
+        selector,
+        block: string = 'end'
+    ) {
         setTimeout(function () {
-            document.querySelector(selector).scrollIntoView({behavior: 'smooth', block: 'end'});
+            document.querySelector(selector)
+                .scrollIntoView({
+                    behavior: 'smooth',
+                    block: block
+                });
         });
     }
 }

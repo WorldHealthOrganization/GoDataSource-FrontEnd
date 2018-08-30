@@ -163,6 +163,8 @@ export class ImportableMapField {
         destinationOption?: string;
     }[] = [];
 
+    public readonly: boolean = false;
+
     constructor(
         public destinationField: string = null,
         public sourceField: string = null

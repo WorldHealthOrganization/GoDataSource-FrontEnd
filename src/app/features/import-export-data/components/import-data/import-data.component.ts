@@ -10,6 +10,8 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { DomService } from '../../../../core/services/helper/dom.service';
+import { ImportExportService } from '../../../../core/services/data/import-export.service';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -34,7 +36,9 @@ export enum ImportServerModelNames {
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent implements OnInit {
-    // mimes
+    /**
+     * Extension mapped to mimes
+     */
     private allowedMimeTypes: string[] = [];
     private allowedMimeTypesMap = {
         [ImportDataExtension.CSV]: 'text/csv',
@@ -45,7 +49,9 @@ export class ImportDataComponent implements OnInit {
         [ImportDataExtension.JSON]: 'application/json'
     };
 
-    // extensions
+    /**
+     * Allowed extensions
+     */
     private _allowedExtensions: string[];
     @Input() set allowedExtensions(extensions: string[]) {
         this._allowedExtensions = extensions;
@@ -66,6 +72,9 @@ export class ImportDataComponent implements OnInit {
         return this._allowedExtensions ? this._allowedExtensions : [];
     }
 
+    /**
+     * Page title
+     */
     @Input() title: string = '';
 
     /**
@@ -87,17 +96,31 @@ export class ImportDataComponent implements OnInit {
         return this._model;
     }
 
-    // handle upload files
+    /**
+     * File uploader
+     */
     uploader: FileUploader;
 
-    // file over drop-zone
+    /**
+     * Cursor is over drag-drop file zone
+     */
     hasFileOver: boolean = false;
 
+    /**
+     * Variables sent to translation pipe
+     */
     translationData: {
         types?: string
     } = {};
 
+    /**
+     * Percent displayed when uploading a file
+     */
     progress: number = null;
+
+    /**
+     * Display spinner when True, otherwise display the form
+     */
     private _displayLoading: boolean = false;
     private _displayLoadingLocked: boolean = false;
     @Input() set displayLoading(value: boolean) {
@@ -109,11 +132,25 @@ export class ImportDataComponent implements OnInit {
         return this._displayLoading;
     }
 
+    /**
+     * Import success message
+     */
     @Input() importSuccessMessage: string = 'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE';
 
     // finished - imported data with success
+    /**
+     * Event called when we finished importing data ( this should handle page redirect )
+     */
     @Output() finished = new EventEmitter<void>();
 
+    /**
+     * Where should we POST mapped data to ( endpoint that imports data )
+     */
+    @Input() importDataUrl: string;
+
+    /**
+     * Endpoint to upload file ( & get header columns and other data )
+     */
     private _importFileUrl: string;
     @Input() set importFileUrl(value: string) {
         this._importFileUrl = value;
@@ -126,15 +163,45 @@ export class ImportDataComponent implements OnInit {
         return this._importFileUrl;
     }
 
+    /**
+     * Tokens for properties for which we don't receive labels from the server
+     */
     @Input() fieldsWithoutTokens: {
         [property: string]: string
     } = {};
 
+    /**
+     * Required fields that user needs to map
+     */
+    private requiredDestinationFieldsMap: {
+        [modelProperty: string]: true
+    } = {};
+    private _requiredDestinationFields: string[] = [];
+    @Input() set requiredDestinationFields(value: string[]) {
+        this._requiredDestinationFields = value;
+        this.requiredDestinationFieldsMap = {};
+        _.each(value, (v: string) => {
+            this.requiredDestinationFieldsMap[v] = true;
+        });
+    }
+    get requiredDestinationFields(): string[] {
+        return this._requiredDestinationFields;
+    }
+
+    /**
+     * Keep all file data ( header columns, module information, drop-down options etc )
+     */
     importableObject: ImportableFileModel;
 
+    /**
+     * Mapped fields
+     */
     mappedFields: ImportableMapField[] = [];
 
-    fastMappedModelValues: {
+    /**
+     * Used to determine fast the values of a dropdown for a property from a deep level property ( so we don't have to do _.get )
+     */
+    private fastMappedModelValues: {
         [path: string]: {
             value: any[] | null | undefined
         }
@@ -142,15 +209,22 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * Constructor
-     * @param router
-     * @param route
+     * @param snackbarService
+     * @param authDataService
+     * @param dialogService
+     * @param i18nService
+     * @param formHelper
+     * @param domService
+     * @param importExportService
      */
     constructor(
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private i18nService: I18nService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private domService: DomService,
+        private importExportService: ImportExportService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -287,6 +361,7 @@ export class ImportDataComponent implements OnInit {
                 }
 
                 // populate deducted mappings
+                const mapOfRequiredDestinationFields = this.requiredDestinationFieldsMap ? _.clone(this.requiredDestinationFieldsMap) : {};
                 _.each(this.importableObject.suggestedFieldMapping, (destinationField: string, sourceField: string) => {
                     // create new possible map item
                     const importableItem = new ImportableMapField(
@@ -296,6 +371,26 @@ export class ImportDataComponent implements OnInit {
 
                     // add options if necessary
                     this.addMapOptionsIfNecessary(importableItem);
+
+                    // do we need to make this one readonly ?
+                    if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                        importableItem.readonly = true;
+                        delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                    }
+
+                    // add to list
+                    this.mappedFields.push(importableItem);
+                });
+
+                // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
+                _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
+                    // create
+                    const importableItem = new ImportableMapField(
+                        property
+                    );
+
+                    // make it readonly
+                    importableItem.readonly = true;
 
                     // add to list
                     this.mappedFields.push(importableItem);
@@ -458,13 +553,119 @@ export class ImportDataComponent implements OnInit {
      * @param form
      */
     importData(form: NgForm) {
+        // do we have import data url ?
+        if (!this.importDataUrl) {
+            // we don't need to display an error since this is a developer issue, he forgot to include url, in normal conditions this shouldn't happen
+            return;
+        }
+
         // validate form
-        if (!this.formHelper.validateForm(form)) {
+        if (!this.formHelper.validateForm(
+            form,
+            false
+        )) {
+            // scroll to the first invalid input
+            const invalidControls = this.formHelper.getInvalidControls(form);
+            if (!_.isEmpty(invalidControls)) {
+                this.domService.scrollItemIntoView(
+                    '[name="' + Object.keys(invalidControls)[0] + '"]',
+                    'start'
+                );
+            }
+
+            // invalid form
             return;
         }
 
         // display fields with data
-        const dirtyFields: any = this.formHelper.getFields(form);
-        console.log(dirtyFields);
+        const allFields: any = this.formHelper.getFields(form);
+
+        // nothing to import - this is handled above, when we convert JSON to importable object
+        // NO NEED for further checks
+
+        // #TODO - objects aren't handled for now
+        // we will add this functionality later
+        // #TODO - IMPORTANT => later we might move the entire logic in the template ( name attribute, but for now since we don't know how we will handle object we will leave the format logic here )
+
+        // construct import JSON
+        const importJSON = {
+            fileId: this.importableObject.id,
+            map: {},
+            valuesMap: {}
+        };
+        _.each(
+            allFields.mapObject,
+            (item: {
+                source: string,
+                destination: string,
+                options: {
+                    sourceOption: string,
+                    destinationOption: string
+                }[]
+            }) => {
+                // map main properties
+                importJSON.map[item.source] = item.destination;
+
+                // map drop-down values
+                if (
+                    item.options &&
+                    item.options.length > 0
+                ) {
+                    importJSON.valuesMap[item.source] = _.transform(
+                        item.options,
+                        (result, option: {
+                            sourceOption: string,
+                            destinationOption: string
+                        }) => {
+                            result[option.sourceOption] = option.destinationOption;
+                        },
+                        {}
+                    );
+                }
+            }
+        )
+
+// #TODO - remove me
+        console.log(importJSON);
+// #TODO - end of remove me
+
+//         // import data
+//         this._displayLoading = true;
+//         this._displayLoadingLocked = true;
+//         this.progress = null;
+//         this.importExportService.importData(
+//             this.importDataUrl,
+//             importJSON
+//         )
+//         .catch((err) => {
+//             // display error message
+//             this.snackbarService.showError(err.message);
+//
+//             // reset loading
+//             this._displayLoading = true;
+//             this._displayLoadingLocked = true;
+//
+// // #TODO - remove me
+//             console.log(err);
+// // #TODO - end of remove me
+//
+//             // propagate err
+//             return ErrorObservable.create(err);
+//         })
+//         .subscribe((data) => {
+// // #TODO - remove me
+//             console.log(data);
+// // #TODO - end of remove me
+//
+//
+//             // display success
+//             // this.snackbarService.showSuccess(
+//             //     this.importSuccessMessage,
+//             //     this.translationData
+//             // );
+//
+//             // emit finished event - event should handle redirect
+//             // this.finished.emit();
+//         });
     }
 }
