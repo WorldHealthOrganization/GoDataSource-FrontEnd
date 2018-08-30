@@ -8,6 +8,7 @@ import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/m
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -15,7 +16,8 @@ export class TransmissionChainDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {}
+    ) {
+    }
 
     /**
      * Map Transmission chain to Chain model
@@ -87,6 +89,89 @@ export class TransmissionChainDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
             MetricIndependentTransmissionChainsModel);
+    }
+
+    /**
+     * convert transmission chain model to the format needed by the graph
+     * @param chains
+     * @param filters
+     * @returns {any}
+     */
+    convertChainToGraphElements(chains, filters: any): any {
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
+        let selectedNodeIds: string[] = [];
+        if (!_.isEmpty(chains)) {
+            const firstChain = chains[0];
+
+            // if show contacts and show events filters are not checked then only look into chainRelations for cases / events - faster lookup
+            if (!filters.showContacts && filters.showEvents) {
+
+                _.forEach(chains, (chain, chainKey) => {
+                    if (!_.isEmpty(chain.chainRelations)) {
+                        _.forEach(chain.chainRelations, (relation, key) => {
+                            selectedNodeIds.push(relation.entityIds[0]);
+                            selectedNodeIds.push(relation.entityIds[1]);
+                        });
+                        selectedNodeIds = _.uniq(selectedNodeIds);
+                        _.forEach(selectedNodeIds, (nodeId, key) => {
+                            const node = chain.nodes[nodeId];
+                            if (node) {
+                                const nodeData = new GraphNodeModel(node.model);
+                                nodeData.type = node.type;
+                                graphData.nodes.push({data: nodeData});
+                            }
+                        });
+                    }
+                });
+            } else {
+
+                // if show contacts filter is checked or show events is not checked, then look into all the nodes - don't rely on chainRelations
+                if (!_.isEmpty(firstChain.nodes)) {
+                    _.forEach(firstChain.nodes, function (node, key) {
+                        let allowAdd = false;
+                        if (node.type === EntityType.CONTACT && filters.showContacts) {
+                            allowAdd = true;
+                        } else if (node.type === EntityType.EVENT && filters.showEvents) {
+                            allowAdd = true;
+                        } else if (node.type === EntityType.CASE) {
+                            allowAdd = true;
+                        }
+                        if (allowAdd) {
+                            const nodeData = new GraphNodeModel(node.model);
+                            nodeData.type = node.type;
+                            graphData.nodes.push({data: nodeData});
+                            selectedNodeIds.push(nodeData.id);
+                        }
+                    });
+                }
+            }
+
+            if (!_.isEmpty(firstChain.relationships)) {
+                console.log(firstChain.relationships);
+                _.forEach(firstChain.relationships, function (relationship, key) {
+                    // add relation only if the nodes are in the selectedNodes array
+                    if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
+                        const graphEdge = new GraphEdgeModel();
+                        if (relationship.persons[0].source) {
+                            graphEdge.source = relationship.persons[0].id;
+                            graphEdge.sourceType = relationship.persons[0].type;
+                            graphEdge.target = relationship.persons[1].id;
+                            graphEdge.targetType = relationship.persons[1].type;
+                        } else {
+                            graphEdge.source = relationship.persons[1].id;
+                            graphEdge.sourceType = relationship.persons[1].type;
+                            graphEdge.target = relationship.persons[0].id;
+                            graphEdge.targetType = relationship.persons[0].type;
+                        }
+                        graphEdge.setEdgeColor();
+                        graphData.edges.push({data: graphEdge});
+                    }
+                });
+            }
+
+
+        }
+        return graphData;
     }
 }
 

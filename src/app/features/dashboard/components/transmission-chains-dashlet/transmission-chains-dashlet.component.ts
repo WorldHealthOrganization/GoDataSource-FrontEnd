@@ -25,6 +25,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     Constants = Constants;
+    filters: any = {};
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -35,6 +36,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        // init filters
+        this.filters.showContacts = false;
+        this.filters.showEvents = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -51,7 +55,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id).subscribe((chains) => {
 
                 if ( !_.isEmpty(chains) ) {
-                    this.graphElements = chains[0].convertChainToGraphElements();
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
                 } else {
                     this.graphElements = [];
                 }
@@ -82,6 +86,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
                 this.dialogService.showDataDialog(dialogData);
             });
+    }
+
+    refreshChain() {
+        this.displayChainsOfTransmission();
     }
 
     /**

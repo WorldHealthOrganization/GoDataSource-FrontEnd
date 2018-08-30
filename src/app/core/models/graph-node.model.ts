@@ -14,8 +14,25 @@ export class GraphNodeModel {
         this.name = _.get(data, 'name');
         this.type = _.get(data, 'type', '');
 
-        // default node color
-        this.nodeColor = '#4DB0A0';
+        // set color based on type
+        switch (this.type) {
+            case EntityType.CASE: {
+                this.nodeColor = '#4DB0A0';
+                break;
+            }
+            case EntityType.CONTACT: {
+                this.nodeColor = '#008DC9';
+                break;
+            }
+            case EntityType.EVENT: {
+                this.nodeColor = '#F44708';
+                break;
+            }
+            default: {
+                this.nodeColor = '#4DB0A0';
+                break;
+            }
+        }
     }
 
 }

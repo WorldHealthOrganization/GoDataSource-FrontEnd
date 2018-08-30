@@ -1,3 +1,25 @@
+<div>
+<div fxLayout="row" fxLayoutGap="10px">
+    <!-- entity type filter - events -->
+    <app-form-checkbox
+        name="showEvents"
+        label="Show Events"
+        [(ngModel)]="filters.showEvents">
+    </app-form-checkbox>
+    <!-- entity type filter - contacts -->
+    <app-form-checkbox
+        name="showContacts"
+        label="Show Contacts"
+        [(ngModel)]="filters.showContacts">
+    </app-form-checkbox>
+
+</div>
+    <div>
+        <button mat-raised-button (click)="refreshChain()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+</div>
 <app-cytoscape-graph
     [elements]="graphElements"
     [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
