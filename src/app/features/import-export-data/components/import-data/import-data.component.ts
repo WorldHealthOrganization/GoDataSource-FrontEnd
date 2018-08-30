@@ -301,10 +301,6 @@ export class ImportDataComponent implements OnInit {
                     this.mappedFields.push(importableItem);
                 });
 
-// #TODO REMOVE ME
-console.log(this.importableObject);
-// #TODO END OF REMOVE ME
-
                 // display form
                 this._displayLoading = false;
                 this._displayLoadingLocked = false;

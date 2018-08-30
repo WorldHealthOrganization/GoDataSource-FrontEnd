@@ -133,16 +133,7 @@
                     *ngIf="
                         importableObject.distinctFileColumnValuesKeyValue &&
                         importableObject.distinctFileColumnValuesKeyValue[item.sourceField] &&
-                        (
-                            (
-                                getModelPropertyValues(item.destinationField)
-                            ) || (
-                                importableObject.distinctFileColumnValuesKeyValue[item.sourceField].length > 0 && (
-                                    importableObject.distinctFileColumnValuesKeyValue[item.sourceField][0].value.indexOf('[object Object]') > -1 ||
-                                    importableObject.distinctFileColumnValuesKeyValue[item.sourceField][0].value.indexOf(',') > -1
-                                )
-                            )
-                        )
+                        getModelPropertyValues(item.destinationField)
                     "
                     class="import-data-map-fields-children">
                     <div

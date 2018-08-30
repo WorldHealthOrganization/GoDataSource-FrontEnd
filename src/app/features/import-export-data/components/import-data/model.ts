@@ -61,6 +61,13 @@ export class ImportableFileModel {
                     value
                 );
             })
+            // #TODO - remove when object logic was implemented
+            .filter((value: ImportableLabelValuePair) => {
+                return !(this.distinctFileColumnValues[value.value] &&
+                    this.distinctFileColumnValues[value.value].length > 0 &&
+                    this.distinctFileColumnValues[value.value][0].indexOf('[object Object]') > -1);
+            })
+            // #TODO - end of remove
             .sortBy((item: { label: string }) => {
                 return item.label;
             })
@@ -75,37 +82,44 @@ export class ImportableFileModel {
             // if this is a string property then we can push it as it is
             if (_.isString(impLVPair.label)) {
                 // add parent prefix to child one
-                impLVPair.label = labelPrefix + translate(impLVPair.label);
+                impLVPair.label = labelPrefix + translate(
+                    fieldsWithoutTokens[impLVPair.value] ?
+                        fieldsWithoutTokens[impLVPair.value] :
+                        impLVPair.label
+                );
 
-                // add to list of filtres to which we can push data
+                // add to list of filters to which we can push data
                 result.push(impLVPair);
             } else {
-                // otherwise we need to map it to multiple values
-                if (_.isObject(impLVPair.label)) {
-                    // add as parent drop-down as well
-                    // #TODO
-                    //
+                // ignore object properties for now - this will be fixed on the next PR
+                // #TODO
 
-                    // add child options
-                    let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
-                    parentTokenLabel = parentTokenLabel ? translate(parentTokenLabel) : parentTokenLabel;
-                    labelPrefix += parentTokenLabel ? parentTokenLabel + ' => ' : '';
-                    _.each(impLVPair.label, (token: string, prop: string) => {
-                        // //fieldsWithoutTokens
-                        createImportableLabelValuePair(
-                            result,
-                            new ImportableLabelValuePair(
-                                token,
-                                impLVPair.value + '][' + prop
-                            ),
-                            labelPrefix
-                        );
-                    });
-                } else {
-                    // something else - array etc
-                    // #TODO -  at this point we didn't encounter a case were we need this one
-                    // NOTHING TO DO HERE ?
-                }
+                // // otherwise we need to map it to multiple values
+                // if (_.isObject(impLVPair.label)) {
+                //     // add as parent drop-down as well
+                //     // #TODO
+                //     //
+                //
+                //     // add child options
+                //     let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
+                //     parentTokenLabel = parentTokenLabel ? translate(parentTokenLabel) : parentTokenLabel;
+                //     labelPrefix += parentTokenLabel ? parentTokenLabel + ' => ' : '';
+                //     _.each(impLVPair.label, (token: string, prop: string) => {
+                //         // //fieldsWithoutTokens
+                //         createImportableLabelValuePair(
+                //             result,
+                //             new ImportableLabelValuePair(
+                //                 token,
+                //                 impLVPair.value + '][' + prop
+                //             ),
+                //             labelPrefix
+                //         );
+                //     });
+                // } else {
+                //     // something else - array etc
+                //     // #TODO -  at this point we didn't encounter a case were we need this one
+                //     // NOTHING TO DO HERE ?
+                // }
             }
         };
 
