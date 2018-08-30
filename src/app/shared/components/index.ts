@@ -15,10 +15,8 @@ import { CountedItemsListComponent } from './counted-items-list/counted-items-li
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-fill-questionnaire.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
-import { DashboardMetricDashletComponent } from './dashboard-metric-dashlet/dashboard-metric-dashlet.component';
 import { FormInputListComponent } from './form-input-list/form-input-list.component';
 import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
-import { DashboardDynamicMetricDashletComponent } from './dashboard-dynamic-metric-dashlet/dashboard-dynamic-metric-dashlet.component';
 import { CytoscapeGraphComponent } from './cytoscape-graph/cytoscape-graph.component';
 import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
@@ -31,11 +29,26 @@ export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
 export const components: any[] = [
+    // popups
     SnackbarComponent,
+
+    // main layout
     TopnavComponent,
     BreadcrumbsComponent,
+    SideFiltersComponent,
+
+    // dashboard
+    DashboardCustomMetricDashletComponent,
+    CytoscapeGraphComponent,
+
+    // google
+    GoogleMapComponent,
+    GoogleMapMovementComponent,
+
+    // authentication - #TODO - this needs to be refactored & removed
     NotAuthTemplateComponent,
-    DialogComponent,
+
+    // inputs
     FormAddressComponent,
     FormAddressListComponent,
     FormDocumentComponent,
@@ -45,15 +58,13 @@ export const components: any[] = [
     FormRelationshipComponent,
     FormInputListComponent,
     FormLocationDropdownComponent,
-    SideFiltersComponent,
+    FormFillQuestionnaireComponent,
+
+    // display information
     CountedItemsListComponent,
     YesNoLabelComponent,
-    FormFillQuestionnaireComponent,
     ReferenceDataLabelComponent,
-    DashboardMetricDashletComponent,
-    DashboardDynamicMetricDashletComponent,
-    CytoscapeGraphComponent,
-    DashboardCustomMetricDashletComponent,
-    GoogleMapComponent,
-    GoogleMapMovementComponent
+
+    // dialogs
+    DialogComponent
 ];

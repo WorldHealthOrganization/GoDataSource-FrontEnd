@@ -68,6 +68,32 @@
             </mat-cell>
         </ng-container>
 
+        <!--Length -->
+        <ng-container matColumnDef="length">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_LENGTH' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.length }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Duration -->
+        <ng-container matColumnDef="duration">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_DURATION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.duration }} {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS' | translate}}
+            </mat-cell>
+        </ng-container>
+
         <!-- Active -->
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>

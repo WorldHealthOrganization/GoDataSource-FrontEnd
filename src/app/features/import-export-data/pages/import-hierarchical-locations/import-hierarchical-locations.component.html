@@ -1,0 +1,13 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE'"
+    [isOneStep]="true"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl">
+</app-import-data>

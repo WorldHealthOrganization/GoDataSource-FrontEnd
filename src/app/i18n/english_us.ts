@@ -100,6 +100,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
+        'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
 
         /**
          * Login page
@@ -340,6 +341,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT': 'Add',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Create Case Lab result page
@@ -406,6 +408,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
+        'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
 
         /**
          * Create Location page
@@ -937,11 +940,14 @@ export const EnglishUsLang = {
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES': 'Number of Cases',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE': 'Number of Alive Cases',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_LENGTH': 'Length',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_DURATION': 'Duration',
 
         /**
          * Transmission Chains List page
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
 
         /**
          * Side filter
@@ -957,6 +963,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL': 'Condition',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT': 'Contains',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
@@ -986,6 +993,31 @@ export const EnglishUsLang = {
          */
         'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
         'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
-        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses'
+        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+
+        /**
+         * Import data
+         */
+        'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE': 'Drag & drop a file of the following types here: {{types}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
+        'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
+        'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
+        'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
+        'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
+
+        /**
+         * Import hierarchical locations
+         */
+        'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
+
+        /**
+         * Import case lab data
+         */
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
     }
 };

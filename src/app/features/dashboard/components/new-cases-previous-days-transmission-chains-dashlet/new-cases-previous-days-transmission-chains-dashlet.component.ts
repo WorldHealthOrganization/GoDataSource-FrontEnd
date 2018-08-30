@@ -3,6 +3,8 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
@@ -23,6 +25,11 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements O
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    // refresh only after we finish changing data
+    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.updateValues();
+    }));
+
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService
@@ -36,7 +43,7 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements O
                 if (selectedOutbreak) {
                     this.selectedOutbreak = selectedOutbreak;
                     this.xPreviousDays = selectedOutbreak.noDaysInChains;
-                    this.updateValues();
+                    this.triggerUpdateValues.call(true);
                 }
             });
     }
@@ -48,7 +55,7 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements O
     onChangeSetting(newXPreviousDays) {
         this.xPreviousDays = newXPreviousDays;
         // get number of cases in previous x days in known transmission chains
-        this.updateValues();
+        this.triggerUpdateValues.call();
     }
 
     /**
