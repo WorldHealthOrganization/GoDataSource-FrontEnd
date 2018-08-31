@@ -78,7 +78,7 @@
 
     <!-- Map fields -->
     <div
-        *ngIf="!displayLoading && importableObject"
+        *ngIf="!displayLoading && importableObject && !errMsgDetails"
         fxFlex fxLayout="column" fxLayoutGap="30px"
         class="import-data-map-fields">
         <form
@@ -120,6 +120,22 @@
                         (optionChanged)="addMapOptionsIfNecessary(item)"
                         [disabled]="item.readonly">
                     </app-form-select>
+
+                    <div
+                        *ngIf="isDestinationArray(item.destinationField)"
+                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        <div
+                            *ngFor="let levelMatch of noOfLevels(item.destinationField); let destinationLevelIndex = index;"
+                            fxFlex>
+                            <app-form-select
+                                [name]="'mapObject[' + indexMapField + '][destinationLevel][' + destinationLevelIndex + ']'"
+                                [required]="true"
+                                [(ngModel)]="item.destinationLevel[destinationLevelIndex]"
+                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL' | translate"
+                                [options]="possibleDestinationLevels">
+                            </app-form-select>
+                        </div>
+                    </div>
 
                     <div
                         fxFlex="70px">
@@ -216,5 +232,21 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Map fields -->
+    <div
+        *ngIf="!displayLoading && importableObject && errMsgDetails"
+        fxFlex fxLayout="column" fxLayoutGap="30px"
+        class="import-data-errors">
+        <div
+            class="import-data-errors-title">
+            {{ 'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED' | translate }}
+        </div>
+        <div
+            *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
+            class="import-data-errors-err">
+            {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: Object.keys(err.error.details.codes).join(', ') } }}
+        </div>
     </div>
 </mat-card>

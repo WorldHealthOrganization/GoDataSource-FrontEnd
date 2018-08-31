@@ -61,13 +61,6 @@ export class ImportableFileModel {
                     value
                 );
             })
-            // #TODO - remove when object logic was implemented
-            .filter((value: ImportableLabelValuePair) => {
-                return !(this.distinctFileColumnValues[value.value] &&
-                    this.distinctFileColumnValues[value.value].length > 0 &&
-                    this.distinctFileColumnValues[value.value][0].indexOf('[object Object]') > -1);
-            })
-            // #TODO - end of remove
             .sortBy((item: { label: string }) => {
                 return item.label;
             })
@@ -94,8 +87,7 @@ export class ImportableFileModel {
             // otherwise we need to map it to multiple values
             } else if (_.isObject(impLVPair.label)) {
                 // add as parent drop-down as well
-                // #TODO
-                //
+                // NO NEED FOR NOW, since back-end doesn't have this implementation anymore
 
                 // add child options
                 let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
@@ -156,6 +148,8 @@ export class ImportableMapField {
     }[] = [];
 
     public readonly: boolean = false;
+
+    public destinationLevel: number[] = [0, 0, 0];
 
     constructor(
         public destinationField: string = null,

@@ -12,6 +12,7 @@ import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportService } from '../../../../core/services/data/import-export.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -194,9 +195,46 @@ export class ImportDataComponent implements OnInit {
     importableObject: ImportableFileModel;
 
     /**
+     * Destination level value
+     */
+    possibleDestinationLevels = [{
+        label: '1',
+        value: 0
+    }, {
+        label: '2',
+        value: 1
+    }, {
+        label: '3',
+        value: 2
+    }];
+
+    /**
      * Mapped fields
      */
     mappedFields: ImportableMapField[] = [];
+
+    /**
+     * Keep err msg details
+     */
+    errMsgDetails: {
+        details: {
+            failed: {
+                recordNo: number,
+                error: {
+                    details: {
+                        codes: {
+                            [property: string]: any
+                        }
+                    }
+                }
+            }[]
+        }
+    };
+
+    /**
+     * Object
+     */
+    Object = Object;
 
     /**
      * Used to determine fast the values of a dropdown for a property from a deep level property ( so we don't have to do _.get )
@@ -401,10 +439,6 @@ export class ImportDataComponent implements OnInit {
                 this._displayLoadingLocked = false;
                 this.progress = null;
             }
-
-// #TODO - remove me
-            console.log(this.importableObject);
-// #TODO - end of remove me
         };
     }
 
@@ -415,7 +449,10 @@ export class ImportDataComponent implements OnInit {
     addMapOptionsIfNecessary(importableItem: ImportableMapField) {
         // add all distinct source as items that we need to map
         importableItem.mappedOptions = [];
-        const distinctValues: string[] = _.get(this.importableObject, `distinctFileColumnValuesKeyValue.${importableItem.sourceField}`, []);
+        // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
+        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue ?
+            this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceField] :
+            [];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
             // create map option with source
             const mapOpt: {
@@ -550,6 +587,22 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Check if property should receive an array
+     * @param destinationProperty
+     */
+    isDestinationArray(destinationProperty: string): boolean {
+        return destinationProperty ? destinationProperty.indexOf('[]') > -1 : false;
+    }
+
+    /**
+     * Number of levels
+     * @param destinationProperty
+     */
+    noOfLevels(destinationProperty: string): any[] {
+        return destinationProperty.match(/\[\]/g) || [];
+    }
+
+    /**
      * Import data
      * @param form
      */
@@ -584,10 +637,6 @@ export class ImportDataComponent implements OnInit {
         // nothing to import - this is handled above, when we convert JSON to importable object
         // NO NEED for further checks
 
-        // #TODO - objects aren't handled for now
-        // we will add this functionality later
-        // #TODO - IMPORTANT => later we might move the entire logic in the template ( name attribute, but for now since we don't know how we will handle object we will leave the format logic here )
-
         // construct import JSON
         const importJSON = {
             fileId: this.importableObject.id,
@@ -599,6 +648,7 @@ export class ImportDataComponent implements OnInit {
             (item: {
                 source: string,
                 destination: string,
+                destinationLevel?: number[],
                 options: {
                     sourceOption: string,
                     destinationOption: string
@@ -606,6 +656,20 @@ export class ImportDataComponent implements OnInit {
             }) => {
                 // map main properties
                 importJSON.map[item.source] = item.destination;
+
+                // do we have arrays? add indexes
+                let mapDestValue: string = importJSON.map[item.source];
+                if (this.isDestinationArray(mapDestValue)) {
+                    // add indexes
+                    let index: number = 0;
+                    while (this.isDestinationArray(mapDestValue)) {
+                        mapDestValue = mapDestValue.replace('[]', '[' + item.destinationLevel[index] + ']');
+                        index++;
+                    }
+
+                    // replace with the new value
+                    importJSON.map[item.source] = mapDestValue;
+                }
 
                 // map drop-down values
                 if (
@@ -624,49 +688,44 @@ export class ImportDataComponent implements OnInit {
                     );
                 }
             }
+        );
+
+        // import data
+        this._displayLoading = true;
+        this._displayLoadingLocked = true;
+        this.progress = null;
+        this.importExportService.importData(
+            this.importDataUrl,
+            importJSON
         )
+        .catch((err) => {
+            // display error message
+            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                // construct custom message
+                this.errMsgDetails = err;
 
-// #TODO - remove me
-        console.log(importJSON);
-// #TODO - end of remove me
+                // display error
+                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+            } else {
+                this.snackbarService.showError(err.message);
+            }
 
-//         // import data
-//         this._displayLoading = true;
-//         this._displayLoadingLocked = true;
-//         this.progress = null;
-//         this.importExportService.importData(
-//             this.importDataUrl,
-//             importJSON
-//         )
-//         .catch((err) => {
-//             // display error message
-//             this.snackbarService.showError(err.message);
-//
-//             // reset loading
-//             this._displayLoading = true;
-//             this._displayLoadingLocked = true;
-//
-// // #TODO - remove me
-//             console.log(err);
-// // #TODO - end of remove me
-//
-//             // propagate err
-//             return ErrorObservable.create(err);
-//         })
-//         .subscribe((data) => {
-// // #TODO - remove me
-//             console.log(data);
-// // #TODO - end of remove me
-//
-//
-//             // display success
-//             // this.snackbarService.showSuccess(
-//             //     this.importSuccessMessage,
-//             //     this.translationData
-//             // );
-//
-//             // emit finished event - event should handle redirect
-//             // this.finished.emit();
-//         });
+            // reset loading
+            this._displayLoading = false;
+            this._displayLoadingLocked = false;
+
+            // propagate err
+            return ErrorObservable.create(err);
+        })
+        .subscribe((data) => {
+            // display success
+            this.snackbarService.showSuccess(
+                this.importSuccessMessage,
+                this.translationData
+            );
+
+            // emit finished event - event should handle redirect
+            this.finished.emit();
+        });
     }
 }

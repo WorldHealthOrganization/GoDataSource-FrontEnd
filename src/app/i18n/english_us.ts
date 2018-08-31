@@ -1001,6 +1001,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
+        'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
@@ -1011,6 +1013,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL': 'Select Level',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
 
