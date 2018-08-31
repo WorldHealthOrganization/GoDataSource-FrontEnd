@@ -108,13 +108,44 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by a text field
+     * @param {string} property
+     * @param {string} value
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byContainingText(
+        property: string,
+        value: string,
+        replace: boolean = true
+    ) {
+        // do we need to remove condition ?
+        if (_.isEmpty(value)) {
+            this.remove(property);
+        } else {
+            // filter with 'startsWith' criteria
+            this.where({
+                [property]: {
+                    regexp: '/' + RequestFilter.escapeStringForRegex(value) + '/i'
+                }
+            }, replace);
+        }
+        return this;
+    }
+
+    /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
      * @param {string} value
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
-    byEquality(property: string, value: string, replace: boolean = true) {
+    byEquality(
+        property: string,
+        value: string,
+        replace: boolean = true,
+        caseInsensitive: boolean = false
+    ) {
         if (_.isEmpty(value)) {
             // remove filter
             this.remove(property);
@@ -122,7 +153,7 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    eq: value
+                    [caseInsensitive ? 'regexp' : 'eq']: caseInsensitive ? '/^' + RequestFilter.escapeStringForRegex(value) + '$/i' : value
                 }
             }, replace);
         }
