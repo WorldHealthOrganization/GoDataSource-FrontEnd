@@ -401,6 +401,10 @@ export class ImportDataComponent implements OnInit {
                 this._displayLoadingLocked = false;
                 this.progress = null;
             }
+
+// #TODO - remove me
+            console.log(this.importableObject);
+// #TODO - end of remove me
         };
     }
 
@@ -533,9 +537,6 @@ export class ImportDataComponent implements OnInit {
      * @param path
      */
     getModelPropertyValues(path: string) {
-        // construct the full path
-        path = '[' + path + ']';
-
         // bring values only if we didn't bring them before already
         if (!this.fastMappedModelValues[path]) {
             // retrieve value

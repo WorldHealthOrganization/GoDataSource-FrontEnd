@@ -90,36 +90,28 @@ export class ImportableFileModel {
 
                 // add to list of filters to which we can push data
                 result.push(impLVPair);
-            } else {
-                // ignore object properties for now - this will be fixed on the next PR
-                // #TODO
 
-                // // otherwise we need to map it to multiple values
-                // if (_.isObject(impLVPair.label)) {
-                //     // add as parent drop-down as well
-                //     // #TODO
-                //     //
+            // otherwise we need to map it to multiple values
+            } else if (_.isObject(impLVPair.label)) {
+                // add as parent drop-down as well
+                // #TODO
                 //
-                //     // add child options
-                //     let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
-                //     parentTokenLabel = parentTokenLabel ? translate(parentTokenLabel) : parentTokenLabel;
-                //     labelPrefix += parentTokenLabel ? parentTokenLabel + ' => ' : '';
-                //     _.each(impLVPair.label, (token: string, prop: string) => {
-                //         // //fieldsWithoutTokens
-                //         createImportableLabelValuePair(
-                //             result,
-                //             new ImportableLabelValuePair(
-                //                 token,
-                //                 impLVPair.value + '][' + prop
-                //             ),
-                //             labelPrefix
-                //         );
-                //     });
-                // } else {
-                //     // something else - array etc
-                //     // #TODO -  at this point we didn't encounter a case were we need this one
-                //     // NOTHING TO DO HERE ?
-                // }
+
+                // add child options
+                let parentTokenLabel: string = fieldsWithoutTokens[impLVPair.value] ? fieldsWithoutTokens[impLVPair.value] : '';
+                parentTokenLabel = parentTokenLabel ? translate(parentTokenLabel) : parentTokenLabel;
+                labelPrefix += parentTokenLabel ? parentTokenLabel + ' => ' : '';
+                _.each(impLVPair.label, (token: string, prop: string) => {
+                    // //fieldsWithoutTokens
+                    createImportableLabelValuePair(
+                        result,
+                        new ImportableLabelValuePair(
+                            token,
+                            impLVPair.value + '.' + prop
+                        ),
+                        labelPrefix
+                    );
+                });
             }
         };
 
