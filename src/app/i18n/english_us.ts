@@ -749,9 +749,6 @@ export const EnglishUsLang = {
         /**
          * Outbreak Templates
          */
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': 'Date/Time',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': 'Numeric',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': 'Single Answer',
         'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
         'LNG_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
