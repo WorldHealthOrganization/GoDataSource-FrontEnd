@@ -482,5 +482,27 @@ export class RequestFilter {
         return stringified ? JSON.stringify(returnCondition) : returnCondition;
     }
 
+    /**
+     * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
+     * Only first condition is returned
+     * @param {boolean} stringified
+     * @param {boolean} includeWhere
+     * @returns {{}}
+     */
+    generateCustomConditionRelation(relationName: string = '', stringified: boolean = false, includeWhere: boolean = false ) {
+        let returnCondition: any;
+        const condition = this.isEmpty() ?
+            {} : this.conditions;
+
+        console.log(condition);
+        // include or not the 'where' property
+        if (includeWhere) {
+            returnCondition = { where: condition };
+        } else {
+            returnCondition = condition;
+        }
+        return stringified ? JSON.stringify(returnCondition) : returnCondition;
+    }
+
 
 }

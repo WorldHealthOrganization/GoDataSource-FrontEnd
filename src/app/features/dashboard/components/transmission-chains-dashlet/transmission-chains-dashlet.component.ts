@@ -13,6 +13,12 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -26,19 +32,27 @@ export class TransmissionChainsDashletComponent implements OnInit {
     graphElements: any;
     Constants = Constants;
     filters: any = {};
+    caseClassificationsList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
         private entityDataService: EntityDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
         // init filters
         this.filters.showContacts = false;
         this.filters.showEvents = true;
+
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -52,8 +66,70 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     displayChainsOfTransmission() {
         if ( this.selectedOutbreak) {
-            this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id).subscribe((chains) => {
+            console.log(this.filters);
 
+            const requestQueryBuilder = new RequestQueryBuilder();
+            // create queryBuilder for filters
+           if (this.filters) {
+               requestQueryBuilder.filter.remove('gender');
+               requestQueryBuilder.filter.remove('occupation');
+
+               const conditions: any =  {};
+               // create conditions based on filters
+               // occupation
+               if ( !_.isEmpty(this.filters.occupation) ) {
+                    conditions['occupation'] = { regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.occupation) + '/i' };
+               }
+               // gender
+               if ( !_.isEmpty(this.filters.gender) ) {
+                   conditions['gender'] =  { inq:  this.filters.gender};
+               }
+               // case classification
+               if ( !_.isEmpty(this.filters.classification) ) {
+                   conditions['classification'] = this.filters.classification;
+               }
+               // case classification
+               if ( !_.isEmpty(this.filters.locationId) ) {
+                   conditions['addresses.locationId'] = this.filters.locationId;
+               }
+               // firstName
+               if ( !_.isEmpty(this.filters.firstName) ) {
+                   conditions['firstName'] = { regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.firstName) + '/i' };
+               }
+               // lastName
+               if ( !_.isEmpty(this.filters.lastName) ) {
+                   conditions['lastName'] = { regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.lastName) + '/i' };
+               }
+               // age start
+               if ( !_.isEmpty(this.filters.age) ) {
+                   console.log(this.filters.age);
+             //      conditions['age'] =  { between:  [ this.filters.age};
+               }
+               // age end
+               if ( !_.isEmpty(this.filters.gender) ) {
+                   conditions['gender'] =  { inq:  this.filters.gender};
+               }
+               // gender
+               if ( !_.isEmpty(this.filters.gender) ) {
+                   conditions['gender'] =  { inq:  this.filters.gender};
+               }
+               // gender
+               if ( !_.isEmpty(this.filters.gender) ) {
+                   conditions['gender'] =  { inq:  this.filters.gender};
+               }
+
+
+              requestQueryBuilder.filter.where({
+                  person: {
+                      where: conditions
+                  }
+              });
+
+           }
+
+            this.filters.filtersDefault = this.filtersDefault();
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
+                console.log(chains);
                 if ( !_.isEmpty(chains) ) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
                 } else {
@@ -88,8 +164,19 @@ export class TransmissionChainsDashletComponent implements OnInit {
             });
     }
 
+    /**
+     * refresh chain data based on filters
+     */
     refreshChain() {
         this.displayChainsOfTransmission();
+    }
+
+    /**
+     * used to determine if filters are used. If not, we can load the graph faster
+     * @returns {boolean}
+     */
+    filtersDefault(): boolean {
+        return ( this.filters.showEvents && !this.filters.showContacts && _.isEmpty(this.filters.classification) && _.isEmpty(this.filters.gender) && _.isEmpty(this.filters.occupation) );
     }
 
     /**

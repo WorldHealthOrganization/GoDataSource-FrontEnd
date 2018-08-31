@@ -33,6 +33,39 @@ export class TransmissionChainDataService {
     }
 
     /**
+     * Map Transmission chain data to Chain model - we need to return the nodes even if there is no chain found
+     */
+    private mapTransmissionChainDataToModel(result) {
+        const nodes = _.get(result, 'nodes', {});
+        const edges = _.get(result, 'edges', {});
+        const transmissionChains = _.get(result, 'transmissionChains.chains', []);
+
+        if ( _.isEmpty(transmissionChains) ) {
+            return [new TransmissionChainModel({}, nodes, Object.values(edges))];
+        }
+
+        return _.map(transmissionChains, (chain) => {
+            return new TransmissionChainModel(chain, nodes, Object.values(edges));
+        });
+    }
+
+    /**
+     * Retrieve the list of Independent Transmission Chains, nodes, edges
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<TransmissionChainModel[]>}
+     */
+    getIndependentTransmissionChainData(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<TransmissionChainModel[]> {
+        const filter = queryBuilder.filter.generateFirstCondition(true, false);
+        return this.http.get(
+            `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
+        ).map(this.mapTransmissionChainDataToModel);
+    }
+
+    /**
      * Retrieve the list of Independent Transmission Chains
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
@@ -49,6 +82,7 @@ export class TransmissionChainDataService {
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
     }
+
 
     /**
      * Retrieve the list of New Transmission Chains from contacts who became cases
@@ -98,13 +132,15 @@ export class TransmissionChainDataService {
      * @returns {any}
      */
     convertChainToGraphElements(chains, filters: any): any {
+        console.log(chains);
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         let selectedNodeIds: string[] = [];
         if (!_.isEmpty(chains)) {
             const firstChain = chains[0];
-
+    console.log(filters);
+    console.log(chains);
             // if show contacts and show events filters are not checked then only look into chainRelations for cases / events - faster lookup
-            if (!filters.showContacts && filters.showEvents) {
+            if (filters.filtersDefault) {
 
                 _.forEach(chains, (chain, chainKey) => {
                     if (!_.isEmpty(chain.chainRelations)) {
@@ -147,7 +183,6 @@ export class TransmissionChainDataService {
             }
 
             if (!_.isEmpty(firstChain.relationships)) {
-                console.log(firstChain.relationships);
                 _.forEach(firstChain.relationships, function (relationship, key) {
                     // add relation only if the nodes are in the selectedNodes array
                     if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {

@@ -1,19 +1,83 @@
 <div>
-<div fxLayout="row" fxLayoutGap="10px">
-    <!-- entity type filter - events -->
-    <app-form-checkbox
-        name="showEvents"
-        label="Show Events"
-        [(ngModel)]="filters.showEvents">
-    </app-form-checkbox>
-    <!-- entity type filter - contacts -->
-    <app-form-checkbox
-        name="showContacts"
-        label="Show Contacts"
-        [(ngModel)]="filters.showContacts">
-    </app-form-checkbox>
+    <div fxLayout="row" fxLayoutGap="10px">
+        <!-- entity type filter - events -->
+        <app-form-checkbox
+            name="showEvents"
+            label="Show Events"
+            [(ngModel)]="filters.showEvents">
+        </app-form-checkbox>
+        <!-- entity type filter - contacts -->
+        <app-form-checkbox
+            name="showContacts"
+            label="Show Contacts"
+            [(ngModel)]="filters.showContacts">
+        </app-form-checkbox>
+    </div>
+    <div fxLayout="row" fxLayoutGap="10px">
+        <!-- case classification -->
+        <app-form-select
+            name="classification"
+            [(ngModel)]="filters.classification"
+            [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+            [options]="caseClassificationsList$ | async">
+        </app-form-select>
+        <!-- occupation -->
+        <app-form-input
+            name="occupation"
+            [(ngModel)]="filters.occupation"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+            maxlength="500">
+        </app-form-input>
+        <!-- gender -->
+        <app-form-select
+            name="gender"
+            [(ngModel)]="filters.gender"
+            [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+            [options]="genderList$ | async"
+            multiple="true">
+        </app-form-select>
+        <!-- first name -->
+        <app-form-input
+            name="firstName"
+            [(ngModel)]="filters.firstName"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
+            maxlength="100">
+        </app-form-input>
+        <!-- last name -->
+        <app-form-input
+            name="lastName"
+            [(ngModel)]="filters.lastName"
+            [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+            maxlength="100">
+        </app-form-input>
+    </div>
+    <div fxFlex="30">
+        <div>Age:</div>
+        <!-- age -->
+        <app-form-range
+            name="age"
+            [(ngModel)]="filters.age">
+        </app-form-range>
+    </div>
+    <div  fxFlex="30">
+        <div>Date</div>
+        <!-- Date -->
+        <app-form-daterange
+            name="date"
+            [(ngModel)]="filters.date">
+        </app-form-daterange>
 
-</div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="10px"  fxFlex="30">
+        <!-- location -->
+        <app-form-location-dropdown
+            fxFlex
+            name="locationId"
+            [(ngModel)]="filters.locationId"
+            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate">
+        </app-form-location-dropdown>
+
+    </div>
     <div>
         <button mat-raised-button (click)="refreshChain()">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
