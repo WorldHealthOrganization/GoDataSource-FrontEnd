@@ -74,7 +74,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_CASE]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Case Lab Result
     {
@@ -94,7 +97,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

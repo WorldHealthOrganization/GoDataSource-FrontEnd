@@ -5,6 +5,7 @@ import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
     // Contact list
@@ -19,7 +20,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_CONTACT]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Contact
     {
@@ -39,7 +43,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CONTACT],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Contact movement
     {
@@ -76,7 +83,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_FOLLOWUP]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Follow Up
     {
@@ -96,7 +106,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_FOLLOWUP],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 
