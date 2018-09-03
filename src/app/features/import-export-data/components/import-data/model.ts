@@ -54,6 +54,18 @@ export class ImportableFileModel {
         this.suggestedFieldMapping = _.get(data, 'suggestedFieldMapping', {});
         this.distinctFileColumnValues = _.get(data, 'distinctFileColumnValues', {});
 
+// #TODO - remove me after backend uploads fix
+this.modelPropertyValues = _.transform(this.modelPropertyValues, (result, v, k) => {
+   result[k] = _.map(v, (i) => {
+       i.label = i.label ?
+           i.label :
+           i.name
+       ;
+       return i;
+   });
+});
+// #TODO - end of remove me
+
         this.fileHeadersKeyValue = _.chain(this.fileHeaders)
             .map((value: string) => {
                 return new ImportableLabelValuePair(
