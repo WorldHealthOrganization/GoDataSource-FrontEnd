@@ -164,11 +164,6 @@ export const JapaneseLang = {
         /**
          * Outbreak Templates
          */
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT': '[言語] Free Text',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWER': '[言語] Multiple Answers',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': '[言語] Date/Time',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': '[言語] Numeric',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': '[言語] Single Answer',
 
         /**
          * Security Questions

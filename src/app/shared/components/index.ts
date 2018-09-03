@@ -21,6 +21,7 @@ import { CytoscapeGraphComponent } from './cytoscape-graph/cytoscape-graph.compo
 import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 import { GoogleMapComponent } from './google-map/google-map.component';
 import { GoogleMapMovementComponent } from './google-map-movement/google-map-movement.component';
+import { ChronologyComponent } from './chronology/chronology.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -64,6 +65,7 @@ export const components: any[] = [
     CountedItemsListComponent,
     YesNoLabelComponent,
     ReferenceDataLabelComponent,
+    ChronologyComponent,
 
     // dialogs
     DialogComponent

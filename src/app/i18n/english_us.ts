@@ -291,6 +291,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Create Case page
@@ -314,11 +315,25 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
+        'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Movement Case page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
+
+        /**
+         * Chronology Case page
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE': 'Hospitalisation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE': 'Hospitalisation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE': 'Incubation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_END_DATE': 'Incubation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE': 'Isolation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE': 'Isolation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE': 'Lab Result Date',
+
 
         /**
          * Case lab results fields
@@ -541,6 +556,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Create Contact page
@@ -565,11 +581,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Movement Contact page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
+
+        /**
+         * Chronology Contact page
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact "{{name}}" chronology',
+
 
         /**
          * Relationship Fields
@@ -780,12 +803,6 @@ export const EnglishUsLang = {
         /**
          * Outbreak Templates
          */
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT': 'Free Text',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_OPTIONS': 'Multiple Options',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_SELECTION': 'Single Selection',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': 'Date/Time',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': 'Numeric',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': 'Single Answer',
         'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
         'LNG_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',

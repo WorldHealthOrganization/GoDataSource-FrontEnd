@@ -1,0 +1,30 @@
+@import '~styles/_colors';
+
+app-chronology {
+    mgl-timeline-entry-dot {
+        background-color: @color-accent-main;
+        z-index: 10;
+    }
+
+    mgl-timeline-entry-header {
+        background-color: #F5F5F5;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    mgl-timeline-entry-side {
+        margin-top: 20px;
+    }
+
+    mgl-timeline.mobile {
+
+        // fix for IE
+        mgl-timeline-entry-side.mobile {
+            left: 10px !important;
+            width: 100px !important;
+            display: block !important;
+            z-index: 10 !important;
+        }
+
+    }
+
+}
