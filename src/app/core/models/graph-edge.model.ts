@@ -18,16 +18,7 @@ export class GraphEdgeModel {
     }
 
     setEdgeColor() {
-        // if (this.sourceType === EntityType.CASE && this.targetType === EntityType.CASE ) {
-        //     this.edgeColor = '#FAA70B';
-        // } else if (this.sourceType === EntityType.CONTACT && this.targetType === EntityType.CONTACT ) {
-        //     this.edgeColor = '#4DB0A0';
-        // } else if (this.sourceType === EntityType.EVENT && this.targetType === EntityType.EVENT ) {
-        //     this.edgeColor = '#F44708';
-        // } else {
-        //
-        // }
-        // set color based on type
+        // set the colors based on nodes type
         switch (this.targetType) {
             case EntityType.CASE: {
                 this.edgeColor = '#4DB0A0';

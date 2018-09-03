@@ -14,7 +14,7 @@ export class GraphNodeModel {
         this.name = _.get(data, 'name');
         this.type = _.get(data, 'type', '');
 
-        // set color based on type
+        // set the color based on node type
         switch (this.type) {
             case EntityType.CASE: {
                 this.nodeColor = '#4DB0A0';
