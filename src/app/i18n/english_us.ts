@@ -241,6 +241,7 @@ export const EnglishUsLang = {
         /**
          * Case Fields
          */
+        'LNG_CASE_FIELD_LABEL_CASE': 'Case',
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': 'Fill Geo-Location Latitude',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': 'Date of Outcome',

@@ -47,6 +47,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     availableSideFilters: FilterModel[];
 
+    genderOptionsList$: Observable<any[]>;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -62,6 +64,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+        this.genderOptionsList$ = this.genericDataService.getGenderList();
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -91,13 +94,80 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 type: FilterType.ADDRESS
             }),
             new FilterModel({
-                fieldName: 'firstName',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-                type: FilterType.TEXT,
-                relationshipPath: ['contact'],
-                relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                fieldName: 'date',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'lostToFollowUp',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$
+            }),
+            new FilterModel({
+                fieldName: 'performed',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                type: FilterType.SELECT,
+                options$: this.yesNoOptionsList$
             })
         ];
+        if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
+            this.availableSideFilters = [
+                ...this.availableSideFilters,
+                ...[
+                    new FilterModel({
+                        fieldName: 'firstName',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'lastName',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'gender',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+                        type: FilterType.MULTISELECT,
+                        options$: this.genderOptionsList$,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'age',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
+                        type: FilterType.RANGE_NUMBER,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dob',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+                        type: FilterType.RANGE_DATE,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'phone',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_PHONE',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'occupation',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                        type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    })
+                ]
+            ];
+        }
     }
 
     refreshList() {
