@@ -4,7 +4,8 @@
     [(ngModel)]="transmissionChainViewType"
     required="true"
     [options]="transmissionChainViewTypes$ | async"
-    (optionChanged)="updateView()">
+    (optionChanged)="updateView()"
+    [clearable]="false">
 </app-form-select>
 <!-- spinner -->
 <div class="spinnerGraph"
