@@ -301,8 +301,7 @@ export abstract class ListComponent {
         this.clearHeaderSort();
 
         // retrieve Side filters
-        if (this.sideFilter)
-        {
+        if (this.sideFilter) {
             this.queryBuilder = new RequestQueryBuilder();
             this.sideFilter.clear();
         }
