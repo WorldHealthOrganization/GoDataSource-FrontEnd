@@ -16,8 +16,7 @@ export class TransmissionChainDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Map Transmission chain to Chain model
@@ -40,7 +39,7 @@ export class TransmissionChainDataService {
         const edges = _.get(result, 'edges', {});
         const transmissionChains = _.get(result, 'transmissionChains.chains', []);
 
-        if ( _.isEmpty(transmissionChains) ) {
+        if (_.isEmpty(transmissionChains)) {
             return [new TransmissionChainModel({}, nodes, Object.values(edges))];
         }
 
@@ -132,16 +131,14 @@ export class TransmissionChainDataService {
      * @returns {any}
      */
     convertChainToGraphElements(chains, filters: any): any {
-        console.log(chains);
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         let selectedNodeIds: string[] = [];
         if (!_.isEmpty(chains)) {
+            // will use firstChainData to load all the nodes
             const firstChain = chains[0];
-    console.log(filters);
-    console.log(chains);
             // if show contacts and show events filters are not checked then only look into chainRelations for cases / events - faster lookup
             if (filters.filtersDefault) {
-
+                // loop through the list of relations from all chains
                 _.forEach(chains, (chain, chainKey) => {
                     if (!_.isEmpty(chain.chainRelations)) {
                         _.forEach(chain.chainRelations, (relation, key) => {
@@ -149,6 +146,7 @@ export class TransmissionChainDataService {
                             selectedNodeIds.push(relation.entityIds[1]);
                         });
                         selectedNodeIds = _.uniq(selectedNodeIds);
+                        // load the data for all selected nodes
                         _.forEach(selectedNodeIds, (nodeId, key) => {
                             const node = chain.nodes[nodeId];
                             if (node) {
@@ -160,11 +158,11 @@ export class TransmissionChainDataService {
                     }
                 });
             } else {
-
                 // if show contacts filter is checked or show events is not checked, then look into all the nodes - don't rely on chainRelations
                 if (!_.isEmpty(firstChain.nodes)) {
                     _.forEach(firstChain.nodes, function (node, key) {
                         let allowAdd = false;
+                        // show nodes based on their type
                         if (node.type === EntityType.CONTACT && filters.showContacts) {
                             allowAdd = true;
                         } else if (node.type === EntityType.EVENT && filters.showEvents) {
@@ -182,6 +180,7 @@ export class TransmissionChainDataService {
                 }
             }
 
+            // generate edges based on the nodes included in the graph
             if (!_.isEmpty(firstChain.relationships)) {
                 _.forEach(firstChain.relationships, function (relationship, key) {
                     // add relation only if the nodes are in the selectedNodes array
@@ -198,13 +197,12 @@ export class TransmissionChainDataService {
                             graphEdge.target = relationship.persons[0].id;
                             graphEdge.targetType = relationship.persons[0].type;
                         }
+                        // set the edge color based on the type of the source and target
                         graphEdge.setEdgeColor();
                         graphData.edges.push({data: graphEdge});
                     }
                 });
             }
-
-
         }
         return graphData;
     }
