@@ -650,6 +650,7 @@ export abstract class ListComponent {
     ) {
         this.dialogService.showInput(new DialogConfiguration({
             message: message,
+            yesLabel: 'LNG_COMMON_LABEL_EXPORT',
             placeholder: placeholder,
             customInputOptions: _.map(allowedExportTypes, (item: ImportDataExtension) => {
                 return new LabelValuePair(
@@ -660,7 +661,7 @@ export abstract class ListComponent {
             customInputOptionsMultiple: false
         })).subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
-                // #TODO
+                // answer.inputValue.value
             }
         });
     }
