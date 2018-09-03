@@ -193,6 +193,10 @@
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT' | translate }}
                     </button>
 
+                    <button mat-menu-item [routerLink]="['.', item.id, 'chronology']">
+                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
+                    </button>
+
                     <ng-container *app-selected-outbreak-is-active>
                         <button *ngIf="hasContactWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY'| translate}}

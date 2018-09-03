@@ -50,7 +50,15 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_CONTACT]
         }
     },
-
+    // View Contact chronology
+    {
+        path: ':contactId/chronology',
+        component: fromPages.ViewChronologyContactComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CONTACT]
+        }
+    },
     // Follow-ups list
     {
         path: 'follow-ups',

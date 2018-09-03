@@ -57,7 +57,15 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_CASE]
         }
     },
-
+    // View Case Chronology
+    {
+        path: ':caseId/chronology',
+        component: fromPages.ViewChronologyCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE]
+        }
+    },
     // Lab results
     {
         path: ':caseId/lab-results',
