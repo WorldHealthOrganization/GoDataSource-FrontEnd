@@ -46,18 +46,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     // available side filters
     availableSideFilters: FilterModel[];
 
-    // available lab names
-    labNamesList$;
-
-    // available sample types
-    sampleTypeList$;
-
-    // available test types
-    testTypesList$;
-
-    // available results list
-    resultsList$;
-
     constructor(
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
@@ -98,10 +86,10 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         });
 
         // get the option list for side filters
-        this.resultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
-        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
-        this.sampleTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
-        this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
+        const resultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
+        const testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
+        const sampleTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
+        const labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
 
         this.availableSideFilters = [
             new FilterModel({
@@ -132,29 +120,47 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 fieldName: 'labName',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
                 type: FilterType.SELECT,
-                options$: this.labNamesList$,
+                options$: labNamesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'sampleType',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
                 type: FilterType.SELECT,
-                options$: this.sampleTypeList$,
+                options$: sampleTypeList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testType',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
                 type: FilterType.SELECT,
-                options$: this.testTypesList$,
+                options$: testTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'result',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
-                options$: this.resultsList$,
+                options$: resultsList$,
             }),
+            new FilterModel({
+                fieldName: 'dateTesting',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+                type: FilterType.RANGE_DATE,
+                sortable: true,
+            }),
+            new FilterModel({
+                fieldName: 'notes',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES',
+                type: FilterType.TEXT,
+                sortable: true,
+            }),
+            new FilterModel({
+                fieldName: 'status',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
+                type: FilterType.TEXT,
+                sortable: true,
+            })
         ];
     }
 
