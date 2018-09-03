@@ -97,7 +97,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        protected dialogService: DialogService
     ) {
         super();
     }

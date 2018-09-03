@@ -10,25 +10,27 @@ export enum DialogAnswerButton {
 }
 
 export class DialogAnswerInputValue {
-    constructor(public value?: number) {
-    }
+    constructor(public value?: any) {}
 }
 
 export class DialogAnswer {
-    constructor(public button: DialogAnswerButton,
-                public inputValue?: DialogAnswerInputValue) {
-    }
+    constructor(
+        public button: DialogAnswerButton,
+        public inputValue?: DialogAnswerInputValue
+    ) {}
 }
 
 export class DialogConfiguration {
     public message: string;
-    public yesLabel?: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
-    public cancelLabel?: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
-    public placeholder?: string = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
-    public translateData?: {} = {};
-    public customInput?: boolean = false;
-    public required?: boolean = false;
-    public data?: LabelValuePair[];
+    public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
+    public cancelLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
+    public placeholder: string = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
+    public translateData: {} = {};
+    public customInput: boolean = false;
+    public customInputOptions: LabelValuePair[];
+    public customInputOptionsMultiple: boolean = false;
+    public required: boolean = false;
+    public data: LabelValuePair[];
 
     constructor(data: string | {
         message: string,
@@ -37,6 +39,8 @@ export class DialogConfiguration {
         placeholder?: string,
         translateData?: {},
         customInput?: boolean,
+        customInputOptions?: LabelValuePair[],
+        customInputOptionsMultiple?: boolean,
         required?: boolean,
         data?: LabelValuePair[]
     }) {

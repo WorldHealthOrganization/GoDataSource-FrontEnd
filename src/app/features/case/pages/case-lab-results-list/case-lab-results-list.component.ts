@@ -47,7 +47,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private caseDataService: CaseDataService,
         private labResultDataService: LabResultDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private genericDataService: GenericDataService
     ) {
         super();

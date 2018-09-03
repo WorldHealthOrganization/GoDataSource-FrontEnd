@@ -81,7 +81,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService
     ) {
         super(listFilterDataService, route.queryParams);

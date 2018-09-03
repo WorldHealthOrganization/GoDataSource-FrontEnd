@@ -13,6 +13,10 @@ import { SideFiltersComponent } from '../../shared/components/side-filters/side-
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
 import { DateRangeModel } from '../models/date-range.model';
+import { ImportDataExtension } from '../../features/import-export-data/components/import-data/import-data.component';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../shared/components';
+import { DialogService } from '../services/helper/dialog.service';
+import { LabelValuePair } from '../models/label-value-pair';
 
 export abstract class ListComponent {
     /**
@@ -64,7 +68,8 @@ export abstract class ListComponent {
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
-        protected queryParams: Observable<Params> = null
+        protected queryParams: Observable<Params> = null,
+        protected dialogService: DialogService = null
     ) {
         // check the filter after creating the List Component instance
         setTimeout(() => {
@@ -634,4 +639,29 @@ export abstract class ListComponent {
         this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
     }
 
+    /**
+     * Export data
+     */
+    protected exportData(
+        message: string,
+        placeholder: string,
+        exportUrl: string,
+        allowedExportTypes: ImportDataExtension[]
+    ) {
+        this.dialogService.showInput(new DialogConfiguration({
+            message: message,
+            placeholder: placeholder,
+            customInputOptions: _.map(allowedExportTypes, (item: ImportDataExtension) => {
+                return new LabelValuePair(
+                    item.toString(),
+                    item.toString()
+                );
+            }),
+            customInputOptionsMultiple: false
+        })).subscribe((answer: DialogAnswer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                // #TODO
+            }
+        });
+    }
 }

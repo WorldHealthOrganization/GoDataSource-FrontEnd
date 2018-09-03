@@ -4,6 +4,9 @@ import { Observable } from 'rxjs/Observable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { ImportDataExtension } from '../../../import-export-data/components/import-data/import-data.component';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -11,7 +14,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
     templateUrl: './reference-data-categories-list.component.html',
     styleUrls: ['./reference-data-categories-list.component.less']
 })
-export class ReferenceDataCategoriesListComponent {
+export class ReferenceDataCategoriesListComponent extends ListComponent {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -22,9 +25,24 @@ export class ReferenceDataCategoriesListComponent {
 
     constructor(
         private router: Router,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        protected dialogService: DialogService
     ) {
+        super(
+            null,
+            null,
+            dialogService
+        );
+
+        // load reference data
         this.referenceData$ = this.referenceDataDataService.getReferenceData();
+    }
+
+    /**
+     * Implement abstract function
+     */
+    public refreshList() {
+        // NOTHING
     }
 
     /**
@@ -32,8 +50,29 @@ export class ReferenceDataCategoriesListComponent {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['categoryName', 'entries', 'actions'];
+        return [
+            'categoryName',
+            'entries',
+            'actions'
+        ];
+    }
 
-        return columns;
+    /**
+     * Export reference data
+     */
+    exportReferenceData() {
+        super.exportData(
+            'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE',
+            'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TYPE',
+            'reference-data/export',
+            [
+                ImportDataExtension.JSON,
+                ImportDataExtension.ODS,
+                ImportDataExtension.XML,
+                ImportDataExtension.XLSX,
+                ImportDataExtension.XLS,
+                ImportDataExtension.CSV
+            ]
+        );
     }
 }

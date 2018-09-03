@@ -49,7 +49,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute
     ) {

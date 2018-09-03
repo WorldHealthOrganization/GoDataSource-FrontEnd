@@ -39,7 +39,7 @@ export class UserListComponent extends ListComponent implements OnInit {
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService,
+        protected dialogService: DialogService,
         private userRoleDataService: UserRoleDataService
     ) {
         super();
