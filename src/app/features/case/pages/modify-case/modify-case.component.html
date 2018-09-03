@@ -325,6 +325,14 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
+        <button *ngIf="viewOnly && hasCaseWriteAccess()"
+                mat-raised-button color="primary" class="button-primary"
+                [routerLink]="['/cases', caseData.id, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>

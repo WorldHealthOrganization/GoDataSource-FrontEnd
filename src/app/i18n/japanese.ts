@@ -14,7 +14,7 @@ export const JapaneseLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': '[言語] Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': '[言語] Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': '[言語] Teams',
-        'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL': '[言語] Clusters',
+        'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': '[言語] Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': '[言語] Contacts',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': '[言語] Cases',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': '[言語] Events',

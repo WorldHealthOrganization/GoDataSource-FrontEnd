@@ -15,7 +15,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
-        'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL': 'Clusters',
+        'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Upcoming Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL': 'Missed Follow-ups',
@@ -80,6 +80,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
@@ -375,6 +376,36 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
+
+        /**
+         * Cluster Fields
+         */
+        'LNG_CLUSTER_FIELD_LABEL_NAME': 'Name',
+        'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION': 'Description',
+
+        /**
+         * Clusters list page
+         */
+        'LNG_PAGE_LIST_CLUSTERS_TITLE': 'Clusters',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE': 'View People',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Cluster deleted!',
+
+        /**
+         * Create Cluster page
+         */
+        'LNG_PAGE_CREATE_CLUSTER_TITLE': 'Create New Cluster',
+        'LNG_PAGE_CREATE_CLUSTER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON': 'Create Cluster',
+        'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE': 'Cluster created!',
+
+        /**
+         * View / Modify Cluster page
+         */
+        'LNG_PAGE_VIEW_CLUSTER_TITLE': 'View {{name}}',
+        'LNG_PAGE_MODIFY_CLUSTER_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_CLUSTER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE': 'Cluster saved!',
+        'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE': 'View People',
 
         /**
          * Entity Relationships list page
