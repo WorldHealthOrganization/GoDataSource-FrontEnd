@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
-import { FormControl, NgForm } from '@angular/forms';
+import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { SnackbarService } from './snackbar.service';
 
@@ -94,23 +94,52 @@ export class FormHelperService {
     /**
      * Check if a form is modified and valid, otherwise display a meaningful error
      * @param form
+     * @param checkForChanges
      * @returns {boolean}
      */
-    validateForm(form) {
-        // get dirty fields
-        const dirtyFields: any = this.getDirtyFields(form);
-
+    validateForm(
+        form: NgForm,
+        checkForChanges: boolean = true
+    ) {
+        // display invalid error if form is invalid
         if (!form.valid) {
             this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
             return false;
         }
 
-        if (_.isEmpty(dirtyFields)) {
-            this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
-            return false;
+        // do we to display a message if there are no changes ?
+        if (checkForChanges) {
+            // get dirty fields
+            const dirtyFields: any = this.getDirtyFields(form);
+
+            // if there are no changes, display an error
+            if (_.isEmpty(dirtyFields)) {
+                this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+                return false;
+            }
         }
 
+        // form is valid
         return true;
+    }
+
+    /**
+     * Get list of invalid controls
+     * @param form
+     */
+    getInvalidControls(form: NgForm) {
+        // we don't handle if there are two controls with the same name
+        const invalidControls: {
+            [name: string]: AbstractControl
+        } = {};
+        _.forEach(form.controls, (control: AbstractControl, controlName: string) => {
+            if (control.invalid) {
+                invalidControls[controlName] = control;
+            }
+        });
+
+        // finished
+        return invalidControls;
     }
 }
 

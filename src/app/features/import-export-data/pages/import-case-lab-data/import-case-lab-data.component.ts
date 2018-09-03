@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ImportDataExtension } from '../../components/import-data/import-data.component';
+import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 @Component({
@@ -13,6 +13,10 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 })
 export class ImportCaseLabDataComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_CASES_TITLE',
+            '/cases',
+        ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
             '',
@@ -32,6 +36,18 @@ export class ImportCaseLabDataComponent implements OnInit {
     displayLoading: boolean = true;
 
     importFileUrl: string = '';
+    importDataUrl: string = '';
+
+    ImportServerModelNames = ImportServerModelNames;
+
+    fieldsWithoutTokens = {
+        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+    };
+
+    requiredDestinationFields = [
+        'personId',
+        'dateSampleTaken'
+    ];
 
     /**
      * Constructor
@@ -50,7 +66,11 @@ export class ImportCaseLabDataComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // get the results for contacts on the follow up list
                 if (selectedOutbreak && selectedOutbreak.id) {
+                    // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
+                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/lab-results/import-importable-file-using-map`;
+
+                    // display import form
                     this.displayLoading = false;
                 }
             });

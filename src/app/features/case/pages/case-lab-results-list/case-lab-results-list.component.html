@@ -5,15 +5,6 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button
-                        *ngIf="!appliedListFilter"
-                        class="button-primary"
-                        mat-raised-button
-                        color="primary"
-                        [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
-                        {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
-                    </button>
-
                     <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
                         {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
                     </button>

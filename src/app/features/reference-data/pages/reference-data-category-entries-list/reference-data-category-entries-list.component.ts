@@ -23,7 +23,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ReferenceDataCategoryEntriesListComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '.')
+        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
     ];
 
     categoryEntries$: Observable<ReferenceDataEntryModel[]>;

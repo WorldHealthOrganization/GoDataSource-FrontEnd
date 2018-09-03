@@ -1,4 +1,4 @@
-import { Attribute, Directive, forwardRef } from '@angular/core';
+import { Attribute, Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 
@@ -18,10 +18,21 @@ import * as _ from 'lodash';
 export class UniqueValidatorDirective implements Validator {
     private regex: RegExp;
 
+    private _appUniqueValidatorExpression: string;
+    @Input() set appUniqueValidatorExpression(value: string) {
+        this._appUniqueValidatorExpression = value;
+        this.regex = new RegExp(this._appUniqueValidatorExpression, 'i');
+    }
+    get appUniqueValidatorExpression(): string {
+        return this._appUniqueValidatorExpression;
+    }
+
     constructor(
         @Attribute('app-unique-validator') private appUniqueValidator: string
     ) {
-        this.regex = new RegExp( appUniqueValidator, 'i');
+        if (appUniqueValidator) {
+            this.regex = new RegExp(appUniqueValidator, 'i');
+        }
     }
 
     validate(control: AbstractControl): { [key: string]: any } {
@@ -39,6 +50,7 @@ export class UniqueValidatorDirective implements Validator {
         ) {
             _.each(control.root.controls, (ctrl: AbstractControl, name: string) => {
                 if (
+                    this.regex &&
                     this.regex.test(name) &&
                     _.isString(ctrl.value) &&
                     ctrl.value.toLowerCase() === control.value.toLowerCase()
