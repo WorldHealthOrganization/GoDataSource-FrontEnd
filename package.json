@@ -28,6 +28,7 @@
         "@ng-select/ng-select": "1.5.2",
         "@ngx-translate/core": "9.1.1",
         "@types/googlemaps": "3.30.11",
+        "angular-mgl-timeline": "0.2.0",
         "core-js": "2.5.6",
         "cytoscape": "3.2.15",
         "cytoscape-cola": "2.2.3",

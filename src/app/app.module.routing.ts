@@ -108,6 +108,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_EVENT]
                 }
             },
+            // Cluster Module routes
+            {
+                path: ModulePath.ClusterModule,
+                loadChildren: './features/cluster/cluster.module#ClusterModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_OUTBREAK]
+                }
+            },
             // Relationship Module routes
             {
                 path: ModulePath.RelationshipModule,

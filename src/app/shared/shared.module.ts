@@ -11,7 +11,7 @@ import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { ResizableModule } from 'angular-resizable-element';
+import { MglTimelineModule } from 'angular-mgl-timeline';
 
 @NgModule({
     imports: [
@@ -23,7 +23,7 @@ import { ResizableModule } from 'angular-resizable-element';
         XtFormsModule,
         AngularMaterialModule,
         TranslateModule,
-        ResizableModule
+        MglTimelineModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -40,7 +40,7 @@ import { ResizableModule } from 'angular-resizable-element';
         TranslateModule,
         XtFormsModule,
         AngularMaterialModule,
-        ResizableModule,
+        MglTimelineModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components,
