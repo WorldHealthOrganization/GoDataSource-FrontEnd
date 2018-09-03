@@ -21,26 +21,33 @@ export class DialogAnswer {
 }
 
 export class DialogConfiguration {
-    constructor(public message: string,
-                public yesLabel?: string,
-                public cancelLabel?: string,
-                public placeholder?: string,
-                public translateData?: {},
-                public customInput?: boolean,
-                public required?: boolean,
-                public data?: LabelValuePair[]) {
-        // default values since we can't do this from the parameters
-        if (!yesLabel) {
-            this.yesLabel = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
-        }
-        if (!cancelLabel) {
-            this.cancelLabel = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
-        }
-        if (!placeholder) {
-            this.placeholder = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
-        }
-        if (!translateData) {
-            this.translateData = {};
+    public message: string;
+    public yesLabel?: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
+    public cancelLabel?: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
+    public placeholder?: string = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
+    public translateData?: {} = {};
+    public customInput?: boolean = false;
+    public required?: boolean = false;
+    public data?: LabelValuePair[];
+
+    constructor(data: string | {
+        message: string,
+        yesLabel?: string,
+        cancelLabel?: string,
+        placeholder?: string,
+        translateData?: {},
+        customInput?: boolean,
+        required?: boolean,
+        data?: LabelValuePair[]
+    }) {
+        // assign properties
+        if (_.isString(data)) {
+            this.message = data as string;
+        } else {
+            Object.assign(
+                this,
+                data
+            );
         }
     }
 }

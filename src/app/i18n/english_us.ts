@@ -782,6 +782,7 @@ export const EnglishUsLang = {
          * Reference Data - Categories List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export',
 
         /**
          * Reference Data - Category Entries List page
