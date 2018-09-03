@@ -28,6 +28,7 @@
         <div fxLayout="row" fxLayoutGap="10px">
             <!-- case classification -->
             <app-form-select
+                fxFlex="20"
                 name="classification"
                 [(ngModel)]="filters.classification"
                 [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
@@ -35,6 +36,7 @@
             </app-form-select>
             <!-- occupation -->
             <app-form-input
+                fxFlex="20"
                 name="occupation"
                 [(ngModel)]="filters.occupation"
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
@@ -42,6 +44,7 @@
             </app-form-input>
             <!-- gender -->
             <app-form-select
+                fxFlex="10"
                 name="gender"
                 [(ngModel)]="filters.gender"
                 [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
@@ -50,6 +53,7 @@
             </app-form-select>
             <!-- first name -->
             <app-form-input
+                fxFlex="20"
                 name="firstName"
                 [(ngModel)]="filters.firstName"
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
@@ -57,6 +61,7 @@
             </app-form-input>
             <!-- last name -->
             <app-form-input
+                fxFlex="20"
                 name="lastName"
                 [(ngModel)]="filters.lastName"
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
