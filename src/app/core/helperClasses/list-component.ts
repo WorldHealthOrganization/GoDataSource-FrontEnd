@@ -17,7 +17,7 @@ import { ImportDataExtension } from '../../features/import-export-data/component
 import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../shared/components';
 import { DialogService } from '../services/helper/dialog.service';
 import { LabelValuePair } from '../models/label-value-pair';
-import { ImportExportService } from '../services/data/import-export.service';
+import { ImportExportDataService } from '../services/data/import-export.data.service';
 
 export abstract class ListComponent {
     /**
@@ -71,7 +71,7 @@ export abstract class ListComponent {
         protected listFilterDataService: ListFilterDataService = null,
         protected queryParams: Observable<Params> = null,
         protected dialogService: DialogService = null,
-        protected importExportService: ImportExportService = null
+        protected importExportDataService: ImportExportDataService = null
     ) {
         // check the filter after creating the List Component instance
         setTimeout(() => {
@@ -663,7 +663,7 @@ export abstract class ListComponent {
             customInputOptionsMultiple: false
         })).subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
-                this.importExportService.exportData(
+                this.importExportDataService.exportData(
                     exportUrl,
                     answer.inputValue.value
                 ).subscribe((blob) => {

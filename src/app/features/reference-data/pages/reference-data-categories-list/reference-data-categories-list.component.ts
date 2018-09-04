@@ -7,7 +7,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ImportDataExtension } from '../../../import-export-data/components/import-data/import-data.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ImportExportService } from '../../../../core/services/data/import-export.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -28,13 +28,13 @@ export class ReferenceDataCategoriesListComponent extends ListComponent {
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         protected dialogService: DialogService,
-        protected importExportService: ImportExportService
+        protected importExportDataService: ImportExportDataService
     ) {
         super(
             null,
             null,
             dialogService,
-            importExportService
+            importExportDataService
         );
 
         // load reference data
