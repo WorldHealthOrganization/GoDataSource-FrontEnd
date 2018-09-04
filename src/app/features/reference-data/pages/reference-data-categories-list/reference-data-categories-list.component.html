@@ -4,17 +4,18 @@
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
             <div class="topnav-actions">
-                <button
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    (click)="exportReferenceData()">
-                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate}}
-                </button>
+                <app-export-button
+                    [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
+                    [placeholder]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TYPE' | translate"
+                    url="reference-data/export"
+                    [fileName]="referenceDataExporFileName">
+                </app-export-button>
             </div>
         </div>
     </ng-container>
 </app-topnav>
+
 <mat-card class="page-section page-content">
 
     <mat-table #table [dataSource]="referenceData$ | async">

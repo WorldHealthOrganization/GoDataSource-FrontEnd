@@ -72,6 +72,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
+        'LNG_COMMON_BUTTON_EXPORT': 'Export',
 
         /**
          * Dialogs

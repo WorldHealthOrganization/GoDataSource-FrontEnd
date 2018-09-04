@@ -13,6 +13,7 @@ export class ImportExportDataService {
      * Import data
      * @param url
      * @param data
+     * @returns {Observable<any>}
      */
     importData(url: string, data: {}): Observable<any> {
         return this.http.post(url, data);
@@ -22,8 +23,9 @@ export class ImportExportDataService {
      * Export Data
      * @param url
      * @param fileType
+     * @returns {Observable<Blob>}
      */
-    exportData(url: string, fileType: string): Observable<any>  {
+    exportData(url: string, fileType: string): Observable<Blob>  {
         return this.http.get(
             `${url}?type=${fileType}`, {
                 responseType: 'blob'

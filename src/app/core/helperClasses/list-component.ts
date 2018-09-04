@@ -13,11 +13,6 @@ import { SideFiltersComponent } from '../../shared/components/side-filters/side-
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
 import { DateRangeModel } from '../models/date-range.model';
-import { ImportDataExtension } from '../../features/import-export-data/components/import-data/import-data.component';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../../shared/components';
-import { DialogService } from '../services/helper/dialog.service';
-import { LabelValuePair } from '../models/label-value-pair';
-import { ImportExportDataService } from '../services/data/import-export.data.service';
 
 export abstract class ListComponent {
     /**
@@ -69,9 +64,7 @@ export abstract class ListComponent {
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
-        protected queryParams: Observable<Params> = null,
-        protected dialogService: DialogService = null,
-        protected importExportDataService: ImportExportDataService = null
+        protected queryParams: Observable<Params> = null
     ) {
         // check the filter after creating the List Component instance
         setTimeout(() => {
@@ -639,40 +632,5 @@ export abstract class ListComponent {
 
     initIndividualCheckbox(key) {
         this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
-    }
-
-    /**
-     * Export data
-     */
-    protected exportData(
-        message: string,
-        placeholder: string,
-        exportUrl: string,
-        allowedExportTypes: ImportDataExtension[]
-    ) {
-        this.dialogService.showInput(new DialogConfiguration({
-            message: message,
-            yesLabel: 'LNG_COMMON_LABEL_EXPORT',
-            placeholder: placeholder,
-            customInputOptions: _.map(allowedExportTypes, (item: ImportDataExtension) => {
-                return new LabelValuePair(
-                    item.toString(),
-                    item.toString().substr(1)
-                );
-            }),
-            customInputOptionsMultiple: false
-        })).subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                this.importExportDataService.exportData(
-                    exportUrl,
-                    answer.inputValue.value
-                ).subscribe((blob) => {
-                    // console.log(data.type);
-                    // console.log(data.body);
-                    const url = window.URL.createObjectURL(blob);
-                    window.open(url);
-                });
-            }
-        });
     }
 }
