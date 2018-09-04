@@ -85,6 +85,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
                     // navigate to Cases/Events listing page
+                    this.disableDirtyConfirm();
                     if (entityType === EntityType.EVENT) {
                         this.router.navigate(['/events']);
                     } else {
@@ -105,6 +106,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         this.snackbarService.showError(err.message);
 
                         // redirect to cases
+                        this.disableDirtyConfirm();
                         this.router.navigate(['/cases']);
                         return ErrorObservable.create(err);
                     })
@@ -119,6 +121,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                                 this.snackbarService.showError(err.message);
 
                                 // navigate to Cases/Events listing page
+                                this.disableDirtyConfirm();
                                 if (entityType === EntityType.EVENT) {
                                     this.router.navigate(['/events']);
                                 } else {
@@ -204,6 +207,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
                             // navigate to listing page
+                            this.disableDirtyConfirm();
                             this.router.navigate(['/contacts']);
                         });
                 });

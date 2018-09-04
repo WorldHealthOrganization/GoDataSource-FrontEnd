@@ -89,7 +89,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                                         // show error message
                                         this.snackbarService.showError(err.message);
 
-                                        // redirect to cases
+                                        // redirect
+                                        this.disableDirtyConfirm();
                                         this.router.navigate(['/contacts/follow-ups']);
                                         return ErrorObservable.create(err);
                                     })
@@ -136,6 +137,7 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(['/contacts/follow-ups']);
             });
     }

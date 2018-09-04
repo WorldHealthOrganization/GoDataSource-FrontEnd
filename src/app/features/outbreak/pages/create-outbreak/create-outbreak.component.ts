@@ -73,6 +73,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     // load language tokens so they will be available
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(['/outbreaks']);
                 });
         }

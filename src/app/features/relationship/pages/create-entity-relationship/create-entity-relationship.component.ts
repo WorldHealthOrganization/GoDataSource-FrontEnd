@@ -82,6 +82,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
                     // No entities selected; navigate back to Available Entities list
+                    this.disableDirtyConfirm();
                     this.router.navigate(['..', 'available-entities']);
                 } else {
                     this.selectedEntityIds = JSON.parse(queryParams.selectedEntityIds);
@@ -115,6 +116,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                                 this.snackbarService.showError(err.message);
 
                                 // Entity not found; navigate back to Entities list
+                                this.disableDirtyConfirm();
                                 this.router.navigate([this.entityMap[this.entityType].link]);
 
                                 return ErrorObservable.create(err);
@@ -221,6 +223,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 }
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
     }

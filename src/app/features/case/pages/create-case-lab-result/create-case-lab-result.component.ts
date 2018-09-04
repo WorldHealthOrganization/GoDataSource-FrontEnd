@@ -82,6 +82,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                                 this.snackbarService.showError(err.message);
 
                                 // Case not found; navigate back to Cases list
+                                this.disableDirtyConfirm();
                                 this.router.navigate(['/cases']);
 
                                 return ErrorObservable.create(err);
@@ -125,6 +126,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate([`/cases/${this.caseId}/lab-results`]);
                 });
         }

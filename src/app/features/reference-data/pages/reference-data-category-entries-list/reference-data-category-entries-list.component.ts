@@ -42,6 +42,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
     }
 
     ngOnInit() {
+        // no need for confirm popup on this page
+        this.disableDirtyConfirm();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         // get the route params
