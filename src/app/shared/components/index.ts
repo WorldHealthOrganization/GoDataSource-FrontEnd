@@ -65,8 +65,6 @@ export const components: any[] = [
     CountedItemsListComponent,
     YesNoLabelComponent,
     ReferenceDataLabelComponent,
-    DashboardMetricDashletComponent,
-    DashboardDynamicMetricDashletComponent,
     CytoscapeGraphComponent,
     GoogleMapComponent,
     GoogleMapMovementComponent,
