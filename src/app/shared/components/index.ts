@@ -54,7 +54,6 @@ export const components: any[] = [
     FormDocumentComponent,
     FormDocumentListComponent,
     FormRangeComponent,
-    FormRangeComponent,
     FormRelationshipComponent,
     FormInputListComponent,
     FormLocationDropdownComponent,

@@ -307,7 +307,6 @@ export abstract class ListComponent {
             (queryBuilder = this.sideFilter.getQueryBuilder())
         ) {
             this.queryBuilder = queryBuilder;
-            this.sideFilter.reset();
         }
 
         // apply list filters which is mandatory
