@@ -56,15 +56,12 @@ export class DialogService {
         // create input dialog configuration
         let dialogConf: DialogConfiguration = null;
         if (_.isString(messageToken)) {
-            dialogConf = new DialogConfiguration(
-                messageToken as string,
-                undefined,
-                undefined,
-                undefined,
-                translateData,
-                true,
-                required
-            );
+            dialogConf = new DialogConfiguration({
+                message: messageToken as string,
+                translateData: translateData,
+                customInput: true,
+                required: required
+            });
         } else {
             dialogConf = messageToken as DialogConfiguration;
             dialogConf.required = required;
@@ -89,16 +86,10 @@ export class DialogService {
      */
     showDataDialog(data: LabelValuePair[]): Observable<DialogAnswer> {
         // construct dialog message data
-        const dialogConfig = new DialogConfiguration(
-            '',
-            undefined,
-            undefined,
-            undefined,
-            {},
-            false,
-            false,
-            data
-        );
+        const dialogConfig = new DialogConfiguration({
+            message: '',
+            data: data
+        });
         const dialogComp = DialogComponent.defaultConfigWithData(dialogConfig);
 
         // open dialog
