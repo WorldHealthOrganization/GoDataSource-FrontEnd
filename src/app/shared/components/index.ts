@@ -72,7 +72,7 @@ export const components: any[] = [
     GoogleMapMovementComponent,
     DashboardCustomMetricDashletComponent,
     LocationBreadcrumbsComponent,
-    ChronologyComponent
+    ChronologyComponent,
 
     // dialogs
     DialogComponent
