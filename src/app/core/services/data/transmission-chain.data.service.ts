@@ -8,6 +8,7 @@ import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/m
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -31,6 +32,39 @@ export class TransmissionChainDataService {
     }
 
     /**
+     * Map Transmission chain data to Chain model - we need to return the nodes even if there is no chain found
+     */
+    private mapTransmissionChainDataToModel(result) {
+        const nodes = _.get(result, 'nodes', {});
+        const edges = _.get(result, 'edges', {});
+        const transmissionChains = _.get(result, 'transmissionChains.chains', []);
+
+        if (_.isEmpty(transmissionChains)) {
+            return [new TransmissionChainModel({}, nodes, Object.values(edges))];
+        }
+
+        return _.map(transmissionChains, (chain) => {
+            return new TransmissionChainModel(chain, nodes, Object.values(edges));
+        });
+    }
+
+    /**
+     * Retrieve the list of Independent Transmission Chains, nodes, edges
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<TransmissionChainModel[]>}
+     */
+    getIndependentTransmissionChainData(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<TransmissionChainModel[]> {
+        const filter = queryBuilder.filter.generateFirstCondition(true, false);
+        return this.http.get(
+            `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
+        ).map(this.mapTransmissionChainDataToModel);
+    }
+
+    /**
      * Retrieve the list of Independent Transmission Chains
      * @param {string} outbreakId
      * @param {RequestQueryBuilder} queryBuilder
@@ -47,6 +81,7 @@ export class TransmissionChainDataService {
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
     }
+
 
     /**
      * Retrieve the list of New Transmission Chains from contacts who became cases
@@ -87,6 +122,89 @@ export class TransmissionChainDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
             MetricIndependentTransmissionChainsModel);
+    }
+
+    /**
+     * convert transmission chain model to the format needed by the graph
+     * @param chains
+     * @param filters
+     * @returns {any}
+     */
+    convertChainToGraphElements(chains, filters: any): any {
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
+        let selectedNodeIds: string[] = [];
+        if (!_.isEmpty(chains)) {
+            // will use firstChainData to load all the nodes
+            const firstChain = chains[0];
+            // if show contacts and show events filters are not checked then only look into chainRelations for cases / events - faster lookup
+            if (filters.filtersDefault) {
+                // loop through the list of relations from all chains
+                _.forEach(chains, (chain, chainKey) => {
+                    if (!_.isEmpty(chain.chainRelations)) {
+                        _.forEach(chain.chainRelations, (relation, key) => {
+                            selectedNodeIds.push(relation.entityIds[0]);
+                            selectedNodeIds.push(relation.entityIds[1]);
+                        });
+                        selectedNodeIds = _.uniq(selectedNodeIds);
+                        // load the data for all selected nodes
+                        _.forEach(selectedNodeIds, (nodeId, key) => {
+                            const node = chain.nodes[nodeId];
+                            if (node) {
+                                const nodeData = new GraphNodeModel(node.model);
+                                nodeData.type = node.type;
+                                graphData.nodes.push({data: nodeData});
+                            }
+                        });
+                    }
+                });
+            } else {
+                // if show contacts filter is checked or show events is not checked, then look into all the nodes - don't rely on chainRelations
+                if (!_.isEmpty(firstChain.nodes)) {
+                    _.forEach(firstChain.nodes, function (node, key) {
+                        let allowAdd = false;
+                        // show nodes based on their type
+                        if (node.type === EntityType.CONTACT && filters.showContacts) {
+                            allowAdd = true;
+                        } else if (node.type === EntityType.EVENT && filters.showEvents) {
+                            allowAdd = true;
+                        } else if (node.type === EntityType.CASE) {
+                            allowAdd = true;
+                        }
+                        if (allowAdd) {
+                            const nodeData = new GraphNodeModel(node.model);
+                            nodeData.type = node.type;
+                            graphData.nodes.push({data: nodeData});
+                            selectedNodeIds.push(nodeData.id);
+                        }
+                    });
+                }
+            }
+
+            // generate edges based on the nodes included in the graph
+            if (!_.isEmpty(firstChain.relationships)) {
+                _.forEach(firstChain.relationships, function (relationship, key) {
+                    // add relation only if the nodes are in the selectedNodes array
+                    if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
+                        const graphEdge = new GraphEdgeModel();
+                        if (relationship.persons[0].source) {
+                            graphEdge.source = relationship.persons[0].id;
+                            graphEdge.sourceType = relationship.persons[0].type;
+                            graphEdge.target = relationship.persons[1].id;
+                            graphEdge.targetType = relationship.persons[1].type;
+                        } else {
+                            graphEdge.source = relationship.persons[1].id;
+                            graphEdge.sourceType = relationship.persons[1].type;
+                            graphEdge.target = relationship.persons[0].id;
+                            graphEdge.targetType = relationship.persons[0].type;
+                        }
+                        // set the edge color based on the type of the source and target
+                        graphEdge.setEdgeColor();
+                        graphData.edges.push({data: graphEdge});
+                    }
+                });
+            }
+        }
+        return graphData;
     }
 }
 
