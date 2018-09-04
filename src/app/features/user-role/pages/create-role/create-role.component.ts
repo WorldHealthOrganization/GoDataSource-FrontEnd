@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-role',
@@ -19,7 +20,7 @@ import * as _ from 'lodash';
     templateUrl: './create-role.component.html',
     styleUrls: ['./create-role.component.less']
 })
-export class CreateRoleComponent {
+export class CreateRoleComponent extends ConfirmOnFormChanges {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '..'),
@@ -35,6 +36,7 @@ export class CreateRoleComponent {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super();
         // get the list of permissions to populate the dropdown in UI
         this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions();
     }

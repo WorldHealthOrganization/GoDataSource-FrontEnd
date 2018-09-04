@@ -12,6 +12,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 import * as _ from 'lodash';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-user',
@@ -19,7 +20,7 @@ import * as _ from 'lodash';
     templateUrl: './create-user.component.html',
     styleUrls: ['./create-user.component.less']
 })
-export class CreateUserComponent {
+export class CreateUserComponent extends ConfirmOnFormChanges {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '..'),
@@ -37,6 +38,7 @@ export class CreateUserComponent {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super();
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
     }
