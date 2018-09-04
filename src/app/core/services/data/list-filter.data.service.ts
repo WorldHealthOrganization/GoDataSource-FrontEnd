@@ -12,6 +12,9 @@ import * as moment from 'moment';
 import { DateRangeModel } from '../../models/date-range.model';
 import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
+import { Moment } from 'moment';
+import { ContactDataService } from './contact.data.service';
+import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 
 @Injectable()
 export class ListFilterDataService {
@@ -20,7 +23,8 @@ export class ListFilterDataService {
         private outbreakDataService: OutbreakDataService,
         private followUpDataService: FollowUpsDataService,
         private genericDataService: GenericDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private contactDataService: ContactDataService
     ) {}
 
 
@@ -321,5 +325,31 @@ export class ListFilterDataService {
             true
         );
         return filterQueryBuilder;
+    }
+
+    /**
+     * Create the query builder for filtering the contacts seen on selected date
+     * @param {date} date
+     * @returns {Observable<MetricContactsSeenEachDays>}
+     */
+    filterContactsSeen(date: Moment): Observable<MetricContactsSeenEachDays> {
+        // get the outbreakId
+        return this.outbreakDataService
+            .getSelectedOutbreak()
+            .mergeMap((selectedOutbreak: OutbreakModel) => {
+            // build the query builder
+                const qb = new RequestQueryBuilder();
+
+                // filter by date
+                qb.filter.byDateRange(
+                    'date', {
+                        // clone date
+                        startDate: moment(date).startOf('day'),
+                        endDate: moment(date).endOf('day')
+                    }
+                );
+
+                return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
+            });
     }
 }

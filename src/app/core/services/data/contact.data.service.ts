@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactModel } from '../../models/contact.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ExposureTypeGroupModel } from '../../models/exposure-type-group';
+import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 
 @Injectable()
 export class ContactDataService {
@@ -82,6 +83,19 @@ export class ContactDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts/new-by-exposure-type/count?filter=${filter}`),
             ExposureTypeGroupModel
+        );
+    }
+
+    /**
+     * Retrieve the list of new Contacts who were seen each day
+     * @param {string} outbreakId
+     * @returns {Observable<MetricContactsSeenEachDays>}
+     */
+    getNumberOfContactsSeenEachDay(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsSeenEachDays> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-seen/count?filter=${filter}`),
+            MetricContactsSeenEachDays
         );
     }
 }
