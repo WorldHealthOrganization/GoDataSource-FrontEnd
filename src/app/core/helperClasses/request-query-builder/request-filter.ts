@@ -481,6 +481,4 @@ export class RequestFilter {
         }
         return stringified ? JSON.stringify(returnCondition) : returnCondition;
     }
-
-
 }

@@ -22,6 +22,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { Constants } from '../../../../core/models/constants';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -29,7 +30,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './create-contact.component.html',
     styleUrls: ['./create-contact.component.less']
 })
-export class CreateContactComponent implements OnInit {
+export class CreateContactComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
@@ -59,6 +60,7 @@ export class CreateContactComponent implements OnInit {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService
     ) {
+        super();
         this.genderList$ = this.genericDataService.getGenderList();
     }
 

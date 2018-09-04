@@ -4,7 +4,8 @@
     [(ngModel)]="transmissionChainViewType"
     required="true"
     [options]="transmissionChainViewTypes$ | async"
-    (optionChanged)="updateView()">
+    (optionChanged)="updateView()"
+    [clearable]="false">
 </app-form-select>
 <!-- spinner -->
 <div class="spinnerGraph"
@@ -12,8 +13,8 @@
     <mat-spinner>
     </mat-spinner>
 </div>
+
 <!-- cytoscape element -->
 <div class="cy"
      [fxShow]="!showLoading">
 </div>
-

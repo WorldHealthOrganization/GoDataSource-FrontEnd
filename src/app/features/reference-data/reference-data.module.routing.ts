@@ -5,6 +5,7 @@ import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
     // Reference Data Categories List
@@ -20,7 +21,10 @@ const routes: Routes = [
     // Create new Reference Data entry
     {
         path: ':categoryId/create',
-        component: fromPages.CreateReferenceDataEntryComponent
+        component: fromPages.CreateReferenceDataEntryComponent,
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Reference Data Entry
     {
@@ -39,7 +43,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_REFERENCE_DATA],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

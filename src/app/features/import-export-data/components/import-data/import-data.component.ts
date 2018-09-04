@@ -11,7 +11,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
-import { ImportExportService } from '../../../../core/services/data/import-export.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 export enum ImportDataExtension {
@@ -265,7 +265,7 @@ export class ImportDataComponent implements OnInit {
         private i18nService: I18nService,
         private formHelper: FormHelperService,
         private domService: DomService,
-        private importExportService: ImportExportService
+        private importExportService: ImportExportDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
