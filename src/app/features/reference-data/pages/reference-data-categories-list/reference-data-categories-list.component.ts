@@ -5,6 +5,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -21,14 +22,20 @@ export class ReferenceDataCategoriesListComponent {
     // list of entries grouped by category
     referenceData$: Observable<ReferenceDataCategoryModel[]>;
 
-    referenceDataExporFileName: string = 'Reference Data - ' + moment().format('YYYY-MM-DD');
+    referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
     constructor(
         private router: Router,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService
     ) {
         // load reference data
         this.referenceData$ = this.referenceDataDataService.getReferenceData();
+
+        // add page title
+        this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
+            ' - ' +
+            this.referenceDataExporFileName;
     }
 
     /**
