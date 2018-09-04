@@ -787,6 +787,7 @@ export const EnglishUsLang = {
          * Reference Data - Categories List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON': 'Import Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
 
@@ -1064,10 +1065,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
         'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN': 'Try again',
         'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
@@ -1086,6 +1089,11 @@ export const EnglishUsLang = {
         /**
          * Import case lab data
          */
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
+
+        /**
+         * Import reference data
+         */
+        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data'
     }
 };

@@ -25,6 +25,8 @@ export enum ImportDataExtension {
 
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
+    REFERENCE_DATA = 'referenceData',
+
     OUTBREAK = 'outbreak',
     CASE = 'case',
     CONTACT = 'contact'
@@ -221,6 +223,7 @@ export class ImportDataComponent implements OnInit {
             failed: {
                 recordNo: number,
                 error: {
+                    code: number,
                     details: {
                         codes: {
                             [property: string]: any
@@ -727,5 +730,15 @@ export class ImportDataComponent implements OnInit {
             // emit finished event - event should handle redirect
             this.finished.emit();
         });
+    }
+
+    /**
+     * Reset form & try again
+     */
+    tryAgain() {
+        this.importableObject = null;
+        this.errMsgDetails = null;
+        this.uploader.clearQueue();
+        this.mappedFields = [];
     }
 }
