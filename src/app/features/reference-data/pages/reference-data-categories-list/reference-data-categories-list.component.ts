@@ -32,13 +32,6 @@ export class ReferenceDataCategoriesListComponent {
     }
 
     /**
-     * Implement abstract function
-     */
-    public refreshList() {
-        // NOTHING
-    }
-
-    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
