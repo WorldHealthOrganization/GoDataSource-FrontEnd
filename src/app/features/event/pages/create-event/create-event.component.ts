@@ -12,6 +12,7 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './create-event.component.html',
     styleUrls: ['./create-event.component.less']
 })
-export class CreateEventComponent implements OnInit {
+export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('Events', '/events'),
@@ -41,6 +42,7 @@ export class CreateEventComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super();
     }
 
     ngOnInit() {

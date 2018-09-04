@@ -125,39 +125,6 @@ export class TransmissionChainModel {
         return this.casesMap[firstCasePerson.id];
     }
 
-    /**
-     * convert transmission chain model to the format needed by the graph
-     * @param {TransmissionChainModel} transmissionChain
-     * @returns {any}
-     */
-    convertChainToGraphElements(): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
-        if ( !_.isEmpty(this) ) {
-            if ( !_.isEmpty ( this.nodes) ) {
-                _.forEach( this.nodes, function(node, key) {
-                    const nodeData = new GraphNodeModel(node.model);
-                    nodeData.type = node.type;
-                    graphData.nodes.push({data: nodeData});
-                });
-            }
 
-            if ( !_.isEmpty ( this.relationships) ) {
-                _.forEach( this.relationships, function(relationship, key) {
-                    const graphEdge = new GraphEdgeModel();
-                    if ( relationship.persons[0].source ) {
-                        graphEdge.source = relationship.persons[0].id;
-                        graphEdge.target = relationship.persons[1].id;
-                    } else {
-                        graphEdge.source = relationship.persons[1].id;
-                        graphEdge.target = relationship.persons[0].id;
-                    }
-
-                    graphData.edges.push({data: graphEdge});
-
-                });
-            }
-        }
-        return graphData;
-    }
 
 }

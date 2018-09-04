@@ -6,7 +6,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -15,6 +14,7 @@ import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -22,7 +22,7 @@ import * as moment from 'moment';
     templateUrl: './create-contact-follow-up.component.html',
     styleUrls: ['./create-contact-follow-up.component.less']
 })
-export class CreateContactFollowUpComponent implements OnInit {
+export class CreateContactFollowUpComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
@@ -39,11 +39,12 @@ export class CreateContactFollowUpComponent implements OnInit {
         private route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // retrieve query params

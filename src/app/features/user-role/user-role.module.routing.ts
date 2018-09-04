@@ -5,6 +5,7 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
     // Roles list
@@ -19,7 +20,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_ROLE]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Role
     {
@@ -39,7 +43,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_ROLE],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 
