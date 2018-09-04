@@ -102,6 +102,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
+        'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
 
         /**
          * Login page
@@ -281,6 +282,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Cases list page
@@ -1051,12 +1053,23 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
         'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
+        'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
         'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
         'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL': 'Select Level',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
 
         /**
          * Import hierarchical locations

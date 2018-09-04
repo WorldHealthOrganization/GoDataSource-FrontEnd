@@ -14,6 +14,15 @@
                 </button>
 
                 <ng-container *app-selected-outbreak-is-active>
+                    <button
+                        *ngIf="hasCaseWriteAccess() && !appliedListFilter"
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
+                        {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
+                    </button>
+
                     <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary"
                             [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
