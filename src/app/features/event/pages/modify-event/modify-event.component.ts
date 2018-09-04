@@ -105,6 +105,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(['/events']);
             });
     }

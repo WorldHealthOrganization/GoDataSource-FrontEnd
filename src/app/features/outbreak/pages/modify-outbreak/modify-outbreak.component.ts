@@ -117,6 +117,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 // update language tokens to get the translation of submitted questions and answers
                 this.i18nService.loadUserLanguage().subscribe();
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(['/outbreaks']);
             });
     }

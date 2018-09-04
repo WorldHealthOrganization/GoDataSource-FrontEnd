@@ -95,6 +95,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate([`/reference-data/${this.categoryId}`]);
             });
     }

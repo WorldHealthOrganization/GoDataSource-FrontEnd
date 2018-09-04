@@ -124,6 +124,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(['/clusters']);
             });
     }

@@ -61,6 +61,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
                         this.snackbarService.showError(err.message);
 
                         // redirect to cases
+                        this.disableDirtyConfirm();
                         this.router.navigate(['/contacts']);
                         return ErrorObservable.create(err);
                     })
@@ -76,6 +77,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
                                 this.snackbarService.showError(err.message);
 
                                 // redirect to cases
+                                this.disableDirtyConfirm();
                                 this.router.navigate(['/contacts']);
                                 return ErrorObservable.create(err);
                             })
@@ -110,6 +112,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(['/contacts/follow-ups']);
                 });
         }
