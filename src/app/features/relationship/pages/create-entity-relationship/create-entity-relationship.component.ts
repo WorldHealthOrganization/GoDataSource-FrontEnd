@@ -20,6 +20,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -27,7 +28,7 @@ import 'rxjs/add/observable/forkJoin';
     templateUrl: './create-entity-relationship.component.html',
     styleUrls: ['./create-entity-relationship.component.less']
 })
-export class CreateEntityRelationshipComponent implements OnInit {
+export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -58,7 +59,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
     selectedEntityIds: string[];
     selectedEntities: (CaseModel|ContactModel|EventModel)[];
 
-    relationship = new RelationshipModel();
+    relationships: RelationshipModel[] = [];
 
     constructor(
         private router: Router,
@@ -70,6 +71,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService
     ) {
+        super();
     }
 
     ngOnInit() {
@@ -161,6 +163,11 @@ export class CreateEntityRelationshipComponent implements OnInit {
             .getEntitiesList(this.outbreakId, qb)
             .subscribe((entities) => {
                 this.selectedEntities = entities;
+
+                this.relationships = [];
+                _.each(this.selectedEntities, () => {
+                    this.relationships.push(new RelationshipModel());
+                });
             });
     }
 

@@ -7,9 +7,11 @@ export enum ModulePath {
     ContactModule = 'contacts',
     CaseModule = 'cases',
     EventModule = 'events',
+    ClusterModule = 'clusters',
     RelationshipModule = 'relationships',
     ReferenceDataModule = 'reference-data',
     LocationModule = 'locations',
     DashboardModule = 'dashboard',
-    TransmissionChainModule = 'transmission-chains'
+    TransmissionChainModule = 'transmission-chains',
+    ImportExportDataModule = 'import-export-data'
 }

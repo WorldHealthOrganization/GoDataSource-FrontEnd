@@ -224,7 +224,10 @@ export class SideFiltersComponent {
                 case FilterType.TEXT:
                     switch (comparator) {
                         case FilterComparator.IS:
-                            qb.filter.byEquality(filter.fieldName, appliedFilter.value, false);
+                            qb.filter.byEquality(filter.fieldName, appliedFilter.value, false, true);
+                            break;
+                        case FilterComparator.CONTAINS_TEXT:
+                            qb.filter.byContainingText(filter.fieldName, appliedFilter.value, false);
                             break;
 
                         // FilterComparator.TEXT_STARTS_WITH

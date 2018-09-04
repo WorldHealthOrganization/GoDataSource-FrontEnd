@@ -6,6 +6,7 @@ import { CaseLabResultsListComponent } from './case-lab-results-list/case-lab-re
 import { CreateCaseLabResultComponent } from './create-case-lab-result/create-case-lab-result.component';
 import { ModifyCaseLabResultComponent } from './modify-case-lab-result/modify-case-lab-result.component';
 import { ViewMovementCaseComponent } from './view-movement-case/view-movement-case.component';
+import { ViewChronologyCaseComponent } from './view-chronology-case/view-chronology-case.component';
 
 // export each page component individually
 export * from './cases-list/cases-list.component';
@@ -15,6 +16,7 @@ export * from './case-lab-results-list/case-lab-results-list.component';
 export * from './create-case-lab-result/create-case-lab-result.component';
 export * from './modify-case-lab-result/modify-case-lab-result.component';
 export * from './view-movement-case/view-movement-case.component';
+export * from './view-chronology-case/view-chronology-case.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -25,5 +27,5 @@ export const pageComponents: any[] = [
     CaseLabResultsListComponent,
     CreateCaseLabResultComponent,
     ModifyCaseLabResultComponent,
-    CaseLabResultsListComponent
+    ViewChronologyCaseComponent
 ];

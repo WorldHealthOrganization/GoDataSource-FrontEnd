@@ -4,7 +4,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
-import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { Constants } from '../../../../core/models/constants';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -13,6 +12,12 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -25,16 +30,29 @@ export class TransmissionChainsDashletComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     Constants = Constants;
+    showSettings: boolean = false;
+    filters: any = {};
+    caseClassificationsList$: Observable<any[]>;
+    genderList$: Observable<any[]>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
         private entityDataService: EntityDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
+        // init filters - only show cases and events first
+        this.filters.showContacts = false;
+        this.filters.showEvents = true;
+
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -47,18 +65,72 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * Display chains of transmission
      */
     displayChainsOfTransmission() {
-        if ( this.selectedOutbreak) {
-            this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id).subscribe((chains) => {
+        if (this.selectedOutbreak) {
+            const requestQueryBuilder = new RequestQueryBuilder();
+            // create queryBuilder for filters
+            if (this.filters) {
+                const conditions: any = {};
+                // create conditions based on filters
+                // occupation
+                if (!_.isEmpty(this.filters.occupation)) {
+                    conditions['occupation'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.occupation) + '/i'};
+                }
+                // gender
+                if (!_.isEmpty(this.filters.gender)) {
+                    conditions['gender'] = {inq: this.filters.gender};
+                }
+                // case classification
+                if (!_.isEmpty(this.filters.classification)) {
+                    conditions['classification'] = this.filters.classification;
+                }
+                // case classification
+                if (!_.isEmpty(this.filters.locationId)) {
+                    conditions['addresses.locationId'] = this.filters.locationId;
+                }
+                // firstName
+                if (!_.isEmpty(this.filters.firstName)) {
+                    conditions['firstName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.firstName) + '/i'};
+                }
+                // lastName
+                if (!_.isEmpty(this.filters.lastName)) {
+                    conditions['lastName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.lastName) + '/i'};
+                }
+                // age
+                if (!_.isEmpty(this.filters.age)) {
+                    if (this.filters.age.from && this.filters.age.to) {
+                        conditions['age'] = {between: [this.filters.age.from, this.filters.age.to]};
+                    } else if (this.filters.age.from) {
+                        conditions['age'] = {gt: this.filters.age.from};
+                    } else {
+                        conditions['age'] = {lt: this.filters.age.to};
+                    }
+                }
+                // date of reporting
+                if (!_.isEmpty(this.filters.date)) {
+                    if (!_.isEmpty(this.filters.date.startDate) && !_.isEmpty(this.filters.date.endDate)) {
+                        conditions['dateOfReporting'] = {between: [this.filters.date.startDate, this.filters.date.endDate]};
+                    } else if (!_.isEmpty(this.filters.date.startDate)) {
+                        conditions['dateOfReporting'] = {gt: this.filters.date.startDate};
+                    } else {
+                        conditions['dateOfReporting'] = {lt: this.filters.date.endDate};
+                    }
+                }
 
-                if ( !_.isEmpty(chains) ) {
-                    this.graphElements = chains[0].convertChainToGraphElements();
+                requestQueryBuilder.filter.where({
+                    person: {
+                        where: conditions
+                    }
+                });
+            }
+
+            this.filters.filtersDefault = this.filtersDefault();
+            // get chain data and convert to graph nodes
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
+                if (!_.isEmpty(chains)) {
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
                 } else {
                     this.graphElements = [];
                 }
-
-            // Load the graph for tests
-            //    this.loadGraphWithNodesAndEdges(400);
-
             });
         }
     }
@@ -68,7 +140,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * @param {GraphNodeModel} entity
      * @returns {IterableIterator<any>}
      */
-     onNodeTap(entity: GraphNodeModel) {
+    onNodeTap(entity: GraphNodeModel) {
         // retrieve Case/Event/Contact information
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
@@ -77,7 +149,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe((entityData: CaseModel|EventModel|ContactModel) => {
+            .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                 // show dialog with data
                 const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
                 this.dialogService.showDataDialog(dialogData);
@@ -85,21 +157,54 @@ export class TransmissionChainsDashletComponent implements OnInit {
     }
 
     /**
-     * Load the graph for tests
-     * @param {number} maxNodes
+     * display / hide the settings section
      */
-    loadGraphWithNodesAndEdges(maxNodes: number) {
-        for ( let i = 0; i < maxNodes; i++) {
-            this.graphElements.nodes.push({data: new GraphNodeModel({id: i, name: i})});
+    toggleSettings() {
+        this.showSettings = !this.showSettings;
+    }
 
-            if ( i < maxNodes - 4) {
-                this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 1})});
-                if ( i % 2 === 0) {
-                    this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 2})});
-                }
-                this.graphElements.edges.push({data: new GraphEdgeModel({source: i, target: i + 3})});
-            }
-        }
+    /**
+     * refresh chain data based on filters
+     */
+    refreshChain() {
+        this.displayChainsOfTransmission();
+        // close settings panel
+        this.showSettings = false;
+    }
+
+    /**
+     * used to determine if filters are used. If not, we can load the graph faster
+     * @returns {boolean}
+     */
+    filtersDefault(): boolean {
+        return (
+            this.filters.showEvents
+            && !this.filters.showContacts
+            && _.isEmpty(this.filters.classification)
+            && _.isEmpty(this.filters.gender)
+            && _.isEmpty(this.filters.occupation)
+            && _.isEmpty(this.filters.firstName)
+            && _.isEmpty(this.filters.lastName)
+            && _.isEmpty(this.filters.date)
+            && _.isEmpty(this.filters.locationId)
+            && _.isEmpty(this.filters.age)
+            );
+    }
+
+    /**
+     * set age filter at range update
+     * @param ageRange
+     */
+    setAgeFilter(ageRange) {
+        this.filters.age = ageRange;
+    }
+
+    /**
+     * set age filter at range update
+     * @param dateRange
+     */
+    setDateFilter(dateRange) {
+        this.filters.date = dateRange;
     }
 
 }

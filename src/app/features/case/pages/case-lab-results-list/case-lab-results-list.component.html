@@ -4,13 +4,20 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *app-selected-outbreak-is-active class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                    {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
-                </button>
+                <ng-container *app-selected-outbreak-is-active>
+                    <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                        {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT' | translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
             </div>
         </div>
     </ng-container>
 </app-topnav>
+
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->

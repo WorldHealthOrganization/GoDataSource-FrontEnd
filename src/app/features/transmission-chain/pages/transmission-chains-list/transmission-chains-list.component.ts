@@ -76,6 +76,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             'rootCase',
             'noCases',
             'noAliveCases',
+            'length',
+            'duration',
             'active'
         ];
     }

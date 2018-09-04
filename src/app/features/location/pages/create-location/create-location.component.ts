@@ -9,6 +9,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-location',
@@ -16,7 +17,7 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
     templateUrl: './create-location.component.html',
     styleUrls: ['./create-location.component.less']
 })
-export class CreateLocationComponent implements OnInit {
+export class CreateLocationComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
@@ -33,7 +34,9 @@ export class CreateLocationComponent implements OnInit {
         private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private route: ActivatedRoute,
-        private formHelper: FormHelperService) {
+        private formHelper: FormHelperService
+    ) {
+        super();
     }
 
     ngOnInit() {
