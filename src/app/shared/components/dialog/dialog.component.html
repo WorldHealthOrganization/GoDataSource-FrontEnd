@@ -30,12 +30,25 @@
     </div>
 
     <div *ngIf="confirmData?.customInput">
-        <app-form-input
-            [(ngModel)]="dialogAnswerInputValue.value"
-            [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
-            [required]="confirmData.required"
-            type="number">
-        </app-form-input>
+        <ng-container *ngIf="confirmData?.customInputOptions">
+            <app-form-select
+                name="labName"
+                [(ngModel)]="dialogAnswerInputValue.value"
+                [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
+                [options]="confirmData.customInputOptions"
+                optionLabelKey="label"
+                optionValueKey="value"
+                [multiple]="confirmData.customInputOptionsMultiple">
+            </app-form-select>
+        </ng-container>
+        <ng-container *ngIf="!confirmData?.customInputOptions">
+            <app-form-input
+                [(ngModel)]="dialogAnswerInputValue.value"
+                [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
+                [required]="confirmData.required"
+                type="number">
+            </app-form-input>
+        </ng-container>
     </div>
 
     <div *ngIf="!confirmData?.data"

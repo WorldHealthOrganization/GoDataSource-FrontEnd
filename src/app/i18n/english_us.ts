@@ -47,6 +47,8 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
         'LNG_COMMON_LABEL_NONE': 'None',
+        'LNG_COMMON_LABEL_EXPORT': 'Export',
+        'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
 
         /**
          * General Actions
@@ -71,6 +73,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
+        'LNG_COMMON_BUTTON_EXPORT': 'Export',
 
         /**
          * Dialogs
@@ -785,6 +788,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON': 'Import Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
 
         /**
          * Reference Data - Category Entries List page

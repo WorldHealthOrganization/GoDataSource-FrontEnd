@@ -12,6 +12,14 @@
                     [routerLink]="['/import-export-data', 'reference-data', 'import']">
                     {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
                 </button>
+
+                <app-export-button
+                    [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
+                    url="reference-data/export"
+                    [fileName]="referenceDataExporFileName">
+                </app-export-button>
+
             </div>
         </div>
     </ng-container>

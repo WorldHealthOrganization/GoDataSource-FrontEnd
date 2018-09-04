@@ -228,12 +228,11 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     generateFollowUps() {
         if (this.selectedOutbreak) {
-            this.dialogService.showInput(new DialogConfiguration(
-                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                undefined,
-                'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
-            )).subscribe((answer: DialogAnswer) => {
+            this.dialogService.showInput(new DialogConfiguration({
+                message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
+            })).subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
                         this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
                             .catch((err) => {

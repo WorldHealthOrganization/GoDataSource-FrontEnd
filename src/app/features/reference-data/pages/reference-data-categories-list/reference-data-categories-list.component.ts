@@ -7,6 +7,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -26,12 +28,21 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
     // list of entries grouped by category
     referenceData$: Observable<ReferenceDataCategoryModel[]>;
 
+    referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
+
     constructor(
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private i18nService: I18nService
     ) {
+        // load reference data
         this.referenceData$ = this.referenceDataDataService.getReferenceData();
+
+        // add page title
+        this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
+            ' - ' +
+            this.referenceDataExporFileName;
     }
 
     /**
@@ -47,9 +58,11 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['categoryName', 'entries', 'actions'];
-
-        return columns;
+        return [
+            'categoryName',
+            'entries',
+            'actions'
+        ];
     }
 
     /**

@@ -633,5 +633,4 @@ export abstract class ListComponent {
     initIndividualCheckbox(key) {
         this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
     }
-
 }

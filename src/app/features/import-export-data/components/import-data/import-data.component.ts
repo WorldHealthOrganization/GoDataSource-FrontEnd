@@ -256,7 +256,7 @@ export class ImportDataComponent implements OnInit {
      * @param i18nService
      * @param formHelper
      * @param domService
-     * @param importExportService
+     * @param importExportDataService
      */
     constructor(
         private snackbarService: SnackbarService,
@@ -265,7 +265,7 @@ export class ImportDataComponent implements OnInit {
         private i18nService: I18nService,
         private formHelper: FormHelperService,
         private domService: DomService,
-        private importExportService: ImportExportDataService
+        private importExportDataService: ImportExportDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -697,7 +697,7 @@ export class ImportDataComponent implements OnInit {
         this._displayLoading = true;
         this._displayLoadingLocked = true;
         this.progress = null;
-        this.importExportService.importData(
+        this.importExportDataService.importData(
             this.importDataUrl,
             importJSON
         )
