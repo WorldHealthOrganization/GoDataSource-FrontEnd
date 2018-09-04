@@ -23,7 +23,7 @@ export class ReferenceDataCategoriesListComponent {
 
     referenceDataExporFileName: string = 'Reference Data - ' + moment().format('YYYY-MM-DD');
 
-        constructor(
+    constructor(
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService
     ) {
