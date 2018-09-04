@@ -17,5 +17,18 @@ export class ImportExportService {
     importData(url: string, data: {}): Observable<any> {
         return this.http.post(url, data);
     }
+
+    /**
+     * Export Data
+     * @param url
+     * @param fileType
+     */
+    exportData(url: string, fileType: string): Observable<any>  {
+        return this.http.get(
+            `${url}?type=${fileType}`, {
+                responseType: 'blob'
+            }
+        );
+    }
 }
 
