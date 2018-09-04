@@ -47,8 +47,6 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     availableSideFilters: FilterModel[];
 
-    genderOptionsList$: Observable<any[]>;
-
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -64,7 +62,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        this.genderOptionsList$ = this.genericDataService.getGenderList();
+
+        const genderOptionsList$ = this.genericDataService.getGenderList();
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -133,7 +132,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                         fieldName: 'gender',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_GENDER',
                         type: FilterType.MULTISELECT,
-                        options$: this.genderOptionsList$,
+                        options$: genderOptionsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),

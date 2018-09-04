@@ -301,9 +301,13 @@ export abstract class ListComponent {
         this.clearHeaderSort();
 
         // retrieve Side filters
-        if (this.sideFilter) {
-            this.queryBuilder = new RequestQueryBuilder();
-            this.sideFilter.clear();
+        let queryBuilder;
+        if (
+            this.sideFilter &&
+            (queryBuilder = this.sideFilter.getQueryBuilder())
+        ) {
+            this.queryBuilder = queryBuilder;
+            this.sideFilter.reset();
         }
 
         // apply list filters which is mandatory
