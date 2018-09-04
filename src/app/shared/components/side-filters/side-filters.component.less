@@ -20,7 +20,7 @@
         mat-sidenav {
             margin-top: 10vh;
             max-height: 80vh;
-            width: 400px;
+            width: 300px;
             padding: 15px;
             height: auto;
             bottom: unset !important;
@@ -50,6 +50,11 @@
         }
     }
 
+    .add-side-filter {
+        text-transform: uppercase;
+        text-align: left;
+    }
+
     .filters-section {
 
         .applied-filter {
@@ -60,14 +65,15 @@
 
             .filter-container {
                 margin: 10px 0;
+                position: relative;
 
                 .filter-details {
-                    min-width: 100%;
+                    min-width: 90%;
 
                     .filter-details-delete-button {
                         position: absolute;
                         right: 0;
-                        top: 0;
+                        top: 50%;
                     }
 
                     .mat-form-field-infix {
@@ -82,9 +88,10 @@
         .applied-sort {
             .sort-container {
                 margin: 10px 0;
+                position: relative;
 
                 .sort-details {
-                    min-width: 100%;
+                    min-width: 90%;
 
                     .sort-details-delete-button {
                         position: absolute;
