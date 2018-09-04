@@ -49,7 +49,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
-        protected dialogService: DialogService,
+        private dialogService: DialogService,
         private genericDataService: GenericDataService
     ) {
         super();

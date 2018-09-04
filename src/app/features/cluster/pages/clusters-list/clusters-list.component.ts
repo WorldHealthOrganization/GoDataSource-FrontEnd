@@ -39,7 +39,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        protected dialogService: DialogService
+        private dialogService: DialogService
     ) {
         super();
     }

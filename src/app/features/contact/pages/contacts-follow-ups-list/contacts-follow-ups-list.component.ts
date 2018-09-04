@@ -51,7 +51,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
-        protected dialogService: DialogService,
+        private dialogService: DialogService,
         private genericDataService: GenericDataService) {
         super();
     }

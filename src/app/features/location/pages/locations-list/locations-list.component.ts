@@ -41,7 +41,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
-        protected dialogService: DialogService,
+        private dialogService: DialogService,
         private snackbarService: SnackbarService
     ) {
         super();

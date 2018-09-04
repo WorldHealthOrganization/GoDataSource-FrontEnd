@@ -45,8 +45,8 @@ export class ExportButtonComponent {
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     constructor(
-        protected dialogService: DialogService = null,
-        protected importExportDataService: ImportExportDataService = null
+        private dialogService: DialogService = null,
+        private importExportDataService: ImportExportDataService = null
     ) {}
 
     triggerExport() {

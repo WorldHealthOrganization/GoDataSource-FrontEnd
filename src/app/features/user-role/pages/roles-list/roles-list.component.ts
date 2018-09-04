@@ -37,7 +37,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
-        protected dialogService: DialogService
+        private dialogService: DialogService
     ) {
         super();
 

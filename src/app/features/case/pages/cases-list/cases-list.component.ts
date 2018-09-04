@@ -60,7 +60,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        protected dialogService: DialogService,
+        private dialogService: DialogService,
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService
     ) {

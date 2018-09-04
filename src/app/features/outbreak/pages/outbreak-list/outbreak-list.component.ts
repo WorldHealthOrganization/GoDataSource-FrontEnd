@@ -53,7 +53,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        protected dialogService: DialogService
+        private dialogService: DialogService
     ) {
         super();
     }
