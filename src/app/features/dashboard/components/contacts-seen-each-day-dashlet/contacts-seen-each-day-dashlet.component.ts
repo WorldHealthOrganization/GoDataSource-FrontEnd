@@ -1,7 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscriber } from 'rxjs/Subscriber';
@@ -9,6 +6,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -24,9 +22,6 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     // filter by date
     date: Moment = moment();
 
-    // selected outbreak
-    selectedOutbreakId: string;
-
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
     };
@@ -40,34 +35,26 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     }));
 
     constructor(
-        private outbreakDataService: OutbreakDataService,
-        private contactDataService: ContactDataService,
         private listFilterDataService: ListFilterDataService) {
     }
 
     ngOnInit() {
-        // get the number of cases seen each day
-        this.outbreakDataService
-            .getSelectedOutbreak()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreakId = selectedOutbreak.id;
-                    this.triggerUpdateValues.call(true);
-                }
-            });
+        this.triggerUpdateValues.call(true);
     }
 
     onDateChanged(date) {
         this.date = date;
-
-        this.queryParams.date = JSON.stringify(date);
 
         // update
         this.triggerUpdateValues.call();
     }
 
     updateValues () {
-        this.queryParams.date = this.date.toISOString();
+        if (_.isEmpty(this.date) || !this.date.isValid()) {
+            this.date = moment();
+        } else {
+            this.queryParams.date = this.date.toISOString();
+        }
 
         // get the results for contacts seen
         this.listFilterDataService.filterContactsSeen(this.date)
