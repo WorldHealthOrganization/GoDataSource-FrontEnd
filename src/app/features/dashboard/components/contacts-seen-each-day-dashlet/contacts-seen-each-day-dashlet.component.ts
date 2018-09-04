@@ -52,9 +52,9 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     updateValues () {
         if (_.isEmpty(this.date) || !this.date.isValid()) {
             this.date = moment();
-        } else {
-            this.queryParams.date = this.date.toISOString();
         }
+
+        this.queryParams.date = this.date.toISOString();
 
         // get the results for contacts seen
         this.listFilterDataService.filterContactsSeen(this.date)
