@@ -107,7 +107,7 @@ export class FormHelperService {
             return false;
         }
 
-        // do we to display a message if there are no changes ?
+        // should we to display a message if there are no changes ?
         if (checkForChanges) {
             // get dirty fields
             const dirtyFields: any = this.getDirtyFields(form);
