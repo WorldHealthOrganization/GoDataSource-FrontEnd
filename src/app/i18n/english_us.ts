@@ -48,6 +48,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_ALL': 'All',
         'LNG_COMMON_LABEL_NONE': 'None',
         'LNG_COMMON_LABEL_EXPORT': 'Export',
+        'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
 
         /**
          * General Actions
@@ -786,9 +787,8 @@ export const EnglishUsLang = {
          * Reference Data - Categories List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
-        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
-        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TYPE': 'As Type',
 
         /**
          * Reference Data - Category Entries List page

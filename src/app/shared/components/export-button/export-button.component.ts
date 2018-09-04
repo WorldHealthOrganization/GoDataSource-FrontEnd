@@ -29,7 +29,7 @@ export enum ExportDataExtension {
 export class ExportButtonComponent {
     @Input() label: string = 'LNG_COMMON_BUTTON_EXPORT';
     @Input() message: string = '';
-    @Input() placeholder: string = '';
+    @Input() placeholder: string = 'LNG_COMMON_LABEL_EXPORT_TYPE';
     @Input() url: string = '';
     @Input() allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
