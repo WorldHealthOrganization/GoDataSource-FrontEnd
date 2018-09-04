@@ -24,7 +24,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 })
 export class LocationsListComponent extends ListComponent implements OnInit {
     // breadcrumb header
-    public breadcrumb: BreadcrumbItemModel[] =  [
+    public breadcrumbs: BreadcrumbItemModel[] =  [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LOCATIONS_TITLE',
             '/locations'
