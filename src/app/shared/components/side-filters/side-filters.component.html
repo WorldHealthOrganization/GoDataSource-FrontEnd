@@ -222,22 +222,25 @@
 
                 </div>
 
-                <button
-                    *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    type="submit">
-                    {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
-                </button>
+                <div class="buttons-container">
+                    <button
+                        *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
+                        class="button-primary stretched-button"
+                        mat-raised-button
+                        color="primary"
+                        type="submit">
+                        {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
+                    </button>
 
-                <button
-                    mat-raised-button
-                    class="side-filters-reset-button"
-                    type="button"
-                    (click)="reset()">
-                    {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
-                </button>
+                    <button
+                        mat-raised-button
+                        class="side-filters-reset-button"
+                        type="button"
+                        (click)="reset()">
+                        {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+                </div>
+
 
             </form>
 
