@@ -20,6 +20,9 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
     // number of contacts become cases over time and place
     contactsBecomeCasesCount: number;
 
+    // number of cases ( total )
+    casesCount: number;
+
     // filter by Date Range
     dateRange: DateRangeModel;
 
@@ -104,7 +107,23 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
                 .subscribe((result) => {
                     this.contactsBecomeCasesCount = result.count;
                 });
+
+            this.caseDataService
+                .getCasesCount(this.selectedOutbreak.id)
+                .subscribe((result) => {
+                    this.casesCount = result.count;
+                });
         }
+    }
+
+    /**
+     * Calculate percentage of contacts that become cases
+     * @returns {number}
+     */
+    percentageContactsCases() {
+        return this.casesCount ?
+            Math.round(this.contactsBecomeCasesCount / this.casesCount * 100) :
+            0;
     }
 
 }

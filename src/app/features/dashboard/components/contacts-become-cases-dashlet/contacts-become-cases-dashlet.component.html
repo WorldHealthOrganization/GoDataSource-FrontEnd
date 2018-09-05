@@ -1,7 +1,7 @@
 <app-dashboard-custom-metric-dashlet
     [link]="['/cases']"
     [params]="queryParams"
-    [value]="contactsBecomeCasesCount">
+    [value]="(this.percentageContactsCases()) + '%'">
 
     <div fxLayout="row" fxLayoutGap="10px">
         <div>
