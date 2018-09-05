@@ -370,4 +370,12 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 }
             });
     }
+    /**
+     * Check if date is in future to know if we show "Missed to follow-up" option or not
+     */
+    dateInTheFuture(followUpDate): boolean {
+        const date = followUpDate ? moment(followUpDate) : null;
+        return !!(date && date.isAfter(Constants.today()));
+
+    }
 }
