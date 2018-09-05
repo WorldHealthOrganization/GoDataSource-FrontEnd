@@ -67,7 +67,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
     }
 
@@ -136,7 +136,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

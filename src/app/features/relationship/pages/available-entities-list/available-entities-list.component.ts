@@ -110,7 +110,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        this.refreshList();
+                        this.needsRefreshList(true);
 
                         // get entity data
                         this.entityDataService
@@ -174,33 +174,12 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
-
-        const fields: any = this.formHelper.getFields(form);
-
-        const allEntitiesField = _.get(fields, 'allEntities', false);
-        const entityIdsField = _.get(fields, 'entityIds', {});
-
-        let selectedEntities = [];
-
-        // check if all entities were selected
-        if (allEntitiesField) {
-            // all entities were selected
-            selectedEntities = Object.keys(entityIdsField);
-        } else {
-            // get the IDs of the selected entities
-            for (const entityId in entityIdsField) {
-                if (entityIdsField[entityId]) {
-                    selectedEntities.push(entityId);
-                }
-            }
-        }
-
         // redirect to next step
         this.router.navigate(
             [`/relationships/${this.entityType}/${this.entityId}/create`],
             {
                 queryParams: {
-                    selectedEntityIds: JSON.stringify(selectedEntities)
+                    selectedEntityIds: JSON.stringify(this.checkedRecords)
                 }
             }
         );

@@ -80,7 +80,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
                             // retrieve lab data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                     });
                 });
         });
@@ -230,7 +230,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

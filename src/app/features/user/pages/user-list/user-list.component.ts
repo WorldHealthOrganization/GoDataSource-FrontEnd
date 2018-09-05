@@ -51,7 +51,7 @@ export class UserListComponent extends ListComponent implements OnInit {
 
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -97,7 +97,7 @@ export class UserListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

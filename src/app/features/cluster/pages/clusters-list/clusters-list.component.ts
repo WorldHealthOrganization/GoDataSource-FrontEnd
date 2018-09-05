@@ -55,7 +55,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
     }
 
@@ -126,7 +126,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

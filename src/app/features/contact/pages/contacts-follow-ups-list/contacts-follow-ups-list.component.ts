@@ -82,7 +82,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
 
         // set available side filters
@@ -199,7 +199,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     switchToPastFollowUps() {
         this.showPastFollowUps = true;
-        this.refreshList();
+        this.needsRefreshList(true);
 
         // update breadcrumbs
         this.breadcrumbs.pop();
@@ -214,7 +214,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     switchToUpcomingFollowUps() {
         this.showPastFollowUps = false;
-        this.refreshList();
+        this.needsRefreshList(true);
 
         // update breadcrumbs
         this.breadcrumbs.pop();
@@ -277,7 +277,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -304,7 +304,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -330,7 +330,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                 this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                                 // reload data
-                                this.refreshList();
+                                this.needsRefreshList(true);
                             });
                     }
             });
@@ -364,7 +364,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
 
                                     // refresh list
-                                    this.refreshList();
+                                    this.needsRefreshList(true);
                                 });
                         });
                 }

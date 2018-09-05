@@ -63,7 +63,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
 
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -96,7 +96,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.authUser = authenticatedUser.user;
                                 });
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -122,7 +122,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.authUser = authenticatedUser.user;
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
                                     this.outbreakDataService.checkActiveSelectedOutbreak();
-                                    this.refreshList();
+                                    this.needsRefreshList(true);
                                 });
                         });
                 }
@@ -162,7 +162,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             }
         }
         // refresh list
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**

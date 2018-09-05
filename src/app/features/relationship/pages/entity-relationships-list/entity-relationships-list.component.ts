@@ -128,7 +128,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        this.refreshList();
+                        this.needsRefreshList(true);
 
                         // get entity data
                         this.entityDataService
@@ -225,7 +225,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

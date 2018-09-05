@@ -135,7 +135,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 }
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
 
         // case condition
@@ -298,6 +298,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     getTableColumns(): string[] {
         const columns = [
+            'checkbox',
             'firstName',
             'lastName',
             'age',
@@ -346,7 +347,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

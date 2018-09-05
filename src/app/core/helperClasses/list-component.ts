@@ -55,13 +55,35 @@ export abstract class ListComponent {
      * Models for the checkbox functionality
      * @type {boolean}
      */
-    public checkboxModels = {
+    private checkboxModels = {
         checkAll: false,
-        individualCheck: []
+        individualCheck: {}
     };
+
+    /**
+     * All checkbox selected
+     * @param value
+     */
+    set checkedAllRecords(value: boolean) {
+        // set master check all
+        this.checkboxModels.checkAll = value;
+
+        // check/un-check all individual checkboxes
+        for (const id in this.checkboxModels.individualCheck) {
+            this.checkboxModels.individualCheck[id] = this.checkboxModels.checkAll;
+        }
+    }
+    get checkedAllRecords(): boolean {
+        return this.checkboxModels.checkAll;
+    }
 
     // refresh only after we finish changing data
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // reset checked items
+        this.checkboxModels.checkAll = false;
+        this.checkboxModels.individualCheck = {};
+
+        // refresh list
         this.refreshList();
     }));
 
@@ -636,24 +658,47 @@ export abstract class ListComponent {
     }
 
     /**
-     * "Check All" checkbox was touched
+     * Individual Checkbox
      */
-    checkAll() {
-        // check/un-check all individual checkboxes
-        for (const key in this.checkboxModels.individualCheck) {
-            this.checkboxModels.individualCheck[key] = this.checkboxModels.checkAll;
+    checkedRecord(id: string, checked?: boolean) {
+        // initialize
+        if (this.checkboxModels.individualCheck[id] === undefined) {
+            this.checkboxModels.individualCheck[id] = false;
+        }
+
+        // set / get ?
+        if (checked !== undefined) {
+            // set value
+            this.checkboxModels.individualCheck[id] = checked ? true : false;
+
+            // reset check all
+            let checkedAll: boolean = true;
+            _.each(this.checkboxModels.individualCheck, (check: boolean) => {
+                if (!check) {
+                    checkedAll = false;
+                    return false;
+                }
+            });
+            this.checkboxModels.checkAll = checkedAll;
+        } else {
+            // get
+            return this.checkboxModels.individualCheck[id];
         }
     }
 
     /**
-     * An individual checkbox was touched
+     * Retrieve list of checked records ( an array of IDs )
      */
-    individualCheck() {
-        // un-check the "CheckAll" checkbox
-        this.checkboxModels.checkAll = false;
-    }
-
-    initIndividualCheckbox(key) {
-        this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
+    get checkedRecords(): string[] {
+        const ids: string[] = [];
+        _.each(
+            this.checkboxModels.individualCheck,
+            (checked: boolean, id: string) => {
+                if (checked) {
+                    ids.push(id);
+                }
+            }
+        );
+        return ids;
     }
 }

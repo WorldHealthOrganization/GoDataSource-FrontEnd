@@ -29,6 +29,26 @@
 
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event)">
 
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px">
+                <div class="table-header-cell">
+                    <app-form-checkbox
+                        name="listCheckedAll"
+                        [(ngModel)]="checkedAllRecords">
+                    </app-form-checkbox>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="70px">
+                <app-form-checkbox
+                    [name]="'listCheckedIndividual[' + item.id + ']'"
+                    class="table-checkbox"
+                    [ngModel]="checkedRecord(item.id)"
+                    (optionChanged)="checkedRecord(item.id, $event)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
+
         <!-- First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
