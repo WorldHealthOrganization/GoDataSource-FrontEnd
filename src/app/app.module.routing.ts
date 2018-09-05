@@ -27,6 +27,11 @@ const routes: Routes = [
             language: LanguageResolver
         },
         children: [
+            // Redirect
+            {
+                path: ModulePath.Redirect,
+                loadChildren: './features/redirect/redirect.module#RedirectModule'
+            },
             // Account Module routes
             {
                 path: ModulePath.AccountModule,

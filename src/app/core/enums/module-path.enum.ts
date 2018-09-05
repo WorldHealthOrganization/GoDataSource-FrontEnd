@@ -1,4 +1,5 @@
 export enum ModulePath {
+    Redirect = 'redirect',
     AuthenticationModule = 'auth',
     AccountModule = 'account',
     UserModule = 'users',

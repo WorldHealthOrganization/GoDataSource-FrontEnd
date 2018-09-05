@@ -24,7 +24,7 @@ import {
     ReferenceDataEntryModel
 } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -82,7 +82,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private router: Router
     ) {
         super(listFilterDataService, route.queryParams);
     }
@@ -351,5 +352,29 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Goto Create Follow-ups
+     */
+    gotoAddFollowUps() {
+        // get list of contacts for which we want to create follow-ups
+        const selectedRecords: string[] = this.checkedRecords;
+        if (selectedRecords.length < 1) {
+            return;
+        }
+
+        // pop item
+        const contactId: string = selectedRecords.splice(0, 1)[0];
+
+        // redirect to next step
+        this.router.navigate(
+            [`/contacts/${contactId}/follow-ups/create`],
+            {
+                queryParams: {
+                    params: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }
