@@ -23,10 +23,8 @@
             <div class="other-kpi-header">
                 {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}
             </div>
-
-            <!-- other KPI section content -->
-            <div class="other-kpi-content" fxLayout="row wrap">
-
+            <!--cases KPI section-->
+            <div class="cases-kpi-content" fxLayout="row wrap">
                 <!-- Cases who have died -->
                 <app-cases-deceased-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
@@ -61,7 +59,10 @@
                 <app-cases-pending-lab-results-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-cases-pending-lab-results-dashlet>
+            </div>
 
+            <!--contacts KPI section-->
+            <div class="contacts-kpi-content" fxLayout="row wrap">
                 <!-- Contacts per case mean -->
                 <app-contacts-per-case-mean-dashlet
                     *ngIf="hasReadContactPermissions()">
@@ -91,7 +92,10 @@
                 <app-contacts-become-cases-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
                 </app-contacts-become-cases-dashlet>
+            </div>
 
+            <!--chains of transmission KPI section-->
+            <div class="chains-of-transmission-kpi-content" fxLayout="row wrap">
                 <!-- number of independent chains of transmission -->
                 <app-independent-transmission-chains-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
@@ -107,9 +111,6 @@
                     *ngIf="hasReadReportPermissions()">
                 </app-new-chains-of-transmission-from-registered-contacts-dashlet>
             </div>
-
         </mat-card>
-
-
     </div>
 </div>
