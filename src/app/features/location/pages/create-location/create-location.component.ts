@@ -8,7 +8,6 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
@@ -46,14 +45,13 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
                 // set parent
                 this.parentId = params.parentId;
 
-                if (!this.parentId) {
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_CREATE_LOCATION_TITLE',
-                            '/locations'
-                        )
-                    );
-                }
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_CREATE_LOCATION_TITLE',
+                        '.',
+                        true
+                    )
+                );
             });
     }
 

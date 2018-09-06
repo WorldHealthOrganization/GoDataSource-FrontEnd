@@ -20,7 +20,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 })
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumb: BreadcrumbItemModel[] =  [
+    public breadcrumbs: BreadcrumbItemModel[] =  [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_LOCATIONS_TITLE',
             '/locations'
@@ -53,7 +53,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 this.locationId = params.locationId;
 
                 // reset breadcrumbs
-                this.breadcrumb = [
+                this.breadcrumbs = [
                     new BreadcrumbItemModel(
                         'LNG_PAGE_LIST_LOCATIONS_TITLE',
                         '/locations'
@@ -61,6 +61,29 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 ];
                 this.locationBreadcrumbs = [];
             });
+
+        if (this.locationId) {
+            this.locationDataService
+                .getLocation(this.locationId)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    this.router.navigate(['/locations']);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe((locationData: {}) => {
+                    // location data
+                    this.locationData = new LocationModel(locationData);
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                            '.',
+                            true,
+                            {},
+                            this.locationData
+                        )
+                    )
+                });
+        }
     }
 
     modifyLocation(form: NgForm) {

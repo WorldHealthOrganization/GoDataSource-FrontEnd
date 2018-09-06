@@ -51,34 +51,7 @@ export class LocationBreadcrumbsComponent extends ListComponent implements OnIni
                     if (this.parentId) {
                         // retrieve parent locations
                         this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                            if (locationParents && locationParents.length > 0) {
-                                let locationP = locationParents[0];
-                                while (!_.isEmpty(locationP.location)) {
-                                    // make previous breadcrumb not the active one
-                                    if (this.locationBreadcrumbs.length) {
-                                        this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1].active = false;
-                                    }
-                                    // add breadcrumb
-                                    this.locationBreadcrumbs.push(
-                                        new BreadcrumbItemModel(
-                                            locationP.location.name,
-                                            `/locations/${locationP.location.id}/children`,
-                                            true
-                                        )
-                                    );
-                                    // next location
-                                    locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                                }
-                            }
-                            if (url.includes('/create')) {
-                                this.locationBreadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_CREATE_LOCATION_TITLE',
-                                        '.',
-                                        true
-                                    )
-                                );
-                            }
+                            this.addBreadcrumbs(locationParents);
                         });
                     } else {
                         if (this.locationId) {
@@ -96,29 +69,11 @@ export class LocationBreadcrumbsComponent extends ListComponent implements OnIni
                                     // retrieve parent locations
                                     if (this.locationData.parentLocationId) {
                                         this.locationDataService.getHierarchicalParentListOfLocation(this.locationData.parentLocationId).subscribe((locationParents) => {
-                                            if (locationParents && locationParents.length > 0) {
-                                                let locationP = locationParents[0];
-                                                while (!_.isEmpty(locationP.location)) {
-                                                    if (this.locationBreadcrumbs.length) {
-                                                        this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1].active = false;
-                                                    }
-                                                    // add breadcrumb
-                                                    this.locationBreadcrumbs.push(
-                                                        new BreadcrumbItemModel(
-                                                            locationP.location.name,
-                                                            `/locations/${locationP.location.id}/children`,
-                                                        )
-                                                    );
-
-                                                    // next location
-                                                    locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                                                }
-                                            }
-
+                                            this.addBreadcrumbs(locationParents);
                                             // add create
                                             this.locationBreadcrumbs.push(
                                                 new BreadcrumbItemModel(
-                                                    'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                                                    'LNG_PAGE_MODIFY_LOCATION_NAME',
                                                     '.',
                                                     true,
                                                     {},
@@ -143,6 +98,30 @@ export class LocationBreadcrumbsComponent extends ListComponent implements OnIni
                     }
                 }
             );
+    }
+
+    /**
+     * Add breadcrumbs
+     * @param locationParents
+     */
+    addBreadcrumbs(locationParents) {
+        if (locationParents && locationParents.length > 0) {
+            let locationP = locationParents[0];
+            while (!_.isEmpty(locationP.location)) {
+                if ( this.locationBreadcrumbs.length) {
+                    this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1].active = false;
+                }
+                // add breadcrumbs
+                this.locationBreadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        locationP.location.name,
+                        `/locations/${locationP.location.id}/children`,
+                        true
+                    )
+                );
+                locationP =_.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
+            }
+        }
     }
 
     /**
