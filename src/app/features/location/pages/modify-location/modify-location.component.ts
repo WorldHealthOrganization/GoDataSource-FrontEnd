@@ -82,7 +82,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                             {},
                             this.locationData
                         )
-                    )
+                    );
                 });
         }
     }

@@ -119,7 +119,7 @@ export class LocationBreadcrumbsComponent extends ListComponent implements OnIni
                         true
                     )
                 );
-                locationP =_.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
+                locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
             }
         }
     }
