@@ -43,6 +43,7 @@
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <app-form-input
+                    fxFlex="25%"
                     [name]="name + '[city]'"
                     [(ngModel)]="address.city"
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
@@ -52,6 +53,7 @@
                 </app-form-input>
 
                 <app-form-input
+                    fxFlex="25%"
                     [name]="name + '[postalCode]'"
                     [(ngModel)]="address.postalCode"
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
@@ -61,6 +63,7 @@
                 </app-form-input>
 
                 <app-form-input
+                    fxFlex="50%"
                     [name]="name + '[addressLine1]'"
                     [(ngModel)]="address.addressLine1"
                     [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
@@ -68,8 +71,6 @@
                     [required]="required"
                     (input)="onChange()">
                 </app-form-input>
-
-                <div fxFlex><!-- placeholder --></div>
             </div>
         </div>
     </form>
