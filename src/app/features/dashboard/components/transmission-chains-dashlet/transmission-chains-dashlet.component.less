@@ -1,11 +1,24 @@
 @import '~styles/common';
 
-app-transmission-chains-dashlet{
+app-transmission-chains-dashlet {
     .dashboard-box-header{
-        background-color: @color-contact-dashlet-chains-of-transmission-header;
-        cursor: pointer;
-    }
+    background-color: @color-contact-dashlet-chains-of-transmission-header;
+    cursor: pointer;
+}
     .dashboard-box-content{
         background-color: @color-contact-dashlet-chains-of-transmission-content;
+    }
+    .chain-settings {
+        .settings-container {
+            padding: 10px;
+            .settings-heading{
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            .settings-sub-heading{
+                font-weight: bold;
+                margin: 10px;
+            }
+        }
     }
 }

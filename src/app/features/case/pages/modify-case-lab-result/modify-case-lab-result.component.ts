@@ -92,6 +92,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                 this.snackbarService.showError(err.message);
 
                                 // Case not found; navigate back to Cases list
+                                this.disableDirtyConfirm();
                                 this.router.navigate(['/cases']);
 
                                 return ErrorObservable.create(err);
@@ -111,6 +112,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                     .catch((err) => {
                                         this.snackbarService.showError(err.message);
 
+                                        this.disableDirtyConfirm();
                                         this.router.navigate([`/cases/${params.caseId}/lab-results`]);
 
                                         return ErrorObservable.create(err);
@@ -160,6 +162,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
                 // navigate back to Case Relationships list
+                this.disableDirtyConfirm();
                 this.router.navigate([`/cases/${this.caseData.id}/lab-results`]);
             });
     }

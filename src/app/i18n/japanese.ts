@@ -14,7 +14,7 @@ export const JapaneseLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': '[言語] Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': '[言語] Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': '[言語] Teams',
-        'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL': '[言語] Clusters',
+        'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': '[言語] Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': '[言語] Contacts',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': '[言語] Cases',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': '[言語] Events',
@@ -164,11 +164,6 @@ export const JapaneseLang = {
         /**
          * Outbreak Templates
          */
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT': '[言語] Free Text',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWER': '[言語] Multiple Answers',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': '[言語] Date/Time',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': '[言語] Numeric',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': '[言語] Single Answer',
 
         /**
          * Security Questions

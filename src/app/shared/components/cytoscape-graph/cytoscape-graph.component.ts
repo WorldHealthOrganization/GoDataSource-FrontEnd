@@ -5,7 +5,6 @@ import * as dagre from 'cytoscape-dagre';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
-import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cytoscape-graph',

@@ -13,6 +13,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -20,7 +21,7 @@ import * as _ from 'lodash';
     templateUrl: './create-outbreak.component.html',
     styleUrls: ['./create-outbreak.component.less']
 })
-export class CreateOutbreakComponent implements OnInit {
+export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '..'),
@@ -42,6 +43,7 @@ export class CreateOutbreakComponent implements OnInit {
         private formHelper: FormHelperService,
         private i18nService: I18nService
     ) {
+        super();
     }
 
     ngOnInit() {
@@ -71,6 +73,7 @@ export class CreateOutbreakComponent implements OnInit {
                     // load language tokens so they will be available
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(['/outbreaks']);
                 });
         }

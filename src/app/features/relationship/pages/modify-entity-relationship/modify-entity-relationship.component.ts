@@ -113,6 +113,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                                 this.snackbarService.showError(err.message);
 
                                 // Entity not found; navigate back to Entities list
+                                this.disableDirtyConfirm();
                                 this.router.navigate([this.entityMap[this.entityType].link]);
 
                                 return ErrorObservable.create(err);
@@ -140,6 +141,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                                         this.snackbarService.showError(err.message);
 
                                         // Relationship not found; navigate back to Entity Relationships list
+                                        this.disableDirtyConfirm();
                                         this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
 
                                         return ErrorObservable.create(err);
@@ -193,6 +195,7 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
                 // navigate back to Entity Relationships list
+                this.disableDirtyConfirm();
                 this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
     }

@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
     // Entity Relationships list
@@ -18,7 +19,10 @@ const routes: Routes = [
     // Create new Entity relationship(s)
     {
         path: ':entityType/:entityId/create',
-        component: fromPages.CreateEntityRelationshipComponent
+        component: fromPages.CreateEntityRelationshipComponent,
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Entity Relationship
     {
@@ -34,7 +38,10 @@ const routes: Routes = [
         component: fromPages.ModifyEntityRelationshipComponent,
         data: {
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

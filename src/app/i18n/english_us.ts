@@ -15,7 +15,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
-        'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL': 'Clusters',
+        'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Upcoming Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL': 'Missed Follow-ups',
@@ -47,6 +47,8 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
         'LNG_COMMON_LABEL_NONE': 'None',
+        'LNG_COMMON_LABEL_EXPORT': 'Export',
+        'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
 
         /**
          * General Actions
@@ -71,6 +73,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
+        'LNG_COMMON_BUTTON_EXPORT': 'Export',
 
         /**
          * Dialogs
@@ -80,6 +83,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
@@ -101,6 +105,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
+        'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
 
         /**
          * Login page
@@ -280,6 +285,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Cases list page
@@ -290,6 +296,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Create Case page
@@ -313,11 +320,25 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
+        'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Movement Case page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
+
+        /**
+         * Chronology Case page
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE': 'Hospitalisation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE': 'Hospitalisation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE': 'Incubation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_END_DATE': 'Incubation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE': 'Isolation Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE': 'Isolation End Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE': 'Lab Result Date',
+
 
         /**
          * Case lab results fields
@@ -360,6 +381,36 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
+
+        /**
+         * Cluster Fields
+         */
+        'LNG_CLUSTER_FIELD_LABEL_NAME': 'Name',
+        'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION': 'Description',
+
+        /**
+         * Clusters list page
+         */
+        'LNG_PAGE_LIST_CLUSTERS_TITLE': 'Clusters',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE': 'View People',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Cluster deleted!',
+
+        /**
+         * Create Cluster page
+         */
+        'LNG_PAGE_CREATE_CLUSTER_TITLE': 'Create New Cluster',
+        'LNG_PAGE_CREATE_CLUSTER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON': 'Create Cluster',
+        'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE': 'Cluster created!',
+
+        /**
+         * View / Modify Cluster page
+         */
+        'LNG_PAGE_VIEW_CLUSTER_TITLE': 'View {{name}}',
+        'LNG_PAGE_MODIFY_CLUSTER_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_CLUSTER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE': 'Cluster saved!',
+        'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE': 'View People',
 
         /**
          * Entity Relationships list page
@@ -510,6 +561,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Create Contact page
@@ -534,11 +586,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
 
         /**
          * Movement Contact page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
+
+        /**
+         * Chronology Contact page
+         */
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact "{{name}}" chronology',
+
 
         /**
          * Relationship Fields
@@ -728,6 +787,9 @@ export const EnglishUsLang = {
          * Reference Data - Categories List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON': 'Import Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
 
         /**
          * Reference Data - Category Entries List page
@@ -749,12 +811,6 @@ export const EnglishUsLang = {
         /**
          * Outbreak Templates
          */
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT': 'Free Text',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_OPTIONS': 'Multiple Options',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_SELECTION': 'Single Selection',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_DATE_TIME': 'Date/Time',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_NUMERIC': 'Numeric',
-        'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_ANSWER': 'Single Answer',
         'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
         'LNG_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
@@ -882,6 +938,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE': 'CONTACTS PER CASE (MEAN)',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE': 'CONTACTS PER CASE (MEDIAN)',
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY' : 'CASES SEEN ON',
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
@@ -922,6 +979,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS': 'Cases with less than {{x}} contacts',
         'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP': 'Contacts lost to follow-up',
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN': 'Contacts seen',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
@@ -1003,12 +1061,25 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE': 'Error processing file',
         'LNG_PAGE_IMPORT_DATA_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
+        'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
         'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN': 'Try again',
         'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
+        'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL': 'Select Level',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
 
         /**
          * Import hierarchical locations
@@ -1018,6 +1089,11 @@ export const EnglishUsLang = {
         /**
          * Import case lab data
          */
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
+
+        /**
+         * Import reference data
+         */
+        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data'
     }
 };

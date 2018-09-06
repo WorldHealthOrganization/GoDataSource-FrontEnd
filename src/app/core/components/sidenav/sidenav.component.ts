@@ -101,12 +101,6 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
                     [PERMISSION.READ_OUTBREAK],
                     '/users'
-                ),
-                new ChildNavItem(
-                    'clusters',
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_CLUSTERS_LABEL',
-                    [PERMISSION.READ_OUTBREAK],
-                    '/users'
                 )
             ]
         ),
@@ -169,6 +163,15 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_EVENT],
             [],
             '/events',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            'clusters',
+            'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
+            'groupWork',
+            [PERMISSION.READ_OUTBREAK],
+            [],
+            '/clusters',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         // new NavItem(

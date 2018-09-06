@@ -24,6 +24,16 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE]
         }
+    },
+
+    // Import reference data
+    {
+        path: 'reference-data/import',
+        component: fromPages.ImportReferenceDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+        }
     }
 ];
 

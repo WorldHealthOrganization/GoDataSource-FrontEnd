@@ -20,6 +20,7 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -27,7 +28,7 @@ import 'rxjs/add/observable/forkJoin';
     templateUrl: './create-entity-relationship.component.html',
     styleUrls: ['./create-entity-relationship.component.less']
 })
-export class CreateEntityRelationshipComponent implements OnInit {
+export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -70,6 +71,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService
     ) {
+        super();
     }
 
     ngOnInit() {
@@ -80,6 +82,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
                     // No entities selected; navigate back to Available Entities list
+                    this.disableDirtyConfirm();
                     this.router.navigate(['..', 'available-entities']);
                 } else {
                     this.selectedEntityIds = JSON.parse(queryParams.selectedEntityIds);
@@ -113,6 +116,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
                                 this.snackbarService.showError(err.message);
 
                                 // Entity not found; navigate back to Entities list
+                                this.disableDirtyConfirm();
                                 this.router.navigate([this.entityMap[this.entityType].link]);
 
                                 return ErrorObservable.create(err);
@@ -219,6 +223,7 @@ export class CreateEntityRelationshipComponent implements OnInit {
                 }
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
     }

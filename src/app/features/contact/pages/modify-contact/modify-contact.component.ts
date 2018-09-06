@@ -16,6 +16,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { Constants } from '../../../../core/models/constants';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -28,6 +31,9 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     contactId: string;
     outbreakId: string;
@@ -47,6 +53,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
+        private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private contactDataService: ContactDataService,
         private formHelper: FormHelperService,
@@ -57,6 +64,10 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // reference data
         this.genderList$ = this.genericDataService.getGenderList();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
@@ -87,6 +98,14 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             });
                     });
             });
+    }
+
+    /**
+     * Check if we have write access to contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     /**
@@ -122,6 +141,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(['/contacts']);
             });
     }

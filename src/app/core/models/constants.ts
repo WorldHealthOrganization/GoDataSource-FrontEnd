@@ -9,6 +9,7 @@ export enum ApplyListFilter {
     CASES_HOSPITALISED = 'cases_hospitalised',
     CONTACTS_LOST_TO_FOLLOW_UP = 'contacts_lost_to_follow_up',
     CONTACTS_NOT_SEEN = 'contacts_not_seen',
+    CONTACTS_SEEN = 'contacts_seen',
     CASES_LESS_CONTACTS = 'cases_less_contacts',
     CASES_IN_KNOWN_TRANSMISSION_CHAINS = 'cases_in_known_transmission_chains',
     CASES_PREVIOUS_DAYS_CONTACTS = 'cases_previous_days_contacts',
@@ -32,18 +33,29 @@ export class Constants {
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {
         FREE_TEXT: {
-            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_FREE_TEXT',
-            value: 'Free text'
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT'
         },
         MULTIPLE_OPTIONS: {
-            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_MULTIPLE_OPTIONS',
-            value: 'Multiple Options'
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS'
         },
         SINGLE_SELECTION: {
-            label: 'LNG_TEMPLATE_QUESTION_ANSWER_TYPE_SINGLE_SELECTION',
-            value: 'Single Selection'
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER'
         }
-
+        // NUMERIC: {
+        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC',
+        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC'
+        // },
+        // FILE_UPLOAD: {
+        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD',
+        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD'
+        // },
+        // DATE_TIME: {
+        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME',
+        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME'
+        // }
     };
 
     // keep functionality
@@ -57,6 +69,7 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
         [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
+        [Constants.APPLY_LIST_FILTER.CONTACTS_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN',
         [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS',
         [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',

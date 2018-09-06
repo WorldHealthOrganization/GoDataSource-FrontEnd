@@ -1,6 +1,27 @@
 <app-topnav>
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="hasReferenceDataWriteAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'reference-data', 'import']">
+                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
+                </button>
+
+                <app-export-button
+                    [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
+                    url="reference-data/export"
+                    [fileName]="referenceDataExporFileName">
+                </app-export-button>
+
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 

@@ -239,38 +239,6 @@ export class SideFiltersComponent {
                 case FilterType.ADDRESS:
                     // contains / within
                     switch (comparator) {
-                        case FilterComparator.WITHIN:
-                            // both lat * lng are required
-                            const lat: number = appliedFilter.value.lat || appliedFilter.value.lat === 0 ? parseFloat(appliedFilter.value.lat) : null;
-                            const lng: number = appliedFilter.value.lng || appliedFilter.value.lng === 0 ? parseFloat(appliedFilter.value.lng) : null;
-                            if (
-                                lat === null ||
-                                lng === null
-                            ) {
-                                break;
-                            }
-
-                            // construct near query
-                            const nearQuery = {
-                                near: {
-                                    lat: lat,
-                                    lng: lng
-                                }
-                            };
-
-                            // add max distance if provided
-                            const maxDistance: number = appliedFilter.value.maxDistance ? parseFloat(appliedFilter.value.maxDistance) : null;
-                            if (maxDistance !== null) {
-                                // convert miles to meters
-                                (nearQuery as any).maxDistance = maxDistance * 1609.34;
-                            }
-
-                            // add filter
-                            qb.filter.where({
-                                [`${filter.fieldName}.geoLocation`]: nearQuery
-                            });
-                            break;
-
                         case FilterComparator.LOCATION:
                             qb.filter.where({
                                 [`${filter.fieldName}.locationId`]: {

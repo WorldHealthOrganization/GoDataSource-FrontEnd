@@ -18,6 +18,7 @@ import { LabResultDataService } from './data/lab-result.data.service';
 import { ListFilterDataService } from './data/list-filter.data.service';
 import { EntityDataService } from './data/entity.data.service';
 import { TransmissionChainDataService } from './data/transmission-chain.data.service';
+import { ImportExportDataService } from './data/import-export.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -64,6 +65,7 @@ export const services: any[] = [
     ListFilterDataService,
     EntityDataService,
     TransmissionChainDataService,
+    ImportExportDataService,
 
     // guard services
     AuthGuard,

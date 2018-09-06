@@ -9,5 +9,9 @@
     [title]="'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE'"
     [displayLoading]="displayLoading"
     (finished)="finished()"
-    [importFileUrl]="importFileUrl">
+    [importFileUrl]="importFileUrl"
+    [importDataUrl]="importDataUrl"
+    [model]="ImportServerModelNames.CASE_LAB_RESULTS"
+    [fieldsWithoutTokens]="fieldsWithoutTokens"
+    [requiredDestinationFields]="requiredDestinationFields">
 </app-import-data>

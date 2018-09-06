@@ -57,7 +57,15 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_CASE]
         }
     },
-
+    // View Case Chronology
+    {
+        path: ':caseId/chronology',
+        component: fromPages.ViewChronologyCaseComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE]
+        }
+    },
     // Lab results
     {
         path: ':caseId/lab-results',
@@ -74,7 +82,10 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_CASE]
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Case Lab Result
     {
@@ -94,7 +105,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

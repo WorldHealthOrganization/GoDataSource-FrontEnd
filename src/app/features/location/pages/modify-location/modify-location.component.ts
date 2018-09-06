@@ -60,6 +60,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                     .getLocation(this.locationId)
                     .catch((err) => {
                         this.snackbarService.showError(err.message);
+                        this.disableDirtyConfirm();
                         this.router.navigate(['/locations']);
                         return ErrorObservable.create(err);
                     })
@@ -131,6 +132,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate(
                     this.locationData.parentLocationId ?
                         ['/locations', this.locationData.parentLocationId, 'children'] :

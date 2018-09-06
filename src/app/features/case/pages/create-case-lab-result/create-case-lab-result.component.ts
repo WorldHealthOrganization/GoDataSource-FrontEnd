@@ -17,6 +17,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -24,7 +25,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './create-case-lab-result.component.html',
     styleUrls: ['./create-case-lab-result.component.less']
 })
-export class CreateCaseLabResultComponent implements OnInit {
+export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -55,6 +56,7 @@ export class CreateCaseLabResultComponent implements OnInit {
         private formHelper: FormHelperService,
         private labResultDataService: LabResultDataService
     ) {
+        super();
     }
 
     ngOnInit() {
@@ -80,6 +82,7 @@ export class CreateCaseLabResultComponent implements OnInit {
                                 this.snackbarService.showError(err.message);
 
                                 // Case not found; navigate back to Cases list
+                                this.disableDirtyConfirm();
                                 this.router.navigate(['/cases']);
 
                                 return ErrorObservable.create(err);
@@ -123,6 +126,7 @@ export class CreateCaseLabResultComponent implements OnInit {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate([`/cases/${this.caseId}/lab-results`]);
                 });
         }

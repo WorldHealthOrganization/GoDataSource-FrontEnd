@@ -17,12 +17,32 @@ export class ConfirmOnFormChanges {
     @ViewChildren(NgForm) protected canDeactivateForms: QueryList<NgForm>;
 
     /**
+     * False, if confirm dialog should be shown when forms are dirty
+     */
+    private _confirmDisabled: boolean = false;
+
+    /**
+     * Don't display confirm popup ( even if forms are dirty )
+     */
+    disableDirtyConfirm() {
+        this._confirmDisabled = true;
+    }
+
+    /**
+     * Display confirm popup if forms are dirty
+     */
+    enableDirtyConfirm() {
+        this._confirmDisabled = false;
+    }
+
+    /**
      * Check if we have changes on our forms
      */
     @HostListener('window:beforeunload')
     canDeactivate(): boolean | Observable<boolean> {
         // there are no forms to check for changes
         if (
+            this._confirmDisabled ||
             !this.canDeactivateForms ||
             this.canDeactivateForms.length < 1
         ) {

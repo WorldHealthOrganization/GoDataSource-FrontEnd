@@ -7,6 +7,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -14,7 +15,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
     templateUrl: './create-reference-data-entry.component.html',
     styleUrls: ['./create-reference-data-entry.component.less']
 })
-export class CreateReferenceDataEntryComponent implements OnInit {
+export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
@@ -31,6 +32,7 @@ export class CreateReferenceDataEntryComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
     ) {
+        super();
     }
 
     ngOnInit() {
@@ -79,6 +81,7 @@ export class CreateReferenceDataEntryComponent implements OnInit {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
                 // navigate to listing page
+                this.disableDirtyConfirm();
                 this.router.navigate([`/reference-data/${this.categoryId}`]);
             });
     }
