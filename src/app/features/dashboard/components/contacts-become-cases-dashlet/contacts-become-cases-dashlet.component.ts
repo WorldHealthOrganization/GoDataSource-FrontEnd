@@ -116,14 +116,4 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
         }
     }
 
-    /**
-     * Calculate percentage of contacts that become cases
-     * @returns {number}
-     */
-    percentageContactsCases() {
-        return this.casesCount ?
-            Math.round(this.contactsBecomeCasesCount / this.casesCount * 100) :
-            0;
-    }
-
 }
