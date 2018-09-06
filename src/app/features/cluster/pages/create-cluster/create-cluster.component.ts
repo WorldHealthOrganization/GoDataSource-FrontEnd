@@ -69,6 +69,7 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(['/clusters']);
                 });
         }

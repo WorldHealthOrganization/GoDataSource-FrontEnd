@@ -61,6 +61,7 @@ export class CreateUserComponent extends ConfirmOnFormChanges {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(['/users']);
                 });
         }

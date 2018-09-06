@@ -246,7 +246,23 @@
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
             class="import-data-errors-err">
-            {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: Object.keys(err.error.details.codes).join(', ') } }}
+            <span *ngIf="err.error.code === 11000">
+                {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
+            </span>
+            <span *ngIf="err.error.code !== 11000">
+                {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: err.error.details ? Object.keys(err.error.details.codes).join(', ') : [] } }}
+            </span>
+        </div>
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="end">
+            <button
+                mat-raised-button
+                color="primary"
+                class="button-primary"
+                type="button"
+                (click)="tryAgain()">
+                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
+            </button>
         </div>
     </div>
 </mat-card>

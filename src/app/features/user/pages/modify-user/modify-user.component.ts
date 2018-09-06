@@ -102,6 +102,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
                             // navigate to listing page
+                            this.disableDirtyConfirm();
                             this.router.navigate(['/users']);
                         });
                 });

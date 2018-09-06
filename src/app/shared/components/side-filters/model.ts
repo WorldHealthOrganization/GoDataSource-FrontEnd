@@ -32,7 +32,6 @@ export enum FilterComparator {
     BEFORE = 'before',
     AFTER = 'after',
     CONTAINS = 'contains',
-    WITHIN = 'within',
     LOCATION = 'location'
 }
 
@@ -188,10 +187,6 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
             value: FilterComparator.LOCATION,
             valueType: ValueType.SELECT
-        }, {
-            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
-            value: FilterComparator.WITHIN,
-            valueType: ValueType.LAT_LNG_WITHIN
         }]
     };
 

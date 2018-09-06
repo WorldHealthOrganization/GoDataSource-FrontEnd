@@ -145,39 +145,6 @@
                                     [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
                                     [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
                                 </app-form-daterange>
-
-                                <!-- Within Filter -->
-                                <div
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
-                                        filter.comparator === FilterComparator.WITHIN"
-                                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                                    <app-form-input
-                                        [name]="'filter[filters][' + i + '][value][lat]'"
-                                        [ngModel]="filter.value?.lat"
-                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_LATITUDE' | translate"
-                                        (optionChanged)="setObjectValue(filter, 'lat', $event);"
-                                        type="number"
-                                        [required]="true">
-                                    </app-form-input>
-                                    <app-form-input
-                                        [name]="'filter[filters][' + i + '][value][lng]'"
-                                        [ngModel]="filter.value?.lng"
-                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_LONGITUDE' | translate"
-                                        (optionChanged)="setObjectValue(filter, 'lng', $event);"
-                                        type="number"
-                                        [required]="true">
-                                    </app-form-input>
-                                </div>
-                                <app-form-input
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
-                                        filter.comparator === FilterComparator.WITHIN"
-                                    [name]="'filter[filters][' + i + '][value][maxDistance]'"
-                                    [ngModel]="filter.value?.maxDistance"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate"
-                                    (optionChanged)="setObjectValue(filter, 'maxDistance', $event);"
-                                    type="number">
-                                </app-form-input>
-
                             </mat-card>
                         </div>
 

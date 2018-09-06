@@ -22,6 +22,7 @@ import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric
 import { GoogleMapComponent } from './google-map/google-map.component';
 import { GoogleMapMovementComponent } from './google-map-movement/google-map-movement.component';
 import { ChronologyComponent } from './chronology/chronology.component';
+import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 
 // export necessary components individually
@@ -65,10 +66,12 @@ export const components: any[] = [
     CountedItemsListComponent,
     YesNoLabelComponent,
     ReferenceDataLabelComponent,
-    DashboardCustomMetricDashletComponent,
     LocationBreadcrumbsComponent,
     ChronologyComponent,
 
     // dialogs
-    DialogComponent
+    DialogComponent,
+
+    // general
+    ExportButtonComponent
 ];

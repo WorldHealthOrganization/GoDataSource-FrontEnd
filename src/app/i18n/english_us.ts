@@ -47,6 +47,8 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NO': 'No',
         'LNG_COMMON_LABEL_ALL': 'All',
         'LNG_COMMON_LABEL_NONE': 'None',
+        'LNG_COMMON_LABEL_EXPORT': 'Export',
+        'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
 
         /**
          * General Actions
@@ -71,6 +73,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
+        'LNG_COMMON_BUTTON_EXPORT': 'Export',
 
         /**
          * Dialogs
@@ -785,6 +788,9 @@ export const EnglishUsLang = {
          * Reference Data - Categories List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON': 'Import Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
 
         /**
          * Reference Data - Category Entries List page
@@ -933,6 +939,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE': 'CONTACTS PER CASE (MEAN)',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE': 'CONTACTS PER CASE (MEDIAN)',
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY' : 'CASES SEEN ON',
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
         'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
@@ -973,6 +980,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS': 'Cases with less than {{x}} contacts',
         'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP': 'Contacts lost to follow-up',
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN': 'Contacts seen',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
@@ -1058,10 +1066,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
         'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE': 'Import file',
+        'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN': 'Try again',
         'LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
@@ -1080,6 +1090,11 @@ export const EnglishUsLang = {
         /**
          * Import case lab data
          */
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
+
+        /**
+         * Import reference data
+         */
+        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data'
     }
 };

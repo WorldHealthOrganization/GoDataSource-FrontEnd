@@ -85,6 +85,7 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
 
                     // navigate to listing page
+                    this.disableDirtyConfirm();
                     this.router.navigate(this.parentId ? ['/locations', this.parentId, 'children'] : ['/locations']);
                 });
         }

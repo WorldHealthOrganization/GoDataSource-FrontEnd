@@ -8,6 +8,7 @@ import { CasesHospitalisedDashletComponent } from '../components/cases-hospitali
 import { ContactsNotSeenDashletComponent } from '../components/contacts-not-seen-dashlet/contacts-not-seen-dashlet.component';
 import { CasesLessContactsDashletComponent } from '../components/cases-less-contacts-dashlet/cases-less-contacts-dashlet.component';
 import { NewCasesPreviousDaysContactsDashletComponent } from '../components/new-cases-previous-days-contacts-dashlet/new-cases-previous-days-contacts-dashlet.component';
+import { ContactsSeenEachDayDashletComponent } from '../components/contacts-seen-each-day-dashlet/contacts-seen-each-day-dashlet.component';
 
 // export each page component individually
 export * from './dashboard/dashboard.component';
@@ -22,7 +23,8 @@ export const pageComponents: any[] = [
    ContactsPerCaseMedianDashletComponent,
    ContactsNotSeenDashletComponent,
    CasesLessContactsDashletComponent,
-   NewCasesPreviousDaysContactsDashletComponent
+   NewCasesPreviousDaysContactsDashletComponent,
+   ContactsSeenEachDayDashletComponent
 
 ];
 

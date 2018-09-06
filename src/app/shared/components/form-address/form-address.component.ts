@@ -52,35 +52,4 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     get address(): AddressModel {
         return this.value ? this.value : {} as AddressModel;
     }
-
-    /**
-     * Geo location changed
-     */
-    onChangeGeo(
-        latOrLng: string,
-        event: any
-    ) {
-        // do we need to add a geo location object ?
-        if (!this.address.geoLocation) {
-            this.address.geoLocation = {
-                lat: '',
-                lng: ''
-            };
-        }
-
-        // set value
-        const value: string = event.target.value;
-        this.address.geoLocation[latOrLng] = value.length > 0 ? parseFloat(value) : value;
-
-        // if both values are empty then we need to remove point because api will fail
-        if (
-            (this.address.geoLocation.lat === null || this.address.geoLocation.lat === '') &&
-            (this.address.geoLocation.lng === null || this.address.geoLocation.lng === '')
-        ) {
-            this.address.geoLocation = undefined;
-        }
-
-        // call on change
-        this.onChange();
-    }
 }
