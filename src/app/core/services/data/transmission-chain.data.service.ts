@@ -145,16 +145,16 @@ export class TransmissionChainDataService {
                             selectedNodeIds.push(relation.entityIds[0]);
                             selectedNodeIds.push(relation.entityIds[1]);
                         });
-                        selectedNodeIds = _.uniq(selectedNodeIds);
-                        // load the data for all selected nodes
-                        _.forEach(selectedNodeIds, (nodeId, key) => {
-                            const node = chain.nodes[nodeId];
-                            if (node) {
-                                const nodeData = new GraphNodeModel(node.model);
-                                nodeData.type = node.type;
-                                graphData.nodes.push({data: nodeData});
-                            }
-                        });
+                    }
+                });
+                selectedNodeIds = _.uniq(selectedNodeIds);
+                // load the data for all selected nodes
+                _.forEach(selectedNodeIds, (nodeId, key) => {
+                    const node = firstChain.nodes[nodeId];
+                    if (node) {
+                        const nodeData = new GraphNodeModel(node.model);
+                        nodeData.type = node.type;
+                        graphData.nodes.push({data: nodeData});
                     }
                 });
             } else {

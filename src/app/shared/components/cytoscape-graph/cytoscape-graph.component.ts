@@ -28,6 +28,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     /**
      *  layout cola - bubble view
+     *  Nodes are automatically arranged to use optimally use the space
      */
     layoutCola: any = {
         name: 'cola',
@@ -48,7 +49,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     };
 
     /**
-     *  layout dagre - tree
+     *  layout dagre - tree - hierarchic view
+     *  the nodes are automatically arranged based on source / target properties
      */
     layoutDagre: any = {
         name: 'dagre',
@@ -60,14 +62,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         edgeSep: 10, // the separation between adjacent edges in the same rank
         rankSep: 50, // the separation between adjacent nodes in the same rank
         rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right,
-        ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
-        // transform: function( node, pos ) { return pos; },
-        minLen: function (edge) {
-            return 1;
-        }, // number of ranks to keep between the source and target of the edge
-        edgeWeight: function (edge) {
-            return 1;
-        }, // higher weight edges are generally made shorter and straighter than lower weight edges
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
@@ -77,78 +71,43 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     };
 
     /**
-     *  layout cola - timeline
+     *  layout preset - timeline
+     *  nodes are manually positioned based on date of Reporting
      */
-    layoutPreset1: any = {
-        name: 'cola',
-        fit: true,
-     //   flow: {axis: 'y', minSeparation: 30},
-        padding: 10,
-        nodeDimensionsIncludeLabels: true,
-        maxSimulationTime: 3000,
-        avoidOverlap: true,
-        unconstrIter: 10,
-        userConstIter: 20,
-        stop: () => {
-            this.showLoading = false;
-            if (this.cy) {
-                this.cy.fit();
-            }
-        },
-        alignment: ( node ) =>  {
-            // restrict position of the node on the x axis for the timeline view
-            const nodeData = node.json().data;
-            const datesIndex = _.findIndex(
-                this.datesArray,
-                function (o) {
-                    return o === nodeData.dateOfReporting;
-                });
-            console.log(nodeData);
-            console.log(nodeData.dateOfReporting);
-            console.log(datesIndex);
-            const restrictedPos = datesIndex * 100;
-            console.log(restrictedPos);
-            return { x: restrictedPos };
-        }
-    };
-
     layoutPreset: any = {
         name: 'preset',
         fit: true,
-        randomize: true,
-        //   flow: {axis: 'y', minSeparation: 30},
-        padding: 10,
-        nodeDimensionsIncludeLabels: true,
-        maxSimulationTime: 3000,
-        avoidOverlap: true,
-        unconstrIter: 10,
-        userConstIter: 20,
+        padding: 30,
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
                 this.cy.fit();
             }
         },
-        positions: ( node ) =>  {
+        positions: (node) => {
             // restrict position of the node on the x axis for the timeline view
             const nodeData = node.json().data;
+            // calculate position on x axis based on the index of the date.
             const datesIndex = _.findIndex(
                 this.datesArray,
                 function (o) {
                     return o === nodeData.dateOfReporting;
                 });
+            // using 150px as it looks fine
             const posX = datesIndex * 150;
+            // calculate position on y axis based on the index of the node from that respective date
             const nodesArray = this.timelineDates[nodeData.dateOfReporting];
-            let nodeIndex = 2;
-            if ( nodesArray.length > 1 ) {
+            let nodeIndex = 1;
+            if (nodesArray.length > 1) {
                 nodeIndex = _.findIndex(
                     nodesArray,
-                    function ( n ) {
+                    function (n) {
                         return n === nodeData.id;
                     });
             }
-            const posY = (nodeIndex % 2 === 0) ? ( nodeIndex  ) * 100 : ( nodeIndex  ) * 100 * -1;
-            return { x: posX, y: posY };
+            // using 100 px as it looks fine
+            const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+            return {x: posX, y: posY};
         }
     };
 
@@ -160,7 +119,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         max: 4
     };
 
-    defaultStyle: any = [ // the stylesheet for the graph
+    // the stylesheet for the graph
+    defaultStyle: any = [
         {
             selector: 'node',
             style: {
@@ -178,7 +138,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     ];
 
-    timelineStyle: any = [ // the stylesheet for the graph
+    // the style for the timeline view. The label field is modified in order to display dateOfReporting
+    timelineStyle: any = [
         {
             selector: 'node',
             style: {
@@ -199,7 +160,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     showLoading: boolean = true;
     datesArray: string[] = [];
-    timelinePositions: any;
     timelineDates: any = {};
 
     constructor(
@@ -219,8 +179,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
-
-
     }
 
     public ngOnChanges(): any {
@@ -235,6 +193,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         const nativeElement = this.el.nativeElement;
         const container = nativeElement.getElementsByClassName(this.container);
 
+        // load the correct layout based on the view selected
         this.configureGraphViewType();
 
         // initialize the cytoscape object
@@ -255,44 +214,27 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             const node = evt.target;
             this.nodeTapped.emit(node.json().data);
         });
-
     }
 
     /**
      * Generate the array of dates to be used on the timeline view
      */
-    calculateDates() {
-        _.forEach( this.elements.nodes, (node, key) => {
-            const nodeData = node.data;
-            console.log(nodeData.id);
-            if ( this.timelineDates[node.data.dateOfReporting] ) {
+    calculateTimelineDates() {
+        // empty the already set timeline and dates arrays
+        this.timelineDates = {};
+        this.datesArray = [];
+        // loop through nodes to extract the dates ( dateOfReporting)
+        _.forEach(this.elements.nodes, (node, key) => {
+            if (this.timelineDates[node.data.dateOfReporting]) {
                 this.timelineDates[node.data.dateOfReporting].push(node.data.id);
             } else {
                 this.timelineDates[node.data.dateOfReporting] = [];
                 this.timelineDates[node.data.dateOfReporting].push(node.data.id);
             }
-
             this.datesArray.push(node.data.dateOfReporting);
-
         });
-        console.log(this.timelineDates);
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);
-        // console.log(this.datesArray);
-
-        // _.forEach( this.elements.nodes, (node, key) => {
-        //     const datesIndex = _.findIndex(
-        //         this.datesArray,
-        //         function (o) {
-        //             return o === node.data.dateOfReporting;
-        //         });
-        //
-        //
-        //     const pos = { x: datesIndex * 100 };
-        //     this.timelineStyle.node.data.id = pos;
-        //
-        // });
-
     }
 
     /**
@@ -316,8 +258,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             this.layout = this.layoutDagre;
             this.style = this.defaultStyle;
         } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
-            this.calculateDates();
-            cytoscape.use(cola);
+            this.calculateTimelineDates();
             this.style = this.timelineStyle;
             this.layout = this.layoutPreset;
         }
