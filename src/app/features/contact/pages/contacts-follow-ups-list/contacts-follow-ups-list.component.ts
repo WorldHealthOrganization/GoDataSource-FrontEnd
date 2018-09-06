@@ -340,10 +340,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     /**
      * Mark a contact as missing from a follow-up
      * @param {FollowUpModel} followUp
+     * @param {boolean} contactMissed
      */
-    markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
+    markContactAsMissedFromFollowUp(followUp: FollowUpModel, contactMissed?: boolean) {
+        // show confirm dialog to confirm the action and check if contact is missed or not
+        const confirmMessage =
+            contactMissed ? 'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP' : 'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP';
+        this.dialogService.showConfirm(confirmMessage, new ContactModel(followUp.contact))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
@@ -351,9 +354,15 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         .subscribe((selectedOutbreak: OutbreakModel) => {
                             // mark follow-up
                             this.followUpsDataService
-                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
-                                    lostToFollowUp: true
-                                })
+                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id,
+                                    // check if contact is missed or not and if is missed, make it unmissed
+                                    contactMissed ?
+                                        {
+                                            lostToFollowUp: false
+                                        } :
+                                        {
+                                            lostToFollowUp: true
+                                        })
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
 
@@ -376,6 +385,5 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     dateInTheFuture(followUpDate): boolean {
         const date = followUpDate ? moment(followUpDate) : null;
         return !!(date && date.isAfter(Constants.today()));
-
     }
 }
