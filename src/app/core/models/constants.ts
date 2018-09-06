@@ -137,6 +137,10 @@ export class Constants {
         HIERARCHICAL_NETWORK: {
             label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
+        },
+        TIMELINE_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
+            value: 'TIMELINE_NETWORK'
         }
     };
 
