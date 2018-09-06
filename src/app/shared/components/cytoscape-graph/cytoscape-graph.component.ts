@@ -28,7 +28,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     /**
      *  layout cola - bubble view
-     *  Nodes are automatically arranged to use optimally use the space
+     *  Nodes are automatically arranged to optimally use the space
      */
     layoutCola: any = {
         name: 'cola',
