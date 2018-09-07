@@ -24,7 +24,7 @@
                 {{'LNG_PAGE_DASHBOARD_KPI_TITLE' | translate}}
             </div>
             <!--cases KPI section-->
-            <div class="cases-kpi-content" fxLayout="row wrap">
+            <div class="dashlet-kpi-content" fxLayout="row wrap">
                 <!-- Cases who have died -->
                 <app-cases-deceased-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
@@ -62,7 +62,7 @@
             </div>
 
             <!--contacts KPI section-->
-            <div class="contacts-kpi-content" fxLayout="row wrap">
+            <div class="dashlet-kpi-content" fxLayout="row wrap">
                 <!-- Contacts per case mean -->
                 <app-contacts-per-case-mean-dashlet
                     *ngIf="hasReadContactPermissions()">
@@ -100,7 +100,7 @@
             </div>
 
             <!--chains of transmission KPI section-->
-            <div class="chains-of-transmission-kpi-content" fxLayout="row wrap">
+            <div class="dashlet-kpi-content" fxLayout="row wrap">
                 <!-- number of independent chains of transmission -->
                 <app-independent-transmission-chains-dashlet
                     *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
