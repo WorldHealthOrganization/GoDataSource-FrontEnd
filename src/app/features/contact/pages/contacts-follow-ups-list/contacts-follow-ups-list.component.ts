@@ -343,7 +343,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      * @param {boolean} contactMissed
      */
     markContactAsMissedFromFollowUp(followUp: FollowUpModel, contactMissed?: boolean) {
-        // show confirm dialog to confirm the action and check if contact is missed or not
+        // show confirm dialog to confirm the action and check if contact is missed or not to know what message to display
         const confirmMessage =
             contactMissed ? 'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP' : 'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP';
         this.dialogService.showConfirm(confirmMessage, new ContactModel(followUp.contact))
@@ -369,8 +369,12 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                     return ErrorObservable.create(err);
                                 })
                                 .subscribe(() => {
-                                    // mark follow-up
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
+                                    // mark follow-up as missed or as present
+                                    const successMessage =
+                                        contactMissed ?
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP_SUCCESS_MESSAGE' :
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE';
+                                    this.snackbarService.showSuccess(successMessage);
 
                                     // refresh list
                                     this.refreshList();
@@ -383,7 +387,10 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      * Check if date is in future to know if we show "Missed to follow-up" option or not
      */
     dateInTheFuture(followUpDate): boolean {
+        console.log('aaa');
+        console.log(followUpDate);
+        console.log(Constants.today().toISOString());
         const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.isAfter(Constants.today()));
+        return !!(date && date.isSameOrAfter(Constants.today()));
     }
 }
