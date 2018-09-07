@@ -474,6 +474,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_LOCATION_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
 
