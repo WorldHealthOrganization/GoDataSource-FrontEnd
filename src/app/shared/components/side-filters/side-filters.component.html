@@ -60,14 +60,6 @@
                         <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
                             <mat-card class="filter-details" fxFlex>
 
-                                <!-- Delete filter item -->
-                                <button
-                                    class="filter-details-delete-button"
-                                    type="button" mat-icon-button
-                                    (click)="deleteFilter(i)">
-                                    <span class="xt-icon">delete</span>
-                                </button>
-
                                 <!-- Filter Type -->
                                 <app-form-select
                                     [name]="'filter[filters][' + i + '][filter]'"
@@ -146,11 +138,18 @@
                                     [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
                                 </app-form-daterange>
                             </mat-card>
+                            <!-- Delete filter item -->
+                            <button
+                                class="filter-details-delete-button"
+                                type="button" mat-icon-button
+                                (click)="deleteFilter(i)">
+                                <span class="xt-icon">delete</span>
+                            </button>
                         </div>
 
                     </div>
 
-                    <button type="button" mat-button color="primary" (click)="addFilter()">
+                    <button type="button" mat-button color="primary" class="add-side-filter" (click)="addFilter()">
                         {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
 
@@ -179,14 +178,6 @@
                                 class="sort-details"
                                 fxFlex>
 
-                                <!-- Delete sort item -->
-                                <button
-                                    class="sort-details-delete-button"
-                                    type="button" mat-icon-button
-                                    (click)="deleteSort(i)">
-                                    <span class="xt-icon">delete</span>
-                                </button>
-
                                 <!-- Sort By Field -->
                                 <app-form-select
                                     [name]="'sortBy[items][' + i + '][sort]'"
@@ -208,11 +199,21 @@
                                     [clearable]="false">
                                 </app-form-select>
                             </mat-card>
+
+                            <!-- Delete sort item -->
+                            <button
+                                class="sort-details-delete-button"
+                                type="button" mat-icon-button
+                                (click)="deleteSort(i)">
+                                <span class="xt-icon">delete</span>
+                            </button>
+
                         </div>
                     </div>
 
                     <button
-                         type="button"
+                        class="add-side-filter"
+                        type="button"
                         mat-button
                         color="primary"
                         (click)="addSort()">
@@ -221,22 +222,25 @@
 
                 </div>
 
-                <button
-                    *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    type="submit">
-                    {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
-                </button>
+                <div class="buttons-container">
+                    <button
+                        *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
+                        class="button-primary stretched-button"
+                        mat-raised-button
+                        color="primary"
+                        type="submit">
+                        {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
+                    </button>
 
-                <button
-                    mat-raised-button
-                    class="side-filters-reset-button"
-                    type="button"
-                    (click)="reset()">
-                    {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
-                </button>
+                    <button
+                        mat-raised-button
+                        class="side-filters-reset-button"
+                        type="button"
+                        (click)="reset()">
+                        {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+                </div>
+
 
             </form>
 
