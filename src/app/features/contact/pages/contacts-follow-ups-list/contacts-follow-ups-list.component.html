@@ -38,6 +38,41 @@
     </div>
 
     <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px">
+                <div class="table-header-cell">
+                    <app-form-checkbox
+                        name="listCheckedAll"
+                        [(ngModel)]="checkedAllRecords">
+                    </app-form-checkbox>
+                </div>
+                <div class="column-filter">
+                    <button
+                        *ngIf="checkedRecords.length > 0"
+                        mat-icon-button
+                        [matMenuTriggerFor]="actionsMenuMultipleRecords">
+                        <span class="xt-icon">moreVertical</span>
+                    </button>
+
+                    <mat-menu #actionsMenuMultipleRecords="matMenu">
+                        <button
+                            mat-menu-item>
+                            aaaa
+                        </button>
+                    </mat-menu>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="70px">
+                <app-form-checkbox
+                    [name]="'listCheckedIndividual[' + item.id + ']'"
+                    class="table-checkbox"
+                    [ngModel]="checkedRecord(item.id)"
+                    (optionChanged)="checkedRecord(item.id, $event)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
+
         <!-- Contact First Name -->
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>

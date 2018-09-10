@@ -34,8 +34,6 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    remainingContactIds: string[];
-
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -49,14 +47,6 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
     }
 
     ngOnInit() {
-        // retrieve query params
-        this.route.queryParams
-            .subscribe((queryParams: { params: string }) => {
-                if (queryParams.params) {
-                    this.remainingContactIds = JSON.parse(queryParams.params);
-                }
-            });
-
         // retrieve query params
         this.route.params
             .subscribe((params: {contactId}) => {
@@ -123,25 +113,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-
-                    // redirect to list if we don't have to create other follow-ups, otherwise jump to the next contact
-                    if (
-                        this.remainingContactIds &&
-                        this.remainingContactIds.length > 0
-                    ) {
-                        // pop item
-                        const contactId: string = this.remainingContactIds.splice(0, 1)[0];
-                        this.router.navigate(
-                            ['/redirect'], {
-                                queryParams: {
-                                    url: `/contacts/${contactId}/follow-ups/create`,
-                                    params: JSON.stringify(this.remainingContactIds)
-                                }
-                            }
-                        );
-                    } else {
-                        this.router.navigate(['/contacts/follow-ups']);
-                    }
+                    this.router.navigate(['/contacts/follow-ups']);
                 });
         }
     }

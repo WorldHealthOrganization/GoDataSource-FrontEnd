@@ -241,7 +241,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         // default visible columns
-        const columns = [
+        return [
+            'checkbox',
             'firstName',
             'lastName',
             'date',
@@ -251,9 +252,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'deleted',
             'actions'
         ];
-
-        // return columns that should be visible
-        return columns;
     }
 
     /**
