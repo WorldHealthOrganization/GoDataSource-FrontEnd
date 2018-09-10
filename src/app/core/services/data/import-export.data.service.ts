@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
 @Injectable()
 export class ImportExportDataService {
@@ -23,11 +24,22 @@ export class ImportExportDataService {
      * Export Data
      * @param url
      * @param fileType
+     * @param encryptPassword
      * @returns {Observable<Blob>}
      */
-    exportData(url: string, fileType: string): Observable<Blob>  {
+    exportData(
+        url: string,
+        data: {
+            fileType: string,
+            encryptPassword?: string
+        }
+    ): Observable<Blob>  {
+        let completeURL = `${url}?type=${data.fileType}`;
+        if (!_.isEmpty(data.encryptPassword)) {
+            completeURL += `&encryptPassword=${data.encryptPassword}`;
+        }
         return this.http.get(
-            `${url}?type=${fileType}`, {
+            completeURL, {
                 responseType: 'blob'
             }
         );

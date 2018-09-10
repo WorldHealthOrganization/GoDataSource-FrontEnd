@@ -49,6 +49,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NONE': 'None',
         'LNG_COMMON_LABEL_EXPORT': 'Export',
         'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
+        'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD': 'Encrypt Password',
 
         /**
          * General Actions
