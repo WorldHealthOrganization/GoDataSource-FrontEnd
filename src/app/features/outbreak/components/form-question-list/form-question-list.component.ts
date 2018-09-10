@@ -106,4 +106,24 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
         // "bind value"
         this.values[index][key] = value;
     }
+
+    /**
+     * Clear Answers if free text is selected
+     */
+    onChangeAnswerType(index: number) {
+        // check if free text is selected
+        if (
+            this.values[index] &&
+            (this.values[index] as QuestionModel).answerType !== Constants.ANSWER_TYPES.SINGLE_SELECTION.value &&
+            (this.values[index] as QuestionModel).answerType !== Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+        ) {
+            // clear answers
+            (this.values[index] as QuestionModel).answers = [];
+        }
+
+        // call parent
+        setTimeout(() => {
+            super.onChange();
+        });
+    }
 }

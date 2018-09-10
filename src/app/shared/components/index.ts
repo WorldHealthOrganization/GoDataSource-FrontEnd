@@ -23,6 +23,7 @@ import { GoogleMapComponent } from './google-map/google-map.component';
 import { GoogleMapMovementComponent } from './google-map-movement/google-map-movement.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
+import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -65,6 +66,7 @@ export const components: any[] = [
     CountedItemsListComponent,
     YesNoLabelComponent,
     ReferenceDataLabelComponent,
+    LocationBreadcrumbsComponent,
     ChronologyComponent,
 
     // dialogs
