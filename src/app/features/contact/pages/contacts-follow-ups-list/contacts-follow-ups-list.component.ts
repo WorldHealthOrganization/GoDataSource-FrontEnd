@@ -19,6 +19,7 @@ import { DialogAnswer, DialogConfiguration } from '../../../../shared/components
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -55,7 +56,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService) {
+        private genericDataService: GenericDataService,
+        private router: Router
+    ) {
         super();
     }
 
@@ -241,8 +244,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         // default visible columns
-        return [
-            'checkbox',
+        const columns = [
             'firstName',
             'lastName',
             'date',
@@ -252,6 +254,16 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'deleted',
             'actions'
         ];
+
+        // checkboxes should be visible only if we have write access
+        if (this.hasFollowUpsWriteAccess()) {
+            columns.unshift(
+                'checkbox'
+            );
+        }
+
+        // finished
+        return columns;
     }
 
     /**
@@ -367,5 +379,26 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         });
                 }
             });
+    }
+
+    /**
+     * Modify selected follow-ups
+     */
+    modifySelectedFollowUps() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: string[] = this.checkedRecords;
+        if (selectedRecords.length < 1) {
+            return;
+        }
+
+        // redirect to next step
+        this.router.navigate(
+            ['/contacts/follow-ups/modify-list'],
+            {
+                queryParams: {
+                    followUpsIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }

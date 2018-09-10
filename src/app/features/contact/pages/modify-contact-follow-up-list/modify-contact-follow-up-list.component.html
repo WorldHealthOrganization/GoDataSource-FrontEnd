@@ -1,0 +1,203 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Details step -->
+        <mat-step [stepControl]="followDetailsForm">
+            <form #followDetailsForm="ngForm">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE'| translate}}
+                </ng-template>
+
+                <div
+                    *ngFor="let followUpData of followUps; let i = index"
+                    fxFlex fxLayout="row" fxLayoutAlign="start center">
+                    <mat-card
+                        fxFlex
+                        class="page-section">
+                        <input
+                            type="hidden"
+                            [name]="'followUps[' + i + '][id]'"
+                            [ngModel]="followUpData.id"/>
+
+                        <div
+                            fxLayout="column" fxLayoutGap="20px">
+
+                            <div
+                                fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <div>
+                                    {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}
+                                </div>
+                                <div>
+                                    {{ followUpData.contact.name }}
+                                </div>
+                            </div>
+
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                                    <app-form-datepicker
+                                        [name]="'followUps[' + i + '][date]'"
+                                        [(ngModel)]="followUpData.date"
+                                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                                        required="true"
+                                        app-date-validator>
+                                    </app-form-datepicker>
+                                    <div
+                                        fxFlex="40px"
+                                        fxLayout="column"
+                                        fxLayoutAlign="center">
+                                        <button
+                                            class="copy-field-button"
+                                            type="button"
+                                            mat-icon-button
+                                            [title]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
+                                            (click)="copyValueToEmptyFields('date', followUpData)">
+                                            <span class="xt-icon">fileCopy</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <app-form-slide-toggle
+                                    [name]="'followUps[' + i + '][performed]'"
+                                    [ngModel]="followUpData.performed"
+                                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
+                                    [disabled]="dateInTheFuture(followUpData)">
+                                </app-form-slide-toggle>
+
+                                <app-form-slide-toggle
+                                    [name]="'followUps[' + i + '][lostToFollowUp]'"
+                                    [ngModel]="followUpData.lostToFollowUp"
+                                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
+                                    [disabled]="dateInTheFuture(followUpData)">
+                                </app-form-slide-toggle>
+                            </div>
+
+                            <div
+                                fxFlex fxLayout="column" fxLayoutGap="10px">
+                                <div fxFlex fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start center">
+                                    <div class="section-title">
+                                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS' | translate }}
+                                    </div>
+                                    <div
+                                        fxFlex="40px"
+                                        fxLayout="column"
+                                        fxLayoutAlign="center">
+                                        <button
+                                            class="copy-field-button"
+                                            type="button"
+                                            mat-icon-button
+                                            [title]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
+                                            (click)="copyValueToEmptyFields('address', followUpData, followDetailsForm)">
+                                            <span class="xt-icon">fileCopy</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <app-form-address
+                                    [name]="'followUps[' + i + '][address]'"
+                                    [ngModel]="followUpData.address"
+                                    [displayCopyField]="true"
+                                    [displayCopyFieldDescription]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
+                                    (copyValue)="copyValueToEmptyFields('address[' + $event + ']', followUpData, followDetailsForm)">
+                                </app-form-address>
+                            </div>
+
+                        </div>
+                    </mat-card>
+
+                    <div
+                        fxFlex="70px">
+                        <button
+                            *ngIf="followUps.length > 1"
+                            type="button"
+                            mat-icon-button
+                            (click)="removeFollowUp(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <button
+                        mat-button matStepperNext
+                        (click)="invalidDisplayFields(followDetailsForm)">
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Questionnaire step -->
+        <mat-step [stepControl]="followQuestionnaireForm">
+            <form #followQuestionnaireForm="ngForm">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE'| translate}}
+                </ng-template>
+
+                <div
+                    *ngFor="let followUpData of followUps; let i = index"
+                    fxFlex fxLayout="row" fxLayoutAlign="start center">
+
+                    <app-form-fill-questionnaire
+                        fxFlex
+                        [name]="'followUps[' + i + '][questionnaireAnswers]'"
+                        [ngModel]="followUpData.questionnaireAnswers"
+                        [questions]="selectedOutbreak?.contactFollowUpTemplate"
+                        [displayCopyField]="true"
+                        [displayCopyFieldDescription]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
+                        (copyValue)="copyValueToEmptyFields('questionnaireAnswers[' + $event + ']', followUpData, followQuestionnaireForm)">
+                        <div
+                            fxLayout="row" fxLayoutGap="20px" fxFlex
+                            class="list-questionnaire-title">
+                            <div>
+                                {{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}
+                            </div>
+                            <div>
+                                {{ followUpData.contact.name }}
+                            </div>
+                        </div>
+                    </app-form-fill-questionnaire>
+
+                    <div
+                        fxFlex="70px">
+                        <button
+                            *ngIf="followUps.length > 1"
+                            type="button"
+                            mat-icon-button
+                            (click)="removeFollowUp(i)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <button
+                        mat-button matStepperNext
+                        (click)="invalidDisplayFields(followQuestionnaireForm)">
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            TODO
+            <!--<ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>-->
+            <!--{{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}-->
+            <!--<div>-->
+                <!--<button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>-->
+                <!--<button type="button" mat-button (click)="createNewRelationship(followDetailsForm, followQuestionnaireForm)">-->
+                    <!--{{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}-->
+                <!--</button>-->
+            <!--</div>-->
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

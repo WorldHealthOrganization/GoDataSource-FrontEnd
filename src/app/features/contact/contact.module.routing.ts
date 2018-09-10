@@ -48,6 +48,7 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+
     // View Contact movement
     {
         path: ':contactId/movement',
@@ -57,6 +58,7 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_CONTACT]
         }
     },
+
     // View Contact chronology
     {
         path: ':contactId/chronology',
@@ -66,6 +68,7 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_CONTACT]
         }
     },
+
     // Follow-ups list
     {
         path: 'follow-ups',
@@ -114,6 +117,18 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_FOLLOWUP],
             action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // Modify list of Follow Ups
+    {
+        path: 'follow-ups/modify-list',
+        component: fromPages.ModifyContactFollowUpListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_FOLLOWUP]
         },
         canDeactivate: [
             PageChangeConfirmationGuard

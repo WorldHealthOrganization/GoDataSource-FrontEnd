@@ -14,7 +14,9 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div
+                            fxLayout="row" fxLayoutGap="20px" fxFlex
+                            class="follow-ups-title">
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
                             <a [routerLink]="['/contacts', followUpData.personId, viewOnly ? 'view' : 'modify']">
                                 {{ followUpData.contact.name }}
