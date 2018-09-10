@@ -214,7 +214,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                if (createRelationships$.length > 0) {
+                if (createRelationships$.length > 1) {
                     // multiple relationships
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE');
                 } else {

@@ -21,11 +21,6 @@
                     <mat-card
                         fxFlex
                         class="page-section">
-                        <input
-                            type="hidden"
-                            [name]="'followUps[' + i + '][id]'"
-                            [ngModel]="followUpData.id"/>
-
                         <div
                             fxLayout="column" fxLayoutGap="20px">
 
@@ -178,6 +173,9 @@
                 </div>
 
                 <div>
+                    <button mat-button matStepperPrevious>
+                        {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                    </button>
                     <button
                         mat-button matStepperNext
                         (click)="invalidDisplayFields(followQuestionnaireForm)">
@@ -189,15 +187,21 @@
 
         <!-- Final step -->
         <mat-step>
-            TODO
-            <!--<ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>-->
-            <!--{{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}-->
-            <!--<div>-->
-                <!--<button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>-->
-                <!--<button type="button" mat-button (click)="createNewRelationship(followDetailsForm, followQuestionnaireForm)">-->
-                    <!--{{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}-->
-                <!--</button>-->
-            <!--</div>-->
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div>
+                <button mat-button matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-button
+                    (click)="updateFollowUps([followDetailsForm, followQuestionnaireForm])">
+                    {{'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON' | translate}}
+                </button>
+            </div>
         </mat-step>
     </mat-horizontal-stepper>
 </div>

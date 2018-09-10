@@ -13,6 +13,13 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { NgForm, NgModel } from '@angular/forms';
 import { GroupBase } from '../../../../shared/xt-forms/core';
+import * as moment from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Moment } from 'moment';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -33,18 +40,29 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     followUps: FollowUpModel[] = [];
 
+    serverToday: Moment = null;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private followUpsDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService,
+        private formHelper: FormHelperService
     ) {
         super();
     }
 
     ngOnInit() {
+        // get today time
+        this.genericDataService
+            .getServerUTCCurrentDateTime()
+            .subscribe((serverDateTime: string) => {
+                this.serverToday = moment(serverDateTime).startOf('day');
+            });
+
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
@@ -187,7 +205,93 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * Date in the future
      */
     dateInTheFuture(followUpData: FollowUpModel) {
-        // #TODO
-        return false;
+        const date = followUpData.date ?
+            moment(followUpData.date) :
+            null;
+
+        return this.serverToday &&
+            date &&
+            date.endOf('day').isAfter(this.serverToday);
+    }
+
+    /**
+     * Update Follow-Ups
+     * @param stepForms
+     */
+    updateFollowUps(stepForms: NgForm[]) {
+        // get forms fields
+        const followUpsToSave: {
+            [ id: string ]: FollowUpModel
+        } = {};
+        const mappedRealFollowUps: {
+            [ id: string ]: FollowUpModel
+        } = {};
+        _.each(
+            stepForms,
+            (form) => {
+                // get dirty fields
+                const dirtyFields: any = this.formHelper.getDirtyFields(form);
+                if (!_.isEmpty(dirtyFields)) {
+                    // go through each dirty follow-up record
+                    for (const property in dirtyFields.followUps) {
+                        // retrieve id
+                        const id: string = this.followUps[property].id;
+
+                        // map related follow-up so we can easily use it later
+                        mappedRealFollowUps[id] = this.followUps[property];
+
+                        // set data
+                        followUpsToSave[id] = {
+                            ...followUpsToSave[id],
+                            ...dirtyFields.followUps[property]
+                        };
+                    }
+                }
+            }
+        );
+
+        // check if we have something to save
+        if (_.isEmpty(followUpsToSave)) {
+            this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+            return;
+        }
+
+        // save follow-ups
+        // construct list of observables to save follow-ups
+        const observableList$: Observable<any>[] = [];
+        _.each(
+            followUpsToSave,
+            (followUp: FollowUpModel, id: string) => {
+                // retrieve contact id
+                observableList$.push(
+                    this.followUpsDataService
+                        .modifyFollowUp(
+                            this.selectedOutbreak.id,
+                            mappedRealFollowUps[id].personId,
+                            id,
+                            followUp
+                        )
+                );
+            }
+        );
+
+        // execute observables in parallel
+        Observable.forkJoin(observableList$)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                // multiple or single followups to save ?
+                if (observableList$.length > 1) {
+                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                } else {
+                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
+                }
+
+                // navigate to listing page
+                this.disableDirtyConfirm();
+                this.router.navigate(['/contacts/follow-ups']);
+            });
     }
 }

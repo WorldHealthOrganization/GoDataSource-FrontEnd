@@ -687,6 +687,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON': 'Update follow-ups',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Relationship created!',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
          * Event fields
