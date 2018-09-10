@@ -35,6 +35,15 @@ const routes: Routes = [
             action: ViewModifyComponentAction.VIEW
         }
     },
+    // View clusters people
+    {
+        path: ':clusterId/people',
+        component: fromPages.ClustersPeopleListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE, PERMISSION.READ_CONTACT]
+        }
+    },
     // Edit Cluster
     {
         path: ':clusterId/modify',

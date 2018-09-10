@@ -1,0 +1,129 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <ng-container *app-selected-outbreak-is-active>
+                    <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                        {{'add people' | translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('lastName', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Classification -->
+        <ng-container matColumnDef="classification">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="classificationFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterBySelectField('classification', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter>
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                    [value]="item.classification">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_GENDER' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="genderFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBySelectField('gender', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter>
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.gender }}
+            </mat-cell>
+        </ng-container>
+
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
+    <!-- First Name -->
+</mat-card>
