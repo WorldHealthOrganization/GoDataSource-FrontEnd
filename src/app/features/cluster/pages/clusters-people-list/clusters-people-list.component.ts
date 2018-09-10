@@ -8,6 +8,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -28,7 +29,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     // cluster people list
     clusterPeopleList$: Observable<any>;
 
-
+    EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
 
@@ -67,10 +68,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
     refreshList() {
-        this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id)
-            .subscribe((data) => {
-            console.log(data);
-            })
+        this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id);
     }
 
     /**
@@ -79,9 +77,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         const columns = [
-            'firstName', 'lastName', 'gender', 'classification'
-            // 'lastName', 'age', 'gender', 'risk',
-            // 'lastFollowUp', 'place', 'address'
+            'firstName', 'lastName', 'age', 'gender', 'risk',
+            'lastFollowUp', 'place', 'address'
         ];
 
         return columns;
