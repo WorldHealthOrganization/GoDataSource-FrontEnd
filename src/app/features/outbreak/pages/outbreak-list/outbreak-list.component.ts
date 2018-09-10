@@ -18,6 +18,9 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -46,6 +49,14 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
 
+    outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML
+    ];
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
@@ -53,7 +64,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -62,6 +74,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+
+        // add page title
+        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL') +
+            ' - ' +
+            this.outbreaksDataExporFileName;
+
 
         this.refreshList();
     }

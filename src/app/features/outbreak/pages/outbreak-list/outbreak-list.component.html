@@ -4,6 +4,14 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
+                <app-export-button
+                    [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
+                    url="outbreaks/export"
+                    [fileName]="outbreaksDataExporFileName"
+                    [allowedExportTypes]="allowedExportTypes">
+                </app-export-button>
+
                 <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
