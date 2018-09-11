@@ -31,13 +31,23 @@ export class ImportExportDataService {
         url: string,
         data: {
             fileType: string,
-            encryptPassword?: string
+            encryptPassword?: string,
+            anonymizeFields?: string[]
         }
     ): Observable<Blob>  {
+        // url + export type ( json, csv ... )
         let completeURL = `${url}?type=${data.fileType}`;
+
+        // encryption password
         if (!_.isEmpty(data.encryptPassword)) {
             completeURL += `&encryptPassword=${data.encryptPassword}`;
         }
+
+        // anonymize fields
+        if (!_.isEmpty(data.anonymizeFields)) {
+            completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
+        }
+
         return this.http.get(
             completeURL, {
                 responseType: 'blob'

@@ -72,7 +72,9 @@
                         optionLabelKey="label"
                         optionValueKey="value"
                         [multiple]="field.inputOptionsMultiple"
-                        [required]="field.required">
+                        [required]="field.required"
+                        app-required-one-or-other-validator
+                        [requiredOtherField]="field.requiredOneOfTwo">
                     </app-form-select>
 
                     <!-- Text / Number -->
@@ -82,7 +84,9 @@
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
                         [required]="field.required"
-                        [type]="field.type">
+                        [type]="field.type"
+                        app-required-one-or-other-validator
+                        [requiredOtherField]="field.requiredOneOfTwo">
                     </app-form-input>
                 </div>
             </ng-container>
@@ -100,7 +104,7 @@
             <button
                 class="dialog-button"
                 mat-button
-                [disabled]="confirmData?.customInput && !form?.valid"
+                [disabled]="confirmData?.customInput && form?.invalid"
                 (click)="yes()"
                 type="button">
                 {{ confirmData?.yesLabel | translate:confirmData?.translateData }}

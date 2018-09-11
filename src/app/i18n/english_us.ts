@@ -50,6 +50,8 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT': 'Export',
         'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
         'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD': 'Encrypt Password',
+        'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
+        'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
 
         /**
          * General Actions
@@ -155,6 +157,7 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE': 'before',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
+        'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED': 'At least one field must be filled',
 
         /**
          * API Errors
@@ -206,6 +209,7 @@ export const EnglishUsLang = {
         /**
          * Outbreak Fields
          */
+        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',

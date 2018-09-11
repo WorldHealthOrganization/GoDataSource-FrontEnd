@@ -5,6 +5,8 @@ import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { ImportExportDataService } from '../../../core/services/data/import-export.data.service';
 import * as _ from 'lodash';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -31,6 +33,10 @@ export class ExportButtonComponent {
     @Input() message: string = '';
     @Input() extensionPlaceholder: string = 'LNG_COMMON_LABEL_EXPORT_TYPE';
     @Input() encryptPlaceholder: string = 'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD';
+    @Input() anonymizePlaceholder: string = 'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS';
+    @Input() displayEncrypt: boolean = false;
+    @Input() displayAnonymize: boolean = false;
+    @Input() anonymizeFields: LabelValuePair[];
     @Input() url: string = '';
     @Input() allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
@@ -47,47 +53,78 @@ export class ExportButtonComponent {
 
     constructor(
         private dialogService: DialogService = null,
-        private importExportDataService: ImportExportDataService = null
+        private importExportDataService: ImportExportDataService = null,
+        private snackbarService: SnackbarService
     ) {}
 
     triggerExport() {
-        this.dialogService.showInput(new DialogConfiguration({
-            message: this.message,
-            yesLabel: this.yesLabel,
-            fieldsList: [
-                new DialogField({
-                    name: 'fileType',
-                    placeholder: this.extensionPlaceholder,
-                    inputOptions: _.map(this.allowedExportTypes, (item: ExportDataExtension) => {
-                        return new LabelValuePair(
-                            item as string,
-                            item as string
-                        );
-                    }),
-                    inputOptionsMultiple: false,
-                    required: true
+        // construct list of inputs that we need in the dialog
+        const fieldsList: DialogField[] = [
+            new DialogField({
+                name: 'fileType',
+                placeholder: this.extensionPlaceholder,
+                inputOptions: _.map(this.allowedExportTypes, (item: ExportDataExtension) => {
+                    return new LabelValuePair(
+                        item as string,
+                        item as string
+                    );
                 }),
+                inputOptionsMultiple: false,
+                required: true
+            })
+        ];
+
+        // add encrypt password
+        if (this.displayEncrypt) {
+            fieldsList.push(
                 new DialogField({
                     name: 'encryptPassword',
-                    placeholder: this.encryptPlaceholder
+                    placeholder: this.encryptPlaceholder,
+                    requiredOneOfTwo: 'anonymizeFields'
                 })
-            ]
-        })).subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                this.importExportDataService.exportData(
-                    this.url,
-                    answer.inputValue.value
-                ).subscribe((blob) => {
-                    const url = window.URL.createObjectURL(blob);
+            );
+        }
 
-                    const link = this.buttonDownloadFile.nativeElement;
-                    link.href = url;
-                    link.download = `${this.fileName}.${answer.inputValue.value.fileType}`;
-                    link.click();
+        // add encrypt anonymize fields
+        if (this.displayAnonymize) {
+            fieldsList.push(
+                new DialogField({
+                    name: 'anonymizeFields',
+                    placeholder: this.anonymizePlaceholder,
+                    inputOptions: this.anonymizeFields,
+                    inputOptionsMultiple: true,
+                    requiredOneOfTwo: 'encryptPassword'
+                })
+            );
+        }
 
-                    window.URL.revokeObjectURL(url);
-                });
-            }
-        });
+        // display dialog
+        this.dialogService
+            .showInput(new DialogConfiguration({
+                message: this.message,
+                yesLabel: this.yesLabel,
+                fieldsList: fieldsList
+            }))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.importExportDataService
+                        .exportData(
+                            this.url,
+                            answer.inputValue.value
+                        ).catch((err) => {
+                            this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                            return ErrorObservable.create(err);
+                        }).subscribe((blob) => {
+                            const url = window.URL.createObjectURL(blob);
+
+                            const link = this.buttonDownloadFile.nativeElement;
+                            link.href = url;
+                            link.download = `${this.fileName}.${answer.inputValue.value.fileType}`;
+                            link.click();
+
+                            window.URL.revokeObjectURL(url);
+                        });
+                }
+            });
     }
 }

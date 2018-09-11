@@ -27,6 +27,7 @@ export class DialogField {
     public inputOptionsMultiple: boolean = false;
     public required: boolean = false;
     public type: string = 'text';
+    public requiredOneOfTwo: string;
 
     constructor(data: {
         name: string,
@@ -34,7 +35,8 @@ export class DialogField {
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
         required?: boolean,
-        type?: string
+        type?: string,
+        requiredOneOfTwo?: string
     }) {
         Object.assign(
             this,

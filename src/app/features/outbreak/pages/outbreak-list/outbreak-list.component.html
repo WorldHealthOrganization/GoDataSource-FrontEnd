@@ -9,7 +9,10 @@
                     [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
                     url="outbreaks/export"
                     [fileName]="outbreaksDataExporFileName"
-                    [allowedExportTypes]="allowedExportTypes">
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
                 </app-export-button>
 
                 <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
