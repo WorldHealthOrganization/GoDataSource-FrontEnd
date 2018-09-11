@@ -119,7 +119,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * @param {Object} item
      * @returns {boolean}
      */
-    getAccessPermissions(item){
+    getAccessPermissions(item) {
         switch (item.type) {
             case EntityType.CASE:
                 return this.hasCaseWriteAccess();
