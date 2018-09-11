@@ -12,7 +12,7 @@ export class RequestPaginator {
      * @param {PageEvent} page
      * @returns {RequestPaginator}
      */
-    setPage(page: PageEvent) {
+    setPage(page: (PageEvent | {pageSize: number, pageIndex: number})) {
         this.limit = page.pageSize;
         this.skip = page.pageSize * page.pageIndex;
 
