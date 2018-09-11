@@ -87,7 +87,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
-                // re-load the list when the Selected Outbreak is changed
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
 

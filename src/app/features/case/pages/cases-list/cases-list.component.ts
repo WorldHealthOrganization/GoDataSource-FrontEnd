@@ -83,7 +83,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
-                // re-load the list when the Selected Outbreak is changed
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
 

@@ -58,6 +58,7 @@ export abstract class ListComponent {
 
     public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
     public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
+    private paginatorInitialized = false;
 
     /**
      * Models for the checkbox functionality
@@ -114,7 +115,9 @@ export abstract class ListComponent {
      * Refresh items count
      * Note: To be overridden on pages that implement pagination
      */
-    public refreshListCount() {}
+    public refreshListCount() {
+        console.error('Component must implement \'refreshListCount\' method');
+    }
 
     /**
      * Tell list that we need to refresh list
@@ -124,7 +127,7 @@ export abstract class ListComponent {
         // do we need to reset pagination (aka go to the first page) ?
         if (
             resetPagination &&
-            !this.queryBuilder.paginator.isEmpty()
+            this.paginatorInitialized
         ) {
             // re-calculate items count (filters have changed)
             this.refreshListCount();
@@ -305,6 +308,19 @@ export abstract class ListComponent {
         return relationQB.filter;
     }
 
+    /**
+     * Initialize paginator
+     */
+    protected initPaginator() {
+        // initialize query paginator
+        this.queryBuilder.paginator.setPage({
+            pageSize: this.pageSize,
+            pageIndex: 0
+        });
+
+        this.paginatorInitialized = true;
+    }
+
     changePage(page: PageEvent) {
         // update API pagination params
         this.queryBuilder.paginator.setPage(page);
@@ -380,6 +396,9 @@ export abstract class ListComponent {
 
         // refresh of the list is done automatically after debounce time
         // #
+
+        // refresh total number of items
+        this.refreshListCount();
     }
 
     /**
