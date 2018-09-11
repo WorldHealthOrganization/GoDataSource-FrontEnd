@@ -79,8 +79,9 @@ export class ClusterDataService {
      * @param {string} clusterId
      * @returns {Observable<any>}
      */
-    getClusterPeople (outbreakId: string, clusterId: string): Observable<any> {
-        return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people`);
+    getClusterPeople (outbreakId: string, clusterId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`);
     }
 }
 

@@ -2,14 +2,6 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-                <ng-container *app-selected-outbreak-is-active>
-                    <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
-                        {{'add people' | translate}} <span class="xt-icon">addCircle</span>
-                    </button>
-                </ng-container>
-            </div>
         </div>
     </ng-container>
 </app-topnav>
@@ -42,7 +34,7 @@
                                 name="firstNameFilter"
                                 ngModel
                                 placeholder="Filter"
-                                (optionChanged)="filterByTextField(['firstName', 'name'], $event)">
+                                (optionChanged)="filterByTextField('firstName', $event)">
                             </app-form-input>
                         </div>
                     </div>
@@ -180,7 +172,7 @@
                 </mat-cell>
             </ng-container>
 
-            <!-- Place -->
+            <!-- Address -->
             <ng-container matColumnDef="address">
                 <mat-header-cell *matHeaderCellDef>
                     <div class="table-header-cell">
@@ -198,12 +190,36 @@
                 </mat-cell>
             </ng-container>
 
+            <!-- Inline Actions -->
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+                <mat-cell *matCellDef="let item" fxFlex="70px">
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
+                    </button>
+
+                    <mat-menu #actionsMenu="matMenu">
+                        <button
+                            [routerLink]="getItemRouterLink(item, 'view')"
+                            mat-menu-item>
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <button
+                                *ngIf="getAccessPermissions(item)"
+                                [routerLink]="getItemRouterLink(item, 'modify')"
+                                mat-menu-item>
+                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </mat-cell>
+            </ng-container>
 
             <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
             <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
         </mat-table>
-
     </div>
-
-    <!-- First Name -->
 </mat-card>
