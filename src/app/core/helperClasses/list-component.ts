@@ -297,9 +297,6 @@ export abstract class ListComponent {
         });
 
         this.paginatorInitialized = true;
-
-        // get items count
-        this.refreshListCount();
     }
 
     changePage(page: PageEvent) {
@@ -377,6 +374,9 @@ export abstract class ListComponent {
 
         // refresh of the list is done automatically after debounce time
         // #
+
+        // refresh total number of items
+        this.refreshListCount();
     }
 
     /**
