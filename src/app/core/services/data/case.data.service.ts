@@ -80,6 +80,7 @@ export class CaseDataService {
     /**
      * Return count of cases
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<any>}
      */
     getCasesCount(

@@ -8,7 +8,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatSort, MatSortable } from '@angular/material';
+import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
@@ -33,6 +33,11 @@ export abstract class ListComponent {
      */
     @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
 
+    /**
+     * Retrieve Paginator
+     */
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
     public breadcrumbs: BreadcrumbItemModel[];
 
     /**
@@ -50,6 +55,9 @@ export abstract class ListComponent {
      * List Filter Query Builder
      */
     protected appliedListFilterQueryBuilder: RequestQueryBuilder;
+
+    public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
+    public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
 
     /**
      * Models for the checkbox functionality
@@ -103,9 +111,33 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
+     * Refresh items count
+     * Note: To be overridden on pages that implement pagination
+     */
+    public refreshListCount() {}
+
+    /**
      * Tell list that we need to refresh list
      */
-    public needsRefreshList(instant: boolean = false) {
+    public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+
+        // do we need to reset pagination (aka go to the first page) ?
+        if (
+            resetPagination &&
+            !this.queryBuilder.paginator.isEmpty()
+        ) {
+            // re-calculate items count (filters have changed)
+            this.refreshListCount();
+
+            // move to the first page (if not already there)
+            if (this.paginator.hasPreviousPage()) {
+                this.paginator.firstPage();
+                // no need to refresh the list here, because our 'changePage' hook will trigger that again
+                return;
+            }
+        }
+
+        // refresh list
         this.triggerListRefresh.call(instant);
     }
 
@@ -139,13 +171,14 @@ export abstract class ListComponent {
         }
 
         // refresh list
-        this.needsRefreshList();
+        this.needsRefreshList(false, false);
     }
 
     /**
      * Filter the list by a text field
      * @param {string} property
      * @param {string} value
+     * @param {RequestFilterOperator} operator
      */
     filterByTextField(
         property: string | string[],
@@ -272,8 +305,16 @@ export abstract class ListComponent {
         return relationQB.filter;
     }
 
+    changePage(page: PageEvent) {
+        // update API pagination params
+        this.queryBuilder.paginator.setPage(page);
+
+        // refresh list
+        this.needsRefreshList(true, false);
+    }
+
     /**
-     * Clear query builder of conditions & include & ....
+     * Clear query builder of conditions and sorting criterias
      */
     clearQueryBuilder() {
         // clear query filters
@@ -331,7 +372,7 @@ export abstract class ListComponent {
             this.sideFilter &&
             (queryBuilder = this.sideFilter.getQueryBuilder())
         ) {
-            this.queryBuilder = queryBuilder;
+            this.queryBuilder.merge(queryBuilder);
         }
 
         // apply list filters which is mandatory
@@ -346,14 +387,17 @@ export abstract class ListComponent {
      * @param {RequestQueryBuilder} queryBuilder
      */
     applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear query builder of conditions and sorting criterias
+        this.clearQueryBuilder();
+
         // clear table filters
         this.clearHeaderFilters();
 
         // reset table sort columns
         this.clearHeaderSort();
 
-        // replace query builder with side filters
-        this.queryBuilder = queryBuilder;
+        // merge query builder with side filters
+        this.queryBuilder.merge(queryBuilder);
 
         // apply list filters which is mandatory
         this.mergeListFilterToMainFilter();
@@ -373,7 +417,7 @@ export abstract class ListComponent {
     }
 
     /**
-     *  Check if list filter applies
+     * Check if list filter applies
      */
     protected checkListFilters() {
         if (
