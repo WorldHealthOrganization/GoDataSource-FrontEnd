@@ -13,6 +13,18 @@
                     {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                 </button>
 
+                <app-export-button
+                    *ngIf="exportCasesUrl"
+                    [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
+                    [url]="exportCasesUrl"
+                    [fileName]="casesDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
+                </app-export-button>
+
                 <ng-container *app-selected-outbreak-is-active>
                     <button
                         *ngIf="hasCaseWriteAccess() && !appliedListFilter"

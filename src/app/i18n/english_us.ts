@@ -302,6 +302,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
 
         /**
          * Create Case page
@@ -540,6 +542,7 @@ export const EnglishUsLang = {
         /**
          * Contact Fields
          */
+        'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
@@ -556,9 +559,11 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
+        'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
 
         /**
          * Contacts list page
@@ -568,6 +573,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
 
         /**
          * Create Contact page
