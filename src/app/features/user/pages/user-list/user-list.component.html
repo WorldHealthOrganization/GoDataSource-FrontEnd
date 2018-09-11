@@ -72,9 +72,15 @@
         <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div>{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
+                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-input
+                            name="emailFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('email', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -87,7 +93,7 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
+                    <div>{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -133,5 +139,12 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(usersListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 
 </mat-card>
