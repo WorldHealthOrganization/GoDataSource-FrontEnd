@@ -20,6 +20,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -49,6 +50,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     yesNoOptionsList$: Observable<any[]>;
 
     availableSideFilters: FilterModel[];
+
+    followUpsListCount$: Observable<any>;
 
     constructor(
         private authDataService: AuthDataService,
@@ -81,7 +84,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected oubreak
+                // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
@@ -197,6 +200,18 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     this.followUpsList$ = this.followUpsDataService
                         .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
                 });
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.followUpsListCount$ = this.followUpsDataService.getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 

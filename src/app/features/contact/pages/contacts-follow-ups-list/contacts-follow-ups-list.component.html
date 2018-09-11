@@ -257,4 +257,11 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(followUpsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>

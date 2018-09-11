@@ -84,7 +84,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true, true);
+                this.needsRefreshList(true);
             });
 
         // set available side filters
