@@ -188,13 +188,11 @@ export class RequestQueryBuilder {
     }
 
     /**
-     * Clear query
+     * Clear filter and sort criterias
      */
     clear() {
         this.filter.clear();
-        this.includedRelations = {};
         this.sort.clear();
-        this.paginator.clear();
     }
 }
 

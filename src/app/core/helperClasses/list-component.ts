@@ -72,10 +72,6 @@ export abstract class ListComponent {
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshList();
     }));
-    // refresh only after we finish changing data
-    private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.refreshListCount();
-    }));
 
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
@@ -102,22 +98,25 @@ export abstract class ListComponent {
      * Tell list that we need to refresh list
      */
     public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
-        if (resetPagination) {
-            // re-calculate items count
-            this.triggerListCountRefresh.call(instant);
+
+        // do we need to reset pagination (aka go to the first page) ?
+        if (
+            resetPagination &&
+            !this.queryBuilder.paginator.isEmpty()
+        ) {
+            // re-calculate items count (filters have changed)
+            this.refreshListCount();
 
             // move to the first page (if not already there)
             if (this.paginator.hasPreviousPage()) {
                 this.paginator.firstPage();
-                // no need to refresh the list here, because our 'changePage' hook will trigger that
-            } else {
-                // already on the first page; refresh list
-                this.triggerListRefresh.call(instant);
+                // no need to refresh the list here, because our 'changePage' hook will trigger that again
+                return;
             }
-
-        } else {
-            this.triggerListRefresh.call(instant);
         }
+
+        // refresh list
+        this.triggerListRefresh.call(instant);
     }
 
     /**
@@ -150,7 +149,7 @@ export abstract class ListComponent {
         }
 
         // refresh list
-        this.needsRefreshList();
+        this.needsRefreshList(false, false);
     }
 
     /**
@@ -285,7 +284,7 @@ export abstract class ListComponent {
     }
 
     changePage(page: PageEvent) {
-        // update paginator settings
+        // update API pagination params
         this.queryBuilder.paginator.setPage(page);
 
         // refresh list
@@ -293,7 +292,7 @@ export abstract class ListComponent {
     }
 
     /**
-     * Clear query builder of conditions & include & ....
+     * Clear query builder of conditions and sorting criterias
      */
     clearQueryBuilder() {
         // clear query filters
@@ -351,7 +350,7 @@ export abstract class ListComponent {
             this.sideFilter &&
             (queryBuilder = this.sideFilter.getQueryBuilder())
         ) {
-            this.queryBuilder = queryBuilder;
+            this.queryBuilder.merge(_.cloneDeep(queryBuilder));
         }
 
         // apply list filters which is mandatory
@@ -366,14 +365,17 @@ export abstract class ListComponent {
      * @param {RequestQueryBuilder} queryBuilder
      */
     applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear query builder of conditions and sorting criterias
+        this.clearQueryBuilder();
+
         // clear table filters
         this.clearHeaderFilters();
 
         // reset table sort columns
         this.clearHeaderSort();
 
-        // replace query builder with side filters
-        this.queryBuilder = queryBuilder;
+        // merge query builder with side filters
+        this.queryBuilder.merge(_.cloneDeep(queryBuilder));
 
         // apply list filters which is mandatory
         this.mergeListFilterToMainFilter();
@@ -393,7 +395,7 @@ export abstract class ListComponent {
     }
 
     /**
-     *  Check if list filter applies
+     * Check if list filter applies
      */
     protected checkListFilters() {
         if (
