@@ -4,38 +4,74 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
-    <form #form="ngForm" (submit)="createNewRole(form)">
+<div class="page-content">
 
-        <div fxLayout="column">
+    <mat-horizontal-stepper linear #stepper>
 
-            <app-form-input
-                name="name"
-                [(ngModel)]="newUserRole.name"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
-                required="true">
-            </app-form-input>
+        <mat-step>
+            <form #form="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
-            <app-form-textarea
-                name="description"
-                [(ngModel)]="newUserRole.description"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate">
-            </app-form-textarea>
+                <div fxLayout="column">
+                    <mat-card class="page-section">
 
-            <app-form-select
-                name="permissionIds"
-                [(ngModel)]="newUserRole.permissionIds"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
-                required="true"
-                [options]="availablePermissions$ | async"
-                optionLabelKey="label"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                multiple="true">
-            </app-form-select>
 
-            <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-        </div>
+                        <app-form-input
+                            name="name"
+                            [(ngModel)]="newUserRole.name"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                            required="true">
+                        </app-form-input>
 
-    </form>
-</mat-card>
+                        <app-form-textarea
+                            name="description"
+                            [(ngModel)]="newUserRole.description"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate">
+                        </app-form-textarea>
+
+                        <app-form-select
+                            name="permissionIds"
+                            [(ngModel)]="newUserRole.permissionIds"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                            required="true"
+                            [options]="availablePermissions$ | async"
+                            optionLabelKey="label"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            multiple="true">
+                        </app-form-select>
+                    </mat-card>
+
+                    <div>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    </div>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div>
+                <button mat-button matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-button
+                    (click)="createNewRole(form)">
+                    {{'LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+
+    </mat-horizontal-stepper>
+
+</div>
+
+

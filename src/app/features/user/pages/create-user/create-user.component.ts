@@ -44,11 +44,9 @@ export class CreateUserComponent extends ConfirmOnFormChanges {
     }
 
     createNewUser(form: NgForm) {
-
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (form.valid && !_.isEmpty(dirtyFields)) {
-
             // try to authenticate the user
             this.userDataService
                 .createUser(dirtyFields)

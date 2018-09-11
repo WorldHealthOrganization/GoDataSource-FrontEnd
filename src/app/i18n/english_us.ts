@@ -486,6 +486,7 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_EMAIL': 'Email',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
+        'LNG_USER_FIELD_LABEL_SYNONYM' : 'Synonyms',
 
         /**
          * List Users page
@@ -497,6 +498,8 @@ export const EnglishUsLang = {
          * Create User page
          */
         'LNG_PAGE_CREATE_USER_TITLE': 'Create New User',
+        'LNG_PAGE_CREATE_USER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON' : 'Create user',
         'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE': 'User created!',
 
         /**
@@ -523,6 +526,7 @@ export const EnglishUsLang = {
          * Create User Role Page
          */
         'LNG_PAGE_CREATE_USER_ROLE_TITLE': 'Create New Role',
+        'LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON': 'Create new role',
         'LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE': 'Role created!',
 
         /**
