@@ -350,7 +350,7 @@ export abstract class ListComponent {
             this.sideFilter &&
             (queryBuilder = this.sideFilter.getQueryBuilder())
         ) {
-            this.queryBuilder.merge(_.cloneDeep(queryBuilder));
+            this.queryBuilder.merge(queryBuilder);
         }
 
         // apply list filters which is mandatory
@@ -375,7 +375,7 @@ export abstract class ListComponent {
         this.clearHeaderSort();
 
         // merge query builder with side filters
-        this.queryBuilder.merge(_.cloneDeep(queryBuilder));
+        this.queryBuilder.merge(queryBuilder);
 
         // apply list filters which is mandatory
         this.mergeListFilterToMainFilter();

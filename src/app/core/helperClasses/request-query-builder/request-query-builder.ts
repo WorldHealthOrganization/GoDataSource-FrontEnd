@@ -192,7 +192,9 @@ export class RequestQueryBuilder {
      */
     clear() {
         this.filter.clear();
+        this.includedRelations = {};
         this.sort.clear();
+        this.deleted = false;
     }
 }
 
