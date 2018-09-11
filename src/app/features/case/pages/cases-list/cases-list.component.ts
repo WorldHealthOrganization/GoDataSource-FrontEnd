@@ -22,6 +22,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cases-list',
@@ -41,6 +42,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
+    casesListCount$: Observable<any>;
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
@@ -83,6 +85,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
                 // re-load the list when the Selected Outbreak is changed
                 this.refreshList();
+                this.refreshListCount();
             });
 
         // set available side filters
@@ -155,6 +158,18 @@ export class CasesListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 

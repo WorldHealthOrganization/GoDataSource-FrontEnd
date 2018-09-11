@@ -30,9 +30,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 })
 export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // Entities Map for specific data
     entityMap = {

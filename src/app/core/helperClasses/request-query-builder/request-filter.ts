@@ -432,6 +432,7 @@ export class RequestFilter {
      */
     clear() {
         this.conditions = [];
+        this.flags = {};
 
         return this;
     }
