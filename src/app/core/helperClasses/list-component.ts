@@ -8,7 +8,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatSort, MatSortable } from '@angular/material';
+import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
@@ -33,6 +33,11 @@ export abstract class ListComponent {
      */
     @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
 
+    /**
+     * Retrieve Paginator
+     */
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
     public breadcrumbs: BreadcrumbItemModel[];
 
     /**
@@ -51,6 +56,9 @@ export abstract class ListComponent {
      */
     protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
+    public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
+    public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
+
     /**
      * Models for the checkbox functionality
      * @type {boolean}
@@ -63,6 +71,10 @@ export abstract class ListComponent {
     // refresh only after we finish changing data
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
         this.refreshList();
+    }));
+    // refresh only after we finish changing data
+    private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshListCount();
     }));
 
     protected constructor(
@@ -81,10 +93,31 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
+     * Refresh items count
+     * Note: To be overridden on pages that implement pagination
+     */
+    public refreshListCount() {}
+
+    /**
      * Tell list that we need to refresh list
      */
-    public needsRefreshList(instant: boolean = false) {
-        this.triggerListRefresh.call(instant);
+    public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+        if (resetPagination) {
+            // re-calculate items count
+            this.triggerListCountRefresh.call(instant);
+
+            // move to the first page (if not already there)
+            if (this.paginator.hasPreviousPage()) {
+                this.paginator.firstPage();
+                // no need to refresh the list here, because our 'changePage' hook will trigger that
+            } else {
+                // already on the first page; refresh list
+                this.triggerListRefresh.call(instant);
+            }
+
+        } else {
+            this.triggerListRefresh.call(instant);
+        }
     }
 
     /**
@@ -124,6 +157,7 @@ export abstract class ListComponent {
      * Filter the list by a text field
      * @param {string} property
      * @param {string} value
+     * @param {RequestFilterOperator} operator
      */
     filterByTextField(
         property: string | string[],
@@ -248,6 +282,14 @@ export abstract class ListComponent {
 
         // retrieve filter
         return relationQB.filter;
+    }
+
+    changePage(page: PageEvent) {
+        // update paginator settings
+        this.queryBuilder.paginator.setPage(page);
+
+        // refresh list
+        this.needsRefreshList(true, false);
     }
 
     /**
