@@ -32,7 +32,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 export class OutbreakListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
     ];
 
     // import constants into template
@@ -100,7 +100,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
 
         // add page title
-        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL') +
+        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_TITLE') +
             ' - ' +
             this.outbreaksDataExporFileName;
 

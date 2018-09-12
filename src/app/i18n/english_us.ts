@@ -925,6 +925,7 @@ export const EnglishUsLang = {
         /**
          * Outbreaks List Page
          */
+        'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
