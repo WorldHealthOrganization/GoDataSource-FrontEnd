@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
@@ -32,6 +31,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -52,6 +52,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
+    contactsListCount$: Observable<any>;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -181,8 +182,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
 
         // case condition
@@ -320,6 +323,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 

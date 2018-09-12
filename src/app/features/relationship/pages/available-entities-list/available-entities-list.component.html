@@ -44,7 +44,7 @@
                 <ng-container matColumnDef="firstName">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div mat-sort-header>
                                 {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
                             </div>
                             <div class="column-filter">
@@ -67,7 +67,7 @@
                 <ng-container matColumnDef="lastName">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div mat-sort-header>
                                 {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
                             </div>
                             <div class="column-filter">
@@ -112,7 +112,7 @@
                 <ng-container matColumnDef="gender">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div mat-sort-header>
                                 {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
                             </div>
                             <div class="column-filter">
@@ -134,10 +134,10 @@
                 </ng-container>
 
                 <!-- Risk -->
-                <ng-container matColumnDef="risk">
+                <ng-container matColumnDef="riskLevel">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div mat-sort-header>
                                 {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
                             </div>
                             <div class="column-filter">
@@ -212,6 +212,13 @@
                 <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
+
+            <mat-paginator
+                [length]="(entitiesListCount$ | async)?.count"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="changePage($event)">
+            </mat-paginator>
 
         </mat-card>
     </div>

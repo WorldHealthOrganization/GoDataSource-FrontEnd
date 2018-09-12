@@ -19,14 +19,34 @@ export class ContactDataService {
     /**
      * Retrieve the list of Contacts for an Outbreak
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<ContactModel[]>}
      */
-    getContactsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactModel[]> {
+    getContactsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<ContactModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts?filter=${filter}`),
             ContactModel
         );
+    }
+
+    /**
+     * Return total number of contacts
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getContactsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
     }
 
     /**

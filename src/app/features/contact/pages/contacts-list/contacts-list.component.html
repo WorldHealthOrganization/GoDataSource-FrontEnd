@@ -228,4 +228,11 @@
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
 
+    <mat-paginator
+        [length]="(contactsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
 </mat-card>
