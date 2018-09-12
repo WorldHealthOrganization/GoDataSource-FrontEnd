@@ -47,7 +47,7 @@
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('lastName', $event)"
+                            (optionChanged)="filterByTextField('name', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-input>
                     </div>
@@ -65,7 +65,12 @@
                 <div class="table-header-cell">
                     <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
                     <div class="column-filter">
-                        <!-- @TODO later -->
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('date', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
@@ -158,4 +163,12 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(eventsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
 </mat-card>

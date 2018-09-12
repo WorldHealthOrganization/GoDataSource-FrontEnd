@@ -30,6 +30,22 @@ export class EventDataService {
     }
 
     /**
+     * Return total number of events
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEventsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/events/filtered-count?filter=${filter}`);
+    }
+
+    /**
      * Add new Event to an existing Outbreak
      * @param {string} outbreakId
      * @param eventData
