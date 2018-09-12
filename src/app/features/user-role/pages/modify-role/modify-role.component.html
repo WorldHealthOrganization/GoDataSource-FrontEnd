@@ -4,44 +4,69 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
-    <form #form="ngForm" (submit)="modifyRole(form)">
+<form #form="ngForm" (submit)="modifyRole(form)" class="page-content form-section">
 
-        <div fxLayout="column">
+    <div class="form-content">
 
-            <app-form-input
-                name="name"
-                [(ngModel)]="userRole.name"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
-                required="true"
-                [disabled]="viewOnly">
-            </app-form-input>
+        <mat-tab-group class="page-tabs-navbar">
 
-            <app-form-textarea
-                name="description"
-                [(ngModel)]="userRole.description"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
-                [disabled]="viewOnly">
-            </app-form-textarea>
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE'| translate">
 
-            <app-form-select
-                name="permissionIds"
-                [(ngModel)]="userRole.permissionIds"
-                [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
-                required="true"
-                [options]="availablePermissions$ | async"
-                optionLabelKey="label"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                multiple="true"
-                [disabled]="viewOnly">
-            </app-form-select>
-            <button *ngIf="viewOnly && hasUserRoleWriteAccess()" mat-raised-button color="primary"
-                    [routerLink]="['/user-roles', userRoleId, 'modify']">{{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                <mat-card class="page-section">
+
+                    <div fxLayout="column">
+
+                        <app-form-input
+                            name="name"
+                            [(ngModel)]="userRole.name"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                            required="true"
+                            [disabled]="viewOnly">
+                        </app-form-input>
+
+                        <app-form-textarea
+                            name="description"
+                            [(ngModel)]="userRole.description"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
+                            [disabled]="viewOnly">
+                        </app-form-textarea>
+
+                        <app-form-select
+                            name="permissionIds"
+                            [(ngModel)]="userRole.permissionIds"
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                            required="true"
+                            [options]="availablePermissions$ | async"
+                            optionLabelKey="label"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            multiple="true"
+                            [disabled]="viewOnly">
+                        </app-form-select>
+
+
+                    </div>
+                </mat-card>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button *ngIf="viewOnly && hasUserRoleWriteAccess()" mat-raised-button color="primary" class="button-primary"
+                [routerLink]="['/user-roles', userRoleId, 'modify']">{{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button *ngIf="!viewOnly" mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            <button type="button"
+                    [routerLink]="'/user-roles'"
+                    mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
-        </div>
-
-    </form>
-</mat-card>
+        </ng-container>
+    </div>
+</form>
