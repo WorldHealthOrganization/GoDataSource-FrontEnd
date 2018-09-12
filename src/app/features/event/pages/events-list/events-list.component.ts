@@ -18,6 +18,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-events-list',
@@ -36,6 +37,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
 
     // list of existing events
     eventsList$: Observable<EventModel[]>;
+    eventsListCount$: Observable<any>;
 
     // events outbreak
     selectedOutbreak: OutbreakModel;
@@ -66,8 +68,10 @@ export class EventsListComponent extends ListComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
     }
 
@@ -78,6 +82,18 @@ export class EventsListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // retrieve the list of Events
             this.eventsList$ = this.eventDataService.getEventsList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.eventsListCount$ = this.eventDataService.getEventsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
