@@ -415,8 +415,7 @@ export const EnglishUsLang = {
         /**
          * View Cluster people page
          */
-        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE' : 'Clusters',
-        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_VIEW_PEOPLE_TITLE': 'People',
+        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE' : 'People',
 
         /**
          * Entity Relationships list page

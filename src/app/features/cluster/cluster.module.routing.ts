@@ -39,10 +39,7 @@ const routes: Routes = [
     {
         path: ':clusterId/people',
         component: fromPages.ClustersPeopleListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_CASE, PERMISSION.READ_CONTACT, PERMISSION.READ_EVENT]
-        }
+        canActivate: [AuthGuard]
     },
     // Edit Cluster
     {

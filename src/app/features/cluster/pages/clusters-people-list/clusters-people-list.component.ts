@@ -23,7 +23,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ClustersPeopleListComponent extends ListComponent implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '/clusters', true),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'),
     ];
     // authenticated user
     authUser: UserModel;
@@ -64,11 +64,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
                         this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
                             .subscribe((clusterData: ClusterModel) => {
                                 this.cluster = clusterData;
-                                // resetting the breadcrumb and pushing the new ones
-                                this.breadcrumbs[0].active = false;
+                                // pushing the new breadcrumbs
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(clusterData.name),
-                                    new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_VIEW_PEOPLE_TITLE', '.', true)
+                                    new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true)
                                 );
                                 // retrieve cluster data
                                 this.refreshList();
