@@ -246,10 +246,10 @@
         <div
             *ngFor="let err of errMsgDetails.details && errMsgDetails.details.failed ? errMsgDetails.details.failed : []"
             class="import-data-errors-err">
-            <span *ngIf="err.error.code === 11000">
+            <span *ngIf="err.error.code === ImportServerErrorCodes.DUPLICATE_RECORD">
                 {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE' | translate:{ recordNo: err.recordNo } }}
             </span>
-            <span *ngIf="err.error.code !== 11000">
+            <span *ngIf="err.error.code !== ImportServerErrorCodes.DUPLICATE_RECORD">
                 {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: err.error.details ? Object.keys(err.error.details.codes).join(', ') : [] } }}
             </span>
         </div>
