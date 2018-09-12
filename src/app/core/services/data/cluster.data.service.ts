@@ -97,11 +97,34 @@ export class ClusterDataService {
      * Get people for specific cluster
      * @param {string} outbreakId
      * @param {string} clusterId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<any>}
      */
-    getClusterPeople (outbreakId: string, clusterId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getClusterPeople (
+        outbreakId: string,
+        clusterId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`);
+    }
+
+    /**
+     * Return total number of people in a cluster
+     * @param {string} outbreakId
+     * @param {string} clusterId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getClusterPeopleCount(
+        outbreakId: string,
+        clusterId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people/count?where=${whereFilter}`);
     }
 }
 

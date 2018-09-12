@@ -13,6 +13,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -33,6 +34,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     cluster: ClusterModel;
     // cluster people list
     clusterPeopleList$: Observable<any>;
+    clusterPeopleListCount$: Observable<any>;
+
     // gender list
     genderList$: Observable<any[]>;
 
@@ -52,25 +55,33 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
         this.genderList$ = this.genericDataService.getGenderList().share();
-        // retrieve cluster info
+
+        // get cluster ID from route params
         this.route.params.subscribe((params: { clusterId }) => {
             // get selected outbreak
             this.outbreakDataService.getSelectedOutbreak()
                 .subscribe((selectedOutbreak) => {
-                this.selectedOutbreak = selectedOutbreak;
+                    this.selectedOutbreak = selectedOutbreak;
                     if (selectedOutbreak && selectedOutbreak.id) {
+
+                        // retrieve cluster info
                         this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
                             .subscribe((clusterData: ClusterModel) => {
                                 this.cluster = clusterData;
+
                                 // pushing the new breadcrumbs
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(clusterData.name),
                                     new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true)
                                 );
-                                // retrieve cluster data
-                                this.refreshList();
+
+                                // initialize pagination
+                                this.initPaginator();
+                                // ...and load the list of items
+                                this.needsRefreshList(true);
                             });
                     }
                 });
@@ -81,7 +92,19 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
     refreshList() {
-        this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder);
+        if (this.selectedOutbreak) {
+            this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder);
     }
 
     /**
