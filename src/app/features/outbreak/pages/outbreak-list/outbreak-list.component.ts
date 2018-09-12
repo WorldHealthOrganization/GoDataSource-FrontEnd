@@ -18,6 +18,10 @@ import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -46,6 +50,37 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
 
+    outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_ID', 'id' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_NAME', 'name' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION', 'description' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DISEASE', 'disease' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_START_DATE', 'startDate' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_END_DATE', 'endDate' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS', 'periodOfFollowup' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY', 'frequencyOfFollowUp' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY', 'frequencyOfFollowUpPerDay' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS', 'noDaysAmongContacts' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS', 'noDaysInChains' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN', 'noDaysNotSeen' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS', 'noLessContacts' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT', 'noDaysNewContacts' ),
+        new LabelValuePair( 'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION', 'caseInvestigationTemplate' ),
+        new LabelValuePair( 'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP', 'contactFollowUpTemplate' ),
+        new LabelValuePair( 'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE', 'labResultsTemplate' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK', 'caseIdMask' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES', 'countries' ),
+        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS', 'longPeriodsBetweenCaseOnset' ),
+    ];
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
@@ -53,7 +88,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -62,6 +98,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+
+        // add page title
+        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL') +
+            ' - ' +
+            this.outbreaksDataExporFileName;
+
 
         this.refreshList();
     }
@@ -172,5 +214,4 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
     }
-
 }

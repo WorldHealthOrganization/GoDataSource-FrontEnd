@@ -22,6 +22,10 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
+import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 
 @Component({
@@ -55,6 +59,47 @@ export class CasesListComponent extends ListComponent implements OnInit {
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    exportCasesUrl: string;
+    casesDataExportFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ID', 'id' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_GENDER', 'gender' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOB', 'dob' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_AGE', 'age' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DECEASED', 'deceased' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES', 'hospitalizationDates' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES', 'isolationDates' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES', 'incubationDates' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TYPE', 'type' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
+        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused' )
+    ];
+
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
@@ -64,12 +109,18 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         protected route: ActivatedRoute,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private i18nService: I18nService
     ) {
         super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {
+        // add page title
+        this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
+            ' - ' +
+            this.casesDataExportFileName;
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -82,6 +133,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // export cases url
+                this.exportCasesUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
+                }
 
                 // initialize pagination
                 this.initPaginator();
