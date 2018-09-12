@@ -37,6 +37,20 @@ export class UserDataService {
     }
 
     /**
+     * Return total number of users
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getUsersCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`users/count?where=${whereFilter}`);
+    }
+
+    /**
      * Retrieve a User
      * @param {string} userId
      * @returns {Observable<UserRoleModel>}

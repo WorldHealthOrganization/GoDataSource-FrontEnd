@@ -29,6 +29,10 @@ export class Constants {
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
 
+    // pagination defaults and configuration
+    static PAGE_SIZE_OPTIONS = [10, 25, 50];
+    static DEFAULT_PAGE_SIZE = 25;
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {

@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cases-list',
@@ -45,6 +46,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
+    casesListCount$: Observable<any>;
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
@@ -141,8 +143,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
                     this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
                 }
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
 
         // set available side filters
@@ -215,6 +219,18 @@ export class CasesListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // retrieve the list of Cases
             this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
