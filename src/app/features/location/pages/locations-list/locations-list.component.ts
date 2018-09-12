@@ -15,6 +15,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-locations-list',
@@ -31,9 +32,14 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         )
     ];
 
-    locationsList$: Observable<LocationModel[]>;
-    yesNoOptionsList$: Observable<any[]>;
+    // parent location ID
     parentId: string;
+
+    // list of existing locations
+    locationsList$: Observable<LocationModel[]>;
+    locationsListCount$: Observable<any>;
+
+    yesNoOptionsList$: Observable<any[]>;
 
     // authenticated user
     authUser: UserModel;
@@ -62,10 +68,31 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 // set parent
                 this.parentId = params.parentId;
 
-                // refresh list
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when parent location is changed
+                this.needsRefreshList(true);
             });
     }
+
+    /**
+     * Re(load) the list of Locations
+     */
+    refreshList() {
+        // retrieve the list of Locations
+        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder);
+    }
+
     /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
@@ -115,13 +142,5 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      */
     hasLocationWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
-    }
-
-    /**
-     * Re(load) the Contacts list
-     */
-    refreshList() {
-        // retrieve the list of Contacts
-        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
     }
 }
