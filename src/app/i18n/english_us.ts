@@ -566,6 +566,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
+        'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Contacts list page
@@ -577,6 +578,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
 
         /**
          * Create Contact page
@@ -1119,6 +1121,11 @@ export const EnglishUsLang = {
         /**
          * Import case lab data
          */
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
+
+        /**
+         * Import contact data
+         */
+        'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE': 'Import Contact Data'
     }
 };

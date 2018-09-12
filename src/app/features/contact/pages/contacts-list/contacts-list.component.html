@@ -15,6 +15,15 @@
                     [displayAnonymize]="true"
                     [anonymizeFields]="anonymizeFields">
                 </app-export-button>
+
+                <button
+                    *ngIf="!appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'contact-data', 'import']">
+                    {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                </button>
             </div>
         </div>
     </ng-container>

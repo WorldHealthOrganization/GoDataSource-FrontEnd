@@ -44,6 +44,16 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE]
         }
+    },
+
+    // Import contact data
+    {
+        path: 'contact-data/import',
+        component: fromPages.ImportContactDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CONTACT]
+        }
     }
 ];
 
