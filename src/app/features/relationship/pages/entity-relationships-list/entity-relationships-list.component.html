@@ -109,10 +109,10 @@
         </ng-container>
 
         <!-- Certainty Level -->
-        <ng-container matColumnDef="certaintyLevel">
+        <ng-container matColumnDef="certaintyLevelId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
                     </div>
                     <div class="column-filter">
@@ -138,10 +138,10 @@
         </ng-container>
 
         <!-- Exposure Type -->
-        <ng-container matColumnDef="exposureType">
+        <ng-container matColumnDef="exposureTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
@@ -167,10 +167,10 @@
         </ng-container>
 
         <!-- Exposure Frequency -->
-        <ng-container matColumnDef="exposureFrequency">
+        <ng-container matColumnDef="exposureFrequencyId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
                     </div>
                     <div class="column-filter">
@@ -196,10 +196,10 @@
         </ng-container>
 
         <!-- Exposure Duration -->
-        <ng-container matColumnDef="exposureDuration">
+        <ng-container matColumnDef="exposureDurationId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -225,10 +225,10 @@
         </ng-container>
 
         <!-- Relation -->
-        <ng-container matColumnDef="relation">
+        <ng-container matColumnDef="socialRelationshipTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -286,5 +286,12 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(relationshipsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 
 </mat-card>
