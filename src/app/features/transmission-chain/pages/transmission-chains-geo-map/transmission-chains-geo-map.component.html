@@ -7,17 +7,18 @@
 <mat-card
     class="page-section page-content">
     <app-google-map
-        *ngIf="markers.length > 0"
+        *ngIf="markers.length > 0 || displayLoading"
         width="100%"
         height="100%"
         [centerLocation]="selectedGeoPoint"
         [markers]="markers"
         [lines]="lines"
-        [fitMapOnMarkersChange]="true">
+        [fitMapOnMarkersChange]="true"
+        [displayLoading]="displayLoading">
     </app-google-map>
 
     <div
-        *ngIf="markers.length < 1"
+        *ngIf="markers.length < 1 && !displayLoading"
         fxFlex
         class="geo-map-no-data">
         <span>

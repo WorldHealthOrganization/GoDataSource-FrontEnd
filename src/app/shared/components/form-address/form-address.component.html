@@ -6,8 +6,8 @@
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <app-form-select
                     [name]="name + '[name]'"
-                    [(ngModel)]="address.name"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
+                    [(ngModel)]="address.typeId"
+                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_TYPE' | translate"
                     [disabled]="disabled"
                     [required]="required"
                     [options]="addressTypes$ | async"

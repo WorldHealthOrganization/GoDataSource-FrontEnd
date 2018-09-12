@@ -171,7 +171,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',

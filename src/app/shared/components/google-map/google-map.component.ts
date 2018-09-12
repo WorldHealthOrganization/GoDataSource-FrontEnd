@@ -14,6 +14,7 @@ export class GoogleMapComponent {
     @Input() zoom: number = 10;
     @Input() mapType: google.maps.MapTypeId = google.maps.MapTypeId.HYBRID;
     @Input() fitMapOnMarkersChange: boolean = false;
+    @Input() displayLoading: boolean = false;
 
     private markerBounds: google.maps.LatLngBounds;
     private _centerLocation: google.maps.LatLng;
