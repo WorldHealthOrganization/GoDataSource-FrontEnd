@@ -4,73 +4,166 @@
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <app-form-select
-                    [name]="name + '[name]'"
-                    [(ngModel)]="address.name"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    [options]="addressTypes$ | async"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[name]'"
+                        [(ngModel)]="address.name"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        [options]="addressTypes$ | async"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('name')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-datepicker
-                    [name]="name + '[date]'"
-                    [(ngModel)]="address.date"
-                    [required]="required"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
-                    [maxDate]="Constants.today()"
-                    app-date-validator
-                    [dateSameOrBefore]="Constants.today()"
-                    (optionChanged)="onChange()">
-                </app-form-datepicker>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-datepicker
+                        [name]="name + '[date]'"
+                        [(ngModel)]="address.date"
+                        [required]="required"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
+                        [maxDate]="Constants.today()"
+                        app-date-validator
+                        [dateSameOrBefore]="Constants.today()"
+                        (optionChanged)="onChange()">
+                    </app-form-datepicker>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('date')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
                 <div fxFlex><!-- placeholder --></div>
                 <div fxFlex><!-- placeholder --></div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <app-form-location-dropdown
-                    fxFlex
-                    [name]="name + '[locationId]'"
-                    [(ngModel)]="address.locationId"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    (changed)="onChange()">
-                </app-form-location-dropdown>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-location-dropdown
+                        fxFlex
+                        [name]="name + '[locationId]'"
+                        [(ngModel)]="address.locationId"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (changed)="onChange()">
+                    </app-form-location-dropdown>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('locationId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <app-form-input
-                    fxFlex="25%"
-                    [name]="name + '[city]'"
-                    [(ngModel)]="address.city"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    (input)="onChange()">
-                </app-form-input>
+                <div fxFlex="25%" fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[city]'"
+                        [(ngModel)]="address.city"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('city')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-input
-                    fxFlex="25%"
-                    [name]="name + '[postalCode]'"
-                    [(ngModel)]="address.postalCode"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    (input)="onChange()">
-                </app-form-input>
+                <div fxFlex="25%" fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[postalCode]'"
+                        [(ngModel)]="address.postalCode"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('postalCode')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-input
-                    fxFlex="50%"
-                    [name]="name + '[addressLine1]'"
-                    [(ngModel)]="address.addressLine1"
-                    [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    (input)="onChange()">
-                </app-form-input>
+                <div fxFlex="50%" fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[addressLine1]'"
+                        [(ngModel)]="address.addressLine1"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('addressLine1')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </form>

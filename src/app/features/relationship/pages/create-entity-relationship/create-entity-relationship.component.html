@@ -11,7 +11,9 @@
         <!-- Relationships step -->
         <mat-step [stepControl]="relationshipsForm">
             <form #relationshipsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}</ng-template>
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}
+                </ng-template>
 
                 <mat-card class="page-section" *ngFor="let person of selectedEntities; let i = index">
                     <input type="hidden" [name]="'relationships[' + i + '][relatedEntityId]'" [ngModel]="person.id" />

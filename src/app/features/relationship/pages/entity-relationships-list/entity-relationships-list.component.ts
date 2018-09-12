@@ -257,7 +257,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

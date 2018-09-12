@@ -19,6 +19,9 @@ import { DialogAnswer, DialogConfiguration } from '../../../../shared/components
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { Router } from '@angular/router';
+import * as _ from 'lodash';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -49,13 +52,17 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     availableSideFilters: FilterModel[];
 
+    followUpsListCount$: Observable<any>;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService) {
+        private genericDataService: GenericDataService,
+        private router: Router
+    ) {
         super();
     }
 
@@ -78,11 +85,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected oubreak
+                // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
 
         // set available side filters
@@ -169,8 +178,11 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         }
     }
 
-    refreshList() {
-        if (this.selectedOutbreak) {
+    /**
+     * Construct query builder
+     */
+    private addFollowUpConditionsToQB(): Observable<void> {
+        return Observable.create((observer: Subscriber<void>) => {
             this.genericDataService.getServerUTCCurrentDateTime()
                 .subscribe((serverDateTime: string) => {
                     // display only unresolved followups
@@ -190,16 +202,44 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         }]
                     }, true);
 
-                    // retrieve the list of Follow Ups
-                    this.followUpsList$ = this.followUpsDataService
-                        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                    // finished configuring query builder
+                    observer.next();
+                    observer.complete();
                 });
+        });
+    }
+
+    /**
+     * Refresh list
+     */
+    refreshList() {
+        if (this.selectedOutbreak) {
+            this.addFollowUpConditionsToQB().subscribe(() => {
+                // retrieve the list of Follow Ups
+                this.followUpsList$ = this.followUpsDataService
+                    .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+            });
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            this.addFollowUpConditionsToQB().subscribe(() => {
+                // remove paginator from query builder
+                const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+                countQueryBuilder.paginator.clear();
+                this.followUpsListCount$ = this.followUpsDataService
+                    .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
+            });
         }
     }
 
     switchToPastFollowUps() {
         this.showPastFollowUps = true;
-        this.refreshList();
+        this.needsRefreshList(true);
 
         // update breadcrumbs
         this.breadcrumbs.pop();
@@ -214,7 +254,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     switchToUpcomingFollowUps() {
         this.showPastFollowUps = false;
-        this.refreshList();
+        this.needsRefreshList(true);
 
         // update breadcrumbs
         this.breadcrumbs.pop();
@@ -252,7 +292,14 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'actions'
         ];
 
-        // return columns that should be visible
+        // checkboxes should be visible only if we have write access
+        if (this.hasFollowUpsWriteAccess()) {
+            columns.unshift(
+                'checkbox'
+            );
+        }
+
+        // finished
         return columns;
     }
 
@@ -277,7 +324,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -304,7 +351,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -330,7 +377,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                 this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                                 // reload data
-                                this.refreshList();
+                                this.needsRefreshList(true);
                             });
                     }
             });
@@ -364,10 +411,31 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
 
                                     // refresh list
-                                    this.refreshList();
+                                    this.needsRefreshList(true);
                                 });
                         });
                 }
             });
+    }
+
+    /**
+     * Modify selected follow-ups
+     */
+    modifySelectedFollowUps() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: string[] = this.checkedRecords;
+        if (selectedRecords.length < 1) {
+            return;
+        }
+
+        // redirect to next step
+        this.router.navigate(
+            ['/contacts/follow-ups/modify-list'],
+            {
+                queryParams: {
+                    followUpsIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 }

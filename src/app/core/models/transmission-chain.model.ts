@@ -3,8 +3,6 @@ import { EntityModel } from './entity.model';
 import { CaseModel } from './case.model';
 import { RelationshipModel, RelationshipPersonModel } from './relationship.model';
 import { EntityType } from './entity-type';
-import { GraphNodeModel } from './graph-node.model';
-import { GraphEdgeModel } from './graph-edge.model';
 
 export class TransmissionChainRelation {
 

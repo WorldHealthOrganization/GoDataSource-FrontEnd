@@ -359,7 +359,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
             'firstName',
             'lastName',
             'age',
@@ -368,8 +368,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             'riskLevel',
             'actions'
         ];
-
-        return columns;
     }
 
     /**
@@ -408,7 +406,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

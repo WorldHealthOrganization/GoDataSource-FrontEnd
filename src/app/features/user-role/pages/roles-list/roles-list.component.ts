@@ -46,7 +46,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -74,7 +74,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('Role deleted!');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
