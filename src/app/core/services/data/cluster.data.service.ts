@@ -17,9 +17,13 @@ export class ClusterDataService {
     /**
      * Retrieve the list of Clusters for an Outbreak
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<ClusterModel[]>}
      */
-    getClusterList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ClusterModel[]> {
+    getClusterList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<ClusterModel[]> {
 
         const filter = queryBuilder.buildQuery();
 
@@ -27,6 +31,22 @@ export class ClusterDataService {
             this.http.get(`outbreaks/${outbreakId}/clusters?filter=${filter}`),
             ClusterModel
         );
+    }
+
+    /**
+     * Return total number of clusters for an Outbreak
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getClustersCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`outbreaks/${outbreakId}/clusters/count?where=${whereFilter}`);
     }
 
     /**

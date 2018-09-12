@@ -2,6 +2,20 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <app-export-button
+                    *ngIf="exportContactsUrl"
+                    [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
+                    [url]="exportContactsUrl"
+                    [fileName]="contactsDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
+                </app-export-button>
+            </div>
         </div>
     </ng-container>
 </app-topnav>

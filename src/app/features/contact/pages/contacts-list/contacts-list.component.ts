@@ -32,6 +32,9 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as moment from 'moment';
+import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -73,6 +76,35 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    exportContactsUrl: string;
+    contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ID', 'id' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_GENDER', 'gender' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_AGE', 'age' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_TYPE', 'type' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' )
+    ];
+
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
@@ -82,12 +114,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private i18nService: I18nService
     ) {
         super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {
+        // add page title
+        this.contactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE') +
+            ' - ' +
+            this.contactsDataExportFileName;
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -118,6 +156,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // export contacts url
+                this.exportContactsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
+                }
 
                 // get new contacts grouped by exposure types
                 if (this.selectedOutbreak) {
