@@ -19,6 +19,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-available-entities-list',
