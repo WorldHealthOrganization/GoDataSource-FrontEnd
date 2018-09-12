@@ -193,7 +193,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     }
 
     /**
-     * Scroll to invalid fields
+     * Display error when we have invalid fields
      */
     invalidDisplayFields(form: NgForm) {
         if (form.invalid) {
