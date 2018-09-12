@@ -304,6 +304,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
 
         /**
          * Create Case page
@@ -362,6 +363,7 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Case Lab results list page
@@ -1105,13 +1107,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
 
         /**
-         * Import case lab data
-         */
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
-
-        /**
          * Import reference data
          */
-        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data'
+        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data',
+
+        /**
+         * Import case data
+         */
+        'LNG_PAGE_IMPORT_CASE_DATA_TITLE': 'Import Case Data',
+
+        /**
+         * Import case lab data
+         */
+        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data'
     }
 };

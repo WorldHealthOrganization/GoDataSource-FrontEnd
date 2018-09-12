@@ -65,7 +65,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
-        ExportDataExtension.XML
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS
     ];
 
     anonymizeFields: LabelValuePair[] = [

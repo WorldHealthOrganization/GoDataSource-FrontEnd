@@ -16,16 +16,6 @@ const routes: Routes = [
         }
     },
 
-    // Import case lab data locations
-    {
-        path: 'case-lab-data/import',
-        component: fromPages.ImportCaseLabDataComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_CASE]
-        }
-    },
-
     // Import reference data
     {
         path: 'reference-data/import',
@@ -33,6 +23,26 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+        }
+    },
+
+    // Import case data
+    {
+        path: 'case-data/import',
+        component: fromPages.ImportCaseDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
+    },
+
+    // Import case lab data
+    {
+        path: 'case-lab-data/import',
+        component: fromPages.ImportCaseLabDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
         }
     }
 ];
