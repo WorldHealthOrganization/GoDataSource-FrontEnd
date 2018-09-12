@@ -422,6 +422,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE': 'View People',
 
         /**
+         * View Cluster people page
+         */
+        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE' : 'People',
+
+        /**
          * Entity Relationships list page
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
