@@ -1,0 +1,27 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card
+    class="page-section page-content">
+    <app-google-map
+        *ngIf="markers.length > 0"
+        width="100%"
+        height="100%"
+        [centerLocation]="selectedGeoPoint"
+        [markers]="markers"
+        [lines]="lines"
+        [fitMapOnMarkersChange]="true">
+    </app-google-map>
+
+    <div
+        *ngIf="markers.length < 1"
+        fxFlex
+        class="geo-map-no-data">
+        <span>
+            {{ 'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA' | translate }}
+        </span>
+    </div>
+</mat-card>
