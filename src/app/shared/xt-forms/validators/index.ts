@@ -8,6 +8,7 @@ import { PasswordValidatorDirective } from './password-validator.directive';
 import { NotEqualValidatorDirective } from './not-equal-validator.directive';
 import { UniqueValidatorDirective } from './unique-validator.directive';
 import { DateValidatorDirective } from './date-validator.directive';
+import { RequiredOneOrOtherValidatorDirective } from './required-one-or-other-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -19,5 +20,6 @@ export const validatorDirectives: any[] = [
     PasswordValidatorDirective,
     NotEqualValidatorDirective,
     UniqueValidatorDirective,
-    DateValidatorDirective
+    DateValidatorDirective,
+    RequiredOneOrOtherValidatorDirective
 ];

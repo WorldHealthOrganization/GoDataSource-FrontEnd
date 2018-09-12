@@ -20,6 +20,31 @@ export class DialogAnswer {
     ) {}
 }
 
+export class DialogField {
+    public name: string;
+    public placeholder: string;
+    public inputOptions: LabelValuePair[];
+    public inputOptionsMultiple: boolean = false;
+    public required: boolean = false;
+    public type: string = 'text';
+    public requiredOneOfTwo: string;
+
+    constructor(data: {
+        name: string,
+        placeholder: string,
+        inputOptions?: LabelValuePair[],
+        inputOptionsMultiple?: boolean,
+        required?: boolean,
+        type?: string,
+        requiredOneOfTwo?: string
+    }) {
+        Object.assign(
+            this,
+            data
+        );
+    }
+}
+
 export class DialogConfiguration {
     public message: string;
     public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
@@ -31,6 +56,7 @@ export class DialogConfiguration {
     public customInputOptionsMultiple: boolean = false;
     public required: boolean = false;
     public data: LabelValuePair[];
+    public fieldsList: DialogField[];
 
     constructor(data: string | {
         message: string,
@@ -42,12 +68,14 @@ export class DialogConfiguration {
         customInputOptions?: LabelValuePair[],
         customInputOptionsMultiple?: boolean,
         required?: boolean,
-        data?: LabelValuePair[]
+        data?: LabelValuePair[],
+        fieldsList?: DialogField[]
     }) {
         // assign properties
         if (_.isString(data)) {
             this.message = data as string;
         } else {
+            // assign properties
             Object.assign(
                 this,
                 data
@@ -101,10 +129,17 @@ export class DialogComponent {
 
     }
 
-    constructor(private dialogRef: MatDialogRef<DialogComponent>,
-                @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration) {
+    constructor(
+        private dialogRef: MatDialogRef<DialogComponent>,
+        @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration
+    ) {
         // set confirm data
         this.confirmData = data;
+
+        // if we've assigned field lists then we need an object to keep properties
+        if (!_.isEmpty(this.confirmData.fieldsList)) {
+            this.dialogAnswerInputValue.value = {};
+        }
     }
 
     cancel() {

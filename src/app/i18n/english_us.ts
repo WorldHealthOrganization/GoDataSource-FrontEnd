@@ -49,6 +49,9 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NONE': 'None',
         'LNG_COMMON_LABEL_EXPORT': 'Export',
         'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
+        'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD': 'Encrypt Password',
+        'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
+        'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
 
         /**
          * General Actions
@@ -154,6 +157,7 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE': 'before',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
+        'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED': 'At least one field must be filled',
 
         /**
          * API Errors
@@ -205,6 +209,7 @@ export const EnglishUsLang = {
         /**
          * Outbreak Fields
          */
+        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
@@ -297,6 +302,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
 
         /**
          * Create Case page
@@ -535,6 +542,7 @@ export const EnglishUsLang = {
         /**
          * Contact Fields
          */
+        'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
@@ -551,9 +559,11 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
+        'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
 
         /**
          * Contacts list page
@@ -563,6 +573,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
 
         /**
          * Create Contact page
@@ -900,6 +912,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
+        'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
 
         /**
          * Create Outbreak Page
