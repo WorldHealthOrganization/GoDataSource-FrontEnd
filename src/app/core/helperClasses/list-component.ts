@@ -16,6 +16,7 @@ import { DateRangeModel } from '../models/date-range.model';
 import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';
+import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 
 export abstract class ListComponent {
     /**
@@ -37,6 +38,11 @@ export abstract class ListComponent {
      * Retrieve Paginator
      */
     @ViewChild(MatPaginator) paginator: MatPaginator;
+
+    /**
+     * Individual checkboxes selects
+     */
+    @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent >;
 
     public breadcrumbs: BreadcrumbItemModel[];
 
@@ -80,6 +86,18 @@ export abstract class ListComponent {
         // check/un-check all individual checkboxes
         for (const id in this.checkboxModels.individualCheck) {
             this.checkboxModels.individualCheck[id] = this.checkboxModels.checkAll;
+        }
+
+        // go through all html checkboxes and update their value - this is faster than using binding which slows down a lot the page
+        if (
+            this.listCheckedIndividualInputs &&
+            this.listCheckedIndividualInputs.length > 0
+        ) {
+            this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
+                // retrieve id
+                const id = checkbox.name.substring(checkbox.name.lastIndexOf('[') + 1, checkbox.name.lastIndexOf(']'));
+                checkbox.value = !!this.checkboxModels.individualCheck[id];
+            });
         }
     }
     get checkedAllRecords(): boolean {
@@ -723,30 +741,21 @@ export abstract class ListComponent {
     /**
      * Individual Checkbox
      */
-    checkedRecord(id: string, checked?: boolean) {
-        // initialize
-        if (this.checkboxModels.individualCheck[id] === undefined) {
-            this.checkboxModels.individualCheck[id] = false;
-        }
+    checkedRecord(id: string, checked: boolean) {
+        // set value
+        this.checkboxModels.individualCheck[id] = checked ? true : false;
 
-        // set / get ?
-        if (checked !== undefined) {
-            // set value
-            this.checkboxModels.individualCheck[id] = checked ? true : false;
+        // reset check all
+        let checkedAll: boolean = true;
+        _.each(this.checkboxModels.individualCheck, (check: boolean) => {
+            if (!check) {
+                checkedAll = false;
+                return false;
+            }
+        });
 
-            // reset check all
-            let checkedAll: boolean = true;
-            _.each(this.checkboxModels.individualCheck, (check: boolean) => {
-                if (!check) {
-                    checkedAll = false;
-                    return false;
-                }
-            });
-            this.checkboxModels.checkAll = checkedAll;
-        } else {
-            // get
-            return this.checkboxModels.individualCheck[id];
-        }
+        // set check all value
+        this.checkboxModels.checkAll = checkedAll;
     }
 
     /**

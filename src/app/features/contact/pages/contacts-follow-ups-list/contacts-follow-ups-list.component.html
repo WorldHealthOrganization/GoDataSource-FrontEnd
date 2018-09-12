@@ -52,7 +52,6 @@
                     <div class="column-filter">
                         <button
                             mat-icon-button
-                            [disabled]="checkedRecords.length < 1"
                             [matMenuTriggerFor]="actionsMenuMultipleRecords">
                             <span class="xt-icon">moreVertical</span>
                         </button>
@@ -69,10 +68,12 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item;" fxFlex="60px">
                 <app-form-checkbox
+                    #listCheckedIndividual
                     [name]="'listCheckedIndividual[' + item.id + ']'"
                     class="table-checkbox"
-                    [ngModel]="checkedRecord(item.id)"
-                    (optionChanged)="checkedRecord(item.id, $event)">
+                    ngModel
+                    (optionChanged)="checkedRecord(item.id, $event)"
+                    (afterInitialize)="checkedRecord(item.id, false)">
                 </app-form-checkbox>
             </mat-cell>
         </ng-container>

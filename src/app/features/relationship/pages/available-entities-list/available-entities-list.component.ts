@@ -173,12 +173,18 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
+        // get list
+        const selectedRecords: string[] = this.checkedRecords;
+        if (selectedRecords.length < 1) {
+            return;
+        }
+
         // redirect to next step
         this.router.navigate(
             [`/relationships/${this.entityType}/${this.entityId}/create`],
             {
                 queryParams: {
-                    selectedEntityIds: JSON.stringify(this.checkedRecords)
+                    selectedEntityIds: JSON.stringify(selectedRecords)
                 }
             }
         );

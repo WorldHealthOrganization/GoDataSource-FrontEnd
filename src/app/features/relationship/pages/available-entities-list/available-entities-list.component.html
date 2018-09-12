@@ -26,10 +26,12 @@
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item;" fxFlex="70px" [ngClass]="'cell-' + item.type">
                         <app-form-checkbox
+                            #listCheckedIndividual
                             [name]="'listCheckedIndividual[' + item.id + ']'"
                             class="table-checkbox"
-                            [ngModel]="checkedRecord(item.id)"
-                            (optionChanged)="checkedRecord(item.id, $event)">
+                            ngModel
+                            (optionChanged)="checkedRecord(item.id, $event)"
+                            (afterInitialize)="checkedRecord(item.id, false)">
                         </app-form-checkbox>
                     </mat-cell>
                 </ng-container>
@@ -214,8 +216,7 @@
         <button
             class="button-primary"
             mat-raised-button
-            color="primary"
-            [disabled]="checkedRecords.length < 1">
+            color="primary">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
         <button type="button" [routerLink]="['/relationships', entityType, this.entityId]" mat-raised-button>
