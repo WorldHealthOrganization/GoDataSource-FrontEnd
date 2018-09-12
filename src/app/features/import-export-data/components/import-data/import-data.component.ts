@@ -13,6 +13,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { v4 as uuid } from 'uuid';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -459,9 +460,11 @@ export class ImportDataComponent implements OnInit {
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
             // create map option with source
             const mapOpt: {
+                id: string;
                 sourceOption: string,
                 destinationOption?: string
             } = {
+                id: uuid(),
                 sourceOption: distinctVal.value
             };
 
@@ -543,7 +546,9 @@ export class ImportDataComponent implements OnInit {
      */
     addNewOptionMap(indexMapField: number) {
         // add new item
-        this.mappedFields[indexMapField].mappedOptions.push({});
+        this.mappedFields[indexMapField].mappedOptions.push({
+            id: uuid()
+        });
     }
 
     /**
@@ -677,7 +682,7 @@ export class ImportDataComponent implements OnInit {
                 // map drop-down values
                 if (
                     item.options &&
-                    item.options.length > 0
+                    !_.isEmpty(item.options)
                 ) {
                     importJSON.valuesMap[item.source] = _.transform(
                         item.options,

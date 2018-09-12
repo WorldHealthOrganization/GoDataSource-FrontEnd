@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 export class ImportableLabelValuePair {
     constructor(
@@ -143,6 +144,7 @@ export class ImportableFileModel {
 
 export class ImportableMapField {
     public mappedOptions: {
+        id: string;
         sourceOption?: string;
         destinationOption?: string;
     }[] = [];
@@ -151,8 +153,12 @@ export class ImportableMapField {
 
     public destinationLevel: number[] = [0, 0, 0];
 
+    public id: string;
+
     constructor(
         public destinationField: string = null,
         public sourceField: string = null
-    ) {}
+    ) {
+        this.id = uuid();
+    }
 }

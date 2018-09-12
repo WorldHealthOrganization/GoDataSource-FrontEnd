@@ -102,7 +102,7 @@
                 <div
                     fxFlex fxLayout="row" fxLayoutGap="20px">
                     <app-form-select
-                        [name]="'mapObject[' + indexMapField + '][source]'"
+                        [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
                         [required]="true"
                         [(ngModel)]="item.sourceField"
@@ -112,7 +112,7 @@
                     </app-form-select>
 
                     <app-form-select
-                        [name]="'mapObject[' + indexMapField + '][destination]'"
+                        [name]="'mapObject[' + item.id + '][destination]'"
                         [required]="true"
                         [(ngModel)]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
@@ -128,7 +128,7 @@
                             *ngFor="let levelMatch of noOfLevels(item.destinationField); let destinationLevelIndex = index;"
                             fxFlex>
                             <app-form-select
-                                [name]="'mapObject[' + indexMapField + '][destinationLevel][' + destinationLevelIndex + ']'"
+                                [name]="'mapObject[' + item.id + '][destinationLevel][' + destinationLevelIndex + ']'"
                                 [required]="true"
                                 [(ngModel)]="item.destinationLevel[destinationLevelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL' | translate"
@@ -160,9 +160,9 @@
                         *ngFor="let mappedOpt of item.mappedOptions; let indexMapOption = index"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
                         <app-form-select
-                            [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][sourceOption]'"
+                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
-                            [appUniqueValidatorExpression]="'\\[' + indexMapField + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
+                            [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
                             [required]="true"
                             [(ngModel)]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -171,7 +171,7 @@
 
                         <app-form-select
                             *ngIf="getModelPropertyValues(item.destinationField)"
-                            [name]="'mapObject[' + indexMapField + '][options][' + indexMapOption + '][destinationOption]'"
+                            [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                             [required]="true"
                             [(ngModel)]="mappedOpt.destinationOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
