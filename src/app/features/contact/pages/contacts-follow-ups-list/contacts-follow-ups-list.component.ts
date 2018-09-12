@@ -21,6 +21,7 @@ import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -177,8 +178,11 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         }
     }
 
-    refreshList() {
-        if (this.selectedOutbreak) {
+    /**
+     * Construct query builder
+     */
+    private addFollowUpConditionsToQB(): Observable<void> {
+        return Observable.create((observer: Subscriber<void>) => {
             this.genericDataService.getServerUTCCurrentDateTime()
                 .subscribe((serverDateTime: string) => {
                     // display only unresolved followups
@@ -198,10 +202,23 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         }]
                     }, true);
 
-                    // retrieve the list of Follow Ups
-                    this.followUpsList$ = this.followUpsDataService
-                        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                    // finished configuring query builder
+                    observer.next();
+                    observer.complete();
                 });
+        });
+    }
+
+    /**
+     * Refresh list
+     */
+    refreshList() {
+        if (this.selectedOutbreak) {
+            this.addFollowUpConditionsToQB().subscribe(() => {
+                // retrieve the list of Follow Ups
+                this.followUpsList$ = this.followUpsDataService
+                    .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+            });
         }
     }
 
@@ -210,10 +227,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
-            // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            countQueryBuilder.paginator.clear();
-            this.followUpsListCount$ = this.followUpsDataService.getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
+            this.addFollowUpConditionsToQB().subscribe(() => {
+                // remove paginator from query builder
+                const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+                countQueryBuilder.paginator.clear();
+                this.followUpsListCount$ = this.followUpsDataService
+                    .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
+            });
         }
     }
 

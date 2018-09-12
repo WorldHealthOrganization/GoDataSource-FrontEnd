@@ -154,10 +154,8 @@ export class FollowUpsDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-        // #TODO replace return with filtered count once this feature is deployed on back-end
-        // const filter = queryBuilder.buildQuery();
-        // return this.http.get(`outbreaks/${outbreakId}/follow-ups/filtered-count?filter=${filter}`);
-        return this.http.get(`outbreaks/${outbreakId}/follow-ups/count`);
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/filtered-count?filter=${filter}`);
     }
 
     /**
