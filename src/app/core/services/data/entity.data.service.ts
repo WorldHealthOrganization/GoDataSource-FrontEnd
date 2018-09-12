@@ -64,6 +64,22 @@ export class EntityDataService {
     }
 
     /**
+     * Return total number of Cases, Contacts and Events for an Outbreak
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntitiesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
+    }
+
+    /**
      * Retrieve an Entity of an Outbreak
      * @param {EntityType} entityType
      * @param {string} entityId
