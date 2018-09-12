@@ -23,9 +23,7 @@ export class ImportExportDataService {
     /**
      * Export Data
      * @param url
-     * @param fileType
-     * @param encryptPassword
-     * @returns {Observable<Blob>}
+     * @param data
      */
     exportData(
         url: string,
