@@ -49,6 +49,9 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NONE': 'None',
         'LNG_COMMON_LABEL_EXPORT': 'Export',
         'LNG_COMMON_LABEL_EXPORT_TYPE': 'As Type',
+        'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD': 'Encrypt Password',
+        'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
+        'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
 
         /**
          * General Actions
@@ -92,6 +95,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
+        'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
+        'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
         'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': 'Are you sure you want to duplicate this question?',
@@ -154,6 +159,7 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE': 'before',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
+        'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED': 'At least one field must be filled',
 
         /**
          * API Errors
@@ -205,6 +211,7 @@ export const EnglishUsLang = {
         /**
          * Outbreak Fields
          */
+        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
@@ -297,6 +304,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
 
         /**
          * Create Case page
@@ -411,6 +420,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CLUSTER_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE': 'Cluster saved!',
         'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE': 'View People',
+
+        /**
+         * View Cluster people page
+         */
+        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE' : 'People',
 
         /**
          * Entity Relationships list page
@@ -535,6 +549,7 @@ export const EnglishUsLang = {
         /**
          * Contact Fields
          */
+        'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
@@ -551,9 +566,11 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
+        'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
 
         /**
          * Contacts list page
@@ -563,6 +580,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
 
         /**
          * Create Contact page
@@ -654,6 +673,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON': 'Generate',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE': 'How many days do you want to follow?',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL': 'Follow-up days',
+        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS': 'Modify the selected follow-ups',
 
         /**
          * Create Follow-up page
@@ -674,6 +694,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+
+        /**
+         * Modify Follow-up list page
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE': 'Modify Follow-ups',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED': 'No follow-ups were selected',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS': 'There are invalid fields on this page, you can\'t proceed',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON': 'Update follow-ups',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Relationship created!',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
          * Event fields
@@ -897,9 +930,12 @@ export const EnglishUsLang = {
         /**
          * Outbreaks List Page
          */
+        'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
+        'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
 
         /**
          * Create Outbreak Page

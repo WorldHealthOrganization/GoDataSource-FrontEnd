@@ -72,6 +72,28 @@ export class RelationshipDataService {
     }
 
     /**
+     * Retrieve the total number of Relationships of a Case / Contact / Event
+     * @param {string} outbreakId
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntityRelationshipsCount(
+        outbreakId: string,
+        entityType: EntityType,
+        entityId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(
+            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/filtered-count?filter=${filter}`
+        );
+    }
+
+    /**
      * Retrieve a Relationship between 2 entities (Cases / Contacts / Events)
      * @param {string} outbreakId
      * @param {EntityType} entityType

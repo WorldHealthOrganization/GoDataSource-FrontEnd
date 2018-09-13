@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { GroupBase } from '../../xt-forms/core';
@@ -27,6 +27,10 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
 
     Constants = Constants;
 
+    @Input() displayCopyField: boolean = false;
+    @Input() displayCopyFieldDescription: string = '';
+    @Output() copyValue = new EventEmitter<string>();
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -51,5 +55,13 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      */
     get address(): AddressModel {
         return this.value ? this.value : {} as AddressModel;
+    }
+
+    /**
+     * Copy value
+     * @param property
+     */
+    triggerCopyValue(property) {
+        this.copyValue.emit(property);
     }
 }

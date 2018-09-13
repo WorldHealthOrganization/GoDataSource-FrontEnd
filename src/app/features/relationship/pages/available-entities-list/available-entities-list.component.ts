@@ -54,6 +54,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     entityId: string;
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+    entitiesListCount$: Observable<any>;
 
     genderList$: Observable<any[]>;
 
@@ -110,7 +111,10 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        this.refreshList();
+                        // initialize pagination
+                        this.initPaginator();
+                        // ...and load the list of items
+                        this.needsRefreshList(true);
 
                         // get entity data
                         this.entityDataService
@@ -161,12 +165,63 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.outbreakId && this.entityType && this.entityId) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder);
+        }
+    }
+
+    /**
+     * @Overrides parent method
+     *
+     * @param data
+     */
+    public sortBy(data) {
+        const property = _.get(data, 'active');
+        const direction = _.get(data, 'direction');
+
+        if (
+            property === 'firstName' &&
+            direction
+        ) {
+            // need to sort by firstName ASC, name ASC (so we sort Events aswell)
+
+            // remove previous sort columns, we can sort only by one column at a time
+            this.queryBuilder.sort.clear();
+
+            // retrieve Side filters
+            let queryBuilder;
+            if (
+                this.sideFilter &&
+                (queryBuilder = this.sideFilter.getQueryBuilder())
+            ) {
+                this.queryBuilder.sort.merge(queryBuilder.sort);
+            }
+
+            // apply sort
+            this.queryBuilder.sort.by('firstName', direction);
+            this.queryBuilder.sort.by('name', direction);
+
+            // refresh list
+            this.needsRefreshList(false, false);
+        } else {
+            // call method from parent class
+            super.sortBy(data);
+        }
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
     getTableColumns(): string[] {
         const columns = [
-            'checkbox', 'firstName', 'lastName', 'age', 'gender', 'risk',
+            'checkbox', 'firstName', 'lastName', 'age', 'gender', 'riskLevel',
             'lastFollowUp', 'place', 'address'
         ];
 
@@ -174,25 +229,10 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
-
-        const fields: any = this.formHelper.getFields(form);
-
-        const allEntitiesField = _.get(fields, 'allEntities', false);
-        const entityIdsField = _.get(fields, 'entityIds', {});
-
-        let selectedEntities = [];
-
-        // check if all entities were selected
-        if (allEntitiesField) {
-            // all entities were selected
-            selectedEntities = Object.keys(entityIdsField);
-        } else {
-            // get the IDs of the selected entities
-            for (const entityId in entityIdsField) {
-                if (entityIdsField[entityId]) {
-                    selectedEntities.push(entityId);
-                }
-            }
+        // get list
+        const selectedRecords: string[] = this.checkedRecords;
+        if (selectedRecords.length < 1) {
+            return;
         }
 
         // redirect to next step
@@ -200,7 +240,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             [`/relationships/${this.entityType}/${this.entityId}/create`],
             {
                 queryParams: {
-                    selectedEntityIds: JSON.stringify(selectedEntities)
+                    selectedEntityIds: JSON.stringify(selectedRecords)
                 }
             }
         );

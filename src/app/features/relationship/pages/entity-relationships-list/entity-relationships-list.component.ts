@@ -67,6 +67,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
     // list of relationships
     relationshipsList$: Observable<RelationshipModel[]>;
+    relationshipsListCount$: Observable<any>;
 
     // list of certainty levels
     certaintyLevelList$: Observable<any>;
@@ -128,7 +129,10 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        this.refreshList();
+                        // initialize pagination
+                        this.initPaginator();
+                        // ...and re-load the list when the Selected Outbreak is changed
+                        this.needsRefreshList(true);
 
                         // get entity data
                         this.entityDataService
@@ -175,13 +179,41 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 }
             }, true);
 
-
             // retrieve the list of Relationships
             this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(
                 this.outbreakId,
                 this.entityType,
                 this.entityId,
                 qb
+            );
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.outbreakId && this.entityType && this.entityId) {
+
+            // include related people in response
+            const qb = new RequestQueryBuilder();
+            qb.merge(this.queryBuilder);
+
+            const peopleQueryBuilder = qb.include('people');
+            peopleQueryBuilder.queryBuilder.filter.where({
+                id: {
+                    neq: this.entityId
+                }
+            }, true);
+
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(qb);
+            countQueryBuilder.paginator.clear();
+            this.relationshipsListCount$ = this.relationshipDataService.getEntityRelationshipsCount(
+                this.outbreakId,
+                this.entityType,
+                this.entityId,
+                countQueryBuilder
             );
         }
     }
@@ -196,8 +228,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
      */
     getTableColumns(): string[] {
         const columns = [
-            'firstName', 'lastName', 'contactDate', 'certaintyLevel', 'exposureType',
-            'exposureFrequency', 'exposureDuration', 'relation', 'actions'
+            'firstName', 'lastName', 'contactDate', 'certaintyLevelId', 'exposureTypeId',
+            'exposureFrequencyId', 'exposureDurationId', 'socialRelationshipTypeId', 'actions'
         ];
 
         return columns;
@@ -225,7 +257,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

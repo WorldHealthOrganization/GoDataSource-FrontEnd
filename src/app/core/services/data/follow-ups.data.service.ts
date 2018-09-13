@@ -145,6 +145,20 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Return count of follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getFollowUpsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/filtered-count?filter=${filter}`);
+    }
+
+    /**
      * Add a new Follow-up for a Contact
      * @param {string} outbreakId
      * @param {string} contactId
