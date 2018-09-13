@@ -132,7 +132,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {

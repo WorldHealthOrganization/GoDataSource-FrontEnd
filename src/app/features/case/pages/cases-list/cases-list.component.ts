@@ -10,7 +10,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -107,7 +106,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         protected route: ActivatedRoute,
@@ -127,7 +125,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         // subscribe to the Selected Outbreak Subject stream

@@ -134,7 +134,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
-                {{ item.gender }}
+                {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
 

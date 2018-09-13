@@ -12,7 +12,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -48,7 +47,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         private router: Router,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
@@ -57,7 +55,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     }
 
     ngOnInit() {
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 

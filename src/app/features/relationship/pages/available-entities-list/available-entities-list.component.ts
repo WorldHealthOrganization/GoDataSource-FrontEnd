@@ -18,8 +18,8 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -72,14 +72,14 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
 
         this.route.params
             .subscribe((params: {entityType, entityId}) => {

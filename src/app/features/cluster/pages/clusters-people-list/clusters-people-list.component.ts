@@ -9,10 +9,10 @@ import { Observable } from 'rxjs/Observable';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -43,8 +43,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
-        private genericDataService: GenericDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
@@ -53,7 +53,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         // retrieve cluster info
         this.route.params.subscribe((params: { clusterId }) => {
             // get selected outbreak
