@@ -177,7 +177,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',
@@ -1053,6 +1053,13 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
+
+        /**
+         * Transmission Chains Geo map
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE': 'Geospatially Map',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA': 'No chains with geo location provided',
 
         /**
          * Side filter
