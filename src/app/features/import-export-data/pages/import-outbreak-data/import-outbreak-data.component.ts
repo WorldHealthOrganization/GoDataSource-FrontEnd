@@ -12,7 +12,11 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 export class ImportOutbreakDataComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
+            'LNG_PAGE_LIST_OUTBREAKS_TITLE',
+            '/outbreaks'
+        ),
+        new BreadcrumbItemModel(
+            'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE',
             '',
             true
         )
@@ -27,15 +31,26 @@ export class ImportOutbreakDataComponent {
         ImportDataExtension.JSON
     ];
 
-    importFileUrl: string = '';
-    importDataUrl: string = '';
+    importFileUrl: string = '/importable-files';
+    importDataUrl: string = '/outbreaks/import-importable-file-using-map';
 
     ImportServerModelNames = ImportServerModelNames;
 
-    fieldsWithoutTokens = {
-    };
-
     requiredDestinationFields = [
+        'name',
+        'disease',
+        'countries[]',
+        'description',
+        'startDate',
+        'periodOfFollowup',
+        'frequencyOfFollowUp',
+        'frequencyOfFollowUpPerDay',
+        'caseIdMask',
+        'noDaysAmongContacts',
+        'noDaysInChains',
+        'noDaysNotSeen',
+        'noLessContacts',
+        'longPeriodsBetweenCaseOnset'
     ];
 
     /**
