@@ -1,6 +1,17 @@
 <app-topnav>
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    class="button-primary"
+                    mat-raised-button color="primary"
+                    [routerLink]="['/transmission-chains', 'map']">
+                    {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
+                </button>
+            </div>
+        </div>
     </ng-container>
 </app-topnav>
 
