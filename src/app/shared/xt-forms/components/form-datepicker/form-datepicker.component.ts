@@ -8,7 +8,8 @@ import {
     SkipSelf,
     HostBinding,
     Output,
-    EventEmitter
+    EventEmitter,
+    OnInit
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { Constants } from '../../../../core/models/constants';
@@ -16,6 +17,9 @@ import { ElementBase } from '../../core/index';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { Moment } from 'moment';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as _ from 'lodash';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -46,7 +50,7 @@ export const DEFAULT_FORMAT = {
        { provide: MAT_DATE_FORMATS, useValue: DEFAULT_FORMAT }
     ]
 })
-export class FormDatepickerComponent extends ElementBase<string> {
+export class FormDatepickerComponent extends ElementBase<string> implements OnInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -58,6 +62,7 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @Input() maxDate: string | Moment;
     @Input() minDate: string | Moment;
+    @Input() tooltip: string = null;
 
     public identifier = `form-datepicker-${FormDatepickerComponent.identifier++}`;
 
@@ -66,9 +71,18 @@ export class FormDatepickerComponent extends ElementBase<string> {
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+    }
+
+    ngOnInit() {
+        const labelValue = _.camelCase(this.i18nService.instant(this.placeholder)).toLowerCase();
+        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryDta) => {
+            this.tooltip = _.isEmpty(glossaryDta[labelValue]) ? null : this.i18nService.instant(glossaryDta[labelValue]);
+        });
     }
 
     /**
