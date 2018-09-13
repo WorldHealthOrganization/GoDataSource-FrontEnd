@@ -12,7 +12,8 @@
             [multiple]="multiple"
             (blur)="onBlur()"
             [disabled]="disabled"
-            (selectionChange)="onChange(selectElement.value)">
+            (selectionChange)="onChange(selectElement.value)"
+            [matTooltip]="tooltip">
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">

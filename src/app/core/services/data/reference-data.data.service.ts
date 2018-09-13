@@ -133,7 +133,7 @@ export class ReferenceDataDataService {
         return this.http.post(`reference-data`, entry)
             .mergeMap(() => {
                 // invalidate list cache
-                this.cacheService.remove(CacheKey.REFERENCE_DATA);
+                this.clearReferenceDataCache();
 
                 // re-load language tokens
                 return this.i18nService.loadUserLanguage();
@@ -150,7 +150,7 @@ export class ReferenceDataDataService {
         return this.http.put(`reference-data/${entryId}`, entryData)
             .mergeMap(() => {
                 // invalidate list cache
-                this.cacheService.remove(CacheKey.REFERENCE_DATA);
+                this.clearReferenceDataCache();
 
                 // re-load language tokens
                 return this.i18nService.loadUserLanguage();
@@ -166,11 +166,43 @@ export class ReferenceDataDataService {
         return this.http.delete(`reference-data/${entryId}`)
             .mergeMap(() => {
                 // invalidate list cache
-                this.cacheService.remove(CacheKey.REFERENCE_DATA);
+                this.clearReferenceDataCache();
 
                 // re-load language tokens
                 return this.i18nService.loadUserLanguage();
             });
+    }
+
+    /**
+     * Clear reference data cache
+     */
+    clearReferenceDataCache() {
+        this.cacheService.remove(CacheKey.REFERENCE_DATA);
+        this.cacheService.remove(CacheKey.REFERENCE_DATA_GLOSSARY);
+    }
+
+    /**
+     * Return a map of glossary terms
+     */
+    getGlossaryItems(): Observable<any> {
+        const glossaryDataCache = this.cacheService.get(CacheKey.REFERENCE_DATA_GLOSSARY);
+        if (glossaryDataCache) {
+            return Observable.of(glossaryDataCache);
+        } else {
+            return this.getReferenceDataByCategory(ReferenceDataCategory.GLOSSARY)
+                .map((data) => {
+                    // map data
+                    const glossaryMap = {};
+                    _.forEach(data.entries, (entry) => {
+                        const entryValue = _.camelCase(this.i18nService.instant(entry.value)).toLowerCase();
+                        glossaryMap[entryValue] = entry.description;
+                    });
+                    // set cache
+                    this.cacheService.set(CacheKey.REFERENCE_DATA_GLOSSARY, glossaryMap);
+                    // finished
+                    return glossaryMap;
+                });
+        }
     }
 }
 

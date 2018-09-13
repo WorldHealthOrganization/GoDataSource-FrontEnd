@@ -1,8 +1,13 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding } from '@angular/core';
+import {
+    Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding,
+    OnInit
+} from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-select',
@@ -15,7 +20,7 @@ import * as _ from 'lodash';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> {
+export class FormSelectComponent extends ElementBase<string> implements OnInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -32,6 +37,7 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
+    @Input() tooltip: string = null;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
@@ -42,9 +48,18 @@ export class FormSelectComponent extends ElementBase<string> {
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+    }
+
+    ngOnInit() {
+        const labelValue = _.camelCase(this.i18nService.instant(this.placeholder)).toLowerCase();
+        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+        });
     }
 
     /**
