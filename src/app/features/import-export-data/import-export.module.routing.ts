@@ -54,6 +54,16 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CONTACT]
         }
+    },
+
+    // Import outbreak data
+    {
+        path: 'outbreak-data/import',
+        component: fromPages.ImportOutbreakDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_OUTBREAK]
+        }
     }
 ];
 

@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <app-export-button
-                    *ngIf="exportContactsUrl"
+                    *ngIf="!appliedListFilter && exportContactsUrl"
                     [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
                     [url]="exportContactsUrl"

@@ -14,7 +14,7 @@
                 </button>
 
                 <app-export-button
-                    *ngIf="exportCasesUrl"
+                    *ngIf="!appliedListFilter && exportCasesUrl"
                     [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
                     [url]="exportCasesUrl"

@@ -5,6 +5,7 @@ import { ImportDataComponent } from '../components/import-data/import-data.compo
 import { ImportReferenceDataComponent } from './import-reference-data/import-reference-data.component';
 import { ImportCaseDataComponent } from './import-case-data/import-case-data.component';
 import { ImportContactDataComponent } from './import-contact-data/import-contact-data.component';
+import { ImportOutbreakDataComponent } from './import-outbreak-data/import-outbreak-data.component';
 
 // export each page component individually
 export * from './import-hierarchical-locations/import-hierarchical-locations.component';
@@ -13,6 +14,7 @@ export * from '../components/import-data/import-data.component';
 export * from './import-reference-data/import-reference-data.component';
 export * from './import-case-data/import-case-data.component';
 export * from './import-contact-data/import-contact-data.component';
+export * from './import-outbreak-data/import-outbreak-data.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -21,5 +23,6 @@ export const pageComponents: any[] = [
     ImportCaseLabDataComponent,
     ImportReferenceDataComponent,
     ImportCaseDataComponent,
-    ImportContactDataComponent
+    ImportContactDataComponent,
+    ImportOutbreakDataComponent
 ];

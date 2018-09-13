@@ -913,13 +913,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
 
         /**
-         * Outbreaks List Page
+         * Outbreak List Page
          */
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON': 'Import Outbreak Data',
 
         /**
          * Create Outbreak Page
@@ -1128,6 +1129,11 @@ export const EnglishUsLang = {
         /**
          * Import contact data
          */
-        'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE': 'Import Contact Data'
+        'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE': 'Import Contact Data',
+
+        /**
+         * Import outbreak data
+         */
+        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data'
     }
 };
