@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
@@ -23,6 +23,10 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
 
     // import constants into template
     Constants = Constants;
+
+    @Input() displayCopyField: boolean = false;
+    @Input() displayCopyFieldDescription: string = '';
+    @Output() copyValue = new EventEmitter<string>();
 
     /**
      * Set question and group them by category
@@ -50,5 +54,13 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
 
         // initialize
         this.value = this.value ? this.value : {};
+    }
+
+    /**
+     * Copy value
+     * @param property
+     */
+    triggerCopyValue(property) {
+        this.copyValue.emit(property);
     }
 }

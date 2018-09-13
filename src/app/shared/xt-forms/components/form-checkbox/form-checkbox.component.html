@@ -3,7 +3,7 @@
 
     <mat-checkbox *ngIf="!readonly"
                       [(ngModel)]="value" [attr.name]="name" [labelPosition]="labelBefore ? 'before' : 'after'"
-                      [disabled]="disabled"
+                      [disabled]="disabled" [disableRipple]="disableRipple"
                       (click)="onClick()" (change)="onChange()">
         {{label}}
     </mat-checkbox>

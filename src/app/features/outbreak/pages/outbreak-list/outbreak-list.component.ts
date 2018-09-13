@@ -32,7 +32,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 export class OutbreakListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '.', true)
     ];
 
     // import constants into template
@@ -100,12 +100,12 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
 
         // add page title
-        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL') +
+        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_TITLE') +
             ' - ' +
             this.outbreaksDataExporFileName;
 
-
-        this.refreshList();
+        // refresh
+        this.needsRefreshList(true);
     }
 
     /**
@@ -138,7 +138,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.authUser = authenticatedUser.user;
                                 });
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -164,7 +164,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.authUser = authenticatedUser.user;
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
                                     this.outbreakDataService.checkActiveSelectedOutbreak();
-                                    this.refreshList();
+                                    this.needsRefreshList(true);
                                 });
                         });
                 }
@@ -204,7 +204,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             }
         }
         // refresh list
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**

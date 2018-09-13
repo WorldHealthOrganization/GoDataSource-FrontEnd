@@ -95,6 +95,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
+        'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
+        'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
         'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': 'Are you sure you want to duplicate this question?',
@@ -420,6 +422,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CLUSTER_ACTION_VIEW_PEOPLE': 'View People',
 
         /**
+         * View Cluster people page
+         */
+        'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE' : 'People',
+
+        /**
          * Entity Relationships list page
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
@@ -666,6 +673,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON': 'Generate',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE': 'How many days do you want to follow?',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL': 'Follow-up days',
+        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS': 'Modify the selected follow-ups',
 
         /**
          * Create Follow-up page
@@ -686,6 +694,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+
+        /**
+         * Modify Follow-up list page
+         */
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE': 'Modify Follow-ups',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED': 'No follow-ups were selected',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS': 'There are invalid fields on this page, you can\'t proceed',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON': 'Update follow-ups',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Relationship created!',
+        'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
          * Event fields
@@ -909,6 +930,7 @@ export const EnglishUsLang = {
         /**
          * Outbreaks List Page
          */
+        'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',

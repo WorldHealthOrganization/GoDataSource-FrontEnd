@@ -28,7 +28,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
     ];
     // authenticated user
     authUser: UserModel;
