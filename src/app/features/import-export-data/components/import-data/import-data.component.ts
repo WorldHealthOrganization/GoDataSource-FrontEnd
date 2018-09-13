@@ -33,6 +33,10 @@ export enum ImportServerModelNames {
     CONTACT = 'contact'
 }
 
+enum ImportServerErrorCodes {
+    DUPLICATE_RECORD = 11000
+}
+
 @Component({
     selector: 'app-import-data',
     encapsulation: ViewEncapsulation.None,
@@ -236,9 +240,10 @@ export class ImportDataComponent implements OnInit {
     };
 
     /**
-     * Object
+     * Constants / Classes
      */
     Object = Object;
+    ImportServerErrorCodes = ImportServerErrorCodes;
 
     /**
      * Used to determine fast the values of a dropdown for a property from a deep level property ( so we don't have to do _.get )

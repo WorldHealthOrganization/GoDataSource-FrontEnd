@@ -49,7 +49,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
     }
 

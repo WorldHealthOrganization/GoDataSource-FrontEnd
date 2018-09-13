@@ -82,7 +82,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
 
         // set available side filters
@@ -230,7 +230,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -257,7 +257,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

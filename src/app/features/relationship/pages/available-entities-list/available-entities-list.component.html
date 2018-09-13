@@ -18,25 +18,21 @@
                 <ng-container matColumnDef="checkbox">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px">
                         <div class="table-header-cell">
-
                             <app-form-checkbox
-                                name="allEntities"
-                                [(ngModel)]="checkboxModels.checkAll"
-                                (optionChanged)="checkAll()">
+                                name="listCheckedAll"
+                                [(ngModel)]="checkedAllRecords">
                             </app-form-checkbox>
-
                         </div>
                     </mat-header-cell>
-
                     <mat-cell *matCellDef="let item;" fxFlex="70px" [ngClass]="'cell-' + item.type">
-
-                        <app-form-checkbox class="table-checkbox"
-                            [name]="'entityIds[' + item.id + ']'"
-                            [ngModel]="checkboxModels.individualCheck[item.id]"
-                            (optionChanged)="individualCheck()"
-                            (afterInitialize)="initIndividualCheckbox(item.id)">
+                        <app-form-checkbox
+                            #listCheckedIndividual
+                            [name]="'listCheckedIndividual[' + item.id + ']'"
+                            class="table-checkbox"
+                            ngModel
+                            (optionChanged)="checkedRecord(item.id, $event)"
+                            (afterInitialize)="checkedRecord(item.id, false)">
                         </app-form-checkbox>
-
                     </mat-cell>
                 </ng-container>
 
@@ -224,7 +220,10 @@
     </div>
 
     <div class="form-actions">
-        <button class="button-primary" mat-raised-button color="primary">
+        <button
+            class="button-primary"
+            mat-raised-button
+            color="primary">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
         <button type="button" [routerLink]="['/relationships', entityType, this.entityId]" mat-raised-button>

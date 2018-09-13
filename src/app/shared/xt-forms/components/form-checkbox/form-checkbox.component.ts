@@ -38,6 +38,7 @@ export class FormCheckboxComponent extends ElementBase<boolean> implements OnIni
     @Input() labelBefore: boolean;
     @Input() readonly: boolean = false;
     @Input() disabled: boolean = false;
+    @Input() disableRipple: boolean = true;
 
     public identifier = `form-checkbox-${FormCheckboxComponent.identifier++}`;
 
