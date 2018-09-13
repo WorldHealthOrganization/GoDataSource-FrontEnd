@@ -10,6 +10,19 @@
                     </button>
                 </ng-container>
 
+                <app-export-button
+                    *ngIf="exportFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
+                    [url]="exportFollowUpsUrl"
+                    [fileName]="followUpsDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="exportQueryBuilder">
+                </app-export-button>
+
                 <button *ngIf="!showPastFollowUps" mat-raised-button (click)="switchToPastFollowUps()">
                     {{'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_PAST_FOLLOW_UPS' | translate}}
                 </button>

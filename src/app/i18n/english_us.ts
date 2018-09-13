@@ -680,6 +680,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL': 'Follow-up days',
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS': 'Modify the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
 
         /**

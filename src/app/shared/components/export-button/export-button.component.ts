@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@ang
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-export-button',
@@ -27,6 +28,7 @@ export class ExportButtonComponent {
     @Input() allowedExportTypes: ExportDataExtension[];
     @Input() yesLabel: string;
     @Input() fileName: string;
+    @Input() queryBuilder: RequestQueryBuilder;
 
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
@@ -47,7 +49,8 @@ export class ExportButtonComponent {
             allowedExportTypes: this.allowedExportTypes,
             yesLabel: this.yesLabel,
             fileName: this.fileName,
-            buttonDownloadFile: this.buttonDownloadFile
+            buttonDownloadFile: this.buttonDownloadFile,
+            queryBuilder: this.queryBuilder
         });
     }
 }

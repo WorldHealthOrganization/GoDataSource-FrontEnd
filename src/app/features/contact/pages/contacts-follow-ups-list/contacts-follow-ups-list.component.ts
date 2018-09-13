@@ -73,6 +73,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
+    exportQueryBuilder: RequestQueryBuilder;
 
     constructor(
         private authDataService: AuthDataService,
@@ -238,6 +239,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             }
                         }]
                     }, true);
+
+                    // use the same query builder to export follow-ups
+                    this.exportQueryBuilder = _.cloneDeep(this.queryBuilder);
 
                     // finished configuring query builder
                     observer.next();
