@@ -41,7 +41,12 @@ export class ImportCaseDataComponent implements OnInit {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        'addresses[]': 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+        'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        'hospitalizationDates[]': 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES',
+        'isolationDates[]': 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES',
+        'incubationDates[]': 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES'
     };
 
     requiredDestinationFields = [

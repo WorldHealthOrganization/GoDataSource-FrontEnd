@@ -15,7 +15,7 @@ export class ImportContactDataComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/cases',
+            '/contacts',
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE',
@@ -41,13 +41,18 @@ export class ImportContactDataComponent implements OnInit {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
+        'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+        'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS'
     };
 
     requiredDestinationFields = [
         'firstName',
         'gender',
-        'dateOfReporting'
+        'dateOfReporting',
+        'relationship.persons[].id'
     ];
 
     /**

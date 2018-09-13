@@ -567,6 +567,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS': 'Persons',
 
         /**
          * Contacts list page
