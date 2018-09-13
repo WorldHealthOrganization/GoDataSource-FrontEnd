@@ -58,9 +58,18 @@
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
                             <button
+                                *ngIf="hasFollowUpsWriteAccess()"
                                 mat-menu-item
                                 (click)="modifySelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
+                            </button>
+
+                            <a hidden #buttonDownloadFile></a>
+                            <button
+                                *ngIf="exportFollowUpsUrl"
+                                mat-menu-item
+                                (click)="exportSelectedFollowUps()">
+                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
                             </button>
                         </mat-menu>
                     </div>

@@ -13,6 +13,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -44,9 +45,12 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private genericDataService: GenericDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        protected snackbarService: SnackbarService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

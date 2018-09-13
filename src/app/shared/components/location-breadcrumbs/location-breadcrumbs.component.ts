@@ -30,9 +30,11 @@ export class LocationBreadcrumbsComponent extends ListComponent implements OnIni
         private locationDataService: LocationDataService,
         private route: ActivatedRoute,
         private router: Router,
-        private snackbarService: SnackbarService
+        protected snackbarService: SnackbarService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

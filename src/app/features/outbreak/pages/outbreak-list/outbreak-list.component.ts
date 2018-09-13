@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
@@ -20,7 +20,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
@@ -87,11 +86,13 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private i18nService: I18nService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

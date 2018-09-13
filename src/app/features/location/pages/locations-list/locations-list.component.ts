@@ -50,9 +50,11 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        private snackbarService: SnackbarService
+        protected snackbarService: SnackbarService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

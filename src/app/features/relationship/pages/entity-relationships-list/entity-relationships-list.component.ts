@@ -96,11 +96,13 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

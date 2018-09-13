@@ -52,6 +52,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD': 'Encrypt Password',
         'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
         'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
+        'LNG_COMMON_LABEL_NO_RECORDS_SELECTED': 'No records selected',
 
         /**
          * General Actions
@@ -645,6 +646,7 @@ export const EnglishUsLang = {
         /**
          * Follow-up fields
          */
+        'LNG_FOLLOW_UP_FIELD_LABEL_ID': 'ID',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT': 'Contact',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME': 'First Name',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME': 'Last Name',
@@ -654,6 +656,7 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED': 'Performed',
         'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP': 'Lost to Follow-up',
         'LNG_FOLLOW_UP_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Follow-ups list page
@@ -674,6 +677,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE': 'How many days do you want to follow?',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL': 'Follow-up days',
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS': 'Modify the selected follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
 
         /**
          * Create Follow-up page

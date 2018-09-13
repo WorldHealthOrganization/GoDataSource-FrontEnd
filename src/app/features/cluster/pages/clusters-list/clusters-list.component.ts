@@ -39,11 +39,13 @@ export class ClustersListComponent extends ListComponent implements OnInit {
     constructor(
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

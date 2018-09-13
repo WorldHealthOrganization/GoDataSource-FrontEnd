@@ -70,11 +70,13 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private formHelper: FormHelperService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -229,9 +231,9 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
-        // get list
-        const selectedRecords: string[] = this.checkedRecords;
-        if (selectedRecords.length < 1) {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
             return;
         }
 
