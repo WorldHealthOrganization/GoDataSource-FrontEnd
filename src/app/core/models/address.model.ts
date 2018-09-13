@@ -4,7 +4,7 @@ import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-que
 import * as moment from 'moment';
 
 export class AddressModel {
-    name: string;
+    typeId: string;
     city: string;
     postalCode: string;
     addressLine1: string;
@@ -14,7 +14,7 @@ export class AddressModel {
     geoLocation: { lat: number | string, lng: number | string } | null;
 
     constructor(data = null) {
-        this.name = _.get(data, 'name');
+        this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');
         this.postalCode = _.get(data, 'postalCode');
         this.addressLine1 = _.get(data, 'addressLine1');
