@@ -44,6 +44,8 @@ enum ImportServerErrorCodes {
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent implements OnInit {
+    static DESTINATION_LEVELS_EXCLUDE_ARRAY = 'exclude';
+
     /**
      * Extension mapped to mimes
      */
@@ -213,6 +215,9 @@ export class ImportDataComponent implements OnInit {
     }, {
         label: '3',
         value: 2
+    }, {
+        label: 'Exclude Array',
+        value: ImportDataComponent.DESTINATION_LEVELS_EXCLUDE_ARRAY
     }];
 
     /**
@@ -661,7 +666,7 @@ export class ImportDataComponent implements OnInit {
             (item: {
                 source: string,
                 destination: string,
-                destinationLevel?: number[],
+                destinationLevel?: (number | string)[],
                 options: {
                     sourceOption: string,
                     destinationOption: string
@@ -676,7 +681,13 @@ export class ImportDataComponent implements OnInit {
                     // add indexes
                     let index: number = 0;
                     while (this.isDestinationArray(mapDestValue)) {
-                        mapDestValue = mapDestValue.replace('[]', '[' + item.destinationLevel[index] + ']');
+                        mapDestValue = mapDestValue.replace(
+                            '[]', (
+                                item.destinationLevel[index] === ImportDataComponent.DESTINATION_LEVELS_EXCLUDE_ARRAY ?
+                                    '' :
+                                    ( '[' + item.destinationLevel[index] + ']' )
+                            )
+                        );
                         index++;
                     }
 

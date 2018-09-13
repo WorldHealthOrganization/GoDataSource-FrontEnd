@@ -50,7 +50,10 @@ export class ImportOutbreakDataComponent {
         'noDaysInChains',
         'noDaysNotSeen',
         'noLessContacts',
-        'longPeriodsBetweenCaseOnset'
+        'longPeriodsBetweenCaseOnset',
+        'caseInvestigationTemplate',
+        'contactFollowUpTemplate',
+        'labResultsTemplate'
     ];
 
     /**
