@@ -107,10 +107,6 @@ export abstract class ListComponent {
 
     // refresh only after we finish changing data
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
-        // reset checked items
-        this.checkboxModels.checkAll = false;
-        this.checkboxModels.individualCheck = {};
-
         // refresh list
         this.refreshList();
     }));
@@ -143,6 +139,9 @@ export abstract class ListComponent {
      * Tell list that we need to refresh list
      */
     public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+        // reset checked items
+        this.checkboxModels.checkAll = false;
+        this.checkboxModels.individualCheck = {};
 
         // do we need to reset pagination (aka go to the first page) ?
         if (
