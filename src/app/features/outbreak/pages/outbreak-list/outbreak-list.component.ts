@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -21,6 +21,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -49,7 +50,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
 
+    exportOutbreaksUrl: string = 'outbreaks/export';
     outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -214,5 +217,58 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+    }
+
+    /**
+     * Get the list of table columns to be displayed
+     * @returns {string[]}
+     */
+    getTableColumns(): string[] {
+        return [
+            'checkbox',
+            'name',
+            'disease',
+            'country',
+            'startDate',
+            'endDate',
+            'active',
+            'actions'
+        ];
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedOutbreaks() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE',
+            url: this.exportOutbreaksUrl,
+            fileName: this.outbreaksDataExporFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

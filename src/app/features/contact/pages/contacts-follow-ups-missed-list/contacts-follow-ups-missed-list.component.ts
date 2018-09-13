@@ -60,6 +60,14 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         ExportDataExtension.XML,
         ExportDataExtension.PDF
     ];
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED', 'performed'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP', 'lostToFollowUp'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+    ];
 
     constructor(
         private authDataService: AuthDataService,
@@ -345,14 +353,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
-            anonymizeFields: [
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED', 'performed'),
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP', 'lostToFollowUp'),
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
-                new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
-            ]
+            anonymizeFields: this.anonymizeFields
         });
     }
 }

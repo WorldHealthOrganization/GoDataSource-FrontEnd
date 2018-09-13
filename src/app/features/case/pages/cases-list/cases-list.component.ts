@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-cases-list',
@@ -60,6 +61,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     exportCasesUrl: string;
     casesDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -258,7 +260,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
+            'checkbox',
             'firstName',
             'lastName',
             'classification',
@@ -267,8 +270,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
             'dateOfOnset',
             'actions'
         ];
-
-        return columns;
     }
 
     /**
@@ -295,5 +296,41 @@ export class CasesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedCases() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportCasesUrl,
+            fileName: this.casesDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

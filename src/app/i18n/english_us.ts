@@ -307,6 +307,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
 
         /**
          * Create Case page
@@ -583,6 +584,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
 
         /**
          * Create Contact page
@@ -941,6 +943,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS': 'Export the selected outbreaks',
 
         /**
          * Create Outbreak Page

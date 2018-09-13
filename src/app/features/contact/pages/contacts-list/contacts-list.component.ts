@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -78,6 +78,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -363,6 +364,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     getTableColumns(): string[] {
         return [
+            'checkbox',
             'firstName',
             'lastName',
             'age',
@@ -413,5 +415,41 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedContacts() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportContactsUrl,
+            fileName: this.contactsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

@@ -42,6 +42,47 @@
     </div>
 
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Checkbox -->
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef fxFlex="60px">
+                <div class="table-header-cell">
+                    <div>
+                        <app-form-checkbox
+                            class="table-checkbox"
+                            name="listCheckedAll"
+                            [(ngModel)]="checkedAllRecords">
+                        </app-form-checkbox>
+                    </div>
+                    <div class="column-filter">
+                        <button
+                            mat-icon-button
+                            [matMenuTriggerFor]="actionsMenuMultipleRecords">
+                            <span class="xt-icon">moreVertical</span>
+                        </button>
+
+                        <mat-menu #actionsMenuMultipleRecords="matMenu">
+                            <a hidden #buttonDownloadFile></a>
+                            <button
+                                *ngIf="exportContactsUrl"
+                                mat-menu-item
+                                (click)="exportSelectedContacts()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item;" fxFlex="60px">
+                <app-form-checkbox
+                    #listCheckedIndividual
+                    [name]="'listCheckedIndividual[' + item.id + ']'"
+                    class="table-checkbox"
+                    ngModel
+                    (optionChanged)="checkedRecord(item.id, $event)"
+                    (afterInitialize)="checkedRecord(item.id, false)">
+                </app-form-checkbox>
+            </mat-cell>
+        </ng-container>
 
         <!-- First Name -->
         <ng-container matColumnDef="firstName">
