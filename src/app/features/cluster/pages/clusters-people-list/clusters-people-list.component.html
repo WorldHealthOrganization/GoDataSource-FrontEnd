@@ -18,208 +18,204 @@
         </button>
     </div>
 
-    <div class="form-content">
 
-        <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event)">
 
-            <!-- First Name -->
-            <ng-container matColumnDef="firstName">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <app-form-input
-                                name="firstNameFilter"
-                                ngModel
-                                placeholder="Filter"
-                                (optionChanged)="filterByTextField('firstName', $event)">
-                            </app-form-input>
-                        </div>
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
                     </div>
-                </mat-header-cell>
-
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    {{item.type === EntityType.EVENT ? item.name : item.firstName}}
-                </mat-cell>
-            </ng-container>
-
-            <!-- Last Name -->
-            <ng-container matColumnDef="lastName">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <app-form-input
-                                name="lastNameFilter"
-                                ngModel
-                                placeholder="Filter"
-                                (optionChanged)="filterByTextField('lastName', $event)">
-                            </app-form-input>
-                        </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)">
+                        </app-form-input>
                     </div>
-                </mat-header-cell>
+                </div>
+            </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    {{item.lastName}}
-                </mat-cell>
-            </ng-container>
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.type === EntityType.EVENT ? item.name : item.firstName}}
+            </mat-cell>
+        </ng-container>
 
-            <!-- Age -->
-            <ng-container matColumnDef="age">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div mat-sort-header>
-                            {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <app-form-range
-                                name="ageFilter"
-                                ngModel
-                                (changed)="filterByRangeField('age', $event)">
-                            </app-form-range>
-                        </div>
+        <!-- Last Name -->
+        <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
                     </div>
-                </mat-header-cell>
-
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    {{item.age}}
-                </mat-cell>
-            </ng-container>
-
-            <!-- Gender -->
-            <ng-container matColumnDef="gender">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <app-form-select
-                                name="genderFilter"
-                                ngModel
-                                placeholder="Filter"
-                                [options]="genderList$ | async"
-                                (optionChanged)="filterBySelectField('gender', $event)"
-                                multiple="true">
-                            </app-form-select>
-                        </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="lastNameFilter"
+                            ngModel
+                            placeholder="Filter"
+                            (optionChanged)="filterByTextField('lastName', $event)">
+                        </app-form-input>
                     </div>
-                </mat-header-cell>
+                </div>
+            </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    {{item.gender}}
-                </mat-cell>
-            </ng-container>
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.lastName}}
+            </mat-cell>
+        </ng-container>
 
-            <!-- Risk -->
-            <ng-container matColumnDef="risk">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+        <!-- Age -->
+        <ng-container matColumnDef="age">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
                     </div>
-                </mat-header-cell>
-
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    <app-reference-data-label
-                        [category]="ReferenceDataCategory.RISK_LEVEL"
-                        [value]="item.riskLevel">
-                    </app-reference-data-label>
-                </mat-cell>
-            </ng-container>
-
-            <!-- Last follow-up -->
-            <ng-container matColumnDef="lastFollowUp">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+                    <div class="column-filter">
+                        <app-form-range
+                            name="ageFilter"
+                            ngModel
+                            (changed)="filterByRangeField('age', $event)">
+                        </app-form-range>
                     </div>
-                </mat-header-cell>
+                </div>
+            </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    <!-- placeholder -->
-                </mat-cell>
-            </ng-container>
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.age}}
+            </mat-cell>
+        </ng-container>
 
-            <!-- Place -->
-            <ng-container matColumnDef="place">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
                     </div>
-                </mat-header-cell>
-
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    <!-- placeholder -->
-                </mat-cell>
-            </ng-container>
-
-            <!-- Address -->
-            <ng-container matColumnDef="address">
-                <mat-header-cell *matHeaderCellDef>
-                    <div class="table-header-cell">
-                        <div>
-                            {{'LNG_ENTITY_FIELD_LABEL_ADDRESS' | translate}}
-                        </div>
-                        <div class="column-filter">
-                            <!-- placeholder -->
-                        </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="genderFilter"
+                            ngModel
+                            placeholder="Filter"
+                            [options]="genderList$ | async"
+                            (optionChanged)="filterBySelectField('gender', $event)"
+                            multiple="true">
+                        </app-form-select>
                     </div>
-                </mat-header-cell>
+                </div>
+            </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                    <!-- placeholder -->
-                </mat-cell>
-            </ng-container>
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.gender}}
+            </mat-cell>
+        </ng-container>
 
-            <!-- Inline Actions -->
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+        <!-- Risk -->
+        <ng-container matColumnDef="riskLevel">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header>
+                        {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="riskLevelsList$ | async"
+                            (optionChanged)="filterBySelectField('riskLevel', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter>
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" fxFlex="70px">
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.RISK_LEVEL"
+                    [value]="item.riskLevel">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Place -->
+        <ng-container matColumnDef="place">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>
+                        {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.mainAddress.location?.name}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Address -->
+        <ng-container matColumnDef="address">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>
+                        {{'LNG_ENTITY_FIELD_LABEL_ADDRESS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                {{item.mainAddress.fullAddress}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button
+                        [routerLink]="getItemRouterLink(item, 'view')"
+                        mat-menu-item>
+                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
+                    <ng-container *app-selected-outbreak-is-active>
                         <button
-                            [routerLink]="getItemRouterLink(item, 'view')"
+                            *ngIf="getAccessPermissions(item)"
+                            [routerLink]="getItemRouterLink(item, 'modify')"
                             mat-menu-item>
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                         </button>
+                    </ng-container>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
 
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button
-                                *ngIf="getAccessPermissions(item)"
-                                [routerLink]="getItemRouterLink(item, 'modify')"
-                                mat-menu-item>
-                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                            </button>
-                        </ng-container>
-                    </mat-menu>
-                </mat-cell>
-            </ng-container>
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
 
-            <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-            <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
-        </mat-table>
-    </div>
+    <mat-paginator
+        [length]="(clusterPeopleListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
 </mat-card>

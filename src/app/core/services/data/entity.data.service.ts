@@ -53,7 +53,15 @@ export class EntityDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<(CaseModel | ContactModel | EventModel)[]> {
 
-        const filter = queryBuilder.buildQuery();
+        const qb = new RequestQueryBuilder();
+        // include relation for Events
+        qb.include('location');
+        // include relation for Cases / Contacts
+        qb.include('locations');
+
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
 
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
             .map((peopleList) => {
