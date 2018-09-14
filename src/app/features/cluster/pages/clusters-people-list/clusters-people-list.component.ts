@@ -14,6 +14,8 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -34,8 +36,11 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     cluster: ClusterModel;
     // cluster people list
     clusterPeopleList$: Observable<any>;
-    // gender list
+    clusterPeopleListCount$: Observable<any>;
+
+    // reference data
     genderList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
@@ -46,7 +51,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         private clusterDataService: ClusterDataService,
         private genericDataService: GenericDataService,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -56,25 +62,34 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
-        // retrieve cluster info
+        this.genderList$ = this.genericDataService.getGenderList();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get cluster ID from route params
         this.route.params.subscribe((params: { clusterId }) => {
             // get selected outbreak
             this.outbreakDataService.getSelectedOutbreak()
                 .subscribe((selectedOutbreak) => {
-                this.selectedOutbreak = selectedOutbreak;
+                    this.selectedOutbreak = selectedOutbreak;
                     if (selectedOutbreak && selectedOutbreak.id) {
+
+                        // retrieve cluster info
                         this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
                             .subscribe((clusterData: ClusterModel) => {
                                 this.cluster = clusterData;
+
                                 // pushing the new breadcrumbs
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(clusterData.name),
                                     new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true)
                                 );
-                                // retrieve cluster data
-                                this.refreshList();
+
+                                // initialize pagination
+                                this.initPaginator();
+                                // ...and load the list of items
+                                this.needsRefreshList(true);
                             });
                     }
                 });
@@ -85,7 +100,19 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      * Re(load) the Cluster people list, based on the applied filter, sort criterias
      */
     refreshList() {
-        this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder);
+        if (this.selectedOutbreak) {
+            this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.clusterPeopleListCount$ = this.clusterDataService.getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder);
     }
 
     /**
@@ -94,8 +121,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         const columns = [
-            'firstName', 'lastName', 'age', 'gender', 'risk',
-            'lastFollowUp', 'place', 'address', 'actions'
+            'firstName', 'lastName', 'age', 'gender', 'riskLevel',
+            'place', 'address', 'actions'
         ];
         return columns;
     }

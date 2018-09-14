@@ -55,6 +55,12 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_NO_RECORDS_SELECTED': 'No records selected',
 
         /**
+         * Gender list
+         */
+        'LNG_COMMON_GENDER_MALE': 'Male',
+        'LNG_COMMON_GENDER_FEMALE': 'Female',
+
+        /**
          * General Actions
          */
         'LNG_PAGE_ACTION_DELETE': 'Delete',
@@ -242,9 +248,11 @@ export const EnglishUsLang = {
         /**
          * Entity Fields
          */
+        'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',
         'LNG_ENTITY_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_ENTITY_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_ENTITY_FIELD_LABEL_AGE': 'Age',
+        'LNG_ENTITY_FIELD_LABEL_DOB': 'Date of birth',
         'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
         'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',

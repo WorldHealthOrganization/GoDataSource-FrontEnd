@@ -18,8 +18,9 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -56,7 +57,13 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
     entitiesListCount$: Observable<any>;
 
+    // available side filters
+    availableSideFilters: FilterModel[];
+
+    // reference data
     genderList$: Observable<any[]>;
+    entityTypesList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -72,7 +79,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -82,6 +89,11 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // reference data
         this.genderList$ = this.genericDataService.getGenderList().share();
+        this.entityTypesList$ = this.genericDataService.getEntityTypesAsLabelValue();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+
+        // side filters
+        this.generateSideFilters();
 
         this.route.params
             .subscribe((params: {entityType, entityId}) => {
@@ -178,6 +190,62 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         }
     }
 
+    private generateSideFilters() {
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'type',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+                type: FilterType.MULTISELECT,
+                options$: this.entityTypesList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'gender',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+                type: FilterType.MULTISELECT,
+                options$: this.genderList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
+                type: FilterType.RANGE_NUMBER,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'dob',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'riskLevel',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
+                type: FilterType.MULTISELECT,
+                options$: this.riskLevelsList$,
+                sortable: true
+            }),
+
+        ];
+    }
+
     /**
      * @Overrides parent method
      *
@@ -224,7 +292,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     getTableColumns(): string[] {
         const columns = [
             'checkbox', 'firstName', 'lastName', 'age', 'gender', 'riskLevel',
-            'lastFollowUp', 'place', 'address'
+            'place', 'address'
         ];
 
         return columns;
