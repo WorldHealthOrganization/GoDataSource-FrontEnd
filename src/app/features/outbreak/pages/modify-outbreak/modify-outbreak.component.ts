@@ -40,7 +40,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     diseasesList$: Observable<any[]>;
     // list of countries
     countriesList$: Observable<any[]>;
-    glosaryList$: Observable<any[]>;
 
     // index of the current tab
     currentTabIndex = 0;
