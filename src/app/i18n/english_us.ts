@@ -54,12 +54,6 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
 
         /**
-         * Gender list
-         */
-        'LNG_COMMON_GENDER_MALE': 'Male',
-        'LNG_COMMON_GENDER_FEMALE': 'Female',
-
-        /**
          * General Actions
          */
         'LNG_PAGE_ACTION_DELETE': 'Delete',
