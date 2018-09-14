@@ -32,12 +32,17 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
+    @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
+
+    static compareWithDefault = (o1: any, o2: any) => {
+        return o1 === o2;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

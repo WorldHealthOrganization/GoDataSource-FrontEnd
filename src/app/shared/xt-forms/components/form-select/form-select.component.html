@@ -6,6 +6,7 @@
         <mat-select
             #selectElement="ngModel"
             [(ngModel)]="value"
+            [compareWith]="compareWith"
             [attr.name]="name"
             [required]="required"
             [placeholder]="placeholder"
