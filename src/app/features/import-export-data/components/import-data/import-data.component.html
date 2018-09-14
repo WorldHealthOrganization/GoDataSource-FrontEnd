@@ -102,8 +102,10 @@
                 <div
                     fxFlex fxLayout="row" fxLayoutGap="20px">
                     <app-form-select
+                        #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
+                        [valueReplacer]="formatSourceValueForDuplicates()"
                         [required]="true"
                         [(ngModel)]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -122,17 +124,18 @@
                     </app-form-select>
 
                     <div
-                        *ngIf="isDestinationArray(item.destinationField)"
+                        *ngIf="isSourceDestinationArray(item.sourceField) || isSourceDestinationArray(item.destinationField)"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
                         <div
-                            *ngFor="let levelMatch of noOfLevels(item.destinationField); let destinationLevelIndex = index;"
+                            *ngFor="let levelMatch of noOfMaxLevels(item.sourceField, item.destinationField); let levelIndex = index;"
                             fxFlex>
                             <app-form-select
-                                [name]="'mapObject[' + item.id + '][destinationLevel][' + destinationLevelIndex + ']'"
+                                [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
                                 [required]="true"
-                                [(ngModel)]="item.destinationLevel[destinationLevelIndex]"
-                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL' | translate"
-                                [options]="possibleDestinationLevels">
+                                [(ngModel)]="item.sourceDestinationLevel[levelIndex]"
+                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
+                                [options]="possibleSourceDestinationLevels"
+                                (optionChanged)="sourceControl.control.updateValueAndValidity()">
                             </app-form-select>
                         </div>
                     </div>

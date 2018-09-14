@@ -10,7 +10,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
@@ -44,8 +43,6 @@ enum ImportServerErrorCodes {
     styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent implements OnInit {
-    static DESTINATION_LEVELS_EXCLUDE_ARRAY = 'exclude';
-
     /**
      * Extension mapped to mimes
      */
@@ -204,9 +201,9 @@ export class ImportDataComponent implements OnInit {
     importableObject: ImportableFileModel;
 
     /**
-     * Destination level value
+     * Source / Destination level value
      */
-    possibleDestinationLevels = [{
+    possibleSourceDestinationLevels = [{
         label: '1',
         value: 0
     }, {
@@ -215,9 +212,6 @@ export class ImportDataComponent implements OnInit {
     }, {
         label: '3',
         value: 2
-    }, {
-        label: 'Exclude Array',
-        value: ImportDataComponent.DESTINATION_LEVELS_EXCLUDE_ARRAY
     }];
 
     /**
@@ -266,7 +260,6 @@ export class ImportDataComponent implements OnInit {
      * @param dialogService
      * @param i18nService
      * @param formHelper
-     * @param domService
      * @param importExportDataService
      */
     constructor(
@@ -275,7 +268,6 @@ export class ImportDataComponent implements OnInit {
         private dialogService: DialogService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private domService: DomService,
         private importExportDataService: ImportExportDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
@@ -606,18 +598,86 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * Check if property should receive an array
-     * @param destinationProperty
+     * @param sourceOrDestinationProperty
      */
-    isDestinationArray(destinationProperty: string): boolean {
-        return destinationProperty ? destinationProperty.indexOf('[]') > -1 : false;
+    isSourceDestinationArray(sourceOrDestinationProperty: string): boolean {
+        return sourceOrDestinationProperty ? sourceOrDestinationProperty.indexOf('[]') > -1 : false;
     }
 
     /**
      * Number of levels
-     * @param destinationProperty
+     * @param sourceOrDestinationProperty
      */
-    noOfLevels(destinationProperty: string): any[] {
-        return destinationProperty.match(/\[\]/g) || [];
+    noOfMaxLevels(sourceProperty: string, destinationProperty: string): any[] {
+        const sourceArray: any[] = sourceProperty ?
+            ( sourceProperty.match(/\[\]/g) || [] ) :
+            [];
+        const destinationArray: any[] = destinationProperty ?
+            ( destinationProperty.match(/\[\]/g) || [] ) :
+            [];
+        return sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
+    }
+
+    /**
+     * Format Value
+     * @param controlName
+     * @param value
+     */
+    formatSourceValueForDuplicates(): ( controlName: string, value: string ) => string {
+        const self = this;
+        return (
+            controlName: string,
+            value: string
+        ): string => {
+            // determine if this is a source item that we need to adapt for duplicates
+            if (
+                value &&
+                value.indexOf('[]') > -1
+            ) {
+                // determine id & item
+                const id: string = controlName.substring(controlName.indexOf('[') + 1, controlName.indexOf(']'));
+
+                // find item
+                const item = _.find(
+                    this.mappedFields,
+                    {
+                        id: id
+                    }
+                );
+
+                // retrieve value with indexes
+                return self.addIndexesToArrays(
+                    value,
+                    item.sourceDestinationLevel
+                );
+            }
+
+            // not a source field
+            return value;
+        };
+    }
+
+    /**
+     * do we have arrays? if so, add indexes
+     * @param mapValue
+     * @param itemLevels
+     */
+    addIndexesToArrays(
+        mapValue: string,
+        itemLevels: number[]
+    ): any {
+        // add indexes
+        let index: number = 0;
+        while (this.isSourceDestinationArray(mapValue)) {
+            mapValue = mapValue.replace(
+                '[]',
+                '[' + itemLevels[index] + ']'
+            );
+            index++;
+        }
+
+        // finished
+        return mapValue;
     }
 
     /**
@@ -636,15 +696,6 @@ export class ImportDataComponent implements OnInit {
             form,
             false
         )) {
-            // scroll to the first invalid input
-            const invalidControls = this.formHelper.getInvalidControls(form);
-            if (!_.isEmpty(invalidControls)) {
-                this.domService.scrollItemIntoView(
-                    '[name="' + Object.keys(invalidControls)[0] + '"]',
-                    'start'
-                );
-            }
-
             // invalid form
             return;
         }
@@ -666,40 +717,37 @@ export class ImportDataComponent implements OnInit {
             (item: {
                 source: string,
                 destination: string,
-                destinationLevel?: (number | string)[],
+                sourceDestinationLevel?: number[],
                 options: {
                     sourceOption: string,
                     destinationOption: string
                 }[]
             }) => {
+                // forge the almighty source & destination
+                let source: string = item.source;
+                let destination: string = item.destination;
+
+                // add indexes to source arrays
+                source = this.addIndexesToArrays(
+                    source,
+                    item.sourceDestinationLevel
+                );
+
+                // add indexes to destination arrays
+                destination = this.addIndexesToArrays(
+                    destination,
+                    item.sourceDestinationLevel
+                );
+
                 // map main properties
-                importJSON.map[item.source] = item.destination;
-
-                // do we have arrays? add indexes
-                let mapDestValue: string = importJSON.map[item.source];
-                if (this.isDestinationArray(mapDestValue)) {
-                    // add indexes
-                    let index: number = 0;
-                    while (this.isDestinationArray(mapDestValue)) {
-                        mapDestValue = mapDestValue.replace(
-                            '[]', (
-                                item.destinationLevel[index] === ImportDataComponent.DESTINATION_LEVELS_EXCLUDE_ARRAY ?
-                                    '' :
-                                    ( '[' + item.destinationLevel[index] + ']' )
-                            )
-                        );
-                        index++;
-                    }
-
-                    // replace with the new value
-                    importJSON.map[item.source] = mapDestValue;
-                }
+                importJSON.map[source] = destination;
 
                 // map drop-down values
                 if (
                     item.options &&
                     !_.isEmpty(item.options)
                 ) {
+                    // here we don't need to add indexes, so we keep the arrays just as they are
                     importJSON.valuesMap[item.source] = _.transform(
                         item.options,
                         (result, option: {

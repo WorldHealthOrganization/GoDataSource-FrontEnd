@@ -151,7 +151,7 @@ export class ImportableMapField {
 
     public readonly: boolean = false;
 
-    public destinationLevel: number[] = [0, 0, 0];
+    public sourceDestinationLevel: number[] = [0, 0, 0];
 
     public id: string;
 
