@@ -106,7 +106,7 @@
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
                         [valueReplacer]="formatSourceValueForDuplicates()"
-                        [required]="true"
+                        required="true"
                         [(ngModel)]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
@@ -115,7 +115,7 @@
 
                     <app-form-select
                         [name]="'mapObject[' + item.id + '][destination]'"
-                        [required]="true"
+                        required="true"
                         [(ngModel)]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
@@ -131,7 +131,7 @@
                             fxFlex>
                             <app-form-select
                                 [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
-                                [required]="true"
+                                required="true"
                                 [(ngModel)]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
@@ -166,7 +166,7 @@
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
                             [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
-                            [required]="true"
+                            required="true"
                             [(ngModel)]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                             [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceField]">
@@ -175,7 +175,7 @@
                         <app-form-select
                             *ngIf="getModelPropertyValues(item.destinationField)"
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
-                            [required]="true"
+                            required="true"
                             [(ngModel)]="mappedOpt.destinationOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                             [options]="getModelPropertyValues(item.destinationField)"
