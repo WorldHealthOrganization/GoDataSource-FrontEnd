@@ -49,4 +49,11 @@ export class ContactModel {
         return ( this.firstName ? this.firstName : '' ) +
             ' ' + ( this.lastName ? this.lastName : '' );
     }
+
+    /**
+     * Get the main Address
+     */
+    get fullAddress(): AddressModel {
+        return _.find(this.addresses, {'typeId': 'main_address'});
+    }
 }

@@ -18,8 +18,8 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -56,7 +56,9 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
     entitiesListCount$: Observable<any>;
 
+    // reference data
     genderList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -72,7 +74,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
@@ -80,6 +82,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // reference data
         this.genderList$ = this.genericDataService.getGenderList().share();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         this.route.params
             .subscribe((params: {entityType, entityId}) => {

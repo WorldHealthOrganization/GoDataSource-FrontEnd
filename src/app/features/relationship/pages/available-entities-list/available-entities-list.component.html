@@ -137,7 +137,15 @@
                                 {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
                             </div>
                             <div class="column-filter">
-                                <!-- placeholder -->
+                                <app-form-select
+                                    name="riskLevelFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                    [options]="riskLevelsList$ | async"
+                                    (optionChanged)="filterBySelectField('riskLevel', $event)"
+                                    multiple="true"
+                                    app-reset-input-on-side-filter>
+                                </app-form-select>
                             </div>
                         </div>
                     </mat-header-cell>
@@ -147,24 +155,6 @@
                             [category]="ReferenceDataCategory.RISK_LEVEL"
                             [value]="item.riskLevel">
                         </app-reference-data-label>
-                    </mat-cell>
-                </ng-container>
-
-                <!-- Last follow-up -->
-                <ng-container matColumnDef="lastFollowUp">
-                    <mat-header-cell *matHeaderCellDef>
-                        <div class="table-header-cell">
-                            <div>
-                                {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
-                            </div>
-                            <div class="column-filter">
-                                <!-- placeholder -->
-                            </div>
-                        </div>
-                    </mat-header-cell>
-
-                    <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                        <!-- placeholder -->
                     </mat-cell>
                 </ng-container>
 

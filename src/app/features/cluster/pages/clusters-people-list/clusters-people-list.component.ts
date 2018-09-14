@@ -14,6 +14,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -36,8 +37,9 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     clusterPeopleList$: Observable<any>;
     clusterPeopleListCount$: Observable<any>;
 
-    // gender list
+    // reference data
     genderList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
@@ -47,6 +49,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService
     ) {
         super();
@@ -58,6 +61,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
 
         // reference data
         this.genderList$ = this.genericDataService.getGenderList().share();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         // get cluster ID from route params
         this.route.params.subscribe((params: { clusterId }) => {
@@ -113,7 +117,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         const columns = [
-            'firstName', 'lastName', 'age', 'gender', 'risk',
+            'firstName', 'lastName', 'age', 'gender', 'riskLevel',
             'lastFollowUp', 'place', 'address', 'actions'
         ];
         return columns;
