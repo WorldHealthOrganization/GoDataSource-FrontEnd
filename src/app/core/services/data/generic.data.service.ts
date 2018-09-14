@@ -4,7 +4,6 @@ import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()

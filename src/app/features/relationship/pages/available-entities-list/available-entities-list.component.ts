@@ -90,6 +90,9 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         this.entityTypesList$ = this.genericDataService.getEntityTypesAsLabelValue();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
 
+        // side filters
+        this.generateSideFilters();
+
         this.route.params
             .subscribe((params: {entityType, entityId}) => {
                 this.entityType = params.entityType;
@@ -158,8 +161,34 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                             });
                     });
             });
+    }
 
-        // set available side filters
+    /**
+     * Re(load) the available Entities list, based on the applied filter, sort criterias
+     */
+    refreshList() {
+        if (this.outbreakId && this.entityType && this.entityId) {
+            // retrieve the list of Relationships
+            this.entitiesList$ = this.entityDataService.getEntitiesList(
+                this.outbreakId,
+                this.queryBuilder
+            );
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.outbreakId && this.entityType && this.entityId) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder);
+        }
+    }
+
+    private generateSideFilters() {
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'type',
@@ -213,31 +242,6 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             }),
 
         ];
-    }
-
-    /**
-     * Re(load) the available Entities list, based on the applied filter, sort criterias
-     */
-    refreshList() {
-        if (this.outbreakId && this.entityType && this.entityId) {
-            // retrieve the list of Relationships
-            this.entitiesList$ = this.entityDataService.getEntitiesList(
-                this.outbreakId,
-                this.queryBuilder
-            );
-        }
-    }
-
-    /**
-     * Get total number of items, based on the applied filters
-     */
-    refreshListCount() {
-        if (this.outbreakId && this.entityType && this.entityId) {
-            // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder);
-        }
     }
 
     /**

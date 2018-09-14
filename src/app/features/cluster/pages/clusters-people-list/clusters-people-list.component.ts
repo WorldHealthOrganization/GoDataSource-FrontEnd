@@ -60,7 +60,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
+        this.genderList$ = this.genericDataService.getGenderList();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         // get cluster ID from route params

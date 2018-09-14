@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
-import { Constants } from './constants';
 
 export class EventModel {
     id: string;
