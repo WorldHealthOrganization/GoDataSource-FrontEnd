@@ -112,11 +112,10 @@ export class ClusterDataService {
     ): Observable<(CaseModel | ContactModel | EventModel)[]> {
 
         const qb = new RequestQueryBuilder();
-        // #TODO include locations in response when API is ready
         // include relation for Events
-        // qb.include('location');
+        qb.include('location');
         // include relation for Cases / Contacts
-        // qb.include('locations');
+        qb.include('locations');
 
         qb.merge(queryBuilder);
 

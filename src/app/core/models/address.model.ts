@@ -20,7 +20,7 @@ export class AddressModel {
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
         this.location = new LocationModel(
-            _.find(locationsList, {locationId: this.locationId})
+            _.find(locationsList, {id: this.locationId})
         );
         this.date = _.get(data, 'date', moment().toISOString());
         this.geoLocation = _.get(data, 'geoLocation', {});
