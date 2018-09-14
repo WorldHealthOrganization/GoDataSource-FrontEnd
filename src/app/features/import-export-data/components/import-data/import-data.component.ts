@@ -178,6 +178,13 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Record properties that shouldn't be visible in destination dropdown
+     */
+    @Input() excludeDestinationProperties: {
+        [property: string]: boolean
+    } = {};
+
+    /**
      * Required fields that user needs to map
      */
     private requiredDestinationFieldsMap: {
@@ -212,6 +219,12 @@ export class ImportDataComponent implements OnInit {
     }, {
         label: '3',
         value: 2
+    }, {
+        label: '4',
+        value: 3
+    }, {
+        label: '5',
+        value: 4
     }];
 
     /**
@@ -389,7 +402,8 @@ export class ImportDataComponent implements OnInit {
                     (token: string): string => {
                         return this.i18nService.instant(token);
                     },
-                    this.fieldsWithoutTokens
+                    this.fieldsWithoutTokens,
+                    this.excludeDestinationProperties
                 );
 
                 // we should have at least the headers of the file

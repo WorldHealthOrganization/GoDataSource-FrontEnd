@@ -36,10 +36,20 @@ export class ImportOutbreakDataComponent {
 
     ImportServerModelNames = ImportServerModelNames;
 
+    fieldsWithoutTokens = {
+        'countries[]': 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
+    };
+
+    excludeDestinationProperties = {
+        'caseInvestigationTemplate': true,
+        'contactFollowUpTemplate': true,
+        'labResultsTemplate': true
+    };
+
     requiredDestinationFields = [
         'name',
         'disease',
-        'countries[]',
+        'countries[].id',
         'description',
         'startDate',
         'periodOfFollowup',
@@ -50,10 +60,7 @@ export class ImportOutbreakDataComponent {
         'noDaysInChains',
         'noDaysNotSeen',
         'noLessContacts',
-        'longPeriodsBetweenCaseOnset',
-        'caseInvestigationTemplate',
-        'contactFollowUpTemplate',
-        'labResultsTemplate'
+        'longPeriodsBetweenCaseOnset'
     ];
 
     /**

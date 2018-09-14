@@ -216,6 +216,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
+        'LNG_OUTBREAK_FIELD_LABEL_COUNTRY_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',

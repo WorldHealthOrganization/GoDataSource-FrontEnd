@@ -46,6 +46,9 @@ export class ImportableFileModel {
         translate: (string) => string,
         fieldsWithoutTokens: {
             [property: string]: string
+        } = {},
+        excludeDestinationProperties: {
+            [property: string]: boolean
         } = {}
     ) {
         this.id = _.get(data, 'id');
@@ -75,16 +78,17 @@ export class ImportableFileModel {
         ) => {
             // if this is a string property then we can push it as it is
             if (_.isString(impLVPair.label)) {
-                // add parent prefix to child one
-                impLVPair.label = labelPrefix + translate(
-                    fieldsWithoutTokens[impLVPair.value] ?
-                        fieldsWithoutTokens[impLVPair.value] :
-                        impLVPair.label
-                );
+                if (!excludeDestinationProperties[impLVPair.value]) {
+                    // add parent prefix to child one
+                    impLVPair.label = labelPrefix + translate(
+                        fieldsWithoutTokens[impLVPair.value] ?
+                            fieldsWithoutTokens[impLVPair.value] :
+                            impLVPair.label
+                    );
 
-                // add to list of filters to which we can push data
-                result.push(impLVPair);
-
+                    // add to list of filters to which we can push data
+                    result.push(impLVPair);
+                }
             // otherwise we need to map it to multiple values
             } else if (_.isObject(impLVPair.label)) {
                 // add as parent drop-down as well
