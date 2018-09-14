@@ -157,7 +157,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                <!-- placeholder -->
+                {{item.mainAddress.location?.name}}
             </mat-cell>
         </ng-container>
 
@@ -175,7 +175,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                <!-- placeholder -->
+                {{item.mainAddress.fullAddress}}
             </mat-cell>
         </ng-container>
 

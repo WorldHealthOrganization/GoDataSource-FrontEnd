@@ -6,6 +6,12 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side filters -->
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
+
 <form class="page-content form-section" #form="ngForm" (submit)="selectEntities(form)">
 
     <div class="form-content">
@@ -166,17 +172,24 @@
                                 {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                             </div>
                             <div class="column-filter">
-                                <!-- placeholder -->
+                                <!--<app-form-location-dropdown-->
+                                    <!--name="locationFilter"-->
+                                    <!--ngModel-->
+                                    <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+                                    <!--(changed)="filterBySelectField('address.locationId', $event)"-->
+                                    <!--multiple="true"-->
+                                    <!--app-reset-input-on-side-filter>-->
+                                <!--</app-form-location-dropdown>-->
                             </div>
                         </div>
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                        <!-- placeholder -->
+                        {{item.mainAddress.location?.name}}
                     </mat-cell>
                 </ng-container>
 
-                <!-- Place -->
+                <!-- Address -->
                 <ng-container matColumnDef="address">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
@@ -190,7 +203,7 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                        <!-- placeholder -->
+                        {{item.mainAddress.fullAddress}}
                     </mat-cell>
                 </ng-container>
 

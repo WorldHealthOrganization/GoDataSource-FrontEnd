@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
+import { Constants } from './constants';
 
 export class EventModel {
     id: string;
@@ -23,6 +24,14 @@ export class EventModel {
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
 
         // we need the object to use the custom getter that constructs the address from all fields
-        this.address = new AddressModel(_.get(data, 'address'));
+        const location = _.get(data, 'location');
+        this.address = new AddressModel(_.get(data, 'address'), [location]);
+    }
+
+    /**
+     * Get the main Address
+     */
+    get mainAddress(): AddressModel {
+        return this.address;
     }
 }

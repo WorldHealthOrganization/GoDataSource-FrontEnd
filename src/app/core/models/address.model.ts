@@ -13,13 +13,15 @@ export class AddressModel {
     date: string;
     geoLocation: { lat: number | string, lng: number | string } | null;
 
-    constructor(data = null) {
+    constructor(data = null, locationsList = []) {
         this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');
         this.postalCode = _.get(data, 'postalCode');
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
-        this.location = _.get(data, 'location');
+        this.location = new LocationModel(
+            _.find(locationsList, {locationId: this.locationId})
+        );
         this.date = _.get(data, 'date', moment().toISOString());
         this.geoLocation = _.get(data, 'geoLocation', {});
     }

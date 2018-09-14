@@ -91,11 +91,11 @@ export class Constants {
     // Gender
     static GENDER = {
         MALE: {
-            label: 'Male',
+            label: 'LNG_COMMON_GENDER_MALE',
             value: 'Male'
         },
         FEMALE: {
-            label: 'Female',
+            label: 'LNG_COMMON_GENDER_FEMALE',
             value: 'Female'
         }
     };

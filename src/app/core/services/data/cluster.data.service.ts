@@ -4,6 +4,11 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ClusterModel } from '../../models/cluster.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { CaseModel } from '../../models/case.model';
+import { EventModel } from '../../models/event.model';
+import { ContactModel } from '../../models/contact.model';
+import { EntityModel } from '../../models/entity.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class ClusterDataService {
@@ -98,15 +103,29 @@ export class ClusterDataService {
      * @param {string} outbreakId
      * @param {string} clusterId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
+     * @returns {Observable<(CaseModel | ContactModel | EventModel)[]>}
      */
     getClusterPeople (
         outbreakId: string,
         clusterId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
-        const filter = queryBuilder.buildQuery();
-        return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`);
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+
+        const qb = new RequestQueryBuilder();
+        // #TODO include locations in response when API is ready
+        // qb.include('location');
+        // qb.include('locations');
+
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
+
+        return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`)
+            .map((peopleList) => {
+                return _.map(peopleList, (entity) => {
+                    return new EntityModel(entity).model;
+                });
+            });
     }
 
     /**
