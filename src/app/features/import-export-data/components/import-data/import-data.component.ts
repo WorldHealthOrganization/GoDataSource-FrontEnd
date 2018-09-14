@@ -592,7 +592,10 @@ export class ImportDataComponent implements OnInit {
      */
     lodashCustomGet(object: any, path: string): any {
         // validate input object
-        if (_.isEmpty(object)) {
+        if (
+            _.isEmpty(object) ||
+            _.isEmpty(path)
+        ) {
             return undefined;
         }
 
