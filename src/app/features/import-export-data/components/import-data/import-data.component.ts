@@ -455,6 +455,7 @@ export class ImportDataComponent implements OnInit {
     addMapOptionsIfNecessary(importableItem: ImportableMapField) {
         // add all distinct source as items that we need to map
         importableItem.mappedOptions = [];
+
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
         const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue ?
             this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceField] :
@@ -472,14 +473,18 @@ export class ImportDataComponent implements OnInit {
 
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const destinationOpt = _.chain(this.importableObject)
-                .get(`modelPropertyValues.${importableItem.destinationField}`, [])
-                .find((modelItem: { id: string, label: string }) => {
+            const modelPropertyValues = this.lodashCustomGet(
+                this.importableObject.modelPropertyValues,
+                importableItem.destinationField
+            );
+            const destinationOpt = _.find(
+                modelPropertyValues,
+                (modelItem: { id: string, label: string }) => {
                     return sourceOptReduced === _.camelCase(this.i18nService.instant(modelItem.label)).toLowerCase() ||
                         sourceOptReduced === _.camelCase(modelItem.id).toLowerCase() ||
                         sourceOptReduced === _.camelCase(modelItem.label).toLowerCase();
-                })
-                .value();
+                }
+            );
 
             // found a possible destination field
             if (destinationOpt !== undefined) {
@@ -580,6 +585,37 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Fix issue with lodash not supporting _.get(a, 'aaa[].b'), since it tries to interpret [] as an array
+     * @param object
+     * @param path
+     * @returns {value | undefined} Undefined if not found ( just like _.get )
+     */
+    lodashCustomGet(object: any, path: string): any {
+        // validate input object
+        if (_.isEmpty(object)) {
+            return undefined;
+        }
+
+        // go through the path
+        const pathSplit = path.split('.');
+        _.each(pathSplit, (pathItem: string) => {
+            // retrieve next value
+            object = object[pathItem] !== undefined ?
+                object[pathItem] :
+                _.get(object, pathItem);
+
+            // not found
+            if (object === undefined) {
+                // stop each
+                return false;
+            }
+        });
+
+        // finished return found value
+        return object;
+    }
+
+    /**
      * Retrieve model possible values
      * @param path
      */
@@ -588,7 +624,10 @@ export class ImportDataComponent implements OnInit {
         if (!this.fastMappedModelValues[path]) {
             // retrieve value
             this.fastMappedModelValues[path] = {
-                value: _.get(this.importableObject.modelPropertyValues, path)
+                value: this.lodashCustomGet(
+                    this.importableObject.modelPropertyValues,
+                    path
+                )
             };
         }
 
