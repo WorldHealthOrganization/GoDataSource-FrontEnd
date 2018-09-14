@@ -33,6 +33,8 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
 
+    @Input() displayFilterIcon: boolean = false;
+
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();

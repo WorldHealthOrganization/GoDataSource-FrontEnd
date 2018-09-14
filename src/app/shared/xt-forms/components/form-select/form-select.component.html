@@ -2,8 +2,17 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
+        [class.display-filter-icon]="displayFilterIcon"
         [class.clearable]="clearable && !multiple && !disabled">
+
+        <div
+            *ngIf="displayFilterIcon"
+            class="filter-icon">
+            <span class="xt-icon">search</span>
+        </div>
+
         <mat-select
+            [class.filter-icon-input]="displayFilterIcon"
             #selectElement="ngModel"
             [(ngModel)]="value"
             [attr.name]="name"

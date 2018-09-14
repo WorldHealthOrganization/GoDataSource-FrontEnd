@@ -32,7 +32,7 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
@@ -41,7 +41,8 @@
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
                             (optionChanged)="filterByRelation('people').byTextMultipleProperties(['firstName', 'name'], $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -60,7 +61,7 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME' | translate}}
                     </div>
                     <div class="column-filter">
@@ -70,7 +71,8 @@
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
                             (optionChanged)="filterByRelation('people').byTextMultipleProperties(['lastName', 'name'], $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -89,7 +91,7 @@
         <ng-container matColumnDef="contactDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate}}
                     </div>
                     <div class="column-filter">
@@ -112,7 +114,7 @@
         <ng-container matColumnDef="certaintyLevelId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate}}
                     </div>
                     <div class="column-filter">
@@ -123,7 +125,8 @@
                             [options]="certaintyLevelList$ | async"
                             (optionChanged)="filterBySelectField('certaintyLevelId', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -141,7 +144,7 @@
         <ng-container matColumnDef="exposureTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
@@ -152,7 +155,8 @@
                             [options]="exposureTypeList$ | async"
                             (optionChanged)="filterBySelectField('exposureTypeId', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -170,7 +174,7 @@
         <ng-container matColumnDef="exposureFrequencyId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate}}
                     </div>
                     <div class="column-filter">
@@ -181,7 +185,8 @@
                             [options]="exposuresFrequencyList$ | async"
                             (optionChanged)="filterBySelectField('exposureFrequencyId', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -198,8 +203,8 @@
         <!-- Exposure Duration -->
         <ng-container matColumnDef="exposureDurationId">
             <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header>
+                <div class="table-header-cell" >
+                    <div class="column-header" mat-sort-header>
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -210,7 +215,8 @@
                             [options]="exposureDurationList$ | async"
                             (optionChanged)="filterBySelectField('exposureDurationId', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -228,7 +234,7 @@
         <ng-container matColumnDef="socialRelationshipTypeId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate}}
                     </div>
                     <div class="column-filter">
@@ -239,7 +245,8 @@
                             [options]="relationshipTypeList$ | async"
                             (optionChanged)="filterBySelectField('socialRelationshipTypeId', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>

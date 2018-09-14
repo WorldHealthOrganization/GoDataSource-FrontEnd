@@ -40,7 +40,7 @@
                 <ng-container matColumnDef="firstName">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div mat-sort-header>
+                            <div mat-sort-header class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
                             </div>
                             <div class="column-filter">
@@ -48,7 +48,8 @@
                                     name="firstNameFilter"
                                     ngModel
                                     placeholder="Filter"
-                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)">
+                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                                    [displayFilterIcon]="true">
                                 </app-form-input>
                             </div>
                         </div>
@@ -63,7 +64,7 @@
                 <ng-container matColumnDef="lastName">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div mat-sort-header>
+                            <div mat-sort-header class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
                             </div>
                             <div class="column-filter">
@@ -71,7 +72,8 @@
                                     name="lastNameFilter"
                                     ngModel
                                     placeholder="Filter"
-                                    (optionChanged)="filterByTextField('lastName', $event)">
+                                    (optionChanged)="filterByTextField('lastName', $event)"
+                                    [displayFilterIcon]="true">
                                 </app-form-input>
                             </div>
                         </div>
@@ -86,7 +88,7 @@
                 <ng-container matColumnDef="age">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div mat-sort-header>
+                            <div mat-sort-header class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
                             </div>
                             <div class="column-filter">
@@ -108,7 +110,7 @@
                 <ng-container matColumnDef="gender">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div mat-sort-header>
+                            <div mat-sort-header class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
                             </div>
                             <div class="column-filter">
@@ -118,7 +120,8 @@
                                     placeholder="Filter"
                                     [options]="genderList$ | async"
                                     (optionChanged)="filterBySelectField('gender', $event)"
-                                    multiple="true">
+                                    multiple="true"
+                                    [displayFilterIcon]="true">
                                 </app-form-select>
                             </div>
                         </div>
@@ -133,7 +136,7 @@
                 <ng-container matColumnDef="riskLevel">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div mat-sort-header>
+                            <div mat-sort-header class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
                             </div>
                             <div class="column-filter">
@@ -154,7 +157,7 @@
                 <ng-container matColumnDef="lastFollowUp">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
                             </div>
                             <div class="column-filter">
@@ -172,7 +175,7 @@
                 <ng-container matColumnDef="place">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                             </div>
                             <div class="column-filter">
@@ -190,7 +193,7 @@
                 <ng-container matColumnDef="address">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div>
+                            <div class="column-header">
                                 {{'LNG_ENTITY_FIELD_LABEL_ADDRESS' | translate}}
                             </div>
                             <div class="column-filter">
