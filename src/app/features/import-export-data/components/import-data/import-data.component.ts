@@ -13,6 +13,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
+import { DomService } from '../../../../core/services/helper/dom.service';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -281,7 +282,8 @@ export class ImportDataComponent implements OnInit {
         private dialogService: DialogService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private importExportDataService: ImportExportDataService
+        private importExportDataService: ImportExportDataService,
+        private domService: DomService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
         if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -737,6 +739,15 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Track by mapped field / option
+     * @param index
+     * @param items
+     */
+    trackByFieldID(index: number, item: {id: string}): string {
+        return item.id;
+    }
+
+    /**
      * Import data
      * @param form
      */
@@ -752,6 +763,15 @@ export class ImportDataComponent implements OnInit {
             form,
             false
         )) {
+            // scroll to the first invalid input
+            const invalidControls = this.formHelper.getInvalidControls(form);
+            if (!_.isEmpty(invalidControls)) {
+                this.domService.scrollItemIntoView(
+                    '[name="' + Object.keys(invalidControls)[0] + '"]',
+                    'start'
+                );
+            }
+
             // invalid form
             return;
         }

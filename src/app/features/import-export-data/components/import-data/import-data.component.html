@@ -98,7 +98,7 @@
                 </div>
             </div>
             <div
-                *ngFor="let item of mappedFields; let indexMapField = index;">
+                *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;">
                 <div
                     fxFlex fxLayout="row" fxLayoutGap="20px">
                     <app-form-select
@@ -160,7 +160,7 @@
                     "
                     class="import-data-map-fields-children">
                     <div
-                        *ngFor="let mappedOpt of item.mappedOptions; let indexMapOption = index"
+                        *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
                         <app-form-select
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
