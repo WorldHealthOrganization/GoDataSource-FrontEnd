@@ -486,7 +486,6 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_EMAIL': 'Email',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
-        'LNG_USER_FIELD_LABEL_SYNONYM' : 'Synonyms',
 
         /**
          * List Users page
@@ -507,6 +506,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_USER_TITLE': 'View User',
         'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
+        'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' : 'Details',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
         /**
