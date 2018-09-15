@@ -110,7 +110,7 @@
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="item.sourceField = $event.value">
+                        (optionChanged)="item.sourceField = $event ? $event.value : $event">
                     </app-form-select>
 
                     <app-form-select
@@ -119,7 +119,7 @@
                         [ngModel]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="item.destinationField = $event.value"
+                        (optionChanged)="item.destinationField = $event ? $event.value : $event"
                         [disabled]="item.readonly">
                     </app-form-select>
 
@@ -135,7 +135,7 @@
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="sourceControl.control.updateValueAndValidity(); item.sourceDestinationLevel[levelIndex] = $event.value;">
+                                (optionChanged)="sourceControl.control.updateValueAndValidity(); item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event;">
                             </app-form-select>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                             [ngModel]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                             [options]="importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)]"
-                            (optionChanged)="mappedOpt.sourceOption = $event.value;">
+                            (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
                         </app-form-select>
 
                         <app-form-select
@@ -177,7 +177,7 @@
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                             [options]="getModelPropertyValues(item.destinationField)"
                             optionValueKey="id"
-                            (optionChanged)="mappedOpt.destinationOption = $event.value;">
+                            (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
                         </app-form-select>
 
                         <div fxFlex="70px">
