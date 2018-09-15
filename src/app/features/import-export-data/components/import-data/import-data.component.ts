@@ -252,13 +252,6 @@ export class ImportDataComponent implements OnInit {
     ImportServerErrorCodes = ImportServerErrorCodes;
 
     /**
-     * Used to determine fast the values of a dropdown for a sourceField with indexes
-     */
-    private fastMappedSourceFields: {
-        [sourceField: string]: string
-    } = {};
-
-    /**
      * Format source value callback
      */
     formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
@@ -586,20 +579,20 @@ export class ImportDataComponent implements OnInit {
         // there is no point in setting mapped values if we  don't have to map something
         if (
             !this.importableObject.distinctFileColumnValuesKeyValue ||
-            !this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)] ||
+            !this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes] ||
             !this.importableObject.modelPropertyValuesMap[importableItem.destinationField]
         ) {
             return;
         }
 
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
-        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)];
+        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
             // check to see if we didn't map this value somewhere else already
             if (_.find(
                 this.mappedFields,
                 (item: ImportableMapField): boolean => {
-                    if (this.getMappedFieldSource(item.sourceField) !== this.getMappedFieldSource(importableItem.sourceField)) {
+                    if (item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes) {
                         return false;
                     } else {
                         return _.find(
@@ -739,21 +732,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Retrieve model source field without indexes
-     * @param sourceField
-     */
-    getMappedFieldSource(sourceField: string) {
-        // bring values only if we didn't bring them before already
-        if (!this.fastMappedSourceFields[sourceField]) {
-            // retrieve value
-            this.fastMappedSourceFields[sourceField] = sourceField.replace(/\[\d+\]/g, '[]');
-        }
-
-        // return values
-        return this.fastMappedSourceFields[sourceField];
-    }
-
-    /**
      * Format Value
      */
     private formatSourceValueForDuplicates(controlName: string, value: string): string {
@@ -885,7 +863,7 @@ export class ImportDataComponent implements OnInit {
                 ) {
                     // here we don't need to add indexes, so we keep the arrays just as they are
                     // also, we need to merge value Maps with the previous ones
-                    const properSource = this.getMappedFieldSource(item.source);
+                    const properSource = item.source.replace(/\[\d+\]/g, '[]');
                     importJSON.valuesMap[properSource] = {
                         ...importJSON.valuesMap[properSource],
                         ..._.transform(
@@ -950,6 +928,5 @@ export class ImportDataComponent implements OnInit {
         this.errMsgDetails = null;
         this.uploader.clearQueue();
         this.mappedFields = [];
-        this.fastMappedSourceFields = {};
     }
 }

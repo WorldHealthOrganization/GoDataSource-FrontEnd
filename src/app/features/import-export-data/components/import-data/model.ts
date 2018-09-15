@@ -207,8 +207,10 @@ export class ImportableMapField {
 
     public isSourceArray: boolean = false;
     private _sourceField: string = null;
+    public sourceFieldWithoutIndexes = null;
     set sourceField(value: string) {
         this._sourceField = value;
+        this.sourceFieldWithoutIndexes = this.sourceField.replace(/\[\d+\]/g, '[]');
         this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
         this.checkNumberOfMaxLevels();
     }
