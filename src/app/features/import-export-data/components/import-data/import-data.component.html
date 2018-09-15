@@ -153,11 +153,7 @@
                     </div>
                 </div>
                 <div
-                    *ngIf="
-                        importableObject.distinctFileColumnValuesKeyValue &&
-                        importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)] &&
-                        getModelPropertyValues(item.destinationField)
-                    "
+                    *ngIf="shouldDisplaySourceFieldOptions(item)"
                     class="import-data-map-fields-children">
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"

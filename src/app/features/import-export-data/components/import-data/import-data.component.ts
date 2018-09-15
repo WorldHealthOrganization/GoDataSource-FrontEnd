@@ -268,6 +268,13 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Used to determine fast the previous visibility options of a field
+     */
+    private previousSourceFieldOptionsVisible: {
+        [id: string]: boolean
+    } = {};
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -429,7 +436,8 @@ export class ImportDataComponent implements OnInit {
                     );
 
                     // add options if necessary
-                    this.addMapOptionsIfNecessary(importableItem);
+                    // moved logic so we add options only if needed
+                    // NOT NEEDED ANYMORE
 
                     // do we need to make this one readonly ?
                     if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
@@ -482,7 +490,8 @@ export class ImportDataComponent implements OnInit {
                             );
 
                             // add options if necessary
-                            this.addMapOptionsIfNecessary(importableItem);
+                            // moved logic so we add options only if needed
+                            // NOT NEEDED ANYMORE
 
                             // do we need to make this one readonly ?
                             if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
@@ -589,6 +598,28 @@ export class ImportDataComponent implements OnInit {
             this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)] :
             [];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
+            // check to see if we didn't map this value somewhere else already
+            if (_.find(
+                this.mappedFields,
+                (item: ImportableMapField): boolean => {
+                    if (this.getMappedFieldSource(item.sourceField) !== this.getMappedFieldSource(importableItem.sourceField)) {
+                        return false;
+                    } else {
+                        return _.find(
+                            item.mappedOptions,
+                            (option: {
+                                sourceOption: string
+                            }): boolean => {
+                                return option.sourceOption === distinctVal.value;
+                            }
+                        );
+                    }
+                }
+            )) {
+                // no need to continue since this option is already mapped
+                return;
+            }
+
             // create map option with source
             const mapOpt: {
                 id: string;
@@ -806,6 +837,32 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Display source field options
+     * @param item
+     */
+    shouldDisplaySourceFieldOptions(item: ImportableMapField): boolean {
+        // determine if we should display data
+        const display: boolean =  this.importableObject.distinctFileColumnValuesKeyValue &&
+            this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(item.sourceField)] &&
+            !!this.getModelPropertyValues(item.destinationField);
+
+        // populate options if necessary
+        if (this.previousSourceFieldOptionsVisible[item.id] !== display) {
+            if (display) {
+                if (_.isEmpty(item.mappedOptions)) {
+                    this.addMapOptionsIfNecessary(item);
+                }
+            } else {
+                item.mappedOptions = [];
+            }
+        }
+
+        // display necessary data
+        this.previousSourceFieldOptionsVisible[item.id] = display;
+        return display;
+    }
+
+    /**
      * Format Value
      */
     formatSourceValueForDuplicates(): ( controlName: string, value: string ) => string {
@@ -942,16 +999,21 @@ export class ImportDataComponent implements OnInit {
                     !_.isEmpty(item.options)
                 ) {
                     // here we don't need to add indexes, so we keep the arrays just as they are
-                    importJSON.valuesMap[item.source] = _.transform(
-                        item.options,
-                        (result, option: {
-                            sourceOption: string,
-                            destinationOption: string
-                        }) => {
-                            result[option.sourceOption] = option.destinationOption;
-                        },
-                        {}
-                    );
+                    // also, we need to merge value Maps with the previous ones
+                    const properSource = this.getMappedFieldSource(item.source);
+                    importJSON.valuesMap[properSource] = {
+                        ...importJSON.valuesMap[properSource],
+                        ..._.transform(
+                            item.options,
+                            (result, option: {
+                                sourceOption: string,
+                                destinationOption: string
+                            }) => {
+                                result[option.sourceOption] = option.destinationOption;
+                            },
+                            {}
+                        )
+                    };
                 }
             }
         );
@@ -1005,5 +1067,6 @@ export class ImportDataComponent implements OnInit {
         this.mappedFields = [];
         this.fastMappedModelValues = {};
         this.fastMappedSourceFields = {};
+        this.previousSourceFieldOptionsVisible = {};
     }
 }
