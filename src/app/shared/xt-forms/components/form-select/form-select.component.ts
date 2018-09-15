@@ -92,7 +92,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
         // wait for the input object to be initialized
         // then trigger the initialized event
         setTimeout(() => {
-            return this.initialized.emit(this.value);
+            this.initialized.emit(this.value);
         });
 
         super.ngAfterViewInit();
