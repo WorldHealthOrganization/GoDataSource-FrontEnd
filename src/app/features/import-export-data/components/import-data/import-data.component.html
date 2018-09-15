@@ -120,7 +120,6 @@
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
                         (optionChanged)="item.destinationField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);"
-                        (initialized)="addMapOptionsIfNecessary(item)"
                         [disabled]="item.readonly">
                     </app-form-select>
 

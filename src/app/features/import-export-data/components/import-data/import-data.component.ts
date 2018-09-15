@@ -428,8 +428,7 @@ export class ImportDataComponent implements OnInit {
                     );
 
                     // add options if necessary
-                    // moved logic so we add options only if needed
-                    // NOT NEEDED ANYMORE
+                    this.addMapOptionsIfNecessary(importableItem);
 
                     // do we need to make this one readonly ?
                     if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
@@ -482,8 +481,7 @@ export class ImportDataComponent implements OnInit {
                             );
 
                             // add options if necessary
-                            // moved logic so we add options only if needed
-                            // NOT NEEDED ANYMORE
+                            this.addMapOptionsIfNecessary(importableItem);
 
                             // do we need to make this one readonly ?
                             if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
