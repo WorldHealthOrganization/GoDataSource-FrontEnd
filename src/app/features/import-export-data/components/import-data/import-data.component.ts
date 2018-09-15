@@ -3,7 +3,7 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { ImportableFileModel, ImportableFilePropertiesModel, ImportableLabelValuePair, ImportableMapField } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -438,6 +438,81 @@ export class ImportDataComponent implements OnInit {
 
                     // add to list
                     this.mappedFields.push(importableItem);
+                });
+
+                // do some multilevel mappings
+                const mappedHeaders: {
+                    [key: string]: {
+                        value: string
+                    }
+                } = {};
+                _.each(this.importableObject.fileHeaders, (fHeader: string) => {
+                    mappedHeaders[_.camelCase(fHeader).toLowerCase()] = {
+                        value: fHeader
+                    };
+                });
+                const mapToHeaderFile = (
+                    value: string | ImportableFilePropertiesModel,
+                    property: string,
+                    parentPath: string = ''
+                )  => {
+                    // if object we need to go further into it
+                    if (_.isObject(value)) {
+                        _.each(value, (childValue: string | ImportableFilePropertiesModel, childProperty: string) => {
+                            mapToHeaderFile(
+                                childValue,
+                                childProperty,
+                                _.isObject(childValue) ? `${parentPath}.${childProperty}` : parentPath
+                            );
+                        });
+                    } else {
+                        // found the language tokens
+                        let mappedHeaderObj: {
+                            value: string
+                        };
+                        if (
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+                        ) {
+                            // allow duplicate maps that need to be solved by user
+                            // NOTHING
+
+                            // create new possible map item
+                            const importableItem = new ImportableMapField(
+                                `${parentPath}.${property}`,
+                                mappedHeaderObj.value
+                            );
+
+                            // add options if necessary
+                            this.addMapOptionsIfNecessary(importableItem);
+
+                            // do we need to make this one readonly ?
+                            if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                                importableItem.readonly = true;
+                                delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                            }
+
+                            // add to list
+                            this.mappedFields.push(importableItem);
+                        } else {
+                            // NOT FOUND
+                            // can't map by flat property since they are too common
+                            // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
+                        }
+                    }
+                };
+                _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
+                    if (_.isObject(value)) {
+                        mapToHeaderFile(
+                            value,
+                            property,
+                            property
+                        );
+                    } else {
+                        // TOKEN
+                        // ALREADY MAPPED BY SERVER
+                    }
                 });
 
                 // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
