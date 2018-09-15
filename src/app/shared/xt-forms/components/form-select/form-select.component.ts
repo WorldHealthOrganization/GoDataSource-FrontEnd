@@ -1,5 +1,5 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
@@ -15,7 +15,7 @@ import * as _ from 'lodash';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> {
+export class FormSelectComponent extends ElementBase<string> implements AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -37,6 +37,7 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();
+    @Output() initialized = new EventEmitter<any>();
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
 
@@ -85,5 +86,15 @@ export class FormSelectComponent extends ElementBase<string> {
 
         // emit the currently selected option(s)
         return this.optionChanged.emit(selectedOptions);
+    }
+
+    ngAfterViewInit() {
+        // wait for the input object to be initialized
+        // then trigger the initialized event
+        setTimeout(() => {
+            return this.initialized.emit(this.value);
+        });
+
+        super.ngAfterViewInit();
     }
 }

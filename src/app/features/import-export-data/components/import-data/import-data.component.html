@@ -110,7 +110,7 @@
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="item.sourceField = $event ? $event.value : $event">
+                        (optionChanged)="item.sourceField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);">
                     </app-form-select>
 
                     <app-form-select
@@ -119,7 +119,8 @@
                         [ngModel]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="item.destinationField = $event ? $event.value : $event"
+                        (optionChanged)="item.destinationField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);"
+                        (initialized)="addMapOptionsIfNecessary(item)"
                         [disabled]="item.readonly">
                     </app-form-select>
 
@@ -127,7 +128,7 @@
                         *ngIf="item.isSourceArray || item.isDestinationArray"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
                         <div
-                            *ngFor="let levelMatch of noOfMaxLevels(item.sourceField, item.destinationField); let levelIndex = index;"
+                            *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
                             fxFlex>
                             <app-form-select
                                 [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
@@ -135,7 +136,7 @@
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="sourceControl.control.updateValueAndValidity(); item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event;">
+                                (optionChanged)="item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event; sourceControl.control.updateValueAndValidity();">
                             </app-form-select>
                         </div>
                     </div>
@@ -153,7 +154,10 @@
                     </div>
                 </div>
                 <div
-                    *ngIf="shouldDisplaySourceFieldOptions(item)"
+                    *ngIf="
+                        importableObject.distinctFileColumnValuesKeyValue &&
+                        importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)] &&
+                        !!importableObject.modelPropertyValuesMap[item.destinationField]"
                     class="import-data-map-fields-children">
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
@@ -170,12 +174,11 @@
                         </app-form-select>
 
                         <app-form-select
-                            *ngIf="getModelPropertyValues(item.destinationField)"
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                             required="true"
                             [ngModel]="mappedOpt.destinationOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                            [options]="getModelPropertyValues(item.destinationField)"
+                            [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                             optionValueKey="id"
                             (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
                         </app-form-select>

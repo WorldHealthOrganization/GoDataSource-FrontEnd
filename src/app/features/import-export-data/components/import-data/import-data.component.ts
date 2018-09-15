@@ -252,26 +252,10 @@ export class ImportDataComponent implements OnInit {
     ImportServerErrorCodes = ImportServerErrorCodes;
 
     /**
-     * Used to determine fast the values of a dropdown for a property from a deep level property ( so we don't have to do _.get )
-     */
-    private fastMappedModelValues: {
-        [path: string]: {
-            value: any[] | null | undefined
-        }
-    } = {};
-
-    /**
      * Used to determine fast the values of a dropdown for a sourceField with indexes
      */
     private fastMappedSourceFields: {
         [sourceField: string]: string
-    } = {};
-
-    /**
-     * Used to determine fast the previous visibility options of a field
-     */
-    private previousSourceFieldOptionsVisible: {
-        [id: string]: boolean
     } = {};
 
     /**
@@ -601,10 +585,17 @@ export class ImportDataComponent implements OnInit {
         // add all distinct source as items that we need to map
         importableItem.mappedOptions = [];
 
+        // there is no point in setting mapped values if we  don't have to map something
+        if (
+            !this.importableObject.distinctFileColumnValuesKeyValue ||
+            !this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)] ||
+            !this.importableObject.modelPropertyValuesMap[importableItem.destinationField]
+        ) {
+            return;
+        }
+
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
-        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue ?
-            this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)] :
-            [];
+        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
             // check to see if we didn't map this value somewhere else already
             if (_.find(
@@ -640,10 +631,7 @@ export class ImportDataComponent implements OnInit {
 
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const modelPropertyValues = this.lodashCustomGet(
-                this.importableObject.modelPropertyValues,
-                importableItem.destinationField
-            );
+            const modelPropertyValues = this.importableObject.modelPropertyValuesMap[importableItem.destinationField];
             const destinationOpt = _.find(
                 modelPropertyValues,
                 (modelItem: { id: string, label: string }) => {
@@ -753,60 +741,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Fix issue with lodash not supporting _.get(a, 'aaa[].b'), since it tries to interpret [] as an array
-     * @param object
-     * @param path
-     * @returns {value | undefined} Undefined if not found ( just like _.get )
-     */
-    lodashCustomGet(object: any, path: string): any {
-        // validate input object
-        if (
-            _.isEmpty(object) ||
-            _.isEmpty(path)
-        ) {
-            return undefined;
-        }
-
-        // go through the path
-        const pathSplit = path.split('.');
-        _.each(pathSplit, (pathItem: string) => {
-            // retrieve next value
-            object = object[pathItem] !== undefined ?
-                object[pathItem] :
-                _.get(object, pathItem);
-
-            // not found
-            if (object === undefined) {
-                // stop each
-                return false;
-            }
-        });
-
-        // finished return found value
-        return object;
-    }
-
-    /**
-     * Retrieve model possible values
-     * @param path
-     */
-    getModelPropertyValues(path: string) {
-        // bring values only if we didn't bring them before already
-        if (!this.fastMappedModelValues[path]) {
-            // retrieve value
-            this.fastMappedModelValues[path] = {
-                value: this.lodashCustomGet(
-                    this.importableObject.modelPropertyValues,
-                    path
-                )
-            };
-        }
-
-        // return values
-        return this.fastMappedModelValues[path].value;
-    }
-
-    /**
      * Retrieve model source field without indexes
      * @param sourceField
      */
@@ -819,47 +753,6 @@ export class ImportDataComponent implements OnInit {
 
         // return values
         return this.fastMappedSourceFields[sourceField];
-    }
-
-    /**
-     * Number of levels
-     * @param sourceProperty
-     * @param destinationProperty
-     */
-    noOfMaxLevels(sourceProperty: string, destinationProperty: string): any[] {
-        const sourceArray: any[] = sourceProperty ?
-            ( sourceProperty.match(/\[\]/g) || [] ) :
-            [];
-        const destinationArray: any[] = destinationProperty ?
-            ( destinationProperty.match(/\[\]/g) || [] ) :
-            [];
-        return sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
-    }
-
-    /**
-     * Display source field options
-     * @param item
-     */
-    shouldDisplaySourceFieldOptions(item: ImportableMapField): boolean {
-        // determine if we should display data
-        const display: boolean =  this.importableObject.distinctFileColumnValuesKeyValue &&
-            this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(item.sourceField)] &&
-            !!this.getModelPropertyValues(item.destinationField);
-
-        // populate options if necessary
-        if (this.previousSourceFieldOptionsVisible[item.id] !== display) {
-            if (display) {
-                if (_.isEmpty(item.mappedOptions)) {
-                    this.addMapOptionsIfNecessary(item);
-                }
-            } else {
-                item.mappedOptions = [];
-            }
-        }
-
-        // display necessary data
-        this.previousSourceFieldOptionsVisible[item.id] = display;
-        return display;
     }
 
     /**
@@ -1059,8 +952,6 @@ export class ImportDataComponent implements OnInit {
         this.errMsgDetails = null;
         this.uploader.clearQueue();
         this.mappedFields = [];
-        this.fastMappedModelValues = {};
         this.fastMappedSourceFields = {};
-        this.previousSourceFieldOptionsVisible = {};
     }
 }

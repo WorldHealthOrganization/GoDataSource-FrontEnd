@@ -33,6 +33,9 @@ export class ImportableFileModel {
     modelPropertiesKeyValue:  ImportableLabelValuePair[];
 
     modelPropertyValues: ImportableFilePropertyValuesModel;
+    modelPropertyValuesMap: {
+        [modelProperty: string]: ImportableFilePropertyValuesModel
+    } = {};
 
     distinctFileColumnValues: {
         [fileHeader: string]: string[]
@@ -40,6 +43,43 @@ export class ImportableFileModel {
     distinctFileColumnValuesKeyValue: {
         [fileHeader: string]: ImportableLabelValuePair[]
     };
+
+    /**
+     * Fix issue with lodash not supporting _.get(a, 'aaa[].b'), since it tries to interpret [] as an array
+     * @param object
+     * @param path
+     * @returns {value | undefined} Undefined if not found ( just like _.get )
+     */
+    static lodashCustomGet(
+        object: any,
+        path: string
+    ): any {
+        // validate input object
+        if (
+            _.isEmpty(object) ||
+            _.isEmpty(path)
+        ) {
+            return undefined;
+        }
+
+        // go through the path
+        const pathSplit = path.split('.');
+        _.each(pathSplit, (pathItem: string) => {
+            // retrieve next value
+            object = object[pathItem] !== undefined ?
+                object[pathItem] :
+                _.get(object, pathItem);
+
+            // not found
+            if (object === undefined) {
+                // stop each
+                return false;
+            }
+        });
+
+        // finished return found value
+        return object;
+    }
 
     constructor(
         data = null,
@@ -84,6 +124,12 @@ export class ImportableFileModel {
                         fieldsWithoutTokens[impLVPair.value] ?
                             fieldsWithoutTokens[impLVPair.value] :
                             impLVPair.label
+                    );
+
+                    // map destination field for easy access to mapped options when having [] in path
+                    this.modelPropertyValuesMap[impLVPair.value] = ImportableFileModel.lodashCustomGet(
+                        this.modelPropertyValues,
+                        impLVPair.value
                     );
 
                     // add to list of filters to which we can push data
@@ -164,6 +210,7 @@ export class ImportableMapField {
     set sourceField(value: string) {
         this._sourceField = value;
         this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+        this.checkNumberOfMaxLevels();
     }
     get sourceField(): string {
         return this._sourceField;
@@ -174,10 +221,13 @@ export class ImportableMapField {
     set destinationField(value: string) {
         this._destinationField = value;
         this.isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+        this.checkNumberOfMaxLevels();
     }
     get destinationField(): string {
         return this._destinationField;
     }
+
+    numberOfMaxLevels: any[] = [];
 
     constructor(
         destinationField: string = null,
@@ -186,5 +236,15 @@ export class ImportableMapField {
         this.id = uuid();
         this.destinationField = destinationField;
         this.sourceField = sourceField;
+    }
+
+    checkNumberOfMaxLevels() {
+        const sourceArray: any[] = this.sourceField ?
+            ( this.sourceField.match(/\[\]/g) || [] ) :
+            [];
+        const destinationArray: any[] = this.destinationField ?
+            ( this.destinationField.match(/\[\]/g) || [] ) :
+            [];
+        this.numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
     }
 }
