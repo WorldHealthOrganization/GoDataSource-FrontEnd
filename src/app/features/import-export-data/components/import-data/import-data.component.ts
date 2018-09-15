@@ -275,6 +275,11 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Format source value callback
+     */
+    formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -307,6 +312,9 @@ export class ImportDataComponent implements OnInit {
                 });
             };
         }
+
+        // callbacks
+        this.formatSourceValueForDuplicatesCallback = this.formatSourceValueForDuplicates.bind(this);
     }
 
     /**
@@ -814,14 +822,6 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Check if property should receive an array
-     * @param sourceOrDestinationProperty
-     */
-    isSourceDestinationArray(sourceOrDestinationProperty: string): boolean {
-        return sourceOrDestinationProperty ? sourceOrDestinationProperty.indexOf('[]') > -1 : false;
-    }
-
-    /**
      * Number of levels
      * @param sourceProperty
      * @param destinationProperty
@@ -865,38 +865,32 @@ export class ImportDataComponent implements OnInit {
     /**
      * Format Value
      */
-    formatSourceValueForDuplicates(): ( controlName: string, value: string ) => string {
-        const self = this;
-        return (
-            controlName: string,
-            value: string
-        ): string => {
-            // determine if this is a source item that we need to adapt for duplicates
-            if (
-                value &&
-                value.indexOf('[]') > -1
-            ) {
-                // determine id & item
-                const id: string = controlName.substring(controlName.indexOf('[') + 1, controlName.indexOf(']'));
+    private formatSourceValueForDuplicates(controlName: string, value: string): string {
+        // determine if this is a source item that we need to adapt for duplicates
+        if (
+            value &&
+            value.indexOf('[]') > -1
+        ) {
+            // determine id & item
+            const id: string = controlName.substring(controlName.indexOf('[') + 1, controlName.indexOf(']'));
 
-                // find item
-                const item = _.find(
-                    this.mappedFields,
-                    {
-                        id: id
-                    }
-                );
+            // find item
+            const item = _.find(
+                this.mappedFields,
+                {
+                    id: id
+                }
+            );
 
-                // retrieve value with indexes
-                return self.addIndexesToArrays(
-                    value,
-                    item.sourceDestinationLevel
-                );
-            }
+            // retrieve value with indexes
+            return this.addIndexesToArrays(
+                value,
+                item.sourceDestinationLevel
+            );
+        }
 
-            // not a source field
-            return value;
-        };
+        // not a source field
+        return value;
     }
 
     /**
@@ -910,7 +904,7 @@ export class ImportDataComponent implements OnInit {
     ): any {
         // add indexes
         let index: number = 0;
-        while (this.isSourceDestinationArray(mapValue)) {
+        while (mapValue ? mapValue.indexOf('[]') > -1 : false) {
             mapValue = mapValue.replace(
                 '[]',
                 '[' + itemLevels[index] + ']'

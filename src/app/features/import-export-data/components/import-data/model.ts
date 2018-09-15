@@ -159,10 +159,32 @@ export class ImportableMapField {
 
     public id: string;
 
+    public isSourceArray: boolean = false;
+    private _sourceField: string = null;
+    set sourceField(value: string) {
+        this._sourceField = value;
+        this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+    }
+    get sourceField(): string {
+        return this._sourceField;
+    }
+
+    public isDestinationArray: boolean = false;
+    private _destinationField: string = null;
+    set destinationField(value: string) {
+        this._destinationField = value;
+        this.isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+    }
+    get destinationField(): string {
+        return this._destinationField;
+    }
+
     constructor(
-        public destinationField: string = null,
-        public sourceField: string = null
+        destinationField: string = null,
+        sourceField: string = null
     ) {
         this.id = uuid();
+        this.destinationField = destinationField;
+        this.sourceField = sourceField;
     }
 }

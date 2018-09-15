@@ -105,7 +105,7 @@
                         #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
-                        [valueReplacer]="formatSourceValueForDuplicates()"
+                        [valueReplacer]="formatSourceValueForDuplicatesCallback"
                         required="true"
                         [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
@@ -124,7 +124,7 @@
                     </app-form-select>
 
                     <div
-                        *ngIf="isSourceDestinationArray(item.sourceField) || isSourceDestinationArray(item.destinationField)"
+                        *ngIf="item.isSourceArray || item.isDestinationArray"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
                         <div
                             *ngFor="let levelMatch of noOfMaxLevels(item.sourceField, item.destinationField); let levelIndex = index;"
