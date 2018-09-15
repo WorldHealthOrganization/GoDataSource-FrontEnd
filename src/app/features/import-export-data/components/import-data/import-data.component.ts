@@ -817,106 +817,109 @@ export class ImportDataComponent implements OnInit {
         // display fields with data
         const allFields: any = this.formHelper.getFields(form);
 
-        // nothing to import - this is handled above, when we convert JSON to importable object
-        // NO NEED for further checks
-
-        // construct import JSON
-        const importJSON = {
-            fileId: this.importableObject.id,
-            map: {},
-            valuesMap: {}
-        };
-        _.each(
-            allFields.mapObject,
-            (item: {
-                source: string,
-                destination: string,
-                sourceDestinationLevel?: number[],
-                options: {
-                    sourceOption: string,
-                    destinationOption: string
-                }[]
-            }) => {
-                // forge the almighty source & destination
-                let source: string = item.source;
-                let destination: string = item.destination;
-
-                // add indexes to source arrays
-                source = this.addIndexesToArrays(
-                    source,
-                    item.sourceDestinationLevel
-                );
-
-                // add indexes to destination arrays
-                destination = this.addIndexesToArrays(
-                    destination,
-                    item.sourceDestinationLevel
-                );
-
-                // map main properties
-                importJSON.map[source] = destination;
-
-                // map drop-down values
-                if (
-                    item.options &&
-                    !_.isEmpty(item.options)
-                ) {
-                    // here we don't need to add indexes, so we keep the arrays just as they are
-                    // also, we need to merge value Maps with the previous ones
-                    const properSource = item.source.replace(/\[\d+\]/g, '[]');
-                    importJSON.valuesMap[properSource] = {
-                        ...importJSON.valuesMap[properSource],
-                        ..._.transform(
-                            item.options,
-                            (result, option: {
-                                sourceOption: string,
-                                destinationOption: string
-                            }) => {
-                                result[option.sourceOption] = option.destinationOption;
-                            },
-                            {}
-                        )
-                    };
-                }
-            }
-        );
-
-        // import data
+        // display loading
         this._displayLoading = true;
         this._displayLoadingLocked = true;
-        this.progress = null;
-        this.importExportDataService.importData(
-            this.importDataUrl,
-            importJSON
-        )
-        .catch((err) => {
-            // display error message
-            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                // construct custom message
-                this.errMsgDetails = err;
+        setTimeout(() => {
+            // nothing to import - this is handled above, when we convert JSON to importable object
+            // NO NEED for further checks
 
-                // display error
-                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-            } else {
-                this.snackbarService.showError(err.message);
-            }
+            // construct import JSON
+            const importJSON = {
+                fileId: this.importableObject.id,
+                map: {},
+                valuesMap: {}
+            };
+            _.each(
+                allFields.mapObject,
+                (item: {
+                    source: string,
+                    destination: string,
+                    sourceDestinationLevel?: number[],
+                    options: {
+                        sourceOption: string,
+                        destinationOption: string
+                    }[]
+                }) => {
+                    // forge the almighty source & destination
+                    let source: string = item.source;
+                    let destination: string = item.destination;
 
-            // reset loading
-            this._displayLoading = false;
-            this._displayLoadingLocked = false;
+                    // add indexes to source arrays
+                    source = this.addIndexesToArrays(
+                        source,
+                        item.sourceDestinationLevel
+                    );
 
-            // propagate err
-            return ErrorObservable.create(err);
-        })
-        .subscribe(() => {
-            // display success
-            this.snackbarService.showSuccess(
-                this.importSuccessMessage,
-                this.translationData
+                    // add indexes to destination arrays
+                    destination = this.addIndexesToArrays(
+                        destination,
+                        item.sourceDestinationLevel
+                    );
+
+                    // map main properties
+                    importJSON.map[source] = destination;
+
+                    // map drop-down values
+                    if (
+                        item.options &&
+                        !_.isEmpty(item.options)
+                    ) {
+                        // here we don't need to add indexes, so we keep the arrays just as they are
+                        // also, we need to merge value Maps with the previous ones
+                        const properSource = item.source.replace(/\[\d+\]/g, '[]');
+                        importJSON.valuesMap[properSource] = {
+                            ...importJSON.valuesMap[properSource],
+                            ..._.transform(
+                                item.options,
+                                (result, option: {
+                                    sourceOption: string,
+                                    destinationOption: string
+                                }) => {
+                                    result[option.sourceOption] = option.destinationOption;
+                                },
+                                {}
+                            )
+                        };
+                    }
+                }
             );
 
-            // emit finished event - event should handle redirect
-            this.finished.emit();
+            // import data
+            this.progress = null;
+            this.importExportDataService.importData(
+                this.importDataUrl,
+                importJSON
+            )
+                .catch((err) => {
+                    // display error message
+                    if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                        // construct custom message
+                        this.errMsgDetails = err;
+
+                        // display error
+                        this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                    } else {
+                        this.snackbarService.showError(err.message);
+                    }
+
+                    // reset loading
+                    this._displayLoading = false;
+                    this._displayLoadingLocked = false;
+
+                    // propagate err
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    // display success
+                    this.snackbarService.showSuccess(
+                        this.importSuccessMessage,
+                        this.translationData
+                    );
+
+                    // emit finished event - event should handle redirect
+                    this.finished.emit();
+                });
         });
     }
 
