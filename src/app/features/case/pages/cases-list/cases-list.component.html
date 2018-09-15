@@ -134,7 +134,8 @@
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterBySelectField('classification', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -180,7 +181,8 @@
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>

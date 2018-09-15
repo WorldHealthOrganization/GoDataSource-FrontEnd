@@ -101,7 +101,8 @@
                                     [(ngModel)]="filter.value"
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
-                                    [multiple]="filter.filter.type === FilterType.MULTISELECT">
+                                    [multiple]="filter.filter.type === FilterType.MULTISELECT"
+                                    [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
 
                                 <!-- NUMBER RANGE Filter -->

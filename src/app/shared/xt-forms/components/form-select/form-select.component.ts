@@ -33,6 +33,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
+    @Input() allowSelectionOfDisabledItems: boolean = false;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 

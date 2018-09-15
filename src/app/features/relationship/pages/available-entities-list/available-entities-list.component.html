@@ -124,7 +124,8 @@
                                     placeholder="Filter"
                                     [options]="genderList$ | async"
                                     (optionChanged)="filterBySelectField('gender', $event)"
-                                    multiple="true">
+                                    multiple="true"
+                                    [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
                             </div>
                         </div>
@@ -150,7 +151,8 @@
                                     [options]="riskLevelsList$ | async"
                                     (optionChanged)="filterBySelectField('riskLevel', $event)"
                                     multiple="true"
-                                    app-reset-input-on-side-filter>
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
                             </div>
                         </div>
