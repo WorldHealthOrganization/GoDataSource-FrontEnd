@@ -261,6 +261,13 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Used to determine fast the values of a dropdown for a sourceField with indexes
+     */
+    private fastMappedSourceFields: {
+        [sourceField: string]: string
+    } = {};
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -579,7 +586,7 @@ export class ImportDataComponent implements OnInit {
 
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
         const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue ?
-            this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceField] :
+            this.importableObject.distinctFileColumnValuesKeyValue[this.getMappedFieldSource(importableItem.sourceField)] :
             [];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
             // create map option with source
@@ -620,6 +627,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Display error
      * @param messageToken
+     * @param hideLoading
      */
     private displayError(
         messageToken: string,
@@ -642,7 +650,7 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * File hover dropzone
-     * @param e
+     * @param hasFileOver
      */
     public hoverDropZone(hasFileOver: boolean) {
         this.hasFileOver = hasFileOver;
@@ -760,6 +768,21 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Retrieve model source field without indexes
+     * @param sourceField
+     */
+    getMappedFieldSource(sourceField: string) {
+        // bring values only if we didn't bring them before already
+        if (!this.fastMappedSourceFields[sourceField]) {
+            // retrieve value
+            this.fastMappedSourceFields[sourceField] = sourceField.replace(/\[\d+\]/g, '[]');
+        }
+
+        // return values
+        return this.fastMappedSourceFields[sourceField];
+    }
+
+    /**
      * Check if property should receive an array
      * @param sourceOrDestinationProperty
      */
@@ -769,7 +792,8 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * Number of levels
-     * @param sourceOrDestinationProperty
+     * @param sourceProperty
+     * @param destinationProperty
      */
     noOfMaxLevels(sourceProperty: string, destinationProperty: string): any[] {
         const sourceArray: any[] = sourceProperty ?
@@ -783,8 +807,6 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * Format Value
-     * @param controlName
-     * @param value
      */
     formatSourceValueForDuplicates(): ( controlName: string, value: string ) => string {
         const self = this;
@@ -846,7 +868,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Track by mapped field / option
      * @param index
-     * @param items
+     * @param item
      */
     trackByFieldID(index: number, item: {id: string}): string {
         return item.id;
@@ -961,7 +983,7 @@ export class ImportDataComponent implements OnInit {
             // propagate err
             return ErrorObservable.create(err);
         })
-        .subscribe((data) => {
+        .subscribe(() => {
             // display success
             this.snackbarService.showSuccess(
                 this.importSuccessMessage,
@@ -981,5 +1003,7 @@ export class ImportDataComponent implements OnInit {
         this.errMsgDetails = null;
         this.uploader.clearQueue();
         this.mappedFields = [];
+        this.fastMappedModelValues = {};
+        this.fastMappedSourceFields = {};
     }
 }

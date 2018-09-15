@@ -155,7 +155,7 @@
                 <div
                     *ngIf="
                         importableObject.distinctFileColumnValuesKeyValue &&
-                        importableObject.distinctFileColumnValuesKeyValue[item.sourceField] &&
+                        importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)] &&
                         getModelPropertyValues(item.destinationField)
                     "
                     class="import-data-map-fields-children">
@@ -169,7 +169,7 @@
                             required="true"
                             [(ngModel)]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                            [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceField]">
+                            [options]="importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)]">
                         </app-form-select>
 
                         <app-form-select
@@ -196,8 +196,7 @@
                     <div
                         fxFlex fxLayout="row" fxLayoutAlign="center">
                         <button
-                            *ngIf="importableObject.distinctFileColumnValuesKeyValue[item.sourceField] &&
-                                item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceField].length"
+                            *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)].length"
                             mat-raised-button
                             color="primary"
                             class="button-primary"
