@@ -107,19 +107,19 @@
                         app-unique-validator="\]\[source\]$"
                         [valueReplacer]="formatSourceValueForDuplicates()"
                         required="true"
-                        [(ngModel)]="item.sourceField"
+                        [ngModel]="item.sourceField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
-                        (optionChanged)="addMapOptionsIfNecessary(item)">
+                        (optionChanged)="item.sourceField = $event.value">
                     </app-form-select>
 
                     <app-form-select
                         [name]="'mapObject[' + item.id + '][destination]'"
                         required="true"
-                        [(ngModel)]="item.destinationField"
+                        [ngModel]="item.destinationField"
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                         [options]="importableObject.modelPropertiesKeyValue"
-                        (optionChanged)="addMapOptionsIfNecessary(item)"
+                        (optionChanged)="item.destinationField = $event.value"
                         [disabled]="item.readonly">
                     </app-form-select>
 
@@ -132,10 +132,10 @@
                             <app-form-select
                                 [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
                                 required="true"
-                                [(ngModel)]="item.sourceDestinationLevel[levelIndex]"
+                                [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
-                                (optionChanged)="sourceControl.control.updateValueAndValidity()">
+                                (optionChanged)="sourceControl.control.updateValueAndValidity(); item.sourceDestinationLevel[levelIndex] = $event.value;">
                             </app-form-select>
                         </div>
                     </div>
@@ -163,19 +163,21 @@
                             app-unique-validator
                             [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
                             required="true"
-                            [(ngModel)]="mappedOpt.sourceOption"
+                            [ngModel]="mappedOpt.sourceOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
-                            [options]="importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)]">
+                            [options]="importableObject.distinctFileColumnValuesKeyValue[getMappedFieldSource(item.sourceField)]"
+                            (optionChanged)="mappedOpt.sourceOption = $event.value;">
                         </app-form-select>
 
                         <app-form-select
                             *ngIf="getModelPropertyValues(item.destinationField)"
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                             required="true"
-                            [(ngModel)]="mappedOpt.destinationOption"
+                            [ngModel]="mappedOpt.destinationOption"
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                             [options]="getModelPropertyValues(item.destinationField)"
-                            optionValueKey="id">
+                            optionValueKey="id"
+                            (optionChanged)="mappedOpt.destinationOption = $event.value;">
                         </app-form-select>
 
                         <div fxFlex="70px">
