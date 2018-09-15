@@ -1137,6 +1137,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL': 'Select Level',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1': '1',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2': '2',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3': '3',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4': '4',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5': '5',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6': '6',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7': '7',
 
         /**
          * Import hierarchical locations

@@ -13,6 +13,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -210,22 +211,15 @@ export class ImportDataComponent implements OnInit {
     /**
      * Source / Destination level value
      */
-    possibleSourceDestinationLevels = [{
-        label: '1',
-        value: 0
-    }, {
-        label: '2',
-        value: 1
-    }, {
-        label: '3',
-        value: 2
-    }, {
-        label: '4',
-        value: 3
-    }, {
-        label: '5',
-        value: 4
-    }];
+    possibleSourceDestinationLevels: LabelValuePair[] = [
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1', 0),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2', 1),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3', 2),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4', 3),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5', 4),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6', 5),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6)
+    ];
 
     /**
      * Mapped fields
@@ -466,22 +460,18 @@ export class ImportDataComponent implements OnInit {
                             );
                         });
                     } else {
-                        // found the language tokens
-                        let mappedHeaderObj: {
-                            value: string
-                        };
-                        if (
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
-                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
-                        ) {
+                        // push new mapped field
+                        const pushNewMapField = (
+                            destination: string,
+                            source: string
+                        ): ImportableMapField => {
                             // allow duplicate maps that need to be solved by user
                             // NOTHING
 
                             // create new possible map item
                             const importableItem = new ImportableMapField(
-                                `${parentPath}.${property}`,
-                                mappedHeaderObj.value
+                                destination,
+                                source
                             );
 
                             // add options if necessary
@@ -495,10 +485,52 @@ export class ImportDataComponent implements OnInit {
 
                             // add to list
                             this.mappedFields.push(importableItem);
+
+                            // finished
+                            return importableItem;
+                        };
+
+                        // found the language tokens
+                        let mappedHeaderObj: {
+                            value: string
+                        };
+                        if (
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+                        ) {
+                            pushNewMapField(
+                                `${parentPath}.${property}`,
+                                mappedHeaderObj.value
+                            );
                         } else {
                             // NOT FOUND
-                            // can't map by flat property since they are too common
-                            // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
+                            // search though flat values - for arrays
+                            if (
+                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()])
+                            ) {
+                                // map all determined levels
+                                _.each(
+                                    this.possibleSourceDestinationLevels,
+                                    (supportedLevel: LabelValuePair) => {
+                                        if (
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
+                                        ) {
+                                            pushNewMapField(
+                                                `${parentPath}.${property}`,
+                                                mappedHeaderObj.value
+                                            ).sourceDestinationLevel[0] = supportedLevel.value;
+                                        } else {
+                                            // there is no point going further
+                                            return false;
+                                        }
+                                    }
+                                );
+                            } else {
+                                // NOT FOUND
+                                // can't map by flat property since they are too common
+                                // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
+                            }
                         }
                     }
                 };
