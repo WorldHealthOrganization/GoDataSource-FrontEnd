@@ -11,19 +11,20 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-form-question-list',
+    selector: 'app-form-sub-question-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-question-list.component.html',
-    styleUrls: ['./form-question-list.component.less'],
+    templateUrl: './form-sub-question-list.component.html',
+    styleUrls: ['./form-sub-question-list.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormQuestionListComponent,
+        useExisting: FormSubQuestionListComponent,
         multi: true
     }]
 })
-export class FormQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
+export class FormSubQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
     @Input() viewOnly: boolean = false;
     @Input() variableReadOnly: boolean = false;
 
@@ -32,6 +33,20 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     @Input() scrollToQuestionBlock: string = 'end';
 
     @ViewChild('groupForm') groupForm: NgForm;
+    @Input() parentControls: {
+        [name: string]: AbstractControl
+    }[];
+
+    private _defaultQuestionCategory: string;
+    @Input() set defaultQuestionCategory(value: string) {
+        this._defaultQuestionCategory = value;
+        _.each(this.values, (question: QuestionModel) => {
+            question.category = this._defaultQuestionCategory;
+        });
+    }
+    get defaultQuestionCategory(): string {
+        return this._defaultQuestionCategory;
+    }
 
     // list of form-answer types
     answerTypesList$: Observable<any[]>;
@@ -70,7 +85,11 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     protected generateNewItem(): QuestionModel {
-        return new QuestionModel();
+        const q = new QuestionModel();
+        if (this.defaultQuestionCategory) {
+            q.category = this.defaultQuestionCategory;
+        }
+        return q;
     }
 
     /**

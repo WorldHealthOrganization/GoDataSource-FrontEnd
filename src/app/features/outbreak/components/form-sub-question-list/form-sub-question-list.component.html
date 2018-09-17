@@ -46,7 +46,8 @@
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChange()"
-                                app-unique-validator="\]\[variable\]$">
+                                app-unique-validator="\]\[variable\]$"
+                                [additionalControlsToCheck]="parentControls">
                             </app-form-input>
                         </div>
 
@@ -58,7 +59,7 @@
                                 [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
                                 required="true"
                                 [options]="questionCategoriesList$ | async"
-                                [disabled]="viewOnly"
+                                [disabled]="viewOnly || defaultQuestionCategory"
                                 (optionChanged)="onChange()">
                             </app-form-select>
                         </div>
@@ -101,7 +102,7 @@
 
                     <div fxFlex fxLayout="row">
                         <!-- answers list -->
-                        <app-form-answer-list
+                        <app-form-sub-answer-list
                             class="app-form-answer-list-container"
                             *ngIf="question.answerType === answerTypes.MULTIPLE_OPTIONS.value || question.answerType === answerTypes.SINGLE_SELECTION.value"
                             [name]="name + '[' + i + '][answers]'"
@@ -109,10 +110,8 @@
                             [viewOnly]="viewOnly"
                             (changed)="onChange(false)"
                             (groupValidated)="validateGroup()"
-                            [minItems]="2"
-                            [parentControls]="groupForm.controls"
-                            [defaultQuestionCategory]="values[i].category">
-                        </app-form-answer-list>
+                            [minItems]="2">
+                        </app-form-sub-answer-list>
                     </div>
                 </div>
             </mat-card>

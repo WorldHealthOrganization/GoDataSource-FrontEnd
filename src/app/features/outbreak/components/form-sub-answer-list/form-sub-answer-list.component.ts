@@ -7,25 +7,18 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
 import { AnswerModel } from '../../../../core/models/question.model';
 
 @Component({
-    selector: 'app-form-answer-list',
+    selector: 'app-form-sub-answer-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-answer-list.component.html',
-    styleUrls: ['./form-answer-list.component.less'],
+    templateUrl: './form-sub-answer-list.component.html',
+    styleUrls: ['./form-sub-answer-list.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormAnswerListComponent,
+        useExisting: FormSubAnswerListComponent,
         multi: true
     }]
 })
-export class FormAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
+export class FormSubAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
-
-    @Input() disableAdditionalQuestions: boolean = false;
-    @Input() parentControls: {
-        [name: string]: AbstractControl
-    }[];
-
-    @Input() defaultQuestionCategory: string;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
