@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 
+let QuestionModelInit: any;
 export class AnswerModel {
     new: boolean | true;
     label: string;
@@ -16,7 +17,7 @@ export class AnswerModel {
         this.additionalQuestions = _.map(
             _.get(data, 'additionalQuestions', null),
             (lData: any) => {
-                return new QuestionModel(lData);
+                return new QuestionModelInit(lData);
             });
         if (_.isEmpty(this.additionalQuestions)) {
             this.additionalQuestions = null;
@@ -63,3 +64,4 @@ export class QuestionModel {
             });
     }
 }
+QuestionModelInit = QuestionModel;
