@@ -352,4 +352,30 @@ export class ListFilterDataService {
                 return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
             });
     }
+
+    /**
+     *
+     * @param {date} date
+     * @returns {Observable<any>}
+     */
+    filterContactsWithSuccessfulFollowup(date: Moment): Observable<any> {
+        // get the outbreakId
+        return this.outbreakDataService
+            .getSelectedOutbreak()
+            .mergeMap((selectedOutbreak: OutbreakModel) => {
+                // build the query builder
+                const qb = new RequestQueryBuilder();
+
+                // filter by date
+                qb.filter.byDateRange(
+                    'date', {
+                        // clone date
+                        startDate: moment(date).startOf('day'),
+                        endDate: moment(date).endOf('day')
+                    }
+                );
+
+                return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
+            });
+    }
 }
