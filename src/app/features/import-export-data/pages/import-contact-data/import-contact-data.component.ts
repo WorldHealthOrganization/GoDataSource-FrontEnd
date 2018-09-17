@@ -6,19 +6,19 @@ import { ImportDataExtension, ImportServerModelNames } from '../../components/im
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 
 @Component({
-    selector: 'app-import-case-lab-data',
+    selector: 'app-import-contact-data',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './import-case-lab-data.component.html',
-    styleUrls: ['./import-case-lab-data.component.less']
+    templateUrl: './import-contact-data.component.html',
+    styleUrls: ['./import-contact-data.component.less']
 })
-export class ImportCaseLabDataComponent implements OnInit {
+export class ImportContactDataComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CASES_TITLE',
-            '/cases',
+            'LNG_PAGE_LIST_CONTACTS_TITLE',
+            '/contacts',
         ),
         new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+            'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE',
             '',
             true
         )
@@ -41,12 +41,24 @@ export class ImportCaseLabDataComponent implements OnInit {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        questionnaireAnswers: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        relationship: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP',
+        'addresses[]': 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+        'documents[]': 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        'relationship.persons[]': 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS'
     };
 
     requiredDestinationFields = [
-        'personId',
-        'dateSampleTaken'
+        'firstName',
+        'gender',
+        'dateOfReporting',
+        'relationship.persons[].id',
+        'relationship.contactDate',
+        'relationship.contactDateEstimated',
+        'relationship.certaintyLevelId',
+        'relationship.exposureTypeId',
+        'relationship.exposureFrequencyId',
+        'relationship.exposureDurationId'
     ];
 
     /**
@@ -67,7 +79,7 @@ export class ImportCaseLabDataComponent implements OnInit {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;
-                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/cases/lab-results/import-importable-file-using-map`;
+                    this.importDataUrl = `outbreaks/${selectedOutbreak.id}/contacts/import-importable-file-using-map`;
 
                     // display import form
                     this.displayLoading = false;
@@ -76,6 +88,6 @@ export class ImportCaseLabDataComponent implements OnInit {
     }
 
     finished() {
-        this.router.navigate(['/cases']);
+        this.router.navigate(['/contacts']);
     }
 }

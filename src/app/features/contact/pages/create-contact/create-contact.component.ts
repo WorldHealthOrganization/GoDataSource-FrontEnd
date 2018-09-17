@@ -13,7 +13,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -23,6 +22,8 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { EventModel } from '../../../../core/models/event.model';
 import { Constants } from '../../../../core/models/constants';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -55,13 +56,13 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private contactDataService: ContactDataService,
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
     }
 
     ngOnInit() {

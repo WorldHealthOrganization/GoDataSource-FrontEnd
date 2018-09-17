@@ -3,16 +3,17 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { ImportableFileModel, ImportableLabelValuePair, ImportableMapField } from './model';
+import { ImportableFileModel, ImportableFilePropertiesModel, ImportableLabelValuePair, ImportableMapField } from './model';
 import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { v4 as uuid } from 'uuid';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -178,6 +179,13 @@ export class ImportDataComponent implements OnInit {
     } = {};
 
     /**
+     * Record properties that shouldn't be visible in destination dropdown
+     */
+    @Input() excludeDestinationProperties: {
+        [property: string]: boolean
+    } = {};
+
+    /**
      * Required fields that user needs to map
      */
     private requiredDestinationFieldsMap: {
@@ -201,18 +209,17 @@ export class ImportDataComponent implements OnInit {
     importableObject: ImportableFileModel;
 
     /**
-     * Destination level value
+     * Source / Destination level value
      */
-    possibleDestinationLevels = [{
-        label: '1',
-        value: 0
-    }, {
-        label: '2',
-        value: 1
-    }, {
-        label: '3',
-        value: 2
-    }];
+    possibleSourceDestinationLevels: LabelValuePair[] = [
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1', 0),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2', 1),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3', 2),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4', 3),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5', 4),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6', 5),
+        new LabelValuePair('LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7', 6)
+    ];
 
     /**
      * Mapped fields
@@ -245,13 +252,9 @@ export class ImportDataComponent implements OnInit {
     ImportServerErrorCodes = ImportServerErrorCodes;
 
     /**
-     * Used to determine fast the values of a dropdown for a property from a deep level property ( so we don't have to do _.get )
+     * Format source value callback
      */
-    private fastMappedModelValues: {
-        [path: string]: {
-            value: any[] | null | undefined
-        }
-    } = {};
+    formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
 
     /**
      * Constructor
@@ -260,7 +263,6 @@ export class ImportDataComponent implements OnInit {
      * @param dialogService
      * @param i18nService
      * @param formHelper
-     * @param domService
      * @param importExportDataService
      */
     constructor(
@@ -269,7 +271,6 @@ export class ImportDataComponent implements OnInit {
         private dialogService: DialogService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private domService: DomService,
         private importExportDataService: ImportExportDataService
     ) {
         // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
@@ -288,6 +289,9 @@ export class ImportDataComponent implements OnInit {
                 });
             };
         }
+
+        // callbacks
+        this.formatSourceValueForDuplicatesCallback = this.formatSourceValueForDuplicates.bind(this);
     }
 
     /**
@@ -391,7 +395,8 @@ export class ImportDataComponent implements OnInit {
                     (token: string): string => {
                         return this.i18nService.instant(token);
                     },
-                    this.fieldsWithoutTokens
+                    this.fieldsWithoutTokens,
+                    this.excludeDestinationProperties
                 );
 
                 // we should have at least the headers of the file
@@ -428,6 +433,119 @@ export class ImportDataComponent implements OnInit {
                     this.mappedFields.push(importableItem);
                 });
 
+                // do some multilevel mappings
+                const mappedHeaders: {
+                    [key: string]: {
+                        value: string
+                    }
+                } = {};
+                _.each(this.importableObject.fileHeaders, (fHeader: string) => {
+                    mappedHeaders[_.camelCase(fHeader).toLowerCase()] = {
+                        value: fHeader
+                    };
+                });
+                const mapToHeaderFile = (
+                    value: string | ImportableFilePropertiesModel,
+                    property: string,
+                    parentPath: string = ''
+                )  => {
+                    // if object we need to go further into it
+                    if (_.isObject(value)) {
+                        _.each(value, (childValue: string | ImportableFilePropertiesModel, childProperty: string) => {
+                            mapToHeaderFile(
+                                childValue,
+                                childProperty,
+                                _.isObject(childValue) ? `${parentPath}.${childProperty}` : parentPath
+                            );
+                        });
+                    } else {
+                        // push new mapped field
+                        const pushNewMapField = (
+                            destination: string,
+                            source: string
+                        ): ImportableMapField => {
+                            // allow duplicate maps that need to be solved by user
+                            // NOTHING
+
+                            // create new possible map item
+                            const importableItem = new ImportableMapField(
+                                destination,
+                                source
+                            );
+
+                            // add options if necessary
+                            this.addMapOptionsIfNecessary(importableItem);
+
+                            // do we need to make this one readonly ?
+                            if (mapOfRequiredDestinationFields[importableItem.destinationField]) {
+                                importableItem.readonly = true;
+                                delete mapOfRequiredDestinationFields[importableItem.destinationField];
+                            }
+
+                            // add to list
+                            this.mappedFields.push(importableItem);
+
+                            // finished
+                            return importableItem;
+                        };
+
+                        // found the language tokens
+                        let mappedHeaderObj: {
+                            value: string
+                        };
+                        if (
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+                        ) {
+                            pushNewMapField(
+                                `${parentPath}.${property}`,
+                                mappedHeaderObj.value
+                            );
+                        } else {
+                            // NOT FOUND
+                            // search though flat values - for arrays
+                            if (
+                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()])
+                            ) {
+                                // map all determined levels
+                                _.each(
+                                    this.possibleSourceDestinationLevels,
+                                    (supportedLevel: LabelValuePair) => {
+                                        if (
+                                            (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
+                                        ) {
+                                            pushNewMapField(
+                                                `${parentPath}.${property}`,
+                                                mappedHeaderObj.value
+                                            ).sourceDestinationLevel[0] = supportedLevel.value;
+                                        } else {
+                                            // there is no point going further
+                                            return false;
+                                        }
+                                    }
+                                );
+                            } else {
+                                // NOT FOUND
+                                // can't map by flat property since they are too common
+                                // e.g. start date ( fileHeader[startdate] === model[incubationdates[].startdate] )
+                            }
+                        }
+                    }
+                };
+                _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
+                    if (_.isObject(value)) {
+                        mapToHeaderFile(
+                            value,
+                            property,
+                            property
+                        );
+                    } else {
+                        // TOKEN
+                        // ALREADY MAPPED BY SERVER
+                    }
+                });
+
                 // do we still have required fields? then we need to add a field map for each one of them  to force user to enter data
                 _.each(mapOfRequiredDestinationFields, (n: boolean, property: string) => {
                     // create
@@ -457,29 +575,62 @@ export class ImportDataComponent implements OnInit {
     addMapOptionsIfNecessary(importableItem: ImportableMapField) {
         // add all distinct source as items that we need to map
         importableItem.mappedOptions = [];
+
+        // there is no point in setting mapped values if we  don't have to map something
+        if (
+            !this.importableObject.distinctFileColumnValuesKeyValue ||
+            !this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes] ||
+            !this.importableObject.modelPropertyValuesMap[importableItem.destinationField]
+        ) {
+            return;
+        }
+
         // we CAN'T use _.get because importableItem.sourceField contains special chars [ / ] / .
-        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue ?
-            this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceField] :
-            [];
+        const distinctValues: ImportableLabelValuePair[] = this.importableObject.distinctFileColumnValuesKeyValue[importableItem.sourceFieldWithoutIndexes];
         _.each(distinctValues, (distinctVal: ImportableLabelValuePair) => {
+            // check to see if we didn't map this value somewhere else already
+            if (_.find(
+                this.mappedFields,
+                (item: ImportableMapField): boolean => {
+                    if (item.sourceFieldWithoutIndexes !== importableItem.sourceFieldWithoutIndexes) {
+                        return false;
+                    } else {
+                        return _.find(
+                            item.mappedOptions,
+                            (option: {
+                                sourceOption: string
+                            }): boolean => {
+                                return option.sourceOption === distinctVal.value;
+                            }
+                        );
+                    }
+                }
+            )) {
+                // no need to continue since this option is already mapped
+                return;
+            }
+
             // create map option with source
             const mapOpt: {
+                id: string;
                 sourceOption: string,
                 destinationOption?: string
             } = {
+                id: uuid(),
                 sourceOption: distinctVal.value
             };
 
             // check if we can find a proper destination option
             const sourceOptReduced: string = _.camelCase(mapOpt.sourceOption).toLowerCase();
-            const destinationOpt = _.chain(this.importableObject)
-                .get(`modelPropertyValues.${importableItem.destinationField}`, [])
-                .find((modelItem: { id: string, label: string }) => {
+            const modelPropertyValues = this.importableObject.modelPropertyValuesMap[importableItem.destinationField];
+            const destinationOpt = _.find(
+                modelPropertyValues,
+                (modelItem: { id: string, label: string }) => {
                     return sourceOptReduced === _.camelCase(this.i18nService.instant(modelItem.label)).toLowerCase() ||
                         sourceOptReduced === _.camelCase(modelItem.id).toLowerCase() ||
                         sourceOptReduced === _.camelCase(modelItem.label).toLowerCase();
-                })
-                .value();
+                }
+            );
 
             // found a possible destination field
             if (destinationOpt !== undefined) {
@@ -494,6 +645,7 @@ export class ImportDataComponent implements OnInit {
     /**
      * Display error
      * @param messageToken
+     * @param hideLoading
      */
     private displayError(
         messageToken: string,
@@ -516,7 +668,7 @@ export class ImportDataComponent implements OnInit {
 
     /**
      * File hover dropzone
-     * @param e
+     * @param hasFileOver
      */
     public hoverDropZone(hasFileOver: boolean) {
         this.hasFileOver = hasFileOver;
@@ -548,7 +700,9 @@ export class ImportDataComponent implements OnInit {
      */
     addNewOptionMap(indexMapField: number) {
         // add new item
-        this.mappedFields[indexMapField].mappedOptions.push({});
+        this.mappedFields[indexMapField].mappedOptions.push({
+            id: uuid()
+        });
     }
 
     /**
@@ -578,36 +732,66 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
-     * Retrieve model possible values
-     * @param path
+     * Format Value
      */
-    getModelPropertyValues(path: string) {
-        // bring values only if we didn't bring them before already
-        if (!this.fastMappedModelValues[path]) {
-            // retrieve value
-            this.fastMappedModelValues[path] = {
-                value: _.get(this.importableObject.modelPropertyValues, path)
-            };
+    private formatSourceValueForDuplicates(controlName: string, value: string): string {
+        // determine if this is a source item that we need to adapt for duplicates
+        if (
+            value &&
+            value.indexOf('[]') > -1
+        ) {
+            // determine id & item
+            const id: string = controlName.substring(controlName.indexOf('[') + 1, controlName.indexOf(']'));
+
+            // find item
+            const item = _.find(
+                this.mappedFields,
+                {
+                    id: id
+                }
+            );
+
+            // retrieve value with indexes
+            return this.addIndexesToArrays(
+                value,
+                item.sourceDestinationLevel
+            );
         }
 
-        // return values
-        return this.fastMappedModelValues[path].value;
+        // not a source field
+        return value;
     }
 
     /**
-     * Check if property should receive an array
-     * @param destinationProperty
+     * do we have arrays? if so, add indexes
+     * @param mapValue
+     * @param itemLevels
      */
-    isDestinationArray(destinationProperty: string): boolean {
-        return destinationProperty ? destinationProperty.indexOf('[]') > -1 : false;
+    addIndexesToArrays(
+        mapValue: string,
+        itemLevels: number[]
+    ): any {
+        // add indexes
+        let index: number = 0;
+        while (mapValue ? mapValue.indexOf('[]') > -1 : false) {
+            mapValue = mapValue.replace(
+                '[]',
+                '[' + itemLevels[index] + ']'
+            );
+            index++;
+        }
+
+        // finished
+        return mapValue;
     }
 
     /**
-     * Number of levels
-     * @param destinationProperty
+     * Track by mapped field / option
+     * @param index
+     * @param item
      */
-    noOfLevels(destinationProperty: string): any[] {
-        return destinationProperty.match(/\[\]/g) || [];
+    trackByFieldID(index: number, item: {id: string}): string {
+        return item.id;
     }
 
     /**
@@ -626,15 +810,6 @@ export class ImportDataComponent implements OnInit {
             form,
             false
         )) {
-            // scroll to the first invalid input
-            const invalidControls = this.formHelper.getInvalidControls(form);
-            if (!_.isEmpty(invalidControls)) {
-                this.domService.scrollItemIntoView(
-                    '[name="' + Object.keys(invalidControls)[0] + '"]',
-                    'start'
-                );
-            }
-
             // invalid form
             return;
         }
@@ -642,98 +817,109 @@ export class ImportDataComponent implements OnInit {
         // display fields with data
         const allFields: any = this.formHelper.getFields(form);
 
-        // nothing to import - this is handled above, when we convert JSON to importable object
-        // NO NEED for further checks
-
-        // construct import JSON
-        const importJSON = {
-            fileId: this.importableObject.id,
-            map: {},
-            valuesMap: {}
-        };
-        _.each(
-            allFields.mapObject,
-            (item: {
-                source: string,
-                destination: string,
-                destinationLevel?: number[],
-                options: {
-                    sourceOption: string,
-                    destinationOption: string
-                }[]
-            }) => {
-                // map main properties
-                importJSON.map[item.source] = item.destination;
-
-                // do we have arrays? add indexes
-                let mapDestValue: string = importJSON.map[item.source];
-                if (this.isDestinationArray(mapDestValue)) {
-                    // add indexes
-                    let index: number = 0;
-                    while (this.isDestinationArray(mapDestValue)) {
-                        mapDestValue = mapDestValue.replace('[]', '[' + item.destinationLevel[index] + ']');
-                        index++;
-                    }
-
-                    // replace with the new value
-                    importJSON.map[item.source] = mapDestValue;
-                }
-
-                // map drop-down values
-                if (
-                    item.options &&
-                    item.options.length > 0
-                ) {
-                    importJSON.valuesMap[item.source] = _.transform(
-                        item.options,
-                        (result, option: {
-                            sourceOption: string,
-                            destinationOption: string
-                        }) => {
-                            result[option.sourceOption] = option.destinationOption;
-                        },
-                        {}
-                    );
-                }
-            }
-        );
-
-        // import data
+        // display loading
         this._displayLoading = true;
         this._displayLoadingLocked = true;
-        this.progress = null;
-        this.importExportDataService.importData(
-            this.importDataUrl,
-            importJSON
-        )
-        .catch((err) => {
-            // display error message
-            if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
-                // construct custom message
-                this.errMsgDetails = err;
+        setTimeout(() => {
+            // nothing to import - this is handled above, when we convert JSON to importable object
+            // NO NEED for further checks
 
-                // display error
-                this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
-            } else {
-                this.snackbarService.showError(err.message);
-            }
+            // construct import JSON
+            const importJSON = {
+                fileId: this.importableObject.id,
+                map: {},
+                valuesMap: {}
+            };
+            _.each(
+                allFields.mapObject,
+                (item: {
+                    source: string,
+                    destination: string,
+                    sourceDestinationLevel?: number[],
+                    options: {
+                        sourceOption: string,
+                        destinationOption: string
+                    }[]
+                }) => {
+                    // forge the almighty source & destination
+                    let source: string = item.source;
+                    let destination: string = item.destination;
 
-            // reset loading
-            this._displayLoading = false;
-            this._displayLoadingLocked = false;
+                    // add indexes to source arrays
+                    source = this.addIndexesToArrays(
+                        source,
+                        item.sourceDestinationLevel
+                    );
 
-            // propagate err
-            return ErrorObservable.create(err);
-        })
-        .subscribe((data) => {
-            // display success
-            this.snackbarService.showSuccess(
-                this.importSuccessMessage,
-                this.translationData
+                    // add indexes to destination arrays
+                    destination = this.addIndexesToArrays(
+                        destination,
+                        item.sourceDestinationLevel
+                    );
+
+                    // map main properties
+                    importJSON.map[source] = destination;
+
+                    // map drop-down values
+                    if (
+                        item.options &&
+                        !_.isEmpty(item.options)
+                    ) {
+                        // here we don't need to add indexes, so we keep the arrays just as they are
+                        // also, we need to merge value Maps with the previous ones
+                        const properSource = item.source.replace(/\[\d+\]/g, '[]');
+                        importJSON.valuesMap[properSource] = {
+                            ...importJSON.valuesMap[properSource],
+                            ..._.transform(
+                                item.options,
+                                (result, option: {
+                                    sourceOption: string,
+                                    destinationOption: string
+                                }) => {
+                                    result[option.sourceOption] = option.destinationOption;
+                                },
+                                {}
+                            )
+                        };
+                    }
+                }
             );
 
-            // emit finished event - event should handle redirect
-            this.finished.emit();
+            // import data
+            this.progress = null;
+            this.importExportDataService.importData(
+                this.importDataUrl,
+                importJSON
+            )
+                .catch((err) => {
+                    // display error message
+                    if (err.code === 'IMPORT_PARTIAL_SUCCESS') {
+                        // construct custom message
+                        this.errMsgDetails = err;
+
+                        // display error
+                        this.snackbarService.showError('LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED');
+                    } else {
+                        this.snackbarService.showError(err.message);
+                    }
+
+                    // reset loading
+                    this._displayLoading = false;
+                    this._displayLoadingLocked = false;
+
+                    // propagate err
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    // display success
+                    this.snackbarService.showSuccess(
+                        this.importSuccessMessage,
+                        this.translationData
+                    );
+
+                    // emit finished event - event should handle redirect
+                    this.finished.emit();
+                });
         });
     }
 
