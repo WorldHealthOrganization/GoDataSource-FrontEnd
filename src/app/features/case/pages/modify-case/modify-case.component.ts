@@ -117,17 +117,17 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyCase(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
 
         // omit fields that are NOT visible
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
         if (this.ageSelected) {
             delete dirtyFields.dob;
         } else {
             delete dirtyFields.age;
-        }
-
-        if (!this.formHelper.validateForm(form)) {
-            return;
         }
 
         // modify the Case

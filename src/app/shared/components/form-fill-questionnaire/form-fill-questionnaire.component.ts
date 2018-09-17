@@ -37,6 +37,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
     @Input() displayCopyFieldDescription: string = '';
     @Output() copyValue = new EventEmitter<string>();
 
+    @Input() hideCategories: boolean = false;
+
     /**
      * Set question and group them by category
      * @param {QuestionModel[]} questions
@@ -111,7 +113,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
             selectedAnswers = [selectedAnswers];
         }
 
-        // map answers for each access
+        // determine if we have at least one answer with additional questions
         let hasQuestions: boolean = false;
         _.each(selectedAnswers, (answerValue: string) => {
             if (this.additionalQuestions[question.variable][answerValue]) {
@@ -122,5 +124,23 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
 
         // finished
         return hasQuestions;
+    }
+
+    subQuestionsAnswer(question: QuestionModel, selectedAnswers): string[] {
+        // convert to array if necessary so we handle both single & multiple selects
+        if (!_.isArray(selectedAnswers)) {
+            selectedAnswers = [selectedAnswers];
+        }
+
+        // determine answers with additional questions
+        const answers: string[] = [];
+        _.each(selectedAnswers, (answerValue: string) => {
+            if (this.additionalQuestions[question.variable][answerValue]) {
+                answers.push(answerValue);
+            }
+        });
+
+        // finished
+        return answers;
     }
 }

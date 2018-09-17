@@ -9,7 +9,9 @@
                 <div
                     *ngFor="let categoryData of questionsGroupedByCategory"
                     fxFlex fxLayout="column" fxLayoutAlign="start stretch">
-                    <div fxFlex fxLayout="row" fxLayoutAlign="center"
+                    <div
+                        *ngIf="!hideCategories"
+                        fxFlex fxLayout="row" fxLayoutAlign="center"
                          class="questionnaire-category-title">
                         {{ categoryData.category | translate }}
                     </div>
@@ -83,7 +85,18 @@
                                         question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value
                                     ) && hasSubQuestions(question, value[question.variable])"
                                 class="questionnaire-category-question-additional">
-                                ......
+                                <div
+                                    *ngFor="let answer of subQuestionsAnswer(question, value[question.variable])">
+                                    <app-form-fill-questionnaire
+                                        [name]="name"
+                                        [ngModel]="value"
+                                        [questions]="additionalQuestions[question.variable][answer]"
+                                        [disabled]="disabled"
+                                        [hideCategories]="true"
+                                        (changed)="onChange(false)"
+                                        (groupValidated)="validateGroup()">
+                                    </app-form-fill-questionnaire>
+                                </div>
                             </div>
                         </div>
                     </div>
