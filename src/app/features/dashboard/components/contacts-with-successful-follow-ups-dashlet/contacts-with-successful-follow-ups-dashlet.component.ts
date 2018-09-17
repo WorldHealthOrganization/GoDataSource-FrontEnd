@@ -73,6 +73,6 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
      */
     calculatePercent() {
         return this.contactsWithSuccessfulFollowup ?
-            Math.round(100 * this.contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount / this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount) : 0
+            Math.round(100 * this.contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount / this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount) : 0;
     }
 }
