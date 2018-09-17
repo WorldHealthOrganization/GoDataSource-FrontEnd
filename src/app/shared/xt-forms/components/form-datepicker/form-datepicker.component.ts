@@ -79,7 +79,9 @@ export class FormDatepickerComponent extends ElementBase<string> implements OnIn
     }
 
     ngOnInit() {
-        const labelValue = _.camelCase(this.i18nService.instant(this.placeholder)).toLowerCase();
+        console.log(this.placeholder);
+        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+        console.log(labelValue);
         this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
             this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
         });
