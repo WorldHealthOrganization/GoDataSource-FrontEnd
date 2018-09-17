@@ -114,6 +114,12 @@ export abstract class ListComponent {
         this.refreshList();
     }));
 
+    // refresh only after we finish changing data
+    private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // refresh list
+        this.refreshListCount();
+    }));
+
     protected constructor(
         protected listFilterDataService: ListFilterDataService = null,
         protected queryParams: Observable<Params> = null
@@ -148,7 +154,7 @@ export abstract class ListComponent {
             this.paginatorInitialized
         ) {
             // re-calculate items count (filters have changed)
-            this.refreshListCount();
+            this.triggerListCountRefresh.call(instant);
 
             // move to the first page (if not already there)
             if (this.paginator.hasPreviousPage()) {
@@ -415,8 +421,11 @@ export abstract class ListComponent {
         // refresh of the list is done automatically after debounce time
         // #
 
-        // refresh total number of items
-        this.refreshListCount();
+        // refresh paginator?
+        if (this.paginatorInitialized) {
+            // refresh total number of items
+            this.triggerListCountRefresh.call(true);
+        }
     }
 
     /**
