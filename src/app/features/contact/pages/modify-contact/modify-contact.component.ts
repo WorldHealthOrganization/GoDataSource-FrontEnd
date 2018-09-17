@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -50,7 +49,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     Constants = Constants;
 
     constructor(
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
@@ -68,7 +66,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
         this.route.params

@@ -88,18 +88,6 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'
     };
 
-    // Gender
-    static GENDER = {
-        MALE: {
-            label: 'LNG_COMMON_GENDER_MALE',
-            value: 'Male'
-        },
-        FEMALE: {
-            label: 'LNG_COMMON_GENDER_FEMALE',
-            value: 'Female'
-        }
-    };
-
     // Options for Yes/No dropdowns
     static FILTER_YES_NO_OPTIONS = {
         ALL: {

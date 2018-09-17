@@ -14,6 +14,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -48,7 +49,23 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
+            (countries) => _.map(countries, (country: LabelValuePair) => {
+                country.value = {
+                    id: country.value
+                };
+                return country;
+            })
+        );
+    }
+
+    /**
+     * Compare countries
+     * @param o1
+     * @param o2
+     */
+    compareCountryWith(o1: {id: string}, o2: {id: string}): boolean {
+        return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
     createOutbreak(stepForms: NgForm[]) {

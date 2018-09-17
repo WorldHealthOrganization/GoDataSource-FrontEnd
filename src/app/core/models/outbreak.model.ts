@@ -22,7 +22,9 @@ export class OutbreakModel {
     // TODO - need to allow to set case classifications on outbreak
     // caseClassification: any | null;
     caseIdMask: string;
-    countries: string[];
+    countries: {
+        id: string
+    }[];
     longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {

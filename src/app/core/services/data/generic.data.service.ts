@@ -24,14 +24,6 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Gender options
-     * @returns {Observable<any[]>}
-     */
-    getGenderList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.GENDER));
-    }
-
-    /**
      * Retrieve the list of Filter Yes / No options
      * @returns {Observable<any[]>}
      */
