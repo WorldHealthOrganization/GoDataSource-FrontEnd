@@ -83,11 +83,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                                 this.outbreak
                             )
                         );
-
-                        // set questions and answers to new property to false.
-                        this.setNewFalse(this.outbreak.caseInvestigationTemplate);
-                        this.setNewFalse(this.outbreak.contactFollowUpTemplate);
-                        this.setNewFalse(this.outbreak.labResultsTemplate);
                     });
             });
     }
@@ -134,20 +129,5 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
      */
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
-    }
-    /**
-     * Set attribute new to false for all questions and answers in the array.
-     */
-    setNewFalse(questionsArray = []) {
-        if (!_.isEmpty(questionsArray)) {
-            _.forEach(questionsArray, function (question, key) {
-                questionsArray[key].new = false;
-                if (!_.isEmpty(questionsArray[key].answers)) {
-                    _.forEach(questionsArray[key].answers, function (answer, keyAnswer) {
-                        questionsArray[key].answers[keyAnswer].new = false;
-                    });
-                }
-            });
-        }
     }
 }

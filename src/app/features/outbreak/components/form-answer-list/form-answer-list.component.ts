@@ -1,12 +1,11 @@
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl } from '@angular/forms';
 import { ListBase } from '../../../../shared/xt-forms/core/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { AnswerModel } from '../../../../core/models/answer.model';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { AnswerModel } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-form-answer-list',
@@ -21,6 +20,13 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 })
 export class FormAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
+
+    @Input() disableAdditionalQuestions: boolean = false;
+    @Input() parentControls: {
+        [name: string]: AbstractControl
+    }[];
+
+    @Input() defaultQuestionCategory: string;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,

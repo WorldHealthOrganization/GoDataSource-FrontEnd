@@ -46,7 +46,8 @@
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChange()"
-                                app-unique-validator="\]\[variable\]$">
+                                app-unique-validator="\]\[variable\]$"
+                                [additionalControlsToCheck]="parentControls">
                             </app-form-input>
                         </div>
 
@@ -58,7 +59,7 @@
                                 [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
                                 required="true"
                                 [options]="questionCategoriesList$ | async"
-                                [disabled]="viewOnly"
+                                [disabled]="viewOnly || defaultQuestionCategory"
                                 (optionChanged)="onChange()">
                             </app-form-select>
                         </div>
@@ -109,7 +110,10 @@
                             [viewOnly]="viewOnly"
                             (changed)="onChange(false)"
                             (groupValidated)="validateGroup()"
-                            [minItems]="2">
+                            [minItems]="2"
+                            [disableAdditionalQuestions]="disableAdditionalQuestions"
+                            [parentControls]="controls"
+                            [defaultQuestionCategory]="values[i].category">
                         </app-form-answer-list>
                     </div>
                 </div>
