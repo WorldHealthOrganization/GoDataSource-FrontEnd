@@ -13,6 +13,15 @@
                     {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                 </button>
 
+                <button
+                    *ngIf="!appliedListFilter && hasReportAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/relationships', 'date-onset']">
+                    {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
+                </button>
+
                 <app-export-button
                     *ngIf="!appliedListFilter && exportCasesUrl"
                     [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"

@@ -82,7 +82,7 @@ export class CaseModel {
      */
     get name(): string {
         return ( this.firstName ? this.firstName : '' ) +
-            ' ' + ( this.lastName ? this.lastName : '' );
+            ( this.lastName ? ' ' + this.lastName : '' );
     }
 
     /**

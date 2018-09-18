@@ -10,6 +10,7 @@ import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-
 import * as _ from 'lodash';
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
+import { CasesWithOnsetModel } from '../../models/cases-with-onset.model';
 
 @Injectable()
 export class RelationshipDataService {
@@ -239,6 +240,17 @@ export class RelationshipDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/new-among-known-contacts/count?filter=${filter}`),
             MetricNewCasesWithContactsModel
+        );
+    }
+
+    /**
+     * Get cases with onset date that is before the date of onset of the primary case
+     * @param outbreakId
+     */
+    getCasesWithDateOnsetBeforePrimaryCase(outbreakId: string): Observable<CasesWithOnsetModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/secondary-cases-with-date-of-onset-before-primary-case`),
+            CasesWithOnsetModel
         );
     }
 }

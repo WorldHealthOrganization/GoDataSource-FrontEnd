@@ -310,6 +310,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
+        'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
 
         /**
          * Create Case page
@@ -334,6 +335,17 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+
+        /**
+         * Date onset report list page
+         */
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE': 'Cases with onset date before parent onset case',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW': 'View "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP': 'View Relationship',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY': 'Modify "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP': 'Modify Relationship',
+        'LNG_PAGE_LIST_CASES_LABEL_PRIMARY': 'Primary',
+        'LNG_PAGE_LIST_CASES_LABEL_SECONDARY': 'Secondary',
 
         /**
          * Movement Case page

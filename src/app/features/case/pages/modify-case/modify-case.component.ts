@@ -69,34 +69,48 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
-        this.route.params.subscribe((params: { caseId }) => {
-            this.caseId = params.caseId;
+        // retrieve query params
+        this.route.queryParams
+            .subscribe((queryParams: { onset: boolean }) => {
+                // do we need to add onset breadcrumb ?
+                // no need to check rights since this params should be set only if we come from that page
+                if (queryParams.onset) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+                            '/relationships/date-onset'
+                        )
+                    );
+                }
 
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.selectedOutbreak = selectedOutbreak;
+                // retrieve case data
+                this.route.params.subscribe((params: { caseId }) => {
+                    this.caseId = params.caseId;
 
-                    // get case
-                    this.caseDataService
-                        .getCase(selectedOutbreak.id, this.caseId)
-                        .subscribe(caseDataReturned => {
-                            this.caseData = new CaseModel(caseDataReturned);
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.caseData
-                                )
-                            );
+                    // get current outbreak
+                    this.outbreakDataService
+                        .getSelectedOutbreak()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            this.selectedOutbreak = selectedOutbreak;
+
+                            // get case
+                            this.caseDataService
+                                .getCase(selectedOutbreak.id, this.caseId)
+                                .subscribe(caseDataReturned => {
+                                    this.caseData = new CaseModel(caseDataReturned);
+                                    this.breadcrumbs.push(
+                                        new BreadcrumbItemModel(
+                                            this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
+                                            '.',
+                                            true,
+                                            {},
+                                            this.caseData
+                                        )
+                                    );
+                                });
                         });
                 });
-
-
-        });
+            });
     }
 
     /**
