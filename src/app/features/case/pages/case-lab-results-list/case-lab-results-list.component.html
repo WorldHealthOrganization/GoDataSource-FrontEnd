@@ -130,7 +130,8 @@
                             [options]="labNamesList$ | async"
                             (optionChanged)="filterBySelectField('labName', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -157,7 +158,8 @@
                             [options]="sampleTypesList$ | async"
                             (optionChanged)="filterBySelectField('sampleType', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -184,7 +186,8 @@
                             [options]="testTypesList$ | async"
                             (optionChanged)="filterBySelectField('testType', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -211,7 +214,8 @@
                             [options]="labTestResultsList$ | async"
                             (optionChanged)="filterBySelectField('result', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>

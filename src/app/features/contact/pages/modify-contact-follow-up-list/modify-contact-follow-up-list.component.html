@@ -16,7 +16,7 @@
                 </ng-template>
 
                 <div
-                    *ngFor="let followUpData of followUps; let i = index"
+                    *ngFor="let followUpData of followUps; trackBy: trackByFieldID; let i = index"
                     fxFlex fxLayout="row" fxLayoutAlign="start center">
                     <mat-card
                         fxFlex
@@ -137,7 +137,7 @@
                 </ng-template>
 
                 <div
-                    *ngFor="let followUpData of followUps; let i = index"
+                    *ngFor="let followUpData of followUps; trackBy: trackByFieldID; let i = index"
                     fxFlex fxLayout="row" fxLayoutAlign="start center">
 
                     <app-form-fill-questionnaire

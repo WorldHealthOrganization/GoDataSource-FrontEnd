@@ -18,6 +18,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -53,7 +55,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
@@ -63,7 +66,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        const genderOptionsList$ = this.genericDataService.getGenderList();
+        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(

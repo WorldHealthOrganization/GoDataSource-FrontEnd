@@ -177,7 +177,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',
@@ -216,6 +216,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
+        'LNG_OUTBREAK_FIELD_LABEL_COUNTRY_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
@@ -241,9 +242,11 @@ export const EnglishUsLang = {
         /**
          * Entity Fields
          */
+        'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',
         'LNG_ENTITY_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_ENTITY_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_ENTITY_FIELD_LABEL_AGE': 'Age',
+        'LNG_ENTITY_FIELD_LABEL_DOB': 'Date of birth',
         'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
         'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
@@ -306,6 +309,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
 
         /**
          * Create Case page
@@ -364,6 +368,7 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
          * Case Lab results list page
@@ -571,6 +576,9 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
+        'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS': 'Persons',
 
         /**
          * Contacts list page
@@ -582,6 +590,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
 
         /**
          * Create Contact page
@@ -928,7 +937,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
 
         /**
-         * Outbreaks List Page
+         * Outbreak List Page
          */
         'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
@@ -936,6 +945,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON': 'Import Outbreak Data',
 
         /**
          * Create Outbreak Page
@@ -1046,6 +1056,13 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
+
+        /**
+         * Transmission Chains Geo map
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE': 'Geospatially Map',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA': 'No chains with geo location provided',
 
         /**
          * Side filter
@@ -1117,9 +1134,16 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
-        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION_LEVEL': 'Select Level',
+        'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL': 'Select Level',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD': 'Add field',
         'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION': 'Add field option',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_1': '1',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_2': '2',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_3': '3',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_4': '4',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_5': '5',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_6': '6',
+        'LNG_PAGE_IMPORT_DATA_LABEL_LEVEL_7': '7',
 
         /**
          * Import hierarchical locations
@@ -1127,13 +1151,28 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
 
         /**
+         * Import reference data
+         */
+        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data',
+
+        /**
+         * Import case data
+         */
+        'LNG_PAGE_IMPORT_CASE_DATA_TITLE': 'Import Case Data',
+
+        /**
          * Import case lab data
          */
         'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE': 'Import Case Lab Data',
 
         /**
-         * Import reference data
+         * Import contact data
          */
-        'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE': 'Import Reference Data'
+        'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE': 'Import Contact Data',
+
+        /**
+         * Import outbreak data
+         */
+        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data'
     }
 };

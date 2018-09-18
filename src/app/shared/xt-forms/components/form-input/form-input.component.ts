@@ -77,7 +77,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         // wait for the input object to be initialized
         // then trigger the initialized event
         setTimeout(() => {
-            return this.initialized.emit(this.value);
+            this.initialized.emit(this.value);
         });
 
         super.ngAfterViewInit();

@@ -105,6 +105,7 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByBooleanField('active', $event.value)"
                             app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>

@@ -14,7 +14,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
@@ -41,7 +40,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private entityDataService: EntityDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {}
 
@@ -50,7 +48,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.filters.showContacts = false;
         this.filters.showEvents = true;
 
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
         this.outbreakDataService

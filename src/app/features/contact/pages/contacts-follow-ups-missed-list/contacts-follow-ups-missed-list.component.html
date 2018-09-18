@@ -131,6 +131,7 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>

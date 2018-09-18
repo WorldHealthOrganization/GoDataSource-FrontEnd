@@ -18,6 +18,8 @@ import * as _ from 'lodash';
 export class UniqueValidatorDirective implements Validator {
     private regex: RegExp;
 
+    @Input() valueReplacer: (name: string, value: string) => string;
+
     private _appUniqueValidatorExpression: string;
     @Input() set appUniqueValidatorExpression(value: string) {
         this._appUniqueValidatorExpression = value;
@@ -41,6 +43,16 @@ export class UniqueValidatorDirective implements Validator {
             return null;
         }
 
+        // get control name
+        let controlName: string = '';
+        if (control.parent instanceof FormGroup) {
+            _.each(control.parent.controls, (ctrl: AbstractControl, name) => {
+                if (control === ctrl) {
+                    controlName = name;
+                }
+            });
+        }
+
         // count field values so we can determine duplicates
         let countedItems: number = 0;
         if (
@@ -52,10 +64,35 @@ export class UniqueValidatorDirective implements Validator {
                 if (
                     this.regex &&
                     this.regex.test(name) &&
-                    _.isString(ctrl.value) &&
-                    ctrl.value.toLowerCase() === control.value.toLowerCase()
+                    _.isString(ctrl.value)
                 ) {
-                    countedItems++;
+                    if (
+                        (
+                            this.valueReplacer ?
+                                this.valueReplacer(name, ctrl.value) :
+                                ctrl.value
+                        ).toLowerCase() === (
+                            this.valueReplacer ?
+                                this.valueReplacer(controlName, control.value) :
+                                control.value
+                        ).toLowerCase()
+                    ) {
+                        countedItems++;
+                    } else if (ctrl.value.toLowerCase() === control.value.toLowerCase()) {
+                        if (
+                            ctrl.errors &&
+                            ctrl.errors.notUniqueValidator
+                        ) {
+                            ((lCrl: AbstractControl) => {
+                                setTimeout(
+                                    () => {
+                                        lCrl.updateValueAndValidity();
+                                    },
+                                    200
+                                );
+                            })(ctrl);
+                        }
+                    }
                 }
             });
         }
@@ -63,7 +100,7 @@ export class UniqueValidatorDirective implements Validator {
         // determine if this field has a duplicate value
         if (countedItems > 1) {
             return {
-                notUniqueValidator: false
+                notUniqueValidator: true
             };
         }
 
