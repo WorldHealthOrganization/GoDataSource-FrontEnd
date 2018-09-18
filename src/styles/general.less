@@ -12,6 +12,14 @@ html, body, ul, li, div, span {
     border: 0;
 }
 
+@font-face {
+    font-family: 'Roboto-Font';
+    src: url('Roboto/Roboto-Regular.ttf') format('truetype');
+    font-stretch: normal;
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* Generic styles */
 .a-no-style {
     text-decoration: none;
@@ -35,9 +43,9 @@ html, body, ul, li, div, span {
     // Reset filters
     .reset-filters {
         width: 100%;
-         button {
-             float: right;
-         }
+        button {
+            float: right;
+        }
     }
 
     /* Mat Table overrides */
@@ -79,7 +87,7 @@ html, body, ul, li, div, span {
                 }
 
                 .mat-sort-header-arrow {
-                    color: #4db0a0
+                    color: @color-accent-main
                 }
 
                 .table-header-cell {
@@ -205,7 +213,7 @@ html, body, ul, li, div, span {
 .column-header {
     font-size: 16px;
     font-weight: bold;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: 'Roboto-Font', "Helvetica Neue", sans-serif;
     color: black;
 }
 
