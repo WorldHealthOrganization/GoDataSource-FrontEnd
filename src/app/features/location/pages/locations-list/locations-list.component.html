@@ -153,6 +153,10 @@
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
                     </button>
 
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
+                    </button>
+
                     <mat-divider></mat-divider>
 
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">

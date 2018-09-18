@@ -111,6 +111,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
         'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
+        'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
+        'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
 
         /**
          * Login page
@@ -476,6 +478,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
@@ -496,6 +499,17 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
+
+        /**
+         * Locations Usage list page
+         */
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE': 'Location "{{name}}" usage',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_FOLLOW_UP': 'Follow-up',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_EVENT': 'Event',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CONTACT': 'Contact',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CASE': 'Case',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME': 'Name',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
 
         /**
          * User fields

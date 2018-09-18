@@ -35,6 +35,7 @@ export class CaseModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
+    outbreakId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -72,6 +73,7 @@ export class CaseModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
+        this.outbreakId = _.get(data, 'outbreakId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
