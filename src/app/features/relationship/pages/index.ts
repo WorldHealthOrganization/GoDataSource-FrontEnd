@@ -4,6 +4,7 @@ import { ModifyEntityRelationshipComponent } from './modify-entity-relationship/
 import { AvailableEntitiesListComponent } from './available-entities-list/available-entities-list.component';
 import { CreateEntityRelationshipComponent } from './create-entity-relationship/create-entity-relationship.component';
 import { CasesDateOnsetListComponent } from './cases-date-onset-list/cases-date-onset-list.component';
+import { RelationshipsLongPeriodListComponent } from './relationships-long-period-list/relationships-long-period-list.component';
 
 // export each page component individually
 export * from './entity-relationships-list/entity-relationships-list.component';
@@ -11,6 +12,7 @@ export * from './modify-entity-relationship/modify-entity-relationship.component
 export * from './available-entities-list/available-entities-list.component';
 export * from './create-entity-relationship/create-entity-relationship.component';
 export * from './cases-date-onset-list/cases-date-onset-list.component';
+export * from './relationships-long-period-list/relationships-long-period-list.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -18,5 +20,6 @@ export const pageComponents: any[] = [
     ModifyEntityRelationshipComponent,
     AvailableEntitiesListComponent,
     CreateEntityRelationshipComponent,
-    CasesDateOnsetListComponent
+    CasesDateOnsetListComponent,
+    RelationshipsLongPeriodListComponent
 ];

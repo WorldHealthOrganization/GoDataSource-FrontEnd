@@ -71,7 +71,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
         // retrieve query params
         this.route.queryParams
-            .subscribe((queryParams: { onset: boolean }) => {
+            .subscribe((queryParams: { onset: boolean, longPeriod: boolean }) => {
                 // do we need to add onset breadcrumb ?
                 // no need to check rights since this params should be set only if we come from that page
                 if (queryParams.onset) {
@@ -79,6 +79,17 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                         new BreadcrumbItemModel(
                             'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
                             '/relationships/date-onset'
+                        )
+                    );
+                }
+
+                // do we need to add long period between onset dates breadcrumb ?
+                // no need to check rights since this params should be set only if we come from that page
+                if (queryParams.longPeriod) {
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+                            '/relationships/long-period'
                         )
                     );
                 }

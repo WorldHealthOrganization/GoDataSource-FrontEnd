@@ -8,21 +8,20 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { CasesWithOnsetModel } from '../../../../core/models/cases-with-onset.model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { DiferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 
 @Component({
-    selector: 'app-cases-date-onset-list',
+    selector: 'app-relationships-long-period',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './cases-date-onset-list.component.html',
-    styleUrls: ['./cases-date-onset-list.component.less']
+    templateUrl: './relationships-long-period-list.component.html',
+    styleUrls: ['./relationships-long-period-list.component.less']
 })
-export class CasesDateOnsetListComponent extends ListComponent implements OnInit {
+export class RelationshipsLongPeriodListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE', '', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE', '', true)
     ];
 
     // authenticated user
@@ -31,11 +30,10 @@ export class CasesDateOnsetListComponent extends ListComponent implements OnInit
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
 
-    // list of secondary cases with onset date that is before the date of onset of the primary case
-    casesWithOnsetList$: Observable<CasesWithOnsetModel[]>;
+    // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
+    relationshipList$: Observable<DiferenceOnsetRelationshipModel[]>;
 
     // provide constants to template
-    ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
 
     constructor(
@@ -67,7 +65,7 @@ export class CasesDateOnsetListComponent extends ListComponent implements OnInit
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list
-            this.casesWithOnsetList$ = this.relationshipDataService.getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id);
+            this.relationshipList$ = this.relationshipDataService.getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id);
         }
     }
 
@@ -85,14 +83,13 @@ export class CasesDateOnsetListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         return [
-            'primaryCase.firstName',
-            'primaryCase.lastName',
-            'primaryCase.dateOfOnset',
-            'primaryCase.classification',
-            'secondaryCase.firstName',
-            'secondaryCase.lastName',
-            'secondaryCase.dateOfOnset',
-            'secondaryCase.classification',
+            'people[0].firstName',
+            'people[0].lastName',
+            'people[0].dateOfOnset',
+            'people[1].firstName',
+            'people[1].lastName',
+            'people[1].dateOfOnset',
+            'differenceBetweenDatesOfOnset',
             'actions'
         ];
     }

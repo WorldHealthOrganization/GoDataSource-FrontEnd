@@ -14,7 +14,7 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="casesWithOnsetModel$ | async">
+    <mat-table #table [dataSource]="casesWithOnsetList$ | async">
 
         <!-- Primary Case => Case First Name -->
         <ng-container matColumnDef="primaryCase.firstName">

@@ -56,6 +56,17 @@ const routes: Routes = [
                 PERMISSION.READ_REPORT
             ]
         }
+    },
+    // Report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
+    {
+        path: 'long-period',
+        component: fromPages.RelationshipsLongPeriodListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.READ_REPORT
+            ]
+        }
     }
 ];
 
