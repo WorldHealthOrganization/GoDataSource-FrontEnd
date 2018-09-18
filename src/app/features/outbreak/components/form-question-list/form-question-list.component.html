@@ -46,7 +46,8 @@
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChange()"
-                                app-unique-validator="\]\[variable\]$">
+                                app-unique-validator="\]\[variable\]$"
+                                [additionalControlsToCheck]="additionalControlsToCheck">
                             </app-form-input>
                         </div>
 

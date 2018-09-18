@@ -162,4 +162,16 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
             super.onChange();
         });
     }
+
+    /**
+     * List of sub questions list controls
+     */
+    public getQuestionsListControls(): { [ name: string ]: AbstractControl } {
+        if (!this.groupForm) {
+            return {};
+        }
+
+        // retrieve questions controls
+        return this.groupForm.controls;
+    }
 }
