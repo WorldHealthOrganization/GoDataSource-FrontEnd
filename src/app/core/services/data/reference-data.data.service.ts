@@ -211,6 +211,6 @@ export class ReferenceDataDataService {
      * @returns {string}
      */
     stringifyGlossaryTerm(entry): string {
-         return _.camelCase(this.i18nService.instant(entry.value)).toLowerCase();
+         return _.camelCase(this.i18nService.instant(entry)).toLowerCase();
     }
 }
