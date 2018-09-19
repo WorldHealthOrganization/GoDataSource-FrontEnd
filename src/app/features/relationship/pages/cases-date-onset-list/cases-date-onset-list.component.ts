@@ -8,7 +8,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { CasesWithOnsetModel } from '../../../../core/models/cases-with-onset.model';
+import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 
@@ -32,7 +32,7 @@ export class CasesDateOnsetListComponent extends ListComponent implements OnInit
     selectedOutbreak: OutbreakModel;
 
     // list of secondary cases with onset date that is before the date of onset of the primary case
-    casesWithOnsetList$: Observable<CasesWithOnsetModel[]>;
+    casesWithOnsetList$: Observable<ReportCasesWithOnsetModel[]>;
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;

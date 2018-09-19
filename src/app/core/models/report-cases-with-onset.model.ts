@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { CaseModel } from './case.model';
 import { RelationshipModel } from './relationship.model';
 
-export class CasesWithOnsetModel {
+export class ReportCasesWithOnsetModel {
     primaryCase: CaseModel;
     secondaryCase: CaseModel;
     relationship: RelationshipModel;

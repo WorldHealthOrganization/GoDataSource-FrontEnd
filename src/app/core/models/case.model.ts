@@ -81,8 +81,9 @@ export class CaseModel {
      * @returns {string}
      */
     get name(): string {
-        return ( this.firstName ? this.firstName : '' ) +
-            ( this.lastName ? ' ' + this.lastName : '' );
+        const firstName = _.get(this, 'firstName', '');
+        const lastName = _.get(this, 'lastName', '');
+        return _.trim(`${firstName} ${lastName}`);
     }
 
     /**
