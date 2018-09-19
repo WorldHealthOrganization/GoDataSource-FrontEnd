@@ -194,7 +194,7 @@ export class ReferenceDataDataService {
                     // map data
                     const glossaryMap = {};
                     _.forEach(data.entries, (entry) => {
-                        const entryValue = this.stringifyGlossaryTerm(entry);
+                        const entryValue = this.stringifyGlossaryTerm(entry.value);
                         glossaryMap[entryValue] = entry.description;
                     });
                     // set cache
@@ -210,7 +210,7 @@ export class ReferenceDataDataService {
      * @param entry
      * @returns {string}
      */
-    stringifyGlossaryTerm(entry): string {
-         return _.camelCase(this.i18nService.instant(entry)).toLowerCase();
+    stringifyGlossaryTerm(entry: string): string {
+        return _.camelCase(this.i18nService.instant(entry)).toLowerCase();
     }
 }
