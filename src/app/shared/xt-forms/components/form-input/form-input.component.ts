@@ -9,11 +9,15 @@ import {
     HostBinding,
     Output,
     EventEmitter,
-    AfterViewInit
+    AfterViewInit,
+    OnInit
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-form-input',
@@ -26,7 +30,7 @@ import { ElementBase } from '../../core/index';
         multi: true
     }]
 })
-export class FormInputComponent extends ElementBase<string> implements AfterViewInit {
+export class FormInputComponent extends ElementBase<string> implements AfterViewInit, OnInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -50,9 +54,18 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+    }
+
+    ngOnInit() {
+        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+        });
     }
 
     /**

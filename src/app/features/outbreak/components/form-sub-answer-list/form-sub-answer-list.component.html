@@ -53,15 +53,6 @@
                     <div fxFlex="215px" class="answer-box text-right">
                         <!-- Write access -->
                         <div *ngIf="!viewOnly">
-                            <!-- Answer additional questions -->
-                            <app-form-slide-toggle
-                                [name]="name + '[' + i + '][additionalQuestionsShow]'"
-                                [(ngModel)]="values[i].additionalQuestionsShow"
-                                [label]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
-                                required="false"
-                                (optionChanged)="onChange()">
-                            </app-form-slide-toggle>
-
                             <!-- Alert -->
                             <app-form-slide-toggle
                                 [name]="name + '[' + i + '][alert]'"
@@ -82,21 +73,6 @@
                             <div>{{ (answer.alert ? 'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT' : '') | translate}}</div>
                         </div>
                     </div>
-                </div>
-
-                <div
-                    *ngIf="values[i].additionalQuestionsShow"
-                    class="app-form-answer-questions">
-                    <app-form-sub-question-list
-                        [name]="name + '[' + i + '][additionalQuestions]'"
-                        [ngModel]="values[i].additionalQuestions"
-                        [viewOnly]="viewOnly"
-                        [minItems]="1"
-                        (changed)="onChange(false)"
-                        (groupValidated)="validateGroup()"
-                        [parentControls]="parentControls"
-                        [defaultQuestionCategory]="defaultQuestionCategory">
-                    </app-form-sub-question-list>
                 </div>
             </div>
 

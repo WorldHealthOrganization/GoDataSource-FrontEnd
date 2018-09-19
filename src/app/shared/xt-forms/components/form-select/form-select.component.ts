@@ -1,8 +1,10 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-select',
@@ -15,7 +17,7 @@ import * as _ from 'lodash';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> implements AfterViewInit {
+export class FormSelectComponent extends ElementBase<string> implements OnInit, AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -34,6 +36,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() clearable: boolean = true;
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
     @Input() allowSelectionOfDisabledItems: boolean = false;
+    @Input() tooltip: string = null;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
@@ -49,9 +52,18 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+    }
+
+    ngOnInit() {
+        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+        });
     }
 
     /**

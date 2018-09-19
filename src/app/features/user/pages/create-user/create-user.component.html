@@ -4,66 +4,97 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
-    <form #form="ngForm" (submit)="createNewUser(form)">
+<div class="page-content">
 
-        <div fxLayout="column">
+    <mat-horizontal-stepper linear #stepper>
+        <!--Details step-->
+        <mat-step [stepControl]="form">
+            <form #form="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_USER_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
-            <app-form-input
-                name="firstName"
-                [(ngModel)]="newUser.firstName"
-                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
-                required="true">
-            </app-form-input>
+                <mat-card class="page-section">
+                    <div fxLayout="column">
 
-            <app-form-input
-                name="lastName"
-                [(ngModel)]="newUser.lastName"
-                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
-                required="true">
-            </app-form-input>
+                        <app-form-input
+                            name="firstName"
+                            [(ngModel)]="newUser.firstName"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
+                            required="true">
+                        </app-form-input>
 
-            <app-form-input
-                name="email"
-                [(ngModel)]="newUser.email"
-                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
-                required="true"
-                app-email-validator>
-            </app-form-input>
+                        <app-form-input
+                            name="lastName"
+                            [(ngModel)]="newUser.lastName"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
+                            required="true">
+                        </app-form-input>
 
-            <app-form-select
-                name="roleIds"
-                [(ngModel)]="newUser.roleIds"
-                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
-                required="true"
-                [options]="rolesList$ | async"
-                optionLabelKey="name"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                multiple="true">
-            </app-form-select>
+                        <app-form-input
+                            name="email"
+                            [(ngModel)]="newUser.email"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
+                            required="true"
+                            app-email-validator>
+                        </app-form-input>
 
-            <app-form-input
-                type="password"
-                name="password"
-                [(ngModel)]="newUser.password"
-                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
-                required="true"
-                app-password-validator
-                app-trigger-validation-for="passwordConfirm">
-            </app-form-input>
+                        <app-form-select
+                            name="roleIds"
+                            [(ngModel)]="newUser.roleIds"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
+                            required="true"
+                            [options]="rolesList$ | async"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            multiple="true">
+                        </app-form-select>
 
-            <app-form-input
-                type="password"
-                name="passwordConfirm"
-                [(ngModel)]="passwordConfirmModel"
-                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
-                required="true"
-                app-equal-validator="password">
-            </app-form-input>
+                        <app-form-input
+                            type="password"
+                            name="password"
+                            [(ngModel)]="newUser.password"
+                            [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
+                            required="true"
+                            app-password-validator
+                            app-trigger-validation-for="passwordConfirm">
+                        </app-form-input>
 
-            <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-        </div>
+                        <app-form-input
+                            type="password"
+                            name="passwordConfirm"
+                            [(ngModel)]="passwordConfirmModel"
+                            [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
+                            required="true"
+                            app-equal-validator="password">
+                        </app-form-input>
 
-    </form>
-</mat-card>
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div>
+                <button mat-button matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-button
+                    (click)="createNewUser(form)">
+                    {{'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

@@ -4,86 +4,113 @@
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
-    <form #form="ngForm" (submit)="modifyUser(form)">
+<form #form="ngForm" class="page-content form-section" (submit)="modifyUser(form)">
 
-        <div fxLayout="column">
+    <div class="form-content">
 
-            <app-form-input
-                name="firstName"
-                [(ngModel)]="user.firstName"
-                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
-                required="true"
-                [disabled]="viewOnly">
-            </app-form-input>
+        <mat-tab-group class="page-tabs-navbar">
 
-            <app-form-input
-                name="lastName"
-                [(ngModel)]="user.lastName"
-                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
-                required="true"
-                [disabled]="viewOnly">
-            </app-form-input>
+            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE'| translate">
 
-            <app-form-input
-                name="email"
-                [(ngModel)]="user.email"
-                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
-                required="true"
-                app-email-validator
-                [disabled]="viewOnly">
-            </app-form-input>
+                <mat-card class="page-section">
 
-            <app-form-select
-                name="roleIds"
-                [(ngModel)]="user.roleIds"
-                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
-                required="true"
-                [options]="rolesList$ | async"
-                optionLabelKey="name"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                [disabled]="authUser.id === user.id || viewOnly"
-                multiple="true">
-            </app-form-select>
+                    <div fxLayout="column">
 
-            <app-form-select
-                *ngIf="hasOutbreakReadAccess()"
-                name="activeOutbreakId"
-                [(ngModel)]="user.activeOutbreakId"
-                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
-                optionLabelKey="name"
-                optionValueKey="id"
-                optionTooltipKey="description"
-                [options]="outbreaksList$ | async"
-                [disabled]="viewOnly">
-            </app-form-select>
+                        <app-form-input
+                            name="firstName"
+                            [(ngModel)]="user.firstName"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
+                            required="true"
+                            [disabled]="viewOnly">
+                        </app-form-input>
+
+                        <app-form-input
+                            name="lastName"
+                            [(ngModel)]="user.lastName"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
+                            required="true"
+                            [disabled]="viewOnly">
+                        </app-form-input>
+
+                        <app-form-input
+                            name="email"
+                            [(ngModel)]="user.email"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
+                            required="true"
+                            app-email-validator
+                            [disabled]="viewOnly">
+                        </app-form-input>
+
+                        <app-form-select
+                            name="roleIds"
+                            [(ngModel)]="user.roleIds"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
+                            required="true"
+                            [options]="rolesList$ | async"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            [disabled]="authUser.id === user.id || viewOnly"
+                            multiple="true">
+                        </app-form-select>
+
+                        <app-form-select
+                            *ngIf="hasOutbreakReadAccess()"
+                            name="activeOutbreakId"
+                            [(ngModel)]="user.activeOutbreakId"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            [options]="outbreaksList$ | async"
+                            [disabled]="viewOnly">
+                        </app-form-select>
 
 
-            <app-form-input
-                type="password"
-                name="password"
-                [(ngModel)]="user.password"
-                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
-                app-password-validator
-                app-trigger-validation-for="passwordConfirm"
-                [disabled]="viewOnly">
-            </app-form-input>
+                        <app-form-input
+                            type="password"
+                            name="password"
+                            [(ngModel)]="user.password"
+                            [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
+                            app-password-validator
+                            app-trigger-validation-for="passwordConfirm"
+                            [disabled]="viewOnly">
+                        </app-form-input>
 
-            <app-form-input
-                type="password"
-                name="passwordConfirm"
-                [(ngModel)]="passwordConfirmModel"
-                [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
-                [required]="!!user.password"
-                app-equal-validator="password"
-                [disabled]="viewOnly">
-            </app-form-input>
+                        <app-form-input
+                            type="password"
+                            name="passwordConfirm"
+                            [(ngModel)]="passwordConfirmModel"
+                            [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
+                            [required]="!!user.password"
+                            app-equal-validator="password"
+                            [disabled]="viewOnly">
+                        </app-form-input>
+                    </div>
+                </mat-card>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
 
-            <button *ngIf="viewOnly && hasUserWriteAccess()" mat-raised-button color="primary"
-            [routerLink]="['/users', userId, 'modify']">{{'LNG_COMMON_BUTTON_EDIT' | translate}}</button>
-            <button *ngIf="!viewOnly" mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-        </div>
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
 
-    </form>
-</mat-card>
+        <button *ngIf="viewOnly && hasUserWriteAccess()"
+                mat-raised-button color="primary" class="button-primary"
+                [routerLink]="['/users', userId, 'modify']">
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <ng-container *ngIf="!viewOnly">
+            <button mat-raised-button color="primary" class="button-primary" type="submit">
+                {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </button>
+            <button type="button"
+                    [routerLink]="'/users'"
+                    mat-raised-button>
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+            </button>
+        </ng-container>
+    </div>
+
+</form>

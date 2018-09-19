@@ -140,6 +140,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyCase(form: NgForm) {
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // omit fields that are NOT visible
@@ -147,10 +153,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.dob;
         } else {
             delete dirtyFields.age;
-        }
-
-        if (!this.formHelper.validateForm(form)) {
-            return;
         }
 
         // modify the Case

@@ -89,17 +89,8 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
             this.values.push(newItem);
         }
 
-        // mark as dirty
-        this.control.markAsDirty();
-
-        // validate groups & inputs
-        setTimeout(() => {
-            // validate
-            this.validateGroup();
-
-            // call on change
-            this.changed.emit(this.value);
-        });
+        // trigger change
+        this.onChange();
     }
 
     /**
@@ -184,7 +175,10 @@ export abstract class ListBase<T> extends GroupValidator<T[]> {
     onChange(validateGroup: boolean = true) {
         // validate group
         if (validateGroup) {
-            super.validateGroup();
+            // validate groups & inputs
+            setTimeout(() => {
+                super.validateGroup();
+            });
         }
 
         // mark as dirty
