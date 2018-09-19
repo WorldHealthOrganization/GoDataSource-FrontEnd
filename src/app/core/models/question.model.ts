@@ -1,6 +1,6 @@
+// tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
 
-let QuestionModelInit: any;
 export class AnswerModel {
     new: boolean | true;
     label: string;
@@ -17,7 +17,7 @@ export class AnswerModel {
         this.additionalQuestions = _.map(
             _.get(data, 'additionalQuestions', null),
             (lData: any) => {
-                return new QuestionModelInit(lData);
+                return new QuestionModel(lData);
             });
         if (_.isEmpty(this.additionalQuestions)) {
             this.additionalQuestions = null;
@@ -64,4 +64,3 @@ export class QuestionModel {
             });
     }
 }
-QuestionModelInit = QuestionModel;

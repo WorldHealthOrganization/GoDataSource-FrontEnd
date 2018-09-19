@@ -120,8 +120,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
-        // omit fields that are NOT visible
+        // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // omit fields that are NOT visible
         if (this.ageSelected) {
             delete dirtyFields.dob;
         } else {
