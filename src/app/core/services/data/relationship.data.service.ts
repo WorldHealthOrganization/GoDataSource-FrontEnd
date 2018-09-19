@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { DiferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
+import { ReportDifferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
@@ -258,10 +258,10 @@ export class RelationshipDataService {
      * Get report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
      * @param outbreakId
      */
-    getLongPeriodBetweenDateOfOnset(outbreakId: string): Observable<DiferenceOnsetRelationshipModel[]> {
+    getLongPeriodBetweenDateOfOnset(outbreakId: string): Observable<ReportDifferenceOnsetRelationshipModel[]> {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/relationships/long-periods-between-dates-of-onset-in-transmission-chains`),
-            DiferenceOnsetRelationshipModel
+            ReportDifferenceOnsetRelationshipModel
         );
     }
 }

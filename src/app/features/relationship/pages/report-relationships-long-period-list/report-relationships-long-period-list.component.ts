@@ -9,15 +9,15 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DiferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
+import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 
 @Component({
-    selector: 'app-relationships-long-period',
+    selector: 'app-report-relationships-long-period',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './relationships-long-period-list.component.html',
-    styleUrls: ['./relationships-long-period-list.component.less']
+    templateUrl: './report-relationships-long-period-list.component.html',
+    styleUrls: ['./report-relationships-long-period-list.component.less']
 })
-export class RelationshipsLongPeriodListComponent extends ListComponent implements OnInit {
+export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -31,7 +31,7 @@ export class RelationshipsLongPeriodListComponent extends ListComponent implemen
     selectedOutbreak: OutbreakModel;
 
     // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
-    relationshipList$: Observable<DiferenceOnsetRelationshipModel[]>;
+    relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
 
     // provide constants to template
     EntityType = EntityType;

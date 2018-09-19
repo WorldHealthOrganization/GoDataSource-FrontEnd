@@ -60,7 +60,7 @@ const routes: Routes = [
     // Report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
     {
         path: 'long-period',
-        component: fromPages.RelationshipsLongPeriodListComponent,
+        component: fromPages.ReportRelationshipsLongPeriodListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [

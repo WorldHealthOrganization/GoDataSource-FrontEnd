@@ -61,7 +61,7 @@ export class RelationshipModel {
     }
 }
 
-export class DiferenceOnsetRelationshipModel extends RelationshipModel {
+export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
     differenceBetweenDatesOfOnset: number;
 
     constructor(data = null) {
