@@ -4,7 +4,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -21,6 +21,10 @@ import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { GroupBase } from '../../../../shared/xt-forms/core';
+import { v4 as uuid } from 'uuid';
 
 @Component({
     selector: 'app-create-entity-relationship',
@@ -58,6 +62,7 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
     selectedEntities: (CaseModel|ContactModel|EventModel)[];
 
     relationships: RelationshipModel[] = [];
+    relationshipsIds: string[] = [];
 
     constructor(
         private router: Router,
@@ -67,7 +72,8 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -165,8 +171,10 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
                 this.selectedEntities = entities;
 
                 this.relationships = [];
+                this.relationshipsIds = [];
                 _.each(this.selectedEntities, () => {
                     this.relationships.push(new RelationshipModel());
+                    this.relationshipsIds.push(uuid());
                 });
             });
     }
@@ -226,4 +234,90 @@ export class CreateEntityRelationshipComponent extends ConfirmOnFormChanges impl
             });
     }
 
+    /**
+     * Check if an object has empty values
+     * @param object
+     */
+    private isEmptyObject(object): boolean {
+        return _.every(
+            object,
+            (value) => {
+                return _.isObject(value) ?
+                    this.isEmptyObject(value) :
+                    ( !_.isNumber(value) && _.isEmpty(value) );
+            }
+        );
+    }
+
+    /**
+     * Copy value from current record to all the other records
+     * @param property
+     * @param sourceRelationship
+     */
+    copyValueToEmptyFields(
+        property: string,
+        sourceRelationship: RelationshipModel,
+        form: NgForm
+    ) {
+        // handle remove item confirmation
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_COPY_VALUE')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // copy values
+                    _.each(
+                        this.relationships,
+                        (relationship: RelationshipModel) => {
+                            // if it is a number then it means that it has a value... ( we need to do this because _.isEmpty doesn't work for numbers )
+                            // right now we don't have numbers, but we might in teh future..for example for ZIP codes etc which might break the code
+                            const value: any = _.get(relationship, property);
+                            if (
+                                relationship !== sourceRelationship &&
+                                !_.isNumber(value) && (
+                                    _.isEmpty(value) || (
+                                        _.isObject(value) &&
+                                        this.isEmptyObject(value)
+                                    )
+                                )
+                            ) {
+                                // clone for arrays, because if we put the same object it will cause issues if we want to change something
+                                // clone works for strings & numbers
+                                _.set(relationship, property, _.cloneDeep(_.get(sourceRelationship, property)));
+                            }
+                        }
+                    );
+
+                    // validate groups
+                    if (form) {
+                        // wait for binding to take effect
+                        setTimeout(() => {
+                            const formDirectives = _.get(form, '_directives', []);
+                            _.forEach(formDirectives, (ngModel: NgModel) => {
+                                if (
+                                    ngModel.valueAccessor &&
+                                    ngModel.valueAccessor instanceof GroupBase
+                                ) {
+                                    ngModel.valueAccessor.validateGroup();
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+    }
+
+    /**
+     * Remove relationship
+     * @param index
+     */
+    removeRelationship(index: number) {
+        // handle remove item confirmation
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.selectedEntities.splice(index, 1);
+                    this.relationships.splice(index, 1);
+                    this.relationshipsIds.splice(index, 1);
+                }
+            });
+    }
 }

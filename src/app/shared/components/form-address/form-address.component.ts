@@ -28,7 +28,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     addressTypes$: Observable<any[]>;
 
     @Input() displayCopyField: boolean = false;
-    @Input() displayCopyFieldDescription: string = '';
+    @Input() displayCopyFieldDescription: string;
     @Output() copyValue = new EventEmitter<string>();
 
     serverToday: Moment = null;

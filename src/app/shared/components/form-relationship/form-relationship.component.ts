@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
@@ -30,6 +30,10 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     @Input() required: boolean = false;
 
     @Input() relatedObject: any;
+
+    @Input() displayCopyField: boolean = false;
+    @Input() displayCopyFieldDescription: string;
+    @Output() copyValue = new EventEmitter<string>();
 
     certaintyLevelOptions$: Observable<any[]>;
     exposureTypeOptions$: Observable<any[]>;
@@ -111,5 +115,13 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
      */
     get relationship(): RelationshipModel {
         return this.value;
+    }
+
+    /**
+     * Copy value
+     * @param property
+     */
+    triggerCopyValue(property) {
+        this.copyValue.emit(property);
     }
 }
