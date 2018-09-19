@@ -11,17 +11,33 @@
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-datepicker
-                    [name]="name + '[contactDate]'"
-                    [(ngModel)]="relationship.contactDate"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
-                    [disabled]="disabled"
-                    [required]="required"
-                    (optionChanged)="onChange()"
-                    [maxDate]="Constants.today()"
-                    app-date-validator
-                    [dateSameOrBefore]="Constants.today()">
-                </app-form-datepicker>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-datepicker
+                        [name]="name + '[contactDate]'"
+                        [(ngModel)]="relationship.contactDate"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
+                        [disabled]="disabled"
+                        [required]="required"
+                        (optionChanged)="onChange()"
+                        [maxDate]="Constants.today()"
+                        app-date-validator
+                        [dateSameOrBefore]="Constants.today()">
+                    </app-form-datepicker>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('contactDate')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
                 <app-form-slide-toggle
                     [name]="name + '[contactDateEstimated]'"
@@ -31,92 +47,202 @@
                     (optionChanged)="onChange()">
                 </app-form-slide-toggle>
 
-                <app-form-select
-                    [name]="name + '[certaintyLevelId]'"
-                    [(ngModel)]="relationship.certaintyLevelId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
-                    [options]="certaintyLevelOptions$ | async"
-                    [disabled]="disabled"
-                    [required]="required"
-                    optionLabelKey="label"
-                    optionValueKey="value"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[certaintyLevelId]'"
+                        [(ngModel)]="relationship.certaintyLevelId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
+                        [options]="certaintyLevelOptions$ | async"
+                        [disabled]="disabled"
+                        [required]="required"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('certaintyLevelId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-select
-                    [name]="name + '[exposureTypeId]'"
-                    [(ngModel)]="relationship.exposureTypeId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
-                    [options]="exposureTypeOptions$ | async"
-                    [disabled]="disabled"
-                    [required]="required"
-                    optionLabelKey="label"
-                    optionValueKey="value"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[exposureTypeId]'"
+                        [(ngModel)]="relationship.exposureTypeId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
+                        [options]="exposureTypeOptions$ | async"
+                        [disabled]="disabled"
+                        [required]="required"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('exposureTypeId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-select
-                    [name]="name + '[exposureFrequencyId]'"
-                    [(ngModel)]="relationship.exposureFrequencyId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
-                    [options]="exposureFrequencyOptions$ | async"
-                    [disabled]="disabled"
-                    [required]="required"
-                    optionLabelKey="label"
-                    optionValueKey="value"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[exposureFrequencyId]'"
+                        [(ngModel)]="relationship.exposureFrequencyId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
+                        [options]="exposureFrequencyOptions$ | async"
+                        [disabled]="disabled"
+                        [required]="required"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('exposureFrequencyId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-select
-                    [name]="name + '[exposureDurationId]'"
-                    [(ngModel)]="relationship.exposureDurationId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
-                    [options]="exposureDurationOptions$ | async"
-                    [disabled]="disabled"
-                    [required]="required"
-                    optionLabelKey="label"
-                    optionValueKey="value"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[exposureDurationId]'"
+                        [(ngModel)]="relationship.exposureDurationId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
+                        [options]="exposureDurationOptions$ | async"
+                        [disabled]="disabled"
+                        [required]="required"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('exposureDurationId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-select
-                    [name]="name + '[socialRelationshipTypeId]'"
-                    [(ngModel)]="relationship.socialRelationshipTypeId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
-                    [options]="socialRelationshipOptions$ | async"
-                    [disabled]="disabled"
-                    required="false"
-                    optionLabelKey="label"
-                    optionValueKey="value"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[socialRelationshipTypeId]'"
+                        [(ngModel)]="relationship.socialRelationshipTypeId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
+                        [options]="socialRelationshipOptions$ | async"
+                        [disabled]="disabled"
+                        required="false"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('socialRelationshipTypeId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
 
-                <app-form-select
-                    [name]="name + '[clusterId]'"
-                    [(ngModel)]="relationship.clusterId"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
-                    [options]="clusterOptions$ | async"
-                    [disabled]="disabled"
-                    required="false"
-                    optionLabelKey="name"
-                    optionValueKey="id"
-                    (optionChanged)="onChange()">
-                </app-form-select>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-select
+                        [name]="name + '[clusterId]'"
+                        [(ngModel)]="relationship.clusterId"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
+                        [options]="clusterOptions$ | async"
+                        [disabled]="disabled"
+                        required="false"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        (optionChanged)="onChange()">
+                    </app-form-select>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('clusterId')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-textarea
-                    [name]="name + '[comment]'"
-                    [(ngModel)]="relationship.comment"
-                    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT' | translate"
-                    [disabled]="disabled"
-                    required="false"
-                    (optionChanged)="onChange()">
-                </app-form-textarea>
-
-                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-textarea
+                        [name]="name + '[comment]'"
+                        [(ngModel)]="relationship.comment"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT' | translate"
+                        [disabled]="disabled"
+                        required="false"
+                        (optionChanged)="onChange()">
+                    </app-form-textarea>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('comment')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </form>

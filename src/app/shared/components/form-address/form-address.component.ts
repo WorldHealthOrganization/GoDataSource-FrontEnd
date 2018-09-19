@@ -28,7 +28,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     Constants = Constants;
 
     @Input() displayCopyField: boolean = false;
-    @Input() displayCopyFieldDescription: string = '';
+    @Input() displayCopyFieldDescription: string;
     @Output() copyValue = new EventEmitter<string>();
 
     constructor(
