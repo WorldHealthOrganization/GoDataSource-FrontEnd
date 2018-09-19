@@ -45,10 +45,23 @@ export class OutbreakModel {
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
-        this.caseInvestigationTemplate = _.get(data, 'caseInvestigationTemplate', []);
-        this.contactFollowUpTemplate = _.get(data, 'contactFollowUpTemplate', []);
-        this.labResultsTemplate = _.get(data, 'labResultsTemplate', []);
         this.caseIdMask = _.get(data, 'caseIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
+
+        this.caseInvestigationTemplate = _.map(
+            _.get(data, 'caseInvestigationTemplate', []),
+            (lData: any) => {
+               return new QuestionModel(lData);
+            });
+        this.contactFollowUpTemplate = _.map(
+            _.get(data, 'contactFollowUpTemplate', []),
+            (lData: any) => {
+                return new QuestionModel(lData);
+            });
+        this.labResultsTemplate = _.map(
+            _.get(data, 'labResultsTemplate', []),
+            (lData: any) => {
+                return new QuestionModel(lData);
+            });
     }
 }

@@ -1,5 +1,5 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, ViewChildren, QueryList } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, ViewChild } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl, NgForm } from '@angular/forms';
 import { ListBase } from '../../../../shared/xt-forms/core/list-base';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { QuestionModel } from '../../../../core/models/question.model';
@@ -11,21 +11,20 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { FormAnswerListComponent } from '../form-answer-list/form-answer-list.component';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-form-question-list',
+    selector: 'app-form-sub-question-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-question-list.component.html',
-    styleUrls: ['./form-question-list.component.less'],
+    templateUrl: './form-sub-question-list.component.html',
+    styleUrls: ['./form-sub-question-list.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormQuestionListComponent,
+        useExisting: FormSubQuestionListComponent,
         multi: true
     }]
 })
-export class FormQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
+export class FormSubQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
     @Input() viewOnly: boolean = false;
     @Input() variableReadOnly: boolean = false;
 
@@ -33,8 +32,21 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';
 
-    @ViewChildren(FormAnswerListComponent) answerLists: QueryList<FormAnswerListComponent>;
-    additionalControlsToCheck: { [ name: string ]: AbstractControl };
+    @ViewChild('groupForm') groupForm: NgForm;
+    @Input() parentControls: {
+        [name: string]: AbstractControl
+    }[];
+
+    private _defaultQuestionCategory: string;
+    @Input() set defaultQuestionCategory(value: string) {
+        this._defaultQuestionCategory = value;
+        _.each(this.values, (question: QuestionModel) => {
+            question.category = this._defaultQuestionCategory;
+        });
+    }
+    get defaultQuestionCategory(): string {
+        return this._defaultQuestionCategory;
+    }
 
     // list of form-answer types
     answerTypesList$: Observable<any[]>;
@@ -73,7 +85,11 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     protected generateNewItem(): QuestionModel {
-        return new QuestionModel();
+        const q = new QuestionModel();
+        if (this.defaultQuestionCategory) {
+            q.category = this.defaultQuestionCategory;
+        }
+        return q;
     }
 
     /**
@@ -118,17 +134,6 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     /**
-     * Function triggered when the input value is changed
-     */
-    onChange(validateGroup: boolean = true) {
-        // call parent function
-        super.onChange(validateGroup);
-
-        // set question additional controls
-        this.additionalControlsToCheck = this.getQuestionsListControls();
-    }
-
-    /**
      * Handle two way binding setup for translate items - at initialization - to not loose values in case they are not changed
      * @param {string} key
      * @param {string} value
@@ -159,29 +164,14 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     /**
-     * Retrieve list of additional controls used to determine uniqueness
+     * List of sub questions list controls
      */
-    getQuestionsListControls(): { [ name: string ]: AbstractControl } {
-        if (
-            !this.answerLists ||
-            this.answerLists.length < 1
-        ) {
+    public getQuestionsListControls(): { [ name: string ]: AbstractControl } {
+        if (!this.groupForm) {
             return {};
         }
 
         // retrieve questions controls
-        const controls: { [ name: string ]: AbstractControl } = {};
-        let index: number = 0;
-        this.answerLists.forEach((answerList: FormAnswerListComponent) => {
-            const localControls = answerList.getQuestionsListControls();
-            _.each(localControls, (ctrl: AbstractControl, name: string) => {
-                if (/\]\[variable\]$/.test(name)) {
-                    controls[`[${index++}][variable]`] = ctrl;
-                }
-            });
-        });
-
-        // finished
-        return controls;
+        return this.groupForm.controls;
     }
 }

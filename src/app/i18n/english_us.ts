@@ -96,6 +96,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
         'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
+        'LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP': 'Are you sure you want to remove relationship from the list?',
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
@@ -462,6 +463,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
         'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
 
         /**
          * Location Field
@@ -530,6 +532,8 @@ export const EnglishUsLang = {
          * Create User page
          */
         'LNG_PAGE_CREATE_USER_TITLE': 'Create New User',
+        'LNG_PAGE_CREATE_USER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON' : 'Create user',
         'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE': 'User created!',
 
         /**
@@ -537,6 +541,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_USER_TITLE': 'View User',
         'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
+        'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' : 'Details',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
         /**
@@ -556,6 +561,8 @@ export const EnglishUsLang = {
          * Create User Role Page
          */
         'LNG_PAGE_CREATE_USER_ROLE_TITLE': 'Create New Role',
+        'LNG_PAGE_CREATE_USER_ROLE_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON': 'Create new role',
         'LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE': 'Role created!',
 
         /**
@@ -563,6 +570,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_USER_ROLES_TITLE': 'View Role',
         'LNG_PAGE_MODIFY_USER_ROLES_TITLE': 'Modify Role',
+        'LNG_PAGE_MODIFY_USER_ROLES_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE': 'Role updated!',
 
         /**
@@ -876,12 +884,13 @@ export const EnglishUsLang = {
         'LNG_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE': 'Answer Type',
         'LNG_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED': 'Required?',
         'LNG_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED': 'Required',
-        'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add',
+        'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add Answer',
         'LNG_TEMPLATE_QUESTION_ANSWER_BADGE': 'A',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL': 'Answer Label',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE': 'Answer Value',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
+        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
 
         /**
          * Security Questions

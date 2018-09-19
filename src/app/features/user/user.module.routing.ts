@@ -27,11 +27,6 @@ const routes: Routes = [
     },
     // View User
     {
-        path: ':userId',
-        component: fromPages.ViewUserComponent
-    },
-    // View User
-    {
         path: ':userId/view',
         component: fromPages.ModifyUserComponent,
         canActivate: [AuthGuard],

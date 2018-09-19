@@ -15,16 +15,40 @@
                     {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}
                 </ng-template>
 
-                <mat-card class="page-section" *ngFor="let person of selectedEntities; let i = index">
-                    <input type="hidden" [name]="'relationships[' + i + '][relatedEntityId]'" [ngModel]="person.id" />
+                <div
+                    *ngFor="let person of selectedEntities; let ind = index"
+                    fxFlex fxLayout="row" fxLayoutAlign="start center">
+                    <mat-card
+                        fxFlex
+                        class="page-section">
 
-                    <app-form-relationship
-                        [name]="'relationships[' + i + '][relationship]'"
-                        [ngModel]="relationships[i]"
-                        [relatedObject]="person"
-                        required="true">
-                    </app-form-relationship>
-                </mat-card>
+                        <input
+                            type="hidden"
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relatedEntityId]'"
+                            [ngModel]="person.id"/>
+
+                        <app-form-relationship
+                            [name]="'relationships[' + relationshipsIds[ind] + '][relationship]'"
+                            [ngModel]="relationships[ind]"
+                            [relatedObject]="person"
+                            required="true"
+                            [displayCopyField]="true"
+                            [displayCopyFieldDescription]="'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE' | translate"
+                            (copyValue)="copyValueToEmptyFields($event, relationships[ind], relationshipsForm)">
+                        </app-form-relationship>
+                    </mat-card>
+
+                    <div
+                        fxFlex="70px">
+                        <button
+                            *ngIf="selectedEntities.length > 1"
+                            type="button"
+                            mat-icon-button
+                            (click)="removeRelationship(ind)">
+                            <span class="xt-icon">delete</span>
+                        </button>
+                    </div>
+                </div>
 
                 <div>
                     <button mat-button matStepperNext>

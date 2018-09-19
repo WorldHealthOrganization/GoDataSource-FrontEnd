@@ -58,24 +58,24 @@ export class SidenavComponent implements OnInit {
             'settings',
             [],
             [
-                new ChildNavItem(
-                    'system-config',
-                    'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
-                    ''
-                ),
+                // new ChildNavItem(
+                //     'system-config',
+                //     'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
+                //     [PERMISSION.READ_SYS_CONFIG],
+                //     ''
+                // ),
                 new ChildNavItem(
                     'users',
                     'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',
                     [PERMISSION.READ_USER_ACCOUNT],
                     '/users'
                 ),
-                new ChildNavItem(
-                    'teams',
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
-                    [PERMISSION.READ_TEAM],
-                    '/users'
-                ),
+                // new ChildNavItem(
+                //     'teams',
+                //     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
+                //     [PERMISSION.READ_TEAM],
+                //     '/users'
+                // ),
                 new ChildNavItem(
                     'roles',
                     'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
@@ -96,12 +96,12 @@ export class SidenavComponent implements OnInit {
                     [PERMISSION.READ_OUTBREAK],
                     '/outbreaks'
                 ),
-                new ChildNavItem(
-                    'outbreak-templates',
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
-                    [PERMISSION.READ_OUTBREAK],
-                    '/users'
-                )
+                // new ChildNavItem(
+                //     'outbreak-templates',
+                //     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
+                //     [PERMISSION.READ_OUTBREAK],
+                //     '/users'
+                // )
             ]
         ),
         new NavItem(

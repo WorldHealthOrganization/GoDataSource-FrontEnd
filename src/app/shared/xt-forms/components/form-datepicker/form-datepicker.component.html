@@ -1,7 +1,8 @@
 <div class="form-datepicker-container form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <mat-form-field>
+    <mat-form-field
+    [matTooltip]="tooltip">
         <input
             matInput
             [(ngModel)]="value"

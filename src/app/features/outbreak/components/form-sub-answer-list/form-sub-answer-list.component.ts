@@ -1,35 +1,24 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, ViewChildren, QueryList } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl } from '@angular/forms';
 import { ListBase } from '../../../../shared/xt-forms/core/list-base';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { AnswerModel } from '../../../../core/models/question.model';
-import { FormSubQuestionListComponent } from '../form-sub-question-list/form-sub-question-list.component';
-import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-form-answer-list',
+    selector: 'app-form-sub-answer-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-answer-list.component.html',
-    styleUrls: ['./form-answer-list.component.less'],
+    templateUrl: './form-sub-answer-list.component.html',
+    styleUrls: ['./form-sub-answer-list.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormAnswerListComponent,
+        useExisting: FormSubAnswerListComponent,
         multi: true
     }]
 })
-export class FormAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
+export class FormSubAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
-
-    @Input() disableAdditionalQuestions: boolean = false;
-    @Input() parentControls: {
-        [name: string]: AbstractControl
-    }[];
-
-    @Input() defaultQuestionCategory: string;
-
-    @ViewChildren(FormSubQuestionListComponent) questionLists: QueryList<FormSubQuestionListComponent>;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -85,32 +74,5 @@ export class FormAnswerListComponent extends ListBase<AnswerModel> implements On
     onInitializeBind(index: number, key: string, value: any) {
         // "bind value"
         this.values[index][key] = value;
-    }
-
-    /**
-     * List of sub questions list controls
-     */
-    public getQuestionsListControls(): { [ name: string ]: AbstractControl } {
-        if (
-            !this.questionLists ||
-            this.questionLists.length < 1
-        ) {
-            return {};
-        }
-
-        // retrieve questions controls
-        const controls: { [ name: string ]: AbstractControl } = {};
-        let index: number = 0;
-        this.questionLists.forEach((questionsList: FormSubQuestionListComponent) => {
-            const localControls = questionsList.getQuestionsListControls();
-            _.each(localControls, (ctrl: AbstractControl, name: string) => {
-                if (/\]\[variable\]$/.test(name)) {
-                    controls[`[${index++}][variable]`] = ctrl;
-                }
-            });
-        });
-
-        // finished
-        return controls;
     }
 }
