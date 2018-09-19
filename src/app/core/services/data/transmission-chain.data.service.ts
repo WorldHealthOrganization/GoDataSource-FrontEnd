@@ -160,7 +160,7 @@ export class TransmissionChainDataService {
                             // get earliest hospitalization dates if any
                             let datesArray = [];
                             if (!_.isEmpty(node.model.hospitalizationDates)) {
-                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, key) => {
+                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
                                     datesArray.push(hospitalDate.startDate);
                                 });
                             }
@@ -199,7 +199,7 @@ export class TransmissionChainDataService {
                             // get earliest hospitalization dates if any
                             let datesArray = [];
                             if (!_.isEmpty(node.model.hospitalizationDates)) {
-                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, key) => {
+                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
                                     datesArray.push(hospitalDate.startDate);
                                 });
                             }

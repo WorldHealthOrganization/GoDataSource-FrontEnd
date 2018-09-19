@@ -238,10 +238,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
                 }
                 this.datesArray.push(node.data.dateTimeline);
-            } else {
-                // this.cy.remove(node.data.id);
-                // node.remove();
-                // node.style('display', 'none');
             }
         });
         this.datesArray = _.uniq(this.datesArray);

@@ -7,7 +7,9 @@ export class GraphNodeModel {
     id: string;
     name: string;
     type: EntityType;
+    // date used when displaying the timeline
     dateTimeline: string;
+    // use this field to remove nodes with no date for timeline
     displayTimeline: string;
 
     // default node color
@@ -31,9 +33,6 @@ export class GraphNodeModel {
 
         // label to be used when displaying the timeline view
         this.label = this.name + '\n' + this.dateTimeline;
-        console.log(this.label);
-        console.log(this.dateTimeline);
-
 
         // set the color based on node type
         switch (this.type) {
