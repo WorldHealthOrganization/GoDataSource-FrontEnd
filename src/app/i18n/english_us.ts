@@ -96,6 +96,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
         'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
+        'LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP': 'Are you sure you want to remove relationship from the list?',
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
@@ -460,6 +461,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
         'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
 
         /**
          * Location Field
