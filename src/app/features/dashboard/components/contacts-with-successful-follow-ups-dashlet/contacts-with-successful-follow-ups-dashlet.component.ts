@@ -6,7 +6,7 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
-import { MetricContactsWithSuccessFollowUP } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
+import { MetricContactsWithSuccessfulFollowUP } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -17,17 +17,14 @@ import { MetricContactsWithSuccessFollowUP } from '../../../../core/models/metri
 export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
 
     // contacts with successfulFollowup
-    contactsWithSuccessfulFollowup;
+    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUP;
 
     // filter by day
     date: Moment = moment();
 
     queryParams: any = {
-        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
+        applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP
     };
-
-    // constants to be used for applyListFilter
-    Constants: any = Constants;
 
     // refresh only after we finish changing data
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
@@ -62,7 +59,7 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
 
         // get the results for contacts seen
         this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.date)
-            .subscribe((result: MetricContactsWithSuccessFollowUP) => {
+            .subscribe((result: MetricContactsWithSuccessfulFollowUP) => {
                 this.contactsWithSuccessfulFollowup = result;
             });
     }
@@ -72,7 +69,7 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
      * @returns {number}
      */
     calculatePercent() {
-        return this.contactsWithSuccessfulFollowup ?
+        return this.contactsWithSuccessfulFollowup && this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount > 0 ?
             Math.round(100 * this.contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount / this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount) : 0;
     }
 }

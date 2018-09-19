@@ -1029,6 +1029,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP': 'Contacts lost to follow-up',
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
         'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN': 'Contacts seen',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP': 'Contacts with successful follow-up',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',

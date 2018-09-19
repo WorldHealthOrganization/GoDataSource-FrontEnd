@@ -1,7 +1,13 @@
 import * as _ from 'lodash';
 
-export class MetricContactsWithSuccessFollowUP {
-    contacts: Object[];
+export interface ContactFollowedUp {
+    id: string;
+    totalFollowupsCount: number;
+    successfulFollowupsCount: number;
+}
+
+export class MetricContactsWithSuccessfulFollowUP {
+    contacts: ContactFollowedUp[];
     contactsWithSuccessfulFollowupsCount: number;
     teams: Object[];
     totalContactsWithFollowupsCount: number;

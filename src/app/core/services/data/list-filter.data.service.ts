@@ -14,7 +14,6 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
-import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 
 @Injectable()
 export class ListFilterDataService {
@@ -330,27 +329,25 @@ export class ListFilterDataService {
     /**
      * Create the query builder for filtering the contacts seen on selected date
      * @param {date} date
-     * @returns {Observable<MetricContactsSeenEachDays>}
+     * @returns {Observable<any>}
      */
-    filterContactsSeen(date: Moment): Observable<MetricContactsSeenEachDays> {
+    filterContactsSeen(date: Moment): Observable<any> {
         // get the outbreakId
-        return this.outbreakDataService
-            .getSelectedOutbreak()
-            .mergeMap((selectedOutbreak: OutbreakModel) => {
+        return this.handleFilteringOfLists((selectedOutbreak) => {
             // build the query builder
-                const qb = new RequestQueryBuilder();
+            const qb = new RequestQueryBuilder();
 
-                // filter by date
-                qb.filter.byDateRange(
-                    'date', {
-                        // clone date
-                        startDate: moment(date).startOf('day'),
-                        endDate: moment(date).endOf('day')
-                    }
-                );
+            // filter by date
+            qb.filter.byDateRange(
+                'date', {
+                    // clone date
+                    startDate: moment(date).startOf('day'),
+                    endDate: moment(date).endOf('day')
+                }
+            );
 
-                return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
-            });
+            return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
+        });
     }
 
     /**
@@ -360,22 +357,20 @@ export class ListFilterDataService {
      */
     filterContactsWithSuccessfulFollowup(date: Moment): Observable<any> {
         // get the outbreakId
-        return this.outbreakDataService
-            .getSelectedOutbreak()
-            .mergeMap((selectedOutbreak: OutbreakModel) => {
-                // build the query builder
-                const qb = new RequestQueryBuilder();
+        return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
+            // build the query builder
+            const qb = new RequestQueryBuilder();
 
-                // filter by date
-                qb.filter.byDateRange(
-                    'date', {
-                        // clone date
-                        startDate: moment(date).startOf('day'),
-                        endDate: moment(date).endOf('day')
-                    }
-                );
+            // filter by date
+            qb.filter.byDateRange(
+                'date', {
+                    // clone date
+                    startDate: moment(date).startOf('day'),
+                    endDate: moment(date).endOf('day')
+                }
+            );
 
-                return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
-            });
+            return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
+        });
     }
 }
