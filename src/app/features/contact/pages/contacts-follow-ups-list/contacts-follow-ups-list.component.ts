@@ -22,6 +22,8 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs/Subscriber';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -61,6 +63,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private router: Router
     ) {
         super();
@@ -70,7 +73,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        const genderOptionsList$ = this.genericDataService.getGenderList();
+        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(

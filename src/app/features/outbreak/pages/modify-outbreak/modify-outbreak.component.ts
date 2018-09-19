@@ -18,6 +18,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -64,7 +65,14 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
+            (countries) => _.map(countries, (country: LabelValuePair) => {
+                country.value = {
+                    id: country.value
+                };
+                return country;
+            })
+        );
 
         this.route.params
             .subscribe((params: {outbreakId}) => {
@@ -90,6 +98,15 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                         this.setNewFalse(this.outbreak.labResultsTemplate);
                     });
             });
+    }
+
+    /**
+     * Compare countries
+     * @param o1
+     * @param o2
+     */
+    compareCountryWith(o1: {id: string}, o2: {id: string}): boolean {
+        return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
     /**

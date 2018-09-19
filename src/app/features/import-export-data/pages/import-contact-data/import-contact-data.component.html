@@ -1,0 +1,17 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_CONTACT_DATA_TITLE'"
+    [displayLoading]="displayLoading"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl"
+    [importDataUrl]="importDataUrl"
+    [model]="ImportServerModelNames.CONTACT"
+    [fieldsWithoutTokens]="fieldsWithoutTokens"
+    [requiredDestinationFields]="requiredDestinationFields">
+</app-import-data>

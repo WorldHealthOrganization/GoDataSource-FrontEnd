@@ -1,8 +1,5 @@
-import {
-    Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding,
-    OnInit
-} from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
@@ -20,7 +17,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> implements OnInit {
+export class FormSelectComponent extends ElementBase<string> implements OnInit, AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -37,13 +34,21 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit {
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
+    @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
+    @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() tooltip: string = null;
+
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();
+    @Output() initialized = new EventEmitter<any>();
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
+
+    static compareWithDefault = (o1: any, o2: any) => {
+        return o1 === o2;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -95,5 +100,15 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit {
 
         // emit the currently selected option(s)
         return this.optionChanged.emit(selectedOptions);
+    }
+
+    ngAfterViewInit() {
+        // wait for the input object to be initialized
+        // then trigger the initialized event
+        setTimeout(() => {
+            this.initialized.emit(this.value);
+        });
+
+        super.ngAfterViewInit();
     }
 }
