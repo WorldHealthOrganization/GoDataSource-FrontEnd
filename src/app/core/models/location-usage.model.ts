@@ -4,6 +4,7 @@ import { CaseModel } from './case.model';
 import { ContactModel } from './contact.model';
 import { EventModel } from './event.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
+import { OutbreakModel } from './outbreak.model';
 
 export class LocationUsageModel {
     followUp: FollowUpModel[];
@@ -12,17 +13,17 @@ export class LocationUsageModel {
     event: EventModel[];
 
     constructor(data = null) {
-        this.followUp = _.map(_.get(data, 'followUp', []), (dataC) => {
-            return new FollowUpModel(dataC);
+        this.followUp = _.map(_.get(data, 'followUp', []), (followUpData) => {
+            return new FollowUpModel(followUpData);
         });
-        this.case = _.map(_.get(data, 'case', []), (dataC) => {
-            return new CaseModel(dataC);
+        this.case = _.map(_.get(data, 'case', []), (caseData) => {
+            return new CaseModel(caseData);
         });
-        this.contact = _.map(_.get(data, 'contact', []), (dataC) => {
-            return new ContactModel(dataC);
+        this.contact = _.map(_.get(data, 'contact', []), (contactData) => {
+            return new ContactModel(contactData);
         });
-        this.event = _.map(_.get(data, 'event', []), (dataC) => {
-            return new EventModel(dataC);
+        this.event = _.map(_.get(data, 'event', []), (eventData) => {
+            return new EventModel(eventData);
         });
     }
 }
@@ -41,6 +42,7 @@ export class UsageDetailsItem {
     viewUrl: string;
     modifyUrl: string;
     outbreakId: string;
+    outbreakName: string;
 
     constructor(data: {
         type: string,
@@ -48,7 +50,8 @@ export class UsageDetailsItem {
         name: string,
         viewUrl: string,
         modifyUrl: string,
-        outbreakId: string
+        outbreakId: string,
+        outbreakName: string;
     }) {
         Object.assign(this, data);
     }
@@ -57,7 +60,12 @@ export class UsageDetailsItem {
 export class UsageDetails {
     items: UsageDetailsItem[] = [];
 
-    constructor (data: LocationUsageModel) {
+    constructor (
+        data: LocationUsageModel,
+        outbreaks: {
+            [ id: string ]: OutbreakModel
+        }
+    ) {
         // general stuff
         const dateFormatter = new DateDefaultPipe();
 
@@ -69,7 +77,8 @@ export class UsageDetails {
                 name: followUp.date ? dateFormatter.transform(followUp.date) : '',
                 viewUrl: `/contacts/${followUp.personId}/follow-ups/${followUp.id}/view`,
                 modifyUrl: `/contacts/${followUp.personId}/follow-ups/${followUp.id}/modify`,
-                outbreakId: followUp.outbreakId
+                outbreakId: followUp.outbreakId,
+                outbreakName: outbreaks[followUp.outbreakId] ? outbreaks[followUp.outbreakId].name : ''
             }));
         });
 
@@ -81,7 +90,8 @@ export class UsageDetails {
                 name: event.name,
                 viewUrl: `/events/${event.id}/view`,
                 modifyUrl: `/events/${event.id}/modify`,
-                outbreakId: event.outbreakId
+                outbreakId: event.outbreakId,
+                outbreakName: outbreaks[event.outbreakId] ? outbreaks[event.outbreakId].name : ''
             }));
         });
 
@@ -93,7 +103,8 @@ export class UsageDetails {
                 name: contact.name,
                 viewUrl: `/contacts/${contact.id}/view`,
                 modifyUrl: `/contacts/${contact.id}/modify`,
-                outbreakId: contact.outbreakId
+                outbreakId: contact.outbreakId,
+                outbreakName: outbreaks[contact.outbreakId] ? outbreaks[contact.outbreakId].name : ''
             }));
         });
 
@@ -105,7 +116,8 @@ export class UsageDetails {
                 name: caseM.name,
                 viewUrl: `/cases/${caseM.id}/view`,
                 modifyUrl: `/cases/${caseM.id}/modify`,
-                outbreakId: caseM.outbreakId
+                outbreakId: caseM.outbreakId,
+                outbreakName: outbreaks[caseM.outbreakId] ? outbreaks[caseM.outbreakId].name : ''
             }));
         });
     }

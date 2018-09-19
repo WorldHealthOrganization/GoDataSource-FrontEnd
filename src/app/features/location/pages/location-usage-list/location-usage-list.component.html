@@ -41,6 +41,19 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Outbreak -->
+        <ng-container matColumnDef="outbreakName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.outbreakName }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>

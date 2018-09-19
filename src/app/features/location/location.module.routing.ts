@@ -71,8 +71,7 @@ const routes: Routes = [
         component: fromPages.LocationUsageListComponent,
         canActivate: [AuthGuard],
         data: {
-            // no permissions required for now ?
-            // #TODO - decide if we should add permissions => read case, contact, follow--up, events...
+            // no permissions required for now
         }
     }
 ];

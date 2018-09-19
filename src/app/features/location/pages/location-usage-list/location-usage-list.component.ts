@@ -8,6 +8,9 @@ import { ActivatedRoute } from '@angular/router';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationUsageModel, UsageDetails, UsageDetailsItem, UsageDetailsItemType } from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -29,6 +32,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
     constructor(
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
+        private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute
     ) {
         super();
@@ -73,35 +77,51 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
      */
     refreshList() {
         if (this.locationId) {
-            // retrieve usages of a location
-            this.locationDataService
-                .getLocationUsage(this.locationId)
-                .subscribe((locationUsage: LocationUsageModel) => {
-                    // remove keys if we don't have rights
-                    // #TODO - not sure if this is how it should be...
+            // retrieve outbreaks
+            this.outbreakDataService
+                .getOutbreaksList()
+                .subscribe((outbreaks: OutbreakModel[]) => {
+                    // map outbreaks to id / model
+                    const outbreaksMapped: {
+                        [ id: string ]: OutbreakModel
+                    } = _.transform(
+                        outbreaks,
+                        (result, outbreak: OutbreakModel) => {
+                            result[outbreak.id] = outbreak;
+                        },
+                        {}
+                    );
 
-                    // follow-ups
-                    if (!this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
-                        locationUsage.followUp = [];
-                    }
+                    // retrieve usages of a location
+                    this.locationDataService
+                        .getLocationUsage(this.locationId)
+                        .subscribe((locationUsage: LocationUsageModel) => {
+                            // remove keys if we don't have rights
+                            // #TODO - not sure if this is how it should be...
 
-                    // events
-                    if (!this.authUser.hasPermissions(PERMISSION.READ_EVENT)) {
-                        locationUsage.event = [];
-                    }
+                            // follow-ups
+                            if (!this.authUser.hasPermissions(PERMISSION.READ_FOLLOWUP)) {
+                                locationUsage.followUp = [];
+                            }
 
-                    // contacts
-                    if (!this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
-                        locationUsage.contact = [];
-                    }
+                            // events
+                            if (!this.authUser.hasPermissions(PERMISSION.READ_EVENT)) {
+                                locationUsage.event = [];
+                            }
 
-                    // cases
-                    if (!this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
-                        locationUsage.case = [];
-                    }
+                            // contacts
+                            if (!this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
+                                locationUsage.contact = [];
+                            }
 
-                    // create ussage list
-                    this.usageDetailsList = new UsageDetails(locationUsage).items;
+                            // cases
+                            if (!this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+                                locationUsage.case = [];
+                            }
+
+                            // create usage list
+                            this.usageDetailsList = new UsageDetails(locationUsage, outbreaksMapped).items;
+                        });
                 });
         }
     }
@@ -140,6 +160,7 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
         return [
             'type',
             'name',
+            'outbreakName',
             'actions'
         ];
     }
