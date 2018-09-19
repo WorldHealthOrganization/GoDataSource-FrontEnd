@@ -109,8 +109,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 // using 100 px as it looks fine
                 const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
                 return {x: posX, y: posY};
-            } else {
-                return null;
             }
         }
     };

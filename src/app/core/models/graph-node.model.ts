@@ -18,7 +18,6 @@ export class GraphNodeModel {
 
 
     constructor(data = null) {
-        console.log(data);
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.type = _.get(data, 'type', '');
