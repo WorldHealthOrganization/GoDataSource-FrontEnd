@@ -16,8 +16,9 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -43,7 +44,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
     caseId: string;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private route: ActivatedRoute,
@@ -65,6 +66,13 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         this.route.params
             .subscribe((params: {caseId}) => {

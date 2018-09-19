@@ -17,7 +17,8 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { Constants } from '../../../../core/models/constants';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -46,7 +47,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private router: Router,
@@ -56,7 +57,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private genericDataService: GenericDataService
     ) {
         super(route);
     }
@@ -68,6 +70,13 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         this.route.params.subscribe((params: { caseId }) => {
             this.caseId = params.caseId;

@@ -138,13 +138,4 @@ export class Constants {
             value: 'TIMELINE_NETWORK'
         }
     };
-
-    /**
-     * Returns today's date
-     * @returns Moment
-     */
-    static today() {
-        return moment().startOf('day');
-    }
-
 }

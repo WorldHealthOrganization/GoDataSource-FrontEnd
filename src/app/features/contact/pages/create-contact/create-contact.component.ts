@@ -20,10 +20,11 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EventModel } from '../../../../core/models/event.model';
-import { Constants } from '../../../../core/models/constants';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-create-contact',
@@ -48,7 +49,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     relatedEntityData: CaseModel|EventModel;
     relationship: RelationshipModel = new RelationshipModel();
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private router: Router,
@@ -59,7 +60,8 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private genericDataService: GenericDataService
     ) {
         super();
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
@@ -71,6 +73,13 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
         // ...and a document
         this.contactData.documents.push(new DocumentModel());
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         // retrieve query params
         this.route.queryParams

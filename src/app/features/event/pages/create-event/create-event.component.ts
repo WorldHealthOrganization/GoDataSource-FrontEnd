@@ -9,11 +9,10 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
-
 import * as _ from 'lodash';
-import { Constants } from '../../../../core/models/constants';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-create-event',
@@ -33,19 +32,27 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
     eventData: EventModel = new EventModel();
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
 
     ngOnInit() {
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
+
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
