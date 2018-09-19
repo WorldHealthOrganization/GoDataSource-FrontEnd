@@ -13,12 +13,12 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
-    selector: 'app-cases-date-onset-list',
+    selector: 'app-report-cases-date-onset-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './cases-date-onset-list.component.html',
-    styleUrls: ['./cases-date-onset-list.component.less']
+    templateUrl: './report-cases-date-onset-list.component.html',
+    styleUrls: ['./report-cases-date-onset-list.component.less']
 })
-export class CasesDateOnsetListComponent extends ListComponent implements OnInit {
+export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),

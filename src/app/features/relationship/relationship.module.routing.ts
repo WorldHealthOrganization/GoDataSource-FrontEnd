@@ -48,7 +48,7 @@ const routes: Routes = [
     // View Case with onset date that is before the date of onset of the primary case
     {
         path: 'date-onset',
-        component: fromPages.CasesDateOnsetListComponent,
+        component: fromPages.ReportCasesDateOnsetListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [
