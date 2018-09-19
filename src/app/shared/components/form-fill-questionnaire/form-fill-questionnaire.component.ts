@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, 
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
-import { QuestionModel } from '../../../core/models/question.model';
+import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { Constants } from '../../../core/models/constants';
 
 @Component({
@@ -19,7 +19,16 @@ import { Constants } from '../../../core/models/constants';
 export class FormFillQuestionnaireComponent extends GroupBase<{}> {
     @Input() disabled: boolean = false;
 
-    questionsGroupedByCategory: { category: string, questions: QuestionModel[] }[];
+    questionsGroupedByCategory: {
+        category: string,
+        questions: QuestionModel[]
+    }[];
+
+    additionalQuestions: {
+        [ variable: string ]: {
+            [ answer_value: string ]: QuestionModel[]
+        }
+    } = {};
 
     // import constants into template
     Constants = Constants;
@@ -28,15 +37,35 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
     @Input() displayCopyFieldDescription: string = '';
     @Output() copyValue = new EventEmitter<string>();
 
+    @Input() hideCategories: boolean = false;
+
     /**
      * Set question and group them by category
      * @param {QuestionModel[]} questions
      */
     @Input() set questions(questions: QuestionModel[]) {
+        // reset additional questions
+        this.additionalQuestions = {};
+
         // group them by category
         this.questionsGroupedByCategory = _.chain(questions)
             .groupBy('category')
             .transform((result, questionsData: QuestionModel[], category: string) => {
+                // map additional questions
+                _.each(questionsData, (question: QuestionModel) => {
+                    _.each(question.answers, (answer: AnswerModel) => {
+                        if (!_.isEmpty(answer.additionalQuestions)) {
+                            // answer value should be unique
+                            // can't use _.set since we can have dots & square brackets inside strings
+                            if (!this.additionalQuestions[question.variable]) {
+                                this.additionalQuestions[question.variable] = {};
+                            }
+                            this.additionalQuestions[question.variable][answer.value] = answer.additionalQuestions;
+                        }
+                    });
+                });
+
+                // sort & add root questions
                 result.push({
                     category: category,
                     questions: _.sortBy(questionsData, 'order')
@@ -62,5 +91,56 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
      */
     triggerCopyValue(property) {
         this.copyValue.emit(property);
+    }
+
+    /**
+     * Check if we have sub-questions for teh selected answers
+     * @param question
+     * @param selectedAnswers
+     */
+    hasSubQuestions(question: QuestionModel, selectedAnswers): boolean {
+        // nothing was selected
+        if (
+            _.isEmpty(selectedAnswers) ||
+            !this.additionalQuestions ||
+            !this.additionalQuestions[question.variable]
+        ) {
+            return false;
+        }
+
+        // convert to array if necessary so we handle both single & multiple selects
+        if (!_.isArray(selectedAnswers)) {
+            selectedAnswers = [selectedAnswers];
+        }
+
+        // determine if we have at least one answer with additional questions
+        let hasQuestions: boolean = false;
+        _.each(selectedAnswers, (answerValue: string) => {
+            if (this.additionalQuestions[question.variable][answerValue]) {
+                hasQuestions = true;
+                return false;
+            }
+        });
+
+        // finished
+        return hasQuestions;
+    }
+
+    subQuestionsAnswer(question: QuestionModel, selectedAnswers): string[] {
+        // convert to array if necessary so we handle both single & multiple selects
+        if (!_.isArray(selectedAnswers)) {
+            selectedAnswers = [selectedAnswers];
+        }
+
+        // determine answers with additional questions
+        const answers: string[] = [];
+        _.each(selectedAnswers, (answerValue: string) => {
+            if (this.additionalQuestions[question.variable][answerValue]) {
+                answers.push(answerValue);
+            }
+        });
+
+        // finished
+        return answers;
     }
 }

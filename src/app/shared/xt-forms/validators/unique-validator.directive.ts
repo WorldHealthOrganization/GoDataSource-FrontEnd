@@ -29,6 +29,8 @@ export class UniqueValidatorDirective implements Validator {
         return this._appUniqueValidatorExpression;
     }
 
+    @Input() additionalControlsToCheck: AbstractControl[];
+
     constructor(
         @Attribute('app-unique-validator') private appUniqueValidator: string
     ) {
@@ -60,7 +62,11 @@ export class UniqueValidatorDirective implements Validator {
             control.root instanceof FormGroup &&
             control.root.controls
         ) {
-            _.each(control.root.controls, (ctrl: AbstractControl, name: string) => {
+            _.each(
+                {
+                    ...control.root.controls,
+                    ...this.additionalControlsToCheck
+                }, (ctrl: AbstractControl, name: string) => {
                 if (
                     this.regex &&
                     this.regex.test(name) &&
