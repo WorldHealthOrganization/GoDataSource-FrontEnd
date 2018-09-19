@@ -79,10 +79,12 @@ export class FormDatepickerComponent extends ElementBase<string> implements OnIn
     }
 
     ngOnInit() {
-        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-        });
+        if (this.placeholder) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+            });
+        }
     }
 
     /**

@@ -62,10 +62,12 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     }
 
     ngOnInit() {
-        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-        });
+        if (this.placeholder) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+            });
+        }
     }
 
     /**
