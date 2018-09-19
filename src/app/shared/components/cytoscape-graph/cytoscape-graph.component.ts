@@ -91,23 +91,27 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             const datesIndex = _.findIndex(
                 this.datesArray,
                 function (o) {
-                    return o === nodeData.dateOfReporting;
+                    return o === nodeData.dateTimeline;
                 });
             // using 150px as it looks fine
             const posX = datesIndex * 150;
             // calculate position on y axis based on the index of the node from that respective date
-            const nodesArray = this.timelineDates[nodeData.dateOfReporting];
-            let nodeIndex = 1;
-            if (nodesArray.length > 1) {
-                nodeIndex = _.findIndex(
-                    nodesArray,
-                    function (n) {
-                        return n === nodeData.id;
-                    });
+            if (!_.isEmpty(nodeData.dateTimeline)) {
+                const nodesArray = this.timelineDates[nodeData.dateTimeline];
+                let nodeIndex = 1;
+                if (nodesArray.length > 1) {
+                    nodeIndex = _.findIndex(
+                        nodesArray,
+                        function (n) {
+                            return n === nodeData.id;
+                        });
+                }
+                // using 100 px as it looks fine
+                const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                return {x: posX, y: posY};
+            } else {
+                return null;
             }
-            // using 100 px as it looks fine
-            const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
-            return {x: posX, y: posY};
         }
     };
 
@@ -138,14 +142,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     ];
 
-    // the style for the timeline view. The label field is modified in order to display dateOfReporting
+    // the style for the timeline view. The label field is modified in order to display dateTimeline
     timelineStyle: any = [
         {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
                 'label': 'data(label)',
-                'text-wrap': 'wrap'
+                'text-wrap': 'wrap',
+                'display': 'data(displayTimeline)'
             }
         },
         {
@@ -223,15 +228,21 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         // empty the already set timeline and dates arrays
         this.timelineDates = {};
         this.datesArray = [];
-        // loop through nodes to extract the dates ( dateOfReporting)
+        // loop through nodes to extract the dates ( dateTimeline)
         _.forEach(this.elements.nodes, (node, key) => {
-            if (this.timelineDates[node.data.dateOfReporting]) {
-                this.timelineDates[node.data.dateOfReporting].push(node.data.id);
+            if (!_.isEmpty(node.data.dateTimeline)) {
+                if (this.timelineDates[node.data.dateTimeline]) {
+                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                } else {
+                    this.timelineDates[node.data.dateTimeline] = [];
+                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                }
+                this.datesArray.push(node.data.dateTimeline);
             } else {
-                this.timelineDates[node.data.dateOfReporting] = [];
-                this.timelineDates[node.data.dateOfReporting].push(node.data.id);
+                // this.cy.remove(node.data.id);
+                // node.remove();
+                // node.style('display', 'none');
             }
-            this.datesArray.push(node.data.dateOfReporting);
         });
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);

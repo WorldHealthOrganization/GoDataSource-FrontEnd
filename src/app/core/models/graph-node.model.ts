@@ -7,7 +7,8 @@ export class GraphNodeModel {
     id: string;
     name: string;
     type: EntityType;
-    dateOfReporting: string;
+    dateTimeline: string;
+    displayTimeline: string;
 
     // default node color
     nodeColor: string;
@@ -15,16 +16,24 @@ export class GraphNodeModel {
 
 
     constructor(data = null) {
+        console.log(data);
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
         this.type = _.get(data, 'type', '');
-        this.dateOfReporting = _.get(data, 'dateOfReporting', '');
-        if ( this.dateOfReporting ) {
-            this.dateOfReporting = moment(this.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        this.dateTimeline = _.get(data, 'dateTimeline', '');
+        this.displayTimeline = _.get(data, 'displayTimeline', 'element');
+
+        if ( this.dateTimeline ) {
+            this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        } else {
+            this.displayTimeline = 'none';
         }
 
         // label to be used when displaying the timeline view
-        this.label = this.name + '\n' + this.dateOfReporting;
+        this.label = this.name + '\n' + this.dateTimeline;
+        console.log(this.label);
+        console.log(this.dateTimeline);
+
 
         // set the color based on node type
         switch (this.type) {
