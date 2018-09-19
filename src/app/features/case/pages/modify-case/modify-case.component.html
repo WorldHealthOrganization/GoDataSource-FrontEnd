@@ -246,10 +246,7 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="[
-                                    serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
-                                ]">
+                                [dateSameOrBefore]="dateOnsetSameOrBeforeDates()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle

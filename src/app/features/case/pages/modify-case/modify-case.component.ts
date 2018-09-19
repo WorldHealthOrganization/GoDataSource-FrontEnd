@@ -19,6 +19,11 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
+import { RelationshipModel } from '../../../../core/models/relationship.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-modify-case',
@@ -49,6 +54,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     serverToday: Moment = null;
 
+    parentOnsetDates: Moment[] = [];
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -58,7 +65,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -87,11 +95,48 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 .subscribe((selectedOutbreak: OutbreakModel) => {
                     this.selectedOutbreak = selectedOutbreak;
 
+                    // construct query builder for this case that includes the parent relation as well
+                    const qb = new RequestQueryBuilder();
+
+                    // parent case relations
+                    const relations = qb.include('relationships');
+                    relations.filterParent = false;
+
+                    // keep only relationships for which the current case is the target ( child case )
+                    relations.queryBuilder.filter.where({
+                        or: [{
+                            'persons.0.type': EntityType.CASE,
+                            'persons.0.source': true,
+                            'persons.1.type': EntityType.CASE,
+                            'persons.1.target': true,
+                            'persons.1.id': this.caseId
+                        }, {
+                            'persons.0.type': EntityType.CASE,
+                            'persons.0.target': true,
+                            'persons.0.id': this.caseId,
+                            'persons.1.type': EntityType.CASE,
+                            'persons.1.source': true
+                        }]
+                    });
+
+                    // case data
+                    const people = relations.queryBuilder.include('people');
+                    people.filterParent = false;
+
+                    // ID
+                    qb.filter.byEquality(
+                        'id',
+                        this.caseId
+                    );
+
                     // get case
                     this.caseDataService
-                        .getCase(selectedOutbreak.id, this.caseId)
-                        .subscribe(caseDataReturned => {
-                            this.caseData = new CaseModel(caseDataReturned);
+                        .getCasesList(
+                            selectedOutbreak.id,
+                            qb
+                        )
+                        .subscribe((cases: CaseModel[]) => {
+                            // add breadcrumb
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
                                     this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
@@ -101,6 +146,24 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                     this.caseData
                                 )
                             );
+
+                            // set data only when we have everything
+                            this.caseData = new CaseModel(cases[0]);
+
+                            // determine parent onset dates
+                            const uniqueDates: {} = {};
+                            _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
+                                const parentPerson = _.find(relationship.persons, { source: true });
+                                const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
+                                if (parentCase.dateOfOnset) {
+                                    uniqueDates[moment(parentCase.dateOfOnset).startOf('day').toISOString()] = true;
+                                }
+                            });
+
+                            // convert unique object of dates to array
+                            this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
+                                return moment(date);
+                            });
                         });
                 });
 
@@ -154,5 +217,16 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.disableDirtyConfirm();
                 this.router.navigate(['/cases']);
             });
+    }
+
+    /**
+     * Used for validating date onset
+     */
+    dateOnsetSameOrBeforeDates(): any[] {
+        return [
+            ...this.parentOnsetDates,
+            this.serverToday,
+            [this.caseData.dateDeceased, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_DECEASED')]
+        ];
     }
 }

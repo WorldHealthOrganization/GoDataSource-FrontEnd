@@ -36,6 +36,10 @@ export class CaseModel {
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
 
+    relationships: {
+        people: any[]
+    }[];
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -74,6 +78,8 @@ export class CaseModel {
         this.transferRefused = _.get(data, 'transferRefused');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
+        this.relationships = _.get(data, 'relationships', []);
     }
 
     /**
