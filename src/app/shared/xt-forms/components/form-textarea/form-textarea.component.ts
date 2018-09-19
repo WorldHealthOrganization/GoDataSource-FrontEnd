@@ -51,7 +51,7 @@ export class FormTextareaComponent extends ElementBase<string> implements OnInit
     }
 
     ngOnInit() {
-        const labelValue = _.camelCase(this.i18nService.instant(this.placeholder)).toLowerCase();
+        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
         this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
             this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
         });
