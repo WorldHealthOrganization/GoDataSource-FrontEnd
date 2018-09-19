@@ -516,6 +516,8 @@ export const EnglishUsLang = {
          * Create User page
          */
         'LNG_PAGE_CREATE_USER_TITLE': 'Create New User',
+        'LNG_PAGE_CREATE_USER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON' : 'Create user',
         'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE': 'User created!',
 
         /**
@@ -523,6 +525,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_USER_TITLE': 'View User',
         'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
+        'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' : 'Details',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
         /**
@@ -542,6 +545,8 @@ export const EnglishUsLang = {
          * Create User Role Page
          */
         'LNG_PAGE_CREATE_USER_ROLE_TITLE': 'Create New Role',
+        'LNG_PAGE_CREATE_USER_ROLE_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON': 'Create new role',
         'LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE': 'Role created!',
 
         /**
@@ -549,6 +554,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_USER_ROLES_TITLE': 'View Role',
         'LNG_PAGE_MODIFY_USER_ROLES_TITLE': 'Modify Role',
+        'LNG_PAGE_MODIFY_USER_ROLES_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE': 'Role updated!',
 
         /**
