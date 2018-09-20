@@ -21,46 +21,48 @@
 
     <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event)">
 
-        <!-- First Name -->
-        <ng-container matColumnDef="firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header>
-                        {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+            <!-- First Name -->
+            <ng-container matColumnDef="firstName">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">
+                            {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="firstNameFilter"
+                                ngModel
+                                placeholder="Filter"
+                                (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
                     </div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="firstNameFilter"
-                            ngModel
-                            placeholder="Filter"
-                            (optionChanged)="filterByTextField(['firstName', 'name'], $event)">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
+                </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
                 {{item.type === EntityType.EVENT ? item.name : item.firstName}}
             </mat-cell>
         </ng-container>
 
-        <!-- Last Name -->
-        <ng-container matColumnDef="lastName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header>
-                        {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
+            <!-- Last Name -->
+            <ng-container matColumnDef="lastName">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">
+                            {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-input
+                                name="lastNameFilter"
+                                ngModel
+                                placeholder="Filter"
+                                (optionChanged)="filterByTextField('lastName', $event)"
+                                [displayFilterIcon]="true">
+                            </app-form-input>
+                        </div>
                     </div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="lastNameFilter"
-                            ngModel
-                            placeholder="Filter"
-                            (optionChanged)="filterByTextField('lastName', $event)">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
+                </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
                 {{item.lastName}}
@@ -71,7 +73,7 @@
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_ENTITY_FIELD_LABEL_AGE' | translate}}
                     </div>
                     <div class="column-filter">
@@ -89,26 +91,27 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Gender -->
-        <ng-container matColumnDef="gender">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header>
-                        {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
+            <!-- Gender -->
+            <ng-container matColumnDef="gender">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header" mat-sort-header>
+                            {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="genderFilter"
+                                ngModel
+                                placeholder="Filter"
+                                [options]="genderList$ | async"
+                                (optionChanged)="filterBySelectField('gender', $event)"
+                                multiple="true"
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
                     </div>
-                    <div class="column-filter">
-                        <app-form-select
-                            name="genderFilter"
-                            ngModel
-                            placeholder="Filter"
-                            [options]="genderList$ | async"
-                            (optionChanged)="filterBySelectField('gender', $event)"
-                            multiple="true"
-                            [allowSelectionOfDisabledItems]="true">
-                        </app-form-select>
-                    </div>
-                </div>
-            </mat-header-cell>
+                </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
                 {{ item.gender | translate }}
@@ -119,7 +122,7 @@
         <ng-container matColumnDef="riskLevel">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>
+                    <div mat-sort-header class="column-header">
                         {{'LNG_ENTITY_FIELD_LABEL_RISK' | translate}}
                     </div>
                     <div class="column-filter">
@@ -145,18 +148,36 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Place -->
-        <ng-container matColumnDef="place">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div>
-                        {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+            <!-- Last follow-up -->
+            <ng-container matColumnDef="lastFollowUp">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header">
+                            {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <!-- placeholder -->
+                        </div>
                     </div>
-                    <div class="column-filter">
-                        <!-- placeholder -->
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                    <!-- placeholder -->
+                </mat-cell>
+            </ng-container>
+
+            <!-- Place -->
+            <ng-container matColumnDef="place">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div class="column-header">
+                            {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+                        </div>
+                        <div class="column-filter">
+                            <!-- placeholder -->
+                        </div>
                     </div>
-                </div>
-            </mat-header-cell>
+                </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
                 {{item.mainAddress.location?.name}}
@@ -167,7 +188,7 @@
         <ng-container matColumnDef="address">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>
+                    <div class="column-header">
                         {{'LNG_ENTITY_FIELD_LABEL_ADDRESS' | translate}}
                     </div>
                     <div class="column-filter">

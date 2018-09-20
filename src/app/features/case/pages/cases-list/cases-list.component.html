@@ -100,14 +100,15 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('firstName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -121,15 +122,16 @@
         <!-- Last Name -->
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                <div class="table-header-cell" fxLayout="column" >
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('lastName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -143,7 +145,7 @@
         <ng-container matColumnDef="classification">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="classificationFilter"
@@ -153,7 +155,8 @@
                             (optionChanged)="filterBySelectField('classification', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -170,7 +173,7 @@
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_AGE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_AGE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
@@ -190,7 +193,7 @@
         <ng-container matColumnDef="gender">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_GENDER' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_GENDER' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="genderFilter"
@@ -200,7 +203,8 @@
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -214,7 +218,7 @@
         <ng-container matColumnDef="dateOfOnset">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>

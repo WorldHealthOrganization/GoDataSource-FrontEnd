@@ -38,6 +38,8 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() tooltip: string = null;
 
+    @Input() displayFilterIcon: boolean = false;
+
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();

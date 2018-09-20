@@ -43,6 +43,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Input() readonly: boolean = false;
     @Input() tooltip: string = null;
 
+    @Input() displayFilterIcon: boolean = false;
+
     @Input() maxlength: number;
 
 
