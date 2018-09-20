@@ -91,6 +91,11 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         // set available side filters
         this.availableSideFilters = [
             new FilterModel({
+                fieldName: 'address',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
                 fieldName: 'date',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
                 type: FilterType.RANGE_DATE
