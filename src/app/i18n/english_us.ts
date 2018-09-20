@@ -846,6 +846,7 @@ export const EnglishUsLang = {
          * Reference Data - Category Entries List page
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry deleted!',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_COLOR': 'No color',
 
         /**
          * Create Reference Data Entry page
