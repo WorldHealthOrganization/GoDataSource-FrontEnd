@@ -36,9 +36,9 @@
                         [(ngModel)]="address.date"
                         [required]="required"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
-                        [maxDate]="Constants.today()"
+                        [maxDate]="serverToday"
                         app-date-validator
-                        [dateSameOrBefore]="Constants.today()"
+                        [dateSameOrBefore]="serverToday"
                         (optionChanged)="onChange()">
                     </app-form-datepicker>
                     <div

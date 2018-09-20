@@ -12,7 +12,7 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
-import { Constants } from '../../../core/models/constants';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-form-relationship',
@@ -48,7 +48,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -68,6 +68,13 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     ngOnInit() {
         // init value
         this.value = new RelationshipModel(this.value);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         // reference data
         this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();

@@ -30,9 +30,9 @@
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
                                 required="true"
                                 [disabled]="viewOnly"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()">
+                                [dateSameOrBefore]="serverToday">
                             </app-form-datepicker>
 
                             <app-form-datepicker
@@ -41,9 +41,9 @@
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
                                 [disabled]="viewOnly"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()">
+                                [dateSameOrBefore]="serverToday">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
