@@ -10,6 +10,9 @@ import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-
 import * as _ from 'lodash';
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
+import { LabelValuePair } from '../../models/label-value-pair';
+import { Constants } from '../../models/constants';
+import * as moment from 'moment';
 
 @Injectable()
 export class RelationshipDataService {
@@ -240,6 +243,62 @@ export class RelationshipDataService {
             this.http.get(`outbreaks/${outbreakId}/cases/new-among-known-contacts/count?filter=${filter}`),
             MetricNewCasesWithContactsModel
         );
+    }
+
+    /**
+     * Return label - value pair of Relationship objects
+     * @param {any} relationship
+     * @returns {LabelValuePair[]}
+     */
+    getLightObjectDisplay(
+        relationship: any
+    ): LabelValuePair[] {
+
+        const lightObject = [];
+        // dialog title: Case Details
+        lightObject.push(new LabelValuePair(
+            'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
+            ''
+        ));
+
+        // dialog fields
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            relationship.contactDate ?
+                moment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                ''
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            relationship.certaintyLevelId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            relationship.exposureTypeId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            relationship.exposureFrequencyId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            relationship.exposureDurationId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            relationship.socialRelationshipTypeId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            relationship.comment
+        ));
+        // insert link to full resource
+        lightObject.push(new LabelValuePair(
+            'LINK',
+            `/relationships/${relationship.sourceType}/${relationship.source}/${relationship.id}/view`
+        ));
+
+        return lightObject;
     }
 }
 

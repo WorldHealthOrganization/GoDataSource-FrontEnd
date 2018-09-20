@@ -17,6 +17,8 @@ import { Observable } from 'rxjs/Observable';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
+import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -40,7 +42,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private entityDataService: EntityDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -150,6 +153,28 @@ export class TransmissionChainsDashletComponent implements OnInit {
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                 // show dialog with data
                 const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
+                this.dialogService.showDataDialog(dialogData);
+            });
+    }
+
+    /**
+     * Handle tap on an edge
+     * @param {GraphNodeModel} relationship
+     * @returns {IterableIterator<any>}
+     */
+    onEdgeTap(relationship: GraphEdgeModel) {
+        // retrieve relationship information
+        // get relationship data
+        this.relationshipDataService
+            .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((relationshipData) => {
+                relationshipData.sourceType = relationship.sourceType;
+                relationshipData.source = relationship.source;
+                const dialogData = this.relationshipDataService.getLightObjectDisplay(relationshipData);
                 this.dialogService.showDataDialog(dialogData);
             });
     }
