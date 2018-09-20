@@ -6,7 +6,7 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
-import { MetricContactsWithSuccessfulFollowUP } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
+import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -17,7 +17,7 @@ import { MetricContactsWithSuccessfulFollowUP } from '../../../../core/models/me
 export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
 
     // contacts with successfulFollowup
-    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUP;
+    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp;
 
     // filter by day
     date: Moment = moment();
@@ -59,7 +59,7 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
 
         // get the results for contacts seen
         this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.date)
-            .subscribe((result: MetricContactsWithSuccessfulFollowUP) => {
+            .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                 this.contactsWithSuccessfulFollowup = result;
             });
     }

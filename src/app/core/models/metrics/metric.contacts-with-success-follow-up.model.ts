@@ -6,7 +6,7 @@ export interface ContactFollowedUp {
     successfulFollowupsCount: number;
 }
 
-export class MetricContactsWithSuccessfulFollowUP {
+export class MetricContactsWithSuccessfulFollowUp {
     contacts: ContactFollowedUp[];
     contactsWithSuccessfulFollowupsCount: number;
     teams: Object[];

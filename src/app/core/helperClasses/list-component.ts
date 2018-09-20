@@ -19,7 +19,7 @@ import * as moment from 'moment';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
 import {
     ContactFollowedUp,
-    MetricContactsWithSuccessfulFollowUP
+    MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
 
 export abstract class ListComponent {
@@ -745,7 +745,7 @@ export abstract class ListComponent {
 
                 const followedDate: Moment = moment(queryParams.date);
                 this.listFilterDataService.filterContactsWithSuccessfulFollowup(followedDate)
-                    .subscribe((result: MetricContactsWithSuccessfulFollowUP) => {
+                    .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
                             .map((item: ContactFollowedUp) => {

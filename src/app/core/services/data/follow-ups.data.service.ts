@@ -10,7 +10,7 @@ import { LocationDataService } from './location.data.service';
 import 'rxjs/add/operator/mergeMap';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
-import { MetricContactsWithSuccessfulFollowUP } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
+import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -252,13 +252,13 @@ export class FollowUpsDataService {
     /**
      * Retrieve the list of contacts who have successful followup
      * @param {string} outbreakId
-     * @returns {Observable<MetricContactsWithSuccessfulFollowUP>}
+     * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
-    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUP> {
+    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-with-successful-follow-ups/count?filter=${filter}`),
-            MetricContactsWithSuccessfulFollowUP
+            MetricContactsWithSuccessfulFollowUp
         );
     }
 }
