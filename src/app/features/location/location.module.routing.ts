@@ -64,6 +64,15 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // Location Usage
+    {
+        path: ':locationId/usage',
+        component: fromPages.LocationUsageListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            // no permissions required for now
+        }
     }
 ];
 

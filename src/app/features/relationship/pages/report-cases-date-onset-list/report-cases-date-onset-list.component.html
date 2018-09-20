@@ -1,0 +1,188 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="casesWithOnsetList$ | async">
+
+        <!-- Primary Case => Case First Name -->
+        <ng-container matColumnDef="primaryCase.firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_PRIMARY' | translate }} {{'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.primaryCase?.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Primary Case => Last Name -->
+        <ng-container matColumnDef="primaryCase.lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_PRIMARY' | translate }} {{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.primaryCase?.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Primary Case => Date of onset -->
+        <ng-container matColumnDef="primaryCase.dateOfOnset">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_PRIMARY' | translate }} {{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.primaryCase?.dateOfOnset | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Primary Case => Classification -->
+        <ng-container matColumnDef="primaryCase.classification">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_PRIMARY' | translate }} {{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                    [value]="item.primaryCase?.classification">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Secondary Case => Case First Name -->
+        <ng-container matColumnDef="secondaryCase.firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_SECONDARY' | translate }} {{'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.secondaryCase?.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Secondary Case => Last Name -->
+        <ng-container matColumnDef="secondaryCase.lastName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_SECONDARY' | translate }} {{'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.secondaryCase?.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Secondary Case => Date of onset -->
+        <ng-container matColumnDef="secondaryCase.dateOfOnset">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_SECONDARY' | translate }} {{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.secondaryCase?.dateOfOnset | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Secondary Case => Classification -->
+        <ng-container matColumnDef="secondaryCase.classification">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{ 'LNG_PAGE_LIST_CASES_LABEL_SECONDARY' | translate }} {{'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                    [value]="item.secondaryCase?.classification">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/cases', item.primaryCase?.id, 'view']"
+                        [queryParams]="{ onset: true }">
+                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW' | translate:item.primaryCase }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/cases', item.secondaryCase?.id, 'view']"
+                        [queryParams]="{ onset: true }">
+                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW' | translate:item.secondaryCase }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/relationships', EntityType.CASE, item.primaryCase?.id, item.relationship?.id, 'view']">
+                        {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP' | translate }}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <ng-container *ngIf="hasCaseWriteAccess()">
+                            <button
+                                mat-menu-item [routerLink]="['/cases', item.primaryCase?.id, 'modify']"
+                                [queryParams]="{ onset: true }">
+                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY' | translate:item.primaryCase }}
+                            </button>
+
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/cases', item.secondaryCase?.id, 'modify']"
+                                [queryParams]="{ onset: true }">
+                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY' | translate:item.secondaryCase }}
+                            </button>
+
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/relationships', EntityType.CASE, item.primaryCase?.id, item.relationship?.id, 'modify']">
+                                {{ 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP' | translate }}
+                            </button>
+                        </ng-container>
+                    </ng-container>
+
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
+
+</mat-card>

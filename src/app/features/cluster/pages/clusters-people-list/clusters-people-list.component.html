@@ -111,7 +111,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                {{item.gender}}
+                {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
 

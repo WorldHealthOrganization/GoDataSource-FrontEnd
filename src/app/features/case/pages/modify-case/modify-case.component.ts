@@ -26,9 +26,7 @@ import { Constants } from '../../../../core/models/constants';
     styleUrls: ['./modify-case.component.less']
 })
 export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -47,6 +45,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     EntityType = EntityType;
 
     Constants = Constants;
+
+    queryParams: {
+        onset: boolean,
+        longPeriod: boolean
+    };
 
     constructor(
         private router: Router,
@@ -69,34 +72,82 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
-        this.route.params.subscribe((params: { caseId }) => {
-            this.caseId = params.caseId;
+        // retrieve query params
+        this.route.queryParams
+            .subscribe((queryParams: any) => {
+                this.queryParams = queryParams;
+                this.buildBreadcrumbs();
+            });
 
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.selectedOutbreak = selectedOutbreak;
+        this.route.params
+            .subscribe((params: { caseId }) => {
+                this.caseId = params.caseId;
+                this.retrieveCaseData();
+            });
 
-                    // get case
-                    this.caseDataService
-                        .getCase(selectedOutbreak.id, this.caseId)
-                        .subscribe(caseDataReturned => {
-                            this.caseData = new CaseModel(caseDataReturned);
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.caseData
-                                )
-                            );
-                        });
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+                this.retrieveCaseData();
+            });
+    }
+
+    buildBreadcrumbs() {
+        if (this.caseData) {
+            // initialize breadcrumbs
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            ];
+
+            // do we need to add onset breadcrumb ?
+            // no need to check rights since this params should be set only if we come from that page
+            if (this.queryParams.onset) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+                        '/relationships/date-onset'
+                    )
+                );
+            }
+
+            // do we need to add long period between onset dates breadcrumb ?
+            // no need to check rights since this params should be set only if we come from that page
+            if (this.queryParams.longPeriod) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+                        '/relationships/long-period'
+                    )
+                );
+            }
+
+            // current page title
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
+                    '.',
+                    true,
+                    {},
+                    this.caseData
+                )
+            );
+        }
+    }
+
+    retrieveCaseData() {
+        // get case
+        if (
+            this.selectedOutbreak.id &&
+            this.caseId
+        ) {
+            this.caseDataService
+                .getCase(this.selectedOutbreak.id, this.caseId)
+                .subscribe(caseDataReturned => {
+                    this.caseData = new CaseModel(caseDataReturned);
+                    this.buildBreadcrumbs();
                 });
-
-
-        });
+        }
     }
 
     /**

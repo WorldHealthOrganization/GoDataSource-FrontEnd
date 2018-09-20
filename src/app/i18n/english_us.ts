@@ -96,6 +96,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
         'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
+        'LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP': 'Are you sure you want to remove relationship from the list?',
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
@@ -111,6 +112,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
         'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
+        'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
+        'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
 
         /**
          * Login page
@@ -310,6 +313,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
+        'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
+        'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
 
         /**
          * Create Case page
@@ -334,6 +339,27 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+
+        /**
+         * Date onset report list page
+         */
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE': 'Cases with onset date before parent onset case',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW': 'View "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP': 'View Relationship',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY': 'Modify "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP': 'Modify Relationship',
+        'LNG_PAGE_LIST_CASES_LABEL_PRIMARY': 'Primary',
+        'LNG_PAGE_LIST_CASES_LABEL_SECONDARY': 'Secondary',
+
+        /**
+         * Long period between onset dates report list page
+         */
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE': 'Cases with long periods between onset dates',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_LABEL_DIFFERENCE_BETWEEN_DATES': 'Difference ( days )',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW': 'View "{{name}}"',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP': 'View Relationship',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY': 'Modify "{{name}}"',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP': 'Modify Relationship',
 
         /**
          * Movement Case page
@@ -460,6 +486,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationships created!',
         'LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES': 'There are no entities selected for relationships!',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
 
         /**
          * Location Field
@@ -476,6 +503,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
@@ -496,6 +524,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
+
+        /**
+         * Locations Usage list page
+         */
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE': 'Location "{{name}}" usage',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_FOLLOW_UP': 'Follow-up',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_EVENT': 'Event',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CONTACT': 'Contact',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CASE': 'Case',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME': 'Name',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK': 'Outbreak',
 
         /**
          * User fields
