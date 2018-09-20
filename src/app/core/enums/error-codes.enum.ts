@@ -1,0 +1,4 @@
+export enum ErrorCodes {
+    MODEL_IN_USE = 'MODEL_IN_USE',
+    DELETE_PARENT_MODEL = 'DELETE_PARENT_MODEL'
+}

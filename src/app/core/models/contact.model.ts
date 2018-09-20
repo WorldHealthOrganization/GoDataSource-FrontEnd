@@ -22,6 +22,7 @@ export class ContactModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     dateDeceased: string;
+    outbreakId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -33,6 +34,7 @@ export class ContactModel {
         this.occupation = _.get(data, 'occupation');
         this.dob = _.get(data, 'dob');
         this.age = _.get(data, 'age');
+        this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
 
         const locationsList = _.get(data, 'locations', []);
@@ -55,8 +57,9 @@ export class ContactModel {
      * @returns {string}
      */
     get name(): string {
-        return ( this.firstName ? this.firstName : '' ) +
-            ' ' + ( this.lastName ? this.lastName : '' );
+        const firstName = _.get(this, 'firstName', '');
+        const lastName = _.get(this, 'lastName', '');
+        return _.trim(`${firstName} ${lastName}`);
     }
 
     /**

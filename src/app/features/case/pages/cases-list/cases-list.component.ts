@@ -251,6 +251,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have access to reports
+     * @returns {boolean}
+     */
+    hasReportAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */

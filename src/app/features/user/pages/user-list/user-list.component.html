@@ -29,14 +29,15 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('firstName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -51,14 +52,15 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('lastName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -72,14 +74,15 @@
         <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="emailFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('email', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -93,7 +96,7 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div>{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
+                    <div class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>

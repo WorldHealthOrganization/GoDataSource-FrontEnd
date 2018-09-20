@@ -112,6 +112,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
         'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
+        'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
+        'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
 
         /**
          * Login page
@@ -311,6 +313,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
+        'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
+        'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
 
         /**
          * Create Case page
@@ -335,6 +339,27 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+
+        /**
+         * Date onset report list page
+         */
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE': 'Cases with onset date before parent onset case',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW': 'View "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP': 'View Relationship',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY': 'Modify "{{name}}"',
+        'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP': 'Modify Relationship',
+        'LNG_PAGE_LIST_CASES_LABEL_PRIMARY': 'Primary',
+        'LNG_PAGE_LIST_CASES_LABEL_SECONDARY': 'Secondary',
+
+        /**
+         * Long period between onset dates report list page
+         */
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE': 'Cases with long periods between onset dates',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_LABEL_DIFFERENCE_BETWEEN_DATES': 'Difference ( days )',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW': 'View "{{name}}"',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP': 'View Relationship',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY': 'Modify "{{name}}"',
+        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP': 'Modify Relationship',
 
         /**
          * Movement Case page
@@ -478,6 +503,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
@@ -498,6 +524,18 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
+
+        /**
+         * Locations Usage list page
+         */
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE': 'Location "{{name}}" usage',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_FOLLOW_UP': 'Follow-up',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_EVENT': 'Event',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CONTACT': 'Contact',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CASE': 'Case',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME': 'Name',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK': 'Outbreak',
 
         /**
          * User fields
@@ -993,6 +1031,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CONTACTS_KPI_TITLE': 'Contacts KPIs',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE': 'Chains of transmission KPIs',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE': 'CONTACTS ON THE FOLLOW-UP LIST',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP': 'CONTACTS WITH SUCCESSFUL FOLLOWUP ON ',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE': 'CONTACTS PER CASE (MEAN)',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE': 'CONTACTS PER CASE (MEDIAN)',
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
@@ -1039,6 +1078,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP': 'Contacts lost to follow-up',
         'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN': 'Contacts not seen in {{x}} days',
         'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN': 'Contacts seen',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP': 'Contacts with successful follow-up',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',

@@ -1,7 +1,28 @@
 .form-select-container {
 
+    @position-helper: 24px;
     .mat-form-field {
         width: 100%;
+
+        &.display-filter-icon {
+            .filter-icon {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                span {
+                    font-size: 15px;
+                }
+            }
+
+            .filter-icon-input {
+                padding-left: @position-helper;
+            }
+
+            .mat-form-field-label {
+                margin-left: @position-helper;
+                width: ~'calc(100% - 24px)'
+            }
+        }
     }
 
 }
