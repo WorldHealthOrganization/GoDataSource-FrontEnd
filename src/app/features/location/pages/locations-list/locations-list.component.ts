@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
 import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
@@ -16,6 +16,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
+import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 
 @Component({
     selector: 'app-locations-list',
@@ -50,7 +51,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private router: Router
     ) {
         super(
             snackbarService
@@ -124,8 +126,29 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     // delete record
                     this.locationDataService
                         .deleteLocation(location.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        .catch((err: {
+                            message: string,
+                            code: ErrorCodes,
+                            details: {
+                                id: string,
+                                model: string
+                            }
+                        }) => {
+                            // check if we have a model in use error
+                            if (err.code === ErrorCodes.MODEL_IN_USE) {
+                                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
+                                    .subscribe((answerC: DialogAnswer) => {
+                                        if (answerC.button === DialogAnswerButton.Yes) {
+                                            // redirect to usage page where we can make changes
+                                            this.router.navigate(['/locations', err.details.id, 'usage']);
+                                        }
+                                    });
+                            } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
+                                this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
+                            } else {
+                                this.snackbarService.showError(err.message);
+                            }
+
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {

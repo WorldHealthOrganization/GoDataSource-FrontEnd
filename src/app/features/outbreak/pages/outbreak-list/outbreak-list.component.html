@@ -5,6 +5,7 @@
 
             <div class="topnav-actions">
                 <app-export-button
+                    *ngIf="!appliedListFilter"
                     [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
                     [url]="exportOutbreaksUrl"
@@ -14,6 +15,15 @@
                     [displayAnonymize]="true"
                     [anonymizeFields]="anonymizeFields">
                 </app-export-button>
+
+                <button
+                    *ngIf="!appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
+                    {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
+                </button>
 
                 <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
                         [routerLink]="'./create'">
@@ -112,7 +122,8 @@
                             [options]="diseasesList$ | async"
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -188,7 +199,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="activeOptionsList$ | async"
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>

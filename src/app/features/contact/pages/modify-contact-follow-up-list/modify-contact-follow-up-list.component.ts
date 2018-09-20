@@ -108,6 +108,15 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     }
 
     /**
+     * Track by field id
+     * @param index
+     * @param items
+     */
+    trackByFieldID(index: number, item: {id: string}): string {
+        return item.id;
+    }
+
+    /**
      * Remove follow-up
      * @param index
      */

@@ -6,13 +6,15 @@
         <mat-select
             #selectElement="ngModel"
             [(ngModel)]="value"
+            [compareWith]="compareWith"
             [attr.name]="name"
             [required]="required"
             [placeholder]="placeholder"
             [multiple]="multiple"
             (blur)="onBlur()"
             [disabled]="disabled"
-            (selectionChange)="onChange(selectElement.value)">
+            (selectionChange)="onChange(selectElement.value)"
+            [matTooltip]="tooltip">
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">
@@ -22,7 +24,7 @@
                 *ngFor="let option of options"
                 [value]="option[optionValueKey]"
                 [matTooltip]="option[optionTooltipKey] | translate"
-                [disabled]="option[optionDisabledKey]">
+                [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
                 {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
                 {{option[optionLabelKey] | translate}}
             </mat-option>

@@ -177,7 +177,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -197,22 +198,39 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
+                        <button
+                            *ngIf="!item.deleted && item.personId"
+                            mat-menu-item
+                            [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]"
+                            [queryParams]="{ displayOnlyMissedFollowUps: true }">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
-                            <button mat-menu-item *ngIf="!item.deleted && item.personId && hasFollowUpsWriteAccess()" [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]" [queryParams]="{ displayOnlyMissedFollowUps: true }" >
+                            <button
+                                *ngIf="!item.deleted && item.personId && hasFollowUpsWriteAccess()"
+                                mat-menu-item
+                                [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]"
+                                [queryParams]="{ displayOnlyMissedFollowUps: true }">
                                 {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                             </button>
-                            <button *ngIf="!item.deleted && hasFollowUpsWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteFollowUp(item)">
+                            <button
+                                *ngIf="!item.deleted && hasFollowUpsWriteAccess()"
+                                mat-menu-item
+                                class="mat-menu-item-delete"
+                                (click)="deleteFollowUp(item)">
                                 {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                             </button>
 
-                            <button *ngIf="item.deleted && hasFollowUpsWriteAccess()" mat-menu-item class="mat-menu-item-restore" (click)="restoreFollowUp(item)">
+                            <button
+                                *ngIf="item.deleted && hasFollowUpsWriteAccess()"
+                                mat-menu-item
+                                class="mat-menu-item-restore"
+                                (click)="restoreFollowUp(item)">
                                 {{ 'LNG_PAGE_ACTION_RESTORE' | translate }}
                             </button>
                         </ng-container>
+
                     </mat-menu>
                 </div>
             </mat-cell>

@@ -12,11 +12,16 @@ export class DomService {
         block: string = 'end'
     ) {
         setTimeout(function () {
-            document.querySelector(selector)
-                .scrollIntoView({
+            const item = document.querySelector(selector);
+            if (
+                item &&
+                item.scrollIntoView
+            ) {
+                item.scrollIntoView({
                     behavior: 'smooth',
                     block: block
                 });
+            }
         });
     }
 }

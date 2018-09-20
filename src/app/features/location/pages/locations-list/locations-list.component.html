@@ -102,7 +102,8 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByBooleanField('active', $event.value)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -150,6 +151,10 @@
 
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
+                    </button>
+
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
                     </button>
 
                     <mat-divider></mat-divider>

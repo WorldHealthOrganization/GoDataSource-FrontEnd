@@ -13,8 +13,26 @@
                     {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
                 </button>
 
+                <button
+                    *ngIf="!appliedListFilter && hasReportAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/relationships/date-onset']">
+                    {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
+                </button>
+
+                <button
+                    *ngIf="!appliedListFilter && hasReportAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/relationships/long-period']">
+                    {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
+                </button>
+
                 <app-export-button
-                    *ngIf="exportCasesUrl"
+                    *ngIf="!appliedListFilter && exportCasesUrl"
                     [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
                     [url]="exportCasesUrl"
@@ -26,19 +44,33 @@
                 </app-export-button>
 
                 <ng-container *app-selected-outbreak-is-active>
-                    <button
-                        *ngIf="hasCaseWriteAccess() && !appliedListFilter"
-                        class="button-primary"
-                        mat-raised-button
-                        color="primary"
-                        [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
-                        {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
-                    </button>
+                    <ng-container *ngIf="hasCaseWriteAccess()">
+                        <button
+                            *ngIf="!appliedListFilter"
+                            class="button-primary"
+                            mat-raised-button
+                            color="primary"
+                            [routerLink]="['/import-export-data', 'case-data', 'import']">
+                            {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                        </button>
 
-                    <button *ngIf="hasCaseWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                        <button
+                            *ngIf="!appliedListFilter"
+                            class="button-primary"
+                            mat-raised-button
+                            color="primary"
+                            [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
+                            {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            class="button-primary"
+                            mat-raised-button
+                            color="primary"
                             [routerLink]="'./create'">
-                        {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
-                    </button>
+                            {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                        </button>
+                    </ng-container>
                 </ng-container>
             </div>
         </div>
@@ -161,7 +193,8 @@
                             [options]="caseClassificationsList$ | async"
                             (optionChanged)="filterBySelectField('classification', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -207,13 +240,14 @@
                             [options]="genderList$ | async"
                             (optionChanged)="filterBySelectField('gender', $event)"
                             multiple="true"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true">
                         </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.gender }}
+                {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
 
