@@ -1,13 +1,32 @@
 <div class="dashboard-box">
     <!-- Dynamic title -->
-    <div
-        class="dashboard-box-header">
-        <ng-content></ng-content>
+    <div class="dashboard-box-header">
+
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+            <ng-content></ng-content>
+
+            <div>
+                <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">menu</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <button class="dashlet-menu-item" mat-menu-item>
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_HIDE_LABEL' | translate}}
+                    </button>
+                    <button class="dashlet-menu-item" mat-menu-item>
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_BEFORE_LABEL' | translate}}
+                    </button>
+                    <button class="dashlet-menu-item" mat-menu-item>
+                        {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_AFTER_LABEL' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
     </div>
 
     <!-- Content -->
-    <div
-        class="dashboard-box-content">
+    <div class="dashboard-box-content">
         <span
             [routerLink]="link"
             [queryParams]="params">

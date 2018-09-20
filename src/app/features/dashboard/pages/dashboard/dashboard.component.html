@@ -20,9 +20,24 @@
 
         <mat-card class="page-section">
             <!-- cases KPI section header -->
-            <div class="dashlet-kpi-header">
-                {{'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE' | translate}}
+            <div class="dashlet-kpi-header" fxLayout="row" fxLayoutAlign="space-between center">
+                <div>
+                    {{'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE' | translate}}
+                </div>
+
+                <div>
+                    <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">menu</span>
+                    </button>
+
+                    <mat-menu #actionsMenu="matMenu">
+                        <button class="dashboard-kpi-menu-item" mat-menu-item>
+                            {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
+                        </button>
+                    </mat-menu>
+                </div>
             </div>
+
             <!--cases KPI section-->
             <div class="cases-kpi-content" fxLayout="row wrap">
                 <!-- Cases who have died -->
