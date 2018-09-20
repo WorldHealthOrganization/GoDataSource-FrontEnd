@@ -227,6 +227,7 @@ export class TransmissionChainDataService {
                     // add relation only if the nodes are in the selectedNodes array
                     if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
                         const graphEdge = new GraphEdgeModel();
+                        graphEdge.id = relationship.id;
                         if (relationship.persons[0].source) {
                             graphEdge.source = relationship.persons[0].id;
                             graphEdge.sourceType = relationship.persons[0].type;
