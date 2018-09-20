@@ -159,7 +159,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     /**
      * Handle tap on an edge
-     * @param {GraphNodeModel} relationship
+     * @param {GraphEdgeModel} relationship
      * @returns {IterableIterator<any>}
      */
     onEdgeTap(relationship: GraphEdgeModel) {
