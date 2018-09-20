@@ -86,24 +86,36 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="70px">
 
-                <button *ngIf="!item.readonly" mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
+                <ng-container
+                    *ngIf="!item.readonly">
 
-                <mat-menu #actionsMenu="matMenu">
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}</button>
-
-                    <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}</button>
-
-                    <button mat-menu-item (click)="deleteEntry(item)">
-                        {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                    <button
+                        mat-icon-button
+                        [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
                     </button>
 
-                </mat-menu>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'view']">
+                            {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        </button>
 
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            (click)="deleteEntry(item)">
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                        </button>
+                    </mat-menu>
+
+                </ng-container>
             </mat-cell>
         </ng-container>
 

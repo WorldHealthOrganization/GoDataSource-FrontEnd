@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 // modules
 import { routing } from './reference-data.module.routing';
 import { SharedModule } from '../../shared/shared.module';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 // components
 import * as fromPages from './pages';
@@ -10,8 +11,8 @@ import * as fromPages from './pages';
 @NgModule({
     imports: [
         routing,
-        SharedModule
-
+        SharedModule,
+        ColorPickerModule
     ],
     declarations: [
         ...fromPages.pageComponents

@@ -10,30 +10,39 @@
 
         <div fxLayout="column">
 
-            <div fxLayout="row">
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-slide-toggle
                     name="active"
                     [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
                     [ngModel]="entry.active"
                     [disabled]="viewOnly">
                 </app-form-slide-toggle>
+
+                <div fxFlex>
+                    aaaa
+                </div>
+
+                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex><!-- placeholder --></div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-input fxFlex="30"
-                                name="value"
-                                [ngModel]="entry.value | translate"
-                                [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
-                                required="true"
-                                [disabled]="viewOnly">
+                <app-form-input
+                    fxFlex="30"
+                    name="value"
+                    [ngModel]="entry.value | translate"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                    required="true"
+                    [disabled]="viewOnly">
                 </app-form-input>
 
-                <app-form-textarea fxFlex
-                                   name="description"
-                                   [ngModel]="entry.description | translate"
-                                   [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
-                                   minRows="1"
-                                   [disabled]="viewOnly">
+                <app-form-textarea
+                    fxFlex
+                    name="description"
+                    [ngModel]="entry.description | translate"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
+                    minRows="1"
+                    [disabled]="viewOnly">
                 </app-form-textarea>
             </div>
 
@@ -42,10 +51,26 @@
     </mat-card>
 
     <div class="form-actions">
-        <button *ngIf="!viewOnly" mat-raised-button color="primary" class="button-primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-        <button *ngIf="viewOnly && hasReferenceDataWriteAccess()" type="button"
-                [routerLink]="'/reference-data/' + categoryId + '/' + entryId + '/modify'" mat-raised-button>{{'LNG_COMMON_BUTTON_EDIT' | translate}}</button>
-        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>{{'LNG_COMMON_BUTTON_CANCEL' | translate}}</button>
+        <button
+            *ngIf="!viewOnly"
+            mat-raised-button
+            color="primary"
+            class="button-primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+        <button
+            *ngIf="viewOnly && hasReferenceDataWriteAccess()"
+            type="button"
+            [routerLink]="'/reference-data/' + categoryId + '/' + entryId + '/modify'"
+            mat-raised-button>
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+        <button
+            type="button"
+            [routerLink]="'/reference-data/' + categoryId"
+            mat-raised-button>
+            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+        </button>
     </div>
 
 </form>
