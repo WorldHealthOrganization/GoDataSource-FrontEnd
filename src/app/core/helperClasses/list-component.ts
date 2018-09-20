@@ -17,6 +17,10 @@ import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
+import {
+    ContactFollowedUp,
+    MetricContactsWithSuccessfulFollowUp
+} from '../models/metrics/metric.contacts-with-success-follow-up.model';
 
 export abstract class ListComponent {
     /**
@@ -738,6 +742,32 @@ export abstract class ListComponent {
                                 'inq': result.contactIDs
                             }
                         }, true);
+                        this.mergeListFilterToMainFilter();
+
+                        // refresh list
+                        this.needsRefreshList(true);
+                    });
+                break;
+
+            // Filter contacts witch successful follow-up
+            case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
+
+                const followedDate: Moment = moment(queryParams.date);
+                this.listFilterDataService.filterContactsWithSuccessfulFollowup(followedDate)
+                    .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
+                        const contactIDs: string[] = _.chain(result.contacts)
+                            .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
+                            .map((item: ContactFollowedUp) => {
+                                return item.id;
+                            }).value();
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                        this.appliedListFilterQueryBuilder.filter.where({
+                            id: {
+                                'inq': contactIDs
+                            }
+                        }, true);
+
                         this.mergeListFilterToMainFilter();
 
                         // refresh list
