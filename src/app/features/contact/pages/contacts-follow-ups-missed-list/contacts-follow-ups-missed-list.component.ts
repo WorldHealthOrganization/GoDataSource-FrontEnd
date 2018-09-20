@@ -91,7 +91,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         // set available side filters
         this.availableSideFilters = [
             new FilterModel({
-                fieldName: 'addresses',
+                fieldName: 'address',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
                 type: FilterType.ADDRESS
             }),
@@ -128,6 +128,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                         fieldName: 'lastName',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
                         type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'addresses',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                        type: FilterType.ADDRESS,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
