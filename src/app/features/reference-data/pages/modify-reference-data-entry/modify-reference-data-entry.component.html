@@ -25,7 +25,20 @@
                         {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
                     </div>
 
+                    <!-- Read only -->
                     <input
+                        *ngIf="viewOnly"
+                        fxFlex="132px"
+                        class="ref-data-color-picker"
+                        [style.background]="entry.colorCode"
+                        name="colorCode"
+                        [ngModel]="entry.colorCode"
+                        [readonly]="true"
+                        [required]="false"/>
+
+                    <!-- Read & Write -->
+                    <input
+                        *ngIf="!viewOnly"
                         #colorPickerInput="ngModel"
                         fxFlex="132px"
                         class="ref-data-color-picker"
