@@ -16,8 +16,9 @@ import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-create-case',
@@ -41,7 +42,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private router: Router,
@@ -49,7 +50,8 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
@@ -58,6 +60,13 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());

@@ -82,14 +82,15 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstContactFirstName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
                             (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -104,14 +105,15 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstContactFirstName"
                             ngModel
                             placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
                             (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -125,7 +127,7 @@
         <ng-container matColumnDef="date">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
                             name="dateFilter"
@@ -145,7 +147,7 @@
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_AREA' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -160,7 +162,7 @@
         <ng-container matColumnDef="fullAddress">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS' | translate }}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -175,7 +177,7 @@
         <ng-container matColumnDef="lostToFollowUp">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="lostToFollowUpFilter"
@@ -184,7 +186,8 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByBooleanField('lostToFollowUp', $event.value)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -198,7 +201,7 @@
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
@@ -207,7 +210,8 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>

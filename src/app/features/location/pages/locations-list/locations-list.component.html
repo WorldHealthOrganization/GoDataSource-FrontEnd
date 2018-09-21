@@ -48,14 +48,15 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -72,14 +73,15 @@
         <ng-container matColumnDef="synonyms">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
+                    <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="synonymsFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('synonyms', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -94,7 +96,7 @@
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="activeFilter"
@@ -103,7 +105,8 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByBooleanField('active', $event.value)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -117,7 +120,7 @@
         <ng-container matColumnDef="populationDensity">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="populationDensityFilter"
@@ -151,6 +154,10 @@
 
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
+                    </button>
+
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
                     </button>
 
                     <mat-divider></mat-divider>

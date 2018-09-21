@@ -15,11 +15,11 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -51,7 +51,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     labNameOptionsList$: Observable<any[]>;
     progressOptionsList$: Observable<any[]>;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         protected route: ActivatedRoute,
@@ -75,6 +75,13 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         this.resultTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
         this.labNameOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
         this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         this.route.params
             .subscribe((params: {caseId, labResultId}) => {

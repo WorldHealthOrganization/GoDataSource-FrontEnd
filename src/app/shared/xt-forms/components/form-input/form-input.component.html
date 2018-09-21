@@ -1,8 +1,17 @@
 <div class="form-input-container form-element {{ (tooltip !== null ? 'form-input-tooltip' : '' ) }} "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <mat-form-field>
+    <mat-form-field
+        [class.display-filter-icon]="displayFilterIcon">
+
+        <div
+            *ngIf="displayFilterIcon"
+            class="filter-icon">
+            <span class="xt-icon input-filter-icon">search</span>
+        </div>
+
         <input
+            [class.filter-icon-input]="displayFilterIcon"
             matInput
             [type]="type"
             [maxlength]="maxlength"

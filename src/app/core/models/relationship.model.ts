@@ -60,3 +60,13 @@ export class RelationshipModel {
         });
     }
 }
+
+export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
+    differenceBetweenDatesOfOnset: number;
+
+    constructor(data = null) {
+        super(data);
+
+        this.differenceBetweenDatesOfOnset = _.get(data, 'differenceBetweenDatesOfOnset', 0);
+    }
+}

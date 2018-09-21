@@ -38,6 +38,8 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() tooltip: string = null;
 
+    @Input() displayFilterIcon: boolean = false;
+
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();
@@ -60,10 +62,12 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     }
 
     ngOnInit() {
-        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-        });
+        if (this.placeholder) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+            });
+        }
     }
 
     /**

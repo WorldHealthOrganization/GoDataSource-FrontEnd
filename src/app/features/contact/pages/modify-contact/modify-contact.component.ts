@@ -14,10 +14,11 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { Constants } from '../../../../core/models/constants';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-modify-contact',
@@ -46,7 +47,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
@@ -56,7 +57,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private contactDataService: ContactDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router
+        private router: Router,
+        private genericDataService: GenericDataService
     ) {
         super(route);
     }
@@ -68,6 +70,13 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         this.route.params
             .subscribe((params: {contactId}) => {

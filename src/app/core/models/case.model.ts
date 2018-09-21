@@ -35,6 +35,11 @@ export class CaseModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
+    outbreakId: string;
+
+    relationships: {
+        people: any[]
+    }[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -72,8 +77,11 @@ export class CaseModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
+        this.outbreakId = _.get(data, 'outbreakId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
+        this.relationships = _.get(data, 'relationships', []);
     }
 
     /**
@@ -81,8 +89,9 @@ export class CaseModel {
      * @returns {string}
      */
     get name(): string {
-        return ( this.firstName ? this.firstName : '' ) +
-            ' ' + ( this.lastName ? this.lastName : '' );
+        const firstName = _.get(this, 'firstName', '');
+        const lastName = _.get(this, 'lastName', '');
+        return _.trim(`${firstName} ${lastName}`);
     }
 
     /**

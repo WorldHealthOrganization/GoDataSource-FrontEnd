@@ -5,6 +5,8 @@ import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
 import { LabelValuePair } from '../../models/label-value-pair';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class GenericDataService {
@@ -20,6 +22,17 @@ export class GenericDataService {
         return this.http.get('system-settings/utc-date')
             .map((dateObject: { date }) => {
                 return _.get(dateObject, 'date');
+            });
+    }
+
+    /**
+     * Retrieve server current date
+     * @returns {Observable<Moment>}
+     */
+    getServerUTCToday(): Observable<Moment> {
+        return this.getServerUTCCurrentDateTime()
+            .map((serverDateTime: string) => {
+                return moment(serverDateTime).startOf('day');
             });
     }
 

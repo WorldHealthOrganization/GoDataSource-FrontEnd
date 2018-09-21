@@ -8,6 +8,7 @@ import 'rxjs/add/operator/share';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
+import { LocationUsageModel } from '../../models/location-usage.model';
 
 @Injectable()
 export class LocationDataService {
@@ -208,6 +209,17 @@ export class LocationDataService {
             // refresh location cache
             this.cacheService.remove(CacheKey.LOCATIONS);
         });
+    }
+
+    /**
+     * Retrieve location usage
+     * @param locationId
+     */
+    getLocationUsage(locationId: string): Observable<LocationUsageModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`locations/${locationId}/usage`),
+            LocationUsageModel
+        );
     }
 }
 

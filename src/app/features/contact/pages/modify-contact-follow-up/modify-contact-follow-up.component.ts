@@ -12,11 +12,11 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import * as moment from 'moment';
-import { Constants } from '../../../../core/models/constants';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -41,6 +41,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
     authUser: UserModel;
 
+    serverToday: Moment = null;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -56,6 +58,13 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     }
 
     ngOnInit() {
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -151,8 +160,9 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             null;
 
         if (
+            this.serverToday &&
             date &&
-            date.isAfter(Constants.today())
+            date.startOf('day').isAfter(this.serverToday)
         ) {
             this.followUpData.performed = false;
             this.followUpData.lostToFollowUp = false;

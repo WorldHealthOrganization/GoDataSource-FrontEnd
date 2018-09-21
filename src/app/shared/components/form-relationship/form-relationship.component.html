@@ -19,9 +19,9 @@
                         [disabled]="disabled"
                         [required]="required"
                         (optionChanged)="onChange()"
-                        [maxDate]="Constants.today()"
+                        [maxDate]="serverToday"
                         app-date-validator
-                        [dateSameOrBefore]="Constants.today()">
+                        [dateSameOrBefore]="serverToday">
                     </app-form-datepicker>
                     <div
                         *ngIf="displayCopyField"

@@ -20,6 +20,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() transmissionChainViewType: string;
 
     @Output() nodeTapped = new EventEmitter<any>();
+    @Output() edgeTapped = new EventEmitter<any>();
 
     cy: any;
     container: string = 'cy';
@@ -212,10 +213,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 this.showLoading = true;
             }
         });
-        // add tap event
+        // add node tap event
         this.cy.on('tap', 'node', (evt) => {
             const node = evt.target;
             this.nodeTapped.emit(node.json().data);
+        });
+        // add edge tap event
+        this.cy.on('tap', 'edge', (evt) => {
+            const edge = evt.target;
+            this.edgeTapped.emit(edge.json().data);
         });
     }
 

@@ -58,32 +58,28 @@ export class AddressModel {
             const conditions: any[] = [];
             matches.forEach((searchTerm: string) => {
                 conditions.push({
-                    $or: [{
-                        'city': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                    or: [{
+                        [property + '.city']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }, {
-                        'postalCode': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                        [property + '.postalCode']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }, {
-                        'addressLine1': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                        [property + '.addressLine1']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }]
                 });
             });
 
             // we use elemMatch because of a loopback v3 bug
-           qb.filter.where({
-                [property]: {
-                    elemMatch: {
-                        $and: conditions
-                    }
-                }
+            qb.filter.where({
+                and: conditions
             }, false);
 
             // finished

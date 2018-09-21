@@ -2,13 +2,15 @@ import * as _ from 'lodash';
 import { EntityType } from './entity-type';
 
 export class GraphEdgeModel {
+    id: string;
     source: string;
     target: string;
-    sourceType: string;
-    targetType: string;
+    sourceType: EntityType;
+    targetType: EntityType;
     edgeColor: string;
 
     constructor(data = null) {
+        this.id = _.get(data, 'id');
         this.source = _.get(data, 'source');
         this.target = _.get(data, 'target');
         this.sourceType = _.get(data, 'sourceType');

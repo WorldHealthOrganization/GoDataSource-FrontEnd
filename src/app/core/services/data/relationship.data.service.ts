@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { RelationshipModel } from '../../models/relationship.model';
+import { ReportDifferenceOnsetRelationshipModel, RelationshipModel } from '../../models/relationship.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
@@ -10,6 +10,10 @@ import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-
 import * as _ from 'lodash';
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
+import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
+import { LabelValuePair } from '../../models/label-value-pair';
+import { Constants } from '../../models/constants';
+import * as moment from 'moment';
 
 @Injectable()
 export class RelationshipDataService {
@@ -240,6 +244,84 @@ export class RelationshipDataService {
             this.http.get(`outbreaks/${outbreakId}/cases/new-among-known-contacts/count?filter=${filter}`),
             MetricNewCasesWithContactsModel
         );
+    }
+
+    /**
+     * Get cases with onset date that is before the date of onset of the primary case
+     * @param outbreakId
+     */
+    getCasesWithDateOnsetBeforePrimaryCase(outbreakId: string): Observable<ReportCasesWithOnsetModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/secondary-cases-with-date-of-onset-before-primary-case`),
+            ReportCasesWithOnsetModel
+        );
+    }
+
+    /**
+     * Get report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
+     * @param outbreakId
+     */
+    getLongPeriodBetweenDateOfOnset(outbreakId: string): Observable<ReportDifferenceOnsetRelationshipModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/relationships/long-periods-between-dates-of-onset-in-transmission-chains`),
+            ReportDifferenceOnsetRelationshipModel
+        );
+    }
+
+    /**
+     * Return label - value pair of Relationship objects
+     * @param {any} relationship
+     * @returns {LabelValuePair[]}
+     */
+    getLightObjectDisplay(
+        relationship: any
+    ): LabelValuePair[] {
+
+        const lightObject = [];
+        // dialog title: Case Details
+        lightObject.push(new LabelValuePair(
+            'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
+            ''
+        ));
+
+        // dialog fields
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            relationship.contactDate ?
+                moment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                ''
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            relationship.certaintyLevelId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            relationship.exposureTypeId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            relationship.exposureFrequencyId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            relationship.exposureDurationId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            relationship.socialRelationshipTypeId
+        ));
+        lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            relationship.comment
+        ));
+        // insert link to full resource
+        lightObject.push(new LabelValuePair(
+            'LINK',
+            `/relationships/${relationship.sourceType}/${relationship.source}/${relationship.id}/view`
+        ));
+
+        return lightObject;
     }
 }
 

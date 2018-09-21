@@ -48,10 +48,12 @@ export class FormSlideToggleComponent extends ElementBase<string> implements OnI
     }
 
     ngOnInit() {
-        const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.label);
-        this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-            this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-        });
+        if (this.label) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.label);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+            });
+        }
     }
 
     /**
