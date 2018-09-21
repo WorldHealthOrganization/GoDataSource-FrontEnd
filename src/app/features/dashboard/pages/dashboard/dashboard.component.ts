@@ -131,6 +131,7 @@ export class DashboardComponent implements OnInit {
             }
         )
             .mergeMap(() => {
+                // update user data in local storage
                 return this.authDataService.reloadAndPersistAuthUser();
             });
     }
