@@ -19,6 +19,7 @@ import { ListFilterDataService } from './data/list-filter.data.service';
 import { EntityDataService } from './data/entity.data.service';
 import { TransmissionChainDataService } from './data/transmission-chain.data.service';
 import { ImportExportDataService } from './data/import-export.data.service';
+import { IconDataService } from './data/icon.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -66,6 +67,7 @@ export const services: any[] = [
     EntityDataService,
     TransmissionChainDataService,
     ImportExportDataService,
+    IconDataService,
 
     // guard services
     AuthGuard,

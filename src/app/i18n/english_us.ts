@@ -85,6 +85,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
@@ -904,6 +905,7 @@ export const EnglishUsLang = {
          * Manage Icons List
          */
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE': 'Manage Icons',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_ACTION_DELETE_SUCCESS_MESSAGE': 'Icon deleted!',
 
         /**
          * Manage Icons Create
