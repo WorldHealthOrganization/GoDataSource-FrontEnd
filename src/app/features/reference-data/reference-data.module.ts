@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { routing } from './reference-data.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { FileUploadModule } from 'ng2-file-upload';
 
 // components
 import * as fromPages from './pages';
@@ -12,7 +13,8 @@ import * as fromPages from './pages';
     imports: [
         routing,
         SharedModule,
-        ColorPickerModule
+        ColorPickerModule,
+        FileUploadModule
     ],
     declarations: [
         ...fromPages.pageComponents

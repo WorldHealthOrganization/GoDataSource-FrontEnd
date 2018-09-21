@@ -39,8 +39,8 @@
     </mat-card>
 
     <div class="form-actions">
-        <button mat-raised-button color="primary" class="button-primary">Save</button>
-        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>Cancel</button>
+        <button mat-raised-button color="primary" class="button-primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}</button>
+        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
     </div>
 
 </form>

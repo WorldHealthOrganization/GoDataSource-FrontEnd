@@ -878,6 +878,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE': 'Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON': 'Import Reference Data',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON': 'Export Reference Data',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON': 'Manage Icons',
         'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE': 'Export Reference Data',
 
         /**
@@ -885,6 +886,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry deleted!',
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_COLOR': 'No color',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON': 'Manage Icons',
 
         /**
          * Create Reference Data Entry page
@@ -892,6 +894,30 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE': 'Create New Entry',
         'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry created!',
 
+        /**
+         * Icon Fields
+         */
+        'LNG_ICON_FIELD_LABEL_NAME': 'Name',
+        'LNG_ICON_FIELD_LABEL_ICON': 'Icon',
+
+        /**
+         * Manage Icons List
+         */
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE': 'Manage Icons',
+
+        /**
+         * Manage Icons Create
+         */
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_TITLE': 'Create new Icon',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_WARNING_IMG_REQUIRED': 'Icon required',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_DRAG_AND_DROP_FILE_HERE': 'Drag & drop a file of the following types here: {{types}}',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_OR': 'OR, click',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_CHOOSE_FILE': 'Choose file',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_BUTTON_BROWSE': 'Browse',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_ONLY_ONE_FILE_CAN_BE_ATTACHED': 'Only one file can be attached',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
+        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_PROCESSING_FILE': 'Error uploading icon',
 
         /**
          * Modify Reference Data Entry page
