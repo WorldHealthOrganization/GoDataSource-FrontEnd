@@ -77,6 +77,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
+        'LNG_COMMON_BUTTON_CHANGE': 'Change',
 
         /**
          * Dialogs
@@ -887,6 +888,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry deleted!',
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_COLOR': 'No color',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_ICON': 'No icon',
         'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON': 'Manage Icons',
 
         /**
@@ -894,6 +896,12 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE': 'Create New Entry',
         'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry created!',
+
+        /**
+         * Modify Reference Data Entry page
+         */
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry modified!',
+        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR': 'No icon',
 
         /**
          * Icon Fields
@@ -920,11 +928,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_PROCESSING_FILE': 'Error uploading icon',
-
-        /**
-         * Modify Reference Data Entry page
-         */
-        'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE': 'Reference Data entry modified!',
 
         /**
          * Outbreak Templates

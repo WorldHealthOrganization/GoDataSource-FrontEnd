@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { environment } from '../../../environments/environment';
 
 export class ReferenceDataCategoryModel {
     id: string;
@@ -24,6 +25,16 @@ export class ReferenceDataEntryModel {
     category: ReferenceDataCategoryModel;
     colorCode: string;
 
+    _iconId: string;
+    iconUrl: string;
+    set iconId(iconId: string) {
+        this._iconId = iconId;
+        this.iconUrl = `${environment.apiUrl}/icons/${this.iconId}/download`;
+    }
+    get iconId(): string {
+        return this._iconId;
+    }
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.categoryId = _.get(data, 'categoryId');
@@ -32,6 +43,7 @@ export class ReferenceDataEntryModel {
         this.readonly = _.get(data, 'readOnly', false);
         this.active = _.get(data, 'active', true);
         this.colorCode = _.get(data, 'colorCode');
+        this.iconId = _.get(data, 'iconId');
 
         // add category
         const categoryData = _.get(data, 'category');

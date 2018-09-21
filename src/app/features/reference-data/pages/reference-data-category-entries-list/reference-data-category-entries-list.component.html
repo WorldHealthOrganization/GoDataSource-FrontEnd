@@ -61,7 +61,13 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                <!-- placeholder -->
+                <img
+                    *ngIf="item.iconId"
+                    [src]="item.iconUrl" />
+                <div
+                    *ngIf="!item.iconId">
+                    {{ 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_ICON' | translate }}
+                </div>
             </mat-cell>
         </ng-container>
 
