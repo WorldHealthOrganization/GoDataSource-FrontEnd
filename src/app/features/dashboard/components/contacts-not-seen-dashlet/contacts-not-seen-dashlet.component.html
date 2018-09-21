@@ -1,7 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
     [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN, x: xDaysNotSeen }"
-    [value]="contactsNotSeenCount">
+    [value]="contactsNotSeenCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
 
     <div fxLayout="row" fxLayoutGap="10px">
 

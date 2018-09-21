@@ -11,13 +11,13 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button class="dashlet-menu-item" mat-menu-item>
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onHide()">
                         {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_HIDE_LABEL' | translate}}
                     </button>
-                    <button class="dashlet-menu-item" mat-menu-item>
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onMoveBefore()">
                         {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_BEFORE_LABEL' | translate}}
                     </button>
-                    <button class="dashlet-menu-item" mat-menu-item>
+                    <button class="dashlet-menu-item" mat-menu-item (click)="onMoveAfter()">
                         {{'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_AFTER_LABEL' | translate}}
                     </button>
                 </mat-menu>

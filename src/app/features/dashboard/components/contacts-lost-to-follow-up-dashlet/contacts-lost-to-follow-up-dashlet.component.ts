@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -10,7 +11,7 @@ import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metri
     templateUrl: './contacts-lost-to-follow-up-dashlet.component.html',
     styleUrls: ['./contacts-lost-to-follow-up-dashlet.component.less']
 })
-export class ContactsLostToFollowUpDashletComponent implements OnInit {
+export class ContactsLostToFollowUpDashletComponent extends DashletComponent implements OnInit {
 
     // number of contacts who are lost to follow-up
     noContactsLostToFollowUp: number;
@@ -22,6 +23,7 @@ export class ContactsLostToFollowUpDashletComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService
     ) {
+        super();
     }
 
     ngOnInit() {

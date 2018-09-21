@@ -6,6 +6,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-new-cases-previous-days-contacts-dashlet',
@@ -13,7 +14,7 @@ import { Subscriber } from 'rxjs/Subscriber';
     templateUrl: './new-cases-previous-days-contacts-dashlet.component.html',
     styleUrls: ['./new-cases-previous-days-contacts-dashlet.component.less']
 })
-export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
+export class NewCasesPreviousDaysContactsDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases with less than x contacts
     casesAmongContactsCount: number;
@@ -34,7 +35,9 @@ export class NewCasesPreviousDaysContactsDashletComponent implements OnInit {
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get contacts on followup list count

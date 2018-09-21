@@ -1,7 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'cases'"
     [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS, x: xDaysAmongContacts}"
-    [value]="(this.percentageCases()) + '%'">
+    [value]="(this.percentageCases()) + '%'"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
     <div fxLayout="row" fxLayoutGap="10px">
 
         <div>

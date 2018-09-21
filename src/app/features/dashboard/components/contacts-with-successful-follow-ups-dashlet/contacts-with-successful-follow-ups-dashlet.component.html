@@ -1,7 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
     [params]="queryParams"
-    [value]="calculatePercent() + '%'">
+    [value]="calculatePercent() + '%'"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
 
     <div>
         {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP' | translate}}

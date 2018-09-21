@@ -1,6 +1,9 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/transmission-chains'"
     [params]=""
-    [value]="independentTransmissionChainsCount">
+    [value]="independentTransmissionChainsCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
     {{ 'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS' | translate }}
 </app-dashboard-custom-metric-dashlet>
