@@ -100,6 +100,9 @@ export class DashboardComponent implements OnInit {
         this.persistUserDashboardSettings().subscribe();
     }
 
+    /**
+     * Update dashlets order based on authenticated user's settings
+     */
     private refreshDashletsOrder() {
         _.each(this.kpiGroups, (group) => {
             group.dashlets.sort((a, b) => {
@@ -115,6 +118,9 @@ export class DashboardComponent implements OnInit {
         });
     }
 
+    /**
+     * Persist user's settings for the dashboard
+     */
     private persistUserDashboardSettings(): Observable<any> {
         return this.userDataService.modifyUser(
             this.authUser.id,
