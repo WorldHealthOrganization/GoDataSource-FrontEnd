@@ -12,13 +12,14 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -34,7 +35,18 @@ export class TransmissionChainsDashletComponent implements OnInit {
     showSettings: boolean = false;
     filters: any = {};
     caseClassificationsList$: Observable<any[]>;
+    caseClassificationRefData: ReferenceDataCategoryModel;
     genderList$: Observable<any[]>;
+    genderRefData: ReferenceDataCategoryModel;
+    riskLevelRefData: ReferenceDataCategoryModel;
+    relationRefData: ReferenceDataCategoryModel;
+    certainityLevelRefData: ReferenceDataCategoryModel;
+    exposureTypeRefData: ReferenceDataCategoryModel;
+    exposureFrequencyRefData: ReferenceDataCategoryModel;
+    exposureDurationRefData: ReferenceDataCategoryModel;
+    colorCriteria: any = {nodeColorCriteria: 'default', nodeNameColorCriteria: 'default', edgeColorCriteria: 'default'};
+    legend: any = {nodeColorField: 'default', nodeNameColorField: 'default', edgeColorField: 'default', nodeColor : [], nodeNameColor: [], edgeColor: []};
+    defaultColor = '#3C3F41';
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -54,12 +66,39 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).subscribe((results) => {
+            this.caseClassificationRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.GENDER).subscribe((results) => {
+            this.genderRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).subscribe((results) => {
+            this.riskLevelRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).subscribe((results) => {
+            this.relationRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL).subscribe((results) => {
+            this.certainityLevelRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE).subscribe((results) => {
+            this.exposureTypeRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_FREQUENCY).subscribe((results) => {
+            this.exposureFrequencyRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_DURATION).subscribe((results) => {
+            this.exposureDurationRefData = results;
+        });
+
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
                 this.displayChainsOfTransmission();
             });
+
+
     }
 
     /**
@@ -128,7 +167,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
                 } else {
                     this.graphElements = [];
                 }
@@ -228,6 +267,122 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     setDateFilter(dateRange) {
         this.filters.date = dateRange;
+    }
+
+    /**
+     *
+     * @param colorCriteria
+     */
+    mapColorCriteria() {
+        // node color
+        this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
+        this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
+        this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+        switch (this.colorCriteria.nodeColorCriteria) {
+            case 'type':
+                this.legend.nodeColor[EntityType.CASE] = 'red';
+                this.legend.nodeColor[EntityType.CONTACT] = 'blue';
+                this.legend.nodeColor[EntityType.EVENT] = 'green';
+                break;
+            case 'classification':
+                if (!_.isEmpty(this.caseClassificationRefData.entries)) {
+                    _.forEach(this.caseClassificationRefData.entries, (value, key) => {
+                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'riskLevel':
+                if (!_.isEmpty(this.riskLevelRefData.entries)) {
+                    _.forEach(this.riskLevelRefData.entries, (value, key) => {
+                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'gender':
+                if (!_.isEmpty(this.genderRefData.entries)) {
+                    _.forEach(this.genderRefData.entries, (value, key) => {
+                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            default:
+                this.legend.nodeColor = [];
+        }
+
+        // node name color
+        switch (this.colorCriteria.nodeNameColorCriteria) {
+            case 'type':
+                this.legend.nodeNameColor[EntityType.CASE] = 'red';
+                this.legend.nodeNameColor[EntityType.CONTACT] = 'blue';
+                this.legend.nodeNameColor[EntityType.EVENT] = 'green';
+                break;
+            case 'classification':
+                if (!_.isEmpty(this.caseClassificationRefData.entries)) {
+                    _.forEach(this.caseClassificationRefData.entries, (value, key) => {
+                        this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'riskLevel':
+                if (!_.isEmpty(this.riskLevelRefData.entries)) {
+                    _.forEach(this.riskLevelRefData.entries, (value, key) => {
+                        this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'gender':
+                if (!_.isEmpty(this.genderRefData.entries)) {
+                    _.forEach(this.genderRefData.entries, (value, key) => {
+                        this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            default:
+                this.legend.nodeNameColor = [];
+        }
+
+        // edge color
+        switch (this.colorCriteria.edgeColorCriteria) {
+            case 'socialRelationshipTypeId':
+                if (!_.isEmpty(this.relationRefData.entries)) {
+                    _.forEach(this.relationRefData.entries, (value, key) => {
+                        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'certaintyLevelId':
+                if (!_.isEmpty(this.certainityLevelRefData.entries)) {
+                    _.forEach(this.certainityLevelRefData.entries, (value, key) => {
+                        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'exposureTypeId':
+                if (!_.isEmpty(this.exposureTypeRefData.entries)) {
+                    _.forEach(this.exposureTypeRefData.entries, (value, key) => {
+                        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'exposureFrequencyId':
+                if (!_.isEmpty(this.exposureFrequencyRefData.entries)) {
+                    _.forEach(this.exposureFrequencyRefData.entries, (value, key) => {
+                        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            case 'exposureDurationId':
+                if (!_.isEmpty(this.exposureDurationRefData.entries)) {
+                    _.forEach(this.exposureDurationRefData.entries, (value, key) => {
+                        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
+                break;
+            default:
+                this.legend.edgeColor = [];
+        }
+
+        console.log(this.legend);
     }
 
 }

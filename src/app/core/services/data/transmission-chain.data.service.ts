@@ -10,14 +10,16 @@ import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
 import { DateRangeModel } from '../../models/date-range.model';
-import { Moment } from 'moment';
+import { ReferenceDataCategory } from '../../models/reference-data.model';
+import { ReferenceDataDataService } from './reference-data.data.service';
 
 @Injectable()
 export class TransmissionChainDataService {
 
     constructor(
         private http: HttpClient,
-        private modelHelper: ModelHelperService
+        private modelHelper: ModelHelperService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     /**
@@ -130,9 +132,10 @@ export class TransmissionChainDataService {
      * convert transmission chain model to the format needed by the graph
      * @param chains
      * @param filters
+     * @param colorCriteria
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any): any {
+    convertChainToGraphElements(chains, filters: any, colorCriteria: any): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         let selectedNodeIds: string[] = [];
         if (!_.isEmpty(chains)) {
@@ -248,5 +251,6 @@ export class TransmissionChainDataService {
         }
         return graphData;
     }
+
 }
 

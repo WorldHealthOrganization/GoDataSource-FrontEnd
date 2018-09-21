@@ -238,6 +238,7 @@ export const EnglishUsLang = {
         /**
          * Entity Types
          */
+        'LNG_ENTITY_TYPE_LABEL': 'Entity Type',
         'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
         'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
         'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
