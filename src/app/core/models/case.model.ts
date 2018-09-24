@@ -37,6 +37,10 @@ export class CaseModel {
     transferRefused: boolean;
     outbreakId: string;
 
+    relationships: {
+        people: any[]
+    }[];
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -76,6 +80,8 @@ export class CaseModel {
         this.outbreakId = _.get(data, 'outbreakId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
+        this.relationships = _.get(data, 'relationships', []);
     }
 
     /**

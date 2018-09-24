@@ -27,10 +27,10 @@
                                 [ngModel]="labResultData.dateSampleTaken"
                                 required="true"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
-                                    Constants.today(),
+                                    serverToday,
                                     'dateSampleDelivered',
                                     'dateTesting',
                                     'dateOfResult'
@@ -42,10 +42,10 @@
                                 name="dateSampleDelivered"
                                 [ngModel]="labResultData.dateSampleDelivered"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
-                                    Constants.today(),
+                                    serverToday,
                                     'dateTesting',
                                     'dateOfResult'
                                 ]"
@@ -59,10 +59,10 @@
                                 name="dateTesting"
                                 [ngModel]="labResultData.dateTesting"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
-                                    Constants.today(),
+                                    serverToday,
                                     'dateOfResult'
                                 ]"
                                 [dateSameOrAfter]="[
@@ -78,9 +78,9 @@
                                 name="dateOfResult"
                                 [ngModel]="labResultData.dateOfResult"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()"
+                                [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
                                     'dateTesting',
                                     'dateSampleDelivered',

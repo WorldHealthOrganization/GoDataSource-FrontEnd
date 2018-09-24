@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-cases-pending-lab-results-dashlet',
@@ -10,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
     templateUrl: './cases-pending-lab-results-dashlet.component.html',
     styleUrls: ['./cases-pending-lab-results-dashlet.component.less']
 })
-export class CasesPendingLabResultsDashletComponent implements OnInit {
+export class CasesPendingLabResultsDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases pending lab result
     casesPendingLabResultCount: number;
@@ -20,7 +21,9 @@ export class CasesPendingLabResultsDashletComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get number of cases pending lab result

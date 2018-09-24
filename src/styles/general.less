@@ -34,9 +34,10 @@ html, body, ul, li, div, span {
 
     // Reset filters
     .reset-filters {
-        position: absolute;
-        right: 20px;
-        top: 10px;
+        width: 100%;
+        button {
+            float: right;
+        }
     }
 
     /* Mat Table overrides */
@@ -46,7 +47,7 @@ html, body, ul, li, div, span {
         @cell-padding-left: 20px;
 
         .mat-row {
-            align-items: start !important;
+            align-items: center !important;
             padding: 15px 0 !important;
 
             .mat-cell {
@@ -75,6 +76,10 @@ html, body, ul, li, div, span {
 
                 .mat-sort-header-button {
                     text-align: left;
+                }
+
+                .mat-sort-header-arrow {
+                    color: @color-accent-main
                 }
 
                 .table-header-cell {
@@ -197,6 +202,12 @@ html, body, ul, li, div, span {
     }
 }
 
+.column-header {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: @font-roboto, sans-serif;
+    color: black;
+}
 
 /* Ng Select Invalid Styles */
 @material-invalid-color: #f44336;

@@ -30,14 +30,15 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef fxFlex="20">
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -51,7 +52,7 @@
         <!-- Description -->
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
-                <div class="table-header-cell">
+                <div class="table-header-cell column-header">
                     {{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}
                     <div class="column-filter">
                         <!-- placeholder -->
@@ -66,7 +67,7 @@
         <!-- Permissions -->
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
-                <div class="table-header-cell">
+                <div class="table-header-cell column-header">
                     {{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}
                     <div class="column-filter">
                         <!-- placeholder -->

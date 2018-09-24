@@ -30,6 +30,7 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Input() options: any[];
     @Input() optionLabelKey: string = 'label';
     @Input() optionLabelPrefixKey: string = null;
+    @Input() optionLabelImgKey: string = null;
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
@@ -37,6 +38,8 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
     @Input() allowSelectionOfDisabledItems: boolean = false;
     @Input() tooltip: string = null;
+
+    @Input() displayFilterIcon: boolean = false;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 

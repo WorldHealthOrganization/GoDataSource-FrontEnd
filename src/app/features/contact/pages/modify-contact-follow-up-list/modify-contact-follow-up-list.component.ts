@@ -58,9 +58,9 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     ngOnInit() {
         // get today time
         this.genericDataService
-            .getServerUTCCurrentDateTime()
-            .subscribe((serverDateTime: string) => {
-                this.serverToday = moment(serverDateTime).startOf('day');
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
             });
 
         // get selected outbreak
@@ -220,7 +220,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
         return this.serverToday &&
             date &&
-            date.endOf('day').isAfter(this.serverToday);
+            date.startOf('day').isAfter(this.serverToday);
     }
 
     /**

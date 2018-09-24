@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-cases-refusing-treatment-dashlet',
@@ -10,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
     templateUrl: './cases-refusing-treatment-dashlet.component.html',
     styleUrls: ['./cases-refusing-treatment-dashlet.component.less']
 })
-export class CasesRefusingTreatmentDashletComponent implements OnInit {
+export class CasesRefusingTreatmentDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases refusing treatment
     casesRefusingTreatmentCount: number;
@@ -20,7 +21,9 @@ export class CasesRefusingTreatmentDashletComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get number of cases refusing treatment

@@ -91,14 +91,15 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -113,7 +114,7 @@
         <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="diseaseFilter"
@@ -123,7 +124,8 @@
                             multiple="true"
                             (optionChanged)="filterBySelectField('disease', $event)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -141,7 +143,7 @@
         <ng-container matColumnDef="country">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -159,7 +161,7 @@
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -175,7 +177,7 @@
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
                     <div class="column-filter">
                         <!-- placeholder -->
                     </div>
@@ -191,7 +193,7 @@
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="activeFilter"
@@ -200,7 +202,8 @@
                             [options]="activeOptionsList$ | async"
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true">
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>

@@ -2,8 +2,17 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
+        [class.display-filter-icon]="displayFilterIcon"
         [class.clearable]="clearable && !multiple && !disabled">
+
+        <div
+            *ngIf="displayFilterIcon"
+            class="filter-icon">
+            <span class="xt-icon">search</span>
+        </div>
+
         <mat-select
+            [class.filter-icon-input]="displayFilterIcon"
             #selectElement="ngModel"
             [(ngModel)]="value"
             [compareWith]="compareWith"
@@ -25,8 +34,19 @@
                 [value]="option[optionValueKey]"
                 [matTooltip]="option[optionTooltipKey] | translate"
                 [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
+
+                <!-- Image -->
+                <img
+                    *ngIf="optionLabelImgKey"
+                    height="24px"
+                    [src]="option[optionLabelImgKey]"/>
+
+                <!-- Prefix -->
                 {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+
+                <!-- Label -->
                 {{option[optionLabelKey] | translate}}
+
             </mat-option>
         </mat-select>
     </mat-form-field>
