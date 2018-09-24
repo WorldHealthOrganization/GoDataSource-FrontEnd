@@ -9,6 +9,8 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
+import { DateRangeModel } from '../../models/date-range.model';
+import { Moment } from 'moment';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -145,16 +147,38 @@ export class TransmissionChainDataService {
                             selectedNodeIds.push(relation.entityIds[0]);
                             selectedNodeIds.push(relation.entityIds[1]);
                         });
-                        selectedNodeIds = _.uniq(selectedNodeIds);
-                        // load the data for all selected nodes
-                        _.forEach(selectedNodeIds, (nodeId, key) => {
-                            const node = chain.nodes[nodeId];
-                            if (node) {
-                                const nodeData = new GraphNodeModel(node.model);
-                                nodeData.type = node.type;
-                                graphData.nodes.push({data: nodeData});
+                    }
+                });
+                selectedNodeIds = _.uniq(selectedNodeIds);
+                // load the data for all selected nodes
+                _.forEach(selectedNodeIds, (nodeId, key) => {
+                    const node = firstChain.nodes[nodeId];
+                    if (node) {
+                        const nodeProps = node.model;
+                        // calculate dateTimeline value
+                        if (node.type === EntityType.CASE) {
+                            // get earliest hospitalization dates if any
+                            let datesArray = [];
+                            if (!_.isEmpty(node.model.hospitalizationDates)) {
+                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
+                                    datesArray.push(hospitalDate.startDate);
+                                });
                             }
-                        });
+                            if (!_.isEmpty(node.model.dateOfOnset)) {
+                                datesArray.push(node.model.dateOfOnset);
+                            }
+                            datesArray = _.sortBy(datesArray);
+                            if (!_.isEmpty(datesArray)) {
+                                nodeProps.dateTimeline = datesArray[0];
+                            }
+                        } else if (node.type === EntityType.CONTACT) {
+                            nodeProps.dateTimeline = node.model.dateOfReporting;
+                        } else if (node.type === EntityType.EVENT) {
+                            nodeProps.dateTimeline = node.model.date;
+                        }
+                        const nodeData = new GraphNodeModel(nodeProps);
+                        nodeData.type = node.type;
+                        graphData.nodes.push({data: nodeData});
                     }
                 });
             } else {
@@ -162,16 +186,33 @@ export class TransmissionChainDataService {
                 if (!_.isEmpty(firstChain.nodes)) {
                     _.forEach(firstChain.nodes, function (node, key) {
                         let allowAdd = false;
+                        const nodeProps = node.model;
                         // show nodes based on their type
                         if (node.type === EntityType.CONTACT && filters.showContacts) {
                             allowAdd = true;
+                            nodeProps.dateTimeline = node.model.dateOfReporting;
                         } else if (node.type === EntityType.EVENT && filters.showEvents) {
                             allowAdd = true;
+                            nodeProps.dateTimeline = node.model.date;
                         } else if (node.type === EntityType.CASE) {
                             allowAdd = true;
+                            // get earliest hospitalization dates if any
+                            let datesArray = [];
+                            if (!_.isEmpty(node.model.hospitalizationDates)) {
+                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
+                                    datesArray.push(hospitalDate.startDate);
+                                });
+                            }
+                            if (!_.isEmpty(node.model.dateOfOnset)) {
+                                datesArray.push(node.model.dateOfOnset);
+                            }
+                            datesArray = _.sortBy(datesArray);
+                            if (!_.isEmpty(datesArray)) {
+                                nodeProps.dateTimeline = datesArray[0];
+                            }
                         }
                         if (allowAdd) {
-                            const nodeData = new GraphNodeModel(node.model);
+                            const nodeData = new GraphNodeModel(nodeProps);
                             nodeData.type = node.type;
                             graphData.nodes.push({data: nodeData});
                             selectedNodeIds.push(nodeData.id);
@@ -186,6 +227,7 @@ export class TransmissionChainDataService {
                     // add relation only if the nodes are in the selectedNodes array
                     if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
                         const graphEdge = new GraphEdgeModel();
+                        graphEdge.id = relationship.id;
                         if (relationship.persons[0].source) {
                             graphEdge.source = relationship.persons[0].id;
                             graphEdge.sourceType = relationship.persons[0].type;

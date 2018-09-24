@@ -241,7 +241,7 @@ export class SideFiltersComponent {
                     switch (comparator) {
                         case FilterComparator.LOCATION:
                             qb.filter.where({
-                                [`${filter.fieldName}.locationId`]: {
+                                [`${filter.fieldName}.parentLocationIdFilter`]: {
                                     inq: appliedFilter.value
                                 }
                             });

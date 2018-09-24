@@ -5,6 +5,7 @@ import * as dagre from 'cytoscape-dagre';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -19,6 +20,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() transmissionChainViewType: string;
 
     @Output() nodeTapped = new EventEmitter<any>();
+    @Output() edgeTapped = new EventEmitter<any>();
 
     cy: any;
     container: string = 'cy';
@@ -27,6 +29,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     /**
      *  layout cola - bubble view
+     *  Nodes are automatically arranged to optimally use the space
      */
     layoutCola: any = {
         name: 'cola',
@@ -47,29 +50,66 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     };
 
     /**
-     *  layout dagre - tree
+     *  layout dagre - tree - hierarchic view
+     *  the nodes are automatically arranged based on source / target properties
      */
     layoutDagre: any = {
         name: 'dagre',
         fit: true,
         padding: 10,
         avoidOverlap: true,
+        nodeDimensionsIncludeLabels: true,
         nodeSep: 50, // the separation between adjacent nodes in the same rank
         edgeSep: 10, // the separation between adjacent edges in the same rank
         rankSep: 50, // the separation between adjacent nodes in the same rank
         rankDir: 'TB', // 'TB' for top to bottom flow, 'LR' for left to right,
-        ranker: undefined, // Type of algorithm to assign a rank to each node in the input graph. Possible values: 'network-simplex', 'tight-tree' or 'longest-path'
-        // transform: function( node, pos ) { return pos; },
-        minLen: function (edge) {
-            return 1;
-        }, // number of ranks to keep between the source and target of the edge
-        edgeWeight: function (edge) {
-            return 1;
-        }, // higher weight edges are generally made shorter and straighter than lower weight edges
         stop: () => {
             this.showLoading = false;
             if (this.cy) {
                 this.cy.fit();
+            }
+        }
+    };
+
+    /**
+     *  layout preset - timeline
+     *  nodes are manually positioned based on date of Reporting
+     */
+    layoutPreset: any = {
+        name: 'preset',
+        fit: true,
+        padding: 30,
+        stop: () => {
+            this.showLoading = false;
+            if (this.cy) {
+                this.cy.fit();
+            }
+        },
+        positions: (node) => {
+            // restrict position of the node on the x axis for the timeline view
+            const nodeData = node.json().data;
+            // calculate position on x axis based on the index of the date.
+            const datesIndex = _.findIndex(
+                this.datesArray,
+                function (o) {
+                    return o === nodeData.dateTimeline;
+                });
+            // using 150px as it looks fine
+            const posX = datesIndex * 150;
+            // calculate position on y axis based on the index of the node from that respective date
+            if (!_.isEmpty(nodeData.dateTimeline)) {
+                const nodesArray = this.timelineDates[nodeData.dateTimeline];
+                let nodeIndex = 1;
+                if (nodesArray.length > 1) {
+                    nodeIndex = _.findIndex(
+                        nodesArray,
+                        function (n) {
+                            return n === nodeData.id;
+                        });
+                }
+                // using 100 px as it looks fine
+                const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                return {x: posX, y: posY};
             }
         }
     };
@@ -82,7 +122,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         max: 4
     };
 
-    defaultStyle: any = [ // the stylesheet for the graph
+    // the stylesheet for the graph
+    defaultStyle: any = [
         {
             selector: 'node',
             style: {
@@ -100,7 +141,30 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     ];
 
+    // the style for the timeline view. The label field is modified in order to display dateTimeline
+    timelineStyle: any = [
+        {
+            selector: 'node',
+            style: {
+                'background-color': 'data(nodeColor)',
+                'label': 'data(label)',
+                'text-wrap': 'wrap',
+                'display': 'data(displayTimeline)'
+            }
+        },
+        {
+            selector: 'edge',
+            style: {
+                'line-color': 'data(edgeColor)',
+                'target-arrow-color': 'data(edgeColor)',
+                'target-arrow-shape': 'triangle'
+            }
+        }
+    ];
+
     showLoading: boolean = true;
+    datesArray: string[] = [];
+    timelineDates: any = {};
 
     constructor(
         private genericDataService: GenericDataService,
@@ -133,6 +197,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         const nativeElement = this.el.nativeElement;
         const container = nativeElement.getElementsByClassName(this.container);
 
+        // load the correct layout based on the view selected
         this.configureGraphViewType();
 
         // initialize the cytoscape object
@@ -148,12 +213,39 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 this.showLoading = true;
             }
         });
-        // add tap event
+        // add node tap event
         this.cy.on('tap', 'node', (evt) => {
             const node = evt.target;
             this.nodeTapped.emit(node.json().data);
         });
+        // add edge tap event
+        this.cy.on('tap', 'edge', (evt) => {
+            const edge = evt.target;
+            this.edgeTapped.emit(edge.json().data);
+        });
+    }
 
+    /**
+     * Generate the array of dates to be used on the timeline view
+     */
+    calculateTimelineDates() {
+        // empty the already set timeline and dates arrays
+        this.timelineDates = {};
+        this.datesArray = [];
+        // loop through nodes to extract the dates ( dateTimeline)
+        _.forEach(this.elements.nodes, (node, key) => {
+            if (!_.isEmpty(node.data.dateTimeline)) {
+                if (this.timelineDates[node.data.dateTimeline]) {
+                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                } else {
+                    this.timelineDates[node.data.dateTimeline] = [];
+                    this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                }
+                this.datesArray.push(node.data.dateTimeline);
+            }
+        });
+        this.datesArray = _.uniq(this.datesArray);
+        this.datesArray = _.sortBy(this.datesArray);
     }
 
     /**
@@ -171,9 +263,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value) {
             cytoscape.use(cola);
             this.layout = this.layoutCola;
+            this.style = this.defaultStyle;
         } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value) {
             cytoscape.use(dagre);
             this.layout = this.layoutDagre;
+            this.style = this.defaultStyle;
+        } else if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+            this.calculateTimelineDates();
+            this.style = this.timelineStyle;
+            this.layout = this.layoutPreset;
         }
     }
 

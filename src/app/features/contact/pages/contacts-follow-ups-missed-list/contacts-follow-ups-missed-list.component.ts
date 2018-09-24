@@ -18,6 +18,8 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -53,7 +55,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         private followUpsDataService: FollowUpsDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
@@ -63,7 +66,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        const genderOptionsList$ = this.genericDataService.getGenderList();
+        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -82,13 +85,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 this.selectedOutbreak = selectedOutbreak;
 
                 // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                this.needsRefreshList(true);
             });
 
         // set available side filters
         this.availableSideFilters = [
             new FilterModel({
-                fieldName: 'addresses',
+                fieldName: 'address',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
                 type: FilterType.ADDRESS
             }),
@@ -125,6 +128,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                         fieldName: 'lastName',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
                         type: FilterType.TEXT,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'addresses',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                        type: FilterType.ADDRESS,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
@@ -230,7 +240,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
@@ -257,7 +267,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

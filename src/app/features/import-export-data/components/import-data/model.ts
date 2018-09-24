@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 export class ImportableLabelValuePair {
     constructor(
@@ -32,6 +33,9 @@ export class ImportableFileModel {
     modelPropertiesKeyValue:  ImportableLabelValuePair[];
 
     modelPropertyValues: ImportableFilePropertyValuesModel;
+    modelPropertyValuesMap: {
+        [modelProperty: string]: ImportableFilePropertyValuesModel
+    } = {};
 
     distinctFileColumnValues: {
         [fileHeader: string]: string[]
@@ -40,11 +44,51 @@ export class ImportableFileModel {
         [fileHeader: string]: ImportableLabelValuePair[]
     };
 
+    /**
+     * Fix issue with lodash not supporting _.get(a, 'aaa[].b'), since it tries to interpret [] as an array
+     * @param object
+     * @param path
+     * @returns {value | undefined} Undefined if not found ( just like _.get )
+     */
+    static lodashCustomGet(
+        object: any,
+        path: string
+    ): any {
+        // validate input object
+        if (
+            _.isEmpty(object) ||
+            _.isEmpty(path)
+        ) {
+            return undefined;
+        }
+
+        // go through the path
+        const pathSplit = path.split('.');
+        _.each(pathSplit, (pathItem: string) => {
+            // retrieve next value
+            object = object[pathItem] !== undefined ?
+                object[pathItem] :
+                _.get(object, pathItem);
+
+            // not found
+            if (object === undefined) {
+                // stop each
+                return false;
+            }
+        });
+
+        // finished return found value
+        return object;
+    }
+
     constructor(
         data = null,
         translate: (string) => string,
         fieldsWithoutTokens: {
             [property: string]: string
+        } = {},
+        excludeDestinationProperties: {
+            [property: string]: boolean
         } = {}
     ) {
         this.id = _.get(data, 'id');
@@ -74,16 +118,23 @@ export class ImportableFileModel {
         ) => {
             // if this is a string property then we can push it as it is
             if (_.isString(impLVPair.label)) {
-                // add parent prefix to child one
-                impLVPair.label = labelPrefix + translate(
-                    fieldsWithoutTokens[impLVPair.value] ?
-                        fieldsWithoutTokens[impLVPair.value] :
-                        impLVPair.label
-                );
+                if (!excludeDestinationProperties[impLVPair.value]) {
+                    // add parent prefix to child one
+                    impLVPair.label = labelPrefix + translate(
+                        fieldsWithoutTokens[impLVPair.value] ?
+                            fieldsWithoutTokens[impLVPair.value] :
+                            impLVPair.label
+                    );
 
-                // add to list of filters to which we can push data
-                result.push(impLVPair);
+                    // map destination field for easy access to mapped options when having [] in path
+                    this.modelPropertyValuesMap[impLVPair.value] = ImportableFileModel.lodashCustomGet(
+                        this.modelPropertyValues,
+                        impLVPair.value
+                    );
 
+                    // add to list of filters to which we can push data
+                    result.push(impLVPair);
+                }
             // otherwise we need to map it to multiple values
             } else if (_.isObject(impLVPair.label)) {
                 // add as parent drop-down as well
@@ -143,16 +194,59 @@ export class ImportableFileModel {
 
 export class ImportableMapField {
     public mappedOptions: {
+        id: string;
         sourceOption?: string;
         destinationOption?: string;
     }[] = [];
 
     public readonly: boolean = false;
 
-    public destinationLevel: number[] = [0, 0, 0];
+    public sourceDestinationLevel: number[] = [0, 0, 0];
+
+    public id: string;
+
+    public isSourceArray: boolean = false;
+    private _sourceField: string = null;
+    public sourceFieldWithoutIndexes = null;
+    set sourceField(value: string) {
+        this._sourceField = value;
+        this.sourceFieldWithoutIndexes = this.sourceField ? this.sourceField.replace(/\[\d+\]/g, '[]') : null;
+        this.isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+        this.checkNumberOfMaxLevels();
+    }
+    get sourceField(): string {
+        return this._sourceField;
+    }
+
+    public isDestinationArray: boolean = false;
+    private _destinationField: string = null;
+    set destinationField(value: string) {
+        this._destinationField = value;
+        this.isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+        this.checkNumberOfMaxLevels();
+    }
+    get destinationField(): string {
+        return this._destinationField;
+    }
+
+    numberOfMaxLevels: any[] = [];
 
     constructor(
-        public destinationField: string = null,
-        public sourceField: string = null
-    ) {}
+        destinationField: string = null,
+        sourceField: string = null
+    ) {
+        this.id = uuid();
+        this.destinationField = destinationField;
+        this.sourceField = sourceField;
+    }
+
+    checkNumberOfMaxLevels() {
+        const sourceArray: any[] = this.sourceField ?
+            ( this.sourceField.match(/\[\]/g) || [] ) :
+            [];
+        const destinationArray: any[] = this.destinationField ?
+            ( this.destinationField.match(/\[\]/g) || [] ) :
+            [];
+        this.numberOfMaxLevels = sourceArray.length < destinationArray.length ? destinationArray : sourceArray;
+    }
 }

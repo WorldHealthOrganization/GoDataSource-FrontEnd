@@ -2,7 +2,7 @@
 export class LabelValuePair {
     constructor(
         public label: string,
-        public value: string,
+        public value: any,
         public disabled: boolean = false
     ) {}
 }

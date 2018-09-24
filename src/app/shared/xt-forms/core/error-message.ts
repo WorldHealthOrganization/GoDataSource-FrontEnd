@@ -80,11 +80,14 @@ export class ErrorMessage {
                     'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',
                     this.validator[this.key] as {}
                 );
-
             case 'allOrNoneRequiredValidator':
                 return new ElementBaseFailure(
                     (this.validator[this.key] as any).err,
                     this.validator[this.key] as {}
+                );
+            case 'requiredOtherField':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED'
                 );
         }
 

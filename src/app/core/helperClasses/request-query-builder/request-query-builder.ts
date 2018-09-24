@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { RequestFilter } from './request-filter';
 import { RequestSort } from './request-sort';
+import { RequestPaginator } from './request-paginator';
 
 export class RequestQueryBuilder {
     // Relations to include
@@ -9,6 +10,8 @@ export class RequestQueryBuilder {
     public filter: RequestFilter = new RequestFilter();
     // Order fields
     public sort: RequestSort = new RequestSort();
+    // Paginator
+    public paginator: RequestPaginator = new RequestPaginator();
     // Return deleted records ?
     private deleted: boolean = false;
     // Limit
@@ -17,6 +20,7 @@ export class RequestQueryBuilder {
     public fieldsInResponse: string[] = [];
 
     /**
+     * #TODO Replace usage with RequestPaginator
      * Sets a "limit" on the number of results retrieved in a list
      * @param {number} limit
      * @returns {RequestQueryBuilder}
@@ -83,6 +87,7 @@ export class RequestQueryBuilder {
     buildQuery(stringified: boolean = true) {
         const filter: any = {};
 
+        // add "where" conditions
         if (!this.filter.isEmpty()) {
             filter.where = this.filter.generateCondition();
         }
@@ -95,18 +100,28 @@ export class RequestQueryBuilder {
             });
         }
 
+        // set fields to be included in response
         if (this.fieldsInResponse.length > 0) {
             filter.fields = this.fieldsInResponse;
         }
 
+        // set sorting criterias
         if (!this.sort.isEmpty()) {
             filter.order = this.sort.generateCriteria();
         }
 
+        // limit number of results
         if (this.limitResultsNumber) {
             filter.limit = this.limitResultsNumber;
         }
 
+        // apply pagination criterias
+        if (!this.paginator.isEmpty()) {
+            filter.limit = this.paginator.limit;
+            filter.skip = this.paginator.skip;
+        }
+
+        // retrieve deleted entries?
         if (this.deleted) {
             filter.deleted = true;
         }
@@ -147,6 +162,12 @@ export class RequestQueryBuilder {
         // update the "limit" if necessary
         this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
 
+        // apply pagination criterias
+        if (!queryBuilder.paginator.isEmpty()) {
+            this.paginator.limit = queryBuilder.paginator.limit;
+            this.paginator.skip = queryBuilder.paginator.skip;
+        }
+
         // merge deleted
         this.deleted = queryBuilder.deleted;
 
@@ -162,16 +183,18 @@ export class RequestQueryBuilder {
             this.filter.isEmpty() &&
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
+            this.paginator.isEmpty() &&
             _.isEmpty(this.fieldsInResponse);
     }
 
     /**
-     * Clear query
+     * Clear filter and sort criterias
      */
     clear() {
         this.filter.clear();
         this.includedRelations = {};
         this.sort.clear();
+        this.deleted = false;
     }
 }
 

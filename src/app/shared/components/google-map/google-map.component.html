@@ -1,7 +1,7 @@
 <!-- Draw google map -->
 <div
     #googleMap
-    *ngIf="isMapsInitialized()"
+    *ngIf="isMapsInitialized() && !displayLoading"
     [style.width]="width"
     [style.height]="height">
 </div>
@@ -9,7 +9,7 @@
 <!-- Still loading google map -->
 <div
     class="google-map-loading"
-    *ngIf="!isMapsInitialized()"
+    *ngIf="!isMapsInitialized() || displayLoading"
     [style.width]="width"
     [style.height]="height">
     <mat-spinner></mat-spinner>

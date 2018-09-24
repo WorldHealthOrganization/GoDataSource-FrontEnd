@@ -2,8 +2,8 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportDataExtension, ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-import-case-lab-data',
@@ -49,7 +49,7 @@ export class ImportReferenceDataComponent {
      * @param route
      */
     constructor(
-        private cacheService: CacheService,
+        private referenceDataDataService: ReferenceDataDataService,
         private router: Router,
         private i18nService: I18nService
     ) {}
@@ -61,7 +61,7 @@ export class ImportReferenceDataComponent {
         // reload translations
         this.i18nService.loadUserLanguage().subscribe(() => {
             // clear cache
-            this.cacheService.remove(CacheKey.REFERENCE_DATA);
+            this.referenceDataDataService.clearReferenceDataCache();
 
             // redirect
             this.router.navigate(['/reference-data']);

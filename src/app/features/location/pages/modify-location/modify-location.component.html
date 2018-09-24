@@ -7,6 +7,10 @@
 <form class="page-content form-section" #form="ngForm" (submit)="modifyLocation(form)">
 
     <div class="form-content">
+
+        <!-- location breadcrumb -->
+        <app-location-breadcrumbs></app-location-breadcrumbs>
+
         <mat-tab-group class="page-tabs-navbar">
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE'| translate">

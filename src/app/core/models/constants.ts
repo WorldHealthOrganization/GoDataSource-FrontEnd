@@ -10,6 +10,7 @@ export enum ApplyListFilter {
     CONTACTS_LOST_TO_FOLLOW_UP = 'contacts_lost_to_follow_up',
     CONTACTS_NOT_SEEN = 'contacts_not_seen',
     CONTACTS_SEEN = 'contacts_seen',
+    CONTACTS_FOLLOWED_UP = 'contacts_followed_up',
     CASES_LESS_CONTACTS = 'cases_less_contacts',
     CASES_IN_KNOWN_TRANSMISSION_CHAINS = 'cases_in_known_transmission_chains',
     CASES_PREVIOUS_DAYS_CONTACTS = 'cases_previous_days_contacts',
@@ -28,6 +29,13 @@ export class Constants {
 
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+
+    // pagination defaults and configuration
+    static PAGE_SIZE_OPTIONS = [10, 25, 50];
+    static DEFAULT_PAGE_SIZE = 25;
+
+    // address constants - mapped to reference tokens
+    static ADDRESS_USUAL_PLACE_OF_RESIDENCE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE';
 
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
@@ -70,6 +78,7 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
         [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
         [Constants.APPLY_LIST_FILTER.CONTACTS_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN',
+        [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP',
         [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS',
         [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',
@@ -79,18 +88,6 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES',
         [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'
-    };
-
-    // Gender
-    static GENDER = {
-        MALE: {
-            label: 'Male',
-            value: 'Male'
-        },
-        FEMALE: {
-            label: 'Female',
-            value: 'Female'
-        }
     };
 
     // Options for Yes/No dropdowns
@@ -137,15 +134,10 @@ export class Constants {
         HIERARCHICAL_NETWORK: {
             label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
+        },
+        TIMELINE_NETWORK: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
+            value: 'TIMELINE_NETWORK'
         }
     };
-
-    /**
-     * Returns today's date
-     * @returns Moment
-     */
-    static today() {
-        return moment().startOf('day');
-    }
-
 }

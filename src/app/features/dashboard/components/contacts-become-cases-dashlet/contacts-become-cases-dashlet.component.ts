@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',
@@ -15,10 +16,13 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './contacts-become-cases-dashlet.component.html',
     styleUrls: ['./contacts-become-cases-dashlet.component.less']
 })
-export class ContactsBecomeCasesDashletComponent implements OnInit {
+export class ContactsBecomeCasesDashletComponent extends DashletComponent implements OnInit {
 
     // number of contacts become cases over time and place
     contactsBecomeCasesCount: number;
+
+    // number of cases ( total )
+    casesCount: number;
 
     // filter by Date Range
     dateRange: DateRangeModel;
@@ -42,7 +46,9 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
         private listFilterDataService: ListFilterDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get contacts on followup list count
@@ -103,6 +109,12 @@ export class ContactsBecomeCasesDashletComponent implements OnInit {
                 .getCasesCount(this.selectedOutbreak.id, qb)
                 .subscribe((result) => {
                     this.contactsBecomeCasesCount = result.count;
+                });
+
+            this.caseDataService
+                .getCasesCount(this.selectedOutbreak.id)
+                .subscribe((result) => {
+                    this.casesCount = result.count;
                 });
         }
     }

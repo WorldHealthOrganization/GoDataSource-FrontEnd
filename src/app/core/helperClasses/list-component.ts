@@ -8,7 +8,7 @@ import { FormRangeModel } from '../../shared/components/form-range/form-range.mo
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
-import { MatSort, MatSortable } from '@angular/material';
+import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
@@ -16,6 +16,11 @@ import { DateRangeModel } from '../models/date-range.model';
 import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';
+import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
+import {
+    ContactFollowedUp,
+    MetricContactsWithSuccessfulFollowUp
+} from '../models/metrics/metric.contacts-with-success-follow-up.model';
 
 export abstract class ListComponent {
     /**
@@ -32,6 +37,16 @@ export abstract class ListComponent {
      * Retrieve Side Filters
      */
     @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
+
+    /**
+     * Retrieve Paginator
+     */
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
+    /**
+     * Individual checkboxes selects
+     */
+    @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent >;
 
     public breadcrumbs: BreadcrumbItemModel[];
 
@@ -51,18 +66,62 @@ export abstract class ListComponent {
      */
     protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
+    public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
+    public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
+    private paginatorInitialized = false;
+
     /**
      * Models for the checkbox functionality
      * @type {boolean}
      */
-    public checkboxModels = {
+    private checkboxModels = {
         checkAll: false,
-        individualCheck: []
+        individualCheck: {}
     };
+
+    /**
+     * All checkbox selected
+     * @param value
+     */
+    set checkedAllRecords(value: boolean) {
+        // set master check all
+        this.checkboxModels.checkAll = value;
+
+        // check/un-check all individual checkboxes
+        for (const id in this.checkboxModels.individualCheck) {
+            this.checkboxModels.individualCheck[id] = this.checkboxModels.checkAll;
+        }
+
+        // go through all html checkboxes and update their value - this is faster than using binding which slows down a lot the page
+        if (
+            this.listCheckedIndividualInputs &&
+            this.listCheckedIndividualInputs.length > 0
+        ) {
+            this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
+                // retrieve id
+                const id = checkbox.name.substring(checkbox.name.lastIndexOf('[') + 1, checkbox.name.lastIndexOf(']'));
+                checkbox.value = !!this.checkboxModels.individualCheck[id];
+            });
+        }
+    }
+    get checkedAllRecords(): boolean {
+        return this.checkboxModels.checkAll;
+    }
 
     // refresh only after we finish changing data
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // reset checked items
+        this.checkboxModels.checkAll = false;
+        this.checkboxModels.individualCheck = {};
+
+        // refresh list
         this.refreshList();
+    }));
+
+    // refresh only after we finish changing data
+    private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+        // refresh list
+        this.refreshListCount();
     }));
 
     protected constructor(
@@ -81,9 +140,35 @@ export abstract class ListComponent {
     public abstract refreshList();
 
     /**
+     * Refresh items count
+     * Note: To be overridden on pages that implement pagination
+     */
+    public refreshListCount() {
+        console.error('Component must implement \'refreshListCount\' method');
+    }
+
+    /**
      * Tell list that we need to refresh list
      */
-    public needsRefreshList(instant: boolean = false) {
+    public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+
+        // do we need to reset pagination (aka go to the first page) ?
+        if (
+            resetPagination &&
+            this.paginatorInitialized
+        ) {
+            // re-calculate items count (filters have changed)
+            this.triggerListCountRefresh.call(instant);
+
+            // move to the first page (if not already there)
+            if (this.paginator.hasPreviousPage()) {
+                this.paginator.firstPage();
+                // no need to refresh the list here, because our 'changePage' hook will trigger that again
+                return;
+            }
+        }
+
+        // refresh list
         this.triggerListRefresh.call(instant);
     }
 
@@ -117,13 +202,14 @@ export abstract class ListComponent {
         }
 
         // refresh list
-        this.needsRefreshList();
+        this.needsRefreshList(false, false);
     }
 
     /**
      * Filter the list by a text field
      * @param {string} property
      * @param {string} value
+     * @param {RequestFilterOperator} operator
      */
     filterByTextField(
         property: string | string[],
@@ -251,7 +337,28 @@ export abstract class ListComponent {
     }
 
     /**
-     * Clear query builder of conditions & include & ....
+     * Initialize paginator
+     */
+    protected initPaginator() {
+        // initialize query paginator
+        this.queryBuilder.paginator.setPage({
+            pageSize: this.pageSize,
+            pageIndex: 0
+        });
+
+        this.paginatorInitialized = true;
+    }
+
+    changePage(page: PageEvent) {
+        // update API pagination params
+        this.queryBuilder.paginator.setPage(page);
+
+        // refresh list
+        this.needsRefreshList(true, false);
+    }
+
+    /**
+     * Clear query builder of conditions and sorting criterias
      */
     clearQueryBuilder() {
         // clear query filters
@@ -309,7 +416,7 @@ export abstract class ListComponent {
             this.sideFilter &&
             (queryBuilder = this.sideFilter.getQueryBuilder())
         ) {
-            this.queryBuilder = queryBuilder;
+            this.queryBuilder.merge(queryBuilder);
         }
 
         // apply list filters which is mandatory
@@ -317,6 +424,12 @@ export abstract class ListComponent {
 
         // refresh of the list is done automatically after debounce time
         // #
+
+        // refresh paginator?
+        if (this.paginatorInitialized) {
+            // refresh total number of items
+            this.triggerListCountRefresh.call(true);
+        }
     }
 
     /**
@@ -324,14 +437,17 @@ export abstract class ListComponent {
      * @param {RequestQueryBuilder} queryBuilder
      */
     applySideFilters(queryBuilder: RequestQueryBuilder) {
+        // clear query builder of conditions and sorting criterias
+        this.clearQueryBuilder();
+
         // clear table filters
         this.clearHeaderFilters();
 
         // reset table sort columns
         this.clearHeaderSort();
 
-        // replace query builder with side filters
-        this.queryBuilder = queryBuilder;
+        // merge query builder with side filters
+        this.queryBuilder.merge(queryBuilder);
 
         // apply list filters which is mandatory
         this.mergeListFilterToMainFilter();
@@ -351,7 +467,7 @@ export abstract class ListComponent {
     }
 
     /**
-     *  Check if list filter applies
+     * Check if list filter applies
      */
     protected checkListFilters() {
         if (
@@ -632,28 +748,68 @@ export abstract class ListComponent {
                         this.needsRefreshList(true);
                     });
                 break;
+
+            // Filter contacts witch successful follow-up
+            case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
+
+                const followedDate: Moment = moment(queryParams.date);
+                this.listFilterDataService.filterContactsWithSuccessfulFollowup(followedDate)
+                    .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
+                        const contactIDs: string[] = _.chain(result.contacts)
+                            .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
+                            .map((item: ContactFollowedUp) => {
+                                return item.id;
+                            }).value();
+                        // merge query builder
+                        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                        this.appliedListFilterQueryBuilder.filter.where({
+                            id: {
+                                'inq': contactIDs
+                            }
+                        }, true);
+
+                        this.mergeListFilterToMainFilter();
+
+                        // refresh list
+                        this.needsRefreshList(true);
+                    });
+                break;
         }
     }
 
     /**
-     * "Check All" checkbox was touched
+     * Individual Checkbox
      */
-    checkAll() {
-        // check/un-check all individual checkboxes
-        for (const key in this.checkboxModels.individualCheck) {
-            this.checkboxModels.individualCheck[key] = this.checkboxModels.checkAll;
-        }
+    checkedRecord(id: string, checked: boolean) {
+        // set value
+        this.checkboxModels.individualCheck[id] = checked ? true : false;
+
+        // reset check all
+        let checkedAll: boolean = true;
+        _.each(this.checkboxModels.individualCheck, (check: boolean) => {
+            if (!check) {
+                checkedAll = false;
+                return false;
+            }
+        });
+
+        // set check all value
+        this.checkboxModels.checkAll = checkedAll;
     }
 
     /**
-     * An individual checkbox was touched
+     * Retrieve list of checked records ( an array of IDs )
      */
-    individualCheck() {
-        // un-check the "CheckAll" checkbox
-        this.checkboxModels.checkAll = false;
-    }
-
-    initIndividualCheckbox(key) {
-        this.checkboxModels.individualCheck[key] = !!this.checkboxModels.individualCheck[key];
+    get checkedRecords(): string[] {
+        const ids: string[] = [];
+        _.each(
+            this.checkboxModels.individualCheck,
+            (checked: boolean, id: string) => {
+                if (checked) {
+                    ids.push(id);
+                }
+            }
+        );
+        return ids;
     }
 }

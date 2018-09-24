@@ -19,6 +19,19 @@ const routes: Routes = [
                 PERMISSION.READ_CONTACT
             ]
         }
+    },
+    // Transmission Chains Geospacially map
+    {
+        path: 'map',
+        component: fromPages.TransmissionChainsGeoMapComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.READ_REPORT,
+                PERMISSION.READ_CASE,
+                PERMISSION.READ_CONTACT
+            ]
+        }
     }
 ];
 

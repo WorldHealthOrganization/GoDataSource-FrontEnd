@@ -8,6 +8,7 @@ import 'rxjs/add/operator/share';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
+import { LocationUsageModel } from '../../models/location-usage.model';
 
 @Injectable()
 export class LocationDataService {
@@ -56,9 +57,15 @@ export class LocationDataService {
 
     /**
      * Get all locations that belong to a specific parent ( for top items, parentId can be empty ). Default behavior is to bring only the top records without a parent.
-     * @param parentId
+     * @param {string} parentId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<LocationModel[]>}
      */
-    getLocationsListByParent(parentId: string = null, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<LocationModel[]> {
+    getLocationsListByParent(
+        parentId: string = null,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<LocationModel[]> {
+
         // define parent condition
         const parentCondition = {
             parentLocationId: {
@@ -66,11 +73,11 @@ export class LocationDataService {
             }
         };
 
-        // include contact in response
+        // include conditions
         const qb = new RequestQueryBuilder();
         qb.merge(queryBuilder);
 
-        // remove condition
+        // remove condition on parent
         qb.filter.removeCondition(parentCondition);
 
         // are we using the cache or sending a request further ?
@@ -89,6 +96,38 @@ export class LocationDataService {
             qb.filter.where(parentCondition, true);
             return this.getLocationsList(qb);
         }
+    }
+
+    /**
+     * Get the total number of locations that belong to a specific parent
+     * Note: For top items, parentId can be empty. Default behavior is to bring only the top records without a parent.
+     *
+     * @param {string} parentId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getLocationsCountByParent(
+        parentId: string = null,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        // define parent condition
+        const parentCondition = {
+            parentLocationId: {
+                eq: parentId
+            }
+        };
+
+        // include conditions
+        const qb = new RequestQueryBuilder();
+        qb.merge(queryBuilder);
+
+        // add condition on parent
+        qb.filter.where(parentCondition, true);
+
+        const whereFilter = qb.filter.generateCondition(true);
+
+        return this.http.get(`locations/count?where=${whereFilter}`);
     }
 
     /**
@@ -170,6 +209,17 @@ export class LocationDataService {
             // refresh location cache
             this.cacheService.remove(CacheKey.LOCATIONS);
         });
+    }
+
+    /**
+     * Retrieve location usage
+     * @param locationId
+     */
+    getLocationUsage(locationId: string): Observable<LocationUsageModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`locations/${locationId}/usage`),
+            LocationUsageModel
+        );
     }
 }
 

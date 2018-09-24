@@ -10,7 +10,6 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -18,7 +17,13 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { Constants } from '../../../../core/models/constants';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
+import { RelationshipModel } from '../../../../core/models/relationship.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-modify-case',
@@ -27,9 +32,7 @@ import { Constants } from '../../../../core/models/constants';
     styleUrls: ['./modify-case.component.less']
 })
 export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -47,7 +50,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
+
+    parentOnsetDates: Moment[] = [];
+
+    queryParams: {
+        onset: boolean,
+        longPeriod: boolean
+    };
 
     constructor(
         private router: Router,
@@ -55,10 +65,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private authDataService: AuthDataService,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private genericDataService: GenericDataService,
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -67,38 +78,160 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
-        this.route.params.subscribe((params: { caseId }) => {
-            this.caseId = params.caseId;
+        // retrieve query params
+        this.route.queryParams
+            .subscribe((queryParams: any) => {
+                this.queryParams = queryParams;
+                this.buildBreadcrumbs();
+            });
 
-            // get current outbreak
-            this.outbreakDataService
-                .getSelectedOutbreak()
-                .subscribe((selectedOutbreak: OutbreakModel) => {
-                    this.selectedOutbreak = selectedOutbreak;
+        this.route.params
+            .subscribe((params: { caseId }) => {
+                this.caseId = params.caseId;
+                this.retrieveCaseData();
+            });
 
-                    // get case
-                    this.caseDataService
-                        .getCase(selectedOutbreak.id, this.caseId)
-                        .subscribe(caseDataReturned => {
-                            this.caseData = new CaseModel(caseDataReturned);
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.caseData
-                                )
-                            );
-                        });
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
+
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+                this.retrieveCaseData();
+            });
+    }
+
+    buildBreadcrumbs() {
+        if (this.caseData) {
+            // initialize breadcrumbs
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+            ];
+
+            // do we need to add onset breadcrumb ?
+            // no need to check rights since this params should be set only if we come from that page
+            if (this.queryParams.onset) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+                        '/relationships/date-onset'
+                    )
+                );
+            }
+
+            // do we need to add long period between onset dates breadcrumb ?
+            // no need to check rights since this params should be set only if we come from that page
+            if (this.queryParams.longPeriod) {
+                this.breadcrumbs.push(
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+                        '/relationships/long-period'
+                    )
+                );
+            }
+
+            // current page title
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
+                    '.',
+                    true,
+                    {},
+                    this.caseData
+                )
+            );
+        }
+    }
+
+    retrieveCaseData() {
+        // get case
+        if (
+            this.selectedOutbreak.id &&
+            this.caseId
+        ) {
+            // construct query builder for this case that includes the parent relation as well
+            const qb = new RequestQueryBuilder();
+
+            // parent case relations
+            const relations = qb.include('relationships');
+            relations.filterParent = false;
+
+            // keep only relationships for which the current case is the target ( child case )
+            relations.queryBuilder.filter.where({
+                or: [{
+                    'persons.0.type': EntityType.CASE,
+                    'persons.0.source': true,
+                    'persons.1.type': EntityType.CASE,
+                    'persons.1.target': true,
+                    'persons.1.id': this.caseId
+                }, {
+                    'persons.0.type': EntityType.CASE,
+                    'persons.0.target': true,
+                    'persons.0.id': this.caseId,
+                    'persons.1.type': EntityType.CASE,
+                    'persons.1.source': true
+                }]
+            });
+
+            // case data
+            const people = relations.queryBuilder.include('people');
+            people.filterParent = false;
+
+            // ID
+            qb.filter.byEquality(
+                'id',
+                this.caseId
+            );
+
+            // get case
+            this.caseDataService
+                .getCasesList(
+                    this.selectedOutbreak.id,
+                    qb
+                )
+                .subscribe((cases: CaseModel[]) => {
+                    // add breadcrumb
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            this.viewOnly ? 'LNG_PAGE_VIEW_CASE_TITLE' : 'LNG_PAGE_MODIFY_CASE_TITLE',
+                            '.',
+                            true,
+                            {},
+                            this.caseData
+                        )
+                    );
+
+                    // set data only when we have everything
+                    this.caseData = new CaseModel(cases[0]);
+
+                    // determine parent onset dates
+                    const uniqueDates: {} = {};
+                    _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
+                        const parentPerson = _.find(relationship.persons, { source: true });
+                        const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
+                        if (parentCase.dateOfOnset) {
+                            uniqueDates[moment(parentCase.dateOfOnset).startOf('day').toISOString()] = true;
+                        }
+                    });
+
+                    // convert unique object of dates to array
+                    this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
+                        return moment(date);
+                    });
+
+                    // breadcrumbs
+                    this.buildBreadcrumbs();
                 });
-
-
-        });
+        }
     }
 
     /**
@@ -117,6 +250,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     modifyCase(form: NgForm) {
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // omit fields that are NOT visible
@@ -124,10 +263,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.dob;
         } else {
             delete dirtyFields.age;
-        }
-
-        if (!this.formHelper.validateForm(form)) {
-            return;
         }
 
         // modify the Case
@@ -145,5 +280,16 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.disableDirtyConfirm();
                 this.router.navigate(['/cases']);
             });
+    }
+
+    /**
+     * Used for validating date onset
+     */
+    dateOnsetSameOrBeforeDates(): any[] {
+        return [
+            ...this.parentOnsetDates,
+            this.serverToday,
+            [this.caseData.dateDeceased, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_DECEASED')]
+        ];
     }
 }

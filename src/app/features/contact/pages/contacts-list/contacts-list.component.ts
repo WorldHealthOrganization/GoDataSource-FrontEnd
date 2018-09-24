@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
@@ -32,6 +31,10 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-contacts-list',
@@ -49,6 +52,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
+    contactsListCount$: Observable<any>;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -73,6 +77,37 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    exportContactsUrl: string;
+    contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ID', 'id' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_GENDER', 'gender' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_AGE', 'age' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_TYPE', 'type' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' )
+    ];
+
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
@@ -82,16 +117,22 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private i18nService: I18nService
     ) {
         super(listFilterDataService, route.queryParams);
     }
 
     ngOnInit() {
+        // add page title
+        this.contactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE') +
+            ' - ' +
+            this.contactsDataExportFileName;
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -119,6 +160,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
+                // export contacts url
+                this.exportContactsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
+                }
+
                 // get new contacts grouped by exposure types
                 if (this.selectedOutbreak) {
                     this.countedNewContactsGroupedByExposureType$ = this.contactDataService
@@ -134,8 +184,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
 
         // case condition
@@ -277,6 +329,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
+        }
+    }
+
+    /**
      * Check if we have write access to contacts
      * @returns {boolean}
      */
@@ -297,7 +361,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = [
+        return [
             'firstName',
             'lastName',
             'age',
@@ -306,8 +370,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             'riskLevel',
             'actions'
         ];
-
-        return columns;
     }
 
     /**
@@ -346,7 +408,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

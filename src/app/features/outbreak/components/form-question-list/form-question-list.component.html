@@ -46,7 +46,8 @@
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChange()"
-                                app-unique-validator="\]\[variable\]$">
+                                app-unique-validator="\]\[variable\]$"
+                                [additionalControlsToCheck]="additionalControlsToCheck">
                             </app-form-input>
                         </div>
 
@@ -73,7 +74,7 @@
                                 [options]="answerTypesList$ | async"
                                 multiple="false"
                                 [disabled]="viewOnly"
-                                (optionChanged)="onChange()">
+                                (optionChanged)="onChangeAnswerType(i)">
                             </app-form-select>
                         </div>
 
@@ -109,7 +110,9 @@
                             [viewOnly]="viewOnly"
                             (changed)="onChange(false)"
                             (groupValidated)="validateGroup()"
-                            [minItems]="2">
+                            [minItems]="2"
+                            [parentControls]="groupForm.controls"
+                            [defaultQuestionCategory]="values[i].category">
                         </app-form-answer-list>
                     </div>
                 </div>

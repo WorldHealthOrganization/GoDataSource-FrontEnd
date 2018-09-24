@@ -13,7 +13,8 @@ export class GoogleMapComponent {
     @Input() height: string = '400px';
     @Input() zoom: number = 10;
     @Input() mapType: google.maps.MapTypeId = google.maps.MapTypeId.HYBRID;
-    @Input() fitMapOnMarkersChnage: boolean = false;
+    @Input() fitMapOnMarkersChange: boolean = false;
+    @Input() displayLoading: boolean = false;
 
     private markerBounds: google.maps.LatLngBounds;
     private _centerLocation: google.maps.LatLng;
@@ -104,7 +105,7 @@ export class GoogleMapComponent {
             });
 
             // fit map bounds
-            if (this.fitMapOnMarkersChnage) {
+            if (this.fitMapOnMarkersChange) {
                 this.fitMarkerBounds();
             }
         }
