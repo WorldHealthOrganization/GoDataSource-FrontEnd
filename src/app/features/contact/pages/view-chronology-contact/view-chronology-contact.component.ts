@@ -42,6 +42,9 @@ export class ViewChronologyContactComponent implements OnInit {
                             this.contactData = contactDataReturned;
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
+                                    contactDataReturned.name,
+                                    `/contacts/${contactDataReturned.id}/view`),
+                                new BreadcrumbItemModel(
                                     'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
                                     '.',
                                     true,
