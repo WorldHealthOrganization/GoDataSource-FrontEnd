@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import * as _ from 'lodash';
@@ -82,10 +82,9 @@ export class DashboardComponent implements OnInit {
     }
 
     private initializeDashlets() {
+        const userDashboardSettings: UserSettingsDashboardModel = this.authUser.getSettings(UserSettings.DASHBOARD);
         _.each(this.kpiGroups, (group) => {
             _.each(group.dashlets, (dashlet) => {
-                const userDashboardSettings: UserSettingsDashboardModel = this.authUser.settingsDashboard;
-
                 // add the dashlet to the list (if it's not already existing)
                 userDashboardSettings.addDashletIfNotExists(new DashletSettingsModel({
                     name: dashlet,
@@ -106,8 +105,9 @@ export class DashboardComponent implements OnInit {
     private refreshDashletsOrder() {
         _.each(this.kpiGroups, (group) => {
             group.dashlets.sort((a, b) => {
-                const dashletA = this.authUser.settingsDashboard.getDashlet(a);
-                const dashletB = this.authUser.settingsDashboard.getDashlet(b);
+                const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
+                const dashletA = dashboardSettings.getDashlet(a);
+                const dashletB = dashboardSettings.getDashlet(b);
 
                 if (dashletA && dashletB) {
                     return dashletA.order - dashletB.order;
@@ -122,15 +122,12 @@ export class DashboardComponent implements OnInit {
      * Persist user's settings for the dashboard
      */
     private persistUserDashboardSettings(): Observable<any> {
-        return this.userDataService.modifyUser(
-            this.authUser.id,
-            {
-                settings: {
-                    dashboard: this.authUser.settingsDashboard
-                }
-            }
-        )
-            .mergeMap(() => {
+        return this.userDataService
+            .updateSettings(
+                this.authUser.id,
+                UserSettings.DASHBOARD,
+                this.authUser.getSettings(UserSettings.DASHBOARD)
+            ).mergeMap(() => {
                 // update user data in local storage
                 return this.authDataService.reloadAndPersistAuthUser();
             });
@@ -142,7 +139,7 @@ export class DashboardComponent implements OnInit {
      */
     isDashletVisible(name: string): boolean {
         return _.get(
-            this.authUser.settingsDashboard.getDashlet(name),
+            this.authUser.getSettings(UserSettings.DASHBOARD).getDashlet(name),
             'visible',
             true
         );
@@ -153,7 +150,7 @@ export class DashboardComponent implements OnInit {
      * @param name
      */
     hideDashlet(name: string) {
-        this.authUser.settingsDashboard.hideDashlet(name);
+        this.authUser.getSettings(UserSettings.DASHBOARD).hideDashlet(name);
 
         this.refreshDashletsOrder();
 
@@ -162,7 +159,7 @@ export class DashboardComponent implements OnInit {
     }
 
     moveDashletBefore(name: string) {
-        this.authUser.settingsDashboard.moveDashletBefore(name);
+        this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletBefore(name);
 
         this.refreshDashletsOrder();
 
@@ -171,7 +168,7 @@ export class DashboardComponent implements OnInit {
     }
 
     moveDashletAfter(name: string) {
-        this.authUser.settingsDashboard.moveDashletAfter(name);
+        this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletAfter(name);
 
         this.refreshDashletsOrder();
 
@@ -180,7 +177,7 @@ export class DashboardComponent implements OnInit {
     }
 
     showAllDashlets(kpiGroup: string) {
-        this.authUser.settingsDashboard.showAllDashlets(kpiGroup);
+        this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
 
         // persist changes
         this.persistUserDashboardSettings().subscribe();

@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { UserModel } from '../../models/user.model';
+import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
+import { Subscriber } from 'rxjs/Subscriber';
+import * as _ from 'lodash';
 
 @Injectable()
 export class UserDataService {
@@ -87,6 +89,39 @@ export class UserDataService {
      */
     modifyUser(userId: string, data: any): Observable<any> {
         return this.http.patch(`users/${userId}`, data);
+    }
+
+    /**
+     * Update user settings
+     * @param userId
+     * @param settingsKey
+     * @param data
+     * @returns {Observable<any>}
+     */
+    updateSettings(userId: string, settingsKey: UserSettings, data: any): Observable<any> {
+        return Observable.create((observer: Subscriber<void>) => {
+            this.getUser(userId)
+                .catch((err) => {
+                    observer.error(err);
+                    observer.complete();
+                    return err;
+                })
+                .subscribe((userData) => {
+                    // construct settings
+                    const userSettings = _.set(
+                        _.get(userData, 'settings', {}),
+                        settingsKey,
+                        data
+                    );
+
+                    // save settings
+                    return this.modifyUser(userId, { settings: userSettings })
+                        .subscribe((responseData) => {
+                            observer.next(responseData);
+                            observer.complete();
+                        });
+                });
+        });
     }
 
     /**
