@@ -8,7 +8,6 @@ import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/mergeMap';
 
 @Component({
     selector: 'app-dashboard',
@@ -122,15 +121,10 @@ export class DashboardComponent implements OnInit {
      * Persist user's settings for the dashboard
      */
     private persistUserDashboardSettings(): Observable<any> {
-        return this.userDataService
-            .updateSettings(
-                this.authUser.id,
-                UserSettings.DASHBOARD,
-                this.authUser.getSettings(UserSettings.DASHBOARD)
-            ).mergeMap(() => {
-                // update user data in local storage
-                return this.authDataService.reloadAndPersistAuthUser();
-            });
+        return this.authDataService.updateSettingsForCurrentUser(
+            UserSettings.DASHBOARD,
+            this.authUser.getSettings(UserSettings.DASHBOARD)
+        );
     }
 
     /**

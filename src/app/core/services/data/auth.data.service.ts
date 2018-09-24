@@ -4,14 +4,11 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/switchMap';
-
 import * as _ from 'lodash';
-
 import { StorageService, StorageKey } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
-
 import { AuthModel } from '../../models/auth.model';
-import { UserModel } from '../../models/user.model';
+import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 
 @Injectable()
@@ -64,6 +61,28 @@ export class AuthDataService {
                 // cache auth data with authenticated user information
                 this.storageService.set(StorageKey.AUTH_DATA, authData);
                 return authData;
+            });
+    }
+
+    /**
+     * Update settings for current user
+     * @param settingsKey
+     * @param data
+     * @returns {Observable<any>}
+     */
+    updateSettingsForCurrentUser(
+        settingsKey: UserSettings,
+        data: any
+    ): Observable<any> {
+        const authUser = this.getAuthenticatedUser();
+        return this.userDataService
+            .updateSettings(
+                authUser.id,
+                settingsKey,
+                data
+            ).mergeMap(() => {
+                // update user data in local storage
+                return this.reloadAndPersistAuthUser();
             });
     }
 
