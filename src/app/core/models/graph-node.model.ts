@@ -12,8 +12,10 @@ export class GraphNodeModel {
     // use this field to remove nodes with no date for timeline
     displayTimeline: string;
 
-    // default node color
+    // default node colors
     nodeColor: string;
+    nodeNameColor: string;
+
     label: string;
 
 
@@ -23,6 +25,7 @@ export class GraphNodeModel {
         this.type = _.get(data, 'type', '');
         this.dateTimeline = _.get(data, 'dateTimeline', '');
         this.displayTimeline = _.get(data, 'displayTimeline', 'element');
+        this.nodeNameColor = _.get(data, 'nodeNameColor', '#000000');
 
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);

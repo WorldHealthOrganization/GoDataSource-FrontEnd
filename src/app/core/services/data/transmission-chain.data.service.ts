@@ -181,6 +181,17 @@ export class TransmissionChainDataService {
                         }
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
+                        // set colors
+                        if (Object.keys(colorCriteria.nodeColor).length) {
+                            if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                                nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
+                            }
+                        }
+                        if (Object.keys(colorCriteria.nodeNameColor).length) {
+                            if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                                nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                            }
+                        }
                         graphData.nodes.push({data: nodeData});
                     }
                 });
@@ -217,6 +228,17 @@ export class TransmissionChainDataService {
                         if (allowAdd) {
                             const nodeData = new GraphNodeModel(nodeProps);
                             nodeData.type = node.type;
+                            // set colors
+                            if (Object.keys(colorCriteria.nodeColor).length) {
+                                if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                                    nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
+                                }
+                            }
+                            if (Object.keys(colorCriteria.nodeNameColor).length) {
+                                if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                                    nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                                }
+                            }
                             graphData.nodes.push({data: nodeData});
                             selectedNodeIds.push(nodeData.id);
                         }
@@ -242,8 +264,15 @@ export class TransmissionChainDataService {
                             graphEdge.target = relationship.persons[0].id;
                             graphEdge.targetType = relationship.persons[0].type;
                         }
-                        // set the edge color based on the type of the source and target
-                        graphEdge.setEdgeColor();
+                        // set colors
+                        if (Object.keys(colorCriteria.edgeColor).length) {
+                            if ( colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]] ) {
+                                graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
+                            }
+                        } else {
+                            // set the edge color based on the type of the source and target
+                            graphEdge.setEdgeColor();
+                        }
                         graphData.edges.push({data: graphEdge});
                     }
                 });

@@ -163,6 +163,7 @@
 <app-cytoscape-graph
     [elements]="graphElements"
     [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+    [legend]="legend"
     (nodeTapped)="onNodeTap($event)"
     (edgeTapped)="onEdgeTap($event)">
 </app-cytoscape-graph>

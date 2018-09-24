@@ -46,7 +46,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     exposureDurationRefData: ReferenceDataCategoryModel;
     colorCriteria: any = {nodeColorCriteria: 'default', nodeNameColorCriteria: 'default', edgeColorCriteria: 'default'};
     legend: any = {nodeColorField: 'default', nodeNameColorField: 'default', edgeColorField: 'default', nodeColor : [], nodeNameColor: [], edgeColor: []};
-    defaultColor = '#3C3F41';
+    defaultColor = '#A8A8A8';
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -105,6 +105,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * Display chains of transmission
      */
     displayChainsOfTransmission() {
+        this.mapColorCriteria();
         if (this.selectedOutbreak) {
             const requestQueryBuilder = new RequestQueryBuilder();
             // create queryBuilder for filters
@@ -280,6 +281,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
         switch (this.colorCriteria.nodeColorCriteria) {
             case 'type':
+                this.legend.nodeColor = [];
                 this.legend.nodeColor[EntityType.CASE] = 'red';
                 this.legend.nodeColor[EntityType.CONTACT] = 'blue';
                 this.legend.nodeColor[EntityType.EVENT] = 'green';
