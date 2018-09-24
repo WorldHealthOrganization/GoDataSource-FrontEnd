@@ -25,7 +25,7 @@ export class ReferenceDataEntryModel {
     category: ReferenceDataCategoryModel;
     colorCode: string;
 
-    _iconId: string;
+    private _iconId: string;
     iconUrl: string;
     set iconId(iconId: string) {
         this._iconId = iconId;

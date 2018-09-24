@@ -76,10 +76,10 @@ export class ReferenceDataDataService {
 
     /**
      * Retrieve the list of Reference Data Entries for a specific Category
-     * @param {ReferenceDataCategory | string} categoryId
+     * @param {string} categoryId
      * @returns {Observable<ReferenceDataCategoryModel>}
      */
-    getReferenceDataByCategory(categoryId: ReferenceDataCategory | string): Observable<ReferenceDataCategoryModel> {
+    getReferenceDataByCategory(categoryId: string): Observable<ReferenceDataCategoryModel> {
         // get reference data entries
         return this.getReferenceData()
             .map((entries) => {
