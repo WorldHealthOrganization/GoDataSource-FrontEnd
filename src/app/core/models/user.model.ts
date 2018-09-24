@@ -9,8 +9,12 @@ export enum UserSettings {
     CASE_FIELDS = 'caseFields'
 }
 
+/**
+ * Custom handlers
+ */
 abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
+    static CASE_FIELDS = [];
 }
 
 export class UserModel {
@@ -80,8 +84,11 @@ export class UserModel {
             );
 
             // initialize settings
-            this._settings[property] = UserSettingsHandlers[enumKey] !== undefined ?
-                new UserSettingsHandlers[enumKey](settings) :
+            this._settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
+                    _.isArray(UserSettingsHandlers[enumKey]) ?
+                        (_.isEmpty(settings) ? [] : settings) :
+                        new UserSettingsHandlers[enumKey](settings)
+                ) :
                 settings;
         });
     }
