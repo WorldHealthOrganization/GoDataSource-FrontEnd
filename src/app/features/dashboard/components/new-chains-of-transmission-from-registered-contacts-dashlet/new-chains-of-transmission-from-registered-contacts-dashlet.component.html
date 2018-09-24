@@ -1,7 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="['/transmission-chains']"
     [params]="queryParams"
-    [value]="numOfNewChainsOfTransmissionFromRegContactsBecomeCases">
+    [value]="numOfNewChainsOfTransmissionFromRegContactsBecomeCases"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
     {{ 'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES' | translate }}
 </app-dashboard-custom-metric-dashlet>
 

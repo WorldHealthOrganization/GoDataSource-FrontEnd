@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { UserRoleModel } from './user-role.model';
 import { PERMISSION } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
+import { DashletSettingsModel, UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
 export class UserModel {
     id: string;
@@ -16,6 +17,7 @@ export class UserModel {
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
     securityQuestions: SecurityQuestionModel[] = [];
+    settingsDashboard: UserSettingsDashboardModel;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -28,6 +30,13 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
+        this.settingsDashboard = new UserSettingsDashboardModel(
+            _.get(
+                data,
+                'settings.dashboard',
+                _.get(data, 'settingsDashboard')
+            )
+        );
     }
 
     hasPermissions(...permissionIds: PERMISSION[]): boolean {

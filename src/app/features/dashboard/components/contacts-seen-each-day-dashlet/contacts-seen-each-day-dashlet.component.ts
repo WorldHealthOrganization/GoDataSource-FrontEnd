@@ -7,6 +7,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import * as _ from 'lodash';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -14,7 +15,7 @@ import * as _ from 'lodash';
     templateUrl: './contacts-seen-each-day-dashlet.component.html',
     styleUrls: ['./contacts-seen-each-day-dashlet.component.less']
 })
-export class ContactsSeenEachDayDashletComponent implements OnInit {
+export class ContactsSeenEachDayDashletComponent extends DashletComponent implements OnInit {
 
     // number of contacts seen each day
     contactsSeenEachDay: number;
@@ -35,7 +36,9 @@ export class ContactsSeenEachDayDashletComponent implements OnInit {
     }));
 
     constructor(
-        private listFilterDataService: ListFilterDataService) {
+        private listFilterDataService: ListFilterDataService
+    ) {
+        super();
     }
 
     ngOnInit() {

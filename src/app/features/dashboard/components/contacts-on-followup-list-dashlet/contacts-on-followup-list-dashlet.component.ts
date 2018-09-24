@@ -3,6 +3,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -10,7 +11,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
     templateUrl: './contacts-on-followup-list-dashlet.component.html',
     styleUrls: ['./contacts-on-followup-list-dashlet.component.less']
 })
-export class ContactsOnFollowupListDashletComponent implements OnInit {
+export class ContactsOnFollowupListDashletComponent extends DashletComponent implements OnInit {
 
     // number of contacts on the followup list
     contactsOnFollowUpListCount: number;
@@ -20,7 +21,9 @@ export class ContactsOnFollowupListDashletComponent implements OnInit {
     constructor(
         private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get contacts on followup list count
