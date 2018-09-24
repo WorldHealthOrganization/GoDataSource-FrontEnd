@@ -24,6 +24,7 @@ import * as _ from 'lodash';
 import { Subscriber } from 'rxjs/Subscriber';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -56,6 +57,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     followUpsListCount$: Observable<any>;
 
+    serverToday: Moment = null;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -70,6 +73,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     }
 
     ngOnInit() {
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((currentDate) => {
+               this.serverToday = currentDate;
+            });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
@@ -466,10 +476,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      * Check if date is in future to know if we show "Missed to follow-up" option or not
      */
     dateInTheFuture(followUpDate): boolean {
-        console.log('aaa');
-        console.log(followUpDate);
-        console.log(Constants.today().toISOString());
         const date = followUpDate ? moment(followUpDate) : null;
-        return !!(date && date.isSameOrAfter(Constants.today()));
+        const startOfServerDate = this.serverToday.startOf('day');
+        return !!(date && date.startOf('day').isAfter(startOfServerDate));
     }
 }
