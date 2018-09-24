@@ -34,8 +34,19 @@
                 [value]="option[optionValueKey]"
                 [matTooltip]="option[optionTooltipKey] | translate"
                 [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
+
+                <!-- Image -->
+                <img
+                    *ngIf="optionLabelImgKey"
+                    height="24px"
+                    [src]="option[optionLabelImgKey]"/>
+
+                <!-- Prefix -->
                 {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+
+                <!-- Label -->
                 {{option[optionLabelKey] | translate}}
+
             </mat-option>
         </mat-select>
     </mat-form-field>

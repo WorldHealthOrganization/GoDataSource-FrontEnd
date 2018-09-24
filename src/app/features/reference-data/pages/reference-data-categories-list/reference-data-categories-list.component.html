@@ -9,6 +9,15 @@
                     class="button-primary"
                     mat-raised-button
                     color="primary"
+                    [routerLink]="['/reference-data', 'manage-icons', 'list']">
+                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                </button>
+
+                <button
+                    *ngIf="hasReferenceDataWriteAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
                     [routerLink]="['/import-export-data', 'reference-data', 'import']">
                     {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
                 </button>
@@ -52,8 +61,13 @@
 
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip *ngFor="let entry of item.entries"
-                              [matTooltip]="entry.description | translate">
+                    <mat-chip
+                        *ngFor="let entry of item.entries"
+                        [matTooltip]="entry.description | translate">
+                        <div
+                            *ngIf="entry.colorCode"
+                            class="ref-data-chip-bg-color"
+                            [style.background-color]="entry.colorCode"></div>
                         {{ entry.value | translate }}
                     </mat-chip>
                 </mat-chip-list>

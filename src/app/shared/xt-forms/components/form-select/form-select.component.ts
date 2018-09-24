@@ -30,6 +30,7 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Input() options: any[];
     @Input() optionLabelKey: string = 'label';
     @Input() optionLabelPrefixKey: string = null;
+    @Input() optionLabelImgKey: string = null;
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
