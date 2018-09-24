@@ -44,6 +44,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     exposureTypeRefData: ReferenceDataCategoryModel;
     exposureFrequencyRefData: ReferenceDataCategoryModel;
     exposureDurationRefData: ReferenceDataCategoryModel;
+    personTypeRefData: ReferenceDataCategoryModel;
     colorCriteria: any = {nodeColorCriteria: 'default', nodeNameColorCriteria: 'default', edgeColorCriteria: 'default'};
     legend: any = {nodeColorField: 'default', nodeNameColorField: 'default', edgeColorField: 'default', nodeColor : [], nodeNameColor: [], edgeColor: []};
     defaultColor = '#A8A8A8';
@@ -68,6 +69,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).subscribe((results) => {
             this.caseClassificationRefData = results;
+        });
+        this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).subscribe((results) => {
+            this.personTypeRefData = results;
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.GENDER).subscribe((results) => {
             this.genderRefData = results;
@@ -281,10 +285,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
         switch (this.colorCriteria.nodeColorCriteria) {
             case 'type':
-                this.legend.nodeColor = [];
-                this.legend.nodeColor[EntityType.CASE] = 'red';
-                this.legend.nodeColor[EntityType.CONTACT] = 'blue';
-                this.legend.nodeColor[EntityType.EVENT] = 'green';
+                if (!_.isEmpty(this.personTypeRefData.entries)) {
+                    _.forEach(this.personTypeRefData.entries, (value, key) => {
+                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
                 break;
             case 'classification':
                 if (!_.isEmpty(this.caseClassificationRefData.entries)) {
@@ -314,9 +319,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         // node name color
         switch (this.colorCriteria.nodeNameColorCriteria) {
             case 'type':
-                this.legend.nodeNameColor[EntityType.CASE] = 'red';
-                this.legend.nodeNameColor[EntityType.CONTACT] = 'blue';
-                this.legend.nodeNameColor[EntityType.EVENT] = 'green';
+                if (!_.isEmpty(this.personTypeRefData.entries)) {
+                    _.forEach(this.personTypeRefData.entries, (value, key) => {
+                        this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                    });
+                }
                 break;
             case 'classification':
                 if (!_.isEmpty(this.caseClassificationRefData.entries)) {
@@ -384,7 +391,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 this.legend.edgeColor = [];
         }
 
-        console.log(this.legend);
     }
 
 }
