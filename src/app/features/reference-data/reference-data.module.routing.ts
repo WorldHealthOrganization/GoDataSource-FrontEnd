@@ -47,6 +47,28 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+
+    // Manage Icons - List
+    {
+        path: 'manage-icons/list',
+        component: fromPages.ManageIconsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+        }
+    },
+    // Manage Icons - Create
+    {
+        path: 'manage-icons/add',
+        component: fromPages.ManageIconsCreateComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

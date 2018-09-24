@@ -1,0 +1,89 @@
+app-manage-icons-create {
+    @app-manage-icon-height: 240px;
+    .manage-icon-loading {
+        height: @app-manage-icon-height;
+        text-align: center;
+
+        @mat-spinner-width: 64px;
+        @mat-spinner-height: 64px;
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+
+        .manage-icon-loading-progress {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width;
+            height: 18px;
+        }
+    }
+
+    .manage-icon-drop-zone {
+        border: dotted 3px lightgray;
+        height: 100px;
+
+        &.manage-icon-file-over {
+            border: dotted 3px red;
+        }
+    }
+
+    .manage-icon-file-or {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    // variables
+    @app-manage-icon-border: 1px solid #CCC;
+    @app-manage-icon-padding: 10px;
+    @app-manage-icon-bg-color: #EEE;
+    @app-manage-icon-bg-color-hover: #CCC;
+    .manage-icon-file-input {
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+
+        .manage-icon-file-input-label {
+            padding: @app-manage-icon-padding;
+            background-color: @app-manage-icon-bg-color;
+            border-radius: 5px 0 0 5px;
+            border: @app-manage-icon-border;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .manage-icon-file-input-file {
+            padding: @app-manage-icon-padding;
+            border: @app-manage-icon-border;
+            box-sizing: border-box;
+        }
+
+        .manage-icon-file-input-browse {
+            padding: @app-manage-icon-padding;
+            background-color: @app-manage-icon-bg-color;
+            border-radius: 0 5px 5px 0;
+            border: @app-manage-icon-border;
+            font-weight: bold;
+            box-sizing: border-box;
+
+            &:hover {
+                background-color: @app-manage-icon-bg-color-hover;
+            }
+        }
+    }
+}

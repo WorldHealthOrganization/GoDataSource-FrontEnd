@@ -10,12 +10,81 @@
 
         <div fxLayout="column">
 
-            <div fxLayout="row">
+            <div fxLayout="row" fxLayoutGap="20px">
                 <app-form-slide-toggle
                     name="active"
                     [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
                     [ngModel]="entry.active">
                 </app-form-slide-toggle>
+
+                <div
+                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <div
+                        fxFlex>
+                        {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
+                    </div>
+
+                    <input
+                        #colorPickerInput="ngModel"
+                        fxFlex="132px"
+                        class="ref-data-color-picker"
+                        [style.background]="entry.colorCode"
+                        name="colorCode"
+                        [ngModel]="entry.colorCode"
+                        type="text"
+                        [readonly]="true"
+                        [required]="false"
+                        [colorPicker]="entry.colorCode"
+                        cpOutputFormat="hex"
+                        (colorPickerChange)="entry.colorCode = $event; colorPickerInput.control.markAsDirty();"
+                        (click)="$event.target.select()"/>
+                </div>
+
+                <div fxFlex>
+                    <!-- View Icon  -->
+                    <div
+                        *ngIf="!changeIcon"
+                        fxFlex fxLayout="row" fxLayoutGap="20px">
+
+                        <!-- Label -->
+                        <div>
+                            {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate }}
+                        </div>
+
+                        <!-- Image -->
+                        <img
+                            *ngIf="entry.iconId"
+                            [src]="entry.iconUrl" />
+                        <div
+                            *ngIf="!entry.iconId">
+                            {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
+                        </div>
+
+                        <!-- Change -->
+                        <div>
+                            <button
+                                type="button"
+                                mat-raised-button
+                                (click)="changeIcon = true;">
+                                {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Change Icon -->
+                    <app-form-select
+                        *ngIf="changeIcon"
+                        name="iconId"
+                        [ngModel]="entry.iconId"
+                        [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
+                        [options]="iconsList$ | async"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        optionLabelImgKey="url">
+                    </app-form-select>
+                </div>
+
+                <div fxFlex><!-- placeholder --></div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">
@@ -39,8 +108,8 @@
     </mat-card>
 
     <div class="form-actions">
-        <button mat-raised-button color="primary" class="button-primary">Save</button>
-        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>Cancel</button>
+        <button mat-raised-button color="primary" class="button-primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}</button>
+        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
     </div>
 
 </form>

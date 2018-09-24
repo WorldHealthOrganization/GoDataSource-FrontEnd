@@ -8,6 +8,9 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { Observable } from 'rxjs/Observable';
+import { IconModel } from '../../../../core/models/icon.model';
+import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -25,17 +28,25 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
     // new Entry model
     entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
 
+    iconsList$: Observable<IconModel[]>;
+
+    changeIcon: boolean = false;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private iconDataService: IconDataService
     ) {
         super();
     }
 
     ngOnInit() {
+        // icons data
+        this.iconsList$ = this.iconDataService.getIconsList();
+
         // get the route params
         this.route.params
             .subscribe((params: {categoryId}) => {

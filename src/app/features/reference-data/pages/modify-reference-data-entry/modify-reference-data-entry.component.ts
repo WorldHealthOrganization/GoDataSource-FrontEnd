@@ -12,6 +12,9 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { Observable } from 'rxjs/Observable';
+import { IconModel } from '../../../../core/models/icon.model';
+import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -32,20 +35,29 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
     authUser: UserModel;
 
+    iconsList$: Observable<IconModel[]>;
+
+    changeIcon: boolean = false;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private iconDataService: IconDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        // icons data
+        this.iconsList$ = this.iconDataService.getIconsList();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the route params
         this.route.params
             .subscribe((params: {categoryId, entryId}) => {

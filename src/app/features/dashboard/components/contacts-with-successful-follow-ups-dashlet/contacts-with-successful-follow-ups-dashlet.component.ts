@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import * as _ from 'lodash';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -14,7 +15,7 @@ import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/me
     templateUrl: './contacts-with-successful-follow-ups-dashlet.component.html',
     styleUrls: ['./contacts-with-successful-follow-ups-dashlet.component.less']
 })
-export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
+export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComponent implements OnInit {
 
     // contacts with successfulFollowup
     contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp;
@@ -34,6 +35,7 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent implements OnInit {
     constructor(
         private listFilterDataService: ListFilterDataService
     ) {
+        super();
     }
 
     ngOnInit() {
