@@ -1,11 +1,14 @@
 <app-dashboard-custom-metric-dashlet
     [link]="['/cases']"
     [params]="queryParams"
-    value="{{contactsBecomeCasesCount}} / {{casesCount}}">
+    value="{{contactsBecomeCasesCount}} / {{casesCount}}"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
 
     <div fxLayout="row" fxLayoutGap="10px">
         <div>
-            {{'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD' | translate}}
+            {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD' | translate}}
         </div>
 
         <app-form-daterange
@@ -16,7 +19,7 @@
         </app-form-daterange>
 
         <div fxFlexOffset="5px">
-            {{'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD' | translate}}
+            {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD' | translate}}
         </div>
 
         <app-form-location-dropdown

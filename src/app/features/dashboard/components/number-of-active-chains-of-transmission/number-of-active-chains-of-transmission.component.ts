@@ -4,6 +4,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MetricIndependentTransmissionChainsModel } from '../../../../core/models/metrics/metric-independent-transmission-chains.model';
 import { Constants } from '../../../../core/models/constants';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-number-of-active-chains-of-transmission-dashlet',
@@ -11,7 +12,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './number-of-active-chains-of-transmission.component.html',
     styleUrls: ['./number-of-active-chains-of-transmission.component.less']
 })
-export class NumberOfActiveChainsOfTransmissionComponent implements OnInit {
+export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponent implements OnInit {
 
     // number of active chains of transmission
     numberOfActiveChains: number;
@@ -21,7 +22,9 @@ export class NumberOfActiveChainsOfTransmissionComponent implements OnInit {
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService) {
+        private outbreakDataService: OutbreakDataService
+    ) {
+        super();
     }
 
     ngOnInit() {

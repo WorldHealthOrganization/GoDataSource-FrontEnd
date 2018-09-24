@@ -5,6 +5,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
@@ -12,7 +13,7 @@ import { Subscriber } from 'rxjs/Subscriber';
     templateUrl: './new-cases-previous-days-transmission-chains-dashlet.component.html',
     styleUrls: ['./new-cases-previous-days-transmission-chains-dashlet.component.less']
 })
-export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements OnInit {
+export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases in previous x days in known transmission chains
     casesKnownTransmissionChainsCount: number;
@@ -33,7 +34,9 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent implements O
     constructor(
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get number of cases in previous x days in known transmission chains

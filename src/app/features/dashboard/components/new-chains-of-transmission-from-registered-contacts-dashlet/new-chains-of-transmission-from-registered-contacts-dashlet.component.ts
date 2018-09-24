@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -9,7 +10,7 @@ import { Constants } from '../../../../core/models/constants';
     templateUrl: './new-chains-of-transmission-from-registered-contacts-dashlet.component.html',
     styleUrls: ['./new-chains-of-transmission-from-registered-contacts-dashlet.component.less']
 })
-export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent implements OnInit {
+export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent extends DashletComponent implements OnInit {
 
     // number of new chains of transmission from registered contacts who became cases
     numOfNewChainsOfTransmissionFromRegContactsBecomeCases: number;
@@ -21,7 +22,9 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent imple
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private transmissionChainDataService: TransmissionChainDataService) {
+        private transmissionChainDataService: TransmissionChainDataService
+    ) {
+        super();
     }
 
     ngOnInit() {
