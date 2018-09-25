@@ -16,7 +16,7 @@ export class GraphEdgeModel {
         this.target = _.get(data, 'target');
         this.sourceType = _.get(data, 'sourceType');
         this.targetType = _.get(data, 'targetType');
-        this.edgeColor = _.get(data, Constants.DEFAULT_COLOR_CHAINS);
+        this.edgeColor = _.get(data, 'edgeColor', Constants.DEFAULT_COLOR_CHAINS);
     }
 
 }
