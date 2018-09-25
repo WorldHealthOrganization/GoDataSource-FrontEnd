@@ -19,7 +19,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
