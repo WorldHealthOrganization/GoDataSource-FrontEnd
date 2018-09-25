@@ -238,13 +238,6 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
 
         /**
-         * Entity Types
-         */
-        'LNG_ENTITY_TYPE_LABEL_CASE': 'Case',
-        'LNG_ENTITY_TYPE_LABEL_CONTACT': 'Contact',
-        'LNG_ENTITY_TYPE_LABEL_EVENT': 'Event',
-
-        /**
          * Entity Fields
          */
         'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',

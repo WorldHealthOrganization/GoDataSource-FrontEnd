@@ -43,6 +43,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -70,6 +71,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // get today time
         this.genericDataService
