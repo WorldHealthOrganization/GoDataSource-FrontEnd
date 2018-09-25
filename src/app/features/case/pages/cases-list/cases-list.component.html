@@ -229,6 +229,30 @@
             </mat-cell>
         </ng-container>
 
+        <!--Deleted-->
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                        ></app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
@@ -283,6 +307,11 @@
                         <button *ngIf="hasCaseWriteAccess()" mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCase(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+
+                        <button *ngIf="item.deleted && hasCaseWriteAccess()" mat-menu-item class="mat-menu-item-restore"
+                                (click)="restoreCase(item)">
+                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

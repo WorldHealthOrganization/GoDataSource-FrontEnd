@@ -151,5 +151,15 @@ export class CaseDataService {
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
+    /**
+     *  Restore an contact that was deleted
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @returns {Observable<any>}
+     */
+    restoreCase(outbreakId: string, caseId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/restore`, {});
+    }
+
 }
 

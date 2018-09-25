@@ -118,5 +118,9 @@ export class ContactDataService {
             MetricContactsSeenEachDays
         );
     }
+
+    restoreContact(outbreakI) {
+
+    }
 }
 

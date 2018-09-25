@@ -109,6 +109,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
+        'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
@@ -317,6 +318,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
         'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
         'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
+        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE' : 'Contact restored',
 
         /**
          * Create Case page
@@ -609,6 +611,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
+        'LNG_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
         'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',

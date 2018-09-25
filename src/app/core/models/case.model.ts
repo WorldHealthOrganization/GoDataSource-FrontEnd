@@ -36,6 +36,7 @@ export class CaseModel {
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
+    deleted: boolean;
 
     relationships: {
         people: any[]
@@ -82,6 +83,7 @@ export class CaseModel {
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
         this.relationships = _.get(data, 'relationships', []);
+        this.deleted = _.get(data, 'deleted');
     }
 
     /**

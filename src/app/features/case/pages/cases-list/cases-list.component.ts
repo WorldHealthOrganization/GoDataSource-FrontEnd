@@ -26,6 +26,7 @@ import { ExportDataExtension } from '../../../../shared/components/export-button
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -49,6 +50,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -110,7 +112,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
         super(listFilterDataService, route.queryParams);
     }
@@ -127,6 +130,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
@@ -270,6 +274,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
             'age',
             'gender',
             'dateOfOnset',
+            'deleted',
             'actions'
         ];
 
@@ -298,6 +303,30 @@ export class CasesListComponent extends ListComponent implements OnInit {
                             // reload data
                             this.needsRefreshList(true);
                         });
+                }
+            });
+    }
+
+    /**
+     * Restore a case that was deleted
+     * @param {CaseModel} caseModel
+     */
+    restoreCase(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                this.caseDataService
+                    .restoreCase(this.selectedOutbreak.id, caseModel.id)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        // reload data
+                        this.needsRefreshList(true);
+                    });
                 }
             });
     }
