@@ -108,7 +108,14 @@ export class UserDataService {
                 .subscribe((userData) => {
                     // construct settings
                     const userSettings = _.set(
-                        _.get(userData, 'settings', {}),
+                        _.get(
+                            userData,
+                            'settings',
+                            _.get(
+                                userData,
+                                '_settings'
+                            )
+                        ),
                         settingsKey,
                         data
                     );
