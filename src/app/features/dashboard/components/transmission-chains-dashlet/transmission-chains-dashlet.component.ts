@@ -45,11 +45,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
     exposureFrequencyRefData: ReferenceDataCategoryModel;
     exposureDurationRefData: ReferenceDataCategoryModel;
     personTypeRefData: ReferenceDataCategoryModel;
+    // default color criteria
     colorCriteria: any = {
         nodeColorCriteria: 'type',
         nodeNameColorCriteria: 'classification',
         edgeColorCriteria: 'certaintyLevelId'
     };
+    // default legend
     legend: any = {
         nodeColorField: 'type',
         nodeNameColorField: 'classification',
@@ -95,8 +97,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).subscribe((results) => {
             this.riskLevelRefData = results;
-            // call display chains for default criteria
-            this.displayChainsOfTransmission();
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).subscribe((results) => {
             this.relationRefData = results;
@@ -308,15 +308,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         switch (this.colorCriteria.nodeColorCriteria) {
             case 'type':
                 this.legend.nodeColorLabel = 'LNG_ENTITY_TYPE_LABEL';
-                this.legend.nodeColor[EntityType.CASE] = '#e80b0b';
-                this.legend.nodeColor[EntityType.CONTACT] = '#4DB0A0';
-                this.legend.nodeColor[EntityType.EVENT] = '#f96b00';
-                // TODO: decide if we use the reference data field as Person Type or hardcode these.
-                // if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
-                //     _.forEach(this.personTypeRefData.entries, (value, key) => {
-                //         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-                //     });
-                // }
+                if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
+                    _.forEach(this.personTypeRefData.entries, (value, key) => {
+                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+                    });
+                }
                 break;
             case 'classification':
                 this.legend.nodeColorLabel = 'LNG_CASE_FIELD_LABEL_CLASSIFICATION';
