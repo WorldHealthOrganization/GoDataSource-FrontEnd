@@ -269,9 +269,6 @@ export class TransmissionChainDataService {
                             if ( colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]] ) {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }
-                        } else {
-                            // set the edge color based on the type of the source and target
-                            graphEdge.setEdgeColor();
                         }
                         graphData.edges.push({data: graphEdge});
                     }

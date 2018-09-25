@@ -16,29 +16,7 @@ export class GraphEdgeModel {
         this.sourceType = _.get(data, 'sourceType');
         this.targetType = _.get(data, 'targetType');
 
-        this.edgeColor = '#4DB0A0';
-    }
-
-    setEdgeColor() {
-        // set the colors based on nodes type
-        switch (this.targetType) {
-            case EntityType.CASE: {
-                this.edgeColor = '#4DB0A0';
-                break;
-            }
-            case EntityType.CONTACT: {
-                this.edgeColor = '#008DC9';
-                break;
-            }
-            case EntityType.EVENT: {
-                this.edgeColor = '#F44708';
-                break;
-            }
-            default: {
-                this.edgeColor = '#4DB0A0';
-                break;
-            }
-        }
+        this.edgeColor = '#A8A8A8';
     }
 
 }

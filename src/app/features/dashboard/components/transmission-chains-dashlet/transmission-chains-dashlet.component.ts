@@ -45,8 +45,22 @@ export class TransmissionChainsDashletComponent implements OnInit {
     exposureFrequencyRefData: ReferenceDataCategoryModel;
     exposureDurationRefData: ReferenceDataCategoryModel;
     personTypeRefData: ReferenceDataCategoryModel;
-    colorCriteria: any = {nodeColorCriteria: 'default', nodeNameColorCriteria: 'default', edgeColorCriteria: 'default'};
-    legend: any = {nodeColorField: 'default', nodeNameColorField: 'default', edgeColorField: 'default', nodeColor : [], nodeNameColor: [], edgeColor: []};
+    colorCriteria: any = {
+        nodeColorCriteria: 'type',
+        nodeNameColorCriteria: 'classification',
+        edgeColorCriteria: 'certaintyLevelId'
+    };
+    legend: any = {
+        nodeColorField: 'type',
+        nodeNameColorField: 'classification',
+        edgeColorField: 'certaintyLevelId',
+        nodeColorLabel: 'LNG_ENTITY_TYPE_LABEL',
+        nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        nodeColor : [],
+        nodeNameColor: [],
+        edgeColor: []
+    };
     defaultColor = '#A8A8A8';
 
     constructor(
@@ -69,21 +83,28 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).subscribe((results) => {
             this.caseClassificationRefData = results;
+            // call display chains for default criteria
+            this.displayChainsOfTransmission();
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).subscribe((results) => {
             this.personTypeRefData = results;
+            // call display chains for default criteria
+            this.displayChainsOfTransmission();
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.GENDER).subscribe((results) => {
             this.genderRefData = results;
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).subscribe((results) => {
             this.riskLevelRefData = results;
+            // call display chains for default criteria
+            this.displayChainsOfTransmission();
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).subscribe((results) => {
             this.relationRefData = results;
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL).subscribe((results) => {
             this.certainityLevelRefData = results;
+            this.displayChainsOfTransmission();
         });
         this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE).subscribe((results) => {
             this.exposureTypeRefData = results;
@@ -101,7 +122,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 this.selectedOutbreak = selectedOutbreak;
                 this.displayChainsOfTransmission();
             });
-
 
     }
 
@@ -283,30 +303,41 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
         this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+        this.legend.nodeColor = [];
+        this.legend.nodeNameColor = [];
+        this.legend.edgeColor = [];
         switch (this.colorCriteria.nodeColorCriteria) {
             case 'type':
-                if (!_.isEmpty(this.personTypeRefData.entries)) {
-                    _.forEach(this.personTypeRefData.entries, (value, key) => {
-                        this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
-                    });
-                }
+                this.legend.nodeColorLabel = 'LNG_ENTITY_TYPE_LABEL';
+                this.legend.nodeColor[EntityType.CASE] = '#e80b0b';
+                this.legend.nodeColor[EntityType.CONTACT] = '#4DB0A0';
+                this.legend.nodeColor[EntityType.EVENT] = '#f96b00';
+                // TODO: decide if we use the reference data field as Person Type or hardcode these.
+                // if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
+                //     _.forEach(this.personTypeRefData.entries, (value, key) => {
+                //         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
+                //     });
+                // }
                 break;
             case 'classification':
-                if (!_.isEmpty(this.caseClassificationRefData.entries)) {
+                this.legend.nodeColorLabel = 'LNG_CASE_FIELD_LABEL_CLASSIFICATION';
+                if (this.caseClassificationRefData && !_.isEmpty(this.caseClassificationRefData.entries)) {
                     _.forEach(this.caseClassificationRefData.entries, (value, key) => {
                         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'riskLevel':
-                if (!_.isEmpty(this.riskLevelRefData.entries)) {
+                this.legend.nodeColorLabel = 'LNG_CASE_FIELD_LABEL_RISK_LEVEL';
+                if (this.riskLevelRefData && !_.isEmpty(this.riskLevelRefData.entries)) {
                     _.forEach(this.riskLevelRefData.entries, (value, key) => {
                         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'gender':
-                if (!_.isEmpty(this.genderRefData.entries)) {
+                this.legend.nodeColorLabel = 'LNG_CASE_FIELD_LABEL_GENDER';
+                if (this.genderRefData && !_.isEmpty(this.genderRefData.entries)) {
                     _.forEach(this.genderRefData.entries, (value, key) => {
                         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
@@ -319,28 +350,32 @@ export class TransmissionChainsDashletComponent implements OnInit {
         // node name color
         switch (this.colorCriteria.nodeNameColorCriteria) {
             case 'type':
-                if (!_.isEmpty(this.personTypeRefData.entries)) {
+                this.legend.nodeNameColorLabel = 'LNG_ENTITY_TYPE_LABEL';
+                if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
                     _.forEach(this.personTypeRefData.entries, (value, key) => {
                         this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'classification':
-                if (!_.isEmpty(this.caseClassificationRefData.entries)) {
+                this.legend.nodeNameColorLabel = 'LNG_CASE_FIELD_LABEL_CLASSIFICATION';
+                if (this.caseClassificationRefData && !_.isEmpty(this.caseClassificationRefData.entries)) {
                     _.forEach(this.caseClassificationRefData.entries, (value, key) => {
                         this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'riskLevel':
-                if (!_.isEmpty(this.riskLevelRefData.entries)) {
+                this.legend.nodeNameColorLabel = 'LNG_CASE_FIELD_LABEL_RISK_LEVEL';
+                if (this.riskLevelRefData && !_.isEmpty(this.riskLevelRefData.entries)) {
                     _.forEach(this.riskLevelRefData.entries, (value, key) => {
                         this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'gender':
-                if (!_.isEmpty(this.genderRefData.entries)) {
+                this.legend.nodeNameColorLabel = 'LNG_CASE_FIELD_LABEL_GENDER';
+                if (this.genderRefData && !_.isEmpty(this.genderRefData.entries)) {
                     _.forEach(this.genderRefData.entries, (value, key) => {
                         this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
@@ -353,35 +388,40 @@ export class TransmissionChainsDashletComponent implements OnInit {
         // edge color
         switch (this.colorCriteria.edgeColorCriteria) {
             case 'socialRelationshipTypeId':
-                if (!_.isEmpty(this.relationRefData.entries)) {
+                this.legend.edgeColorLabel = 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION';
+                if (this.relationRefData && !_.isEmpty(this.relationRefData.entries)) {
                     _.forEach(this.relationRefData.entries, (value, key) => {
                         this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'certaintyLevelId':
-                if (!_.isEmpty(this.certainityLevelRefData.entries)) {
+                this.legend.edgeColorLabel = 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL';
+                if (this.certainityLevelRefData && !_.isEmpty(this.certainityLevelRefData.entries)) {
                     _.forEach(this.certainityLevelRefData.entries, (value, key) => {
                         this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'exposureTypeId':
-                if (!_.isEmpty(this.exposureTypeRefData.entries)) {
+                this.legend.edgeColorLabel = 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE';
+                if (this.exposureTypeRefData && !_.isEmpty(this.exposureTypeRefData.entries)) {
                     _.forEach(this.exposureTypeRefData.entries, (value, key) => {
                         this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'exposureFrequencyId':
-                if (!_.isEmpty(this.exposureFrequencyRefData.entries)) {
+                this.legend.edgeColorLabel = 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY';
+                if (this.exposureFrequencyRefData && !_.isEmpty(this.exposureFrequencyRefData.entries)) {
                     _.forEach(this.exposureFrequencyRefData.entries, (value, key) => {
                         this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });
                 }
                 break;
             case 'exposureDurationId':
-                if (!_.isEmpty(this.exposureDurationRefData.entries)) {
+                this.legend.edgeColorLabel = 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION';
+                if (this.exposureDurationRefData && !_.isEmpty(this.exposureDurationRefData.entries)) {
                     _.forEach(this.exposureDurationRefData.entries, (value, key) => {
                         this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : this.defaultColor;
                     });

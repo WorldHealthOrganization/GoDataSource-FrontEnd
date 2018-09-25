@@ -101,18 +101,14 @@
         </div>
 
         <!-- color coding -->
-        <div>
-            Color Coding
-        </div>
 
         <div>
-            Node color
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
         </div>
         <app-form-radio
             name="nodeColorCriteria"
             [(ngModel)]="colorCriteria.nodeColorCriteria"
             [options]="[
-                {value: 'default', label:'Default'},
                 {value: 'type', label:'LNG_ENTITY_TYPE_LABEL'},
                 {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
                 {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
@@ -121,30 +117,28 @@
         </app-form-radio>
 
         <div>
-            Node name color
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
         </div>
         <app-form-radio
             name="nodeNameColorCriteria"
             [(ngModel)]="colorCriteria.nodeNameColorCriteria"
             [options]="[
-                {value: 'default', label:'Default'},
-                {value: 'type', label:'LNG_ENTITY_TYPE_LABEL'},
                 {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
+                {value: 'type', label:'LNG_ENTITY_TYPE_LABEL'},
                 {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
                 {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
                 ]">
         </app-form-radio>
 
         <div>
-            Edge color
+           {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
         </div>
         <app-form-radio
             name="edgeColorCriteria"
             [(ngModel)]="colorCriteria.edgeColorCriteria"
             [options]="[
-                {value: 'default', label:'Default'},
-                {value: 'socialRelationshipTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'},
                 {value: 'certaintyLevelId', label:'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'},
+                {value: 'socialRelationshipTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'},
                 {value: 'exposureTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'},
                 {value: 'exposureFrequencyId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY'},
                 {value: 'exposureDurationId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION'}
