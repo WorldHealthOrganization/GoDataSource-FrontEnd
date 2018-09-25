@@ -538,6 +538,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME': 'Name',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS': 'Only the first {{displayed}} of {{total}} records are displayed',
 
         /**
          * User fields
