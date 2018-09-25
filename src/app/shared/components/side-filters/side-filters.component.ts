@@ -15,10 +15,6 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
     styleUrls: ['./side-filters.component.less']
 })
 export class SideFiltersComponent {
-
-    // available columns to be displayed
-    @Input() columns: any[] = [];
-
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
@@ -45,8 +41,6 @@ export class SideFiltersComponent {
     // apply filters handler
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
 
-    // selected columns for being displayed
-    selectedColumns: string[];
     // applied filters
     appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
@@ -126,7 +120,6 @@ export class SideFiltersComponent {
     }
 
     clear() {
-        this.selectedColumns = [];
         this.appliedFilters = [new AppliedFilterModel()];
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
@@ -294,19 +287,5 @@ export class SideFiltersComponent {
         this.filtersApplied.emit(this.getQueryBuilder());
 
         this.closeSideNav();
-    }
-
-    /**
-     * Set object value property
-     */
-    setObjectValue(
-        filter: AppliedFilterModel,
-        prop: string,
-        value: string) {
-        if (!_.isObject(filter.value)) {
-            filter.value = {};
-        }
-
-        filter.value[prop] = value ? parseFloat(value) : null;
     }
 }
