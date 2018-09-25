@@ -89,27 +89,6 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Entity Types (Case, Contact, Event)
-     * @returns {Observable<LabelValuePair[]>}
-     */
-    getEntityTypesAsLabelValue(): Observable<LabelValuePair[]> {
-        return Observable.of([
-            new LabelValuePair(
-                'LNG_ENTITY_TYPE_LABEL_CASE',
-                EntityType.CASE
-            ),
-            new LabelValuePair(
-                'LNG_ENTITY_TYPE_LABEL_CONTACT',
-                EntityType.CONTACT
-            ),
-            new LabelValuePair(
-                'LNG_ENTITY_TYPE_LABEL_EVENT',
-                EntityType.EVENT
-            )
-        ]);
-    }
-
-    /**
      * Retrieve the list of transmission chain view types
      * @returns {Observable<any[]>}
      */
