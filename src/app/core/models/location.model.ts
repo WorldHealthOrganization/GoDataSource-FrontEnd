@@ -7,7 +7,7 @@ export class LocationModel {
     active: boolean;
     populationDensity: number;
     parentLocationId: string;
-    geoLocation: { lat: number | string, lng: number | string } | null;
+    geoLocation: { lat: number, lng: number } | null;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
