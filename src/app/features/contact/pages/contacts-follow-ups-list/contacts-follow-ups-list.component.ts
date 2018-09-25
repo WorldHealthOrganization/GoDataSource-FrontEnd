@@ -126,7 +126,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
-                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
                 }
 
                 // initialize pagination

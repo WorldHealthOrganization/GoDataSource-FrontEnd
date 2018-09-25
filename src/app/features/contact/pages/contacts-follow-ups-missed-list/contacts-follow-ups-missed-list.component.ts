@@ -121,7 +121,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
-                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
                 }
 
                 // re-load the list when the Selected Outbreak is changed
