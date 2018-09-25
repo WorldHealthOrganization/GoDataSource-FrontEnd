@@ -25,8 +25,8 @@ export class GraphNodeModel {
         this.type = _.get(data, 'type', '');
         this.dateTimeline = _.get(data, 'dateTimeline', '');
         this.displayTimeline = _.get(data, 'displayTimeline', 'element');
-        this.nodeColor = _.get(data, 'nodeColor', '#A8A8A8');
-        this.nodeNameColor = _.get(data, 'nodeNameColor', '#A8A8A8');
+        this.nodeColor = _.get(data, 'nodeColor', Constants.DEFAULT_COLOR_CHAINS);
+        this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
 
 
         if ( this.dateTimeline ) {

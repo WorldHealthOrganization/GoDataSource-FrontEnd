@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { EntityType } from './entity-type';
+import { Constants } from './constants';
 
 export class GraphEdgeModel {
     id: string;
@@ -15,8 +16,7 @@ export class GraphEdgeModel {
         this.target = _.get(data, 'target');
         this.sourceType = _.get(data, 'sourceType');
         this.targetType = _.get(data, 'targetType');
-
-        this.edgeColor = '#A8A8A8';
+        this.edgeColor = _.get(data, Constants.DEFAULT_COLOR_CHAINS);
     }
 
 }
