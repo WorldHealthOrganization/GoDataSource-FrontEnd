@@ -57,7 +57,7 @@ export abstract class ListComponent {
     /**
      * List table columns
      */
-    protected tableColumns: VisibleColumnModel[] = [];
+    tableColumns: VisibleColumnModel[] = [];
 
     /**
      * List table visible columns
