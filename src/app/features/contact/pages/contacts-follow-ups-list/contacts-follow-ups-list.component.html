@@ -236,9 +236,9 @@
                                 *ngIf="!item.deleted && item.personId && hasFollowUpsWriteAccess() && !dateInTheFuture(item.date)"
                                 mat-menu-item
                                 (click)="item.lostToFollowUp ? markContactAsMissedFromFollowUp(item, true) : markContactAsMissedFromFollowUp(item)">
-                                {{item.lostToFollowUp ?
-                                ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT' | translate ) :
-                                ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate)}}
+                                    {{item.lostToFollowUp ?
+                                    ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT' | translate ) :
+                                    ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate)}}
                             </button>
 
                             <mat-divider *ngIf="!item.deleted && item.personId && !item.lostToFollowUp"></mat-divider>
