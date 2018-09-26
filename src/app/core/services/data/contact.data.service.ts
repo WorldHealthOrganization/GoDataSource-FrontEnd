@@ -118,5 +118,15 @@ export class ContactDataService {
             MetricContactsSeenEachDays
         );
     }
+
+    /**
+     * Convert a contact to case
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<any>}
+     */
+    convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
+       return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+    }
 }
 

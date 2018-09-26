@@ -415,4 +415,24 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 }
             });
     }
+
+    convertContactToCase(contactModel: ContactModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
+            .subscribe((answer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.contactDataService
+                        .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
 }
