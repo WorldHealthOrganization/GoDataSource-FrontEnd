@@ -30,10 +30,7 @@ export class UserModel {
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
     securityQuestions: SecurityQuestionModel[] = [];
-
-    private _settings: {
-        [key: string]: any
-    } = {};
+    settings: { [key: string]: any } = {};
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -76,15 +73,11 @@ export class UserModel {
             // retrieve settings
             const settings = _.get(
                 data,
-                `settings.${property}`,
-                _.get(
-                    data,
-                    `_settings.${property}`
-                )
+                `settings.${property}`
             );
 
             // initialize settings
-            this._settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
+            this.settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
                     _.isArray(UserSettingsHandlers[enumKey]) ?
                         (_.isEmpty(settings) ? [] : settings) :
                         new UserSettingsHandlers[enumKey](settings)
@@ -98,6 +91,6 @@ export class UserModel {
      * @param key
      */
     getSettings(key: UserSettings) {
-        return this._settings[key];
+        return this.settings[key];
     }
 }

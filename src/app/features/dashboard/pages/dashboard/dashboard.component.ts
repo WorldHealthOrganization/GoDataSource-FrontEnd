@@ -102,9 +102,9 @@ export class DashboardComponent implements OnInit {
      * Update dashlets order based on authenticated user's settings
      */
     private refreshDashletsOrder() {
+        const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
         _.each(this.kpiGroups, (group) => {
             group.dashlets.sort((a, b) => {
-                const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
                 const dashletA = dashboardSettings.getDashlet(a);
                 const dashletB = dashboardSettings.getDashlet(b);
 

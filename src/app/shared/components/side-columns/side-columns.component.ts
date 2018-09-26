@@ -15,8 +15,14 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
     styleUrls: ['./side-columns.component.less']
 })
 export class SideColumnsComponent {
-    // table columns
+    /**
+     * Contains all fields that aren't required ( e.g. actions )
+     */
     displayColumns: VisibleColumnModel[] = [];
+
+    /**
+     * Table columns contains all fields ( including those that are required )
+     */
     private _tableColumns: VisibleColumnModel[] = [];
     @Input() set tableColumns(tableColumns: VisibleColumnModel[]) {
         // table columns
@@ -50,8 +56,15 @@ export class SideColumnsComponent {
         return this._tableColumnsUserSettingsKey;
     }
 
-    // visible table columns
+    /**
+     * Visible table columns ( used to display columns in table )
+     */
     visibleTableColumns: string[] = [];
+
+    /**
+     * Same as visibleTableColumns, except that this doesn't contains the fields that shouldn't be saved since they can't be used by the server ( e.g. actions )
+     */
+    visibleSaveTableColumns: string[] = [];
 
     // Side Nav
     @ViewChild('sideNav') sideNav: MatSidenav;
@@ -118,12 +131,19 @@ export class SideColumnsComponent {
     initializeVisibleTableColumns() {
         // construct visible table columns
         this.visibleTableColumns = [];
+        this.visibleSaveTableColumns = [];
         _.each(this.tableColumns, (column: VisibleColumnModel) => {
             if (
                 column.required ||
                 column.visible
             ) {
+                // set visible column
                 this.visibleTableColumns.push(column.field);
+
+                // set save fields
+                if (!column.excludeFromSave) {
+                    this.visibleSaveTableColumns.push(column.field);
+                }
             }
         });
 
@@ -162,7 +182,7 @@ export class SideColumnsComponent {
         // save visible columns
         this.authDataService.updateSettingsForCurrentUser(
             this.tableColumnsUserSettingsKey,
-            this.visibleTableColumns
+            this.visibleSaveTableColumns
         ).subscribe();
 
         // close side nav

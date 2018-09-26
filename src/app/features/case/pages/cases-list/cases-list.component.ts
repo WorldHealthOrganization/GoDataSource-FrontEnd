@@ -50,6 +50,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -129,7 +130,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
@@ -191,7 +192,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'actions',
-                required: true
+                required: true,
+                excludeFromSave: true
             })
         ];
     }
@@ -255,7 +257,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
                 type: FilterType.MULTISELECT,
-                options$: occupationsList$,
+                options$: this.occupationsList$,
                 sortable: true
             })
 

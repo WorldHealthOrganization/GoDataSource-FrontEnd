@@ -6,8 +6,8 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
-import { Subscriber } from 'rxjs/Subscriber';
 import * as _ from 'lodash';
+import 'rxjs/add/operator/mergeMap';
 
 @Injectable()
 export class UserDataService {
@@ -97,37 +97,29 @@ export class UserDataService {
      * @param data
      * @returns {Observable<any>}
      */
-    updateSettings(userId: string, settingsKey: UserSettings, data: any): Observable<any> {
-        return Observable.create((observer: Subscriber<void>) => {
-            this.getUser(userId)
-                .catch((err) => {
-                    observer.error(err);
-                    observer.complete();
-                    return err;
-                })
-                .subscribe((userData) => {
-                    // construct settings
-                    const userSettings = _.set(
-                        _.get(
-                            userData,
-                            'settings',
-                            _.get(
-                                userData,
-                                '_settings'
-                            )
-                        ),
-                        settingsKey,
-                        data
-                    );
+    updateSettings(
+        userId: string,
+        settingsKey: UserSettings,
+        data: any
+    ): Observable<any> {
+        return this.getUser(userId)
+            .mergeMap((userData) => {
+                // retrieve current user settings
+                const currentUserSettings = _.get(
+                    userData,
+                    'settings'
+                );
 
-                    // save settings
-                    return this.modifyUser(userId, { settings: userSettings })
-                        .subscribe((responseData) => {
-                            observer.next(responseData);
-                            observer.complete();
-                        });
-                });
-        });
+                // construct new settings
+                const userSettings = _.set(
+                    currentUserSettings,
+                    settingsKey,
+                    data
+                );
+
+                // save settings
+                return this.modifyUser(userId, { settings: userSettings });
+            });
     }
 
     /**
