@@ -129,6 +129,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
@@ -253,7 +254,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-                type: FilterType.TEXT,
+                type: FilterType.MULTISELECT,
+                options$: occupationsList$,
                 sortable: true
             })
 

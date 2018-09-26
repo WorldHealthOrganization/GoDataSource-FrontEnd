@@ -105,12 +105,12 @@
                                 maxlength="50">
                             </app-form-input>
 
-                            <app-form-input
+                            <app-form-select
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
-                                maxlength="500">
-                            </app-form-input>
+                                [options]="occupationsList$ | async">
+                            </app-form-select>
 
                             <div fxFlex fxLayout="row" class="switch-buttons">
                                 <button

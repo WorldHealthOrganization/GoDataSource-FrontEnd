@@ -44,6 +44,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
 
@@ -79,6 +80,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 

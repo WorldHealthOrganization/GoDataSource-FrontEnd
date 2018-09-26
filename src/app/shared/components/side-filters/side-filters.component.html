@@ -105,6 +105,16 @@
                                         filter.comparator === FilterComparator.BEFORE">
                                 </app-form-range>
 
+                                <!-- DATE RANGE Filter-->
+                                <app-form-daterange
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [ngModel]="filter.value"
+                                    (changed)="filter.value = $event;"
+                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
+                                </app-form-daterange>
+
                                 <!-- Address Location -->
                                 <app-form-location-dropdown
                                     *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
@@ -115,16 +125,32 @@
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
 
-                                <!--DATE RANGE Filter-->
-                                <app-form-daterange
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;"
-                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
-                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
-                                </app-form-daterange>
+                                <!-- Address Within Radius -->
+                                <ng-container
+                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
+                                        filter.comparator === FilterComparator.WITHIN">
+                                    <input
+                                        [name]="'filter[filters][' + i + '][extraValues][location]'"
+                                        [ngModel]="filter.extraValues.location"
+                                        type="hidden"/>
+
+                                    <app-form-location-dropdown
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [ngModel]="filter.value"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
+                                        [multiple]="false"
+                                        (changed)="filter.value = $event;"
+                                        (itemChanged)="filter.extraValues.location = $event;">
+                                    </app-form-location-dropdown>
+
+                                    <app-form-input
+                                        [name]="'filter[filters][' + i + '][extraValues][radius]'"
+                                        [(ngModel)]="filter.extraValues.radius"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
+                                    </app-form-input>
+                                </ng-container>
                             </mat-card>
+
                             <!-- Delete filter item -->
                             <button
                                 class="filter-details-delete-button"

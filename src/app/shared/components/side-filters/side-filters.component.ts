@@ -240,6 +240,39 @@ export class SideFiltersComponent {
                             });
                             break;
 
+                        case FilterComparator.WITHIN:
+                            // retrieve location lat & lng
+                            const geoLocation = _.get(appliedFilter, 'extraValues.location.geoLocation', null);
+                            const lat: number = geoLocation && (geoLocation.lat || geoLocation.lat === 0) ? parseFloat(geoLocation.lat) : null;
+                            const lng: number = geoLocation && (geoLocation.lng || geoLocation.lng === 0) ? parseFloat(geoLocation.lng) : null;
+                            if (
+                                lat === null ||
+                                lng === null
+                            ) {
+                                break;
+                            }
+
+                            // construct near query
+                            const nearQuery = {
+                                near: {
+                                    lat: lat,
+                                    lng: lng
+                                }
+                            };
+
+                            // add max distance if provided
+                            const maxDistance: number = _.get(appliedFilter, 'extraValues.radius', null);
+                            if (maxDistance !== null) {
+                                // convert miles to meters
+                                (nearQuery as any).maxDistance = Math.round(maxDistance * 1609.34);
+                            }
+
+                            // add filter
+                            qb.filter.where({
+                                [`${filter.fieldName}.geoLocation`]: nearQuery
+                            });
+                            break;
+
                         // FilterComparator.CONTAINS
                         default:
                             qb.merge(AddressModel.buildSearchFilter(appliedFilter.value, filter.fieldName));
