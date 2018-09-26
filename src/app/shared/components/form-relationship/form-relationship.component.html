@@ -4,8 +4,7 @@
     <form #groupForm="ngForm">
         <div fxLayout="column" fxFlex>
             <div class="relationship-title" fxLayout="row" fxLayoutGap="20px">
-                <div *ngIf="relatedObject?.type === EntityType.CASE">{{'LNG_ENTITY_TYPE_LABEL_CASE' | translate}}</div>
-                <div *ngIf="relatedObject?.type === EntityType.EVENT">{{'LNG_ENTITY_TYPE_LABEL_EVENT' | translate}}</div>
+                <div>{{relatedObject?.type | translate}}</div>
 
                 <div>{{ relatedObject?.name }}</div>
             </div>
