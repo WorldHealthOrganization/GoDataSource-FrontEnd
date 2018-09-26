@@ -39,6 +39,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -58,6 +59,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     ngOnInit() {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 

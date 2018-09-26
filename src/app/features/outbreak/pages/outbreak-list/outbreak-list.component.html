@@ -145,7 +145,17 @@
                 <div class="table-header-cell">
                     <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="countriesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="countriesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('countries', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -163,7 +173,12 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_START_DATE' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-daterange
+                            name="startDateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('startDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
@@ -177,9 +192,14 @@
         <ng-container matColumnDef="endDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_END_DATE' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-daterange
+                            name="endDateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('endDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
@@ -193,7 +213,7 @@
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_ACTIVE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="activeFilter"

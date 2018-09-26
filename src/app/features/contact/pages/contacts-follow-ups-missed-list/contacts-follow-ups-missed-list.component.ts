@@ -98,6 +98,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -210,7 +211,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                     new FilterModel({
                         fieldName: 'occupation',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                        type: FilterType.TEXT,
+                        type: FilterType.MULTISELECT,
+                        options$: occupationsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     })

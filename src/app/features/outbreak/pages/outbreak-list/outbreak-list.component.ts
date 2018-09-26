@@ -44,6 +44,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     activeOptionsList$: Observable<any[]>;
     // list of diseases
     diseasesList$: Observable<any[]>;
+    // countries list
+    countriesList$: Observable<any[]>;
     // authenticated user
     authUser: UserModel;
 
@@ -104,6 +106,14 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
+            (countries) => _.map(countries, (country: LabelValuePair) => {
+                country.value = {
+                    id: country.value
+                };
+                return country;
+            })
+        );
 
         // add page title
         this.outbreaksDataExporFileName = this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_TITLE') +

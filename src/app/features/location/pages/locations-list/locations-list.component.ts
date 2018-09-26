@@ -106,6 +106,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         const columns = [
             'name',
             'synonyms',
+            'latLng',
             'active',
             'populationDensity',
             'actions'

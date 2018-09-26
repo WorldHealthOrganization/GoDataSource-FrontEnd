@@ -27,6 +27,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -77,6 +78,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     ];
     exportQueryBuilder: RequestQueryBuilder;
 
+    serverToday: Moment = null;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -99,10 +102,18 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             ' - ' +
             this.followUpsDataExportFileName;
 
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((currentDate) => {
+               this.serverToday = currentDate;
+            });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -217,7 +228,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     new FilterModel({
                         fieldName: 'occupation',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                        type: FilterType.TEXT,
+                        type: FilterType.MULTISELECT,
+                        options$: occupationsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     })
@@ -432,10 +444,14 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     /**
      * Mark a contact as missing from a follow-up
      * @param {FollowUpModel} followUp
+     * @param {boolean} contactMissed
      */
-    markContactAsMissedFromFollowUp(followUp: FollowUpModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP', new ContactModel(followUp.contact))
+    markContactAsMissedFromFollowUp(followUp: FollowUpModel, contactMissed?: boolean) {
+        // show confirm dialog to confirm the action and check if contact is missed or not to know what message to display
+        const confirmMessage = contactMissed ?
+            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP' :
+            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP';
+        this.dialogService.showConfirm(confirmMessage, new ContactModel(followUp.contact))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
@@ -444,7 +460,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             // mark follow-up
                             this.followUpsDataService
                                 .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
-                                    lostToFollowUp: true
+                                    lostToFollowUp : !contactMissed
                                 })
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
@@ -452,8 +468,12 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                                     return ErrorObservable.create(err);
                                 })
                                 .subscribe(() => {
-                                    // mark follow-up
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE');
+                                    // mark follow-up as missed or as present
+                                    const successMessage =
+                                        contactMissed ?
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP_SUCCESS_MESSAGE' :
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE';
+                                    this.snackbarService.showSuccess(successMessage);
 
                                     // refresh list
                                     this.needsRefreshList(true);
@@ -518,5 +538,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Check if date is in future to know if we show "Missed to follow-up" option or not
+     */
+    dateInTheFuture(followUpDate): boolean {
+        const date = followUpDate ? moment(followUpDate) : null;
+        return !!(date && this.serverToday && date.startOf('day').isAfter(this.serverToday.startOf('day')));
     }
 }
