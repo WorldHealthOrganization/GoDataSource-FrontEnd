@@ -129,7 +129,13 @@ export class FollowUpsDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-        const filter = queryBuilder.buildQuery();
+        // include contact in response
+        const qb = new RequestQueryBuilder();
+        qb.include('contact');
+        qb.merge(queryBuilder);
+
+        // construct query
+        const filter = qb.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed/filtered-count?filter=${filter}`);
     }
 
