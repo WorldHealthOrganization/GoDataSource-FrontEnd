@@ -27,6 +27,7 @@
         "@angular/router": "5.2.10",
         "@ng-select/ng-select": "1.5.2",
         "@ngx-translate/core": "9.1.1",
+        "@swimlane/ngx-charts": "9.0.0",
         "@types/googlemaps": "3.30.11",
         "angular-mgl-timeline": "0.2.0",
         "core-js": "2.5.6",

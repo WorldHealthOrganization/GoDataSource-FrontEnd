@@ -114,3 +114,18 @@
     (nodeTapped)="onNodeTap($event)"
     (edgeTapped)="onEdgeTap($event)">
 </app-cytoscape-graph>
+<br><br><br>
+<ngx-charts-bar-vertical
+    [view]="view"
+    [scheme]="colorScheme"
+    [results]="single"
+    [gradient]="gradient"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [legend]="showLegend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabel"
+    (select)="onSelectChart($event)">
+</ngx-charts-bar-vertical>
