@@ -87,7 +87,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.entityTypesList$ = this.genericDataService.getEntityTypesAsLabelValue();
+        this.entityTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_TYPE).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
 
         // side filters
