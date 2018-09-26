@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -18,7 +18,11 @@ class LocationAutoItem {
         public id: string,
         public label: string,
         public level: number,
-        public disabled: boolean = false
+        public disabled: boolean = false,
+        public geoLocation: {
+            lat: number,
+            lng: number
+        } = null
     ) {}
 }
 
@@ -52,6 +56,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     previousSubscription: Subscription;
 
     needToRetrieveBackData: boolean = false;
+
+    @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
+    @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -150,7 +157,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                         currentItem.location.parentLocationId ?
                             levels[currentItem.location.parentLocationId] + 1 :
                             0,
-                        !currentItem.location.active
+                        !currentItem.location.active,
+                        currentItem.location.geoLocation
                     );
 
                     // add item to list
@@ -168,6 +176,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
                 // set locations
                 this.locationItems = locationItems;
+                this.locationsLoaded.emit(this.locationItems);
             });
 
         // stop previous subscription
@@ -253,5 +262,13 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         return this.groupForm && this.groupForm.controls[this.name] ?
             this.groupForm.controls[this.name].invalid :
             false;
+    }
+
+    /**
+     * Item changed
+     * @param item
+     */
+    triggerItemChanged(item: LocationAutoItem) {
+        this.itemChanged.emit(item);
     }
 }

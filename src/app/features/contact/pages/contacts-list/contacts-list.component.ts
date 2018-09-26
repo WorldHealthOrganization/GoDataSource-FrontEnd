@@ -133,6 +133,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -215,7 +216,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                type: FilterType.TEXT,
+                type: FilterType.MULTISELECT,
+                options$: occupationsList$,
                 sortable: true
             }),
             new FilterModel({

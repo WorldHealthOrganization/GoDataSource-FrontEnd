@@ -55,7 +55,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         nodeColorField: 'type',
         nodeNameColorField: 'classification',
         edgeColorField: 'certaintyLevelId',
-        nodeColorLabel: 'LNG_ENTITY_TYPE_LABEL',
+        nodeColorLabel: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
         nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         nodeColor : [],
@@ -306,7 +306,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.edgeColor = [];
         switch (this.colorCriteria.nodeColorCriteria) {
             case 'type':
-                this.legend.nodeColorLabel = 'LNG_ENTITY_TYPE_LABEL';
+                this.legend.nodeColorLabel = 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL';
                 if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
                     _.forEach(this.personTypeRefData.entries, (value, key) => {
                         this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
@@ -344,7 +344,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         // node name color
         switch (this.colorCriteria.nodeNameColorCriteria) {
             case 'type':
-                this.legend.nodeNameColorLabel = 'LNG_ENTITY_TYPE_LABEL';
+                this.legend.nodeNameColorLabel = 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL';
                 if (this.personTypeRefData && !_.isEmpty(this.personTypeRefData.entries)) {
                     _.forEach(this.personTypeRefData.entries, (value, key) => {
                         this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
