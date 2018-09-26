@@ -152,7 +152,7 @@ export class CaseDataService {
     }
 
     /**
-     *  Restore an contact that was deleted
+     *  Restore a case that was deleted
      * @param {string} outbreakId
      * @param {string} caseId
      * @returns {Observable<any>}

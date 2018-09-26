@@ -119,8 +119,14 @@ export class ContactDataService {
         );
     }
 
-    restoreContact(outbreakI) {
-
+    /**
+     * Restore a contact that was deleted
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<Object>}
+     */
+    restoreContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts/${contactId}/restore`, {});
     }
 }
 

@@ -261,6 +261,11 @@
                         <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
+
+                        <button *ngIf="item.deleted && hasContactWriteAccess()" mat-menu-item class="mat-menu-item-restore"
+                                (click)="restoreContact(item)">
+                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
             </mat-cell>
