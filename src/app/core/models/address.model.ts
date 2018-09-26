@@ -11,7 +11,7 @@ export class AddressModel {
     locationId: string;
     location: LocationModel;
     date: string;
-    geoLocation: { lat: number | string, lng: number | string } | null;
+    geoLocation: { lat: number, lng: number } | null;
 
     constructor(data = null, locationsList = []) {
         this.typeId = _.get(data, 'typeId');
