@@ -158,13 +158,13 @@
                             <mat-divider></mat-divider>
                         </ng-container>
 
-                        <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
 
                         <mat-divider></mat-divider>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
