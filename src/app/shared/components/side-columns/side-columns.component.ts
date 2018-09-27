@@ -85,9 +85,6 @@ export class SideColumnsComponent {
     ) {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // initialize data
-        this.initializeTableColumns();
     }
 
     /**
@@ -102,6 +99,9 @@ export class SideColumnsComponent {
      */
     openSideNav() {
         this.sideNav.open();
+
+        // initialize data
+        this.initializeTableColumns();
     }
 
     /**
