@@ -18,6 +18,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() elements: any;
     @Input() style;
     @Input() transmissionChainViewType: string;
+    @Input() legend: any;
 
     @Output() nodeTapped = new EventEmitter<any>();
     @Output() edgeTapped = new EventEmitter<any>();
@@ -27,6 +28,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     transmissionChainViewTypes$: Observable<any[]>;
 
+    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -128,6 +130,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
+                'color': 'data(nodeNameColor)',
                 'label': 'data(name)'
             }
         },
@@ -147,6 +150,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
+                'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)'

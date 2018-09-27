@@ -1,5 +1,9 @@
 app-cytoscape-graph {
 
+    .cytoscape-graph-container {
+        position: relative;
+    }
+
     .cy {
         width: 97%;
         min-height: 400px;
@@ -11,7 +15,7 @@ app-cytoscape-graph {
         border: 1px solid #d3d3d3;
     }
 
-    .spinnerGraph mat-spinner {
+    .spinner-graph mat-spinner {
         position: absolute;
         left: 50%;
         top: 50%;
@@ -19,9 +23,58 @@ app-cytoscape-graph {
         margin-top: -50px;
     }
 
-    .spinnerGraph {
+    .spinner-graph {
         min-height: 400px;
         margin: 20px;
     }
+
+    .graph-legend {
+        background-color: #FFFFFF;
+        font-size: 0.8em;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        width: auto;
+        max-width: 300px;
+        height: auto;
+        max-height: 75%;
+        padding: 20px 10px;
+        overflow-y: auto;
+        z-index: 10;
+
+        .legend-name {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+
+            .legend-field-name {
+                font-weight: normal;
+                margin-left: 5px;
+            }
+        }
+
+        .legend-item {
+            margin-left: 10px;
+        }
+
+        .legend-item div {
+            float: left;
+        }
+
+        .legend-item:after {
+            content: ".";
+            visibility: hidden;
+            display: block;
+            height: 0;
+            clear: both;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+        }
+
+    }
+
 
 }

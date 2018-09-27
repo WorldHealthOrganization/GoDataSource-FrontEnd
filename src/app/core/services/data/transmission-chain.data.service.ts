@@ -10,14 +10,16 @@ import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
 import { DateRangeModel } from '../../models/date-range.model';
-import { Moment } from 'moment';
+import { ReferenceDataCategory } from '../../models/reference-data.model';
+import { ReferenceDataDataService } from './reference-data.data.service';
 
 @Injectable()
 export class TransmissionChainDataService {
 
     constructor(
         private http: HttpClient,
-        private modelHelper: ModelHelperService
+        private modelHelper: ModelHelperService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     /**
@@ -130,9 +132,10 @@ export class TransmissionChainDataService {
      * convert transmission chain model to the format needed by the graph
      * @param chains
      * @param filters
+     * @param colorCriteria
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any): any {
+    convertChainToGraphElements(chains, filters: any, colorCriteria: any): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
         let selectedNodeIds: string[] = [];
         if (!_.isEmpty(chains)) {
@@ -178,6 +181,17 @@ export class TransmissionChainDataService {
                         }
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
+                        // set colors
+                        if (Object.keys(colorCriteria.nodeColor).length) {
+                            if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                                nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
+                            }
+                        }
+                        if (Object.keys(colorCriteria.nodeNameColor).length) {
+                            if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                                nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                            }
+                        }
                         graphData.nodes.push({data: nodeData});
                     }
                 });
@@ -214,6 +228,17 @@ export class TransmissionChainDataService {
                         if (allowAdd) {
                             const nodeData = new GraphNodeModel(nodeProps);
                             nodeData.type = node.type;
+                            // set colors
+                            if (Object.keys(colorCriteria.nodeColor).length) {
+                                if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                                    nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
+                                }
+                            }
+                            if (Object.keys(colorCriteria.nodeNameColor).length) {
+                                if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                                    nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                                }
+                            }
                             graphData.nodes.push({data: nodeData});
                             selectedNodeIds.push(nodeData.id);
                         }
@@ -239,8 +264,12 @@ export class TransmissionChainDataService {
                             graphEdge.target = relationship.persons[0].id;
                             graphEdge.targetType = relationship.persons[0].type;
                         }
-                        // set the edge color based on the type of the source and target
-                        graphEdge.setEdgeColor();
+                        // set colors
+                        if (Object.keys(colorCriteria.edgeColor).length) {
+                            if ( colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]] ) {
+                                graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
+                            }
+                        }
                         graphData.edges.push({data: graphEdge});
                     }
                 });
@@ -248,5 +277,6 @@ export class TransmissionChainDataService {
         }
         return graphData;
     }
+
 }
 
