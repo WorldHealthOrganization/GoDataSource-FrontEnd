@@ -319,7 +319,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
-<<<<<<< HEAD
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -337,8 +336,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
-=======
->>>>>>> 03c1ee3e70f1fa5b087b23275ed8adfa4a74ee5a
      * Delete specific case from the selected outbreak
      * @param {CaseModel} caseModel
      */
