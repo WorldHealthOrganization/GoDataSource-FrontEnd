@@ -1,0 +1,56 @@
+<div class="side-columns">
+
+    <button class="sidenav-toggle" mat-raised-button (click)="openSideNav()">
+        <span class="xt-icon">columns</span>
+    </button>
+
+    <div class="page-overlay mat-drawer-backdrop" [class.mat-drawer-shown]="sideNav.opened"
+         (click)="closeSideNav()"></div>
+
+    <mat-sidenav-container>
+
+        <mat-sidenav #sideNav mode="over" fixedInViewport>
+
+            <form #form="ngForm" (submit)="apply(form)">
+
+                <!-- Columns to display -->
+                <div *ngIf="displayColumns.length > 0" class="section columns-section">
+
+                    <div class="title">
+                        {{'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate}}
+                    </div>
+
+                    <div class="actions">
+                        <div
+                            *ngFor="let column of displayColumns"
+                            fxLayout="column">
+
+                            <app-form-checkbox
+                                class="side-filter-columns-checkbox"
+                                [name]="'select[columns][' + column.field + ']'"
+                                [ngModel]="column.visible"
+                                [label]="column.label | translate">
+                            </app-form-checkbox>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="buttons-container">
+                    <button
+                        *ngIf="displayColumns.length > 0"
+                        class="button-primary stretched-button"
+                        mat-raised-button
+                        color="primary"
+                        type="submit">
+                        {{'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON' | translate}}
+                    </button>
+                </div>
+
+            </form>
+
+        </mat-sidenav>
+
+    </mat-sidenav-container>
+
+</div>
