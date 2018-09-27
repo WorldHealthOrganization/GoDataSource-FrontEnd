@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -10,7 +10,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -22,10 +22,10 @@ import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
-import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
@@ -63,13 +63,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     exportCasesUrl: string;
     casesDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
         ExportDataExtension.XML,
         ExportDataExtension.JSON,
-        ExportDataExtension.ODS
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
     ];
 
     anonymizeFields: LabelValuePair[] = [
@@ -107,7 +109,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
@@ -115,7 +117,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService
     ) {
-        super(listFilterDataService, route.queryParams);
+        super(
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
+        );
     }
 
     ngOnInit() {
@@ -313,6 +319,23 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Get the list of table columns to be displayed
+     * @returns {string[]}
+     */
+    getTableColumns(): string[] {
+        return [
+            'checkbox',
+            'firstName',
+            'lastName',
+            'classification',
+            'age',
+            'gender',
+            'dateOfOnset',
+            'actions'
+        ];
+    }
+
+    /**
      * Delete specific case from the selected outbreak
      * @param {CaseModel} caseModel
      */
@@ -336,5 +359,41 @@ export class CasesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedCases() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportCasesUrl,
+            fileName: this.casesDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }
