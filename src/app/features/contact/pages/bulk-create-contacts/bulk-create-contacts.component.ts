@@ -133,7 +133,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      */
     @HostListener('window:resize')
     private setSheetWidth() {
-        this.sheetWidth = window.innerWidth - 300;
+        this.sheetWidth = window.innerWidth - 340;
     }
 
     private mapLabelValueToLabel(items: LabelValuePair[]) {
