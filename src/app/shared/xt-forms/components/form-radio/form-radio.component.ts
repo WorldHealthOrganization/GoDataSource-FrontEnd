@@ -27,7 +27,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
         multi: true
     }]
 })
-export class FormRadioComponent extends ElementBase<boolean> implements OnInit {
+export class FormRadioComponent extends ElementBase<string> implements OnInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;

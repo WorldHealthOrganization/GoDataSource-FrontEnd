@@ -35,13 +35,13 @@
                 [options]="caseClassificationsList$ | async">
             </app-form-select>
             <!-- occupation -->
-            <app-form-input
+            <app-form-select
                 fxFlex="20"
                 name="occupation"
                 [(ngModel)]="filters.occupation"
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                maxlength="500">
-            </app-form-input>
+                [options]="occupationsList$ | async">
+            </app-form-select>
             <!-- gender -->
             <app-form-select
                 fxFlex="10"
