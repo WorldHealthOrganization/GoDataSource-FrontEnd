@@ -52,13 +52,17 @@ export class EventsListComponent extends ListComponent implements OnInit {
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
         private genericDataService: GenericDataService
     ) {
-        super(listFilterDataService, route.queryParams);
+        super(
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
+        );
     }
 
     ngOnInit() {

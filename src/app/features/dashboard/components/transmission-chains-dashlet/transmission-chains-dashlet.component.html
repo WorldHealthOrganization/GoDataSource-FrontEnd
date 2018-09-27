@@ -35,13 +35,13 @@
                 [options]="caseClassificationsList$ | async">
             </app-form-select>
             <!-- occupation -->
-            <app-form-input
+            <app-form-select
                 fxFlex="20"
                 name="occupation"
                 [(ngModel)]="filters.occupation"
                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                maxlength="500">
-            </app-form-input>
+                [options]="occupationsList$ | async">
+            </app-form-select>
             <!-- gender -->
             <app-form-select
                 fxFlex="10"
@@ -99,6 +99,51 @@
             </app-form-location-dropdown>
 
         </div>
+
+        <!-- color coding -->
+        <div>
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeColorCriteria"
+            [(ngModel)]="colorCriteria.nodeColorCriteria"
+            [options]="[
+                {value: 'type', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL'},
+                {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
+                {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
+                {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
+                ]">
+        </app-form-radio>
+
+        <div>
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeNameColorCriteria"
+            [(ngModel)]="colorCriteria.nodeNameColorCriteria"
+            [options]="[
+                {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
+                {value: 'type', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL'},
+                {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
+                {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
+                ]">
+        </app-form-radio>
+
+        <div>
+           {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="edgeColorCriteria"
+            [(ngModel)]="colorCriteria.edgeColorCriteria"
+            [options]="[
+                {value: 'certaintyLevelId', label:'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'},
+                {value: 'socialRelationshipTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'},
+                {value: 'exposureTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'},
+                {value: 'exposureFrequencyId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY'},
+                {value: 'exposureDurationId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION'}
+                ]">
+        </app-form-radio>
+
         <div>
             <button mat-raised-button (click)="refreshChain()">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
@@ -111,6 +156,7 @@
 <app-cytoscape-graph
     [elements]="graphElements"
     [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+    [legend]="legend"
     (nodeTapped)="onNodeTap($event)"
     (edgeTapped)="onEdgeTap($event)">
 </app-cytoscape-graph>

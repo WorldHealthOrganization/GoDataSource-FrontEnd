@@ -42,6 +42,9 @@ export class ViewChronologyCaseComponent implements OnInit {
                             this.caseData = caseDataReturned;
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
+                                    caseDataReturned.name,
+                                    `/cases/${caseDataReturned.id}/view`),
+                                new BreadcrumbItemModel(
                                     'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE',
                                     '.',
                                     true,

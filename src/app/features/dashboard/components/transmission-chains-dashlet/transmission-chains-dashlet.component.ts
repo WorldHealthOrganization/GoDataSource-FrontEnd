@@ -13,12 +13,13 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { Observable } from 'rxjs/Observable';
+import { forkJoin } from 'rxjs/observable/forkJoin';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -33,8 +34,81 @@ export class TransmissionChainsDashletComponent implements OnInit {
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
-    caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
+    // reference data categories needed for filters
+    referenceDataCategories: any = [
+        ReferenceDataCategory.PERSON_TYPE,
+        ReferenceDataCategory.GENDER,
+        ReferenceDataCategory.CASE_CLASSIFICATION,
+        ReferenceDataCategory.RISK_LEVEL,
+        ReferenceDataCategory.CONTEXT_OF_TRANSMISSION,
+        ReferenceDataCategory.CERTAINTY_LEVEL,
+        ReferenceDataCategory.EXPOSURE_TYPE,
+        ReferenceDataCategory.EXPOSURE_FREQUENCY,
+        ReferenceDataCategory.EXPOSURE_DURATION
+    ];
+    // reference data entries per category
+    referenceDataEntries: any = [];
+    // reference data labels and categories
+    referenceDataLabelMap: any = {
+        type: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            refDataCateg: ReferenceDataCategory.PERSON_TYPE
+        },
+        gender: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            refDataCateg: ReferenceDataCategory.GENDER
+        },
+        classification: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            refDataCateg: ReferenceDataCategory.CASE_CLASSIFICATION
+        },
+        riskLevel: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            refDataCateg: ReferenceDataCategory.RISK_LEVEL
+        },
+        certaintyLevelId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            refDataCateg: ReferenceDataCategory.CERTAINTY_LEVEL
+        },
+        socialRelationshipTypeId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            refDataCateg: ReferenceDataCategory.CONTEXT_OF_TRANSMISSION
+        },
+        exposureTypeId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_TYPE
+        },
+        exposureFrequencyId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_FREQUENCY
+        },
+        exposureDurationId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+        }
+    };
+
+    // default color criteria
+    colorCriteria: any = {
+        nodeColorCriteria: 'type',
+        nodeNameColorCriteria: 'classification',
+        edgeColorCriteria: 'certaintyLevelId'
+    };
+    // default legend
+    legend: any = {
+        nodeColorField: 'type',
+        nodeNameColorField: 'classification',
+        edgeColorField: 'certaintyLevelId',
+        nodeColorLabel: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+        nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        nodeColor: [],
+        nodeNameColor: [],
+        edgeColor: []
+    };
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -52,13 +126,22 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.filters.showEvents = true;
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-                this.displayChainsOfTransmission();
+
+        this.initializeReferenceData()
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.outbreakDataService
+                    .getSelectedOutbreakSubject()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        this.selectedOutbreak = selectedOutbreak;
+                        this.displayChainsOfTransmission();
+                    });
             });
     }
 
@@ -66,6 +149,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * Display chains of transmission
      */
     displayChainsOfTransmission() {
+        this.mapColorCriteria();
         if (this.selectedOutbreak) {
             const requestQueryBuilder = new RequestQueryBuilder();
             // create queryBuilder for filters
@@ -128,7 +212,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
                 } else {
                     this.graphElements = [];
                 }
@@ -211,7 +295,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             && _.isEmpty(this.filters.date)
             && _.isEmpty(this.filters.locationId)
             && _.isEmpty(this.filters.age)
-            );
+        );
     }
 
     /**
@@ -228,6 +312,52 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     setDateFilter(dateRange) {
         this.filters.date = dateRange;
+    }
+
+    /**
+     *
+     * @param colorCriteria
+     */
+    mapColorCriteria() {
+        // set legend fields to be used
+        this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
+        this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
+        this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+        // set legend labels
+        this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
+        this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
+        this.legend.edgeColorLabel = this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
+        // re-initialize legend entries
+        this.legend.nodeColor = [];
+        this.legend.nodeNameColor = [];
+        this.legend.edgeColor = [];
+        // set legend entries
+        const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
+        _.forEach(nodeColorReferenceDataEntries, (value, key) => {
+            this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
+        _.forEach(nodeNameColorReferenceDataEntries, (value, key) => {
+            this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
+        _.forEach(edgeColorReferenceDataEntries, (value, key) => {
+            this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+    }
+
+    private initializeReferenceData() {
+        // call observables in parallel
+        const referenceDataCategories$ = _.map(
+            this.referenceDataCategories,
+            (refDataCategory) => {
+                return this.referenceDataDataService.getReferenceDataByCategory(refDataCategory)
+                    .do((results) => {
+                        this.referenceDataEntries[refDataCategory] = results;
+                    });
+            }
+        );
+        return forkJoin(referenceDataCategories$);
     }
 
 }
