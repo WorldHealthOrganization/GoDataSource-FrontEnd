@@ -137,16 +137,12 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                // display chain for default criteria
-                //     this.displayChainsOfTransmission();
-
                 this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
                         this.displayChainsOfTransmission();
                     });
-
             });
     }
 
