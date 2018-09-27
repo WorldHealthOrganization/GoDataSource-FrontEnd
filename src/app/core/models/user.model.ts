@@ -6,7 +6,8 @@ import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
 export enum UserSettings {
     DASHBOARD = 'dashboard',
-    CASE_FIELDS = 'caseFields'
+    CASE_FIELDS = 'caseFields',
+    CONTACT_FIELDS = 'contactFields'
 }
 
 /**
@@ -15,6 +16,7 @@ export enum UserSettings {
 abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
+    static CONTACT_FIELDS = [];
 }
 
 export class UserModel {

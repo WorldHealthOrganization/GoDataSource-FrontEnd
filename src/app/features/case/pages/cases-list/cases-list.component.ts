@@ -173,6 +173,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'firstName',
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
@@ -316,23 +321,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
      */
     hasReportAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'checkbox',
-            'firstName',
-            'lastName',
-            'classification',
-            'age',
-            'gender',
-            'dateOfOnset',
-            'actions'
-        ];
     }
 
     /**
