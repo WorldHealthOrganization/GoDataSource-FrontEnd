@@ -307,6 +307,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
+        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE': 'Case restored!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',

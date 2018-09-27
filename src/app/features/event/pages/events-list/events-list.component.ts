@@ -179,7 +179,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

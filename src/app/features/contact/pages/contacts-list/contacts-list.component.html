@@ -254,11 +254,11 @@
                     </button>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                         </button>
 
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
+                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
 

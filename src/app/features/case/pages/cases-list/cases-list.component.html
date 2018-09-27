@@ -300,11 +300,11 @@
                     </button>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasCaseWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                         </button>
 
-                        <button *ngIf="hasCaseWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCase(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
