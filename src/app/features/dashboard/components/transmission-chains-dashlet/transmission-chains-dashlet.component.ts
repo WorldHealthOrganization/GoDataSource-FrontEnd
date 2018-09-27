@@ -38,82 +38,25 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
 
 
-
     view: any[] = [700, 400];
 
     // options
     showXAxis = true;
     showYAxis = true;
     gradient = false;
-    showLegend = true;
+    showLegend = false;
     showXAxisLabel = true;
-    xAxisLabel = 'Country';
+    xAxisLabel = 'Size of chains';
     showYAxisLabel = true;
-    yAxisLabel = 'Population';
+    yAxisLabel = 'Number of chains';
 
     colorScheme = {
-        domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
+        domain: ['#4DB0A0']
     };
 
-    single = [
-        {
-            "name": "Germany",
-            "value": 8940000
-        },
-        {
-            "name": "USA",
-            "value": 5000000
-        },
-        {
-            "name": "France",
-            "value": 7200000
-        }
-    ];
+    chainsSize: any;
 
-    multi = [
-        {
-            "name": "Germany",
-            "series": [
-                {
-                    "name": "2010",
-                    "value": 7300000
-                },
-                {
-                    "name": "2011",
-                    "value": 8940000
-                }
-            ]
-        },
-
-        {
-            "name": "USA",
-            "series": [
-                {
-                    "name": "2010",
-                    "value": 7870000
-                },
-                {
-                    "name": "2011",
-                    "value": 8270000
-                }
-            ]
-        },
-
-        {
-            "name": "France",
-            "series": [
-                {
-                    "name": "2010",
-                    "value": 5000002
-                },
-                {
-                    "name": "2011",
-                    "value": 5800000
-                }
-            ]
-        }
-    ];
-
+    histogramResults: any = [];
 
     onSelectChart(event) {
         console.log(event);
@@ -210,6 +153,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
             this.filters.filtersDefault = this.filtersDefault();
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
+
+                this.setHistogramResults(chains);
+
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters);
                 } else {
@@ -311,6 +257,23 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     setDateFilter(dateRange) {
         this.filters.date = dateRange;
+    }
+
+    setHistogramResults(chains) {
+        this.chainsSize = {};
+        this.histogramResults = [];
+
+        _.forEach(chains, (value, key) => {
+            if ( !_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases] ) {
+                this.chainsSize[value.noCases] ++;
+            } else {
+                this.chainsSize[value.noCases] = 1;
+            }
+        });
+
+        _.forEach(this.chainsSize, (value, key) => {
+            this.histogramResults.push( { name: key, value: value } );
+        });
     }
 
 }
