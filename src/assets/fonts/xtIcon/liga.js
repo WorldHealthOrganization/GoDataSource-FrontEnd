@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'columns': '&#xe919;',
             'groupWork': '&#xe918;',
             'location': '&#xe917;',
             'barChart': '&#xe915;',

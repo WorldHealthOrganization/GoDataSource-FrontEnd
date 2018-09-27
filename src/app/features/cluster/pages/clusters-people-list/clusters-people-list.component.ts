@@ -12,6 +12,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
@@ -48,9 +49,12 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
+        protected snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

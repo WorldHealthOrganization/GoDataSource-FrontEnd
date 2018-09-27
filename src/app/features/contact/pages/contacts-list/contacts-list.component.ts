@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -11,7 +11,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
@@ -33,7 +33,6 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
@@ -79,6 +78,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -111,7 +111,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -120,7 +120,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService
     ) {
-        super(listFilterDataService, route.queryParams);
+        super(
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
+        );
     }
 
     ngOnInit() {
@@ -364,6 +368,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     getTableColumns(): string[] {
         return [
+            'checkbox',
             'firstName',
             'lastName',
             'age',
@@ -414,5 +419,41 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedContacts() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportContactsUrl,
+            fileName: this.contactsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

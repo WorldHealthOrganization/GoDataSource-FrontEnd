@@ -1,0 +1,26 @@
+<div fxLayout="column" fxFlex fxLayoutAlign="space-between center">
+    <ngx-charts-bar-vertical
+        class="histogram-size-chains"
+        [scheme]="{ domain: ['#4DB0A0'] }"
+        [results]="histogramResults"
+        [gradient]="false"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="false"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [yAxisTickFormatting]="axisFormat"
+        [xAxisLabel]="'Size of chains'"
+        [yAxisLabel]="'Number of chains'"
+        [activeEntries]="[activeSelectedBar]"
+        (select)="onSelectChart($event)">
+        <ng-template #tooltipTemplate let-model="model">
+            <div>
+                Size of chains: {{model.name}}
+            </div>
+            <div>
+                Number of chains: {{model.value}}
+            </div>
+        </ng-template>
+    </ngx-charts-bar-vertical>
+</div>

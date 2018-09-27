@@ -18,6 +18,18 @@
 
         </mat-card>
 
+        <mat-card class="page-section">
+
+            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' | translate}}</div>
+
+            <!-- histogram - chains of transmission size -->
+            <app-histogram-transmission-chains-size-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-histogram-transmission-chains-size-dashlet>
+
+
+        </mat-card>
+
         <!-- KPIs -->
         <mat-card
             *ngFor="let group of kpiGroups"
