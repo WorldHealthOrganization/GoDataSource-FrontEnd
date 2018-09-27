@@ -252,6 +252,11 @@
                             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                         </button>
 
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create-bulk"
+                                [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
+                            {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                        </button>
+
                         <button *ngIf="hasCaseWriteAccess()" mat-menu-item
                                 [routerLink]="['.', item.id, 'lab-results', 'create']">
                             {{'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT' | translate}}

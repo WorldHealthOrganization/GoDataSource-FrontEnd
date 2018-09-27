@@ -32,6 +32,7 @@ import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
 import { DialogService } from './helper/dialog.service';
 import { DomService } from './helper/dom.service';
+import { BulkAddContactsService } from './helper/bulk-add-contacts.service';
 
 // guards
 import { AuthGuard } from './guards/auth-guard.service';
@@ -84,5 +85,6 @@ export const services: any[] = [
     I18nService,
     CacheService,
     DialogService,
-    DomService
+    DomService,
+    BulkAddContactsService
 ];

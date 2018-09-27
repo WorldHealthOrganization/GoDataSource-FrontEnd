@@ -131,6 +131,11 @@
                                 {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                             </button>
 
+                            <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create-bulk"
+                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
+                                {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                            </button>
+
                             <mat-divider></mat-divider>
                         </ng-container>
 

@@ -8,7 +8,7 @@
                     <app-form-select
                         [name]="name + '[typeId]'"
                         [(ngModel)]="address.typeId"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_TYPE' | translate"
                         [disabled]="disabled"
                         [required]="required"
                         [options]="addressTypes$ | async"

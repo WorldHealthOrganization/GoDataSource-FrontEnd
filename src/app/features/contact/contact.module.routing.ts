@@ -48,6 +48,18 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Bulk Add Contacts
+    {
+        path: 'create-bulk',
+        component: fromPages.BulkCreateContactsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CONTACT]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
 
     // View Contact movement
     {

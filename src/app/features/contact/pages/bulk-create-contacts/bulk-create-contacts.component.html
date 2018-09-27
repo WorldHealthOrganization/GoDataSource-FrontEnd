@@ -1,0 +1,71 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+<form class="page-content form-section" (submit)="addContacts(sheet)">
+
+    <div class="form-content">
+        <mat-card class="page-section">
+
+            <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+                <hot-table
+                    #sheet
+                    [data]="null"
+                    [colHeaders]="true"
+                    [rowHeaders]="true"
+                    [columnSorting]="true"
+                    [manualColumnResize]="true"
+                    preventOverflow="horizontal"
+                    [width]="sheetWidth"
+                    [height]="520"
+                    [contextMenu]="sheetContextMenu"
+                    [startRows]="20"
+                    [minSpareRows]="1">
+
+                    <ng-container *ngFor="let column of sheetColumns">
+                        <!-- Text column -->
+                        <hot-column
+                            *ngIf="column.type === SheetColumnType.TEXT"
+                            title="{{column.title | translate}}">
+                        </hot-column>
+
+                        <!-- Numeric column -->
+                        <hot-column
+                            *ngIf="column.type === SheetColumnType.NUMERIC"
+                            title="{{column.title | translate}}"
+                            type="numeric"
+                            [numericFormat]="column.numericFormat">
+                        </hot-column>
+
+                        <!-- Date column -->
+                        <hot-column
+                            *ngIf="column.type === SheetColumnType.DATE"
+                            title="{{column.title | translate}}"
+                            type="date">
+                        </hot-column>
+
+                        <!-- Dropdown column -->
+                        <hot-column
+                            *ngIf="column.type === SheetColumnType.DROPDOWN"
+                            title="{{column.title | translate}}"
+                            type="dropdown"
+                            [trimDropdown]="false"
+                            [source]="column.options$ | async">
+                        </hot-column>
+
+                    </ng-container>
+                </hot-table>
+            </div>
+
+        </mat-card>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button mat-raised-button color="primary" class="button-primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+    </div>
+</form>

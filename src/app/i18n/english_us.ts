@@ -60,6 +60,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
         'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
+        'LNG_PAGE_ACTION_BULK_ADD_CONTACTS': 'Bulk Add Contacts',
         'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
 
@@ -183,6 +184,7 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
+        'LNG_ADDRESS_FIELD_LABEL_ADDRESS_TYPE': 'Address Type',
         'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
@@ -604,6 +606,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_AGE_YEARS': 'Age (Years)',
+        'LNG_CONTACT_FIELD_LABEL_AGE_MONTHS': 'Age (Months)',
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
@@ -662,6 +666,21 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+
+        /**
+         * Bulk Add Contacts page
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_TITLE': 'Bulk Add Contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
+
+        /**
+         * Excel-like Sheet (widget)
+         */
+        'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE': 'Add row above',
+        'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row below',
+        'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Remove row',
+        'LNG_SHEET_CONTEXT_MENU_CUT': 'Cut',
+        'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy',
 
         /**
          * Movement Contact page
