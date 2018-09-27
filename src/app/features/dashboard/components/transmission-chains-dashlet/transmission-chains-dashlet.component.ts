@@ -118,8 +118,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private relationshipDataService: RelationshipDataService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         // init filters - only show cases and events first
