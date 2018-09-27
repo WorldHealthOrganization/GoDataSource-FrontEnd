@@ -6,7 +6,12 @@
 <form class="page-content form-section" (submit)="addContacts(sheet)">
 
     <div class="form-content">
-        <mat-card class="page-section">
+        <mat-card class="page-section" fxLayout="column">
+
+            <div class="related-person" fxLayout="row" fxLayoutGap="20px">
+                <div>{{relatedEntityData?.type | translate}}</div>
+                <div>{{relatedEntityData?.name}}</div>
+            </div>
 
             <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
                 <hot-table
