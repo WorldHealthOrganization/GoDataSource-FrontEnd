@@ -11,6 +11,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { Constants } from '../../../../core/models/constants';
 
 @Component({
@@ -35,12 +36,15 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
     };
 
     constructor(
+        protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

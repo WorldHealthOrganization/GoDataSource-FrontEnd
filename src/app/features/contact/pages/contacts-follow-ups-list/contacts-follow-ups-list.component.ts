@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -13,7 +13,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -22,6 +22,9 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Subscriber } from 'rxjs/Subscriber';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
@@ -47,6 +50,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
+    followUpsListCount$: Observable<any>;
     // display past follow-ups or upcoming follow-ups?
     showPastFollowUps: boolean = false;
 
@@ -55,7 +59,23 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     availableSideFilters: FilterModel[];
 
-    followUpsListCount$: Observable<any>;
+    exportFollowUpsUrl: string;
+    followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XML,
+        ExportDataExtension.PDF
+    ];
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED', 'performed'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP', 'lostToFollowUp'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+    ];
+    exportQueryBuilder: RequestQueryBuilder;
 
     serverToday: Moment = null;
 
@@ -63,16 +83,24 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private router: Router
+        private router: Router,
+        private i18nService: I18nService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
+        // add page title
+        this.followUpsDataExportFileName = this.i18nService.instant(this.showPastFollowUps ? 'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE') +
+            ' - ' +
+            this.followUpsDataExportFileName;
+
         // get today time
         this.genericDataService
             .getServerUTCToday()
@@ -101,6 +129,15 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
+
+                // export url
+                this.exportFollowUpsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                }
 
                 // initialize pagination
                 this.initPaginator();
@@ -224,6 +261,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                         }]
                     }, true);
 
+                    // use the same query builder to export follow-ups
+                    this.exportQueryBuilder = _.cloneDeep(this.queryBuilder);
+
                     // finished configuring query builder
                     observer.next();
                     observer.complete();
@@ -304,6 +344,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     getTableColumns(): string[] {
         // default visible columns
         const columns = [
+            'checkbox',
             'firstName',
             'lastName',
             'date',
@@ -313,13 +354,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             'deleted',
             'actions'
         ];
-
-        // checkboxes should be visible only if we have write access
-        if (this.hasFollowUpsWriteAccess()) {
-            columns.unshift(
-                'checkbox'
-            );
-        }
 
         // finished
         return columns;
@@ -453,8 +487,8 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     modifySelectedFollowUps() {
         // get list of follow-ups that we want to modify
-        const selectedRecords: string[] = this.checkedRecords;
-        if (selectedRecords.length < 1) {
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
             return;
         }
 
@@ -467,6 +501,42 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 }
             }
         );
+    }
+
+    /**
+     * Export selected follow-ups
+     */
+    exportSelectedFollowUps() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
+            url: this.exportFollowUpsUrl,
+            fileName: this.followUpsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 
     /**

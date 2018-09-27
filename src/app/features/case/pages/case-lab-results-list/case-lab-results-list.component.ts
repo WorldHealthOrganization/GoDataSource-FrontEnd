@@ -56,11 +56,13 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
         private labResultDataService: LabResultDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
