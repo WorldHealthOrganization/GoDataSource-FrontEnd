@@ -51,17 +51,44 @@ export class TransmissionChainsDashletComponent implements OnInit {
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
-    // reference data labels
+    // reference data labels and categories
     referenceDataLabelMap: any = {
-        type: {label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL', refDataCateg: ReferenceDataCategory.PERSON_TYPE},
-        gender: {label: 'LNG_CASE_FIELD_LABEL_GENDER', refDataCateg: ReferenceDataCategory.GENDER},
-        classification: {label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', refDataCateg: ReferenceDataCategory.CASE_CLASSIFICATION},
-        riskLevel: {label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL', refDataCateg: ReferenceDataCategory.RISK_LEVEL},
-        certaintyLevelId: {label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', refDataCateg: ReferenceDataCategory.CERTAINTY_LEVEL},
-        socialRelationshipTypeId: {label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION', refDataCateg: ReferenceDataCategory.CONTEXT_OF_TRANSMISSION},
-        exposureTypeId: {label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', refDataCateg: ReferenceDataCategory.EXPOSURE_TYPE},
-        exposureFrequencyId: {label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', refDataCateg: ReferenceDataCategory.EXPOSURE_FREQUENCY},
-        exposureDurationId: {label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION}
+        type: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            refDataCateg: ReferenceDataCategory.PERSON_TYPE
+        },
+        gender: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            refDataCateg: ReferenceDataCategory.GENDER
+        },
+        classification: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            refDataCateg: ReferenceDataCategory.CASE_CLASSIFICATION
+        },
+        riskLevel: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            refDataCateg: ReferenceDataCategory.RISK_LEVEL
+        },
+        certaintyLevelId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            refDataCateg: ReferenceDataCategory.CERTAINTY_LEVEL
+        },
+        socialRelationshipTypeId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            refDataCateg: ReferenceDataCategory.CONTEXT_OF_TRANSMISSION
+        },
+        exposureTypeId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_TYPE
+        },
+        exposureFrequencyId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_FREQUENCY
+        },
+        exposureDurationId: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+        }
     };
 
     // default color criteria
