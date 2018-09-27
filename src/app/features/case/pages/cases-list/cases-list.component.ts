@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -26,6 +26,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-cases-list',
@@ -49,6 +50,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -56,6 +58,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
+    UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
     exportCasesUrl: string;
@@ -133,7 +136,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
@@ -156,6 +159,55 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 this.needsRefreshList(true);
             });
 
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'lastName',
+                label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'classification',
+                label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
+            }),
+            new VisibleColumnModel({
+                field: 'age',
+                label: 'LNG_CASE_FIELD_LABEL_AGE'
+            }),
+            new VisibleColumnModel({
+                field: 'gender',
+                label: 'LNG_CASE_FIELD_LABEL_GENDER'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfOnset',
+                label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
         // set available side filters
         this.availableSideFilters = [
             // Case
@@ -211,7 +263,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
                 type: FilterType.MULTISELECT,
-                options$: occupationsList$,
+                options$: this.occupationsList$,
                 sortable: true
             })
 
@@ -267,6 +319,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+<<<<<<< HEAD
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -284,6 +337,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+=======
+>>>>>>> 03c1ee3e70f1fa5b087b23275ed8adfa4a74ee5a
      * Delete specific case from the selected outbreak
      * @param {CaseModel} caseModel
      */

@@ -22,15 +22,21 @@ import {
     ContactFollowedUp,
     MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
+import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 
 export abstract class ListComponent {
+    /**
+     * Breadcrumbs
+     */
+    public breadcrumbs: BreadcrumbItemModel[];
+
     /**
      * Determine all children that we need to reset when side filters are being applied
      */
     @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
 
     /**
-     * Retrieve Mat Table
+     * Retrieve Mat Table sort handler
      */
     @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
 
@@ -49,7 +55,15 @@ export abstract class ListComponent {
      */
     @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent >;
 
-    public breadcrumbs: BreadcrumbItemModel[];
+    /**
+     * List table columns
+     */
+    tableColumns: VisibleColumnModel[] = [];
+
+    /**
+     * List table visible columns
+     */
+    visibleTableColumns: string[] = [];
 
     /**
      * Query builder
@@ -835,5 +849,13 @@ export abstract class ListComponent {
 
         // valid, send list of IDs back
         return selectedRecords;
+    }
+
+    /**
+     * Visible columns
+     * @param visibleColumns
+     */
+    applySideColumnsChanged(visibleColumns: string[]) {
+        this.visibleTableColumns = visibleColumns;
     }
 }

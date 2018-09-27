@@ -2,7 +2,20 @@ import * as _ from 'lodash';
 import { UserRoleModel } from './user-role.model';
 import { PERMISSION } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
-import { DashletSettingsModel, UserSettingsDashboardModel } from './user-settings-dashboard.model';
+import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
+
+export enum UserSettings {
+    DASHBOARD = 'dashboard',
+    CASE_FIELDS = 'caseFields'
+}
+
+/**
+ * Custom handlers
+ */
+abstract class UserSettingsHandlers {
+    static DASHBOARD = UserSettingsDashboardModel;
+    static CASE_FIELDS = [];
+}
 
 export class UserModel {
     id: string;
@@ -17,7 +30,7 @@ export class UserModel {
     roles: UserRoleModel[] = [];
     permissionIds: PERMISSION[] = [];
     securityQuestions: SecurityQuestionModel[] = [];
-    settingsDashboard: UserSettingsDashboardModel;
+    settings: { [key: string]: any } = {};
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -30,13 +43,9 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
-        this.settingsDashboard = new UserSettingsDashboardModel(
-            _.get(
-                data,
-                'settings.dashboard',
-                _.get(data, 'settingsDashboard')
-            )
-        );
+
+        // initialize all settings
+        this.initializeSettings(data);
     }
 
     hasPermissions(...permissionIds: PERMISSION[]): boolean {
@@ -54,5 +63,34 @@ export class UserModel {
 
     hasRole(roleId): boolean {
         return _.indexOf(this.roleIds, roleId) >= 0;
+    }
+
+    /**
+     * Initialize settings
+     */
+    private initializeSettings(data) {
+        _.each(UserSettings, (property: string, enumKey: string) => {
+            // retrieve settings
+            const settings = _.get(
+                data,
+                `settings.${property}`
+            );
+
+            // initialize settings
+            this.settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
+                    _.isArray(UserSettingsHandlers[enumKey]) ?
+                        (_.isEmpty(settings) ? [] : settings) :
+                        new UserSettingsHandlers[enumKey](settings)
+                ) :
+                settings;
+        });
+    }
+
+    /**
+     * Retrieve settings
+     * @param key
+     */
+    getSettings(key: UserSettings) {
+        return this.settings[key];
     }
 }

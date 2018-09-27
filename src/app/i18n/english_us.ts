@@ -1163,7 +1163,6 @@ export const EnglishUsLang = {
          * Side filter
          */
         'LNG_SIDE_FILTERS_TITLE': 'Filters',
-        'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
         'LNG_SIDE_FILTERS_SECTION_SORT_TITLE': 'Sort',
         'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON': 'Add filter',
         'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON': 'Add sort rule',
@@ -1188,6 +1187,12 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
         'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
 
+        /**
+         * Side column
+         */
+        'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
+        'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON': 'Apply',
+        'LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED': 'Please select at least one column',
         /**
          * Location auto-complete search
          */

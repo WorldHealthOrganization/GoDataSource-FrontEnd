@@ -50,6 +50,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
+    followUpsListCount$: Observable<any>;
     // display past follow-ups or upcoming follow-ups?
     showPastFollowUps: boolean = false;
 
@@ -57,8 +58,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
     yesNoOptionsList$: Observable<any[]>;
 
     availableSideFilters: FilterModel[];
-
-    followUpsListCount$: Observable<any>;
 
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');

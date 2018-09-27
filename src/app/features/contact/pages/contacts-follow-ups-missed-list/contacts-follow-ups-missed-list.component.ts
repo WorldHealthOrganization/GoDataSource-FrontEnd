@@ -25,6 +25,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -48,6 +49,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
+    followUpsListCount$: Observable<any>;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -125,7 +127,9 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                     this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
                 }
 
-                // re-load the list when the Selected Outbreak is changed
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
 
@@ -226,6 +230,19 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getLastFollowUpsMissedList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.followUpsListCount$ = this.followUpsDataService
+                .getLastFollowUpsMissedCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
