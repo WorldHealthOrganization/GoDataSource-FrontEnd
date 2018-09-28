@@ -1105,7 +1105,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
 
 
-
         /**
          * Chains of Transmission
          */
