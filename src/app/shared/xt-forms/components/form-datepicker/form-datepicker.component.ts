@@ -8,8 +8,7 @@ import {
     SkipSelf,
     HostBinding,
     Output,
-    EventEmitter,
-    OnInit
+    EventEmitter
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { Constants } from '../../../../core/models/constants';
@@ -20,6 +19,8 @@ import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -50,12 +51,29 @@ export const DEFAULT_FORMAT = {
        { provide: MAT_DATE_FORMATS, useValue: DEFAULT_FORMAT }
     ]
 })
-export class FormDatepickerComponent extends ElementBase<string> implements OnInit {
+export class FormDatepickerComponent extends ElementBase<string> {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    @Input() placeholder: string;
+    _placeholder: string;
+    @Input() set placeholder(placeholder: string) {
+        this._placeholder = placeholder;
+
+        if (
+            this.authUser &&
+            this.placeholder
+        ) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+            });
+        }
+    }
+    get placeholder(): string {
+        return this._placeholder;
+    }
+
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() name: string;
@@ -68,23 +86,19 @@ export class FormDatepickerComponent extends ElementBase<string> implements OnIn
 
     @Output() optionChanged = new EventEmitter<any>();
 
+    authUser: UserModel;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);
-    }
 
-    ngOnInit() {
-        if (this.placeholder) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-            });
-        }
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
