@@ -7,7 +7,7 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { EventModel } from '../../../../core/models/event.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -19,6 +19,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-events-list',
@@ -45,6 +46,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
+    UserSettings = UserSettings;
 
     constructor(
         private eventDataService: EventDataService,
@@ -77,6 +79,39 @@ export class EventsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_EVENT_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'date',
+                label: 'LNG_EVENT_FIELD_LABEL_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'description',
+                label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
+            }),
+            new VisibleColumnModel({
+                field: 'address',
+                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
@@ -115,24 +150,6 @@ export class EventsListComponent extends ListComponent implements OnInit {
      */
     hasContactWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // always visible columns
-        const columns = [
-            'name',
-            'date',
-            'description',
-            'address',
-            'actions'
-        ];
-
-        // finished
-        return columns;
     }
 
     /**

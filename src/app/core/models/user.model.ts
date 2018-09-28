@@ -7,7 +7,10 @@ import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 export enum UserSettings {
     DASHBOARD = 'dashboard',
     CASE_FIELDS = 'caseFields',
-    CONTACT_FIELDS = 'contactFields'
+    CASE_LAB_FIELDS = 'caseLabFields',
+    CONTACT_FIELDS = 'contactFields',
+    EVENT_FIELDS = 'eventFields',
+    RELATIONSHIP_FIELDS = 'relationshipFields'
 }
 
 /**

@@ -96,7 +96,7 @@ export class SideColumnsComponent {
     initializeTableColumns() {
         // get use saved settings
         // get the authenticated user ( every time a new object is created, and since we don't access the contructor again to refresh user data we need to get again the user )
-        const authUser = this.authDataService.getAuthenticatedUser();
+        const authUser: UserModel = this.authDataService.getAuthenticatedUser();
         const settings = authUser.getSettings(this.tableColumnsUserSettingsKey);
 
         // set visible values
@@ -152,7 +152,7 @@ export class SideColumnsComponent {
         const fields: any = this.formHelper.getFields(form);
 
         // retrieve visible fields
-        const columns = _.get(
+        let columns = _.get(
             fields,
             'select.columns',
             {}
@@ -163,6 +163,34 @@ export class SideColumnsComponent {
             this.snackbarService.showError('LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED');
             return;
         }
+
+        // normalize fields
+        // replace all sub-level fields with static strings
+        const normalizedColumns = {};
+        const normalize = (
+            value: boolean | {},
+            key: string,
+            parentKey: string = ''
+        ) => {
+            if (_.isBoolean(value)) {
+                normalizedColumns[parentKey + key] = value;
+            } else {
+                _.each(value, (childValue, childKey) => {
+                    normalize(
+                        childValue,
+                        childKey,
+                        `${parentKey}${key}.`
+                    );
+                });
+            }
+        };
+        _.each(columns, (value, key) => {
+            normalize(
+                value,
+                key
+            );
+        });
+        columns = normalizedColumns;
 
         // set fields visibility
         _.each(this.tableColumns, (column: VisibleColumnModel) => {
