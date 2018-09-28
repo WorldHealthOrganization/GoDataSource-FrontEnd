@@ -3,7 +3,7 @@
         <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
-<form class="page-content form-section" (submit)="addContacts(sheet)">
+<form class="page-content form-section" (submit)="addContacts(sheetTable)">
 
     <div class="form-content">
         <mat-card class="page-section" fxLayout="column">
@@ -14,49 +14,56 @@
             </div>
 
             <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+
                 <hot-table
-                    #sheet
+                    #sheetTable
                     [data]="null"
                     [colHeaders]="true"
                     [rowHeaders]="true"
-                    [columnSorting]="true"
                     [manualColumnResize]="true"
                     preventOverflow="horizontal"
                     [width]="sheetWidth"
                     [height]="520"
                     [contextMenu]="sheetContextMenu"
+                    [colWidths]="150"
                     [startRows]="20"
-                    [minSpareRows]="1">
+                    [minSpareRows]="1"
+                    [beforeValidate]="beforeValidateSheet">
 
                     <ng-container *ngFor="let column of sheetColumns">
                         <!-- Text column -->
                         <hot-column
                             *ngIf="column.type === SheetColumnType.TEXT"
-                            title="{{column.title | translate}}">
+                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            [validator]="column.required ? sheetColumnValidators.required : null">
                         </hot-column>
 
                         <!-- Numeric column -->
                         <hot-column
                             *ngIf="column.type === SheetColumnType.NUMERIC"
-                            title="{{column.title | translate}}"
+                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="numeric"
-                            [numericFormat]="column.numericFormat">
+                            [validator]="column.required ? sheetColumnValidators.requiredPositiveInteger : sheetColumnValidators.positiveInteger">
                         </hot-column>
 
                         <!-- Date column -->
                         <hot-column
                             *ngIf="column.type === SheetColumnType.DATE"
-                            title="{{column.title | translate}}"
-                            type="date">
+                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            type="date"
+                            [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
+                            [correctFormat]="true"
+                            [validator]="column.required ? sheetColumnValidators.required : null">
                         </hot-column>
 
                         <!-- Dropdown column -->
                         <hot-column
                             *ngIf="column.type === SheetColumnType.DROPDOWN"
-                            title="{{column.title | translate}}"
+                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="dropdown"
                             [trimDropdown]="false"
-                            [source]="column.options$ | async">
+                            [source]="column.options$ | async"
+                            [validator]="column.required ? sheetColumnValidators.required : null">
                         </hot-column>
 
                     </ng-container>

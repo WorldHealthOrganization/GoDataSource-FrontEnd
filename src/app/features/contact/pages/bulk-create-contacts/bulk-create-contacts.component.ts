@@ -2,25 +2,24 @@ import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/cor
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DateSheetColumn, DropdownSheetColumn, NumericSheetColumn, SheetColumnType, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import * as Handsontable from 'handsontable';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -51,6 +50,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     riskLevelsLabelsList$: Observable<string[]>;
     documentTypesList$: Observable<any[]>;
     documentTypesLabelsList$: Observable<string[]>;
+    certaintyLevelOptions$: Observable<any[]>;
+    certaintyLevelLabelsOptions$: Observable<string[]>;
+    exposureTypeOptions$: Observable<any[]>;
+    exposureTypeLabelsOptions$: Observable<string[]>;
+    exposureFrequencyOptions$: Observable<any[]>;
+    exposureFrequencyLabelsOptions$: Observable<string[]>;
+    exposureDurationOptions$: Observable<any[]>;
+    exposureDurationLabelsOptions$: Observable<string[]>;
+    socialRelationshipOptions$: Observable<any[]>;
+    socialRelationshipLabelsOptions$: Observable<string[]>;
 
     relatedEntityData: CaseModel|EventModel;
 
@@ -58,8 +67,10 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     sheetWidth = 500;
     sheetContextMenu = {};
     sheetColumns: any[] = [];
+    sheetColumnValidators: any;
 
     // provide constants to template
+    Constants = Constants;
     SheetColumnType = SheetColumnType;
 
     constructor(
@@ -69,10 +80,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
         private i18nService: I18nService
     ) {
         super();
@@ -92,6 +100,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.addressTypesLabelsList$ = this.addressTypesList$.map((result) => this.mapLabelValueToLabel(result));
         this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).share();
         this.documentTypesLabelsList$ = this.documentTypesList$.map((result) => this.mapLabelValueToLabel(result));
+        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
+        this.certaintyLevelLabelsOptions$ = this.certaintyLevelOptions$.map((result) => this.mapLabelValueToLabel(result));
+        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).share();
+        this.exposureTypeLabelsOptions$ = this.exposureTypeOptions$.map((result) => this.mapLabelValueToLabel(result));
+        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).share();
+        this.exposureFrequencyLabelsOptions$ = this.exposureFrequencyOptions$.map((result) => this.mapLabelValueToLabel(result));
+        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).share();
+        this.exposureDurationLabelsOptions$ = this.exposureDurationOptions$.map((result) => this.mapLabelValueToLabel(result));
+        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).share();
+        this.socialRelationshipLabelsOptions$ = this.socialRelationshipOptions$.map((result) => this.mapLabelValueToLabel(result));
 
         // configure spreadsheet widget
         this.configureSheetWidget();
@@ -143,20 +161,94 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     private configureSheetWidget() {
         // configure columns
         this.sheetColumns = [
-            new TextSheetColumn('LNG_CONTACT_FIELD_LABEL_FIRST_NAME'),
-            new TextSheetColumn('LNG_CONTACT_FIELD_LABEL_LAST_NAME'),
-            new DropdownSheetColumn('LNG_CONTACT_FIELD_LABEL_GENDER', this.genderLabelsList$),
-            new TextSheetColumn('LNG_CONTACT_FIELD_LABEL_PHONE'),
-            new DropdownSheetColumn('LNG_CONTACT_FIELD_LABEL_OCCUPATION', this.occupationsLabelsList$),
-            new NumericSheetColumn('LNG_CONTACT_FIELD_LABEL_AGE_YEARS'),
-            new NumericSheetColumn('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS'),
-            new DateSheetColumn('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH'),
-            new DropdownSheetColumn('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', this.riskLevelsLabelsList$),
-            new TextSheetColumn('LNG_CONTACT_FIELD_LABEL_RISK_REASON'),
-            new DropdownSheetColumn('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE', this.documentTypesLabelsList$),
-            new TextSheetColumn('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER'),
-            new DropdownSheetColumn('LNG_ADDRESS_FIELD_LABEL_ADDRESS_TYPE', this.addressTypesLabelsList$),
-            new TextSheetColumn('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+            // Contact properties
+            new TextSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_FIRST_NAME')
+                .setProperty('contact.firstName')
+                .setRequired(),
+            new TextSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
+                .setProperty('contact.lastName'),
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
+                .setProperty('contact.gender')
+                .setOptions(this.genderLabelsList$)
+                .setRequired(),
+            new TextSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE')
+                .setProperty('contact.phone'),
+            new DateSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
+                .setProperty('contact.dateOfReporting')
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
+                .setProperty('contact.occupation')
+                .setOptions(this.occupationsLabelsList$),
+            new NumericSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
+                .setProperty('contact.age.years'),
+            new NumericSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
+                .setProperty('contact.age.months'),
+            new DateSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
+                .setProperty('contact.dob'),
+            new DropdownSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
+                .setProperty('contact.riskLevel')
+                .setOptions(this.riskLevelsLabelsList$),
+            new TextSheetColumn()
+                .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
+                .setProperty('contact.riskReason'),
+
+            // Document(s)
+            new DropdownSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+                .setProperty('contact.documents[0].type')
+                .setOptions(this.documentTypesLabelsList$),
+            new TextSheetColumn()
+                .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+                .setProperty('contact.documents[0].number'),
+
+            // Address(es)
+            new DropdownSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_TYPE')
+                .setProperty('contact.addresses[0].typeId')
+                .setOptions(this.addressTypesLabelsList$),
+            new TextSheetColumn()
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+                .setProperty('contact.addresses[0].addressLine1'),
+
+            // Relationship
+            new DateSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
+                .setProperty('relationship.contactDate')
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
+                .setProperty('relationship.certaintyLevelId')
+                .setOptions(this.certaintyLevelLabelsOptions$)
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
+                .setProperty('relationship.exposureTypeId')
+                .setOptions(this.exposureTypeLabelsOptions$)
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
+                .setProperty('relationship.exposureFrequencyId')
+                .setOptions(this.exposureFrequencyLabelsOptions$)
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
+                .setProperty('relationship.exposureDurationId')
+                .setOptions(this.exposureDurationLabelsOptions$)
+                .setRequired(),
+            new DropdownSheetColumn()
+                .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
+                .setProperty('relationship.socialRelationshipTypeId')
+                .setOptions(this.socialRelationshipLabelsOptions$)
         ];
 
         // configure context menu
@@ -179,6 +271,57 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 }
             }
         };
+
+        // configure custom validators
+        this.sheetColumnValidators = {
+            // required field
+            required: (value, callback) => {
+                if (value === 'empty-row') {
+                    // do not validate empty rows
+                    callback(true);
+                    return;
+                }
+
+                if (value && value.length > 0) {
+                    callback(true);
+                    return;
+                }
+
+                callback(false);
+            },
+            // positive integer
+            positiveInteger: (value, callback) => {
+                if (value === 'empty-row') {
+                    // do not validate empty rows
+                    callback(true);
+                    return;
+                }
+
+                callback(/^([1-9]*|null)$/.test(value));
+            },
+            // required positive integer
+            requiredPositiveInteger: (value, callback) => {
+                if (value === 'empty-row') {
+                    // do not validate empty rows
+                    callback(true);
+                    return;
+                }
+
+                callback(/^[1-9]+$/.test(value));
+            }
+        };
+    }
+
+    beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
+        if (
+            value === null &&
+            sheetCore.isEmptyRow(row)
+        ) {
+            // do not validate empty rows
+            return 'empty-row';
+        } else {
+            return value;
+        }
     }
 
     /**
@@ -247,11 +390,19 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     /**
      * Create new Contacts
-     * @param {any} contactsSheet
+     * @param {any} sheetTable
      */
-    addContacts(contactsSheet: any) {
-        const sheetCore: Handsontable = contactsSheet.hotInstance;
-        const data = sheetCore.getData();
-        console.log(data);
+    addContacts(sheetTable: any) {
+        const sheetCore: Handsontable = sheetTable.hotInstance;
+
+        // is table valid?
+        sheetCore.validateCells((valid) => {
+            if (valid) {
+                const data = sheetCore.getData();
+                console.log(data);
+            } else {
+                this.snackbarService.showError('ERROR MOTHERFUCKER!');
+            }
+        });
     }
 }

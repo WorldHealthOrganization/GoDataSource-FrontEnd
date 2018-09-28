@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';

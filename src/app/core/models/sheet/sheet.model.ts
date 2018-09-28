@@ -8,50 +8,67 @@ export enum SheetColumnType {
 }
 
 export abstract class AbstractSheetColumn {
+    // translation key for column name
+    public title: string;
+    // property used to populate the resulted object after saving data
+    public property: string;
+    // required field?
+    required: boolean = false;
+
     constructor(
         // column type (check Handsontable documentation)
-        public type: SheetColumnType,
-        // translation key for column name
-        public title: string
+        public type: SheetColumnType
     ) {
+    }
+
+    public setTitle(title: string) {
+        this.title = title;
+        return this;
+    }
+
+    public setProperty(property: string) {
+        this.property = property;
+        return this;
+    }
+
+    public setRequired(value: boolean = true) {
+        this.required = value;
+        return this;
     }
 }
 
 export class TextSheetColumn extends AbstractSheetColumn {
     constructor(
-        title: string
     ) {
-        super(SheetColumnType.TEXT, title);
+        super(SheetColumnType.TEXT);
     }
 }
 
 export class DateSheetColumn extends AbstractSheetColumn {
     constructor(
-        title: string
     ) {
-        super(SheetColumnType.DATE, title);
+        super(SheetColumnType.DATE);
     }
 }
 
 export class NumericSheetColumn extends AbstractSheetColumn {
     constructor(
-        title: string,
-        // by default, integer
-        public numericFormat = {
-            // example: '0,0.00 $'
-            pattern: '0'
-        }
     ) {
-        super(SheetColumnType.NUMERIC, title);
+        super(SheetColumnType.NUMERIC);
     }
 }
 
 export class DropdownSheetColumn extends AbstractSheetColumn {
+    // list of options for dropdown
+    public options$: Observable<any>;
+
     constructor(
-        title: string,
-        // list of options for dropdown
-        public options$: Observable<any>
     ) {
-        super(SheetColumnType.DROPDOWN, title);
+        super(SheetColumnType.DROPDOWN);
+    }
+
+    setOptions(options$: Observable<any>) {
+        this.options$ = options$;
+        return this;
     }
 }
