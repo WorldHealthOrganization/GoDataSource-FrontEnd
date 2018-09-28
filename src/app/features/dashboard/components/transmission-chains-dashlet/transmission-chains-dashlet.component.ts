@@ -360,9 +360,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         return forkJoin(referenceDataCategories$);
     }
 
-
-
-
 }
 
 

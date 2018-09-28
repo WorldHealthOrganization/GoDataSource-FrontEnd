@@ -16,7 +16,6 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     chainsSize: any;
     histogramResults: any = [];
     selectedSizeOfChains = 0;
-    activeSelectedBar:any = {};
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
@@ -24,24 +23,25 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // get the number of active chains
         this.outbreakDataService.getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
-                    // get chain data and convert to graph nodes
+                    // get chain data and convert to array of size and number
                     this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id).subscribe((chains) => {
                         this.setHistogramResults(chains);
-
                     });
                 }
             });
     }
 
+    /**
+     * set the data needed for the chart
+     * @param chains
+     */
     setHistogramResults(chains) {
         this.chainsSize = {};
         this.histogramResults = [];
-
         _.forEach(chains, (value, key) => {
             if ( !_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases] ) {
                 this.chainsSize[value.noCases] ++;
@@ -49,12 +49,16 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
                 this.chainsSize[value.noCases] = 1;
             }
         });
-
         _.forEach(this.chainsSize, (value, key) => {
             this.histogramResults.push( { name: key, value: value } );
         });
     }
 
+    /**
+     * format the axis numbers to only display integers
+     * @param data
+     * @returns {string}
+     */
     axisFormat(data) {
         if (data % 1 === 0) {
             return data.toLocaleString();
@@ -63,14 +67,13 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
         }
     }
 
+    /**
+     * Handle click on a bar in the chart
+     * @param event
+     */
     onSelectChart(event) {
-        this.activeSelectedBar = event;
-        console.log(this.activeSelectedBar);
         this.selectedSizeOfChains = event.name;
+        // TODO open chains of transmission filtered by the size of the cahins
     }
 
-    resetChainsSelection() {
-        this.activeSelectedBar = {};
-        this.selectedSizeOfChains = 0;
-    }
 }

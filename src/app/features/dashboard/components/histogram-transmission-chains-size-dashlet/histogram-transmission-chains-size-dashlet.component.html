@@ -1,4 +1,4 @@
-<div fxLayout="column" fxFlex fxLayoutAlign="space-between center">
+<div fxLayout="column" fxFlex fxLayoutAlign="center">
     <ngx-charts-bar-vertical
         class="histogram-size-chains"
         [scheme]="{ domain: ['#4DB0A0'] }"
@@ -10,16 +10,15 @@
         [showXAxisLabel]="true"
         [showYAxisLabel]="true"
         [yAxisTickFormatting]="axisFormat"
-        [xAxisLabel]="'Size of chains'"
-        [yAxisLabel]="'Number of chains'"
-        [activeEntries]="[activeSelectedBar]"
+        [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
+        [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
         (select)="onSelectChart($event)">
         <ng-template #tooltipTemplate let-model="model">
             <div>
-                Size of chains: {{model.name}}
+                {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
             </div>
             <div>
-                Number of chains: {{model.value}}
+                {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
             </div>
         </ng-template>
     </ngx-charts-bar-vertical>
