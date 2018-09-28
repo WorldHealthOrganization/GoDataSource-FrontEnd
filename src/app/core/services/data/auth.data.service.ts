@@ -74,6 +74,28 @@ export class AuthDataService {
         settingsKey: UserSettings,
         data: any
     ): Observable<any> {
+        // update local storage values until data is saved to db and reloaded
+        const authData = this.getAuthData();
+        if (authData) {
+            // retrieve current user settings
+            const currentUserSettings = _.get(
+                authData,
+                'user.settings',
+                {}
+            );
+
+            // construct new settings
+            _.set(
+                currentUserSettings,
+                settingsKey,
+                data
+            );
+
+            // update data
+            this.storageService.set(StorageKey.AUTH_DATA, authData);
+        }
+
+        // save user settings to database
         const authUser = this.getAuthenticatedUser();
         return this.userDataService
             .updateSettings(

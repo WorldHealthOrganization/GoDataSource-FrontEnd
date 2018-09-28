@@ -28,14 +28,6 @@ export class SideColumnsComponent {
         // table columns
         this._tableColumns = tableColumns;
 
-        // determine what checkboxes should be displayed
-        this.displayColumns = [];
-        _.each(this.tableColumns, (column: VisibleColumnModel) => {
-            if (!column.required) {
-                this.displayColumns.push(column);
-            }
-        });
-
         // initialize visible columns
         this.initializeTableColumns();
     }
@@ -69,9 +61,6 @@ export class SideColumnsComponent {
     // Side Nav
     @ViewChild('sideNav') sideNav: MatSidenav;
 
-    // authenticated user
-    authUser: UserModel;
-
     // visible column event handler
     @Output() visibleColumnsChanged = new EventEmitter<string[]>();
 
@@ -82,10 +71,7 @@ export class SideColumnsComponent {
         private authDataService: AuthDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService
-    ) {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-    }
+    ) {}
 
     /**
      * Close Side Nav
@@ -109,17 +95,24 @@ export class SideColumnsComponent {
      */
     initializeTableColumns() {
         // get use saved settings
-        const settings = this.authUser.getSettings(this.tableColumnsUserSettingsKey);
+        // get the authenticated user ( every time a new object is created, and since we don't access the contructor again to refresh user data we need to get again the user )
+        const authUser = this.authDataService.getAuthenticatedUser();
+        const settings = authUser.getSettings(this.tableColumnsUserSettingsKey);
 
         // set visible values
         // we shouldn't have empty arrays..no columns to display...
-        if (!_.isEmpty(settings)) {
-            _.each(this.tableColumns, (column: VisibleColumnModel) => {
-                if (!column.required) {
+        // & determine what checkboxes should be displayed
+        this.displayColumns = [];
+        _.each(this.tableColumns, (column: VisibleColumnModel) => {
+            if (!column.required) {
+                if (!_.isEmpty(settings)) {
                     column.visible = _.indexOf(settings, column.field) > -1;
                 }
-            });
-        }
+
+                // clone column
+                this.displayColumns.push(new VisibleColumnModel(column));
+            }
+        });
 
         // initialize visible data columns
         this.initializeVisibleTableColumns();
