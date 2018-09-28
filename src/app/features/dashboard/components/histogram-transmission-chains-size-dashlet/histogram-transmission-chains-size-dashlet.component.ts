@@ -43,14 +43,14 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
         this.chainsSize = {};
         this.histogramResults = [];
         _.forEach(chains, (value, key) => {
-            if ( !_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases] ) {
-                this.chainsSize[value.noCases] ++;
+            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases]) {
+                this.chainsSize[value.noCases]++;
             } else {
                 this.chainsSize[value.noCases] = 1;
             }
         });
         _.forEach(this.chainsSize, (value, key) => {
-            this.histogramResults.push( { name: key, value: value } );
+            this.histogramResults.push({name: key, value: value});
         });
     }
 
@@ -73,7 +73,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
      */
     onSelectChart(event) {
         this.selectedSizeOfChains = event.name;
-        // TODO open chains of transmission filtered by the size of the cahins
+        // TODO open chains of transmission filtered by the size of the chains
     }
 
 }
