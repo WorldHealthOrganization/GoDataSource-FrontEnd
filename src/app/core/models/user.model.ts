@@ -11,7 +11,8 @@ export enum UserSettings {
     CONTACT_FIELDS = 'contactFields',
     EVENT_FIELDS = 'eventFields',
     RELATIONSHIP_FIELDS = 'relationshipFields',
-    OUTBREAK_FIELDS = 'outbreakFields'
+    OUTBREAK_FIELDS = 'outbreakFields',
+    FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields'
 }
 
 /**
@@ -25,6 +26,7 @@ abstract class UserSettingsHandlers {
     static EVENT_FIELDS = [];
     static RELATIONSHIP_FIELDS = [];
     static OUTBREAK_FIELDS = [];
+    static FOLLOW_UPS_MISSED_FIELDS = [];
 }
 
 export class UserModel {
