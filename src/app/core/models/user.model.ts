@@ -10,7 +10,8 @@ export enum UserSettings {
     CASE_LAB_FIELDS = 'caseLabFields',
     CONTACT_FIELDS = 'contactFields',
     EVENT_FIELDS = 'eventFields',
-    RELATIONSHIP_FIELDS = 'relationshipFields'
+    RELATIONSHIP_FIELDS = 'relationshipFields',
+    OUTBREAK_FIELDS = 'outbreakFields'
 }
 
 /**
@@ -19,7 +20,11 @@ export enum UserSettings {
 abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
+    static CASE_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
+    static EVENT_FIELDS = [];
+    static RELATIONSHIP_FIELDS = [];
+    static OUTBREAK_FIELDS = [];
 }
 
 export class UserModel {
