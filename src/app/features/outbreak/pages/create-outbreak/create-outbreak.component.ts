@@ -57,6 +57,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 return country;
             })
         );
+        this.newOutbreak.noDaysNewContacts = 1 ;
     }
 
     /**
