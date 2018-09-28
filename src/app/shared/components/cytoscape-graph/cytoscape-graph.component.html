@@ -5,7 +5,7 @@
         [(ngModel)]="transmissionChainViewType"
         required="true"
         [options]="transmissionChainViewTypes$ | async"
-        (optionChanged)="updateView()"
+        (optionChanged)="updateView($event)"
         [clearable]="false">
     </app-form-select>
     <!-- spinner -->
@@ -77,4 +77,17 @@
     <div class="cy"
          [fxShow]="!showLoading">
     </div>
+</div>
+
+<div *ngIf="showCaseNodesWithoutDates()"
+     class="entities-no-dates">
+    {{elements.caseNodesWithoutDates.length}} cases without dates
+</div>
+<div *ngIf="showContactNodesWithoutDates()"
+     class="entities-no-dates">
+    {{elements.contactNodesWithoutDates.length}} contacts without dates
+</div>
+<div *ngIf="showEventNodesWithoutDates()"
+     class="entities-no-dates">
+    {{elements.eventNodesWithoutDates.length}} events without dates
 </div>

@@ -31,6 +31,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
     graphElements: any;
+    selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
@@ -358,6 +359,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
         );
         return forkJoin(referenceDataCategories$);
+    }
+
+    viewTypeChanged(viewType) {
+        this.selectedViewType = viewType.value;
     }
 
 }

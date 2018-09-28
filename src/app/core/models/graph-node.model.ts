@@ -37,7 +37,6 @@ export class GraphNodeModel {
 
         // label to be used when displaying the timeline view
         this.label = this.name + '\n' + this.dateTimeline;
-
     }
 
 }
