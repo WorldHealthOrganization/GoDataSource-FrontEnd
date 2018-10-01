@@ -35,7 +35,7 @@
                         <hot-column
                             *ngIf="column.type === SheetColumnType.TEXT"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
-                            [validator]="column.required ? sheetColumnValidators.required : null">
+                            [validator]="column.validate()">
                         </hot-column>
 
                         <!-- Numeric column -->
@@ -43,7 +43,7 @@
                             *ngIf="column.type === SheetColumnType.NUMERIC"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="numeric"
-                            [validator]="column.required ? sheetColumnValidators.requiredPositiveInteger : sheetColumnValidators.positiveInteger">
+                            [validator]="column.validate()">
                         </hot-column>
 
                         <!-- Date column -->
@@ -53,7 +53,7 @@
                             type="date"
                             [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
                             [correctFormat]="true"
-                            [validator]="column.required ? sheetColumnValidators.required : null">
+                            [validator]="column.validate()">
                         </hot-column>
 
                         <!-- Dropdown column -->
@@ -63,7 +63,7 @@
                             type="dropdown"
                             [trimDropdown]="false"
                             [source]="column.options$ | async"
-                            [validator]="column.required ? sheetColumnValidators.required : null">
+                            [validator]="column.validate()">
                         </hot-column>
 
                     </ng-container>

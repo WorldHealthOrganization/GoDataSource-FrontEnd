@@ -20,6 +20,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DateSheetColumn, DropdownSheetColumn, NumericSheetColumn, SheetColumnType, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
+import { BulkAddContactsService } from '../../../../core/services/helper/bulk-add-contacts.service';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -81,7 +82,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private bulkAddContactsService: BulkAddContactsService
     ) {
         super();
     }
@@ -273,43 +275,43 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         };
 
         // configure custom validators
-        this.sheetColumnValidators = {
-            // required field
-            required: (value, callback) => {
-                if (value === 'empty-row') {
-                    // do not validate empty rows
-                    callback(true);
-                    return;
-                }
-
-                if (value && value.length > 0) {
-                    callback(true);
-                    return;
-                }
-
-                callback(false);
-            },
-            // positive integer
-            positiveInteger: (value, callback) => {
-                if (value === 'empty-row') {
-                    // do not validate empty rows
-                    callback(true);
-                    return;
-                }
-
-                callback(/^([1-9]*|null)$/.test(value));
-            },
-            // required positive integer
-            requiredPositiveInteger: (value, callback) => {
-                if (value === 'empty-row') {
-                    // do not validate empty rows
-                    callback(true);
-                    return;
-                }
-
-                callback(/^[1-9]+$/.test(value));
-            }
-        };
+        // this.sheetColumnValidators = {
+        //     // required field
+        //     required: (value, callback) => {
+        //         if (value === 'empty-row') {
+        //             // do not validate empty rows
+        //             callback(true);
+        //             return;
+        //         }
+        //
+        //         if (value && value.length > 0) {
+        //             callback(true);
+        //             return;
+        //         }
+        //
+        //         callback(false);
+        //     },
+        //     // positive integer
+        //     positiveInteger: (value, callback) => {
+        //         if (value === 'empty-row') {
+        //             // do not validate empty rows
+        //             callback(true);
+        //             return;
+        //         }
+        //
+        //         callback(/^([1-9]*|null)$/.test(value));
+        //     },
+        //     // required positive integer
+        //     requiredPositiveInteger: (value, callback) => {
+        //         if (value === 'empty-row') {
+        //             // do not validate empty rows
+        //             callback(true);
+        //             return;
+        //         }
+        //
+        //         callback(/^[1-9]+$/.test(value));
+        //     }
+        // };
     }
 
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
@@ -395,14 +397,20 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     addContacts(sheetTable: any) {
         const sheetCore: Handsontable = sheetTable.hotInstance;
 
-        // is table valid?
-        sheetCore.validateCells((valid) => {
-            if (valid) {
-                const data = sheetCore.getData();
-                console.log(data);
-            } else {
-                this.snackbarService.showError('ERROR MOTHERFUCKER!');
-            }
-        });
+        // validate sheet
+        this.bulkAddContactsService
+            .validateTable(sheetCore)
+            .subscribe((isValid) => {
+                if (!isValid) {
+                    // show error
+                    this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS!');
+                } else {
+                    // collect data from table
+                    const data = this.bulkAddContactsService.getData(sheetCore, this.sheetColumns);
+
+                    // #TODO API call - create contacts
+                    this.snackbarService.showSuccess('TODO API call :)');
+                }
+            });
     }
 }

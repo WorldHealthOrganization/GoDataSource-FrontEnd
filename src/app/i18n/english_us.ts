@@ -672,6 +672,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_BULK_ADD_CONTACTS_TITLE': 'Bulk Add Contacts',
         'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
+        'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid!',
 
         /**
          * Excel-like Sheet (widget)
