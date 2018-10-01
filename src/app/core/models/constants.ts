@@ -33,6 +33,9 @@ export class Constants {
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
 
+    // AGE constants
+    static DEFAULT_AGE_MAX_YEARS = 150;
+
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 

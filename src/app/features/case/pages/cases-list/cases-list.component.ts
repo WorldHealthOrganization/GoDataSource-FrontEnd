@@ -243,8 +243,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
             }),
             new FilterModel({
                 fieldName: 'age',
-                fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-                type: FilterType.RANGE_NUMBER,
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE_FILTER',
+                type: FilterType.RANGE_AGE,
                 sortable: true
             }),
             new FilterModel({

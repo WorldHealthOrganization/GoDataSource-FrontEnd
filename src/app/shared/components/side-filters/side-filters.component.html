@@ -91,9 +91,9 @@
                                     [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
 
-                                <!-- NUMBER RANGE Filter -->
+                                <!-- NUMBER / AGE RANGE Filter -->
                                 <app-form-range
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER"
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER || filter.filter?.type === FilterType.RANGE_AGE"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
                                     (changed)="filter.value = $event;"
@@ -102,7 +102,10 @@
                                         filter.comparator === FilterComparator.AFTER"
                                     [toVisible]="
                                         filter.comparator === FilterComparator.BETWEEN ||
-                                        filter.comparator === FilterComparator.BEFORE">
+                                        filter.comparator === FilterComparator.BEFORE"
+                                    [step]="filter.filter?.type === FilterType.RANGE_AGE ? 0.1 : undefined"
+                                    [min]="filter.filter?.type === FilterType.RANGE_AGE ? 0 : undefined"
+                                    [max]="filter.filter?.type === FilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined">
                                 </app-form-range>
 
                                 <!-- DATE RANGE Filter-->

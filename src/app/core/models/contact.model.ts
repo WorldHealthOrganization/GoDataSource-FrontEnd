@@ -3,6 +3,7 @@ import { AddressModel } from './address.model';
 import { DocumentModel } from './document.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
+import { AgeModel } from './age.model';
 
 export class ContactModel {
     id: string;
@@ -12,8 +13,6 @@ export class ContactModel {
     gender: string;
     phoneNumber: string;
     occupation: string;
-    dob: string;
-    age: number;
     documents: DocumentModel[];
     addresses: AddressModel[];
     riskLevel: string;
@@ -24,6 +23,9 @@ export class ContactModel {
     dateDeceased: string;
     outbreakId: string;
 
+    dob: string;
+    age: AgeModel;
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -32,10 +34,11 @@ export class ContactModel {
         this.gender = _.get(data, 'gender');
         this.phoneNumber = _.get(data, 'phoneNumber');
         this.occupation = _.get(data, 'occupation');
-        this.dob = _.get(data, 'dob');
-        this.age = _.get(data, 'age');
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
+
+        this.dob = _.get(data, 'dob');
+        this.age = new AgeModel(_.get(data, 'age'));
 
         const locationsList = _.get(data, 'locations', []);
         this.addresses = _.map(

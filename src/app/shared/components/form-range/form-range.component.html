@@ -10,7 +10,10 @@
             [(ngModel)]="range.from"
             [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
             type="number"
-            (input)="onChange()">
+            (input)="onChange()"
+            [step]="step"
+            [min]="min"
+            [max]="max">
         </app-form-input>
     </div>
 
@@ -30,7 +33,10 @@
             [(ngModel)]="range.to"
             [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
             type="number"
-            (input)="onChange()">
+            (input)="onChange()"
+            [step]="step"
+            [min]="min"
+            [max]="max">
         </app-form-input>
     </div>
 </div>

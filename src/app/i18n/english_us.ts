@@ -145,6 +145,8 @@ export const EnglishUsLang = {
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
         'LNG_FORM_VALIDATION_ERROR_PATTERN': 'Value does not match required pattern',
+        'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER': 'Must be bigger or equal to {{min}}',
+        'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER': 'Must be smaller or equal to {{max}}',
         'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH': 'Must contain a minimum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH': 'Must contain a maximum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE': 'Value must match password',
@@ -260,6 +262,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': 'Fill Geo-Location Latitude',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': 'Date of Outcome',
         'LNG_CASE_FIELD_LABEL_AGE': 'Age',
+        'LNG_CASE_FIELD_LABEL_AGE_FILTER': 'Age ( years )',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of Onset',
         'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE': 'Is date of onset approximate?',
@@ -1275,6 +1278,13 @@ export const EnglishUsLang = {
         /**
          * Import outbreak data
          */
-        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data'
+        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data',
+
+        /**
+         * Age Fields
+         */
+        'LNG_AGE_FIELD_LABEL_TYPE': 'Years / Months',
+        'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
+        'LNG_AGE_FIELD_LABEL_MONTHS': 'Months'
     }
 };

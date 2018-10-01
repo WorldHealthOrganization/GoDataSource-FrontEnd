@@ -7,6 +7,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-side-filters',
@@ -52,6 +53,7 @@ export class SideFiltersComponent {
     RequestFilterOperator = RequestFilterOperator;
     FilterType = FilterType;
     FilterComparator = FilterComparator;
+    Constants = Constants;
 
     // keep query builder
     queryBuilder: RequestQueryBuilder;
@@ -282,6 +284,11 @@ export class SideFiltersComponent {
                 case FilterType.RANGE_NUMBER:
                     // between / from / to
                     qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
+                    break;
+
+                case FilterType.RANGE_AGE:
+                    // between / from / to
+                    qb.filter.byAgeRange(filter.fieldName, appliedFilter.value, false);
                     break;
 
                 case FilterType.RANGE_DATE:

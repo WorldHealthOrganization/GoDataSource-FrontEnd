@@ -132,12 +132,11 @@
                             </div>
 
                             <div fxFlex>
-                                <app-form-input
+                                <app-form-age
                                     *ngIf="ageSelected"
                                     name="age"
-                                    [(ngModel)]="caseData.age"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_AGE' | translate">
-                                </app-form-input>
+                                    [(ngModel)]="caseData.age">
+                                </app-form-age>
 
                                 <app-form-datepicker
                                     *ngIf="!ageSelected"

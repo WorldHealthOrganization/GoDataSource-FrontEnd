@@ -253,6 +253,125 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by an age range field ('from' / 'to')
+     * @param {string} property
+     * @param value Object with 'from' and 'to' properties
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byAgeRange(property: string, value: any, replace: boolean = true) {
+        // remove conditions
+        this.remove(`${property}.months`);
+        this.remove(`${property}.years`);
+        this.removeCondition({
+            or: [
+                { [`${property}.months`]: true },
+                { [`${property}.years`]: true }
+            ]
+        });
+
+        // determine what filters we need to add
+        const fromValue: number = _.isNumber(value.from) ? value.from : null;
+        const toValue: number = _.isNumber(value.to) ? value.to : null;
+        const addMonthsCondition: boolean = value.from < 1 || fromValue === null;
+        const addYearsCondition: boolean = toValue === null || value.to >= 1;
+
+        // do we need to add any conditions ?
+        if (
+            (
+                addMonthsCondition ||
+                addYearsCondition
+            ) && (
+                fromValue !== null ||
+                toValue !== null
+            )
+        ) {
+            // construct array of conditions
+            const conditions = [];
+            let operator;
+            let valueToCompare;
+
+            // add months condition
+            if (addMonthsCondition) {
+                // between
+                const monthFromValue = fromValue === null ?
+                    0.05 : // at least a couple of days...because in db empty months is saved an 0 and this causes some issues
+                    Math.max(fromValue * 12, 0.05);
+                const monthToValue = toValue === null ?
+                    null : (
+                        toValue <= 1 ?
+                            toValue * 12 :
+                            12
+                    )
+                if (
+                    monthFromValue !== null &&
+                    monthToValue !== null
+                ) {
+                    operator = 'between';
+                    valueToCompare = [monthFromValue, monthToValue];
+                } else if (
+                    monthFromValue !== null
+                ) {
+                    operator = 'gte';
+                    valueToCompare = monthFromValue;
+                } else {
+                    operator = 'lte';
+                    valueToCompare = monthToValue;
+                }
+
+                // add condition
+                conditions.push({
+                    [`${property}.months`]: {
+                        [operator]: valueToCompare
+                    }
+                });
+            }
+
+            // add years condition
+            if (addYearsCondition) {
+                // between
+                if (
+                    fromValue !== null &&
+                    toValue !== null
+                ) {
+                    operator = 'between';
+                    valueToCompare = [fromValue, toValue];
+                } else if (
+                    fromValue !== null
+                ) {
+                    operator = 'gte';
+                    valueToCompare = fromValue;
+                } else {
+                    operator = 'lte';
+                    valueToCompare = toValue;
+                }
+
+                // add condition
+                conditions.push({
+                    [`${property}.years`]: {
+                        [operator]: valueToCompare
+                    }
+                });
+            }
+
+            // add conditions
+            if (conditions.length < 2) {
+                // single condition ( either years or months )
+                this.where(
+                    conditions[0],
+                    true
+                );
+            } else {
+                this.where({
+                    [RequestFilterOperator.OR]: conditions
+                }, true);
+            }
+        }
+
+        return this;
+    }
+
+    /**
      * Filter by date range
      * @param property
      * @param value

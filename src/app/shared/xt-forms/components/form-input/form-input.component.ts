@@ -47,6 +47,9 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Input() maxlength: number;
 
+    @Input() step: number = 1;
+    @Input() min: number;
+    @Input() max: number;
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();

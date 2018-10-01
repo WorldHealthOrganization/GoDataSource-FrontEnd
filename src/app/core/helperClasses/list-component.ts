@@ -274,6 +274,22 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter the list by an age range field ('from' / 'to')
+     * @param {string} property
+     * @param {FormRangeModel} value Object with 'from' and 'to' properties
+     */
+    filterByAgeRangeField(
+        property: string,
+        value: FormRangeModel
+    ) {
+        // filter by age range
+        this.queryBuilder.filter.byAgeRange(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by a date range field ('startDate' / 'endDate')
      * @param {string} property
      * @param value Object with 'startDate' and 'endDate' properties

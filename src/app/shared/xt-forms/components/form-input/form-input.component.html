@@ -22,7 +22,10 @@
             [disabled]="disabled"
             [readonly]="readonly"
             (blur)="onBlur()"
-            (input)="onChange()"/>
+            (input)="onChange()"
+            [step]="step"
+            [min]="min"
+            [max]="max"/>
 
         <span [fxShow]="tooltip !== null" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
 
