@@ -59,6 +59,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     availableSideFilters: FilterModel[];
 
+    printDailyFollowUpsUrl: string;
+    followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
+    printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
@@ -100,6 +103,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         this.followUpsDataExportFileName = this.i18nService.instant(this.showPastFollowUps ? 'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
+        this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
+            ' - ' +
+            this.followUpsPrintDailyFileName;
 
         // get today time
         this.genericDataService
@@ -132,11 +138,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
                 // export url
                 this.exportFollowUpsUrl = null;
+                this.printDailyFollowUpsUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
                 }
 
                 // initialize pagination

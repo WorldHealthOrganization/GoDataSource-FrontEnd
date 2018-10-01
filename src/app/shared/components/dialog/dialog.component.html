@@ -74,7 +74,8 @@
                         [multiple]="field.inputOptionsMultiple"
                         [required]="field.required"
                         app-required-one-or-other-validator
-                        [requiredOtherField]="field.requiredOneOfTwo">
+                        [requiredOtherField]="field.requiredOneOfTwo"
+                        [disabled]="field.disabled">
                     </app-form-select>
 
                     <!-- Text / Number -->
@@ -86,7 +87,8 @@
                         [required]="field.required"
                         [type]="field.type"
                         app-required-one-or-other-validator
-                        [requiredOtherField]="field.requiredOneOfTwo">
+                        [requiredOtherField]="field.requiredOneOfTwo"
+                        [disabled]="field.disabled">
                     </app-form-input>
                 </div>
             </ng-container>
