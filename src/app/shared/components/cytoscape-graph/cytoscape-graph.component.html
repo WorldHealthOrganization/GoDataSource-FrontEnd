@@ -50,6 +50,9 @@
             <div>
                 {{nodeNameColorItem | translate}}
             </div>
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+                - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+            </div>
         </div>
 
         <!-- edge color -->

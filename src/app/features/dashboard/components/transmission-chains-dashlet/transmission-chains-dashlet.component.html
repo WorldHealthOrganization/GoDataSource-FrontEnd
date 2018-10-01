@@ -128,7 +128,7 @@
                 {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
                 ]"
             [disabled]="selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value"
-            [tooltip]="'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP' | translate">
+            [tooltip]="tooltipViewTimeline() | translate">
         </app-form-radio>
         <!--[tooltip]="( selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP' : null) | translate">-->
 

@@ -27,6 +27,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     cy: any;
     container: string = 'cy';
 
+    Constants = Constants;
+
     transmissionChainViewTypes$: Observable<any[]>;
 
     objectKeys = Object.keys;
@@ -257,6 +259,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      * re-render the layout on view type change
      */
     updateView($event) {
+        this.transmissionChainViewType = $event;
         this.render();
         this.viewTypeChanged.emit($event);
     }
