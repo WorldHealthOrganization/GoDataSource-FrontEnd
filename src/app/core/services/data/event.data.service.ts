@@ -88,5 +88,15 @@ export class EventDataService {
     deleteEvent(outbreakId: string, eventId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/events/${eventId}`);
     }
+
+    /**
+     * Restore a deleted event
+     * @param {string} outbreakId
+     * @param {string} eventId
+     * @returns {Observable<any>}
+     */
+    restoreEvent(outbreakId: string, eventId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/events/${eventId}/restore`, {});
+    }
 }
 

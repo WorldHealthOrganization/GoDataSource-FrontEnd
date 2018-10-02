@@ -1,3 +1,7 @@
+// interfaces
+export * from './group-dirty-fields';
+
+// classes
 export * from './element-base';
 export * from './group-validator';
 export * from './group-base';

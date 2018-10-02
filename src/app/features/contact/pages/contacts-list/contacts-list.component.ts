@@ -375,7 +375,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             'gender',
             'phoneNumber',
             'riskLevel',
-            'actions'
+            'actions',
+            'deleted'
         ];
     }
 
@@ -414,6 +415,26 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    restoreContact(contact: ContactModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.contactDataService
+                        .restoreContact(this.selectedOutbreak.id, contact.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });
