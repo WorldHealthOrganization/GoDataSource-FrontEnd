@@ -29,6 +29,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <app-counted-items-list
     [items]="countedNewContactsGroupedByExposureType$ | async"
     (optionChanged)="filterBySelectField('id', $event.ids, null)">
@@ -312,8 +319,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
 
     <mat-paginator

@@ -16,6 +16,11 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
 })
 export class SideColumnsComponent {
     /**
+     * Loading data ?
+     */
+    loading: boolean = false;
+
+    /**
      * Contains all fields that aren't required ( e.g. actions )
      */
     displayColumns: VisibleColumnModel[] = [];
@@ -27,14 +32,6 @@ export class SideColumnsComponent {
     @Input() set tableColumns(tableColumns: VisibleColumnModel[]) {
         // table columns
         this._tableColumns = tableColumns;
-
-        // determine what checkboxes should be displayed
-        this.displayColumns = [];
-        _.each(this.tableColumns, (column: VisibleColumnModel) => {
-            if (!column.required) {
-                this.displayColumns.push(column);
-            }
-        });
 
         // initialize visible columns
         this.initializeTableColumns();
@@ -69,9 +66,6 @@ export class SideColumnsComponent {
     // Side Nav
     @ViewChild('sideNav') sideNav: MatSidenav;
 
-    // authenticated user
-    authUser: UserModel;
-
     // visible column event handler
     @Output() visibleColumnsChanged = new EventEmitter<string[]>();
 
@@ -82,13 +76,7 @@ export class SideColumnsComponent {
         private authDataService: AuthDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService
-    ) {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // initialize data
-        this.initializeTableColumns();
-    }
+    ) {}
 
     /**
      * Close Side Nav
@@ -101,7 +89,16 @@ export class SideColumnsComponent {
      * Open Side Nav
      */
     openSideNav() {
+        // side nav disabled ?
+        if (this.loading) {
+            return;
+        }
+
+        // show side nav
         this.sideNav.open();
+
+        // initialize data
+        this.initializeTableColumns();
     }
 
     /**
@@ -109,17 +106,24 @@ export class SideColumnsComponent {
      */
     initializeTableColumns() {
         // get use saved settings
-        const settings = this.authUser.getSettings(this.tableColumnsUserSettingsKey);
+        // get the authenticated user ( every time a new object is created, and since we don't access the contructor again to refresh user data we need to get again the user )
+        const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+        const settings = authUser.getSettings(this.tableColumnsUserSettingsKey);
 
         // set visible values
         // we shouldn't have empty arrays..no columns to display...
-        if (!_.isEmpty(settings)) {
-            _.each(this.tableColumns, (column: VisibleColumnModel) => {
-                if (!column.required) {
+        // & determine what checkboxes should be displayed
+        this.displayColumns = [];
+        _.each(this.tableColumns, (column: VisibleColumnModel) => {
+            if (!column.required) {
+                if (!_.isEmpty(settings)) {
                     column.visible = _.indexOf(settings, column.field) > -1;
                 }
-            });
-        }
+
+                // clone column
+                this.displayColumns.push(new VisibleColumnModel(column));
+            }
+        });
 
         // initialize visible data columns
         this.initializeVisibleTableColumns();
@@ -159,7 +163,7 @@ export class SideColumnsComponent {
         const fields: any = this.formHelper.getFields(form);
 
         // retrieve visible fields
-        const columns = _.get(
+        let columns = _.get(
             fields,
             'select.columns',
             {}
@@ -171,6 +175,34 @@ export class SideColumnsComponent {
             return;
         }
 
+        // normalize fields
+        // replace all sub-level fields with static strings
+        const normalizedColumns = {};
+        const normalize = (
+            value: boolean | {},
+            key: string,
+            parentKey: string = ''
+        ) => {
+            if (_.isBoolean(value)) {
+                normalizedColumns[parentKey + key] = value;
+            } else {
+                _.each(value, (childValue, childKey) => {
+                    normalize(
+                        childValue,
+                        childKey,
+                        `${parentKey}${key}.`
+                    );
+                });
+            }
+        };
+        _.each(columns, (value, key) => {
+            normalize(
+                value,
+                key
+            );
+        });
+        columns = normalizedColumns;
+
         // set fields visibility
         _.each(this.tableColumns, (column: VisibleColumnModel) => {
             column.visible = !!columns[column.field];
@@ -180,10 +212,13 @@ export class SideColumnsComponent {
         this.initializeVisibleTableColumns();
 
         // save visible columns
+        this.loading = true;
         this.authDataService.updateSettingsForCurrentUser(
             this.tableColumnsUserSettingsKey,
             this.visibleSaveTableColumns
-        ).subscribe();
+        ).subscribe(() => {
+            this.loading = false;
+        });
 
         // close side nav
         this.closeSideNav();
