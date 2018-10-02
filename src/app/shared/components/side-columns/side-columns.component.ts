@@ -16,6 +16,11 @@ import { SnackbarService } from '../../../core/services/helper/snackbar.service'
 })
 export class SideColumnsComponent {
     /**
+     * Loading data ?
+     */
+    loading: boolean = false;
+
+    /**
      * Contains all fields that aren't required ( e.g. actions )
      */
     displayColumns: VisibleColumnModel[] = [];
@@ -84,6 +89,12 @@ export class SideColumnsComponent {
      * Open Side Nav
      */
     openSideNav() {
+        // side nav disabled ?
+        if (this.loading) {
+            return;
+        }
+
+        // show side nav
         this.sideNav.open();
 
         // initialize data
@@ -201,10 +212,13 @@ export class SideColumnsComponent {
         this.initializeVisibleTableColumns();
 
         // save visible columns
+        this.loading = true;
         this.authDataService.updateSettingsForCurrentUser(
             this.tableColumnsUserSettingsKey,
             this.visibleSaveTableColumns
-        ).subscribe();
+        ).subscribe(() => {
+            this.loading = false;
+        });
 
         // close side nav
         this.closeSideNav();

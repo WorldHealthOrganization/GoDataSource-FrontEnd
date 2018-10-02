@@ -14,7 +14,6 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -46,7 +45,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         ) {
             const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
             this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
             });
         }
     }
@@ -77,7 +76,6 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService,
         private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);

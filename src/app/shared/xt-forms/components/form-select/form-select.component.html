@@ -23,7 +23,7 @@
             (blur)="onBlur()"
             [disabled]="disabled"
             (selectionChange)="onChange(selectElement.value)"
-            [matTooltip]="tooltip">
+            [matTooltip]="tooltip | translate">
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">
