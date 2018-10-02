@@ -52,7 +52,6 @@ export class FormRadioComponent extends ElementBase<string> implements OnInit {
     }
 
     ngOnInit() {
-        console.log(this.tooltip);
         return this.afterInitialize.emit();
     }
 

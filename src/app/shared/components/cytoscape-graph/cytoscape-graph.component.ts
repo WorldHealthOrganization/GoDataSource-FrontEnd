@@ -259,7 +259,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      * re-render the layout on view type change
      */
     updateView($event) {
-        this.transmissionChainViewType = $event;
+        this.transmissionChainViewType = $event.value;
         this.render();
         this.viewTypeChanged.emit($event);
     }

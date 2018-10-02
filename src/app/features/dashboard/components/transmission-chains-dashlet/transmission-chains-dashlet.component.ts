@@ -124,7 +124,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private relationshipDataService: RelationshipDataService
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // init filters - only show cases and events first
@@ -375,11 +376,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     viewTypeChanged(viewType) {
         this.selectedViewType = viewType.value;
-        if (this.selectedViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+        if (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
             // if node label criteria is already 'type' then do not reload the graph data.
-            if (this.colorCriteria.nodeNameColorCriteria === 'type') {
-
-            } else {
+            if (this.colorCriteria.nodeNameColorCriteria !== 'type') {
                 this.colorCriteria.nodeNameColorCriteria = 'type';
                 // refresh chain to load the new criteria
                 this.displayChainsOfTransmission();
@@ -392,9 +391,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * @returns {string}
      */
     tooltipViewTimeline() {
-        return ( this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-            ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
-            : null
+        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
+                : null
         );
     }
 

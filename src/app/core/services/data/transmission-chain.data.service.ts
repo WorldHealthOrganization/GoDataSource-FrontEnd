@@ -167,8 +167,8 @@ export class TransmissionChainDataService {
                                 graphData.caseNodesWithoutDates.push(node.model.id);
                             }
                         } else if (node.type === EntityType.CONTACT) {
-                            if (!_.isEmpty(node.model.dateOfReporting)) {
-                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
                             } else {
                                 graphData.contactNodesWithoutDates.push(node.model.id);
                             }
@@ -204,8 +204,8 @@ export class TransmissionChainDataService {
                         // show nodes based on their type
                         if (node.type === EntityType.CONTACT && filters.showContacts) {
                             allowAdd = true;
-                            if (!_.isEmpty(node.model.dateOfReporting)) {
-                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
                             } else {
                                 graphData.contactNodesWithoutDates.push(node.model.id);
                             }
