@@ -9,15 +9,14 @@ import {
     HostBinding,
     Output,
     EventEmitter,
-    AfterViewInit,
-    OnInit
+    AfterViewInit
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
 import { ElementBase } from '../../core/index';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-form-input',
@@ -30,12 +29,29 @@ import * as _ from 'lodash';
         multi: true
     }]
 })
-export class FormInputComponent extends ElementBase<string> implements AfterViewInit, OnInit {
+export class FormInputComponent extends ElementBase<string> implements AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    @Input() placeholder: string;
+    _placeholder: string;
+    @Input() set placeholder(placeholder: string) {
+        this._placeholder = placeholder;
+
+        if (
+            this.authUser &&
+            this.placeholder
+        ) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+            });
+        }
+    }
+    get placeholder(): string {
+        return this._placeholder;
+    }
+
     @Input() type: string = 'text';
     @Input() required: boolean = false;
     @Input() name: string;
@@ -54,6 +70,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
 
+    authUser: UserModel;
+
     public identifier = `form-input-${FormInputComponent.identifier++}`;
 
     constructor(
@@ -61,18 +79,11 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService
+        private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);
-    }
 
-    ngOnInit() {
-        if (this.placeholder) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-            });
-        }
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
@@ -86,7 +97,6 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
      * Function triggered when the input value is changed
      */
     onChange() {
-
         // emit the current value
         return this.optionChanged.emit(this.value);
     }

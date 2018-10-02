@@ -1,10 +1,11 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit, OnInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-form-select',
@@ -17,12 +18,29 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> implements OnInit, AfterViewInit {
+export class FormSelectComponent extends ElementBase<string> implements AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    @Input() placeholder: string;
+    _placeholder: string;
+    @Input() set placeholder(placeholder: string) {
+        this._placeholder = placeholder;
+
+        if (
+            this.authUser &&
+            this.placeholder
+        ) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+            });
+        }
+    }
+    get placeholder(): string {
+        return this._placeholder;
+    }
+
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() name: string;
@@ -46,6 +64,8 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
 
+    authUser: UserModel;
+
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
 
     static compareWithDefault = (o1: any, o2: any) => {
@@ -57,18 +77,11 @@ export class FormSelectComponent extends ElementBase<string> implements OnInit, 
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private i18nService: I18nService
+        private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);
-    }
 
-    ngOnInit() {
-        if (this.placeholder) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : this.i18nService.instant(glossaryData[labelValue]);
-            });
-        }
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**

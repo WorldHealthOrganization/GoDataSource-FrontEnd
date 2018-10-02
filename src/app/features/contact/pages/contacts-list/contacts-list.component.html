@@ -29,6 +29,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.CONTACT_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <app-counted-items-list
     [items]="countedNewContactsGroupedByExposureType$ | async"
     (optionChanged)="filterBySelectField('id', $event.ids, null)">
@@ -238,6 +245,32 @@
             </mat-cell>
         </ng-container>
 
+        <!--Deleted -->
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="riskLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label
+                    [value]="item.deleted">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
@@ -248,46 +281,51 @@
 
                 <mat-menu #actionsMenu="matMenu">
                     <ng-container *app-selected-outbreak-is-active>
-                        <button mat-menu-item *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()"
+                        <button mat-menu-item *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess() && !item.deleted"
                                 [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
                             {{'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP' | translate}}
                         </button>
                         <mat-divider *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()"></mat-divider>
                     </ng-container>
 
-                    <button mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
+                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
                         {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                     </button>
 
                     <mat-divider></mat-divider>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'movement']">
+                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'movement']">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT' | translate }}
                     </button>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'chronology']">
+                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'chronology']">
                         {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
                     </button>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                         </button>
 
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
+                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+
+                        <button *ngIf="item.deleted && hasContactWriteAccess()" mat-menu-item class="mat-menu-item-restore"
+                                (click)="restoreContact(item)">
+                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
 
     <mat-paginator

@@ -224,7 +224,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
+                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
                                 ]">
                             </app-form-datepicker>
 
@@ -249,6 +250,9 @@
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]"
+                                [dateSameOrAfter]="[
+                                    [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate]
                                 ]">
                             </app-form-datepicker>
 

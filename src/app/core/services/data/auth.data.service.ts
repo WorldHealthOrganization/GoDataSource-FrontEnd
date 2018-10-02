@@ -74,6 +74,7 @@ export class AuthDataService {
         settingsKey: UserSettings,
         data: any
     ): Observable<any> {
+        // save user settings to database
         const authUser = this.getAuthenticatedUser();
         return this.userDataService
             .updateSettings(
