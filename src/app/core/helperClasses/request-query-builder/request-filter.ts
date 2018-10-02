@@ -303,7 +303,7 @@ export class RequestFilter {
                         toValue <= 1 ?
                             toValue * 12 :
                             12
-                    )
+                    );
                 if (
                     monthFromValue !== null &&
                     monthToValue !== null
