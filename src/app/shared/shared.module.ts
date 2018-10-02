@@ -12,6 +12,7 @@ import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MglTimelineModule } from 'angular-mgl-timeline';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
     imports: [
@@ -23,7 +24,8 @@ import { MglTimelineModule } from 'angular-mgl-timeline';
         XtFormsModule,
         AngularMaterialModule,
         TranslateModule,
-        MglTimelineModule
+        MglTimelineModule,
+        NgxChartsModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -41,6 +43,7 @@ import { MglTimelineModule } from 'angular-mgl-timeline';
         XtFormsModule,
         AngularMaterialModule,
         MglTimelineModule,
+        NgxChartsModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components,

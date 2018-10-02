@@ -111,6 +111,9 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
+        'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: {{name}}?',
+        'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: {{name}}?',
+        'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
@@ -305,6 +308,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
+        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE': 'Case restored!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
@@ -609,6 +613,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
+        'LNG_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
         'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
@@ -640,6 +645,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
         'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Contact restored!',
 
         /**
          * Create Contact page
@@ -782,6 +788,7 @@ export const EnglishUsLang = {
         'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_EVENT_FIELD_LABEL_DELETED': 'Deleted',
 
         /**
          * Events list page
@@ -789,6 +796,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
         'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Event deleted!',
         'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON': 'See events without relationships',
+        'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Event restored!',
 
         /**
          * Create Event page
@@ -1100,6 +1108,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
         'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECAME CASES',
+        'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE': 'Histogram - Size of Chains of Transmission',
+        'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
+        'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
+
 
         /**
          * Chains of Transmission
