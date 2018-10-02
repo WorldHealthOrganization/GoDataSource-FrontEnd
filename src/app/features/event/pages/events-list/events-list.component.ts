@@ -19,6 +19,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-events-list',
@@ -38,6 +39,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
     // list of existing events
     eventsList$: Observable<EventModel[]>;
     eventsListCount$: Observable<any>;
+    yesNoOptionsList$: Observable<any>;
 
     // events outbreak
     selectedOutbreak: OutbreakModel;
@@ -53,7 +55,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService,
@@ -65,6 +68,7 @@ export class EventsListComponent extends ListComponent implements OnInit {
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -128,7 +132,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
             'date',
             'description',
             'address',
-            'actions'
+            'actions',
+            'deleted'
         ];
 
         // finished
@@ -155,6 +160,30 @@ export class EventsListComponent extends ListComponent implements OnInit {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore an deleted event
+     * @param eventModel
+     */
+    restoreEvent(eventModel: EventModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_EVENT', new EventModel(eventModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.eventDataService
+                        .restoreEvent(this.selectedOutbreak.id, eventModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

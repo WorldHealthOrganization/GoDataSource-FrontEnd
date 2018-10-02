@@ -13,6 +13,7 @@ export class EventModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
+    deleted: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -23,6 +24,7 @@ export class EventModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.outbreakId = _.get(data, 'outbreakId');
+        this.deleted = _.get(data, 'deleted');
 
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');
