@@ -191,7 +191,13 @@ export abstract class ListComponent {
      * Sort asc / desc by specific fields
      * @param data
      */
-    public sortBy(data) {
+    public sortBy(
+        data: any,
+        objectDetailsSort?: {
+            [property: string]: string[]
+        }
+    ) {
+        // sort information
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
 
@@ -213,7 +219,11 @@ export abstract class ListComponent {
             direction
         ) {
             // apply sort
-            this.queryBuilder.sort.by(property, direction);
+            this.queryBuilder.sort.by(
+                property,
+                direction,
+                objectDetailsSort
+            );
         }
 
         // refresh list

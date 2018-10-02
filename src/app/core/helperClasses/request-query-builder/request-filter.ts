@@ -292,11 +292,12 @@ export class RequestFilter {
             let valueToCompare;
 
             // add months condition
+            const defaultMinNonEmptyValue = 0.05;
             if (addMonthsCondition) {
                 // between
                 const monthFromValue = fromValue === null ?
-                    0.05 : // at least a couple of days...because in db empty months is saved an 0 and this causes some issues
-                    Math.max(fromValue * 12, 0.05);
+                    defaultMinNonEmptyValue : // at least a couple of days...because in db empty months is saved an 0 and this causes some issues
+                    Math.max(fromValue * 12, defaultMinNonEmptyValue);
                 const monthToValue = toValue === null ?
                     null : (
                         toValue <= 1 ?

@@ -101,7 +101,7 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef fxFlex="60px">

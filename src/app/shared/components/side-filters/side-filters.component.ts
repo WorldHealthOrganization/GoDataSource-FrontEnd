@@ -318,7 +318,9 @@ export class SideFiltersComponent {
         _.each(sorts, (appliedSort: AppliedSortModel) => {
             queryBuilder.sort.by(
                 appliedSort.sort.fieldName,
-                appliedSort.direction
+                appliedSort.direction, {
+                    age: ['years', 'months']
+                }
             );
         });
 
