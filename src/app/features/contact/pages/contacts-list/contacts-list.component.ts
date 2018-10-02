@@ -433,7 +433,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });
