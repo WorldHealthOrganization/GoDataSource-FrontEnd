@@ -58,12 +58,12 @@ export class SidenavComponent implements OnInit {
             'settings',
             [],
             [
-                // new ChildNavItem(
-                //     'system-config',
-                //     'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
-                //     [PERMISSION.READ_SYS_CONFIG],
-                //     ''
-                // ),
+                new ChildNavItem(
+                    'system-config',
+                    'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/system-config'
+                ),
                 new ChildNavItem(
                     'users',
                     'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',

@@ -13,5 +13,6 @@ export enum ModulePath {
     LocationModule = 'locations',
     DashboardModule = 'dashboard',
     TransmissionChainModule = 'transmission-chains',
-    ImportExportDataModule = 'import-export-data'
+    ImportExportDataModule = 'import-export-data',
+    SystemConfigModule = 'system-config'
 }
