@@ -63,6 +63,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
         'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
+        'LNG_PAGE_ACTION_CLONE': 'Clone',
 
         /**
          * Common buttons

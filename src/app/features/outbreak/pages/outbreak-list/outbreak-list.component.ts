@@ -17,7 +17,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
@@ -282,5 +282,37 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Clone an existing outbreak
+     * @param {OutbreakModel}outbreak
+     */
+    clone(outbreakModel: OutbreakModel) {
+        this.outbreakDataService.getOutbreak(outbreakModel.id)
+            .subscribe((outbreak: OutbreakModel) => {
+                console.log(outbreak);
+                const clonedOutbreak: OutbreakModel = outbreak;
+                this.dialogService.showInput(
+                    new DialogConfiguration({
+                        message: 'Name the clone of the outbreak',
+                        yesLabel: 'Clone',
+                        required: true,
+                        fieldsList: [new DialogField({
+                            name: 'clonedOutbreakName',
+                            placeholder: 'cloned',
+                            required: true,
+                            type: 'text'
+                        })]
+                    }), true)
+                    .subscribe((answer) => {
+                        console.log(answer);
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            delete clonedOutbreak.id;
+                            clonedOutbreak.name = answer.inputValue.value.clonedOutbreakName;
+                            console.log(clonedOutbreak);
+                        }
+                    });
+            });
     }
 }
