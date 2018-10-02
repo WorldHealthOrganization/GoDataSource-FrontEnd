@@ -609,6 +609,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_AGE_FILTER': 'Age ( Years )',
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',

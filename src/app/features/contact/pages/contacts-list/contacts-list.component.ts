@@ -34,6 +34,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-contacts-list',
@@ -45,6 +46,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '.', true)
     ];
+
+    // constants
+    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;
@@ -226,8 +230,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             }),
             new FilterModel({
                 fieldName: 'age',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON',
-                type: FilterType.RANGE_NUMBER,
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_FILTER',
+                type: FilterType.RANGE_AGE,
                 sortable: true
             }),
             new FilterModel({
@@ -313,8 +317,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     }),
                     new FilterModel({
                         fieldName: 'age',
-                        fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-                        type: FilterType.RANGE_NUMBER,
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE_FILTER',
+                        type: FilterType.RANGE_AGE,
                         relationshipPath: ['relationships', 'people'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
                         extraConditions: caseCondition
