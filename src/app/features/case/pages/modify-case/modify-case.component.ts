@@ -24,6 +24,8 @@ import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
+import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
+import { AgeModel } from '../../../../core/models/age.model';
 
 @Component({
     selector: 'app-modify-case',
@@ -112,6 +114,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
     }
 
+    /**
+     * Breadcrumbs
+     */
     buildBreadcrumbs() {
         if (this.caseData) {
             // initialize breadcrumbs
@@ -154,6 +159,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         }
     }
 
+    /**
+     * Case data
+     */
     retrieveCaseData() {
         // get case
         if (
@@ -214,6 +222,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
+                    this.ageSelected = !this.caseData.dob;
 
                     // determine parent onset dates
                     const uniqueDates: {} = {};
@@ -260,11 +269,17 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age information if necessary
+        if (dirtyFields.dob) {
+            AgeModel.addAgeFromDob(
+                dirtyFields,
+                null,
+                dirtyFields.dob,
+                this.serverToday,
+                this.genericDataService
+            );
+        } else if (dirtyFields.age) {
+            dirtyFields.dob = null;
         }
 
         // modify the Case
@@ -282,6 +297,31 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                 this.disableDirtyConfirm();
                 this.router.navigate(['/cases']);
             });
+    }
+
+    /**
+     * DOB changed handler
+     * @param dob
+     * @param date
+     */
+    dobChanged(
+        dob: FormDatepickerComponent,
+        date: Moment
+    ) {
+        AgeModel.addAgeFromDob(
+            this.caseData,
+            dob,
+            date,
+            this.serverToday,
+            this.genericDataService
+        );
+    }
+
+    /**
+     * Age changed
+     */
+    ageChanged() {
+        this.caseData.dob = null;
     }
 
     /**

@@ -135,17 +135,20 @@
                                 <app-form-age
                                     *ngIf="ageSelected"
                                     name="age"
-                                    [(ngModel)]="caseData.age">
+                                    [(ngModel)]="caseData.age"
+                                    (changed)="ageChanged()">
                                 </app-form-age>
 
                                 <app-form-datepicker
                                     *ngIf="!ageSelected"
+                                    #dob
                                     name="dob"
                                     [(ngModel)]="caseData.dob"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
                                     [maxDate]="serverToday"
                                     app-date-validator
-                                    [dateSameOrBefore]="serverToday">
+                                    [dateSameOrBefore]="serverToday"
+                                    (optionChanged)="dobChanged(dob, $event)">
                                 </app-form-datepicker>
                             </div>
 

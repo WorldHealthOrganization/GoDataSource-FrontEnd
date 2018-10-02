@@ -25,6 +25,8 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
+import { AgeModel } from '../../../../core/models/age.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -174,13 +176,20 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         const relationship = _.get(dirtyFields, 'relationship');
         delete dirtyFields.relationship;
 
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age information if necessary
+        if (dirtyFields.dob) {
+            AgeModel.addAgeFromDob(
+                dirtyFields,
+                null,
+                dirtyFields.dob,
+                this.serverToday,
+                this.genericDataService
+            );
+        } else if (dirtyFields.age) {
+            dirtyFields.dob = null;
         }
 
+        // create relationship & contact
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields) &&
@@ -226,5 +235,31 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         });
                 });
         }
+    }
+
+
+    /**
+     * DOB changed handler
+     * @param dob
+     * @param date
+     */
+    dobChanged(
+        dob: FormDatepickerComponent,
+        date: Moment
+    ) {
+        AgeModel.addAgeFromDob(
+            this.contactData,
+            dob,
+            date,
+            this.serverToday,
+            this.genericDataService
+        );
+    }
+
+    /**
+     * Age changed
+     */
+    ageChanged() {
+        this.contactData.dob = null;
     }
 }

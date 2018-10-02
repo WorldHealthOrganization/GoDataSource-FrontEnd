@@ -1,4 +1,7 @@
 import * as _ from 'lodash';
+import { Moment } from 'moment';
+import { GenericDataService } from '../services/data/generic.data.service';
+import { FormDatepickerComponent } from '../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
 
 export class AgeModel {
     years: number;
@@ -7,5 +10,51 @@ export class AgeModel {
     constructor(data = null) {
         this.years = _.get(data, 'years', 0);
         this.months = _.get(data, 'months', 0);
+    }
+
+    /**
+     * Add missing information
+     * @param result
+     * @param dobComponent
+     * @param date
+     * @param serverToday
+     * @param genericDataService
+     */
+    static addAgeFromDob(
+        result: any,
+        dobComponent: FormDatepickerComponent,
+        date: Moment,
+        serverToday: Moment,
+        genericDataService: GenericDataService
+    ) {
+        if (
+            (
+                !dobComponent ||
+                !dobComponent.invalid
+            ) &&
+            date &&
+            date.isValid()
+        ) {
+            // add age object if we don't have one
+            if (!result.age) {
+                result.age = new AgeModel();
+            }
+
+            // add data
+            if (serverToday) {
+                result.age.years = serverToday.diff(date, 'years');
+                result.age.months = result.age.years < 1 ? serverToday.diff(date, 'months') : 0;
+            } else {
+                genericDataService
+                    .getServerUTCToday()
+                    .subscribe((curDate) => {
+                        result.age.years = curDate.diff(date, 'years');
+                        result.age.months = result.age.years < 1 ? curDate.diff(date, 'months') : 0;
+                    });
+            }
+        } else {
+            result.age.months = 0;
+            result.age.years = 0;
+        }
     }
 }

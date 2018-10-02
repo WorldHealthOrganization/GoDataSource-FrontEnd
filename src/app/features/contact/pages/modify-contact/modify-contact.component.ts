@@ -19,6 +19,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Moment } from 'moment';
+import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
+import { AgeModel } from '../../../../core/models/age.model';
 
 @Component({
     selector: 'app-modify-contact',
@@ -95,6 +97,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             .getContact(selectedOutbreak.id, this.contactId)
                             .subscribe(contactDataReturned => {
                                 this.contactData = new ContactModel(contactDataReturned);
+                                this.ageSelected = !this.contactData.dob;
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
@@ -125,17 +128,25 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     }
 
     modifyContact(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
-        }
-
+        // validate form
         if (!this.formHelper.validateForm(form)) {
             return;
+        }
+
+        // retrieve dirty fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // add age information if necessary
+        if (dirtyFields.dob) {
+            AgeModel.addAgeFromDob(
+                dirtyFields,
+                null,
+                dirtyFields.dob,
+                this.serverToday,
+                this.genericDataService
+            );
+        } else if (dirtyFields.age) {
+            dirtyFields.dob = null;
         }
 
         // modify the contact
@@ -153,5 +164,30 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.disableDirtyConfirm();
                 this.router.navigate(['/contacts']);
             });
+    }
+
+    /**
+     * DOB changed handler
+     * @param dob
+     * @param date
+     */
+    dobChanged(
+        dob: FormDatepickerComponent,
+        date: Moment
+    ) {
+        AgeModel.addAgeFromDob(
+            this.contactData,
+            dob,
+            date,
+            this.serverToday,
+            this.genericDataService
+        );
+    }
+
+    /**
+     * Age changed
+     */
+    ageChanged() {
+        this.contactData.dob = null;
     }
 }

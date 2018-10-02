@@ -19,6 +19,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
+import { AgeModel } from '../../../../core/models/age.model';
 
 @Component({
     selector: 'app-create-case',
@@ -95,15 +97,20 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     }
 
     createNewCase(stepForms: NgForm[]) {
-
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-       // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age information if necessary
+        if (dirtyFields.dob) {
+            AgeModel.addAgeFromDob(
+                dirtyFields,
+                null,
+                dirtyFields.dob,
+                this.serverToday,
+                this.genericDataService
+            );
+        } else if (dirtyFields.age) {
+            dirtyFields.dob = null;
         }
 
         if (
@@ -128,4 +135,28 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         }
     }
 
+    /**
+     * DOB changed handler
+     * @param dob
+     * @param date
+     */
+    dobChanged(
+        dob: FormDatepickerComponent,
+        date: Moment
+    ) {
+        AgeModel.addAgeFromDob(
+            this.caseData,
+            dob,
+            date,
+            this.serverToday,
+            this.genericDataService
+        );
+    }
+
+    /**
+     * Age changed
+     */
+    ageChanged() {
+        this.caseData.dob = null;
+    }
 }
