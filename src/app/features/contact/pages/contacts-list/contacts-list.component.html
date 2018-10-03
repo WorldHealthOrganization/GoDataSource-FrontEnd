@@ -164,9 +164,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.age.months > 0 ?
-                    item.age.months + ' ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) :
-                    (item.age.years + ' ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate)) }}
+                <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
 

@@ -106,6 +106,7 @@
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
+                                fxFlex="25%"
                                 name="phoneNumber"
                                 [(ngModel)]="caseData.phoneNumber"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
@@ -114,6 +115,7 @@
                             </app-form-input>
 
                             <app-form-select
+                                fxFlex="25%"
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
@@ -121,8 +123,9 @@
                                 [disabled]="viewOnly">
                             </app-form-select>
 
-
-                            <div fxFlex fxLayout="row">
+                            <div
+                                fxFlex="25%" fxLayout="row"
+                                class="switch-buttons">
                                 <button
                                     fxFlex
                                     mat-raised-button
@@ -141,9 +144,10 @@
                                 </button>
                             </div>
 
-                            <div fxFlex>
+                            <div fxFlex="25%">
                                 <app-form-age
                                     *ngIf="ageSelected"
+                                    #age
                                     name="age"
                                     [(ngModel)]="caseData.age"
                                     [disabled]="viewOnly"

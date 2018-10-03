@@ -8,8 +8,13 @@ export class AgeModel {
     months: number;
 
     constructor(data = null) {
-        this.years = _.get(data, 'years', 0);
-        this.months = _.get(data, 'months', 0);
+        // years
+        this.years = _.get(data, 'years');
+        this.years = this.years < 1 ? undefined : this.years;
+
+        // months
+        this.months = _.get(data, 'months');
+        this.months = this.months < 1 ? undefined : this.months;
     }
 
     /**
@@ -44,17 +49,21 @@ export class AgeModel {
             if (serverToday) {
                 result.age.years = serverToday.diff(date, 'years');
                 result.age.months = result.age.years < 1 ? serverToday.diff(date, 'months') : 0;
+                result.age.years = result.age.years < 1 ? undefined : result.age.years;
+                result.age.months = result.age.months < 1 ? undefined : result.age.months;
             } else {
                 genericDataService
                     .getServerUTCToday()
                     .subscribe((curDate) => {
                         result.age.years = curDate.diff(date, 'years');
                         result.age.months = result.age.years < 1 ? curDate.diff(date, 'months') : 0;
+                        result.age.years = result.age.years < 1 ? undefined : result.age.years;
+                        result.age.months = result.age.months < 1 ? undefined : result.age.months;
                     });
             }
         } else {
-            result.age.months = 0;
-            result.age.years = 0;
+            result.age.months = undefined;
+            result.age.years = undefined;
         }
     }
 }

@@ -26,6 +26,7 @@ import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { SideColumnsComponent } from './side-columns/side-columns.component';
 import { FormAgeComponent } from './form-age/form-age.component';
+import { AgeLabelComponent } from './age-label/age-label.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -72,6 +73,7 @@ export const components: any[] = [
     ReferenceDataLabelComponent,
     LocationBreadcrumbsComponent,
     ChronologyComponent,
+    AgeLabelComponent,
 
     // dialogs
     DialogComponent,

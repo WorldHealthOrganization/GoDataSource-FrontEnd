@@ -51,6 +51,7 @@
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-input
+                                fxFlex="25%"
                                 name="phoneNumber"
                                 [(ngModel)]="contactData.phoneNumber"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER' | translate"
@@ -58,13 +59,16 @@
                             </app-form-input>
 
                             <app-form-select
+                                fxFlex="25%"
                                 name="occupation"
                                 [(ngModel)]="contactData.occupation"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                                 [options]="occupationsList$ | async">
                             </app-form-select>
 
-                            <div fxFlex fxLayout="row">
+                            <div
+                                fxFlex="25%" fxLayout="row"
+                                class="switch-buttons">
                                 <button
                                     fxFlex
                                     type="button"
@@ -83,9 +87,10 @@
                                 </button>
                             </div>
 
-                            <div fxFlex>
+                            <div fxFlex="25%">
                                 <app-form-age
                                     *ngIf="ageSelected"
+                                    #age
                                     name="age"
                                     [(ngModel)]="contactData.age"
                                     (changed)="ageChanged()">
@@ -108,6 +113,7 @@
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-datepicker
+                                fxFlex
                                 name="dateOfReporting"
                                 [(ngModel)]="contactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
@@ -118,6 +124,7 @@
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
+                                fxFlex
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="contactData.isDateOfReportingApproximate"
                                 [label]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">

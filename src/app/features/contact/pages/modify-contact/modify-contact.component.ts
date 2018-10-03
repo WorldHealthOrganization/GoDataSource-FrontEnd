@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
@@ -21,6 +21,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Moment } from 'moment';
 import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
 import { AgeModel } from '../../../../core/models/age.model';
+import { FormAgeComponent } from '../../../../shared/components/form-age/form-age.component';
 
 @Component({
     selector: 'app-modify-contact',
@@ -51,6 +52,11 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     EntityType = EntityType;
 
     serverToday: Moment = null;
+
+    @ViewChild('dob') dobComponent: FormDatepickerComponent;
+    dobDirty: boolean = false;
+    @ViewChild('age') ageComponent: FormAgeComponent;
+    ageDirty: boolean = false;
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
@@ -124,7 +130,39 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
      * Switch between Age and Date of birth
      */
     switchAgeDob(ageSelected: boolean = true) {
+        // save control dirty state since ngIf removes it...and we can't use fxShow / Hide since it doesn't reinitialize component & rebind values
+        if (this.ageSelected) {
+            this.ageDirty = this.ageComponent && this.ageComponent.control.dirty;
+        } else {
+            this.dobDirty = this.dobComponent && this.dobComponent.control.dirty;
+        }
+
+        // switch element that we want to see
         this.ageSelected = ageSelected;
+
+        // make sure we set dirtiness back
+        setTimeout(() => {
+            // make control dirty again
+            if (
+                this.ageSelected &&
+                this.ageDirty &&
+                this.ageComponent
+            ) {
+                // make sure we have control
+                setTimeout(() => {
+                    this.ageComponent.control.markAsDirty();
+                });
+            } else if (
+                !this.ageSelected &&
+                this.dobDirty &&
+                this.dobComponent
+            ) {
+                // make sure we have control
+                setTimeout(() => {
+                    this.dobComponent.control.markAsDirty();
+                });
+            }
+        });
     }
 
     modifyContact(form: NgForm) {

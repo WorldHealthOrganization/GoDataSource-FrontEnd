@@ -2,7 +2,7 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <form #groupForm="ngForm">
-        <div fxLayout="row" fxLayoutGap="20px" fxFlex="50">
+        <div fxLayout="row" fxLayoutGap="20px">
             <app-form-input
                 *ngIf="ageType === AgeTypes.YEARS"
                 [name]="name + '[years]'"
