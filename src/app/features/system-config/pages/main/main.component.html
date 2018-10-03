@@ -158,21 +158,23 @@
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
+                <ng-container
+                    *ngIf="hasSysConfigWriteAccess() && item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value">
 
-                <mat-menu #actionsMenu="matMenu">
-                    <ng-container
-                        *ngIf="hasSysConfigWriteAccess() && item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value">
-                        <button
-                            mat-menu-item
-                            class="mat-menu-item-delete"
-                            (click)="deleteBackup(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
-                    </ng-container>
-                </mat-menu>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
+                    </button>
+
+                    <mat-menu #actionsMenu="matMenu">
+                            <button
+                                mat-menu-item
+                                class="mat-menu-item-delete"
+                                (click)="deleteBackup(item)">
+                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            </button>
+                    </mat-menu>
+
+                </ng-container>
             </mat-cell>
         </ng-container>
 
