@@ -4,12 +4,69 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                #TODO
+                <ng-container
+                    *ngIf="hasSysConfigWriteAccess() && settings">
+                    <button
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        (click)="backupData()">
+                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON' | translate }}
+                    </button>
+                </ng-container>
             </div>
         </div>
     </ng-container>
 </app-topnav>
 
 <mat-card class="page-section page-content">
-    #TODO
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="backupsList$ | async" matSort (matSortChange)="sortBy($event)">
+        <!-- Location -->
+        <ng-container matColumnDef="location">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="locationFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('location', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.location }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    #TODO
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+    </mat-table>
 </mat-card>

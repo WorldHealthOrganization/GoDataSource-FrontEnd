@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { SystemSettingsBackupModule } from '../../enums/system-settings-backup-module.enum';
 
 @Injectable()
 export class GenericDataService {
@@ -94,6 +95,20 @@ export class GenericDataService {
      */
     getTransmissionChainViewTypes(): Observable<any[]> {
         return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_VIEW_TYPES));
+    }
+
+    /**
+     * Retrieve module list
+     */
+    getBackupModuleList(): Observable<LabelValuePair[]> {
+        // determine module list
+        const modulesList: LabelValuePair[] = [];
+        _.each(SystemSettingsBackupModule, (value: string) => {
+            modulesList.push(new LabelValuePair(value, value));
+        });
+
+        // finished
+        return Observable.of(modulesList);
     }
 }
 

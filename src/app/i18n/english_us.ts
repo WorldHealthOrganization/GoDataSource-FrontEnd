@@ -993,9 +993,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1': 'Answer 1',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2': 'Answer 2',
 
-
-
-
         /**
          * Forgot Password Page
          */
@@ -1116,9 +1113,23 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
 
         /**
+         * Backup Fields
+         */
+        'LNG_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_BACKUP_FIELD_LABEL_DATE': 'Date',
+        'LNG_BACKUP_FIELD_LABEL_STATUS': 'Status',
+        'LNG_BACKUP_FIELD_LABEL_ERROR': 'Error',
+
+        /**
          * System Config Main page
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON': 'Backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_MODULES': 'Modules',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE': 'Backup initialized',
 
         /**
          * Chains of Transmission
