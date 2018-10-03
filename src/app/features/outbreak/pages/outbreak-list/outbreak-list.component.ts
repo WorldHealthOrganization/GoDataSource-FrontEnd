@@ -7,7 +7,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
@@ -22,6 +22,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -51,6 +52,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
     exportOutbreaksUrl: string = 'outbreaks/export';
     outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
@@ -120,8 +122,54 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             ' - ' +
             this.outbreaksDataExporFileName;
 
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
         // refresh
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'disease',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+            }),
+            new VisibleColumnModel({
+                field: 'country',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
+            }),
+            new VisibleColumnModel({
+                field: 'startDate',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'endDate',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'active',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
@@ -229,23 +277,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'checkbox',
-            'name',
-            'disease',
-            'country',
-            'startDate',
-            'endDate',
-            'active',
-            'actions'
-        ];
     }
 
     /**

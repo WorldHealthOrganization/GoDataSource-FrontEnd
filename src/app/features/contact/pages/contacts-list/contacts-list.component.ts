@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@an
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -34,6 +34,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -69,6 +70,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -137,7 +139,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -194,6 +195,66 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'lastName',
+                label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'age',
+                label: 'LNG_CONTACT_FIELD_LABEL_AGE'
+            }),
+            new VisibleColumnModel({
+                field: 'gender',
+                label: 'LNG_CONTACT_FIELD_LABEL_GENDER'
+            }),
+            new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_CONTACT_FIELD_LABEL_PHONE'
+            }),
+            new VisibleColumnModel({
+                field: 'riskLevel',
+                label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // case condition
         const caseCondition = new RequestQueryBuilder();
@@ -363,24 +424,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'checkbox',
-            'firstName',
-            'lastName',
-            'age',
-            'gender',
-            'phoneNumber',
-            'riskLevel',
-            'actions',
-            'deleted'
-        ];
-    }
-
-    /**
      * Retrieve risk color accordingly to risk level
      * @param item
      */
@@ -435,6 +478,26 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    convertContactToCase(contactModel: ContactModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
+            .subscribe((answer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.contactDataService
+                        .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

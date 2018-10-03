@@ -34,6 +34,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -270,8 +277,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
 </mat-card>
 

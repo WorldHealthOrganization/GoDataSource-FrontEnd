@@ -89,6 +89,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: {{name}}?',
+        'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE': 'Are you sure you want to convert contact: {{name}} to case?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
@@ -641,11 +642,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP': 'Add Follow-up',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE': 'Contact converted to case!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
         'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE': 'Convert to case',
         'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Contact restored!',
 
         /**
