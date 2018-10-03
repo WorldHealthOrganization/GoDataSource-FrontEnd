@@ -17,6 +17,8 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { UserSettings } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -47,6 +49,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -99,6 +102,63 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).share();
 
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'sampleIdentifier',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'dateSampleTaken',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+            }),
+            new VisibleColumnModel({
+                field: 'dateSampleDelivered',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfResult',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'labName',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'sampleType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'testType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'result',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
@@ -198,26 +258,6 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             countQueryBuilder.paginator.clear();
             this.labResultsListCount$ = this.labResultDataService.getCaseLabResultsCount(this.selectedOutbreak.id, this.caseId, countQueryBuilder);
         }
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'sampleIdentifier',
-            'dateSampleTaken',
-            'dateSampleDelivered',
-            'dateOfResult',
-            'labName',
-            'sampleType',
-            'testType',
-            'result',
-
-            // since we have writeCase permission because of module.routing we don't need to check anything else
-            'actions'
-        ];
     }
 
     deleteLabResult(labResult: LabResultModel) {

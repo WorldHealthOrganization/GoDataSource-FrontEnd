@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs/Observable';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Constants } from '../../../../core/models/constants';
@@ -28,6 +28,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-follow-ups-list',
@@ -42,6 +43,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     // import constants into template
     Constants = Constants;
+    UserSettings = UserSettings;
 
     // authenticated user
     authUser: UserModel;
@@ -117,8 +119,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // add missed / upcoming breadcrumb
         this.breadcrumbs.push(
@@ -152,6 +152,67 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'contact.firstName',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'contact.lastName',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'date',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'area',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA'
+            }),
+            new VisibleColumnModel({
+                field: 'fullAddress',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+            }),
+            new VisibleColumnModel({
+                field: 'lostToFollowUp',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
+        const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // set available side filters
         this.availableSideFilters = [
@@ -343,28 +404,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
      */
     hasFollowUpsWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // default visible columns
-        const columns = [
-            'checkbox',
-            'firstName',
-            'lastName',
-            'date',
-            'area',
-            'fullAddress',
-            'lostToFollowUp',
-            'deleted',
-            'actions'
-        ];
-
-        // finished
-        return columns;
     }
 
     /**

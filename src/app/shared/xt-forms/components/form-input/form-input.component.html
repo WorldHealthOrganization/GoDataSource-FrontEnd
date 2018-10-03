@@ -24,7 +24,7 @@
             (blur)="onBlur()"
             (input)="onChange()"/>
 
-        <span [fxShow]="tooltip !== null" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
+        <span [fxShow]="tooltip !== null" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
 
     </mat-form-field>
 
