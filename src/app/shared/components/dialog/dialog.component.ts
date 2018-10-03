@@ -28,6 +28,8 @@ export class DialogField {
     public required: boolean = false;
     public type: string = 'text';
     public requiredOneOfTwo: string;
+    public value: any;
+    public disabled: boolean = false;
 
     constructor(data: {
         name: string,
@@ -36,7 +38,9 @@ export class DialogField {
         inputOptionsMultiple?: boolean,
         required?: boolean,
         type?: string,
-        requiredOneOfTwo?: string
+        requiredOneOfTwo?: string,
+        value?: any,
+        disabled?: boolean
     }) {
         Object.assign(
             this,
@@ -138,7 +142,19 @@ export class DialogComponent {
 
         // if we've assigned field lists then we need an object to keep properties
         if (!_.isEmpty(this.confirmData.fieldsList)) {
+            // value needs to be an object to accommodate all fields
             this.dialogAnswerInputValue.value = {};
+
+            // put default values
+            _.each(this.confirmData.fieldsList, (field: DialogField) => {
+                // any other value is allowed, this is why we don't use _.isEmpty
+                if (
+                    field.value !== null &&
+                    field.value !== undefined
+                ) {
+                    this.dialogAnswerInputValue.value[field.name] = field.value;
+                }
+            });
         }
     }
 
