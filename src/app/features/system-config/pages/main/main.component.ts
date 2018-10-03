@@ -14,6 +14,9 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Observable } from 'rxjs/Observable';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
+import * as _ from 'lodash';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-system-config-main',
@@ -39,7 +42,12 @@ export class MainComponent extends ListComponent implements OnInit {
     backupsList$: Observable<BackupModel[]>;
 
     // module list
+    backupModulesList$: Observable<any[]>;
     moduleList: LabelValuePair[];
+    backupStatusList$: Observable<any[]>;
+
+    // constants
+    Constants = Constants;
 
     /**
      * Constructor
@@ -48,6 +56,7 @@ export class MainComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private dialogService: DialogService,
         private systemSettingsDataService: SystemSettingsDataService,
+        private systemBackupDataService: SystemBackupDataService,
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService
     ) {
@@ -70,11 +79,14 @@ export class MainComponent extends ListComponent implements OnInit {
                 this.settings = settings;
             });
 
-        this.genericDataService
-            .getBackupModuleList()
-            .subscribe((moduleList) => {
-                this.moduleList = moduleList;
-            });
+        // module list
+        this.backupModulesList$ = this.genericDataService.getBackupModuleList().share();
+        this.backupModulesList$.subscribe((moduleList) => {
+            this.moduleList = moduleList;
+        });
+
+        // backup status list
+        this.backupStatusList$ = this.genericDataService.getBackupStatusList();
 
         // retrieve backups
         this.needsRefreshList();
@@ -92,7 +104,7 @@ export class MainComponent extends ListComponent implements OnInit {
      * Refresh list
      */
     refreshList() {
-        this.backupsList$ = this.systemSettingsDataService.getBackupList();
+        this.backupsList$ = this.systemBackupDataService.getBackupList();
     }
 
     /**
@@ -102,12 +114,22 @@ export class MainComponent extends ListComponent implements OnInit {
     getTableColumns(): string[] {
         return [
             'location',
-            // 'modules',
-            // 'data',
-            // 'status',
-            // 'error',
-            // 'actions'
+            'modules',
+            'date',
+            'status',
+            'error',
+            'actions'
         ];
+    }
+
+    /**
+     * Get translation token from language
+     */
+    getModuleTranslation(module: string) {
+        const moduleItem: LabelValuePair = _.find(this.moduleList, { value: module });
+        return moduleItem ?
+            moduleItem.label :
+            '';
     }
 
     /**
@@ -119,9 +141,18 @@ export class MainComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON',
             fieldsList: [
+                // module list
+                new DialogField({
+                    name: 'location',
+                    placeholder: 'LNG_BACKUP_FIELD_LABEL_LOCATION',
+                    required: true,
+                    value: this.settings.dataBackup.location
+                }),
+
+                // module list
                 new DialogField({
                     name: 'modules',
-                    placeholder: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_MODULES',
+                    placeholder: 'LNG_BACKUP_FIELD_LABEL_MODULES',
                     inputOptions: this.moduleList,
                     inputOptionsMultiple: true,
                     required: true,
@@ -130,7 +161,7 @@ export class MainComponent extends ListComponent implements OnInit {
             ]
         })).subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
-                this.systemSettingsDataService
+                this.systemBackupDataService
                     .createBackup(answer.inputValue.value)
                     .catch((err) => {
                         this.snackbarService.showError(err.message);
@@ -145,5 +176,29 @@ export class MainComponent extends ListComponent implements OnInit {
                     });
             }
         });
+    }
+
+    /**
+     * Delete
+     */
+    deleteBackup(item: BackupModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_BACKUP', item)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.systemBackupDataService
+                        .deleteBackup(item.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // refresh page
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
     }
 }

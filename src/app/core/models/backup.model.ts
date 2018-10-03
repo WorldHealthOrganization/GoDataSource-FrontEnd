@@ -1,10 +1,9 @@
 import * as _ from 'lodash';
-import { SystemSettingsBackupModule } from '../enums/system-settings-backup-module.enum';
 
 export class BackupModel {
     id: string;
     location: string;
-    modules: SystemSettingsBackupModule[];
+    modules: string[];
     date: string;
     status: string;
     error: string;

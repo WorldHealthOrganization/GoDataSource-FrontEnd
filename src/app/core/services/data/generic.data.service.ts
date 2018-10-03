@@ -4,10 +4,8 @@ import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
-import { LabelValuePair } from '../../models/label-value-pair';
 import { Moment } from 'moment';
 import * as moment from 'moment';
-import { SystemSettingsBackupModule } from '../../enums/system-settings-backup-module.enum';
 
 @Injectable()
 export class GenericDataService {
@@ -98,17 +96,17 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve module list
+     * Retrieve backup module list
      */
-    getBackupModuleList(): Observable<LabelValuePair[]> {
-        // determine module list
-        const modulesList: LabelValuePair[] = [];
-        _.each(SystemSettingsBackupModule, (value: string) => {
-            modulesList.push(new LabelValuePair(value, value));
-        });
+    getBackupModuleList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_MODULES));
+    }
 
-        // finished
-        return Observable.of(modulesList);
+    /**
+     * Retrieve backup status list
+     */
+    getBackupStatusList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_STATUS));
     }
 }
 
