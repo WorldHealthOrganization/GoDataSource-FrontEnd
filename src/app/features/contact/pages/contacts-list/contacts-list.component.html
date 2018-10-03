@@ -319,6 +319,11 @@
                                 (click)="restoreContact(item)">
                             {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
+
+                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                                (click)="convertContactToCase(item)">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
             </mat-cell>
