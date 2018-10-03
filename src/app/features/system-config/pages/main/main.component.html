@@ -35,7 +35,7 @@
         <ng-container matColumnDef="location">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="locationFilter"
