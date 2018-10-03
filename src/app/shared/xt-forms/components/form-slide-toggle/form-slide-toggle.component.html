@@ -10,7 +10,7 @@
             [labelPosition]="labelBefore ? 'before' : 'after'"
             [disabled]="disabled"
             (click)="onClick()" (change)="onChange()"
-            [matTooltip]="tooltip">
+            [matTooltip]="tooltip | translate">
             {{label}}
         </mat-slide-toggle>
 

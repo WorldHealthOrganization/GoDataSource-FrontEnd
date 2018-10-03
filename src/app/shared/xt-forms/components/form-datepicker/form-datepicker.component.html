@@ -2,7 +2,7 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
-    [matTooltip]="tooltip">
+    [matTooltip]="tooltip | translate">
         <input
             matInput
             [(ngModel)]="value"

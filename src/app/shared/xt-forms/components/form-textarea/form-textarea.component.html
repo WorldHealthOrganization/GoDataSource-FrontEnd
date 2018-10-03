@@ -6,7 +6,7 @@
                   matTextareaAutosize [matAutosizeMinRows]="minRows" [matAutosizeMaxRows]="maxRows"
                   [required]="required" [disabled]="disabled" [readonly]="readonly"
                   (blur)="onBlur()" (change)="onChange()"
-                  [matTooltip]="tooltip">
+                  [matTooltip]="tooltip | translate">
         </textarea>
     </mat-form-field>
 

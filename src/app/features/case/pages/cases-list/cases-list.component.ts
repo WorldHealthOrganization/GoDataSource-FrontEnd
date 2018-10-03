@@ -25,6 +25,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
@@ -50,6 +51,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
 
     // available side filters
@@ -115,7 +117,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService,
@@ -136,6 +139,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
@@ -173,6 +177,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'firstName',
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
@@ -195,6 +204,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CASE_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -319,23 +332,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        return [
-            'checkbox',
-            'firstName',
-            'lastName',
-            'classification',
-            'age',
-            'gender',
-            'dateOfOnset',
-            'actions'
-        ];
-    }
-
-    /**
      * Delete specific case from the selected outbreak
      * @param {CaseModel} caseModel
      */
@@ -354,6 +350,30 @@ export class CasesListComponent extends ListComponent implements OnInit {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore a case that was deleted
+     * @param {CaseModel} caseModel
+     */
+    restoreCase(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService
+                        .restoreCase(this.selectedOutbreak.id, caseModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });
