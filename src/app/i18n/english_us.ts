@@ -80,6 +80,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
         'LNG_COMMON_BUTTON_CHANGE': 'Change',
+        'LNG_COMMON_BUTTON_CLONE': 'Clone',
 
         /**
          * Dialogs
@@ -123,6 +124,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP': 'Are you sure you want to remove this item?',
         'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
         'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
+        'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK': 'Name the clone of the outbreak',
+
+        /**
+         * Dialogs fields placeholders
+         */
+        'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME' : 'Cloned outbreak name',
 
         /**
          * Login page
@@ -1042,6 +1049,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak successfully cloned',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS': 'Export the selected outbreaks',

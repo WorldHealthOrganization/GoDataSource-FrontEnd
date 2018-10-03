@@ -317,31 +317,43 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     /**
      * Clone an existing outbreak
-     * @param {OutbreakModel}outbreak
+     * @param {OutbreakModel} outbreak
      */
-    clone(outbreakModel: OutbreakModel) {
+    cloneOutbreak(outbreakModel: OutbreakModel) {
+        // get the outbreak to clone
         this.outbreakDataService.getOutbreak(outbreakModel.id)
             .subscribe((outbreak: OutbreakModel) => {
-                console.log(outbreak);
+                // create the clone of the parent outbreak
                 const clonedOutbreak: OutbreakModel = outbreak;
                 this.dialogService.showInput(
                     new DialogConfiguration({
-                        message: 'Name the clone of the outbreak',
-                        yesLabel: 'Clone',
+                        message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
+                        yesLabel: 'LNG_COMMON_BUTTON_CLONE',
                         required: true,
                         fieldsList: [new DialogField({
                             name: 'clonedOutbreakName',
-                            placeholder: 'cloned',
+                            placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                             required: true,
-                            type: 'text'
-                        })]
+                            type: 'text',
+                            value: outbreak.name + ' Clone'
+                        })],
                     }), true)
                     .subscribe((answer) => {
-                        console.log(answer);
                         if (answer.button === DialogAnswerButton.Yes) {
+                            // delete the id from the parent outbreak
                             delete clonedOutbreak.id;
+                            // set the name for the cloned outbreak
                             clonedOutbreak.name = answer.inputValue.value.clonedOutbreakName;
-                            console.log(clonedOutbreak);
+                            this.outbreakDataService.createOutbreak(clonedOutbreak)
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+                                    // refresh the listing page
+                                    this.needsRefreshList(true);
+                            });
                         }
                     });
             });
