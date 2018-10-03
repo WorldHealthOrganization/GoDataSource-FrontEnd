@@ -284,6 +284,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     }
 
+    /**
+     * decide if the link to cases without dates will be displayed
+     * @returns {boolean}
+     */
     showCaseNodesWithoutDates() {
        return (
            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
@@ -292,6 +296,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
        );
     }
 
+    /**
+     * decide if the link to contacts without dates will be displayed
+     * @returns {boolean}
+     */
     showContactNodesWithoutDates() {
         return (
             this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
@@ -299,6 +307,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             && this.elements.contactNodesWithoutDates.length
         );
     }
+
+    /**
+     * decide if the link to events without dates will be displayed
+     * @returns {boolean}
+     */
     showEventNodesWithoutDates() {
         return (
             this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
