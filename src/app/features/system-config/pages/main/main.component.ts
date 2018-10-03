@@ -104,7 +104,7 @@ export class MainComponent extends ListComponent implements OnInit {
      * Refresh list
      */
     refreshList() {
-        this.backupsList$ = this.systemBackupDataService.getBackupList();
+        this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder);
     }
 
     /**

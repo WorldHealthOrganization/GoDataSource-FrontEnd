@@ -41,7 +41,7 @@
                             name="locationFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('location', $event)"
+                            (optionChanged)="filterByTextContainingField('location', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -140,7 +140,7 @@
                             name="errorFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('error', $event)"
+                            (optionChanged)="filterByTextContainingField('error', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
