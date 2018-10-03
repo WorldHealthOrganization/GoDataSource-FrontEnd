@@ -72,6 +72,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_OUTBREAK]
                 }
             },
+            // Outbreak Templates Module routes
+                {
+                    path: ModulePath.OutbreakTemplatesModule,
+                    loadChildren: './features/outbreak-templates/outbreak-templates.module#OutbreakTemplatesModule',
+                    canActivate: [
+                        AuthGuard,
+                        PasswordChangeGuard
+                    ],
+                    data: {
+                        permissions: [PERMISSION.READ_OUTBREAK]
+                    }
+                },
             // Contacts Module routes
             {
                 path: ModulePath.ContactModule,
