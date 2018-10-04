@@ -9,7 +9,7 @@ export class BackupModel {
     error: string;
 
     constructor(data = null) {
-        this.id = _.get(data, 'id');
+        this.id = _.get(data, 'id', _.get(data, 'backupId'));
         this.location = _.get(data, 'location');
         this.modules = _.get(data, 'modules', []);
         this.date = _.get(data, 'date');

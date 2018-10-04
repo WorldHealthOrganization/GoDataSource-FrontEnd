@@ -44,5 +44,25 @@ export class SystemBackupDataService {
     deleteBackup(backupId: string): Observable<any> {
         return this.http.delete(`backups/${backupId}`);
     }
+
+    /**
+     * Retrieve a backup
+     * @param {string} backupId
+     * @returns {Observable<BackupModel>}
+     */
+    getBackup(backupId: string): Observable<BackupModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`backups/${backupId}`),
+            BackupModel
+        );
+    }
+
+    /**
+     * Restore backup
+     * @param backupId
+     */
+    restoreBackup(backupId: string): Observable<any> {
+        return this.http.post(`backups/${backupId}/restore`, {});
+    }
 }
 

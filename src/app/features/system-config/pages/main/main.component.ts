@@ -3,7 +3,7 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -17,6 +17,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'app-system-config-main',
@@ -45,6 +46,10 @@ export class MainComponent extends ListComponent implements OnInit {
     backupModulesList$: Observable<any[]>;
     moduleList: LabelValuePair[];
     backupStatusList$: Observable<any[]>;
+
+    // used to determine when a backup has finished so we can start the restore process...
+    waitForBackupIdToBeReady: string;
+    loading: boolean = false;
 
     // constants
     Constants = Constants;
@@ -133,11 +138,10 @@ export class MainComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Backup data
+     * Init backup dialog
      */
-    backupData() {
-        // display dialog
-        this.dialogService.showInput(new DialogConfiguration({
+    initBackupDialog(): Observable<DialogAnswer> {
+        return this.dialogService.showInput(new DialogConfiguration({
             message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON',
             fieldsList: [
@@ -159,7 +163,15 @@ export class MainComponent extends ListComponent implements OnInit {
                     value: this.settings.dataBackup.modules
                 })
             ]
-        })).subscribe((answer: DialogAnswer) => {
+        }));
+    }
+
+    /**
+     * Backup data
+     */
+    backupData() {
+        // display dialog
+        this.initBackupDialog().subscribe((answer: DialogAnswer) => {
             if (answer.button === DialogAnswerButton.Yes) {
                 this.systemBackupDataService
                     .createBackup(answer.inputValue.value)
@@ -200,5 +212,124 @@ export class MainComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Restore system data to a previous state from a data backup
+     */
+    restoreBackup(backupItemData: BackupModel) {
+        // restore backup handler
+        const restoreBackupNow = () => {
+            this.loading = true;
+            this.waitForBackupIdToBeReady = undefined;
+            this.systemBackupDataService
+                .restoreBackup(backupItemData.id)
+                .catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    // display success message
+                    this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE');
+
+                    // refresh page
+                    this.loading = false;
+                    this.needsRefreshList(true);
+                });
+        };
+
+        // start restore process when backup is ready
+        const backupCheckForReady = () => {
+            setTimeout(
+                () => {
+                    // check if backup is ready
+                    this.systemBackupDataService
+                        .getBackup(this.waitForBackupIdToBeReady)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            // can't continue with the restore
+                            this.waitForBackupIdToBeReady = undefined;
+                            this.needsRefreshList(true);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe((newBackup: BackupModel) => {
+                            switch (newBackup.status) {
+                                // backup ready ?
+                                case Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value:
+                                    // start restore process
+                                    restoreBackupNow();
+                                    break;
+
+                                // backup error ?
+                                case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
+                                    this.snackbarService.showError('LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
+                                    this.waitForBackupIdToBeReady = undefined;
+                                    this.needsRefreshList(true);
+                                    break;
+
+                                // backup isn't ready ?
+                                // Constants.SYSTEM_BACKUP_STATUS.PENDING.value
+                                default:
+                                    backupCheckForReady();
+                                    break;
+                            }
+                        });
+                },
+                300
+            );
+        };
+
+        // display dialog
+        this.dialogService.showConfirm(new DialogConfiguration({
+            message: 'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE',
+            yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON',
+            yesCssClass: 'primary dialog-btn-margin-right-10px',
+            cancelCssClass: 'danger dialog-btn-margin-right-10px',
+            addDefaultButtons: true,
+            buttons: [
+                new DialogButton({
+                    cssClass: 'success',
+                    label: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON',
+                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                    }
+                })
+            ]
+        })).subscribe((answer: DialogAnswer) => {
+            // Backup & Restore
+            if (answer.button === DialogAnswerButton.Yes) {
+                // display dialog
+                this.initBackupDialog().subscribe((answerBackup: DialogAnswer) => {
+                    if (answerBackup.button === DialogAnswerButton.Yes) {
+                        this.systemBackupDataService
+                            .createBackup(answerBackup.inputValue.value)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((newBackup: BackupModel) => {
+                                // display success message
+                                this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+
+                                // refresh page
+                                this.needsRefreshList(true);
+
+                                // restore data
+                                // should we wait for backup to be completed before proceeding ?
+                                this.waitForBackupIdToBeReady = newBackup.id;
+                                backupCheckForReady();
+                            });
+                    } else {
+                        // cancel - display again the previous dialog
+                        this.restoreBackup(backupItemData);
+                    }
+                });
+            } else if (answer.button === DialogAnswerButton.Extra_1) {
+                // restore
+                restoreBackupNow();
+            }
+        });
     }
 }
