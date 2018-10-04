@@ -256,6 +256,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
+        'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
 
         /**
          * Outbreak date inconsistencies list page

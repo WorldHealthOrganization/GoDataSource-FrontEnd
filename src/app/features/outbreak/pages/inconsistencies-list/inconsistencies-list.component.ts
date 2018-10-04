@@ -129,7 +129,66 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     getTableColumns(): string[] {
         return [
             'firstName',
-            'lastName'
+            'lastName',
+            'inconsistencies',
+            'actions'
         ];
+    }
+
+    /**
+     * Get the link to redirect to view page depending on item type and action
+     * @param {Object} item
+     * @param {string} action
+     * @returns {string}
+     */
+    getItemRouterLink (item, action: string) {
+        switch (item.type) {
+            case EntityType.CASE:
+                return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.CONTACT:
+                return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+            case EntityType.EVENT:
+                return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+        }
+    }
+
+    /**
+     * Get the permission for different type of item
+     * @param {Object} item
+     * @returns {boolean}
+     */
+    getAccessPermissions(item) {
+        switch (item.type) {
+            case EntityType.CASE:
+                return this.hasCaseWriteAccess();
+            case EntityType.CONTACT:
+                return this.hasContactWriteAccess();
+            case EntityType.EVENT:
+                return this.hasEventWriteAccess();
+        }
+    }
+
+    /**
+     * Check if we have access to write cluster's cases
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    /**
+     * Check if we have access to write cluster's contacts
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
+     * Check if we have access to write cluster's event
+     * @returns {boolean}
+     */
+    hasEventWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
     }
 }
