@@ -24,5 +24,12 @@ export class SystemSettingsDataService {
             SystemSettingsModel
         );
     }
+
+    /**
+     * Modify system settings
+     */
+    modifySystemSettings(systemSettingsData: any): Observable<any> {
+        return this.http.put('system-settings', systemSettingsData);
+    }
 }
 

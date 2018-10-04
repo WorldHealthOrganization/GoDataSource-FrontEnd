@@ -6,6 +6,17 @@
             <div class="topnav-actions">
                 <ng-container
                     *ngIf="hasSysConfigWriteAccess() && settings && !waitForBackupIdToBeReady && !loading">
+
+                    <!-- Modify settings -->
+                    <button
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        (click)="configureAutomaticBackupSettings()">
+                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
+                    </button>
+
+                    <!-- Create backup -->
                     <button
                         class="button-primary"
                         mat-raised-button

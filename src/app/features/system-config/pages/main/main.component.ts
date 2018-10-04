@@ -78,11 +78,7 @@ export class MainComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // default backup settings
-        this.systemSettingsDataService
-            .getSystemSettings()
-            .subscribe((settings: SystemSettingsModel) => {
-                this.settings = settings;
-            });
+        this.refreshSystemSettings();
 
         // module list
         this.backupModulesList$ = this.genericDataService.getBackupModuleList().share();
@@ -95,6 +91,18 @@ export class MainComponent extends ListComponent implements OnInit {
 
         // retrieve backups
         this.needsRefreshList();
+    }
+
+    /**
+     * Reload system settings
+     */
+    refreshSystemSettings() {
+        this.settings = undefined;
+        this.systemSettingsDataService
+            .getSystemSettings()
+            .subscribe((settings: SystemSettingsModel) => {
+                this.settings = settings;
+            });
     }
 
     /**
@@ -145,7 +153,7 @@ export class MainComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE',
             yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON',
             fieldsList: [
-                // module list
+                // location
                 new DialogField({
                     name: 'location',
                     placeholder: 'LNG_BACKUP_FIELD_LABEL_LOCATION',
@@ -329,6 +337,71 @@ export class MainComponent extends ListComponent implements OnInit {
             } else if (answer.button === DialogAnswerButton.Extra_1) {
                 // restore
                 restoreBackupNow();
+            }
+        });
+    }
+
+    /**
+     * Configure automatic backup settings
+     */
+    configureAutomaticBackupSettings() {
+        return this.dialogService.showInput(new DialogConfiguration({
+            message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
+            yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
+            fieldsList: [
+                // location
+                new DialogField({
+                    name: 'location',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION',
+                    required: true,
+                    value: this.settings.dataBackup.location
+                }),
+
+                // backup interval
+                new DialogField({
+                    name: 'backupInterval',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL',
+                    required: true,
+                    value: this.settings.dataBackup.backupInterval,
+                    type: 'number'
+                }),
+
+                // data retention interval
+                new DialogField({
+                    name: 'dataRetentionInterval',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL',
+                    required: true,
+                    value: this.settings.dataBackup.dataRetentionInterval,
+                    type: 'number'
+                }),
+
+                // module list
+                new DialogField({
+                    name: 'modules',
+                    placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES',
+                    inputOptions: this.moduleList,
+                    inputOptionsMultiple: true,
+                    required: true,
+                    value: this.settings.dataBackup.modules
+                })
+            ]
+        })).subscribe((answer: DialogAnswer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                this.systemSettingsDataService
+                    .modifySystemSettings({
+                        dataBackup: answer.inputValue.value
+                    })
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe(() => {
+                        // display success message
+                        this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+
+                        // refresh settings
+                        this.refreshSystemSettings();
+                    });
             }
         });
     }
