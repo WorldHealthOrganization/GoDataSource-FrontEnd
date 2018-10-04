@@ -78,7 +78,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.selectedOutbreak.id);
+            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
