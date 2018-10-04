@@ -20,7 +20,7 @@ export class SystemBackupDataService {
      */
     createBackup(backupSettings: any = null): Observable<BackupModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.post('backups/create-backup', backupSettings),
+            this.http.post('backups', backupSettings),
             BackupModel
         );
     }
