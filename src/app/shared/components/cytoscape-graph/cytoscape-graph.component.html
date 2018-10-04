@@ -70,6 +70,22 @@
             </div>
         </div>
 
+        <!-- node icon -->
+        <div *ngIf="objectKeys(legend.nodeIcon).length"
+             class="legend-name">
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
+        </div>
+        <div
+            *ngFor="let nodeIconItem of objectKeys(legend.nodeIcon)" class="legend-item">
+            <div
+                class="legend-icon"
+                [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
+            </div>
+            <div>
+                {{nodeIconItem | translate}}
+            </div>
+        </div>
 
     </div>
 

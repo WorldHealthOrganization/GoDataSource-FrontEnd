@@ -18,6 +18,8 @@ export class GraphNodeModel {
 
     label: string;
 
+    picture: string;
+
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -28,6 +30,7 @@ export class GraphNodeModel {
         this.nodeColor = _.get(data, 'nodeColor', Constants.DEFAULT_COLOR_CHAINS);
         this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
 
+        this.picture = _.get(data, 'picture', 'none');
 
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
