@@ -12,6 +12,11 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { Subject } from 'rxjs/Subject';
 import { SnackbarService } from '../helper/snackbar.service';
+import { EntityModel } from '../../models/entity.model';
+import { CaseModel } from '../../models/case.model';
+import { ContactModel } from '../../models/contact.model';
+import { EventModel } from '../../models/event.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class OutbreakDataService {
@@ -231,6 +236,21 @@ export class OutbreakDataService {
             });
     }
 
-
+    /**
+     * Get people inconsistencies
+     * @param outbreakId
+     */
+    getPeopleInconsistencies(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<(CaseModel | ContactModel | EventModel)[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/people/inconsistencies-in-key-dates?filter=${filter}`)
+            .map((peopleList) => {
+                return _.map(peopleList, (entity) => {
+                    return new EntityModel(entity).model;
+                });
+            });
+    }
 }
 

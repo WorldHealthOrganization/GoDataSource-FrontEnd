@@ -258,6 +258,11 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
 
         /**
+         * Outbreak date inconsistencies list page
+         */
+        'LNG_PAGE_LIST_INCONSISTENCIES_TITLE': 'Inconsistencies in key dates',
+
+        /**
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',
@@ -1040,6 +1045,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES': 'View Inconsistencies',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
