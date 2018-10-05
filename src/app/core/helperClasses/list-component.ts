@@ -17,19 +17,26 @@ import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';
 import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
+import { SnackbarService } from '../services/helper/snackbar.service';
 import {
     ContactFollowedUp,
     MetricContactsWithSuccessfulFollowUp
 } from '../models/metrics/metric.contacts-with-success-follow-up.model';
+import { VisibleColumnModel } from '../../shared/components/side-columns/model';
 
 export abstract class ListComponent {
+    /**
+     * Breadcrumbs
+     */
+    public breadcrumbs: BreadcrumbItemModel[];
+
     /**
      * Determine all children that we need to reset when side filters are being applied
      */
     @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
 
     /**
-     * Retrieve Mat Table
+     * Retrieve Mat Table sort handler
      */
     @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
 
@@ -48,7 +55,15 @@ export abstract class ListComponent {
      */
     @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent >;
 
-    public breadcrumbs: BreadcrumbItemModel[];
+    /**
+     * List table columns
+     */
+    tableColumns: VisibleColumnModel[] = [];
+
+    /**
+     * List table visible columns
+     */
+    visibleTableColumns: string[] = [];
 
     /**
      * Query builder
@@ -110,10 +125,6 @@ export abstract class ListComponent {
 
     // refresh only after we finish changing data
     private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
-        // reset checked items
-        this.checkboxModels.checkAll = false;
-        this.checkboxModels.individualCheck = {};
-
         // refresh list
         this.refreshList();
     }));
@@ -125,6 +136,7 @@ export abstract class ListComponent {
     }));
 
     protected constructor(
+        protected snackbarService: SnackbarService,
         protected listFilterDataService: ListFilterDataService = null,
         protected queryParams: Observable<Params> = null
     ) {
@@ -151,6 +163,9 @@ export abstract class ListComponent {
      * Tell list that we need to refresh list
      */
     public needsRefreshList(instant: boolean = false, resetPagination: boolean = true) {
+        // reset checked items
+        this.checkboxModels.checkAll = false;
+        this.checkboxModels.individualCheck = {};
 
         // do we need to reset pagination (aka go to the first page) ?
         if (
@@ -811,5 +826,36 @@ export abstract class ListComponent {
             }
         );
         return ids;
+    }
+
+    /**
+     * Check that we have at least one record selected
+     * @returns {false|string[]} False if not valid, list of ids otherwise
+     */
+    validateCheckedRecords() {
+        // get list of ids
+        const selectedRecords: string[] = this.checkedRecords;
+
+        // validate
+        if (selectedRecords.length < 1) {
+            // display message
+            if (this.snackbarService) {
+                this.snackbarService.showError('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
+            }
+
+            // not valid
+            return false;
+        }
+
+        // valid, send list of IDs back
+        return selectedRecords;
+    }
+
+    /**
+     * Visible columns
+     * @param visibleColumns
+     */
+    applySideColumnsChanged(visibleColumns: string[]) {
+        this.visibleTableColumns = visibleColumns;
     }
 }

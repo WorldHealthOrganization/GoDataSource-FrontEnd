@@ -77,17 +77,19 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.entityTypesList$ = this.genericDataService.getEntityTypesAsLabelValue();
+        this.entityTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_TYPE).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
 
         // side filters
@@ -297,9 +299,9 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
-        // get list
-        const selectedRecords: string[] = this.checkedRecords;
-        if (selectedRecords.length < 1) {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
             return;
         }
 

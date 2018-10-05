@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 @Injectable()
 export class ImportExportDataService {
@@ -31,7 +32,8 @@ export class ImportExportDataService {
             fileType: string,
             encryptPassword?: string,
             anonymizeFields?: string[]
-        }
+        },
+        queryBuilder?: RequestQueryBuilder
     ): Observable<Blob>  {
         // url + export type ( json, csv ... )
         let completeURL = `${url}?type=${data.fileType}`;
@@ -46,6 +48,16 @@ export class ImportExportDataService {
             completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
         }
 
+        // filter ?
+        if (
+            queryBuilder &&
+            !queryBuilder.isEmpty()
+        ) {
+            const filter = queryBuilder.buildQuery();
+            completeURL += `&filter=${filter}`;
+        }
+
+        // execute export
         return this.http.get(
             completeURL, {
                 responseType: 'blob'

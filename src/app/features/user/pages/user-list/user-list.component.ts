@@ -39,11 +39,13 @@ export class UserListComponent extends ListComponent implements OnInit {
     constructor(
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private userRoleDataService: UserRoleDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

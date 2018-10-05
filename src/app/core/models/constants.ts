@@ -31,6 +31,10 @@ export class Constants {
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
+    static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // default color to be used in chains of transmission
+    static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
     // address constants - mapped to reference tokens
     static ADDRESS_USUAL_PLACE_OF_RESIDENCE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE';

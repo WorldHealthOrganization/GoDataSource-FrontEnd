@@ -24,6 +24,7 @@ import { GoogleMapMovementComponent } from './google-map-movement/google-map-mov
 import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
+import { SideColumnsComponent } from './side-columns/side-columns.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -39,6 +40,7 @@ export const components: any[] = [
     TopnavComponent,
     BreadcrumbsComponent,
     SideFiltersComponent,
+    SideColumnsComponent,
 
     // dashboard
     DashboardCustomMetricDashletComponent,
