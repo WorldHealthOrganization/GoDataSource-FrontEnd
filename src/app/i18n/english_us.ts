@@ -1070,6 +1070,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
 
         /**
+         * Outbreak Template list page
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE': 'Outbreak Templates',
+
+        /**
          * Form Range Fields
          */
         'LNG_FORM_RANGE_FIELD_LABEL_FROM': 'From',

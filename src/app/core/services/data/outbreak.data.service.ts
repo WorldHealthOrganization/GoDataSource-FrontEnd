@@ -12,6 +12,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { Subject } from 'rxjs/Subject';
 import { SnackbarService } from '../helper/snackbar.service';
+import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 
 @Injectable()
 export class OutbreakDataService {
@@ -43,6 +44,14 @@ export class OutbreakDataService {
         );
     }
 
+    getOutbreakTemplatesList(): Observable<OutbreakTemplateModel> {
+        console.log('debug');
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`/templates`),
+            OutbreakTemplateModel
+        );
+    }
+
     /**
      * Delete an existing Outbreak
      * @param {string} outbreakId
@@ -58,6 +67,15 @@ export class OutbreakDataService {
                         return res;
                     });
             });
+    }
+
+    /**
+     * Delete an existing outbreak template
+     * @param {string} outbreakTemplateId
+     * @returns {Observable<Object>}
+     */
+    deleteOutbreakTemplate(outbreakTemplateId: string): Observable<any> {
+        return this.http.delete(`templates/${outbreakTemplateId}`);
     }
 
     /**
