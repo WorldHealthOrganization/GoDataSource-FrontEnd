@@ -223,6 +223,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRY_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
+        'LNG_OUTBREAK_FIELD_LABEL_START_DATE_TOOLTIP': 'For info only',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
