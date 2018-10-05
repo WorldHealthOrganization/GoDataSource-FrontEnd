@@ -65,7 +65,8 @@
                                 required="true"
                                 app-date-validator
                                 [dateSameOrBefore]="'endDate'"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                [tooltip]="'LNG_OUTBREAK_FIELD_LABEL_START_DATE_TOOLTIP' | translate">
                             </app-form-datepicker>
                             <app-form-datepicker
                                 name="endDate"
