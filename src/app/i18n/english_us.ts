@@ -69,7 +69,9 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_BACK': 'Back',
         'LNG_COMMON_BUTTON_ADD': 'Add',
+        'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
@@ -513,12 +515,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
 
         /**
          * Create Location page
          */
         'LNG_PAGE_CREATE_LOCATION_TITLE': 'Create New Location',
         'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LOCATION_NAME': 'New Location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON': 'Create location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE': 'Location created!',
 

@@ -17,12 +17,35 @@
             </button>
 
             <button
+                *ngIf="parentId"
                 class="button-primary"
                 mat-raised-button
                 color="primary"
-                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
-                {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                [routerLink]="['/locations', parentId, 'view']"
+                [queryParams]="{ backToCurrent: true }">
+                {{'LNG_COMMON_BUTTON_VIEW' | translate}}
             </button>
+
+            <ng-container
+                *ngIf="hasLocationWriteAccess()">
+                <button
+                    *ngIf="parentId"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/locations', parentId, 'modify']"
+                    [queryParams]="{ backToCurrent: true }">
+                    {{'LNG_COMMON_BUTTON_MODIFY' | translate}}
+                </button>
+
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </ng-container>
         </div>
     </ng-container>
 </app-topnav>
@@ -42,7 +65,7 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="locationsList" matSort (matSortChange)="sortBy($event)">
 
         <!-- Name -->
         <ng-container matColumnDef="name">
@@ -161,12 +184,16 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                    <ng-container
+                        *ngIf="hasLocationWriteAccess()">
+                        <button
+                            mat-menu-item
                             [routerLink]="['/locations', item.id, 'create']">
-                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
-                    </button>
+                            {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
+                        </button>
 
-                    <mat-divider *ngIf="hasLocationWriteAccess()"></mat-divider>
+                        <mat-divider></mat-divider>
+                    </ng-container>
 
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
@@ -182,14 +209,20 @@
                         {{'LNG_PAGE_ACTION_VIEW'| translate}}
                     </button>
 
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                    <ng-container
+                        *ngIf="hasLocationWriteAccess()">
+                        <button
+                            mat-menu-item
                             [routerLink]="['/locations', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY'| translate}}
-                    </button>
+                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                        </button>
 
-                    <button mat-menu-item class="mat-menu-item-delete" (click)="deleteLocation(item)">
-                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                    </button>
+                        <button
+                            mat-menu-item class="mat-menu-item-delete"
+                            (click)="deleteLocation(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
                 </mat-menu>
             </mat-cell>
         </ng-container>
@@ -204,5 +237,11 @@
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">
     </mat-paginator>
+
+    <div
+        *ngIf="locationsList && locationsList.length < 1"
+        class="no-records">
+        {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
+    </div>
 
 </mat-card>

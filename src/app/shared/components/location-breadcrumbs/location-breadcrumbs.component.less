@@ -4,8 +4,70 @@ app-location-breadcrumbs {
             .breadcrumbs-list {
                 margin-left: 20px;
 
+                @location-br-height: 34px;
+                @location-br-bg-color: white;
+                @location-br-border-color: #D5D5D5;
+                @location-br-border: 1px solid @location-br-border-color;
                 .breadcrumb-item {
-                    font-size: 20px;
+                    box-sizing: border-box;
+                    height: @location-br-height;
+                    margin: 0;
+                    padding: 0px 10px;
+                    background-color: @location-br-bg-color;
+                    font-size: 16px;
+                    line-height: 16px;
+                    font-weight: 600;
+
+                    border-top: @location-br-border;
+                    border-bottom: @location-br-border;
+
+                    &:first-child {
+                        border-left: @location-br-border;
+                    }
+
+                    &.active {
+                        font-weight: normal;
+                    }
+                }
+
+                .breadcrumb-separator {
+                    box-sizing: border-box;
+                    position: relative;
+                    width: (@location-br-height / 2);
+                    height: @location-br-height;
+                    padding: 0;
+                    margin: 0;
+                    background-color: @location-br-bg-color;
+                    border-top: @location-br-border;
+                    border-bottom: @location-br-border;
+
+                    &:last-child {
+                        border-top: 1px solid transparent;
+                        border-bottom: 1px solid transparent;
+                    }
+
+                    &:before,
+                    &:after {
+                        content: ' ';
+                        position: absolute;
+                        pointer-events: none;
+                        left: 0;
+                        top: 0;
+                        border: solid transparent;
+                    }
+                    //noinspection CssOptimizeSimilarProperties
+                    &:before {
+                        border-width: @location-br-height / 2;
+                        border-left-color: @location-br-border-color;
+                        margin-top: -1px;
+                    }
+                    //noinspection CssOptimizeSimilarProperties
+                    &:after {
+                        border-left-color: @location-br-bg-color;
+                        border-width: @location-br-height / 2;
+                        left: -1px;
+                        margin-top: -1px;
+                    }
                 }
             }
         }
