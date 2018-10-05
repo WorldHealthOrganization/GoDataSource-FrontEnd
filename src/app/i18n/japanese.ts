@@ -155,7 +155,7 @@ export const JapaneseLang = {
         'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT': '[言語] Lab Test Result',
         'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION': '[言語] Context of Transmission',
         'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION': '[言語] Case Classification',
-        'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST': '[言語] Type Of Lab Result',
+        'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST': '[言語] Type Of Lab Test',
         'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION': '[言語] Occupation',
         'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE': '[言語] Document Type',
         'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE': '[言語] Exposure Type',
