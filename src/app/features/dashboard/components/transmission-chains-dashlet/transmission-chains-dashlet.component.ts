@@ -359,6 +359,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         }
     }
 
+    /**
+     * initialize reference data objects with the needed entities
+     * @returns {Observable<any[]>}
+     */
     private initializeReferenceData() {
         // call observables in parallel
         const referenceDataCategories$ = _.map(
