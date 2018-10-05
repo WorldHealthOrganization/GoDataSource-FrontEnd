@@ -44,7 +44,9 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         ) {
             const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
             this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+                if (!_.isEmpty(glossaryData[labelValue])) {
+                    this.tooltip = glossaryData[labelValue];
+                }
             });
         }
     }

@@ -1,4 +1,4 @@
-<div class="form-select-container form-element"
+<div class="form-select-container form-element {{ (tooltip !== null ? 'form-select-tooltip' : '' ) }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
@@ -22,8 +22,7 @@
             [multiple]="multiple"
             (blur)="onBlur()"
             [disabled]="disabled"
-            (selectionChange)="onChange(selectElement.value)"
-            [matTooltip]="tooltip | translate">
+            (selectionChange)="onChange(selectElement.value)">
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">
@@ -49,6 +48,8 @@
 
             </mat-option>
         </mat-select>
+
+        <span [fxShow]="tooltip !== null" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
     </mat-form-field>
 
     <app-form-validation
