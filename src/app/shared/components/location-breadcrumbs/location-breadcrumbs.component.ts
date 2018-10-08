@@ -40,8 +40,6 @@ export class LocationBreadcrumbsComponent implements OnInit {
                 this.locationId = params.locationId;
                 // reset breadcrumbs
                 this.locationBreadcrumbs = [];
-                // get url for manipulating create location page
-                const url = window.location.pathname;
 
                 // retrieve parents of this parent and create breadcrumbs if necessary
                 if (this.parentId) {
@@ -82,7 +80,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
         // add location
         this.locationBreadcrumbs.push(
             new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_LOCATIONS_TITLE',
+                'LNG_PAGE_LIST_LOCATIONS_ALL_TITLE',
                 '/locations'
             )
         );

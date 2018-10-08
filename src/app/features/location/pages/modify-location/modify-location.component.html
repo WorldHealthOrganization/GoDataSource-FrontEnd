@@ -10,7 +10,7 @@
 
         <!-- location breadcrumb -->
         <app-location-breadcrumbs
-            activeLocationBreadcrumb="LNG_PAGE_MODIFY_LOCATION_NAME"></app-location-breadcrumbs>
+            [activeLocationBreadcrumb]="viewOnly ? 'LNG_PAGE_VIEW_LOCATION_NAME': 'LNG_PAGE_MODIFY_LOCATION_NAME'"></app-location-breadcrumbs>
 
         <mat-tab-group class="page-tabs-navbar">
 
