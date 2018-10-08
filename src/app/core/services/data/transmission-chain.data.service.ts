@@ -136,7 +136,7 @@ export class TransmissionChainDataService {
      * @returns {any}
      */
     convertChainToGraphElements(chains, filters: any, colorCriteria: any): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: []};
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [] };
         let selectedNodeIds: string[] = [];
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
@@ -160,24 +160,24 @@ export class TransmissionChainDataService {
                         const nodeProps = node.model;
                         // calculate dateTimeline value
                         if (node.type === EntityType.CASE) {
-                            // get earliest hospitalization dates if any
-                            let datesArray = [];
-                            if (!_.isEmpty(node.model.hospitalizationDates)) {
-                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
-                                    datesArray.push(hospitalDate.startDate);
-                                });
-                            }
+                            // set date of onset to be used in timeline
                             if (!_.isEmpty(node.model.dateOfOnset)) {
-                                datesArray.push(node.model.dateOfOnset);
-                            }
-                            datesArray = _.sortBy(datesArray);
-                            if (!_.isEmpty(datesArray)) {
-                                nodeProps.dateTimeline = datesArray[0];
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
                             }
                         } else if (node.type === EntityType.CONTACT) {
-                            nodeProps.dateTimeline = node.model.dateOfReporting;
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
                         } else if (node.type === EntityType.EVENT) {
-                            nodeProps.dateTimeline = node.model.date;
+                            if (!_.isEmpty(node.model.data)) {
+                                nodeProps.dateTimeline = node.model.date;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
                         }
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
@@ -204,25 +204,24 @@ export class TransmissionChainDataService {
                         // show nodes based on their type
                         if (node.type === EntityType.CONTACT && filters.showContacts) {
                             allowAdd = true;
-                            nodeProps.dateTimeline = node.model.dateOfReporting;
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
                         } else if (node.type === EntityType.EVENT && filters.showEvents) {
                             allowAdd = true;
-                            nodeProps.dateTimeline = node.model.date;
+                            if (!_.isEmpty(node.model.data)) {
+                                nodeProps.dateTimeline = node.model.date;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
                         } else if (node.type === EntityType.CASE) {
                             allowAdd = true;
-                            // get earliest hospitalization dates if any
-                            let datesArray = [];
-                            if (!_.isEmpty(node.model.hospitalizationDates)) {
-                                _.forEach(node.model.hospitalizationDates, (hospitalDate: DateRangeModel, hospitalDateKey) => {
-                                    datesArray.push(hospitalDate.startDate);
-                                });
-                            }
                             if (!_.isEmpty(node.model.dateOfOnset)) {
-                                datesArray.push(node.model.dateOfOnset);
-                            }
-                            datesArray = _.sortBy(datesArray);
-                            if (!_.isEmpty(datesArray)) {
-                                nodeProps.dateTimeline = datesArray[0];
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
                             }
                         }
                         if (allowAdd) {
