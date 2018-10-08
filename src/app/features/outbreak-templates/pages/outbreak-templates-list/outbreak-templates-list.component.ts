@@ -18,6 +18,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -48,7 +49,9 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         super(
             snackbarService
@@ -158,5 +161,17 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         });
                 }
             });
+    }
+
+    /**
+     * Generate an outbreak from a template
+     * @param outbreakTemplate
+     */
+    generateOutbreak(outbreakTemplate: OutbreakTemplateModel) {
+        const outbreak: OutbreakModel = new OutbreakModel();
+        const newOutbreak = _.merge(outbreakTemplate, outbreak);
+        this.router.navigate(
+            [`outbreaks/create`],
+            {queryParams : {outbreakTemplate: JSON.stringify(newOutbreak)}});
     }
 }

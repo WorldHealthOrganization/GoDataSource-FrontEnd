@@ -12,6 +12,7 @@ export class OutbreakTemplateModel {
     noDaysNotSeen: number;
     noLessContacts: number;
     noDaysNewContacts: number;
+    longPeriodsBetweenCaseOnset: number;
     caseInvestigationTemplate: QuestionModel;
     contactFollowUpTemplate: QuestionModel;
     labResultsTemplate: QuestionModel;
@@ -29,6 +30,7 @@ export class OutbreakTemplateModel {
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
         this.deleted = _.get(data, 'deleted');
+        this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
             (lData: any) => {

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -15,6 +15,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -42,7 +43,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private route: ActivatedRoute
     ) {
         super();
     }
@@ -57,6 +59,9 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 return country;
             })
         );
+        const outbreakTemplate = JSON.parse(this.route.snapshot.queryParamMap.get('outbreakTemplate'));
+        console.log(outbreakTemplate);
+        this.newOutbreak = outbreakTemplate;
     }
 
     /**

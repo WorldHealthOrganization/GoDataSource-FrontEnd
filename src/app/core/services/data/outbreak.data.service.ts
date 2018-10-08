@@ -117,6 +117,18 @@ export class OutbreakDataService {
     }
 
     /**
+     * Retrieve an OutbreakTemplate
+     * @param {string} outbreakTemplateId
+     * @returns {Observable<OutbreakTemplateModel>}
+     */
+    getOutbreakTemplate(outbreakTemplateId: string): Observable<OutbreakTemplateModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`templates/${outbreakTemplateId}`),
+            OutbreakTemplateModel
+        );
+    }
+
+    /**
      * Modify an existing Outbreak
      * @param {string} outbreakId
      * @returns {Observable<any>}
@@ -130,6 +142,18 @@ export class OutbreakDataService {
                         // preserve the output of the main request
                         return res;
                     });
+            });
+    }
+
+    /**
+     * Modify an existing Outbreak template
+     * @param {string} outbreakTemplateId
+     * @returns {Observable<any>}
+     */
+    modifyOutbreakTemplate(outbreakTemplateId: string, data: any): Observable<any> {
+        return this.http.put(`templates/${outbreakTemplateId}`, data)
+            .map((res) => {
+                return res;
             });
     }
 

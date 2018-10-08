@@ -98,6 +98,11 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+                    <button *ngIf="hasOutbreakWriteAccess()" (click)="generateOutbreak(item)"
+                            mat-menu-item class="mat-menu-item">
+                        {{ 'Generate outbreak' | translate}}
+                    </button>
+
                     <button mat-menu-item [routerLink]="['/outbreak-templates', item.id, 'view']">
                         {{'LNG_PAGE_ACTION_VIEW'| translate}}
                     </button>

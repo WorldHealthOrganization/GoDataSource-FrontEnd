@@ -54,7 +54,6 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
     }
 
     createOutbreaktemplate(stepForms: NgForm[]) {
-        console.log(stepForms);
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -73,7 +72,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     this.snackbarService.showSuccess('outbreak template created');
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/outbreaks']);
+                    this.router.navigate(['/outbreak-templates']);
                 });
         }
     };
