@@ -37,7 +37,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     parentId: string;
 
     // list of existing locations
-    locationsList$: Observable<LocationModel[]>;
+    locationsList: LocationModel[];
     locationsListCount$: Observable<any>;
 
     yesNoOptionsList$: Observable<any[]>;
@@ -84,7 +84,10 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of Locations
-        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
+        this.locationsList = null;
+        this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder).subscribe((locationsList) => {
+            this.locationsList = locationsList;
+        });
     }
 
     /**
