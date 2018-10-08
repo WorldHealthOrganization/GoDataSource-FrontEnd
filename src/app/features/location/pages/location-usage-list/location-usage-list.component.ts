@@ -11,6 +11,8 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-location-usage-list',
@@ -28,14 +30,21 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
     locationId: string;
 
     usageDetailsList: UsageDetailsItem[];
+    usageDetailsListMore: {
+        displayed: number,
+        total: number
+    };
 
     constructor(
+        protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -120,7 +129,12 @@ export class LocationUsageListComponent extends ListComponent implements OnInit 
                             }
 
                             // create usage list
-                            this.usageDetailsList = new UsageDetails(locationUsage, outbreaksMapped).items;
+                            const usageData: UsageDetails = new UsageDetails(locationUsage, outbreaksMapped);
+                            this.usageDetailsListMore = usageData.items.length > Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED ? {
+                                displayed: Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED,
+                                total: usageData.items.length
+                            } : null;
+                            this.usageDetailsList = usageData.items.slice(0, Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED);
                         });
                 });
         }

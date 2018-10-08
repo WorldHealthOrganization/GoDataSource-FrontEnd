@@ -32,7 +32,8 @@ export enum FilterComparator {
     BEFORE = 'before',
     AFTER = 'after',
     CONTAINS = 'contains',
-    LOCATION = 'location'
+    LOCATION = 'location',
+    WITHIN = 'within'
 }
 
 // Model for Available Filter
@@ -187,6 +188,10 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
             value: FilterComparator.LOCATION,
             valueType: ValueType.SELECT
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
+            value: FilterComparator.WITHIN,
+            valueType: ValueType.LAT_LNG_WITHIN
         }]
     };
 
@@ -223,6 +228,7 @@ export class AppliedFilterModel {
 
     // selected value for the filter
     public value: any;
+    public extraValues: any = {};
 
     // selected comparator
     private _previousComparator: FilterComparator;
@@ -262,9 +268,11 @@ export class AppliedFilterModel {
                 // NOTHING TO DO
             } else {
                 this.value = null;
+                this.extraValues = {};
             }
         } else {
             this.value = null;
+            this.extraValues = {};
         }
 
         // set previous values

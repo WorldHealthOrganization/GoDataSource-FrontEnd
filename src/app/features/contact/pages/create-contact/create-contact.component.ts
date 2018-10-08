@@ -45,6 +45,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     relatedEntityData: CaseModel|EventModel;
     relationship: RelationshipModel = new RelationshipModel();
@@ -64,10 +65,13 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private genericDataService: GenericDataService
     ) {
         super();
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
     }
 
     ngOnInit() {
+        // reference data
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
 

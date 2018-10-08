@@ -42,9 +42,11 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         private iconDataService: IconDataService,
         private dialogService: DialogService,
-        private snackbarService: SnackbarService
+        protected snackbarService: SnackbarService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     /**

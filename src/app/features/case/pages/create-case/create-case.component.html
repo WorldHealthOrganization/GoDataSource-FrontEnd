@@ -57,12 +57,12 @@
                                 maxlength="50">
                             </app-form-input>
 
-                            <app-form-input
+                            <app-form-select
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
-                                maxlength="500">
-                            </app-form-input>
+                                [options]="occupationsList$ | async">
+                            </app-form-select>
 
                             <div fxFlex fxLayout="row" class="switch-buttons">
                                 <button
@@ -222,7 +222,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
+                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
                                 ]">
                             </app-form-datepicker>
 
@@ -247,6 +248,9 @@
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]"
+                                [dateSameOrAfter]="[
+                                    [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate]
                                 ]">
                             </app-form-datepicker>
 

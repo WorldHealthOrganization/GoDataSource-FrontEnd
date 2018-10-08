@@ -68,6 +68,16 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
             dirtyFields.parentLocationId = this.parentId;
         }
 
+        // remove geo location if empty
+        if (
+            dirtyFields.geoLocation && (
+                !dirtyFields.geoLocation.lat ||
+                !dirtyFields.geoLocation.lng
+            )
+        ) {
+            delete dirtyFields.geoLocation;
+        }
+
         // create record
         if (
             this.formHelper.isFormsSetValid(stepForms) &&

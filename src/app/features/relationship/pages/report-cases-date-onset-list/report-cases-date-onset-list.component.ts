@@ -11,6 +11,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -39,11 +40,14 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     EntityType = EntityType;
 
     constructor(
+        protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private relationshipDataService: RelationshipDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
