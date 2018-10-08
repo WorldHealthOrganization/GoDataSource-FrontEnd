@@ -9,12 +9,10 @@ export class AgeModel {
 
     constructor(data = null) {
         // years
-        this.years = _.get(data, 'years');
-        this.years = this.years < 1 ? undefined : this.years;
+        this.years = _.get(data, 'years', 0);
 
         // months
-        this.months = _.get(data, 'months');
-        this.months = this.months < 1 ? undefined : this.months;
+        this.months = _.get(data, 'months', 0);
     }
 
     /**
@@ -45,11 +43,9 @@ export class AgeModel {
             const now = moment();
             result.age.years = now.diff(date, 'years');
             result.age.months = result.age.years < 1 ? now.diff(date, 'months') : 0;
-            result.age.years = result.age.years < 1 ? undefined : result.age.years;
-            result.age.months = result.age.months < 1 ? undefined : result.age.months;
         } else {
-            result.age.months = undefined;
-            result.age.years = undefined;
+            result.age.months = 0;
+            result.age.years = 0;
         }
     }
 }

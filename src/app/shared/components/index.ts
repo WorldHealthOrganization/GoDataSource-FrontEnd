@@ -27,6 +27,7 @@ import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-br
 import { SideColumnsComponent } from './side-columns/side-columns.component';
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
+import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -66,6 +67,7 @@ export const components: any[] = [
     FormLocationDropdownComponent,
     FormFillQuestionnaireComponent,
     FormAgeComponent,
+    FormAgeDobComponent,
 
     // display information
     CountedItemsListComponent,

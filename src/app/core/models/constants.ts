@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
 /**
  * Apply List Filter
  */
@@ -151,4 +154,11 @@ export class Constants {
             value: 'TIMELINE_NETWORK'
         }
     };
+
+    /**
+     * Today date
+     */
+    static getCurrentDate(): Moment {
+        return moment().startOf('day');
+    }
 }

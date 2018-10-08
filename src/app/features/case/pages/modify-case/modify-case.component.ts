@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -24,9 +24,6 @@ import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
-import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
-import { AgeModel } from '../../../../core/models/age.model';
-import { FormAgeComponent } from '../../../../shared/components/form-age/form-age.component';
 
 @Component({
     selector: 'app-modify-case',
@@ -44,7 +41,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseId: string;
 
     caseData: CaseModel = new CaseModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -62,11 +58,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         onset: boolean,
         longPeriod: boolean
     };
-
-    @ViewChild('dob') dobComponent: FormDatepickerComponent;
-    dobDirty: boolean = false;
-    @ViewChild('age') ageComponent: FormAgeComponent;
-    ageDirty: boolean = false;
 
     constructor(
         private router: Router,
@@ -228,7 +219,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
-                    this.ageSelected = !this.caseData.dob;
 
                     // determine parent onset dates
                     const uniqueDates: {} = {};
@@ -259,45 +249,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        // save control dirty state since ngIf removes it...and we can't use fxShow / Hide since it doesn't reinitialize component & rebind values
-        if (this.ageSelected) {
-            this.ageDirty = this.ageComponent && this.ageComponent.control.dirty;
-        } else {
-            this.dobDirty = this.dobComponent && this.dobComponent.control.dirty;
-        }
-
-        // switch element that we want to see
-        this.ageSelected = ageSelected;
-
-        // make sure we set dirtiness back
-        setTimeout(() => {
-            // make control dirty again
-            if (
-                this.ageSelected &&
-                this.ageDirty &&
-                this.ageComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.ageComponent.control.markAsDirty();
-                });
-            } else if (
-                !this.ageSelected &&
-                this.dobDirty &&
-                this.dobComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.dobComponent.control.markAsDirty();
-                });
-            }
-        });
-    }
-
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -307,55 +258,33 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // add age information if necessary
-        if (dirtyFields.dob) {
-            AgeModel.addAgeFromDob(
-                dirtyFields,
-                null,
-                dirtyFields.dob
-            );
-        } else if (dirtyFields.age) {
-            dirtyFields.dob = null;
-        }
-
-        // modify the Case
-        this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-
-                return ErrorObservable.create(err);
-            })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
-
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/cases']);
-            });
-    }
-
-    /**
-     * DOB changed handler
-     * @param dob
-     * @param date
-     */
-    dobChanged(
-        dob: FormDatepickerComponent,
-        date: Moment
-    ) {
-        AgeModel.addAgeFromDob(
-            this.caseData,
-            dob,
-            date
-        );
-    }
-
-    /**
-     * Age changed
-     */
-    ageChanged() {
-        this.caseData.dob = null;
+        console.log(dirtyFields);
+        // // add age information if necessary
+        // if (dirtyFields.dob) {
+        //     AgeModel.addAgeFromDob(
+        //         dirtyFields,
+        //         null,
+        //         dirtyFields.dob
+        //     );
+        // } else if (dirtyFields.age) {
+        //     dirtyFields.dob = null;
+        // }
+        //
+        // // modify the Case
+        // this.caseDataService
+        //     .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+        //     .catch((err) => {
+        //         this.snackbarService.showError(err.message);
+        //
+        //         return ErrorObservable.create(err);
+        //     })
+        //     .subscribe(() => {
+        //         this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+        //
+        //         // navigate to listing page
+        //         this.disableDirtyConfirm();
+        //         this.router.navigate(['/cases']);
+        //     });
     }
 
     /**

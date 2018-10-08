@@ -1,0 +1,56 @@
+<div class="age-dob-container form-element "OnInit
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="row" fxLayoutGap="20px">
+            <div
+                fxFlex
+                fxLayout="row"
+                class="switch-buttons">
+                <button
+                    fxFlex
+                    mat-raised-button
+                    type="button"
+                    [color]="ageSelected ? 'primary' : ''"
+                    (click)="switchAgeDob(true)">
+                    {{'LNG_CASE_FIELD_LABEL_AGE_BUTTON' | translate}}
+                </button>
+                <button
+                    fxFlex
+                    mat-raised-button
+                    type="button"
+                    [color]="!ageSelected ? 'primary' : ''"
+                    (click)="switchAgeDob(false)">
+                    {{'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
+                </button>
+            </div>
+
+            <div
+                fxFlex>
+                <app-form-age
+                    *ngIf="ageSelected"
+                    #age
+                    name="age"
+                    [(ngModel)]="ageDob.age"
+                    [disabled]="disabled"
+                    [required]="required"
+                    (changed)="ageChanged()">
+                </app-form-age>
+
+                <app-form-datepicker
+                    *ngIf="!ageSelected"
+                    #dob
+                    name="dob"
+                    [(ngModel)]="ageDob.dob"
+                    [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
+                    [disabled]="disabled"
+                    [required]="required"
+                    [maxDate]="today"
+                    app-date-validator
+                    [dateSameOrBefore]="today"
+                    (optionChanged)="dobChanged(dob, $event)">
+                </app-form-datepicker>
+            </div>
+        </div>
+    </form>
+</div>
