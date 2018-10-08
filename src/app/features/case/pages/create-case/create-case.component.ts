@@ -143,9 +143,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             AgeModel.addAgeFromDob(
                 dirtyFields,
                 null,
-                dirtyFields.dob,
-                this.serverToday,
-                this.genericDataService
+                dirtyFields.dob
             );
         } else if (dirtyFields.age) {
             dirtyFields.dob = null;
@@ -185,9 +183,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         AgeModel.addAgeFromDob(
             this.caseData,
             dob,
-            date,
-            this.serverToday,
-            this.genericDataService
+            date
         );
     }
 

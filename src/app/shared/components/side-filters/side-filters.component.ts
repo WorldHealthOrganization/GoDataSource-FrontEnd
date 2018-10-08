@@ -315,13 +315,29 @@ export class SideFiltersComponent {
             .value();
 
         // set sort by fields
+        const objectDetailsSort: {
+            [property: string]: string[]
+        } = {
+            age: ['years', 'months']
+        };
         _.each(sorts, (appliedSort: AppliedSortModel) => {
-            queryBuilder.sort.by(
-                appliedSort.sort.fieldName,
-                appliedSort.direction, {
-                    age: ['years', 'months']
-                }
-            );
+            // add sorting criteria
+            if (
+                objectDetailsSort &&
+                objectDetailsSort[appliedSort.sort.fieldName]
+            ) {
+                _.each(objectDetailsSort[appliedSort.sort.fieldName], (childProperty: string) => {
+                    queryBuilder.sort.by(
+                        `${appliedSort.sort.fieldName}.${childProperty}`,
+                        appliedSort.direction
+                    );
+                });
+            } else {
+                queryBuilder.sort.by(
+                    appliedSort.sort.fieldName,
+                    appliedSort.direction
+                );
+            }
         });
 
         // emit the Request Query Builder

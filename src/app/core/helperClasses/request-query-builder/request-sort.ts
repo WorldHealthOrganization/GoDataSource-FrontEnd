@@ -18,22 +18,10 @@ export class RequestSort {
      */
     by(
         property: string,
-        direction: RequestSortDirection = RequestSortDirection.ASC,
-        objectDetailsSort?: {
-            [property: string]: string[]
-        }
+        direction: RequestSortDirection = RequestSortDirection.ASC
     ) {
         // add sorting criteria
-        if (
-            objectDetailsSort &&
-            objectDetailsSort[property]
-        ) {
-            _.each(objectDetailsSort[property], (childProperty: string) => {
-                this.criterias[`${property}.${childProperty}`] = direction;
-            });
-        } else {
-            this.criterias[property] = direction;
-        }
+        this.criterias[property] = direction;
 
         return this;
     }

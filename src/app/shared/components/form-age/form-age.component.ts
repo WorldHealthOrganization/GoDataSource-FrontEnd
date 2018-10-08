@@ -9,7 +9,7 @@ import { Constants } from '../../../core/models/constants';
 /**
  * Age Types
  */
-enum AgeTypes {
+enum AgeType {
     YEARS = 'years',
     MONTHS = 'months'
 }
@@ -27,18 +27,18 @@ enum AgeTypes {
 })
 export class FormAgeComponent extends GroupBase<AgeModel> {
     // constants
-    AgeTypes = AgeTypes;
+    AgeType = AgeType;
     Constants = Constants;
 
     // age data
     ageTypeArray: LabelValuePair[] = [];
-    _ageType: AgeTypes = AgeTypes.YEARS;
-    set ageType(ageType: AgeTypes) {
+    _ageType: AgeType = AgeType.YEARS;
+    set ageType(ageType: AgeType) {
         // set age type
         this._ageType = ageType;
 
         // copy value from one place to the other
-        if (this.ageType === AgeTypes.MONTHS) {
+        if (this.ageType === AgeType.MONTHS) {
             this.age.months = this.age.years;
             this.age.years = 0;
         } else {
@@ -46,7 +46,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
             this.age.months = 0;
         }
     }
-    get ageType(): AgeTypes {
+    get ageType(): AgeType {
         return this._ageType;
     }
 
@@ -60,7 +60,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
     private _yearsPlaceholder: string = 'LNG_AGE_FIELD_LABEL_YEARS';
     @Input() set yearsPlaceholder(yearsPlaceholder: string) {
         this._yearsPlaceholder = yearsPlaceholder;
-        this.updateAgeTypesArray();
+        this.updateAgeTypeArray();
     }
     get yearsPlaceholder(): string {
         return this._yearsPlaceholder;
@@ -72,7 +72,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
     private _monthsPlaceholder: string = 'LNG_AGE_FIELD_LABEL_MONTHS';
     @Input() set monthsPlaceholder(monthsPlaceholder: string) {
         this._monthsPlaceholder = monthsPlaceholder;
-        this.updateAgeTypesArray();
+        this.updateAgeTypeArray();
     }
     get monthsPlaceholder(): string {
         return this._monthsPlaceholder;
@@ -89,7 +89,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
         super(controlContainer, validators, asyncValidators);
 
         // initialize
-        this.updateAgeTypesArray();
+        this.updateAgeTypeArray();
     }
 
     /**
@@ -106,7 +106,7 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
             value.months > 0
         ) {
             // change age type without resetting value - ( DON'T use setter )
-            this._ageType = AgeTypes.MONTHS;
+            this._ageType = AgeType.MONTHS;
         }
     }
 
@@ -123,15 +123,15 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
     /**
      * Update Age Types Array
      */
-    updateAgeTypesArray() {
+    updateAgeTypeArray() {
         this.ageTypeArray = [
             new LabelValuePair(
                 this.yearsPlaceholder,
-                AgeTypes.YEARS
+                AgeType.YEARS
             ),
             new LabelValuePair(
                 this.monthsPlaceholder,
-                AgeTypes.MONTHS
+                AgeType.MONTHS
             )
         ];
     }

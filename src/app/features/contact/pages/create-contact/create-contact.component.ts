@@ -219,9 +219,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
             AgeModel.addAgeFromDob(
                 dirtyFields,
                 null,
-                dirtyFields.dob,
-                this.serverToday,
-                this.genericDataService
+                dirtyFields.dob
             );
         } else if (dirtyFields.age) {
             dirtyFields.dob = null;
@@ -288,9 +286,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         AgeModel.addAgeFromDob(
             this.contactData,
             dob,
-            date,
-            this.serverToday,
-            this.genericDataService
+            date
         );
     }
 

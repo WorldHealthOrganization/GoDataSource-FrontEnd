@@ -218,12 +218,23 @@ export abstract class ListComponent {
             property &&
             direction
         ) {
-            // apply sort
-            this.queryBuilder.sort.by(
-                property,
-                direction,
-                objectDetailsSort
-            );
+            // add sorting criteria
+            if (
+                objectDetailsSort &&
+                objectDetailsSort[property]
+            ) {
+                _.each(objectDetailsSort[property], (childProperty: string) => {
+                    this.queryBuilder.sort.by(
+                        `${property}.${childProperty}`,
+                        direction
+                    );
+                });
+            } else {
+                this.queryBuilder.sort.by(
+                    property,
+                    direction
+                );
+            }
         }
 
         // refresh list

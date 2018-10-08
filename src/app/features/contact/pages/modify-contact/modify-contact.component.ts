@@ -179,9 +179,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             AgeModel.addAgeFromDob(
                 dirtyFields,
                 null,
-                dirtyFields.dob,
-                this.serverToday,
-                this.genericDataService
+                dirtyFields.dob
             );
         } else if (dirtyFields.age) {
             dirtyFields.dob = null;
@@ -216,9 +214,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         AgeModel.addAgeFromDob(
             this.contactData,
             dob,
-            date,
-            this.serverToday,
-            this.genericDataService
+            date
         );
     }
 

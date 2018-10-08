@@ -4,7 +4,7 @@
     <form #groupForm="ngForm">
         <div fxLayout="row" fxLayoutGap="20px">
             <app-form-input
-                *ngIf="ageType === AgeTypes.YEARS"
+                *ngIf="ageType === AgeType.YEARS"
                 [name]="name + '[years]'"
                 [ngModel]="age.years"
                 [placeholder]="yearsPlaceholder | translate"
@@ -20,7 +20,7 @@
             </app-form-input>
 
             <app-form-input
-                *ngIf="ageType === AgeTypes.MONTHS"
+                *ngIf="ageType === AgeType.MONTHS"
                 [name]="name + '[months]'"
                 [ngModel]="age.months"
                 [placeholder]="monthsPlaceholder | translate"
