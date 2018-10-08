@@ -5,7 +5,7 @@
         [(ngModel)]="transmissionChainViewType"
         required="true"
         [options]="transmissionChainViewTypes$ | async"
-        (optionChanged)="updateView()"
+        (optionChanged)="updateView($event)"
         [clearable]="false">
     </app-form-select>
     <!-- spinner -->
@@ -50,6 +50,9 @@
             <div>
                 {{nodeNameColorItem | translate}}
             </div>
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+                - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+            </div>
         </div>
 
         <!-- edge color -->
@@ -77,4 +80,32 @@
     <div class="cy"
          [fxShow]="!showLoading">
     </div>
+</div>
+
+<div *ngIf="showCaseNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/cases"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
+        {{elements.caseNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+    </a>
+</div>
+<div *ngIf="showContactNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/contacts"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
+        {{elements.contactNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+    </a>
+</div>
+<div *ngIf="showEventNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/events"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
+        {{elements.eventNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+    </a>
 </div>

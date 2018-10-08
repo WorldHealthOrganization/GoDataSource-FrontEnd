@@ -31,6 +31,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
     graphElements: any;
+    selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
@@ -107,6 +108,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         nodeColor: [],
         nodeNameColor: [],
+        nodeNameColorAdditionalInfo: {
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE': 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT': 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT': 'LNG_EVENT_FIELD_LABEL_DATE'
+        },
         edgeColor: []
     };
 
@@ -128,7 +134,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -338,7 +343,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     }
 
     /**
-     *
+     * return mapping between criteria and colors to use
      * @param colorCriteria
      */
     mapColorCriteria() {
@@ -369,6 +374,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         });
     }
 
+    /**
+     * initialize the reference data objects needed for legend
+     * @returns {Observable<any>}
+     */
     private initializeReferenceData() {
         // call observables in parallel
         const referenceDataCategories$ = _.map(
@@ -381,6 +390,33 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
         );
         return forkJoin(referenceDataCategories$);
+    }
+
+    /**
+     * triggered when the view type is changed
+     * @param viewType
+     */
+    viewTypeChanged(viewType) {
+        this.selectedViewType = viewType.value;
+        if (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+            // if node label criteria is already 'type' then do not reload the graph data.
+            if (this.colorCriteria.nodeNameColorCriteria !== 'type') {
+                this.colorCriteria.nodeNameColorCriteria = 'type';
+                // refresh chain to load the new criteria
+                this.displayChainsOfTransmission();
+            }
+        }
+    }
+
+    /**
+     * return the tooltip for criteria based on the selected view type
+     * @returns {string}
+     */
+    tooltipViewTimeline() {
+        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
+                : null
+        );
     }
 
 }
