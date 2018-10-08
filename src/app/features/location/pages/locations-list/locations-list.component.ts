@@ -1,15 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/filter';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import * as _ from 'lodash';
-import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -18,6 +15,8 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import * as _ from 'lodash';
+import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 
 @Component({
     selector: 'app-locations-list',
@@ -26,25 +25,38 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
     styleUrls: ['./locations-list.component.less']
 })
 export class LocationsListComponent extends ListComponent implements OnInit {
-    public breadcrumbs: BreadcrumbItemModel[] = [];
+    // breadcrumb header
+    public breadcrumbs: BreadcrumbItemModel[] =  [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_LOCATIONS_TITLE',
+            '/locations'
+        )
+    ];
 
-    locationsList$: Observable<LocationModel[]>;
-    yesNoOptionsList$: Observable<any[]>;
+    // parent location ID
     parentId: string;
+
+    // list of existing locations
+    locationsList$: Observable<LocationModel[]>;
+    locationsListCount$: Observable<any>;
+
+    yesNoOptionsList$: Observable<any[]>;
 
     // authenticated user
     authUser: UserModel;
 
     constructor(
-        private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
         private genericDataService: GenericDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        private snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private router: Router
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -60,52 +72,29 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 // set parent
                 this.parentId = params.parentId;
 
-                // reset breadcrumbs
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations',
-                        true
-                    )
-                ];
-
-                // retrieve parents of this parent and create breadcrumbs if necessary
-                if (this.parentId) {
-                    // retrieve parent locations
-                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                        if (locationParents && locationParents.length > 0) {
-                            let locationP = locationParents[0];
-                            while (!_.isEmpty(locationP.location)) {
-                                // make previous breadcrumb not the active one
-                                this.breadcrumbs[this.breadcrumbs.length - 1].active = false;
-
-                                // add breadcrumb
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        locationP.location.name,
-                                        `/locations/${locationP.location.id}/children`,
-                                        true
-                                    )
-                                );
-
-                                // next location
-                                locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                            }
-                        }
-                    });
-                }
-
-                // refresh list
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when parent location is changed
+                this.needsRefreshList(true);
             });
     }
 
     /**
-     * Re(load) the Contacts list
+     * Re(load) the list of Locations
      */
     refreshList() {
-        // retrieve the list of Contacts
+        // retrieve the list of Locations
         this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder);
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder);
     }
 
     /**
@@ -117,6 +106,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         const columns = [
             'name',
             'synonyms',
+            'latLng',
             'active',
             'populationDensity',
             'actions'
@@ -137,15 +127,36 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                     // delete record
                     this.locationDataService
                         .deleteLocation(location.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                        .catch((err: {
+                            message: string,
+                            code: ErrorCodes,
+                            details: {
+                                id: string,
+                                model: string
+                            }
+                        }) => {
+                            // check if we have a model in use error
+                            if (err.code === ErrorCodes.MODEL_IN_USE) {
+                                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
+                                    .subscribe((answerC: DialogAnswer) => {
+                                        if (answerC.button === DialogAnswerButton.Yes) {
+                                            // redirect to usage page where we can make changes
+                                            this.router.navigate(['/locations', err.details.id, 'usage']);
+                                        }
+                                    });
+                            } else if (err.code === ErrorCodes.DELETE_PARENT_MODEL) {
+                                this.snackbarService.showError('LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN', location);
+                            } else {
+                                this.snackbarService.showError(err.message);
+                            }
+
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

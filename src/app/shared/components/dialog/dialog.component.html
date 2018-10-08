@@ -29,45 +29,99 @@
         </mat-card>
     </div>
 
-    <div *ngIf="confirmData?.customInput">
-        <ng-container *ngIf="confirmData?.customInputOptions">
-            <app-form-select
-                name="labName"
-                [(ngModel)]="dialogAnswerInputValue.value"
-                [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
-                [options]="confirmData.customInputOptions"
-                optionLabelKey="label"
-                optionValueKey="value"
-                [multiple]="confirmData.customInputOptionsMultiple">
-            </app-form-select>
-        </ng-container>
-        <ng-container *ngIf="!confirmData?.customInputOptions">
-            <app-form-input
-                [(ngModel)]="dialogAnswerInputValue.value"
-                [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
-                [required]="confirmData.required"
-                type="number">
-            </app-form-input>
-        </ng-container>
-    </div>
+    <form #form="ngForm">
+        <div *ngIf="confirmData?.customInput">
+            <!-- Single input -->
+            <ng-container *ngIf="!confirmData?.fieldsList || confirmData?.fieldsList.length < 1">
+                <ng-container *ngIf="confirmData?.customInputOptions">
+                    <app-form-select
+                        name="value"
+                        [(ngModel)]="dialogAnswerInputValue.value"
+                        [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
+                        [options]="confirmData.customInputOptions"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        [multiple]="confirmData.customInputOptionsMultiple"
+                        [required]="confirmData.required">
+                    </app-form-select>
+                </ng-container>
+                <ng-container *ngIf="!confirmData?.customInputOptions">
+                    <app-form-input
+                        name="value"
+                        [(ngModel)]="dialogAnswerInputValue.value"
+                        [placeholder]="confirmData.placeholder | translate:confirmData?.translateData"
+                        [required]="confirmData.required"
+                        type="number">
+                    </app-form-input>
+                </ng-container>
+            </ng-container>
 
-    <div *ngIf="!confirmData?.data"
-         fxFlex fxLayout="row" fxLayoutAlign="end">
-        <button class="dialog-button" mat-button (click)="cancel()">
-            {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
-        </button>
-        <button class="dialog-button" mat-button
-                [disabled]="confirmData?.customInput && confirmData.required && !dialogAnswerInputValue.value"
-                (click)="yes()">
-            {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
-        </button>
-    </div>
+            <!-- Multiple inputs -->
+            <ng-container *ngIf="confirmData?.fieldsList?.length > 0">
+                <div
+                    *ngFor="let field of confirmData.fieldsList"
+                    fxFlex fxLayout="column" fxLayoutGap="20px">
+
+                    <!-- Select -->
+                    <app-form-select
+                        *ngIf="field.inputOptions"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [options]="field.inputOptions"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        [multiple]="field.inputOptionsMultiple"
+                        [required]="field.required"
+                        app-required-one-or-other-validator
+                        [requiredOtherField]="field.requiredOneOfTwo"
+                        [disabled]="field.disabled">
+                    </app-form-select>
+
+                    <!-- Text / Number -->
+                    <app-form-input
+                        *ngIf="!field.inputOptions"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [required]="field.required"
+                        [type]="field.type"
+                        app-required-one-or-other-validator
+                        [requiredOtherField]="field.requiredOneOfTwo"
+                        [disabled]="field.disabled">
+                    </app-form-input>
+                </div>
+            </ng-container>
+        </div>
+
+        <div *ngIf="!confirmData?.data"
+             fxFlex fxLayout="row" fxLayoutAlign="end">
+            <button
+                class="dialog-button"
+                mat-button
+                (click)="cancel()"
+                type="button">
+                {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
+            </button>
+            <button
+                class="dialog-button"
+                mat-button
+                [disabled]="confirmData?.customInput && form?.invalid"
+                (click)="yes()"
+                type="button">
+                {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
+            </button>
+        </div>
+    </form>
 
     <!-- only display cancel button for data dialogs -->
     <div *ngIf="confirmData?.data"
          fxFlex fxLayout="row" fxLayoutAlign="end">
-        <button class="dialog-button" mat-button
-                (click)="cancel()">
+        <button
+            class="dialog-button"
+            mat-button
+            (click)="cancel()"
+            type="button">
             {{ confirmData?.cancelLabel | translate }}
         </button>
 

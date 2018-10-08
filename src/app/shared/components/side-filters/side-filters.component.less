@@ -20,21 +20,31 @@
         mat-sidenav {
             margin-top: 10vh;
             max-height: 80vh;
-            width: 400px;
+            width: 300px;
             padding: 15px;
             height: auto;
             bottom: unset !important;
             overflow-x: hidden;
 
             .side-filters-reset-button {
-                float: right;
+                font-weight: 600
+            }
+
+            .buttons-container {
+                display: flex;
+
+                .stretched-button {
+                    flex: 1 auto;
+                    font-weight: 600;
+                    border-radius: 5px;
+                }
             }
         }
     }
 
     .sidenav-toggle {
         background-color: white;
-        margin-top: 155px;
+        margin-top: 205px;
         padding: 7px 5px;
     }
 
@@ -50,6 +60,12 @@
         }
     }
 
+    .add-side-filter {
+        text-transform: uppercase;
+        text-align: left;
+        font-weight: bold;
+    }
+
     .filters-section {
 
         .applied-filter {
@@ -60,14 +76,15 @@
 
             .filter-container {
                 margin: 10px 0;
+                position: relative;
 
                 .filter-details {
-                    min-width: 100%;
+                    min-width: 90%;
 
                     .filter-details-delete-button {
                         position: absolute;
                         right: 0;
-                        top: 0;
+                        top: 50%;
                     }
 
                     .mat-form-field-infix {
@@ -82,9 +99,10 @@
         .applied-sort {
             .sort-container {
                 margin: 10px 0;
+                position: relative;
 
                 .sort-details {
-                    min-width: 100%;
+                    min-width: 90%;
 
                     .sort-details-delete-button {
                         position: absolute;

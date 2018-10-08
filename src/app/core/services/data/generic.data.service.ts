@@ -4,6 +4,9 @@ import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
+import { LabelValuePair } from '../../models/label-value-pair';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class GenericDataService {
@@ -23,11 +26,14 @@ export class GenericDataService {
     }
 
     /**
-     * Retrieve the list of Gender options
-     * @returns {Observable<any[]>}
+     * Retrieve server current date
+     * @returns {Observable<Moment>}
      */
-    getGenderList(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.GENDER));
+    getServerUTCToday(): Observable<Moment> {
+        return this.getServerUTCCurrentDateTime()
+            .map((serverDateTime: string) => {
+                return moment(serverDateTime).startOf('day');
+            });
     }
 
     /**

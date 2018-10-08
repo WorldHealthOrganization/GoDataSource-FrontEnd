@@ -13,11 +13,12 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import * as _ from 'lodash';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { UserSettings } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -39,9 +40,16 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
 
     // list of existing case lab results
     labResultsList$: Observable<LabResultModel[]>;
+    labResultsListCount$: Observable<any>;
+
+    labTestResultsList$: Observable<any[]>;
+    testTypesList$: Observable<any[]>;
+    sampleTypesList$: Observable<any[]>;
+    labNamesList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
     // available side filters
     availableSideFilters: FilterModel[];
@@ -51,12 +59,13 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private outbreakDataService: OutbreakDataService,
         private caseDataService: CaseDataService,
         private labResultDataService: LabResultDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -79,18 +88,77 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.breadcrumbs.push(new BreadcrumbItemModel(caseData.name, `/cases/${this.caseId}/modify`));
                             this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', '.', true));
 
-                            // retrieve lab data
-                            this.refreshList();
+                            // initialize pagination
+                            this.initPaginator();
+                            // ...and load the list of items
+                            this.needsRefreshList(true);
                     });
                 });
         });
 
         // get the option list for side filters
-        const resultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT);
-        const testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST);
-        const sampleTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE);
-        const labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME);
+        this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
+        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
+        this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
+        this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).share();
 
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'sampleIdentifier',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'dateSampleTaken',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+            }),
+            new VisibleColumnModel({
+                field: 'dateSampleDelivered',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfResult',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'labName',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'sampleType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'testType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'result',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
@@ -120,28 +188,28 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                 fieldName: 'labName',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
                 type: FilterType.SELECT,
-                options$: labNamesList$,
+                options$: this.labNamesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'sampleType',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
                 type: FilterType.SELECT,
-                options$: sampleTypeList$,
+                options$: this.sampleTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testType',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
                 type: FilterType.SELECT,
-                options$: testTypesList$,
+                options$: this.testTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'result',
                 fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
-                options$: resultsList$,
+                options$: this.labTestResultsList$,
             }),
             new FilterModel({
                 fieldName: 'dateTesting',
@@ -172,45 +240,24 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             this.selectedOutbreak &&
             this.caseId
         ) {
-            this.genericDataService.getServerUTCCurrentDateTime()
-                .subscribe((serverDateTime: string) => {
-                    // display only unresolved followups
-                    this.queryBuilder.filter.where({
-                        or: [{
-                                dateOfResult: {
-                                    lte: moment(serverDateTime).endOf('day').toISOString()
-                                }
-                            }, {
-                                dateOfResult: {
-                                    eq: null
-                                }
-                        }]
-                    }, true);
-
-                    // retrieve the list of lab results
-                    this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder);
-                });
+            // retrieve the list of lab results
+            this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder);
         }
     }
 
     /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
+     * Get total number of items, based on the applied filters
      */
-    getTableColumns(): string[] {
-        return [
-            'sampleIdentifier',
-            'dateSampleTaken',
-            'dateSampleDelivered',
-            'dateOfResult',
-            'labName',
-            'sampleType',
-            'testType',
-            'result',
-
-            // since we have writeCase permission because of module.routing we don't need to check anything else
-            'actions'
-        ];
+    refreshListCount() {
+        if (
+            this.selectedOutbreak &&
+            this.caseId
+        ) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.labResultsListCount$ = this.labResultDataService.getCaseLabResultsCount(this.selectedOutbreak.id, this.caseId, countQueryBuilder);
+        }
     }
 
     deleteLabResult(labResult: LabResultModel) {
@@ -230,7 +277,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

@@ -1,6 +1,9 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
     [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED}"
-    [value]="casesHospitalisedCount">
+    [value]="casesHospitalisedCount"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
     {{ "LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE" | translate}}
 </app-dashboard-custom-metric-dashlet>

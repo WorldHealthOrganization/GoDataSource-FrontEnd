@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { UserModel } from '../../models/user.model';
+import { UserModel, UserSettings } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
+import * as _ from 'lodash';
+import 'rxjs/add/operator/mergeMap';
 
 @Injectable()
 export class UserDataService {
@@ -13,8 +15,7 @@ export class UserDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Users
@@ -34,6 +35,20 @@ export class UserDataService {
             this.http.get(`users?filter=${filter}`),
             UserModel
         );
+    }
+
+    /**
+     * Return total number of users
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getUsersCount(
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`users/count?where=${whereFilter}`);
     }
 
     /**
@@ -73,6 +88,38 @@ export class UserDataService {
      */
     modifyUser(userId: string, data: any): Observable<any> {
         return this.http.patch(`users/${userId}`, data);
+    }
+
+    /**
+     * Update user settings
+     * @param userId
+     * @param settingsKey
+     * @param data
+     * @returns {Observable<any>}
+     */
+    updateSettings(
+        userId: string,
+        settingsKey: UserSettings,
+        data: any
+    ): Observable<any> {
+        return this.getUser(userId)
+            .mergeMap((userData) => {
+                // retrieve current user settings
+                const currentUserSettings = _.get(
+                    userData,
+                    'settings'
+                );
+
+                // construct new settings
+                const userSettings = _.set(
+                    currentUserSettings,
+                    settingsKey,
+                    data
+                );
+
+                // save settings
+                return this.modifyUser(userId, { settings: userSettings });
+            });
     }
 
     /**

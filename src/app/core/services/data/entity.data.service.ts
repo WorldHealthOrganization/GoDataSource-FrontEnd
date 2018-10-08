@@ -53,7 +53,15 @@ export class EntityDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<(CaseModel | ContactModel | EventModel)[]> {
 
-        const filter = queryBuilder.buildQuery();
+        const qb = new RequestQueryBuilder();
+        // include relation for Events
+        qb.include('location');
+        // include relation for Cases / Contacts
+        qb.include('locations');
+
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
 
         return this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`)
             .map((peopleList) => {
@@ -61,6 +69,22 @@ export class EntityDataService {
                     return new EntityModel(entity).model;
                 });
             });
+    }
+
+    /**
+     * Return total number of Cases, Contacts and Events for an Outbreak
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEntitiesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`outbreaks/${outbreakId}/people/count?where=${whereFilter}`);
     }
 
     /**

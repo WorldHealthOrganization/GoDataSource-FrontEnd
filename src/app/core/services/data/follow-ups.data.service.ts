@@ -10,6 +10,7 @@ import { LocationDataService } from './location.data.service';
 import 'rxjs/add/operator/mergeMap';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
+import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -77,7 +78,7 @@ export class FollowUpsDataService {
     }
 
     /**
-     * Retrieve the list of of contacts that missed their last follow-up
+     * Retrieve the list of contacts that missed their last follow-up
      * @param {string} outbreakId
      * @returns {Observable<FollowUpModel[]>}
      */
@@ -119,6 +120,26 @@ export class FollowUpsDataService {
     }
 
     /**
+     * Return the number of contacts that missed their last follow-up
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getLastFollowUpsMissedCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // include contact in response
+        const qb = new RequestQueryBuilder();
+        qb.include('contact');
+        qb.merge(queryBuilder);
+
+        // construct query
+        const filter = qb.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed/filtered-count?filter=${filter}`);
+    }
+
+    /**
      * Retrieve Follow-up of a Contact
      * @param {string} outbreakId
      * @param {string} contactId
@@ -142,6 +163,20 @@ export class FollowUpsDataService {
             this.http.get(`outbreaks/${outbreakId}/follow-ups?filter=${filter}`),
             FollowUpModel
         ).mergeMap(followUps => followUps);
+    }
+
+    /**
+     * Return count of follow-ups
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getFollowUpsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -231,6 +266,19 @@ export class FollowUpsDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count`),
             MetricContactsLostToFollowUpModel
+        );
+    }
+
+    /**
+     * Retrieve the list of contacts who have successful followup
+     * @param {string} outbreakId
+     * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
+     */
+    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-with-successful-follow-ups/count?filter=${filter}`),
+            MetricContactsWithSuccessfulFollowUp
         );
     }
 }

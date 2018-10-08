@@ -8,7 +8,6 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
@@ -18,9 +17,13 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
     styleUrls: ['./create-location.component.less']
 })
 export class CreateLocationComponent extends ConfirmOnFormChanges implements OnInit {
-
-    public breadcrumbs: BreadcrumbItemModel[] = [];
-
+    // breadcrumb header
+    public breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_LOCATIONS_TITLE',
+            '/locations'
+        )
+    ];
     locationData: LocationModel = new LocationModel();
 
     parentId: string;
@@ -42,53 +45,13 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
                 // set parent
                 this.parentId = params.parentId;
 
-                // reset breadcrumbs
-                this.breadcrumbs = [
+                this.breadcrumbs.push(
                     new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
+                        'LNG_PAGE_CREATE_LOCATION_TITLE',
+                        '.',
+                        true
                     )
-                ];
-
-                // retrieve parents of this parent and create breadcrumbs if necessary
-                if (this.parentId) {
-                    // retrieve parent locations
-                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                        if (locationParents && locationParents.length > 0) {
-                            let locationP = locationParents[0];
-                            while (!_.isEmpty(locationP.location)) {
-                                // add breadcrumb
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        locationP.location.name,
-                                        `/locations/${locationP.location.id}/children`
-                                    )
-                                );
-
-                                // next location
-                                locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-                            }
-                        }
-
-                        // add create
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_CREATE_LOCATION_TITLE',
-                                '.',
-                                true
-                            )
-                        );
-                    });
-                } else {
-                    // add create
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            'LNG_PAGE_CREATE_LOCATION_TITLE',
-                            '.',
-                            true
-                        )
-                    );
-                }
+                );
             });
     }
 
@@ -103,6 +66,16 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
         // set parent location
         if (this.parentId) {
             dirtyFields.parentLocationId = this.parentId;
+        }
+
+        // remove geo location if empty
+        if (
+            dirtyFields.geoLocation && (
+                !dirtyFields.geoLocation.lat ||
+                !dirtyFields.geoLocation.lng
+            )
+        ) {
+            delete dirtyFields.geoLocation;
         }
 
         // create record

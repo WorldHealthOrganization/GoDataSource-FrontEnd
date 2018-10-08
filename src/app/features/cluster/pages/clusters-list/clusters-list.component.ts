@@ -14,6 +14,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-clusters-list',
@@ -33,15 +34,18 @@ export class ClustersListComponent extends ListComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     // list of existing clusters
     clustersList$: Observable<ClusterModel[]>;
+    clustersListCount$: Observable<any>;
 
     constructor(
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private dialogService: DialogService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -54,8 +58,10 @@ export class ClustersListComponent extends ListComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
     }
 
@@ -65,6 +71,18 @@ export class ClustersListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder);
+        }
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
@@ -126,7 +144,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

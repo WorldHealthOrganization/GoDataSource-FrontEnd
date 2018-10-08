@@ -12,20 +12,6 @@
         <mat-sidenav #sideNav mode="over" fixedInViewport>
 
             <form #form="ngForm" (submit)="apply(form)">
-
-                <!-- Columns to display -->
-                <div *ngIf="columns.length > 0" class="section columns-section">
-
-                    <div class="title">
-                        {{'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate}}
-                    </div>
-
-                    <div class="actions">
-                        <!-- #TODO -->
-                    </div>
-
-                </div>
-
                 <!-- Filters -->
                 <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
@@ -59,14 +45,6 @@
 
                         <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
                             <mat-card class="filter-details" fxFlex>
-
-                                <!-- Delete filter item -->
-                                <button
-                                    class="filter-details-delete-button"
-                                    type="button" mat-icon-button
-                                    (click)="deleteFilter(i)">
-                                    <span class="xt-icon">delete</span>
-                                </button>
 
                                 <!-- Filter Type -->
                                 <app-form-select
@@ -109,7 +87,8 @@
                                     [(ngModel)]="filter.value"
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
-                                    [multiple]="filter.filter.type === FilterType.MULTISELECT">
+                                    [multiple]="filter.filter.type === FilterType.MULTISELECT"
+                                    [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
 
                                 <!-- NUMBER RANGE Filter -->
@@ -126,6 +105,16 @@
                                         filter.comparator === FilterComparator.BEFORE">
                                 </app-form-range>
 
+                                <!-- DATE RANGE Filter-->
+                                <app-form-daterange
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [ngModel]="filter.value"
+                                    (changed)="filter.value = $event;"
+                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
+                                </app-form-daterange>
+
                                 <!-- Address Location -->
                                 <app-form-location-dropdown
                                     *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
@@ -136,21 +125,44 @@
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
 
-                                <!--DATE RANGE Filter-->
-                                <app-form-daterange
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;"
-                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
-                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
-                                </app-form-daterange>
+                                <!-- Address Within Radius -->
+                                <ng-container
+                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
+                                        filter.comparator === FilterComparator.WITHIN">
+                                    <input
+                                        [name]="'filter[filters][' + i + '][extraValues][location]'"
+                                        [ngModel]="filter.extraValues.location"
+                                        type="hidden"/>
+
+                                    <app-form-location-dropdown
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [ngModel]="filter.value"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
+                                        [multiple]="false"
+                                        (changed)="filter.value = $event;"
+                                        (itemChanged)="filter.extraValues.location = $event;">
+                                    </app-form-location-dropdown>
+
+                                    <app-form-input
+                                        [name]="'filter[filters][' + i + '][extraValues][radius]'"
+                                        [(ngModel)]="filter.extraValues.radius"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
+                                    </app-form-input>
+                                </ng-container>
                             </mat-card>
+
+                            <!-- Delete filter item -->
+                            <button
+                                class="filter-details-delete-button"
+                                type="button" mat-icon-button
+                                (click)="deleteFilter(i)">
+                                <span class="xt-icon">delete</span>
+                            </button>
                         </div>
 
                     </div>
 
-                    <button type="button" mat-button color="primary" (click)="addFilter()">
+                    <button type="button" mat-button color="primary" class="add-side-filter" (click)="addFilter()">
                         {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
 
@@ -179,14 +191,6 @@
                                 class="sort-details"
                                 fxFlex>
 
-                                <!-- Delete sort item -->
-                                <button
-                                    class="sort-details-delete-button"
-                                    type="button" mat-icon-button
-                                    (click)="deleteSort(i)">
-                                    <span class="xt-icon">delete</span>
-                                </button>
-
                                 <!-- Sort By Field -->
                                 <app-form-select
                                     [name]="'sortBy[items][' + i + '][sort]'"
@@ -208,11 +212,21 @@
                                     [clearable]="false">
                                 </app-form-select>
                             </mat-card>
+
+                            <!-- Delete sort item -->
+                            <button
+                                class="sort-details-delete-button"
+                                type="button" mat-icon-button
+                                (click)="deleteSort(i)">
+                                <span class="xt-icon">delete</span>
+                            </button>
+
                         </div>
                     </div>
 
                     <button
-                         type="button"
+                        class="add-side-filter"
+                        type="button"
                         mat-button
                         color="primary"
                         (click)="addSort()">
@@ -221,22 +235,25 @@
 
                 </div>
 
-                <button
-                    *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    type="submit">
-                    {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
-                </button>
+                <div class="buttons-container">
+                    <button
+                        *ngIf="appliedFilters.length > 0 || appliedSort.length > 0"
+                        class="button-primary stretched-button"
+                        mat-raised-button
+                        color="primary"
+                        type="submit">
+                        {{'LNG_SIDE_FILTERS_APPLY_FILTERS_BUTTON' | translate}}
+                    </button>
 
-                <button
-                    mat-raised-button
-                    class="side-filters-reset-button"
-                    type="button"
-                    (click)="reset()">
-                    {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
-                </button>
+                    <button
+                        mat-raised-button
+                        class="side-filters-reset-button"
+                        type="button"
+                        (click)="reset()">
+                        {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+                </div>
+
 
             </form>
 

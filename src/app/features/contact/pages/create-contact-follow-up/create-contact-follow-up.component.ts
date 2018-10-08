@@ -12,9 +12,11 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -34,6 +36,11 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
+    serverToday: Moment = null;
+
+    // provide constants to template
+    EntityType = EntityType;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -41,12 +48,20 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private followUpsDataService: FollowUpsDataService
+        private followUpsDataService: FollowUpsDataService,
+        private genericDataService: GenericDataService
     ) {
         super();
     }
 
     ngOnInit() {
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
+
         // retrieve query params
         this.route.params
             .subscribe((params: {contactId}) => {
@@ -127,8 +142,9 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
             null;
 
         if (
+            this.serverToday &&
             date &&
-            date.isAfter(Constants.today())
+            date.startOf('day').isAfter(this.serverToday)
         ) {
             this.followUpData.performed = false;
             this.followUpData.lostToFollowUp = false;

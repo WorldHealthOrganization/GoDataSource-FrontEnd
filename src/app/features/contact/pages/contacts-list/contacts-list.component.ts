@@ -1,9 +1,8 @@
-import * as _ from 'lodash';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -12,7 +11,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
@@ -32,6 +31,10 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -49,6 +52,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
+    contactsListCount$: Observable<any>;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
@@ -66,6 +70,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -73,25 +78,67 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    exportContactsUrl: string;
+    contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.CSV,
+        ExportDataExtension.XLS,
+        ExportDataExtension.XLSX,
+        ExportDataExtension.XML,
+        ExportDataExtension.JSON,
+        ExportDataExtension.ODS
+    ];
+
+    anonymizeFields: LabelValuePair[] = [
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ID', 'id' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_GENDER', 'gender' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_AGE', 'age' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_TYPE', 'type' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' )
+    ];
+
     constructor(
         private contactDataService: ContactDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private i18nService: I18nService
     ) {
-        super(listFilterDataService, route.queryParams);
+        super(
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
+        );
     }
 
     ngOnInit() {
+        // add page title
+        this.contactsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE') +
+            ' - ' +
+            this.contactsDataExportFileName;
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -119,6 +166,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
+                // export contacts url
+                this.exportContactsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
+                }
+
                 // get new contacts grouped by exposure types
                 if (this.selectedOutbreak) {
                     this.countedNewContactsGroupedByExposureType$ = this.contactDataService
@@ -134,9 +190,71 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         });
                 }
 
-                // re-load the list when the Selected Outbreak is changed
-                this.refreshList();
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'lastName',
+                label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'age',
+                label: 'LNG_CONTACT_FIELD_LABEL_AGE'
+            }),
+            new VisibleColumnModel({
+                field: 'gender',
+                label: 'LNG_CONTACT_FIELD_LABEL_GENDER'
+            }),
+            new VisibleColumnModel({
+                field: 'phoneNumber',
+                label: 'LNG_CONTACT_FIELD_LABEL_PHONE'
+            }),
+            new VisibleColumnModel({
+                field: 'riskLevel',
+                label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
+        const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // case condition
         const caseCondition = new RequestQueryBuilder();
@@ -163,7 +281,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'occupation',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                type: FilterType.TEXT,
+                type: FilterType.MULTISELECT,
+                options$: occupationsList$,
                 sortable: true
             }),
             new FilterModel({
@@ -277,6 +396,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.selectedOutbreak) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
+        }
+    }
+
+    /**
      * Check if we have write access to contacts
      * @returns {boolean}
      */
@@ -290,24 +421,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     hasFollowUpWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'firstName',
-            'lastName',
-            'age',
-            'gender',
-            'phoneNumber',
-            'riskLevel',
-            'actions'
-        ];
-
-        return columns;
     }
 
     /**
@@ -346,9 +459,85 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });
+    }
+
+    restoreContact(contact: ContactModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CONTACT', new ContactModel(contact))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.contactDataService
+                        .restoreContact(this.selectedOutbreak.id, contact.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    convertContactToCase(contactModel: ContactModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
+            .subscribe((answer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.contactDataService
+                        .convertContactToCase(this.selectedOutbreak.id, contactModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedContacts() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportContactsUrl,
+            fileName: this.contactsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

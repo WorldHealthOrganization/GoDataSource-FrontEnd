@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-import { GroupBase } from '../../xt-forms/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
+import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Observable } from 'rxjs/Observable';
@@ -12,7 +12,7 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityType } from '../../../core/models/entity-type';
-import { Constants } from '../../../core/models/constants';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-form-relationship',
@@ -25,11 +25,15 @@ import { Constants } from '../../../core/models/constants';
         multi: true
     }]
 })
-export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit {
+export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
     @Input() relatedObject: any;
+
+    @Input() displayCopyField: boolean = false;
+    @Input() displayCopyFieldDescription: string;
+    @Output() copyValue = new EventEmitter<string>();
 
     certaintyLevelOptions$: Observable<any[]>;
     exposureTypeOptions$: Observable<any[]>;
@@ -44,7 +48,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -53,7 +57,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -64,6 +68,13 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
     ngOnInit() {
         // init value
         this.value = new RelationshipModel(this.value);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         // reference data
         this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).share();
@@ -104,5 +115,28 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
      */
     get relationship(): RelationshipModel {
         return this.value;
+    }
+
+    /**
+     * Copy value
+     * @param property
+     */
+    triggerCopyValue(property) {
+        this.copyValue.emit(property);
+    }
+
+    /**
+     * Retrieve fields
+     */
+    getDirtyFields(): {
+        [name: string]: FormControl
+    } {
+        const dirtyControls = {};
+        _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+            if (control.dirty) {
+                dirtyControls[controlName] = control;
+            }
+        });
+        return dirtyControls;
     }
 }

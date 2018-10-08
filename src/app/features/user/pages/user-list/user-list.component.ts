@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -14,6 +13,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-user-list',
@@ -32,17 +32,20 @@ export class UserListComponent extends ListComponent implements OnInit {
 
     // list of existing users
     usersList$: Observable<UserModel[]>;
+    usersListCount$: Observable<any>;
 
     rolesList$: Observable<UserRoleModel[]>;
 
     constructor(
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private userRoleDataService: UserRoleDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -51,7 +54,10 @@ export class UserListComponent extends ListComponent implements OnInit {
 
         this.rolesList$ = this.userRoleDataService.getRolesList();
 
-        this.refreshList();
+        // initialize pagination
+        this.initPaginator();
+        // ...and load the list of items
+        this.needsRefreshList(true);
     }
 
     /**
@@ -60,6 +66,16 @@ export class UserListComponent extends ListComponent implements OnInit {
     refreshList() {
         // get the list of existing users
         this.usersList$ = this.userDataService.getUsersList(this.queryBuilder);
+    }
+
+    /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder);
     }
 
     /**
@@ -97,7 +113,7 @@ export class UserListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

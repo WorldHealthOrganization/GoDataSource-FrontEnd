@@ -28,6 +28,10 @@
 </app-topnav>
 
 <mat-card class="page-section page-content">
+
+    <!-- location breadcrumb -->
+    <app-location-breadcrumbs></app-location-breadcrumbs>
+
     <!-- Reset Filters -->
     <div class="reset-filters">
         <button mat-raised-button (click)="resetFiltersToSideFilters()">
@@ -44,14 +48,15 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -68,14 +73,15 @@
         <ng-container matColumnDef="synonyms">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
+                    <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="synonymsFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByTextField('synonyms', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -86,11 +92,27 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Lat / Lng -->
+        <ng-container matColumnDef="latLng">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEO_LOCATION" | translate}}</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.geoLocation && item.geoLocation.lat ? item.geoLocation.lat + ', ' + item.geoLocation.lng : '' }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Active -->
         <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="activeFilter"
@@ -98,7 +120,9 @@
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByBooleanField('active', $event.value)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>
@@ -112,7 +136,7 @@
         <ng-container matColumnDef="populationDensity">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="populationDensityFilter"
@@ -137,7 +161,8 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'create']">
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                            [routerLink]="['/locations', item.id, 'create']">
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
                     </button>
 
@@ -147,13 +172,18 @@
                         {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
                     </button>
 
+                    <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
+                    </button>
+
                     <mat-divider></mat-divider>
 
                     <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">
                         {{'LNG_PAGE_ACTION_VIEW'| translate}}
                     </button>
 
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item [routerLink]="['/locations', item.id, 'modify']">
+                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
+                            [routerLink]="['/locations', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                     </button>
 
@@ -167,4 +197,12 @@
         <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(locationsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
 </mat-card>

@@ -4,22 +4,24 @@ import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-que
 import * as moment from 'moment';
 
 export class AddressModel {
-    name: string;
+    typeId: string;
     city: string;
     postalCode: string;
     addressLine1: string;
     locationId: string;
     location: LocationModel;
     date: string;
-    geoLocation: { lat: number | string, lng: number | string } | null;
+    geoLocation: { lat: number, lng: number } | null;
 
-    constructor(data = null) {
-        this.name = _.get(data, 'name');
+    constructor(data = null, locationsList = []) {
+        this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');
         this.postalCode = _.get(data, 'postalCode');
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
-        this.location = _.get(data, 'location');
+        this.location = new LocationModel(
+            _.find(locationsList, {id: this.locationId})
+        );
         this.date = _.get(data, 'date', moment().toISOString());
         this.geoLocation = _.get(data, 'geoLocation', {});
     }
@@ -56,32 +58,28 @@ export class AddressModel {
             const conditions: any[] = [];
             matches.forEach((searchTerm: string) => {
                 conditions.push({
-                    $or: [{
-                        'city': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                    or: [{
+                        [property + '.city']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }, {
-                        'postalCode': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                        [property + '.postalCode']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }, {
-                        'addressLine1': {
-                            $regex: RequestFilter.escapeStringForRegex(searchTerm),
-                            $options: 'i'
+                        [property + '.addressLine1']: {
+                            like: '.*' + RequestFilter.escapeStringForRegex(searchTerm) + '.*',
+                            options: 'i'
                         }
                     }]
                 });
             });
 
             // we use elemMatch because of a loopback v3 bug
-           qb.filter.where({
-                [property]: {
-                    elemMatch: {
-                        $and: conditions
-                    }
-                }
+            qb.filter.where({
+                and: conditions
             }, false);
 
             // finished

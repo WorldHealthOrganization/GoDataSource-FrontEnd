@@ -3,55 +3,100 @@
 
     <form #groupForm="ngForm">
         <mat-card class="page-section">
+            <ng-content></ng-content>
+
             <div fxFlex fxLayout="column" fxLayoutGap="40px">
                 <div
                     *ngFor="let categoryData of questionsGroupedByCategory"
                     fxFlex fxLayout="column" fxLayoutAlign="start stretch">
-                    <div fxFlex fxLayout="row" fxLayoutAlign="center"
+                    <div
+                        *ngIf="!hideCategories"
+                        fxFlex fxLayout="row" fxLayoutAlign="center"
                          class="questionnaire-category-title">
                         {{ categoryData.category | translate }}
                     </div>
                     <div>
                         <div
                             *ngFor="let question of categoryData.questions; let questionIndex = index"
-                            fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-evenly stretch"
+                            fxFlex fxLayout="column" fxLayoutGap="20px"
                             class="questionnaire-category-question">
-                            <div fxFlex fxLayout="row" fxLayoutAlign="start center">
-                                <div
-                                    class="questionnaire-category-question-nr">
-                                    {{ ( 'LNG_TEMPLATE_QUESTION_BADGE' | translate )  + (questionIndex + 1) }}
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-evenly stretch">
+                                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                                    <div
+                                        class="questionnaire-category-question-nr">
+                                        {{ ( 'LNG_TEMPLATE_QUESTION_BADGE' | translate )  + (questionIndex + 1) }}
+                                    </div>
+                                    <div
+                                        class="questionnaire-category-question-text">
+                                        {{ question.text | translate }}
+                                    </div>
                                 </div>
-                                <div
-                                    class="questionnaire-category-question-text">
-                                    {{ question.text | translate }}
+                                <div fxFlex>
+                                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                                        <!-- Free text -->
+                                        <app-form-input
+                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
+                                            [name]="name + '[' + question.variable + ']'"
+                                            [(ngModel)]="value[question.variable]"
+                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                            [required]="question.required"
+                                            (optionChanged)="onChange()"
+                                            [disabled]="disabled">
+                                        </app-form-input>
+
+                                        <!-- Multiple selections -->
+                                        <app-form-select
+                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
+                                            [name]="name + '[' + question.variable + ']'"
+                                            [(ngModel)]="value[question.variable]"
+                                            [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
+                                            [required]="question.required"
+                                            [options]="question.answers"
+                                            optionLabelKey="label"
+                                            optionValueKey="value"
+                                            [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
+                                            (optionChanged)="onChange()"
+                                            [disabled]="disabled">
+                                        </app-form-select>
+
+                                        <!-- copy value button -->
+                                        <div
+                                            *ngIf="displayCopyField"
+                                            fxFlex="40px"
+                                            fxLayout="column"
+                                            fxLayoutAlign="center">
+                                            <button
+                                                class="copy-field-button"
+                                                type="button"
+                                                mat-icon-button
+                                                [title]="displayCopyFieldDescription"
+                                                (click)="triggerCopyValue(question.variable)">
+                                                <span class="xt-icon">fileCopy</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div fxFlex>
-                                <!-- Free text -->
-                                <app-form-input
-                                    *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
-                                    [name]="name + '[' + question.variable + ']'"
-                                    [(ngModel)]="value[question.variable]"
-                                    [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
-                                    [required]="question.required"
-                                    (optionChanged)="onChange()"
-                                    [disabled]="disabled">
-                                </app-form-input>
 
-                                <!-- Multiple selections -->
-                                <app-form-select
-                                    *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
-                                    [name]="name + '[' + question.variable + ']'"
-                                    [(ngModel)]="value[question.variable]"
-                                    [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
-                                    [required]="question.required"
-                                    [options]="question.answers"
-                                    optionLabelKey="label"
-                                    optionValueKey="value"
-                                    [multiple]="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"
-                                    (optionChanged)="onChange()"
-                                    [disabled]="disabled">
-                                </app-form-select>
+                            <div
+                                *ngIf="(
+                                        question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ||
+                                        question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value
+                                    ) && hasSubQuestions(question, value[question.variable])"
+                                class="questionnaire-category-question-additional">
+                                <div
+                                    *ngFor="let answer of subQuestionsAnswer(question, value[question.variable])">
+                                    <app-form-fill-questionnaire
+                                        [name]="name"
+                                        [ngModel]="value"
+                                        [questions]="additionalQuestions[question.variable][answer]"
+                                        [disabled]="disabled"
+                                        [hideCategories]="true"
+                                        (changed)="onChange(false)"
+                                        (groupValidated)="validateGroup()">
+                                    </app-form-fill-questionnaire>
+                                </div>
                             </div>
                         </div>
                     </div>

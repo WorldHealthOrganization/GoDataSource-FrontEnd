@@ -16,7 +16,27 @@ const routes: Routes = [
         }
     },
 
-    // Import case lab data locations
+    // Import reference data
+    {
+        path: 'reference-data/import',
+        component: fromPages.ImportReferenceDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+        }
+    },
+
+    // Import case data
+    {
+        path: 'case-data/import',
+        component: fromPages.ImportCaseDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CASE]
+        }
+    },
+
+    // Import case lab data
     {
         path: 'case-lab-data/import',
         component: fromPages.ImportCaseLabDataComponent,
@@ -26,13 +46,23 @@ const routes: Routes = [
         }
     },
 
-    // Import reference data
+    // Import contact data
     {
-        path: 'reference-data/import',
-        component: fromPages.ImportReferenceDataComponent,
+        path: 'contact-data/import',
+        component: fromPages.ImportContactDataComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_REFERENCE_DATA]
+            permissions: [PERMISSION.WRITE_CONTACT]
+        }
+    },
+
+    // Import outbreak data
+    {
+        path: 'outbreak-data/import',
+        component: fromPages.ImportOutbreakDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_OUTBREAK]
         }
     }
 ];

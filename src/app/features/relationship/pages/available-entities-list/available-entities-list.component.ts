@@ -18,8 +18,9 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -54,8 +55,15 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     entityId: string;
     // entities list relationships
     entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+    entitiesListCount$: Observable<any>;
 
+    // available side filters
+    availableSideFilters: FilterModel[];
+
+    // reference data
     genderList$: Observable<any[]>;
+    entityTypesList$: Observable<any[]>;
+    riskLevelsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -69,16 +77,23 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList().share();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
+        this.entityTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_TYPE).share();
+        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+
+        // side filters
+        this.generateSideFilters();
 
         this.route.params
             .subscribe((params: {entityType, entityId}) => {
@@ -110,7 +125,10 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
 
-                        this.refreshList();
+                        // initialize pagination
+                        this.initPaginator();
+                        // ...and load the list of items
+                        this.needsRefreshList(true);
 
                         // get entity data
                         this.entityDataService
@@ -161,38 +179,130 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        if (this.outbreakId && this.entityType && this.entityId) {
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder);
+        }
+    }
+
+    private generateSideFilters() {
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'type',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+                type: FilterType.MULTISELECT,
+                options$: this.entityTypesList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'firstName',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'lastName',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'gender',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+                type: FilterType.MULTISELECT,
+                options$: this.genderList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'age',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
+                type: FilterType.RANGE_NUMBER,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'addresses',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+                type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'dob',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'riskLevel',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
+                type: FilterType.MULTISELECT,
+                options$: this.riskLevelsList$,
+                sortable: true
+            }),
+
+        ];
+    }
+
+    /**
+     * @Overrides parent method
+     *
+     * @param data
+     */
+    public sortBy(data) {
+        const property = _.get(data, 'active');
+        const direction = _.get(data, 'direction');
+
+        if (
+            property === 'firstName' &&
+            direction
+        ) {
+            // need to sort by firstName ASC, name ASC (so we sort Events aswell)
+
+            // remove previous sort columns, we can sort only by one column at a time
+            this.queryBuilder.sort.clear();
+
+            // retrieve Side filters
+            let queryBuilder;
+            if (
+                this.sideFilter &&
+                (queryBuilder = this.sideFilter.getQueryBuilder())
+            ) {
+                this.queryBuilder.sort.merge(queryBuilder.sort);
+            }
+
+            // apply sort
+            this.queryBuilder.sort.by('firstName', direction);
+            this.queryBuilder.sort.by('name', direction);
+
+            // refresh list
+            this.needsRefreshList(false, false);
+        } else {
+            // call method from parent class
+            super.sortBy(data);
+        }
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
     getTableColumns(): string[] {
         const columns = [
-            'checkbox', 'firstName', 'lastName', 'age', 'gender', 'risk',
-            'lastFollowUp', 'place', 'address'
+            'checkbox', 'firstName', 'lastName', 'age', 'gender', 'riskLevel',
+            'place', 'address'
         ];
 
         return columns;
     }
 
     selectEntities(form: NgForm) {
-
-        const fields: any = this.formHelper.getFields(form);
-
-        const allEntitiesField = _.get(fields, 'allEntities', false);
-        const entityIdsField = _.get(fields, 'entityIds', {});
-
-        let selectedEntities = [];
-
-        // check if all entities were selected
-        if (allEntitiesField) {
-            // all entities were selected
-            selectedEntities = Object.keys(entityIdsField);
-        } else {
-            // get the IDs of the selected entities
-            for (const entityId in entityIdsField) {
-                if (entityIdsField[entityId]) {
-                    selectedEntities.push(entityId);
-                }
-            }
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
         }
 
         // redirect to next step
@@ -200,7 +310,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             [`/relationships/${this.entityType}/${this.entityId}/create`],
             {
                 queryParams: {
-                    selectedEntityIds: JSON.stringify(selectedEntities)
+                    selectedEntityIds: JSON.stringify(selectedRecords)
                 }
             }
         );

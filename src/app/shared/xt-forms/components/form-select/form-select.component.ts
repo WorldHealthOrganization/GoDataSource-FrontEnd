@@ -1,8 +1,11 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, NgModel } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-form-select',
@@ -15,12 +18,29 @@ import * as _ from 'lodash';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> {
+export class FormSelectComponent extends ElementBase<string> implements AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    @Input() placeholder: string;
+    _placeholder: string;
+    @Input() set placeholder(placeholder: string) {
+        this._placeholder = placeholder;
+
+        if (
+            this.authUser &&
+            this.placeholder
+        ) {
+            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
+            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
+                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+            });
+        }
+    }
+    get placeholder(): string {
+        return this._placeholder;
+    }
+
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() name: string;
@@ -28,23 +48,40 @@ export class FormSelectComponent extends ElementBase<string> {
     @Input() options: any[];
     @Input() optionLabelKey: string = 'label';
     @Input() optionLabelPrefixKey: string = null;
+    @Input() optionLabelImgKey: string = null;
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
     @Input() clearable: boolean = true;
+    @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
+    @Input() allowSelectionOfDisabledItems: boolean = false;
+    @Input() tooltip: string = null;
+
+    @Input() displayFilterIcon: boolean = false;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
 
     @Output() optionChanged = new EventEmitter<any>();
+    @Output() initialized = new EventEmitter<any>();
+
+    authUser: UserModel;
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
+
+    static compareWithDefault = (o1: any, o2: any) => {
+        return o1 === o2;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private referenceDataDataService: ReferenceDataDataService,
+        private authDataService: AuthDataService
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
@@ -80,5 +117,15 @@ export class FormSelectComponent extends ElementBase<string> {
 
         // emit the currently selected option(s)
         return this.optionChanged.emit(selectedOptions);
+    }
+
+    ngAfterViewInit() {
+        // wait for the input object to be initialized
+        // then trigger the initialized event
+        setTimeout(() => {
+            this.initialized.emit(this.value);
+        });
+
+        super.ngAfterViewInit();
     }
 }

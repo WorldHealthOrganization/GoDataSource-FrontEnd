@@ -80,6 +80,7 @@ export class CaseDataService {
     /**
      * Return count of cases
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<any>}
      */
     getCasesCount(
@@ -148,6 +149,16 @@ export class CaseDataService {
         const filter = filterQueryBuilder.buildQuery();
         // call endpoint
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
+    }
+
+    /**
+     *  Restore a case that was deleted
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @returns {Observable<any>}
+     */
+    restoreCase(outbreakId: string, caseId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/restore`, {});
     }
 
 }

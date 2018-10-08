@@ -2,7 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,10 +14,11 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
-import { Constants } from '../../../../core/models/constants';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-modify-contact',
@@ -43,14 +43,14 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
 
-    Constants = Constants;
+    serverToday: Moment = null;
 
     constructor(
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
@@ -58,7 +58,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private contactDataService: ContactDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router
+        private router: Router,
+        private genericDataService: GenericDataService
     ) {
         super(route);
     }
@@ -68,8 +69,16 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // reference data
-        this.genderList$ = this.genericDataService.getGenderList();
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
 
         this.route.params
             .subscribe((params: {contactId}) => {

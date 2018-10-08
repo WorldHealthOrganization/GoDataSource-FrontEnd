@@ -17,7 +17,7 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <div>{{'LNG_ENTITY_TYPE_LABEL_CONTACT' | translate}}</div>
+                            <div>{{EntityType.CONTACT | translate}}</div>
                             <a [routerLink]="['/contacts', contactData.id, 'modify']">{{ contactData.name }}</a>
                         </div>
 

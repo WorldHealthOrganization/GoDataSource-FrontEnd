@@ -42,6 +42,9 @@ export class ViewChronologyContactComponent implements OnInit {
                             this.contactData = contactDataReturned;
                             this.breadcrumbs.push(
                                 new BreadcrumbItemModel(
+                                    contactDataReturned.name,
+                                    `/contacts/${contactDataReturned.id}/view`),
+                                new BreadcrumbItemModel(
                                     'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
                                     '.',
                                     true,
@@ -57,7 +60,7 @@ export class ViewChronologyContactComponent implements OnInit {
                             }
                             // date deceased
                             if (!_.isEmpty(this.contactData.dateDeceased)) {
-                                this.chronologyEntries.push({date: this.contactData.dateDeceased, label: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED'});
+                                this.chronologyEntries.push({date: this.contactData.dateDeceased, label: 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED'});
                             }
 
                             // sort collection asc

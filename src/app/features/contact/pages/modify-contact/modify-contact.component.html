@@ -60,13 +60,13 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                            <app-form-input
+                            <app-form-select
                                 name="occupation"
                                 [(ngModel)]="contactData.occupation"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                                maxlength="500"
+                                [options]="occupationsList$ | async"
                                 [disabled]="viewOnly">
-                            </app-form-input>
+                            </app-form-select>
 
                             <div fxFlex fxLayout="row">
                                 <button
@@ -102,9 +102,9 @@
                                     [(ngModel)]="contactData.dob"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH' | translate"
                                     [disabled]="viewOnly"
-                                    [maxDate]="Constants.today()"
+                                    [maxDate]="serverToday"
                                     app-date-validator
-                                    [dateSameOrBefore]="Constants.today()">
+                                    [dateSameOrBefore]="serverToday">
                                 </app-form-datepicker>
                             </div>
                         </div>
@@ -116,9 +116,9 @@
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
                                 [disabled]="viewOnly"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()">
+                                [dateSameOrBefore]="serverToday">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle

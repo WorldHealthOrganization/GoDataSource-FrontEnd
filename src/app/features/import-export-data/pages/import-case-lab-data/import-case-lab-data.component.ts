@@ -41,7 +41,7 @@ export class ImportCaseLabDataComponent implements OnInit {
     ImportServerModelNames = ImportServerModelNames;
 
     fieldsWithoutTokens = {
-        questionnaireAnswers: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+        questionnaireAnswers: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
     };
 
     requiredDestinationFields = [
@@ -64,7 +64,6 @@ export class ImportCaseLabDataComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for contacts on the follow up list
                 if (selectedOutbreak && selectedOutbreak.id) {
                     // set URLs
                     this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;

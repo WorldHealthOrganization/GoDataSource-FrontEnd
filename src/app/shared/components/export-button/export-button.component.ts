@@ -1,19 +1,8 @@
 import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration } from '../dialog/dialog.component';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { DialogService } from '../../../core/services/helper/dialog.service';
-import { ImportExportDataService } from '../../../core/services/data/import-export.data.service';
-import * as _ from 'lodash';
-
-export enum ExportDataExtension {
-    CSV = 'csv',
-    XLS = 'xls',
-    XLSX = 'xlsx',
-    XML = 'xml',
-    ODS = 'ods',
-    JSON = 'json'
-}
+import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-export-button',
@@ -28,55 +17,40 @@ export enum ExportDataExtension {
 })
 export class ExportButtonComponent {
     @Input() label: string = 'LNG_COMMON_BUTTON_EXPORT';
-    @Input() message: string = '';
-    @Input() placeholder: string = 'LNG_COMMON_LABEL_EXPORT_TYPE';
-    @Input() url: string = '';
-    @Input() allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.CSV,
-        ExportDataExtension.XLS,
-        ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
-        ExportDataExtension.ODS,
-        ExportDataExtension.JSON
-    ];
-    @Input() yesLabel: string = 'LNG_COMMON_LABEL_EXPORT';
-    @Input() fileName: string = 'file';
+    @Input() message: string;
+    @Input() extensionPlaceholder: string;
+    @Input() encryptPlaceholder: string;
+    @Input() anonymizePlaceholder: string;
+    @Input() displayEncrypt: boolean;
+    @Input() displayAnonymize: boolean;
+    @Input() anonymizeFields: LabelValuePair[];
+    @Input() url: string;
+    @Input() allowedExportTypes: ExportDataExtension[];
+    @Input() yesLabel: string;
+    @Input() fileName: string;
+    @Input() queryBuilder: RequestQueryBuilder;
 
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     constructor(
-        private dialogService: DialogService = null,
-        private importExportDataService: ImportExportDataService = null
+        private dialogService: DialogService = null
     ) {}
 
     triggerExport() {
-        this.dialogService.showInput(new DialogConfiguration({
+        this.dialogService.showExportDialog({
             message: this.message,
+            extensionPlaceholder: this.extensionPlaceholder,
+            encryptPlaceholder: this.encryptPlaceholder,
+            anonymizePlaceholder: this.anonymizePlaceholder,
+            displayEncrypt: this.displayEncrypt,
+            displayAnonymize: this.displayAnonymize,
+            anonymizeFields: this.anonymizeFields,
+            url: this.url,
+            allowedExportTypes: this.allowedExportTypes,
             yesLabel: this.yesLabel,
-            placeholder: this.placeholder,
-            customInputOptions: _.map(this.allowedExportTypes, (item: ExportDataExtension) => {
-                return new LabelValuePair(
-                    item as string,
-                    item as string
-                );
-            }),
-            customInputOptionsMultiple: false
-        })).subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-                this.importExportDataService.exportData(
-                    this.url,
-                    answer.inputValue.value
-                ).subscribe((blob) => {
-                    const url = window.URL.createObjectURL(blob);
-
-                    const link = this.buttonDownloadFile.nativeElement;
-                    link.href = url;
-                    link.download = `${this.fileName}.${answer.inputValue.value}`;
-                    link.click();
-
-                    window.URL.revokeObjectURL(url);
-                });
-            }
+            fileName: this.fileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+            queryBuilder: this.queryBuilder
         });
     }
 }

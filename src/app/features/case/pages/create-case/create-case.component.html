@@ -31,10 +31,12 @@
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
                                 required="true"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()"
-                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -103,12 +105,12 @@
                                 maxlength="50">
                             </app-form-input>
 
-                            <app-form-input
+                            <app-form-select
                                 name="occupation"
                                 [(ngModel)]="caseData.occupation"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
-                                maxlength="500">
-                            </app-form-input>
+                                [options]="occupationsList$ | async">
+                            </app-form-select>
 
                             <div fxFlex fxLayout="row" class="switch-buttons">
                                 <button
@@ -142,9 +144,9 @@
                                     name="dob"
                                     [(ngModel)]="caseData.dob"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
-                                    [maxDate]="Constants.today()"
+                                    [maxDate]="serverToday"
                                     app-date-validator
-                                    [dateSameOrBefore]="Constants.today()">
+                                    [dateSameOrBefore]="serverToday">
                                 </app-form-datepicker>
                             </div>
 
@@ -207,26 +209,31 @@
                                 name="dateBecomeCase"
                                 [(ngModel)]="caseData.dateBecomeCase"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()">
+                                [dateSameOrBefore]="serverToday">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfInfection"
                                 [(ngModel)]="caseData.dateOfInfection"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
-                                [maxDate]="Constants.today()"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="Constants.today()"
-                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
+                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-datepicker
                                 name="dateOfOutcome"
                                 [(ngModel)]="caseData.dateOfOutcome"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
-                                app-date-validator>
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday">
                             </app-form-datepicker>
                         </div>
 
@@ -236,8 +243,15 @@
                                 name="dateOfOnset"
                                 [(ngModel)]="caseData.dateOfOnset"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                                [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="[[caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]]">
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]"
+                                [dateSameOrAfter]="[
+                                    [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate]
+                                ]">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
@@ -258,9 +272,9 @@
                                     [(ngModel)]="caseData.dateDeceased"
                                     [disabled]="!caseData.deceased"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
-                                    [maxDate]="Constants.today()"
+                                    [maxDate]="serverToday"
                                     app-date-validator
-                                    [dateSameOrBefore]="Constants.today()"
+                                    [dateSameOrBefore]="serverToday"
                                     [dateSameOrAfter]="[
                                         [caseData.dateOfReporting, 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING' | translate],
                                         [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate],

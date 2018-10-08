@@ -1,0 +1,114 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<form
+    class="page-content form-section"
+    #form="ngForm"
+    (submit)="createNewIcon(form)">
+
+    <mat-card class="form-content page-section">
+
+        <!-- Uploading / Saving data -->
+        <div
+            *ngIf="displayLoading"
+            class="manage-icon-loading">
+            <mat-spinner></mat-spinner>
+            <span
+                *ngIf="progress !== null"
+                class="manage-icon-loading-progress">
+            {{ progress }} %
+        </span>
+        </div>
+
+        <div
+            *ngIf="!displayLoading"
+            fxLayout="column">
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-input
+                    name="name"
+                    [ngModel]="icon.name"
+                    [placeholder]="'LNG_ICON_FIELD_LABEL_NAME' | translate"
+                    required="true">
+                </app-form-input>
+
+                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex><!-- placeholder --></div>
+                <div fxFlex><!-- placeholder --></div>
+            </div>
+
+            <div
+                fxFlex fxLayout="column" fxLayoutGap="12px">
+                <div>
+                    <input
+                        hidden
+                        #importDataBtn
+                        type="file"
+                        ng2FileSelect
+                        [uploader]="uploader"
+                        [accept]="allowedExtensions"/>
+
+                    <div
+                        fxFlex fxLayoutAlign="center center"
+                        class="manage-icon-drop-zone"
+                        [class.manage-icon-file-over]="hasFileOver"
+                        ng2FileDrop
+                        [uploader]="uploader"
+                        (fileOver)="hoverDropZone($event)"
+                        (click)="importDataBtn.click()">
+                        {{ 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_DRAG_AND_DROP_FILE_HERE' | translate:translationData }}
+                    </div>
+                </div>
+
+                <div
+                    class="manage-icon-file-or">
+                    {{ 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_OR' | translate }}
+                </div>
+
+                <div
+                    class="manage-icon-file-input"
+                    fxFlex fxLayout="row"
+                    (click)="importDataBtn.click()">
+                    <div
+                        class="manage-icon-file-input-label">
+                        {{ 'LNG_ICON_FIELD_LABEL_ICON' | translate:translationData }}
+                    </div>
+                    <div
+                        fxFlex
+                        class="manage-icon-file-input-file">
+                        {{ uploader?.queue.length > 0 ? uploader.queue[0].file.name : ('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_LABEL_CHOOSE_FILE' | translate) }}
+                    </div>
+                    <div
+                        class="manage-icon-file-input-browse">
+                        {{ 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_BUTTON_BROWSE' | translate }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </mat-card>
+
+    <div class="form-actions">
+        <button
+            *ngIf="!displayLoading"
+            mat-raised-button
+            color="primary"
+            class="button-primary">
+            {{ 'LNG_COMMON_BUTTON_SAVE' | translate }}
+        </button>
+        <button
+            *ngIf="!displayLoading"
+            type="button"
+            [routerLink]="['/reference-data', 'manage-icons', 'list']"
+            [queryParams]="{ categoryId: category?.id }"
+            mat-raised-button>
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
+        </button>
+    </div>
+
+</form>

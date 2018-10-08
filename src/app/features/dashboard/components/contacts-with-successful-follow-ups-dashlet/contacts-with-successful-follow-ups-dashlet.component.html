@@ -1,0 +1,20 @@
+<app-dashboard-custom-metric-dashlet
+    [link]="'/contacts'"
+    [params]="queryParams"
+    [value]="calculatePercent() + '%'"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
+
+    <div>
+        {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP' | translate}}
+    </div>
+
+    <app-form-datepicker
+        fxFlexOffset="5px"
+        name="dateFilter"
+        [ngModel]="date"
+        (optionChanged)="onDateChanged($event)">
+    </app-form-datepicker>
+
+</app-dashboard-custom-metric-dashlet>

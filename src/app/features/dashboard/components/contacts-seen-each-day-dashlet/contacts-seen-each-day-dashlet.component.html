@@ -1,10 +1,13 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
     [params]="queryParams"
-    [value]="contactsSeenEachDay">
+    [value]="contactsSeenEachDay"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
 
     <div>
-        {{ 'LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY' | translate}}
+        {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate}}
     </div>
 
     <app-form-datepicker

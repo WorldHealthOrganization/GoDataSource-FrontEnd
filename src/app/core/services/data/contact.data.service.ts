@@ -19,14 +19,34 @@ export class ContactDataService {
     /**
      * Retrieve the list of Contacts for an Outbreak
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<ContactModel[]>}
      */
-    getContactsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ContactModel[]> {
+    getContactsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<ContactModel[]> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts?filter=${filter}`),
             ContactModel
         );
+    }
+
+    /**
+     * Return total number of contacts
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getContactsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/contacts/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -97,6 +117,26 @@ export class ContactDataService {
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-seen/count?filter=${filter}`),
             MetricContactsSeenEachDays
         );
+    }
+
+    /**
+     * Restore a contact that was deleted
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<Object>}
+     */
+    restoreContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts/${contactId}/restore`, {});
+    }
+
+    /**
+     * Convert a contact to case
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<any>}
+     */
+    convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
+       return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
     }
 }
 

@@ -30,6 +30,22 @@ export class EventDataService {
     }
 
     /**
+     * Return total number of events
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getEventsCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/events/filtered-count?filter=${filter}`);
+    }
+
+    /**
      * Add new Event to an existing Outbreak
      * @param {string} outbreakId
      * @param eventData
@@ -71,6 +87,16 @@ export class EventDataService {
      */
     deleteEvent(outbreakId: string, eventId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/events/${eventId}`);
+    }
+
+    /**
+     * Restore a deleted event
+     * @param {string} outbreakId
+     * @param {string} eventId
+     * @returns {Observable<any>}
+     */
+    restoreEvent(outbreakId: string, eventId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/events/${eventId}/restore`, {});
     }
 }
 

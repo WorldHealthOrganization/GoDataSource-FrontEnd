@@ -7,6 +7,10 @@
 <form class="page-content form-section" #form="ngForm" (submit)="modifyLocation(form)">
 
     <div class="form-content">
+
+        <!-- location breadcrumb -->
+        <app-location-breadcrumbs></app-location-breadcrumbs>
+
         <mat-tab-group class="page-tabs-navbar">
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE'| translate">
@@ -38,6 +42,29 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="geoLocation[lat]"
+                                [(ngModel)]="locationData.geoLocation.lat"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                [required]="!!locationData.geoLocation?.lng"
+                                [disabled]="viewOnly"
+                                type="number">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="geoLocation[lng]"
+                                [(ngModel)]="locationData.geoLocation.lng"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                [required]="!!locationData.geoLocation?.lat"
+                                [disabled]="viewOnly"
+                                type="number">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

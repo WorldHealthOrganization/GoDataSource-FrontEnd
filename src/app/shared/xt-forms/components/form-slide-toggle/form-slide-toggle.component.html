@@ -9,7 +9,8 @@
             [attr.name]="name"
             [labelPosition]="labelBefore ? 'before' : 'after'"
             [disabled]="disabled"
-            (click)="onClick()" (change)="onChange()">
+            (click)="onClick()" (change)="onChange()"
+            [matTooltip]="tooltip | translate">
             {{label}}
         </mat-slide-toggle>
 

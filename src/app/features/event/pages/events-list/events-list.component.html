@@ -24,6 +24,13 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.EVENT_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -41,14 +48,15 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('lastName', $event)"
-                            app-reset-input-on-side-filter>
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -63,9 +71,14 @@
         <ng-container matColumnDef="date">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
                     <div class="column-filter">
-                        <!-- @TODO later -->
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('date', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
@@ -78,14 +91,15 @@
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header>{{'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="descriptionFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
                             (optionChanged)="filterByTextField('description', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
                         </app-form-input>
                     </div>
                 </div>
@@ -99,12 +113,36 @@
         <ng-container matColumnDef="address">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{ 'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate }}</div>
                     <div class="column-filter"></div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
                 {{ item.address.fullAddress }}
+            </mat-cell>
+        </ng-container>
+
+        <!--Deleted-->
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                        ></app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -119,7 +157,7 @@
 
                     <mat-menu #actionsMenu="matMenu">
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasContactWriteAccess()" mat-menu-item routerLink="/contacts/create"
+                            <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
                                     [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
                                 {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                             </button>
@@ -127,26 +165,31 @@
                             <mat-divider></mat-divider>
                         </ng-container>
 
-                        <button mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
 
                         <mat-divider></mat-divider>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEventWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            <button *ngIf="hasEventWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                                 {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                             </button>
 
                             <button
-                                *ngIf="hasEventWriteAccess()"
+                                *ngIf="hasEventWriteAccess() && !item.deleted"
                                 mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteEvent(item)">
                                 {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            </button>
+
+                            <button *ngIf="item.deleted && hasEventWriteAccess()" mat-menu-item class="mat-menu-item-restore"
+                                    (click)="restoreEvent(item)">
+                                {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                             </button>
                         </ng-container>
 
@@ -155,7 +198,15 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <mat-paginator
+        [length]="(eventsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+
 </mat-card>

@@ -36,17 +36,19 @@ export class RolesListComponent extends ListComponent implements OnInit {
         private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService
     ) {
-        super();
+        super(
+            snackbarService
+        );
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     ngOnInit() {
-        this.refreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -74,7 +76,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
                             this.snackbarService.showSuccess('Role deleted!');
 
                             // reload data
-                            this.refreshList();
+                            this.needsRefreshList(true);
                         });
                 }
             });

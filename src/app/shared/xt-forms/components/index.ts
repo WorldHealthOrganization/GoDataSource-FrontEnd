@@ -7,6 +7,7 @@ import { FormSlideToggleComponent } from './form-slide-toggle/form-slide-toggle.
 import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
 import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
 import { FormDaterangeListComponent } from './form-daterange-list/form-daterange-list.component';
+import { FormRadioComponent } from './form-radio/form-radio.component';
 
 export const components: any[] = [
     FormValidationComponent,
@@ -17,5 +18,6 @@ export const components: any[] = [
     FormSlideToggleComponent,
     FormCheckboxComponent,
     FormDaterangeComponent,
-    FormDaterangeListComponent
+    FormDaterangeListComponent,
+    FormRadioComponent
 ];

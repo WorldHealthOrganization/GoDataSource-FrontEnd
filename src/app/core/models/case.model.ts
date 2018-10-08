@@ -3,6 +3,7 @@ import { AddressModel } from './address.model';
 import { DocumentModel } from './document.model';
 import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
+import { Constants } from './constants';
 
 export class CaseModel {
     id: string;
@@ -34,6 +35,12 @@ export class CaseModel {
     dateOfReporting: string;
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
+    outbreakId: string;
+    deleted: boolean;
+
+    relationships: {
+        people: any[]
+    }[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -46,7 +53,15 @@ export class CaseModel {
         this.dob = _.get(data, 'dob');
         this.age = _.get(data, 'age');
         this.documents = _.get(data, 'documents', []);
-        this.addresses = _.get(data, 'addresses', []);
+
+        const locationsList = _.get(data, 'locations', []);
+        this.addresses = _.map(
+            _.get(data, 'addresses', []),
+            (addressData) => {
+                return new AddressModel(addressData, locationsList);
+            }
+        );
+
         this.classification = _.get(data, 'classification');
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
@@ -63,8 +78,12 @@ export class CaseModel {
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
+        this.outbreakId = _.get(data, 'outbreakId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
+
+        this.relationships = _.get(data, 'relationships', []);
+        this.deleted = _.get(data, 'deleted');
     }
 
     /**
@@ -72,7 +91,20 @@ export class CaseModel {
      * @returns {string}
      */
     get name(): string {
-        return ( this.firstName ? this.firstName : '' ) +
-            ' ' + ( this.lastName ? this.lastName : '' );
+        const firstName = _.get(this, 'firstName', '');
+        const lastName = _.get(this, 'lastName', '');
+        return _.trim(`${firstName} ${lastName}`);
+    }
+
+    /**
+     * Get the main Address
+     */
+    get mainAddress(): AddressModel {
+        // get main address
+        const mainAddress = _.find(this.addresses, {'typeId': Constants.ADDRESS_USUAL_PLACE_OF_RESIDENCE});
+        // do we have main address? Otherwise use any address
+        const address = mainAddress ? mainAddress : this.addresses[0];
+
+        return address ? address : new AddressModel();
     }
 }

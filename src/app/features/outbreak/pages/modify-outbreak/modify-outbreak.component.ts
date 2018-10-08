@@ -18,6 +18,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -28,7 +29,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL', '/outbreaks')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
     ];
     // authenticated user
     authUser: UserModel;
@@ -64,7 +65,14 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
     ngOnInit() {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY);
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
+            (countries) => _.map(countries, (country: LabelValuePair) => {
+                country.value = {
+                    id: country.value
+                };
+                return country;
+            })
+        );
 
         this.route.params
             .subscribe((params: {outbreakId}) => {
@@ -83,13 +91,17 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                                 this.outbreak
                             )
                         );
-
-                        // set questions and answers to new property to false.
-                        this.setNewFalse(this.outbreak.caseInvestigationTemplate);
-                        this.setNewFalse(this.outbreak.contactFollowUpTemplate);
-                        this.setNewFalse(this.outbreak.labResultsTemplate);
                     });
             });
+    }
+
+    /**
+     * Compare countries
+     * @param o1
+     * @param o2
+     */
+    compareCountryWith(o1: {id: string}, o2: {id: string}): boolean {
+        return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
     /**
@@ -134,20 +146,5 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
      */
     selectTab(tabChangeEvent: MatTabChangeEvent): void {
         this.currentTabIndex = tabChangeEvent.index;
-    }
-    /**
-     * Set attribute new to false for all questions and answers in the array.
-     */
-    setNewFalse(questionsArray = []) {
-        if (!_.isEmpty(questionsArray)) {
-            _.forEach(questionsArray, function (question, key) {
-                questionsArray[key].new = false;
-                if (!_.isEmpty(questionsArray[key].answers)) {
-                    _.forEach(questionsArray[key].answers, function (answer, keyAnswer) {
-                        questionsArray[key].answers[keyAnswer].new = false;
-                    });
-                }
-            });
-        }
     }
 }

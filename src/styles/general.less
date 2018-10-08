@@ -34,9 +34,11 @@ html, body, ul, li, div, span {
 
     // Reset filters
     .reset-filters {
-        position: absolute;
-        right: 20px;
-        top: 10px;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+        width: 100%;
+        padding-bottom: 10px;
     }
 
     /* Mat Table overrides */
@@ -46,20 +48,20 @@ html, body, ul, li, div, span {
         @cell-padding-left: 20px;
 
         .mat-row {
-            align-items: start !important;
+            align-items: center !important;
             padding: 15px 0 !important;
 
             .mat-cell {
                 font-size: 16px !important;
                 padding-left: @cell-padding-left;
 
-                &.cell-case {
+                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE {
                     color: @color-case;
                 }
-                &.cell-contact {
+                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT {
                     color: @color-contact;
                 }
-                &.cell-event {
+                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT {
                     color: @color-event;
                 }
             }
@@ -75,6 +77,10 @@ html, body, ul, li, div, span {
 
                 .mat-sort-header-button {
                     text-align: left;
+                }
+
+                .mat-sort-header-arrow {
+                    color: @color-accent-main
                 }
 
                 .table-header-cell {
@@ -111,7 +117,7 @@ html, body, ul, li, div, span {
 
     // form elements having dynamic width
     .form-element-host {
-        flex: 1;
+        flex: 1 auto;
     }
 
     app-form-slide-toggle {
@@ -125,6 +131,7 @@ html, body, ul, li, div, span {
         }
 
         .form-icon {
+            display: inline !important;
             cursor: pointer;
             line-height: 0;
         }
@@ -136,8 +143,7 @@ html, body, ul, li, div, span {
 }
 
 .page-tabs-navbar {
-    flex: 1;
-
+    flex: 1 auto;
 }
 
 .page-tabs-navbar-placeholder {
@@ -148,7 +154,7 @@ html, body, ul, li, div, span {
     display: flex;
 
     .form-content {
-        flex: 1;
+        flex: 1 auto;
         margin-right: 10px;
     }
 
@@ -186,6 +192,7 @@ html, body, ul, li, div, span {
 .switch-buttons {
     button {
         height: 45px;
+        border-radius: 5px;
     }
 }
 
@@ -196,6 +203,12 @@ html, body, ul, li, div, span {
     }
 }
 
+.column-header {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: @font-roboto, sans-serif;
+    color: black;
+}
 
 /* Ng Select Invalid Styles */
 @material-invalid-color: #f44336;

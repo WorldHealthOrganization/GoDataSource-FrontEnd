@@ -5,6 +5,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',
@@ -12,7 +13,7 @@ import { Subscriber } from 'rxjs/Subscriber';
     templateUrl: './contacts-not-seen-dashlet.component.html',
     styleUrls: ['./contacts-not-seen-dashlet.component.less']
 })
-export class ContactsNotSeenDashletComponent implements OnInit {
+export class ContactsNotSeenDashletComponent extends DashletComponent implements OnInit {
 
     // number of days defined on outbreak (x)
     xDaysNotSeen: number;
@@ -32,7 +33,9 @@ export class ContactsNotSeenDashletComponent implements OnInit {
     constructor(
         private followUpDataService: FollowUpsDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get number of not seen contacts

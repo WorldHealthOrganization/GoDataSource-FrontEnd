@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { DashletComponent } from '../../helperClasses/dashlet-component';
 
 @Component({
     selector: 'app-cases-hospitalised-dashlet',
@@ -10,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
     templateUrl: './cases-hospitalised-dashlet.component.html',
     styleUrls: ['./cases-hospitalised-dashlet.component.less']
 })
-export class CasesHospitalisedDashletComponent implements OnInit {
+export class CasesHospitalisedDashletComponent extends DashletComponent implements OnInit {
 
     // number of hospitalised cases
     casesHospitalisedCount: number;
@@ -20,7 +21,9 @@ export class CasesHospitalisedDashletComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService
-    ) {}
+    ) {
+        super();
+    }
 
     ngOnInit() {
         // get number of hospitalised cases

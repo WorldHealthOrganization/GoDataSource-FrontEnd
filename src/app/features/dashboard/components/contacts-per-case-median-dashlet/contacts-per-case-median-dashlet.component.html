@@ -1,5 +1,8 @@
 <app-dashboard-custom-metric-dashlet
-    [value]="medianNoContactsPerCase">
+    [value]="medianNoContactsPerCase"
+    (hide)="onHide()"
+    (moveBefore)="onMoveBefore()"
+    (moveAfter)="onMoveAfter()">
     {{ "LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE" | translate}}
 </app-dashboard-custom-metric-dashlet>
 
