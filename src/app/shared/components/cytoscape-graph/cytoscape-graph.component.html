@@ -77,4 +77,13 @@
     <div class="cy"
          [fxShow]="!showLoading">
     </div>
+
+    <button mat-raised-button (click)="switchTimelineView('vertical')">
+        {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
+    </button>
+
+    <button mat-raised-button (click)="switchTimelineView('horizontal')">
+        {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+    </button>
+
 </div>

@@ -279,6 +279,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     }
 
+    /**
+     * switch timeline view type: vertical / horizontal
+     * @param timelineViewType
+     */
+    switchTimelineView(timelineViewType) {
+
+    }
+
 }
 
 
