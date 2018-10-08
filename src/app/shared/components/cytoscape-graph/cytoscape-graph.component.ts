@@ -22,9 +22,12 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     @Output() nodeTapped = new EventEmitter<any>();
     @Output() edgeTapped = new EventEmitter<any>();
+    @Output() viewTypeChanged = new EventEmitter<any>();
 
     cy: any;
     container: string = 'cy';
+
+    Constants = Constants;
 
     transmissionChainViewTypes$: Observable<any[]>;
 
@@ -255,8 +258,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     /**
      * re-render the layout on view type change
      */
-    updateView() {
+    updateView($event) {
+        this.transmissionChainViewType = $event.value;
         this.render();
+        this.viewTypeChanged.emit($event);
     }
 
     /**
@@ -279,6 +284,41 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     }
 
+    /**
+     * decide if the link to cases without dates will be displayed
+     * @returns {boolean}
+     */
+    showCaseNodesWithoutDates() {
+       return (
+           this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+           && this.elements
+           && this.elements.caseNodesWithoutDates.length
+       );
+    }
+
+    /**
+     * decide if the link to contacts without dates will be displayed
+     * @returns {boolean}
+     */
+    showContactNodesWithoutDates() {
+        return (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            && this.elements
+            && this.elements.contactNodesWithoutDates.length
+        );
+    }
+
+    /**
+     * decide if the link to events without dates will be displayed
+     * @returns {boolean}
+     */
+    showEventNodesWithoutDates() {
+        return (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            && this.elements
+            && this.elements.eventNodesWithoutDates.length
+        );
+    }
 }
 
 

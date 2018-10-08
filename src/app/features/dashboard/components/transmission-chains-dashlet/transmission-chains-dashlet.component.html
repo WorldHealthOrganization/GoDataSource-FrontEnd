@@ -126,7 +126,9 @@
                 {value: 'type', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL'},
                 {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
                 {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
-                ]">
+                ]"
+            [disabled]="selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value"
+            [tooltip]="tooltipViewTimeline() | translate">
         </app-form-radio>
 
         <div>
@@ -155,8 +157,9 @@
 <!-- cytoscape element -->
 <app-cytoscape-graph
     [elements]="graphElements"
-    [transmissionChainViewType]="Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+    [transmissionChainViewType]="selectedViewType"
     [legend]="legend"
     (nodeTapped)="onNodeTap($event)"
-    (edgeTapped)="onEdgeTap($event)">
+    (edgeTapped)="onEdgeTap($event)"
+    (viewTypeChanged)="viewTypeChanged($event)">
 </app-cytoscape-graph>
