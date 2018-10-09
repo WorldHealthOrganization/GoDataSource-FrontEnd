@@ -638,8 +638,11 @@ export const EnglishUsLang = {
          * User Role fields
          */
         'LNG_USER_ROLE_FIELD_LABEL_NAME': 'Name',
+        'LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION': 'TEST_DESCRIPTION',
         'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION': 'TEST_DESCRIPTION',
         'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS': 'Options',
+        'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION': 'TEST_DESCRIPTION',
 
         /**
          * List User Role page
