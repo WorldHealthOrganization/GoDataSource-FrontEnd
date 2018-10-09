@@ -69,7 +69,9 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_BACK': 'Back',
         'LNG_COMMON_BUTTON_ADD': 'Add',
+        'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
@@ -514,17 +516,21 @@ export const EnglishUsLang = {
          * Locations list page
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ALL_TITLE': 'All',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
-        'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
+        'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
+        'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
 
         /**
          * Create Location page
          */
         'LNG_PAGE_CREATE_LOCATION_TITLE': 'Create New Location',
         'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LOCATION_NAME': 'New Location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON': 'Create location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE': 'Location created!',
 
@@ -533,6 +539,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_LOCATION_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_VIEW_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
@@ -1135,9 +1142,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE': 'Relationship Details',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Name Color',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE': 'events without date',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
 
 
         /**
@@ -1155,6 +1168,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in the previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
+        'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
+        'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -1199,6 +1215,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT': 'Contains',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD': 'Keyword',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
@@ -1208,7 +1225,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION': 'Place',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within radius',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE': 'Max Distance ( miles )',
-        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Direction',
+        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Order',
         'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER': 'Sort By',
         'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
         'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
