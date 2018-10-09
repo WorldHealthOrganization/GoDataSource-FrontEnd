@@ -288,6 +288,7 @@
                     [required]="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
+                    [readOnly]="viewOnly">
                 </app-form-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES'| translate}}</div>
@@ -300,6 +301,7 @@
                     [required]="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
+                    [readOnly]="viewOnly">
                 </app-form-daterange-list>
 
             </mat-tab>
