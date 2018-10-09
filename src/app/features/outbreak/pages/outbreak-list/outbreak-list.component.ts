@@ -335,7 +335,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                             required: true,
                             type: 'text',
-                            value: outbreak.name + ' Clone'
+                            value: outbreak.name + this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME')
                         })],
                     }), true)
                     .subscribe((answer) => {
