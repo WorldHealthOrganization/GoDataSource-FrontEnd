@@ -80,6 +80,7 @@
     <div class="cy"
          [fxShow]="!showLoading">
     </div>
+
 </div>
 
 <div *ngIf="showCaseNodesWithoutDates()"
@@ -109,3 +110,15 @@
         {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
     </a>
 </div>
+
+<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
+    mat-raised-button
+    (click)="switchTimelineView('vertical')">
+    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
+</button>
+
+<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
+    mat-raised-button
+    (click)="switchTimelineView('horizontal')">
+    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+</button>
