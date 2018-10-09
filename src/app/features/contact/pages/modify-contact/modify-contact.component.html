@@ -20,6 +20,7 @@
                                 name="firstName"
                                 [(ngModel)]="contactData.firstName"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="200"
                                 [disabled]="viewOnly">
@@ -29,6 +30,7 @@
                                 name="middleName"
                                 [(ngModel)]="contactData.middleName"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
                                 maxlength="200"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -37,6 +39,7 @@
                                 name="lastName"
                                 [(ngModel)]="contactData.lastName"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                                 maxlength="200"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -45,6 +48,7 @@
                                 name="gender"
                                 [(ngModel)]="contactData.gender"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
                                 required="true"
                                 [options]="genderList$ | async"
                                 [disabled]="viewOnly">
@@ -55,19 +59,19 @@
                             <div
                                 fxFlex fxLayout="row" fxLayoutGap="20px">
                                 <app-form-input
-                                    fxFlex="25%"
                                     name="phoneNumber"
                                     [(ngModel)]="contactData.phoneNumber"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION"
                                     maxlength="50"
                                     [disabled]="viewOnly">
                                 </app-form-input>
 
                                 <app-form-select
-                                    fxFlex="25%"
                                     name="occupation"
                                     [(ngModel)]="contactData.occupation"
                                     [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async"
                                     [disabled]="viewOnly">
                                 </app-form-select>
@@ -93,6 +97,7 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="contactData.dateOfReporting"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
@@ -105,6 +110,7 @@
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="contactData.isDateOfReportingApproximate"
                                 [label]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
@@ -128,6 +134,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="contactData.riskLevel"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 [options]="riskLevelsList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
@@ -138,6 +145,7 @@
                                 name="riskReason"
                                 [(ngModel)]="contactData.riskReason"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-textarea>
                         </div>
