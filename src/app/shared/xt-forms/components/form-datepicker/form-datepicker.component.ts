@@ -16,10 +16,6 @@ import { ElementBase } from '../../core/index';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { Moment } from 'moment';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -55,25 +51,7 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    _placeholder: string;
-    @Input() set placeholder(placeholder: string) {
-        this._placeholder = placeholder;
-
-        if (
-            this.authUser &&
-            this.placeholder
-        ) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                if (!_.isEmpty(glossaryData[labelValue])) {
-                    this.tooltip = glossaryData[labelValue];
-                }
-            });
-        }
-    }
-    get placeholder(): string {
-        return this._placeholder;
-    }
+    @Input() placeholder: string;
 
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
@@ -87,18 +65,12 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
-    authUser: UserModel;
-
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**

@@ -4,10 +4,6 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-form-slide-toggle',
@@ -25,25 +21,7 @@ export class FormSlideToggleComponent extends ElementBase<string> {
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    _label: string;
-    @Input() set label(label: string) {
-        this._label = label;
-
-        if (
-            this.authUser &&
-            this.label
-        ) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.label);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                if (!_.isEmpty(glossaryData[labelValue])) {
-                    this.tooltip = glossaryData[labelValue];
-                }
-            });
-        }
-    }
-    get label(): string {
-        return this._label;
-    }
+    @Input() label: string;
 
     // used only when toggle is "readonly" and not checked
     @Input() notCheckedLabel: string;
@@ -57,18 +35,12 @@ export class FormSlideToggleComponent extends ElementBase<string> {
 
     @Output() optionChanged = new EventEmitter<any>();
 
-    authUser: UserModel;
-
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**

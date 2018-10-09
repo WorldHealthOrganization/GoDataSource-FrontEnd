@@ -13,10 +13,6 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-form-input',
@@ -34,25 +30,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    _placeholder: string;
-    @Input() set placeholder(placeholder: string) {
-        this._placeholder = placeholder;
-
-        if (
-            this.authUser &&
-            this.placeholder
-        ) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                if (!_.isEmpty(glossaryData[labelValue])) {
-                    this.tooltip = glossaryData[labelValue];
-                }
-            });
-        }
-    }
-    get placeholder(): string {
-        return this._placeholder;
-    }
+    @Input() placeholder: string;
 
     @Input() type: string = 'text';
     @Input() required: boolean = false;
@@ -72,20 +50,14 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
 
-    authUser: UserModel;
-
     public identifier = `form-input-${FormInputComponent.identifier++}`;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**
