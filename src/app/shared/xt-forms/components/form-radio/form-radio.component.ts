@@ -35,6 +35,8 @@ export class FormRadioComponent extends ElementBase<string> implements OnInit {
     @Input() label: string;
     @Input() name: string;
     @Input() options: LabelValuePair[];
+    @Input() disabled: boolean = false;
+    @Input() tooltip: string = null;
 
     public identifier = `form-radio-${FormRadioComponent.identifier++}`;
 

@@ -807,6 +807,58 @@ export abstract class ListComponent {
                         this.needsRefreshList(true);
                     });
                 break;
+
+            // Filter cases without date of onset.
+            case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN:
+                // get the case ids that need to be updated
+                const caseIds = _.get(queryParams, 'caseIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': caseIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            // Filter contacts without date of last contact.
+            case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
+                // get the contact ids that need to be updated
+                const contactIds = _.get(queryParams, 'contactIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': contactIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            // Filter events without date
+            case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN:
+                // get the event ids that need to be updated
+                const eventIds = _.get(queryParams, 'eventIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': eventIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
         }
     }
 
