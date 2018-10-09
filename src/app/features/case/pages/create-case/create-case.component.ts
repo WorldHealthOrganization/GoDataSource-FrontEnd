@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -12,16 +12,13 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
-import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
-import { AgeModel } from '../../../../core/models/age.model';
-import { FormAgeComponent } from '../../../../shared/components/form-age/form-age.component';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-case',
@@ -37,7 +34,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     ];
 
     caseData: CaseModel = new CaseModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
@@ -47,11 +43,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     serverToday: Moment = null;
-
-    @ViewChild('dob') dobComponent: FormDatepickerComponent;
-    dobDirty: boolean = false;
-    @ViewChild('age') ageComponent: FormAgeComponent;
-    ageDirty: boolean = false;
 
     constructor(
         private router: Router,
@@ -95,60 +86,18 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             });
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        // save control dirty state since ngIf removes it...and we can't use fxShow / Hide since it doesn't reinitialize component & rebind values
-        if (this.ageSelected) {
-            this.ageDirty = this.ageComponent && this.ageComponent.control.dirty;
-        } else {
-            this.dobDirty = this.dobComponent && this.dobComponent.control.dirty;
-        }
-
-        // switch element that we want to see
-        this.ageSelected = ageSelected;
-
-        // make sure we set dirtiness back
-        setTimeout(() => {
-            // make control dirty again
-            if (
-                this.ageSelected &&
-                this.ageDirty &&
-                this.ageComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.ageComponent.control.markAsDirty();
-                });
-            } else if (
-                !this.ageSelected &&
-                this.dobDirty &&
-                this.dobComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.dobComponent.control.markAsDirty();
-                });
-            }
-        });
-    }
-
     createNewCase(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        // add age information if necessary
-        if (dirtyFields.dob) {
-            AgeModel.addAgeFromDob(
-                dirtyFields,
-                null,
-                dirtyFields.dob
-            );
-        } else if (dirtyFields.age) {
-            dirtyFields.dob = null;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
+        // validate
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
@@ -169,28 +118,5 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                     this.router.navigate(['/cases']);
                 });
         }
-    }
-
-    /**
-     * DOB changed handler
-     * @param dob
-     * @param date
-     */
-    dobChanged(
-        dob: FormDatepickerComponent,
-        date: Moment
-    ) {
-        AgeModel.addAgeFromDob(
-            this.caseData,
-            dob,
-            date
-        );
-    }
-
-    /**
-     * Age changed
-     */
-    ageChanged() {
-        this.caseData.dob = null;
     }
 }

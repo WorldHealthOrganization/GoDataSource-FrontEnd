@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
@@ -19,9 +19,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Moment } from 'moment';
-import { FormDatepickerComponent } from '../../../../shared/xt-forms/components/form-datepicker/form-datepicker.component';
-import { AgeModel } from '../../../../core/models/age.model';
-import { FormAgeComponent } from '../../../../shared/components/form-age/form-age.component';
 
 @Component({
     selector: 'app-modify-contact',
@@ -42,7 +39,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     outbreakId: string;
 
     contactData: ContactModel = new ContactModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
@@ -52,11 +48,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     EntityType = EntityType;
 
     serverToday: Moment = null;
-
-    @ViewChild('dob') dobComponent: FormDatepickerComponent;
-    dobDirty: boolean = false;
-    @ViewChild('age') ageComponent: FormAgeComponent;
-    ageDirty: boolean = false;
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
@@ -103,7 +94,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             .getContact(selectedOutbreak.id, this.contactId)
                             .subscribe(contactDataReturned => {
                                 this.contactData = new ContactModel(contactDataReturned);
-                                this.ageSelected = !this.contactData.dob;
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
@@ -126,45 +116,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        // save control dirty state since ngIf removes it...and we can't use fxShow / Hide since it doesn't reinitialize component & rebind values
-        if (this.ageSelected) {
-            this.ageDirty = this.ageComponent && this.ageComponent.control.dirty;
-        } else {
-            this.dobDirty = this.dobComponent && this.dobComponent.control.dirty;
-        }
-
-        // switch element that we want to see
-        this.ageSelected = ageSelected;
-
-        // make sure we set dirtiness back
-        setTimeout(() => {
-            // make control dirty again
-            if (
-                this.ageSelected &&
-                this.ageDirty &&
-                this.ageComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.ageComponent.control.markAsDirty();
-                });
-            } else if (
-                !this.ageSelected &&
-                this.dobDirty &&
-                this.dobComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.dobComponent.control.markAsDirty();
-                });
-            }
-        });
-    }
-
     modifyContact(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -174,15 +125,11 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // add age information if necessary
-        if (dirtyFields.dob) {
-            AgeModel.addAgeFromDob(
-                dirtyFields,
-                null,
-                dirtyFields.dob
-            );
-        } else if (dirtyFields.age) {
-            dirtyFields.dob = null;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
         // modify the contact
@@ -200,28 +147,5 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.disableDirtyConfirm();
                 this.router.navigate(['/contacts']);
             });
-    }
-
-    /**
-     * DOB changed handler
-     * @param dob
-     * @param date
-     */
-    dobChanged(
-        dob: FormDatepickerComponent,
-        date: Moment
-    ) {
-        AgeModel.addAgeFromDob(
-            this.contactData,
-            dob,
-            date
-        );
-    }
-
-    /**
-     * Age changed
-     */
-    ageChanged() {
-        this.contactData.dob = null;
     }
 }

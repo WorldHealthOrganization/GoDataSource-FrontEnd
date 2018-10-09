@@ -13,8 +13,8 @@
                 type="number"
                 (optionChanged)="onChangeNo('years', $event)"
                 app-min-max-validator
-                [minNumber]="1"
-                [min]="1"
+                [minNumber]="0"
+                [min]="0"
                 [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
                 [max]="Constants.DEFAULT_AGE_MAX_YEARS">
             </app-form-input>
@@ -29,8 +29,8 @@
                 type="number"
                 (optionChanged)="onChangeNo('months', $event)"
                 app-min-max-validator
-                [minNumber]="1"
-                [min]="1"
+                [minNumber]="0"
+                [min]="0"
                 [maxNumber]="11"
                 [max]="11">
             </app-form-input>

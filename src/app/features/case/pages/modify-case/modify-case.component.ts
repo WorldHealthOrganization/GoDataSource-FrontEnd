@@ -225,7 +225,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
                         const parentPerson = _.find(relationship.persons, { source: true });
                         const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
-                        if (parentCase.dateOfOnset) {
+                        if (
+                            parentCase &&
+                            parentCase.dateOfOnset
+                        ) {
                             uniqueDates[moment(parentCase.dateOfOnset).startOf('day').toISOString()] = true;
                         }
                     });
@@ -258,33 +261,28 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        console.log(dirtyFields);
-        // // add age information if necessary
-        // if (dirtyFields.dob) {
-        //     AgeModel.addAgeFromDob(
-        //         dirtyFields,
-        //         null,
-        //         dirtyFields.dob
-        //     );
-        // } else if (dirtyFields.age) {
-        //     dirtyFields.dob = null;
-        // }
-        //
-        // // modify the Case
-        // this.caseDataService
-        //     .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
-        //     .catch((err) => {
-        //         this.snackbarService.showError(err.message);
-        //
-        //         return ErrorObservable.create(err);
-        //     })
-        //     .subscribe(() => {
-        //         this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
-        //
-        //         // navigate to listing page
-        //         this.disableDirtyConfirm();
-        //         this.router.navigate(['/cases']);
-        //     });
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
+        }
+
+        // modify the Case
+        this.caseDataService
+            .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+
+                // navigate to listing page
+                this.disableDirtyConfirm();
+                this.router.navigate(['/cases']);
+            });
     }
 
     /**

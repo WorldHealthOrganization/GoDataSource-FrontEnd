@@ -1,13 +1,13 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { FormDatepickerComponent } from '../../xt-forms/components/form-datepicker/form-datepicker.component';
-import { FormAgeComponent } from '../form-age/form-age.component';
 import { Moment } from 'moment';
 import { AgeModel } from '../../../core/models/age.model';
 import { Constants } from '../../../core/models/constants';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-form-age-dob',
@@ -28,11 +28,6 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
     ageSelected: boolean = true;
 
     today: Moment;
-
-    @ViewChild('dob') dobComponent: FormDatepickerComponent;
-    dobDirty: boolean = false;
-    @ViewChild('age') ageComponent: FormAgeComponent;
-    ageDirty: boolean = false;
 
     /**
      * Constructor
@@ -56,39 +51,8 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
      * Switch between Age and Date of birth
      */
     switchAgeDob(ageSelected: boolean = true) {
-        // save control dirty state since ngIf removes it...and we can't use fxShow / Hide since it doesn't reinitialize component & rebind values
-        if (this.ageSelected) {
-            this.ageDirty = this.ageComponent && this.ageComponent.control.dirty;
-        } else {
-            this.dobDirty = this.dobComponent && this.dobComponent.control.dirty;
-        }
-
         // switch element that we want to see
         this.ageSelected = ageSelected;
-
-        // make sure we set dirtiness back
-        setTimeout(() => {
-            // make control dirty again
-            if (
-                this.ageSelected &&
-                this.ageDirty &&
-                this.ageComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.ageComponent.control.markAsDirty();
-                });
-            } else if (
-                !this.ageSelected &&
-                this.dobDirty &&
-                this.dobComponent
-            ) {
-                // make sure we have control
-                setTimeout(() => {
-                    this.dobComponent.control.markAsDirty();
-                });
-            }
-        });
     }
 
     /**
@@ -124,11 +88,27 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
         date: Moment
     ) {
         // update age
-        AgeModel.addAgeFromDob(
-            this.value,
-            dob,
-            date
-        );
+        if (
+            (
+                !dob ||
+                !dob.invalid
+            ) &&
+            date &&
+            date.isValid()
+        ) {
+            // add age object if we don't have one
+            if (!this.ageDob.age) {
+                this.ageDob.age = new AgeModel();
+            }
+
+            // add data
+            const now = moment();
+            this.ageDob.age.years = now.diff(date, 'years');
+            this.ageDob.age.months = this.ageDob.age.years < 1 ? now.diff(date, 'months') : 0;
+        } else {
+            this.ageDob.age.months = 0;
+            this.ageDob.age.years = 0;
+        }
 
         // tell parent that data changed
         super.onChange();
