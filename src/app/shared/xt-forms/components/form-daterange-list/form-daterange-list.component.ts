@@ -20,6 +20,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../components/dialog/dia
 export class FormDaterangeListComponent extends ListBase<DateRangeModel> implements OnInit {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
+    @Input() readOnly: boolean = false;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
