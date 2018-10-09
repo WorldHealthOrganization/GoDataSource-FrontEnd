@@ -18,6 +18,7 @@ export enum FilterType {
     SELECT = 'select',
     MULTISELECT = 'multiselect',
     RANGE_NUMBER = 'range_number',
+    RANGE_AGE = 'range_age',
     RANGE_DATE = 'range_date',
     ADDRESS = 'address'
 }
@@ -164,6 +165,21 @@ export class AppliedFilterModel {
             valueType: ValueType.RANGE_NUMBER
         }],
 
+        // range age
+        [FilterType.RANGE_AGE]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
+            value: FilterComparator.BETWEEN,
+            valueType: ValueType.RANGE_NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
+            value: FilterComparator.BEFORE,
+            valueType: ValueType.RANGE_NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
+            value: FilterComparator.AFTER,
+            valueType: ValueType.RANGE_NUMBER
+        }],
+
         // range date
         [FilterType.RANGE_DATE]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
@@ -199,6 +215,7 @@ export class AppliedFilterModel {
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
+        [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
         [FilterType.ADDRESS]: FilterComparator.CONTAINS
     };

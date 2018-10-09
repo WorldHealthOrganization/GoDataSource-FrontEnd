@@ -15,6 +15,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -41,8 +42,10 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
 
+    // constants
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+    Constants = Constants;
 
     constructor(
         private route: ActivatedRoute,
