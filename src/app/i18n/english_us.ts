@@ -1034,6 +1034,7 @@ export const EnglishUsLang = {
          * Icon Fields
          */
         'LNG_ICON_FIELD_LABEL_NAME': 'Name',
+        'LNG_ICON_FIELD_LABEL_NAME_DESCRIPTION': 'TEST_DESCRIPTION',
         'LNG_ICON_FIELD_LABEL_ICON': 'Icon',
 
         /**
