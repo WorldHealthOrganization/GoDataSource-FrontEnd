@@ -16,6 +16,7 @@ import * as moment from 'moment';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -36,6 +37,9 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     serverToday: Moment = null;
+
+    // provide constants to template
+    EntityType = EntityType;
 
     constructor(
         private router: Router,

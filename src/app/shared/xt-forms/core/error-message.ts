@@ -24,6 +24,16 @@ export class ErrorMessage {
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_PATTERN'
                 );
+            case 'minNumberValidator':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER',
+                    {min: this.validator.minNumberValidator['min']}
+                );
+            case 'maxNumberValidator':
+                return new ElementBaseFailure(
+                    'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
+                    {max: this.validator.maxNumberValidator['max']}
+                );
             case 'minlength':
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH',

@@ -15,8 +15,8 @@
                 </div>
             </mat-list-item>
 
-            <mat-list-item *ngIf="!last" class="breadcrumb-separator">
-                <span class="xt-icon">thinArrowRight</span>
+            <mat-list-item *ngIf="displaySeparator && (addSeparatorAtTheEnd || !last)" class="breadcrumb-separator">
+                <span [innerHTML]="separator"></span>
             </mat-list-item>
 
         </ng-container>

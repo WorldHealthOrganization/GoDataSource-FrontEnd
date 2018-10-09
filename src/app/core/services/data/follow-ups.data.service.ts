@@ -78,7 +78,7 @@ export class FollowUpsDataService {
     }
 
     /**
-     * Retrieve the list of of contacts that missed their last follow-up
+     * Retrieve the list of contacts that missed their last follow-up
      * @param {string} outbreakId
      * @returns {Observable<FollowUpModel[]>}
      */
@@ -117,6 +117,26 @@ export class FollowUpsDataService {
                     });
                 });
             });
+    }
+
+    /**
+     * Return the number of contacts that missed their last follow-up
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getLastFollowUpsMissedCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // include contact in response
+        const qb = new RequestQueryBuilder();
+        qb.include('contact');
+        qb.merge(queryBuilder);
+
+        // construct query
+        const filter = qb.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed/filtered-count?filter=${filter}`);
     }
 
     /**

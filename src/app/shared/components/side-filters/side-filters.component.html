@@ -12,20 +12,6 @@
         <mat-sidenav #sideNav mode="over" fixedInViewport>
 
             <form #form="ngForm" (submit)="apply(form)">
-
-                <!-- Columns to display -->
-                <div *ngIf="columns.length > 0" class="section columns-section">
-
-                    <div class="title">
-                        {{'LNG_SIDE_FILTERS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate}}
-                    </div>
-
-                    <div class="actions">
-                        <!-- #TODO -->
-                    </div>
-
-                </div>
-
                 <!-- Filters -->
                 <div *ngIf="filterOptions.length > 0" class="section filters-section" fxLayout="column">
 
@@ -105,9 +91,9 @@
                                     [allowSelectionOfDisabledItems]="true">
                                 </app-form-select>
 
-                                <!-- NUMBER RANGE Filter -->
+                                <!-- NUMBER / AGE RANGE Filter -->
                                 <app-form-range
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER"
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_NUMBER || filter.filter?.type === FilterType.RANGE_AGE"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
                                     (changed)="filter.value = $event;"
@@ -116,8 +102,23 @@
                                         filter.comparator === FilterComparator.AFTER"
                                     [toVisible]="
                                         filter.comparator === FilterComparator.BETWEEN ||
-                                        filter.comparator === FilterComparator.BEFORE">
+                                        filter.comparator === FilterComparator.BEFORE"
+                                    [step]="filter.filter?.type === FilterType.RANGE_AGE ? 0.1 : undefined"
+                                    [min]="filter.filter?.type === FilterType.RANGE_AGE ? 0 : undefined"
+                                    [max]="filter.filter?.type === FilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
+                                    [fromPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_FROM' : 'LNG_FORM_RANGE_FIELD_LABEL_FROM'"
+                                    [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
                                 </app-form-range>
+
+                                <!-- DATE RANGE Filter-->
+                                <app-form-daterange
+                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [ngModel]="filter.value"
+                                    (changed)="filter.value = $event;"
+                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
+                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
+                                </app-form-daterange>
 
                                 <!-- Address Location -->
                                 <app-form-location-dropdown
@@ -129,16 +130,32 @@
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
 
-                                <!--DATE RANGE Filter-->
-                                <app-form-daterange
-                                    *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
-                                    [name]="'filter[filters][' + i + '][value]'"
-                                    [ngModel]="filter.value"
-                                    (changed)="filter.value = $event;"
-                                    [startDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.AFTER"
-                                    [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
-                                </app-form-daterange>
+                                <!-- Address Within Radius -->
+                                <ng-container
+                                    *ngIf="filter.filter?.type === FilterType.ADDRESS &&
+                                        filter.comparator === FilterComparator.WITHIN">
+                                    <input
+                                        [name]="'filter[filters][' + i + '][extraValues][location]'"
+                                        [ngModel]="filter.extraValues.location"
+                                        type="hidden"/>
+
+                                    <app-form-location-dropdown
+                                        [name]="'filter[filters][' + i + '][value]'"
+                                        [ngModel]="filter.value"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
+                                        [multiple]="false"
+                                        (changed)="filter.value = $event;"
+                                        (itemChanged)="filter.extraValues.location = $event;">
+                                    </app-form-location-dropdown>
+
+                                    <app-form-input
+                                        [name]="'filter[filters][' + i + '][extraValues][radius]'"
+                                        [(ngModel)]="filter.extraValues.radius"
+                                        [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE' | translate">
+                                    </app-form-input>
+                                </ng-container>
                             </mat-card>
+
                             <!-- Delete filter item -->
                             <button
                                 class="filter-details-delete-button"
@@ -225,7 +242,7 @@
 
                 <div class="buttons-container">
                     <button
-                        *ngIf="selectedColumns.length > 0 || appliedFilters.length > 0 || appliedSort.length > 0"
+                        *ngIf="appliedFilters.length > 0 || appliedSort.length > 0"
                         class="button-primary stretched-button"
                         mat-raised-button
                         color="primary"

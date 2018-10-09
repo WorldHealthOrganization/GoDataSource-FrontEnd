@@ -4,189 +4,236 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
         </div>
 
-        <div
-            *ngIf="hasLocationWriteAccess()"
-            class="topnav-actions">
-            <button
-                *ngIf="!parentId && !appliedListFilter"
-                class="button-primary"
-                mat-raised-button
-                color="primary"
-                [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
-                {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
-            </button>
+        <div class="topnav-actions">
+            <ng-container
+                *ngIf="hasLocationWriteAccess()">
+                <button
+                    *ngIf="!parentId && !appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
+                    {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
+                </button>
 
-            <button
-                class="button-primary"
-                mat-raised-button
-                color="primary"
-                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
-                {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
-            </button>
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+                    {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </ng-container>
         </div>
     </ng-container>
 </app-topnav>
 
-<mat-card class="page-section page-content">
+<div [ngClass]="{ 'form-section': !!parentId }">
+    <div class="form-content">
+        <mat-card class="page-section page-content">
+            <!-- location breadcrumb -->
+            <app-location-breadcrumbs></app-location-breadcrumbs>
 
-    <!-- location breadcrumb -->
-    <app-location-breadcrumbs></app-location-breadcrumbs>
+            <!-- Reset Filters -->
+            <div class="reset-filters">
+                <button mat-raised-button (click)="resetFiltersToSideFilters()">
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+                <button mat-raised-button (click)="needsRefreshList()">
+                    {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                </button>
+            </div>
 
-    <!-- Reset Filters -->
-    <div class="reset-filters">
-        <button mat-raised-button (click)="resetFiltersToSideFilters()">
-            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-        </button>
-        <button mat-raised-button (click)="needsRefreshList()">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
+            <mat-table #table [dataSource]="locationsList" matSort (matSortChange)="sortBy($event)">
+
+                <!-- Name -->
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="nameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('name', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        <a [routerLink]="['/locations', item.id, 'children']">
+                            {{ item.name }}
+                        </a>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Synonyms -->
+                <ng-container matColumnDef="synonyms">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="synonymsFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('synonyms', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.synonymsAsString }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Lat / Lng -->
+                <ng-container matColumnDef="latLng">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEO_LOCATION" | translate}}</div>
+                            <div class="column-filter">
+                                <!-- placeholder -->
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.geoLocation && item.geoLocation.lat ? item.geoLocation.lat + ', ' + item.geoLocation.lng : '' }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Active -->
+                <ng-container matColumnDef="active">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="activeFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
+                                    [options]="yesNoOptionsList$ | async"
+                                    (optionChanged)="filterByBooleanField('active', $event.value)"
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        <app-yes-no-label [value]="item.active"></app-yes-no-label>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Population density -->
+                <ng-container matColumnDef="populationDensity">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-range
+                                    name="populationDensityFilter"
+                                    ngModel
+                                    (changed)="filterByRangeField('populationDensity', $event)"
+                                    app-reset-input-on-side-filter>
+                                </app-form-range>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.populationDensity }}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Inline Actions -->
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+                    <mat-cell *matCellDef="let item" fxFlex="70px">
+                        <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                            <span class="xt-icon">moreVertical</span>
+                        </button>
+
+                        <mat-menu #actionsMenu="matMenu">
+                            <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
+                                {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
+                            </button>
+
+                            <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
+                                {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
+                            </button>
+
+                            <mat-divider></mat-divider>
+
+                            <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">
+                                {{'LNG_PAGE_ACTION_VIEW'| translate}}
+                            </button>
+
+                            <ng-container
+                                *ngIf="hasLocationWriteAccess()">
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['/locations', item.id, 'modify']">
+                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item class="mat-menu-item-delete"
+                                    (click)="deleteLocation(item)">
+                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                </button>
+                            </ng-container>
+                        </mat-menu>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+                <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+            </mat-table>
+
+            <mat-paginator
+                [length]="(locationsListCount$ | async)?.count"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                (page)="changePage($event)">
+            </mat-paginator>
+
+            <div
+                *ngIf="locationsList && locationsList.length < 1"
+                class="no-records">
+                {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
+            </div>
+        </mat-card>
     </div>
 
-    <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
+    <div
+        *ngIf="parentId"
+        class="form-actions">
+        <button
+            class="button-primary"
+            mat-raised-button
+            color="primary"
+            [routerLink]="['/locations', parentId, 'view']"
+            [queryParams]="{ backToCurrent: true }">
+            {{'LNG_COMMON_BUTTON_VIEW' | translate}}
+        </button>
 
-        <!-- Name -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="nameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('name', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                <a [routerLink]="['/locations', item.id, 'children']">
-                    {{ item.name }}
-                </a>
-            </mat-cell>
-        </ng-container>
-
-        <!-- Synonyms -->
-        <ng-container matColumnDef="synonyms">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMS" | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="synonymsFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('synonyms', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.synonymsAsString }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Active -->
-        <ng-container matColumnDef="active">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_ACTIVE" | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-select
-                            name="activeFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('active', $event.value)"
-                            app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
-                        </app-form-select>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.active"></app-yes-no-label>
-            </mat-cell>
-        </ng-container>
-
-        <!-- Population density -->
-        <ng-container matColumnDef="populationDensity">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY" | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-range
-                            name="populationDensityFilter"
-                            ngModel
-                            (changed)="filterByRangeField('populationDensity', $event)"
-                            app-reset-input-on-side-filter>
-                        </app-form-range>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                {{ item.populationDensity }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Inline Actions -->
-        <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="70px">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                    <span class="xt-icon">moreVertical</span>
-                </button>
-
-                <mat-menu #actionsMenu="matMenu">
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
-                            [routerLink]="['/locations', item.id, 'create']">
-                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD' | translate}}
-                    </button>
-
-                    <mat-divider *ngIf="hasLocationWriteAccess()"></mat-divider>
-
-                    <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
-                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
-                    </button>
-
-                    <button mat-menu-item [routerLink]="['/locations', item.id, 'usage']">
-                        {{'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE' | translate}}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW'| translate}}
-                    </button>
-
-                    <button *ngIf="hasLocationWriteAccess()" mat-menu-item
-                            [routerLink]="['/locations', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY'| translate}}
-                    </button>
-
-                    <button mat-menu-item class="mat-menu-item-delete" (click)="deleteLocation(item)">
-                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                    </button>
-                </mat-menu>
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
-    </mat-table>
-
-    <mat-paginator
-        [length]="(locationsListCount$ | async)?.count"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        (page)="changePage($event)">
-    </mat-paginator>
-
-</mat-card>
+        <button
+            *ngIf="hasLocationWriteAccess()"
+            class="button-primary"
+            mat-raised-button
+            color="primary"
+            [routerLink]="['/locations', parentId, 'modify']"
+            [queryParams]="{ backToCurrent: true }">
+            {{'LNG_COMMON_BUTTON_MODIFY' | translate}}
+        </button>
+    </div>
+</div>

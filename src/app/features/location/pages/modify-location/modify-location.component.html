@@ -9,7 +9,8 @@
     <div class="form-content">
 
         <!-- location breadcrumb -->
-        <app-location-breadcrumbs></app-location-breadcrumbs>
+        <app-location-breadcrumbs
+            [activeLocationBreadcrumb]="viewOnly ? 'LNG_PAGE_VIEW_LOCATION_NAME': 'LNG_PAGE_MODIFY_LOCATION_NAME'"></app-location-breadcrumbs>
 
         <mat-tab-group class="page-tabs-navbar">
 
@@ -44,6 +45,29 @@
 
                             <div fxFlex><!-- placeholder --></div>
                         </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="geoLocation[lat]"
+                                [(ngModel)]="locationData.geoLocation.lat"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                [required]="!!locationData.geoLocation?.lng"
+                                [disabled]="viewOnly"
+                                type="number">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="geoLocation[lng]"
+                                [(ngModel)]="locationData.geoLocation.lng"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                [required]="!!locationData.geoLocation?.lat"
+                                [disabled]="viewOnly"
+                                type="number">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
                     </div>
                 </mat-card>
 
@@ -68,18 +92,29 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button
-            mat-raised-button color="primary" class="button-primary"
-            *ngIf="hasLocationWriteAccess() && viewOnly"
-            [routerLink]="['/locations', locationId, 'modify']">
-            {{'LNG_COMMON_BUTTON_EDIT'| translate}}
-        </button>
+        <ng-container
+            *ngIf="viewOnly">
+            <button
+                *ngIf="hasLocationWriteAccess()"
+                mat-raised-button
+                color="primary"
+                class="button-primary"
+                [routerLink]="['/locations', locationId, 'modify']">
+                {{'LNG_COMMON_BUTTON_EDIT'| translate}}
+            </button>
+            <button
+                type="button"
+                [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
+                mat-raised-button>
+                {{'LNG_COMMON_BUTTON_BACK' | translate}}
+            </button>
+        </ng-container>
         <ng-container *ngIf="!viewOnly">
             <button mat-raised-button color="primary" class="button-primary">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"
-                    [routerLink]="locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations']"
+                    [routerLink]="backToCurrent ? ['/locations', locationId, 'children'] : (locationData.parentLocationId ? ['/locations', locationData.parentLocationId, 'children'] : ['/locations'])"
                     mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>

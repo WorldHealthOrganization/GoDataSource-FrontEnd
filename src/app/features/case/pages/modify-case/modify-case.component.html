@@ -52,63 +52,32 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-input
-                                name="phoneNumber"
-                                [(ngModel)]="caseData.phoneNumber"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
-                                maxlength="50"
-                                [disabled]="viewOnly">
-                            </app-form-input>
-
-                            <app-form-input
-                                name="occupation"
-                                [(ngModel)]="caseData.occupation"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION'| translate"
-                                maxlength="500"
-                                [disabled]="viewOnly">
-                            </app-form-input>
-
-
-                            <div fxFlex fxLayout="row">
-                                <button
-                                    fxFlex
-                                    mat-raised-button
-                                    type="button"
-                                    [color]="ageSelected ? 'primary' : ''"
-                                    (click)="switchAgeDob(true)">
-                                    {{'LNG_CASE_FIELD_LABEL_AGE_BUTTON' | translate}}
-                                </button>
-                                <button
-                                    fxFlex
-                                    mat-raised-button
-                                    type="button"
-                                    [color]="!ageSelected ? 'primary' : ''"
-                                    (click)="switchAgeDob(false)">
-                                    {{'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
-                                </button>
-                            </div>
-
-                            <div fxFlex>
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
                                 <app-form-input
-                                    *ngIf="ageSelected"
-                                    name="age"
-                                    [(ngModel)]="caseData.age"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_AGE' | translate"
+                                    name="phoneNumber"
+                                    [(ngModel)]="caseData.phoneNumber"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
+                                    maxlength="50"
                                     [disabled]="viewOnly">
                                 </app-form-input>
 
-                                <app-form-datepicker
-                                    *ngIf="!ageSelected"
-                                    name="dob"
-                                    [(ngModel)]="caseData.dob"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
-                                    [disabled]="viewOnly"
-                                    [maxDate]="serverToday"
-                                    app-date-validator
-                                    [dateSameOrBefore]="serverToday">
-                                </app-form-datepicker>
+                                <app-form-select
+                                    name="occupation"
+                                    [(ngModel)]="caseData.occupation"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                                    [options]="occupationsList$ | async"
+                                    [disabled]="viewOnly">
+                                </app-form-select>
                             </div>
 
+                            <app-form-age-dob
+                                fxFlex
+                                name="ageDob"
+                                [(ngModel)]="caseData"
+                                [required]="false"
+                                [disabled]="viewOnly">
+                            </app-form-age-dob>
                         </div>
 
                     </div>

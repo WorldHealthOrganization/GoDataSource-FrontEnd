@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-import { GroupBase } from '../../xt-forms/core';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
+import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { RelationshipModel } from '../../../core/models/relationship.model';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Observable } from 'rxjs/Observable';
@@ -25,7 +25,7 @@ import { Moment } from 'moment';
         multi: true
     }]
 })
-export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit {
+export class FormRelationshipComponent extends GroupBase<RelationshipModel> implements OnInit, AfterViewInit, GroupDirtyFields {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
@@ -57,7 +57,7 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
         private genericDataService: GenericDataService,
         private clusterDataService: ClusterDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -123,5 +123,20 @@ export class FormRelationshipComponent extends GroupBase<RelationshipModel> impl
      */
     triggerCopyValue(property) {
         this.copyValue.emit(property);
+    }
+
+    /**
+     * Retrieve fields
+     */
+    getDirtyFields(): {
+        [name: string]: FormControl
+    } {
+        const dirtyControls = {};
+        _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+            if (control.dirty) {
+                dirtyControls[controlName] = control;
+            }
+        });
+        return dirtyControls;
     }
 }

@@ -12,13 +12,13 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
-import * as _ from 'lodash';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-case',
@@ -34,11 +34,11 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     ];
 
     caseData: CaseModel = new CaseModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -58,6 +58,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     ngOnInit() {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
 
@@ -85,25 +86,18 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             });
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
-    }
-
     createNewCase(stepForms: NgForm[]) {
-
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-       // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
+        // validate
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
@@ -125,5 +119,4 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                 });
         }
     }
-
 }

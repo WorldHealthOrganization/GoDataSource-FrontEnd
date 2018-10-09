@@ -14,7 +14,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswerButton } from '../../../../shared/components';
@@ -25,6 +25,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -88,6 +89,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     Constants = Constants;
     ReferenceDataCategory = ReferenceDataCategory;
     EntityType = EntityType;
+    UserSettings = UserSettings;
 
     constructor(
         private router: Router,
@@ -96,11 +98,13 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -160,6 +164,55 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                             });
                     });
             });
+
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'people.firstName',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'people.lastName',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'contactDate',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'certaintyLevelId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'exposureTypeId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'exposureFrequencyId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY'
+            }),
+            new VisibleColumnModel({
+                field: 'exposureDurationId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION'
+            }),
+            new VisibleColumnModel({
+                field: 'socialRelationshipTypeId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
@@ -220,19 +273,6 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
     hasEntityWriteAccess(): boolean {
         return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        const columns = [
-            'firstName', 'lastName', 'contactDate', 'certaintyLevelId', 'exposureTypeId',
-            'exposureFrequencyId', 'exposureDurationId', 'socialRelationshipTypeId', 'actions'
-        ];
-
-        return columns;
     }
 
     /**

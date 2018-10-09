@@ -12,4 +12,7 @@ export class BreadcrumbsComponent {
     // Breadcrumbs items
     @Input() items: BreadcrumbItemModel;
 
+    @Input() addSeparatorAtTheEnd: boolean = false;
+    @Input() displaySeparator: boolean = true;
+    @Input() separator: string = '<span class="xt-icon">thinArrowRight</span>';
 }

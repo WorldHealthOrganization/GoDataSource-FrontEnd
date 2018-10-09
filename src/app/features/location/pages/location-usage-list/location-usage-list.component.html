@@ -88,4 +88,10 @@
         <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
     </mat-table>
 
+    <div
+        *ngIf="usageDetailsListMore"
+        class="app-location-usage-list-too-many">
+        {{ 'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS' | translate:usageDetailsListMore }}
+    </div>
+
 </mat-card>

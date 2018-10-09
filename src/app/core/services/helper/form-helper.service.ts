@@ -36,7 +36,16 @@ export class FormHelperService {
 
         _.forEach(form.controls, (control: FormControl, controlName: string) => {
             if (control.dirty) {
-                _.set(dirtyFields, controlName, control.value);
+                if ((control as any).getDirtyFields) {
+                    _.each((control as any).getDirtyFields(), (
+                        childControl: FormControl,
+                        childControlName: string
+                    ) => {
+                        _.set(dirtyFields, childControlName, childControl.value);
+                    });
+                } else {
+                    _.set(dirtyFields, controlName, control.value);
+                }
             }
         });
 

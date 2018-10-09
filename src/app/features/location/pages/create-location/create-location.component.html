@@ -7,7 +7,8 @@
 <div class="page-content">
 
     <!-- location breadcrumb -->
-    <app-location-breadcrumbs></app-location-breadcrumbs>
+    <app-location-breadcrumbs
+        activeLocationBreadcrumb="LNG_PAGE_CREATE_LOCATION_NAME"></app-location-breadcrumbs>
 
     <mat-horizontal-stepper linear #stepper>
 
@@ -19,7 +20,6 @@
                 <!-- Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="name"
@@ -41,6 +41,27 @@
                                 type="number">
                             </app-form-input>
 
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="geoLocation[lat]"
+                                [(ngModel)]="locationData.geoLocation.lat"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                [required]="!!locationData.geoLocation?.lng"
+                                type="number">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="geoLocation[lng]"
+                                [(ngModel)]="locationData.geoLocation.lng"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                [required]="!!locationData.geoLocation?.lat"
+                                type="number">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

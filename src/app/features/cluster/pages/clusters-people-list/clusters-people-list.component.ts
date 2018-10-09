@@ -12,8 +12,10 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -40,17 +42,22 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
 
+    // constants
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
+    Constants = Constants;
 
     constructor(
         private route: ActivatedRoute,
         private outbreakDataService: OutbreakDataService,
         private clusterDataService: ClusterDataService,
         private authDataService: AuthDataService,
+        protected snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

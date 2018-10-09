@@ -1,20 +1,124 @@
-<!-- dropdown with view types -->
-<app-form-select
-    name="chainView"
-    [(ngModel)]="transmissionChainViewType"
-    required="true"
-    [options]="transmissionChainViewTypes$ | async"
-    (optionChanged)="updateView()"
-    [clearable]="false">
-</app-form-select>
-<!-- spinner -->
-<div class="spinnerGraph"
-     *ngIf="showLoading">
-    <mat-spinner>
-    </mat-spinner>
+<div class="cytoscape-graph-container">
+    <!-- dropdown with view types -->
+    <app-form-select
+        name="chainView"
+        [(ngModel)]="transmissionChainViewType"
+        required="true"
+        [options]="transmissionChainViewTypes$ | async"
+        (optionChanged)="updateView($event)"
+        [clearable]="false">
+    </app-form-select>
+    <!-- spinner -->
+    <div class="spinner-graph"
+         *ngIf="showLoading">
+        <mat-spinner>
+        </mat-spinner>
+    </div>
+
+    <!-- legend -->
+    <div class="graph-legend"
+         *ngIf="legend">
+        <!-- node color -->
+        <div *ngIf="objectKeys(legend.nodeColor).length"
+             class="legend-name">
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
+        </div>
+        <div
+            *ngFor="let nodeColorItem of objectKeys(legend.nodeColor)" class="legend-item">
+            <div
+                class="legend-color"
+                [style.background-color]="legend.nodeColor[nodeColorItem]">
+            </div>
+            <div>
+                {{nodeColorItem | translate}}
+            </div>
+        </div>
+
+        <!-- node name color -->
+        <div *ngIf="objectKeys(legend.nodeNameColor).length"
+             class="legend-name">
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
+        </div>
+        <div
+            *ngFor="let nodeNameColorItem of objectKeys(legend.nodeNameColor)" class="legend-item">
+            <div
+                class="legend-color"
+                [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
+            </div>
+            <div>
+                {{nodeNameColorItem | translate}}
+            </div>
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+                - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+            </div>
+        </div>
+
+        <!-- edge color -->
+        <div *ngIf="objectKeys(legend.edgeColor).length"
+             class="legend-name">
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+            <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
+        </div>
+
+        <div
+            *ngFor="let edgeColorItem of objectKeys(legend.edgeColor)" class="legend-item">
+            <div
+                class="legend-color"
+                [style.background-color]="legend.edgeColor[edgeColorItem]">
+            </div>
+            <div>
+                {{edgeColorItem | translate}}
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- cytoscape element -->
+    <div class="cy"
+         [fxShow]="!showLoading">
+    </div>
+
 </div>
 
-<!-- cytoscape element -->
-<div class="cy"
-     [fxShow]="!showLoading">
+<div *ngIf="showCaseNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/cases"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
+        {{elements.caseNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+    </a>
 </div>
+<div *ngIf="showContactNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/contacts"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
+        {{elements.contactNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+    </a>
+</div>
+<div *ngIf="showEventNodesWithoutDates()"
+     class="entities-no-dates">
+    <a target="_blank"
+       routerLink="/events"
+       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
+        {{elements.eventNodesWithoutDates.length}}
+        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+    </a>
+</div>
+
+<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
+    mat-raised-button
+    (click)="switchTimelineView('vertical')">
+    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
+</button>
+
+<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
+    mat-raised-button
+    (click)="switchTimelineView('horizontal')">
+    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+</button>
