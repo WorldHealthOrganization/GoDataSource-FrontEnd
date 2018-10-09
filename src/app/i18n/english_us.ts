@@ -1252,6 +1252,16 @@ export const EnglishUsLang = {
         'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
 
         /**
+         * Inconsistency labels
+         */
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER': '"{{date1}}" is smaller than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL': '"{{date1}}" is smaller or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER': '"{{date1}}" is bigger than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL': '"{{date1}}" is bigger or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL': '"{{date1}}" is not equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL': '"{{date1}}" is equal to "{{date2}}"',
+
+        /**
          * Import data
          */
         'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE': 'Drag & drop a file of the following types here: {{types}}',

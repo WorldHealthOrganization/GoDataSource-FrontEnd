@@ -12,6 +12,10 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { InconsistencyModel } from '../../../../core/models/inconsistency.model';
+import * as _ from 'lodash';
+import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -30,7 +34,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     authUser: UserModel;
 
     // entities
-    entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+    entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
 
     // constants
     EntityType = EntityType;
@@ -41,7 +45,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     constructor(
         protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -141,7 +146,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * @param {string} action
      * @returns {string}
      */
-    getItemRouterLink (item, action: string) {
+    getItemRouterLink (item: CaseModel | ContactModel | EventModel, action: string) {
         switch (item.type) {
             case EntityType.CASE:
                 return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
@@ -157,7 +162,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * @param {Object} item
      * @returns {boolean}
      */
-    getAccessPermissions(item) {
+    getAccessPermissions(item: CaseModel | ContactModel | EventModel) {
         switch (item.type) {
             case EntityType.CASE:
                 return this.hasCaseWriteAccess();
@@ -190,5 +195,52 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     hasEventWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    /**
+     * Inconsistencies
+     * @param item
+     */
+    inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
+        // construct inconsistencies text
+        let text: string = '';
+        _.each(item.inconsistencies, (inconsistency: InconsistencyModel) => {
+            // determine label
+            let label: string;
+            switch (inconsistency.issue) {
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER';
+                    break;
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL';
+                    break;
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER';
+                    break;
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL';
+                    break;
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL';
+                    break;
+                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_EQUAL:
+                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL';
+                    break;
+            }
+
+            // translate label
+            label = this.i18nService.instant(
+                label, {
+                    date1: inconsistency.dates.length > 0 ? this.i18nService.instant(inconsistency.dates[0].label) : '-',
+                    date2: inconsistency.dates.length > 1 ? this.i18nService.instant(inconsistency.dates[1].label) : '-'
+                }
+            );
+
+            // append inconsistency
+            text += (text.length < 1 ? '' : ' / ') + label;
+        });
+
+        // finished
+        return text;
     }
 }
