@@ -49,7 +49,7 @@
             </mat-option>
         </mat-select>
 
-        <span [fxShow]="tooltip !== null" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
+        <span *ngIf="tooltip" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
     </mat-form-field>
 
     <app-form-validation

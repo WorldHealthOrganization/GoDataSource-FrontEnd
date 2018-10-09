@@ -1,27 +1,33 @@
-<div class="form-slide-toggle-container form-element"
+<div class="form-slide-toggle-container form-element {{ (tooltip !== null ? 'form-slide-tooltip' : '' ) }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <div
         fxFlex>
-        <mat-slide-toggle
-            *ngIf="!readonly"
-            [(ngModel)]="value"
-            [attr.name]="name"
-            [labelPosition]="labelBefore ? 'before' : 'after'"
-            [disabled]="disabled"
-            (click)="onClick()" (change)="onChange()"
-            [matTooltip]="tooltip | translate">
-            {{label}}
-        </mat-slide-toggle>
-
-        <span *ngIf="readonly" class="label-readonly">
-            <ng-container *ngIf="value">
+        <div
+            class="slide-with-icon">
+            <mat-slide-toggle
+                *ngIf="!readonly"
+                [(ngModel)]="value"
+                [attr.name]="name"
+                [labelPosition]="labelBefore ? 'before' : 'after'"
+                [disabled]="disabled"
+                (click)="onClick()" (change)="onChange()">
                 {{label}}
-            </ng-container>
-            <ng-container *ngIf="!value">
-                {{notCheckedLabel}}
-            </ng-container>
-        </span>
+            </mat-slide-toggle>
+
+            <span
+                *ngIf="readonly"
+                class="label-readonly">
+                <ng-container *ngIf="value">
+                    {{label}}
+                </ng-container>
+                <ng-container *ngIf="!value">
+                    {{notCheckedLabel}}
+                </ng-container>
+            </span>
+        </div>
+
+        <span *ngIf="tooltip" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
     </div>
 
     <app-form-validation

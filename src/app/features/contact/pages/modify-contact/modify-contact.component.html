@@ -78,7 +78,12 @@
                                 name="ageDob"
                                 [(ngModel)]="contactData"
                                 [required]="false"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                ageButtonLabel="LNG_CONTACT_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CONTACT_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
                             </app-form-age-dob>
                         </div>
 

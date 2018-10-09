@@ -46,6 +46,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
 
+    @Input() tooltip: string;
+
     locationItems: LocationAutoItem[];
 
     locationLoading: boolean = false;

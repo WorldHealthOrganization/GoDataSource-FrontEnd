@@ -21,6 +21,9 @@ export class FormDaterangeListComponent extends ListBase<DateRangeModel> impleme
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    @Input() fromTooltip: string;
+    @Input() toTooltip: string;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
