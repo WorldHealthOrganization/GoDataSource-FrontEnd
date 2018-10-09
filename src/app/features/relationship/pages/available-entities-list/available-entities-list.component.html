@@ -102,9 +102,10 @@
                                     name="ageFilter"
                                     ngModel
                                     (changed)="filterByAgeRangeField('age', $event)"
-                                    [step]="0.1"
                                     [min]="0"
-                                    [max]="Constants.DEFAULT_AGE_MAX_YEARS">
+                                    [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                                    fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                                    toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
                                 </app-form-range>
                             </div>
                         </div>

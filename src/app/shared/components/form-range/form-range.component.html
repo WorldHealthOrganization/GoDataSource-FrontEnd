@@ -8,7 +8,7 @@
         <app-form-input
             [name]="name + '[from]'"
             [(ngModel)]="range.from"
-            [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_FROM' | translate"
+            [placeholder]="fromPlaceholder | translate"
             type="number"
             (input)="onChange()"
             [step]="step"
@@ -31,7 +31,7 @@
         <app-form-input
             [name]="name + '[to]'"
             [(ngModel)]="range.to"
-            [placeholder]="'LNG_FORM_RANGE_FIELD_LABEL_TO' | translate"
+            [placeholder]="toPlaceholder | translate"
             type="number"
             (input)="onChange()"
             [step]="step"

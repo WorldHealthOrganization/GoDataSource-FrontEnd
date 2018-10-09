@@ -149,16 +149,17 @@
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_AGE_FILTER' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CONTACT_FIELD_LABEL_AGE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-range
                             name="ageFilter"
                             ngModel
                             (changed)="filterByAgeRangeField('age', $event)"
                             app-reset-input-on-side-filter
-                            [step]="0.1"
                             [min]="0"
-                            [max]="Constants.DEFAULT_AGE_MAX_YEARS">
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
                         </app-form-range>
                     </div>
                 </div>

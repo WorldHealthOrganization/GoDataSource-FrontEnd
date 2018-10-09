@@ -21,6 +21,9 @@ export class FormRangeComponent extends GroupBase<FormRangeModel> {
     @Input() min: number;
     @Input() max: number;
 
+    @Input() fromPlaceholder: string = 'LNG_FORM_RANGE_FIELD_LABEL_FROM';
+    @Input() toPlaceholder: string = 'LNG_FORM_RANGE_FIELD_LABEL_TO';
+
     // from
     private _fromVisible: boolean = true;
     @Input() set fromVisible(value: boolean) {

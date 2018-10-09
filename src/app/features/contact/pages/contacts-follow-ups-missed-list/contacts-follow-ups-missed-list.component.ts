@@ -249,7 +249,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                     }),
                     new FilterModel({
                         fieldName: 'age',
-                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_FILTER',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
                         type: FilterType.RANGE_AGE,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'

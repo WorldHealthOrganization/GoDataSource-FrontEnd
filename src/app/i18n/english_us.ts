@@ -253,7 +253,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',
         'LNG_ENTITY_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_ENTITY_FIELD_LABEL_LAST_NAME': 'Last Name',
-        'LNG_ENTITY_FIELD_LABEL_AGE': 'Age ( Years )',
+        'LNG_ENTITY_FIELD_LABEL_AGE': 'Age',
         'LNG_ENTITY_FIELD_LABEL_DOB': 'Date of birth',
         'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
         'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
@@ -268,7 +268,6 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': 'Fill Geo-Location Latitude',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': 'Date of Outcome',
         'LNG_CASE_FIELD_LABEL_AGE': 'Age',
-        'LNG_CASE_FIELD_LABEL_AGE_FILTER': 'Age ( Years )',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of Onset',
         'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE': 'Is date of onset approximate?',
@@ -621,7 +620,6 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
-        'LNG_CONTACT_FIELD_LABEL_AGE_FILTER': 'Age ( Years )',
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
@@ -1318,6 +1316,8 @@ export const EnglishUsLang = {
          */
         'LNG_AGE_FIELD_LABEL_TYPE': 'Years / Months',
         'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
-        'LNG_AGE_FIELD_LABEL_MONTHS': 'Months'
+        'LNG_AGE_FIELD_LABEL_MONTHS': 'Months',
+        'LNG_AGE_FIELD_FILTER_LABEL_FROM': 'From years',
+        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years'
     }
 };

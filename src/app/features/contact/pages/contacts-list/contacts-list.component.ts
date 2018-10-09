@@ -291,7 +291,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             }),
             new FilterModel({
                 fieldName: 'age',
-                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE_FILTER',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
                 type: FilterType.RANGE_AGE,
                 sortable: true
             }),
@@ -378,7 +378,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     }),
                     new FilterModel({
                         fieldName: 'age',
-                        fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE_FILTER',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
                         type: FilterType.RANGE_AGE,
                         relationshipPath: ['relationships', 'people'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
