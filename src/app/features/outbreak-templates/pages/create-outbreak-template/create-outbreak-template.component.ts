@@ -22,8 +22,8 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '..'),
-        new BreadcrumbItemModel('create outbreak', '.', true)
+        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '..'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true)
     ];
 
     diseasesList$: Observable<any[]>;
@@ -42,6 +42,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
     }
 
     ngOnInit() {
+        // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
@@ -53,7 +54,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
         );
     }
 
-    createOutbreaktemplate(stepForms: NgForm[]) {
+    createOutbreakTemplate(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -69,7 +70,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('outbreak template created');
+                    this.snackbarService.showSuccess('LNG_TEMPLATE_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
                     // navigate to listing page
                     this.disableDirtyConfirm();
                     this.router.navigate(['/outbreak-templates']);

@@ -39,7 +39,7 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_NAME" | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_TEMPLATE_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -64,7 +64,7 @@
         <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_TEMPLATE_FIELD_LABEL_DISEASE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="diseaseFilter"
@@ -103,12 +103,12 @@
                         {{ 'Generate outbreak' | translate}}
                     </button>
 
-                    <button mat-menu-item [routerLink]="['/outbreak-templates', item.id, 'view']">
+                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{'LNG_PAGE_ACTION_VIEW'| translate}}
                     </button>
 
                     <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item
-                            [routerLink]="['/outbreak-templates', item.id, 'modify']">
+                            [routerLink]="['.', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY'| translate}}
                     </button>
 

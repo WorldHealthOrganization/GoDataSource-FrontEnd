@@ -5,7 +5,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable } from 'rxjs/Observable';
@@ -40,7 +39,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private outbreakDataService: OutbreakDataService,
         private router: Router,
         private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
@@ -59,9 +57,17 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 return country;
             })
         );
-        const outbreakTemplate = JSON.parse(this.route.snapshot.queryParamMap.get('outbreakTemplate'));
-        console.log(outbreakTemplate);
-        this.newOutbreak = outbreakTemplate;
+        // get the outbreak template
+        this.route.queryParams
+            .subscribe((queryParams: {outbreakTemplateId}) => {
+                this.outbreakDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
+                    .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
+                        // delete the id of the outbreak template
+                        delete outbreakTemplate.id;
+                        // make the new outbreak which is merged with the outbreak template
+                        this.newOutbreak = _.merge(this.newOutbreak, outbreakTemplate);
+                    });
+            });
     }
 
     /**

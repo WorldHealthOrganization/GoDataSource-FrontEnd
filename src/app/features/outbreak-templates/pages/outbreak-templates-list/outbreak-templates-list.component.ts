@@ -29,7 +29,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class OutbreakTemplatesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '.', true)
     ];
 
     outbreakTemplatesList$: Observable<any>;
@@ -50,9 +50,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private router: Router,
-        private route: ActivatedRoute
-    ) {
+        private router: Router)
+    {
         super(
             snackbarService
         );
@@ -61,6 +60,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+        // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
@@ -77,8 +77,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
             .subscribe((selectedOutbreak) => {
                 this.selectedOutbreak = selectedOutbreak;
                 if (this.selectedOutbreak) {
-                    console.log('true');
-                    // retrieve the list of Events
+                    // retrieve the list of outbreak templates
                     this.outbreakTemplatesList$ = this.outbreakDataService.getOutbreakTemplatesList();
                 }
             });
@@ -94,11 +93,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     initializeSideTableColumns() {
         // default table columns
         this.tableColumns = [
-            // new VisibleColumnModel({
-            //     field: 'checkbox',
-            //     required: true,
-            //     excludeFromSave: true
-            // }),
             new VisibleColumnModel({
                 field: 'name',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
@@ -121,7 +115,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            console.log('true');
             // retrieve the list of Events
             this.outbreakTemplatesList$ = this.outbreakDataService.getOutbreakTemplatesList();
         }
@@ -140,7 +133,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * @param {OutbreakTemplateModel} outbreakTemplate
      */
     deleteOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel) {
-        this.dialogService.showConfirm('delete the outbreak template?', outbreakTemplate)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE', outbreakTemplate)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.outbreakDataService
@@ -156,7 +149,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                                 .subscribe((authenticatedUser) => {
                                     this.authUser = authenticatedUser.user;
                                 });
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_TEMPLATE_ACTION_DELETE_SUCCESS_MESSAGE');
                             this.needsRefreshList(true);
                         });
                 }
@@ -168,10 +161,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * @param outbreakTemplate
      */
     generateOutbreak(outbreakTemplate: OutbreakTemplateModel) {
-        const outbreak: OutbreakModel = new OutbreakModel();
-        const newOutbreak = _.merge(outbreakTemplate, outbreak);
         this.router.navigate(
             [`outbreaks/create`],
-            {queryParams : {outbreakTemplate: JSON.stringify(newOutbreak)}});
+            {queryParams: {outbreakTemplateId: outbreakTemplate.id}});
     }
 }

@@ -27,7 +27,7 @@ const routes: Routes = [
     },
     // view outbreak template
     {
-        path: ':outbreakTemplateID/view',
+        path: ':outbreakTemplateId/view',
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
@@ -37,7 +37,7 @@ const routes: Routes = [
     },
     // modify outbreak template
     {
-        path: ':outbreakTemplateID/modify',
+        path: ':outbreakTemplateId/modify',
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {

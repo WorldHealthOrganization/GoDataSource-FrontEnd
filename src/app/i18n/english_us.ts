@@ -99,6 +99,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE': 'Are you sure you want to delete the outbreak template {{name}}?',
         'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
         'LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP': 'Are you sure you want to remove relationship from the list?',
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
@@ -966,6 +967,43 @@ export const EnglishUsLang = {
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
         'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
+        'LNG_TEMPLATE_TITLE': 'Outbreak Templates',
+        'LNG_TEMPLATE_FIELD_LABEL_NAME' : 'Name',
+        'LNG_TEMPLATE_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak template created',
+        'LNG_TEMPLATE_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak template deleted',
+        'LNG_TEMPLATE_FIELD_LABEL_DISEASE' : 'Disease',
+        'LNG_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
+        'LNG_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
+        'LNG_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
+        'LNG_TEMPLATE_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
+        'LNG_TEMPLATE_FIELD_LABEL_CASE_ID_MASK_TOOLTIP': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
+        'LNG_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
+        'LNG_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
+        'LNG_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
+        'LNG_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
+        'LNG_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
+        'LNG_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
+
+        /**
+         * Create Outbreak Page
+         */
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE': 'Create New Outbreak Template',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_DONE': 'Done',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak template',
+
+        /**
+         * Modify Outbreak Template page
+         */
+        'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'View {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_LINK_MODIFY': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
 
         /**
          * Security Questions
@@ -1068,11 +1106,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
-
-        /**
-         * Outbreak Template list page
-         */
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE': 'Outbreak Templates',
 
         /**
          * Form Range Fields

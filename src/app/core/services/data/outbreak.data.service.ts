@@ -44,8 +44,11 @@ export class OutbreakDataService {
         );
     }
 
+    /**
+     * Retrieve the list of Outbreak Templates
+     * @returns {Observable<OutbreakTemplateModel[]>}
+     */
     getOutbreakTemplatesList(): Observable<OutbreakTemplateModel> {
-        console.log('debug');
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`/templates`),
             OutbreakTemplateModel

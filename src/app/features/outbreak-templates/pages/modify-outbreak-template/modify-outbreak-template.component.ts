@@ -27,7 +27,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreaks')
+        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '/outbreak-templates')
     ];
 
     // authenticated user
@@ -55,12 +55,12 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private authDataService: AuthDataService)
     {
         super(route);
-
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+        // get the lists for form
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
@@ -81,7 +81,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                         this.outbreakTemplate = outbreakTemplateData;
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                this.viewOnly ? 'View outbreak' : 'Modify outbreak',
+                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_LINK_MODIFY',
                                 '.',
                                 true,
                                 {},

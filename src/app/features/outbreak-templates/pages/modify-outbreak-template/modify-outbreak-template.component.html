@@ -12,7 +12,7 @@
 
             <mat-tab>
                 <ng-template mat-tab-label>
-                    {{ 'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS' | translate}}
+                    {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS' | translate}}
                 </ng-template>
 
                 <mat-card class="page-section">
@@ -21,14 +21,14 @@
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="outbreakTemplate.name"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_NAME' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_NAME' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
                                 [(ngModel)]="outbreakTemplate.disease"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DISEASE' | translate"
                                 [options]="diseasesList$ | async"
                                 required="true"
                                 [disabled]="viewOnly">
@@ -42,14 +42,14 @@
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="outbreakTemplate.periodOfFollowup"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="frequencyOfFollowUp"
                                 [(ngModel)]="outbreakTemplate.frequencyOfFollowUp"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -59,14 +59,14 @@
                             <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysAmongContacts"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="outbreakTemplate.noDaysInChains"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -76,28 +76,28 @@
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="outbreakTemplate.noDaysNotSeen"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="noLessContacts"
                                 [(ngModel)]="outbreakTemplate.noLessContacts"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="outbreakTemplate.longPeriodsBetweenCaseOnset"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS' | translate"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysNewContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysNewContacts"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
+                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
                                 type="number"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -110,7 +110,7 @@
             <!-- tab Case Investigation -->
             <mat-tab>
                 <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION' | translate}}
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION' | translate}}
                 </ng-template>
                 <app-form-question-list
                     name="caseInvestigationTemplate"
@@ -123,7 +123,7 @@
 
             <mat-tab>
                 <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP' | translate}}
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP' | translate}}
                 </ng-template>
                 <app-form-question-list
                     name="contactFollowUpTemplate"
@@ -137,7 +137,7 @@
             <!-- tab Lab Results -->
             <mat-tab>
                 <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS' | translate}}
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS' | translate}}
                 </ng-template>
                 <app-form-question-list
                     name="labResultsTemplate"
