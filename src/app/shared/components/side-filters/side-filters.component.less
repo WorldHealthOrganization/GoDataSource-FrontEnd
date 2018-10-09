@@ -27,7 +27,8 @@
             overflow-x: hidden;
 
             .title {
-                font-family: "Roboto", sans-serif;
+                font-family: @font-roboto;
+                font-weight: normal;
             }
 
             .actions {
@@ -47,7 +48,7 @@
                 position: relative;
 
                 .stretched-button {
-                    flex: 1;
+                    flex: 1 auto;
                     font-weight: 600;
                     border-radius: 5px;
                     margin-right: 7px;
@@ -78,7 +79,7 @@
 
     .sidenav-toggle {
         background-color: white;
-        margin-top: 155px;
+        margin-top: 205px;
         padding: 7px 5px;
     }
 
@@ -108,7 +109,7 @@
 
             .operator {
                 padding-left: 20px;
-                font-family: "Roboto", sans-serif;
+                font-family: @font-roboto;
             }
 
             .filter-container {
