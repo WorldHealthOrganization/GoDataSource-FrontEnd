@@ -20,6 +20,7 @@ export class ContactModel {
     riskReason: string;
     type: EntityType = EntityType.CONTACT;
     dateOfReporting: string;
+    dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
     dateDeceased: string;
     outbreakId: string;
@@ -49,6 +50,7 @@ export class ContactModel {
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfReporting = _.get(data, 'dateOfReporting');
+        this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.dateDeceased = _.get(data, 'dateDeceased');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.deleted = _.get(data, 'deleted');
