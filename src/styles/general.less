@@ -125,15 +125,21 @@ html, body, ul, li, div, span {
     }
 
     // handle the tooltips on input fields
-    .form-input-tooltip {
-        .mat-input-element {
-            width: 85%;
+    .form-input-tooltip,
+    .form-datepicker-tooltip,
+    .form-select-tooltip,
+    .form-textarea-tooltip {
+        .mat-input-element,
+        .mat-select {
+            width: ~'calc(100% - 24px)';
         }
 
         .form-icon {
             display: inline !important;
             cursor: pointer;
             line-height: 0;
+            float: right;
+            margin-top: 7px;
         }
     }
 }
@@ -191,7 +197,6 @@ html, body, ul, li, div, span {
 
 .switch-buttons {
     button {
-        height: 45px;
         border-radius: 5px;
     }
 }
