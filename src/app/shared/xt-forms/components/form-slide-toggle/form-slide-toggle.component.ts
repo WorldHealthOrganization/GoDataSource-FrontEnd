@@ -35,7 +35,9 @@ export class FormSlideToggleComponent extends ElementBase<string> {
         ) {
             const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.label);
             this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+                if (!_.isEmpty(glossaryData[labelValue])) {
+                    this.tooltip = glossaryData[labelValue];
+                }
             });
         }
     }

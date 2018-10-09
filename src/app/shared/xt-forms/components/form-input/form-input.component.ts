@@ -12,7 +12,6 @@ import {
     AfterViewInit
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
 import { ElementBase } from '../../core/index';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
@@ -45,7 +44,9 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         ) {
             const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
             this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
+                if (!_.isEmpty(glossaryData[labelValue])) {
+                    this.tooltip = glossaryData[labelValue];
+                }
             });
         }
     }
@@ -63,6 +64,10 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Input() displayFilterIcon: boolean = false;
 
     @Input() maxlength: number;
+
+    @Input() step: number = 1;
+    @Input() min: number;
+    @Input() max: number;
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();

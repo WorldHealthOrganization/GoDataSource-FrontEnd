@@ -4,6 +4,7 @@ import { DocumentModel } from './document.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { InconsistencyModel } from './inconsistency.model';
+import { AgeModel } from './age.model';
 
 export class ContactModel {
     id: string;
@@ -13,8 +14,6 @@ export class ContactModel {
     gender: string;
     phoneNumber: string;
     occupation: string;
-    dob: string;
-    age: number;
     documents: DocumentModel[];
     addresses: AddressModel[];
     riskLevel: string;
@@ -27,6 +26,9 @@ export class ContactModel {
     outbreakId: string;
     deleted: boolean;
 
+    dob: string;
+    age: AgeModel;
+
     inconsistencies: InconsistencyModel[];
 
     constructor(data = null) {
@@ -37,10 +39,11 @@ export class ContactModel {
         this.gender = _.get(data, 'gender');
         this.phoneNumber = _.get(data, 'phoneNumber');
         this.occupation = _.get(data, 'occupation');
-        this.dob = _.get(data, 'dob');
-        this.age = _.get(data, 'age');
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
+
+        this.dob = _.get(data, 'dob');
+        this.age = new AgeModel(_.get(data, 'age'));
 
         const locationsList = _.get(data, 'locations', []);
         this.addresses = _.map(

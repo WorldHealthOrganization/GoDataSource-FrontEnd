@@ -5,6 +5,7 @@ import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { InconsistencyModel } from './inconsistency.model';
+import { AgeModel } from './age.model';
 
 export class CaseModel {
     id: string;
@@ -14,8 +15,6 @@ export class CaseModel {
     gender: string;
     phoneNumber: string;
     occupation: string;
-    dob: string;
-    age: number;
     riskLevel: string;
     riskReason: string;
     documents: DocumentModel[];
@@ -43,6 +42,9 @@ export class CaseModel {
         people: any[]
     }[];
 
+    dob: string;
+    age: AgeModel;
+
     inconsistencies: InconsistencyModel[];
 
     constructor(data = null) {
@@ -53,8 +55,6 @@ export class CaseModel {
         this.gender = _.get(data, 'gender');
         this.phoneNumber = _.get(data, 'phoneNumber');
         this.occupation = _.get(data, 'occupation');
-        this.dob = _.get(data, 'dob');
-        this.age = _.get(data, 'age');
         this.documents = _.get(data, 'documents', []);
 
         const locationsList = _.get(data, 'locations', []);
@@ -64,6 +64,9 @@ export class CaseModel {
                 return new AddressModel(addressData, locationsList);
             }
         );
+
+        this.dob = _.get(data, 'dob');
+        this.age = new AgeModel(_.get(data, 'age'));
 
         this.classification = _.get(data, 'classification');
         this.riskLevel = _.get(data, 'riskLevel');

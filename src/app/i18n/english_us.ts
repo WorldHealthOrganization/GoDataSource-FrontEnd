@@ -151,6 +151,8 @@ export const EnglishUsLang = {
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
         'LNG_FORM_VALIDATION_ERROR_PATTERN': 'Value does not match required pattern',
+        'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER': 'Must be bigger or equal to {{min}}',
+        'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER': 'Must be smaller or equal to {{max}}',
         'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH': 'Must contain a minimum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH': 'Must contain a maximum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE': 'Value must match password',
@@ -1324,6 +1326,15 @@ export const EnglishUsLang = {
         /**
          * Import outbreak data
          */
-        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data'
+        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data',
+
+        /**
+         * Age Fields
+         */
+        'LNG_AGE_FIELD_LABEL_TYPE': 'Years / Months',
+        'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
+        'LNG_AGE_FIELD_LABEL_MONTHS': 'Months',
+        'LNG_AGE_FIELD_FILTER_LABEL_FROM': 'From years',
+        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years'
     }
 };

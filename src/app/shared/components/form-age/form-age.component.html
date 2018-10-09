@@ -1,0 +1,51 @@
+<div class="age-container form-element "OnInit
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <form #groupForm="ngForm">
+        <div fxLayout="row" fxLayoutGap="20px">
+            <app-form-input
+                *ngIf="ageType === AgeType.YEARS"
+                [name]="name + '[years]'"
+                [ngModel]="age.years"
+                [placeholder]="yearsPlaceholder | translate"
+                [disabled]="disabled"
+                [required]="required"
+                type="number"
+                (optionChanged)="onChangeNo('years', $event)"
+                app-min-max-validator
+                [minNumber]="0"
+                [min]="0"
+                [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
+                [max]="Constants.DEFAULT_AGE_MAX_YEARS">
+            </app-form-input>
+
+            <app-form-input
+                *ngIf="ageType === AgeType.MONTHS"
+                [name]="name + '[months]'"
+                [ngModel]="age.months"
+                [placeholder]="monthsPlaceholder | translate"
+                [disabled]="disabled"
+                [required]="required"
+                type="number"
+                (optionChanged)="onChangeNo('months', $event)"
+                app-min-max-validator
+                [minNumber]="0"
+                [min]="0"
+                [maxNumber]="11"
+                [max]="11">
+            </app-form-input>
+
+            <app-form-select
+                name="ageType"
+                [(ngModel)]="ageType"
+                [placeholder]="'LNG_AGE_FIELD_LABEL_TYPE' | translate"
+                [options]="ageTypeArray"
+                [disabled]="disabled"
+                [required]="required"
+                optionLabelKey="label"
+                optionValueKey="value"
+                (optionChanged)="onChange()">
+            </app-form-select>
+        </div>
+    </form>
+</div>
