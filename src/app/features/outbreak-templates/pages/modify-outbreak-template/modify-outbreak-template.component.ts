@@ -104,8 +104,6 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        console.log(dirtyFields);
-
         // modify the outbreak template
         this.outbreakDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)

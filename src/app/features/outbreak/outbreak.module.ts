@@ -11,6 +11,7 @@ import * as fromPages from './pages';
     imports: [
         routing,
         SharedModule
+
     ],
     declarations: [
         ...fromPages.pageComponents

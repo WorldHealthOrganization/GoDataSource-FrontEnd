@@ -5,7 +5,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
@@ -18,7 +18,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -41,7 +41,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     authUser: UserModel;
 
     ReferenceDataCategory = ReferenceDataCategory;
-    UserSettings = UserSettings;
 
     constructor(
         protected snackbarService: SnackbarService,

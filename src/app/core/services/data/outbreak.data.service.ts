@@ -75,7 +75,7 @@ export class OutbreakDataService {
     /**
      * Delete an existing outbreak template
      * @param {string} outbreakTemplateId
-     * @returns {Observable<Object>}
+     * @returns {Observable<any>}
      */
     deleteOutbreakTemplate(outbreakTemplateId: string): Observable<any> {
         return this.http.delete(`templates/${outbreakTemplateId}`);
@@ -101,7 +101,7 @@ export class OutbreakDataService {
     /**
      * Create a new OutbreakTemplate
      * @param {OutbreakTemplateModel} outbreakTemplate
-     * @returns {Observable<R>}
+     * @returns {Observable<any>}
      */
     createOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel): Observable<any>{
         return this. http.post(`templates`, outbreakTemplate);
