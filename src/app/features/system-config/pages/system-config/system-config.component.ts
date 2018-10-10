@@ -22,10 +22,10 @@ import { MatDialogRef } from '@angular/material';
 @Component({
     selector: 'app-system-config-main',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './main.component.html',
-    styleUrls: ['./main.component.less']
+    templateUrl: './system-config.component.html',
+    styleUrls: ['./system-config.component.less']
 })
-export class MainComponent extends ListComponent implements OnInit {
+export class SystemConfigComponent extends ListComponent implements OnInit {
     /**
      * Breadcrumbs
      */

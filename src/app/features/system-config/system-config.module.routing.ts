@@ -6,7 +6,7 @@ import * as fromPages from './pages';
 const routes: Routes = [
     {
         path: '',
-        component: fromPages.MainComponent
+        component: fromPages.SystemConfigComponent
     }
 ];
 
