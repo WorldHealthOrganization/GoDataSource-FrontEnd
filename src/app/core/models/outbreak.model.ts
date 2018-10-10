@@ -42,7 +42,7 @@ export class OutbreakModel {
         this.noDaysInChains = _.get(data, 'noDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
-        this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
+        this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');

@@ -70,7 +70,9 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_BACK': 'Back',
         'LNG_COMMON_BUTTON_ADD': 'Add',
+        'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
@@ -88,19 +90,20 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
-        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: {{name}}?',
-        'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE': 'Are you sure you want to convert contact: {{name}} to case?',
-        'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE': 'Are you sure you want to convert contact: "{{name}}" to case?',
+        'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_CLUSTER': 'Are you sure you want to delete this cluster: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
-        'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: {{name}}',
-        'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: {{firstName}} {{lastName}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: "{{name}}"',
+        'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: "{{firstName}} {{lastName}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE': 'Are you sure you want to delete the outbreak template "{{name}}"?',
         'LNG_DIALOG_CONFIRM_REMOVE_FOLLOW_UP': 'Are you sure you want to remove follow-up from the list ( details and questionnaire )?',
         'LNG_DIALOG_CONFIRM_REMOVE_RELATIONSHIP': 'Are you sure you want to remove relationship from the list?',
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
@@ -112,12 +115,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as missing from a follow-up?',
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as present on follow-up?',
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
-        'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: {{name}}?',
-        'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: {{name}}?',
-        'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: {{name}}?',
-        'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: {{name}}?',
-        'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: {{name}}?',
-        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: {{name}}?',
+        'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
         'LNG_DIALOG_CONFIRM_UNSAVED_DATA': 'You have unsaved data, are you sure you want to leave this page and loose all changes?',
@@ -157,6 +160,8 @@ export const EnglishUsLang = {
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED': 'This field is required',
         'LNG_FORM_VALIDATION_ERROR_PATTERN': 'Value does not match required pattern',
+        'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER': 'Must be bigger or equal to {{min}}',
+        'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER': 'Must be smaller or equal to {{max}}',
         'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH': 'Must contain a minimum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH': 'Must contain a maximum of {{length}} characters',
         'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE': 'Value must match password',
@@ -197,13 +202,17 @@ export const EnglishUsLang = {
          * Address Fields
          */
         'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
+        'LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
-        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LAT': 'Latitude',
-        'LNG_ADDRESS_FIELD_LABEL_LOCATION_LNG': 'Longitude',
+        'LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
+        'LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_CITY': 'City',
+        'LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE': 'ZIP',
+        'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
+        'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION': '',
         'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS': 'Add another address',
         'LNG_ADDRESS_LABEL_NO_ADDRESSES': 'No addresses',
 
@@ -211,7 +220,9 @@ export const EnglishUsLang = {
          * Document Fields
          */
         'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
+        'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION': '',
         'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER': 'Document Number',
+        'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION': '',
         'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT': 'Add another document',
         'LNG_DOCUMENT_LABEL_NO_DOCUMENTS': 'No documents',
 
@@ -226,30 +237,6 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
-
-        /**
-         * Outbreak Fields
-         */
-        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
-        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
-        'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
-        'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
-        'LNG_OUTBREAK_FIELD_LABEL_COUNTRY_ID': 'ID',
-        'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
-        'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
-        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
-        'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
-        'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_TOOLTIP': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
-        'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
 
         /**
          * Entity Fields
@@ -269,43 +256,60 @@ export const EnglishUsLang = {
          * Case Fields
          */
         'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION': 'Date of Infection',
-        'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LAT': 'Fill Geo-Location Latitude',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME': 'Date of Outcome',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE': 'Age',
+        'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of Onset',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE': 'Is date of onset approximate?',
+        'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk Reason',
+        'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_RISK_LEVEL': 'Risk level',
+        'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES': 'Hospitalization Dates',
+        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ID': 'ID',
-        'LNG_CASE_FIELD_LABEL_UPDATED_AT': 'Updated At',
-        'LNG_CASE_FIELD_LABEL_OUTBREAK_ID': 'Outbreak ID',
         'LNG_CASE_FIELD_LABEL_DOB': 'Date of Birth',
-        'LNG_CASE_FIELD_LABEL_CREATED_BY': 'Created By',
+        'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE': 'Date of Becoming case',
+        'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle Name',
-        'LNG_CASE_FIELD_LABEL_DELETED_AT': 'Deleted At',
-        'LNG_CASE_FIELD_LABEL_FILL_GEO_LOCATION_LNG': 'Fill Geo-Location Longitude',
+        'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
-        'LNG_CASE_FIELD_LABEL_UPDATED_BY': 'Updated By',
-        'LNG_CASE_FIELD_LABEL_CREATED_AT': 'Created At',
         'LNG_CASE_FIELD_LABEL_TYPE': 'Type',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
+        'LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_GENDER': 'Gender',
+        'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
+        'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Occupation',
+        'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
+        'LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
+        'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
         'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CASE_FIELD_LABEL_INCUBATION_DATES': 'Incubation Dates',
         'LNG_CASE_FIELD_LABEL_ISOLATION_DATES': 'Isolation Dates',
+        'LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
+        'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
         'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
@@ -394,17 +398,29 @@ export const EnglishUsLang = {
          * Case lab results fields
          */
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': 'Sample delivered to lab',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING': 'Date testing',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': 'Date of the result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME': 'Lab name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE': 'Test type',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT': 'Result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
@@ -437,7 +453,9 @@ export const EnglishUsLang = {
          * Cluster Fields
          */
         'LNG_CLUSTER_FIELD_LABEL_NAME': 'Name',
+        'LNG_CLUSTER_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
 
         /**
          * Clusters list page
@@ -500,33 +518,42 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE': 'Copy value to all other that have an empty value',
 
         /**
-         * Location Field
+         * Location Fields
          */
         'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
+        'LNG_LOCATION_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_SYNONYMS': 'Synonyms',
         'LNG_LOCATION_FIELD_LABEL_SYNONYM': 'Synonym',
+        'LNG_LOCATION_FIELD_LABEL_SYNONYM_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION': 'Lat / Lng',
         'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT': 'Latitude',
+        'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG': 'Longitude',
+        'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
-        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION': 'Parent Location',
+        'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
 
         /**
          * Locations list page
          */
         'LNG_PAGE_LIST_LOCATIONS_TITLE': 'Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ALL_TITLE': 'All',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN': 'Children Locations',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
-        'LNG_PAGE_LIST_LOCATIONS_ACTION_ADD_CHILD': 'Add Child Location',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
+        'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
+        'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
 
         /**
          * Create Location page
          */
         'LNG_PAGE_CREATE_LOCATION_TITLE': 'Create New Location',
         'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LOCATION_NAME': 'New Location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON': 'Create location',
         'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE': 'Location created!',
 
@@ -535,6 +562,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_VIEW_LOCATION_TITLE': 'View {{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_VIEW_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_NAME': '{{name}}',
         'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE': 'Location saved!',
@@ -556,10 +584,15 @@ export const EnglishUsLang = {
          * User fields
          */
         'LNG_USER_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_EMAIL': 'Email',
+        'LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
+        'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
+        'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
 
         /**
          * List Users page
@@ -587,8 +620,11 @@ export const EnglishUsLang = {
          * User Role fields
          */
         'LNG_USER_ROLE_FIELD_LABEL_NAME': 'Name',
+        'LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS': 'Options',
+        'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION': '',
 
         /**
          * List User Role page
@@ -617,22 +653,36 @@ export const EnglishUsLang = {
          */
         'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
+        'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
+        'LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
+        'LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
+        'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
+        'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
+        'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
+        'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
+        'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON': 'Age',
+        'LNG_CONTACT_FIELD_LABEL_DOB': 'Date of Birth',
+        'LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
@@ -697,17 +747,24 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
-        'LNG_RELATIONSHIP_FIELD_LABEL_TYPE': 'Relationship Type',
-        'LNG_RELATIONSHIP_FIELD_LABEL_RELATED_PERSON': 'Related Person',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL': 'Certainty Level',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE': 'Exposure Type',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY': 'Exposure Frequency',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION': 'Exposure Duration',
+        'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
+        'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
+        'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME': 'First Name',
         'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME': 'Last Name',
 
@@ -725,10 +782,13 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME': 'First Name',
         'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME': 'Last Name',
         'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
+        'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_AREA': 'Area',
         'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED': 'Performed',
+        'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP': 'Lost to Follow-up',
+        'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
@@ -794,11 +854,16 @@ export const EnglishUsLang = {
          * Event fields
          */
         'LNG_EVENT_FIELD_LABEL_NAME': 'Name',
+        'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_EVENT_FIELD_LABEL_DATE': 'Date',
+        'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION': '',
         'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_EVENT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+        'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION': '',
         'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
+        'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
         'LNG_EVENT_FIELD_LABEL_DELETED': 'Deleted',
 
         /**
@@ -896,10 +961,15 @@ export const EnglishUsLang = {
          * Reference Data Entry fields
          */
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE': 'Label',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION': '',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON': 'Icon',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION': '',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR': 'Color',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION': '',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
 
         /**
          * Reference Data - Categories List page
@@ -934,6 +1004,7 @@ export const EnglishUsLang = {
          * Icon Fields
          */
         'LNG_ICON_FIELD_LABEL_NAME': 'Name',
+        'LNG_ICON_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_ICON_FIELD_LABEL_ICON': 'Icon',
 
         /**
@@ -955,25 +1026,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_FILE_NOT_SUPPORTED': 'File not supported, supported files are: {{types}}',
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_DEFAULT_ATTACH': 'An error occurred while trying to attach file',
         'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_ERROR_PROCESSING_FILE': 'Error uploading icon',
-
-        /**
-         * Outbreak Templates
-         */
-        'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
-        'LNG_TEMPLATE_QUESTION_BADGE': 'Q',
-        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
-        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
-        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
-        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE': 'Answer Type',
-        'LNG_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED': 'Required?',
-        'LNG_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED': 'Required',
-        'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add Answer',
-        'LNG_TEMPLATE_QUESTION_ANSWER_BADGE': 'A',
-        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL': 'Answer Label',
-        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE': 'Answer Value',
-        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
-        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
-        'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
 
         /**
          * Security Questions
@@ -1030,7 +1082,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_RESET_PASSWORD_TITLE': 'Reset Password',
         'LNG_PAGE_RESET_PASSWORD_BUTTON': 'Change Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD': 'New Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION': '',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD_DESCRIPTION': '',
 
         /**
          * Change Password Page
@@ -1041,6 +1095,70 @@ export const EnglishUsLang = {
         'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON': 'Set Security Questions',
         'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON': 'Later',
         'LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE': 'Password Changed',
+
+        /**
+         * Outbreak Questionnaire Templates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW': 'Add Question',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE': 'Q',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE': 'Answer Type',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED': 'Required?',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED': 'Required',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add Answer',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE': 'A',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL': 'Answer Label',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE': 'Answer Value',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
+
+        /**
+         * Outbreak Fields
+         */
+        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
+        'LNG_OUTBREAK_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
+        'LNG_OUTBREAK_FIELD_LABEL_DISEASE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
+        'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
+        'LNG_OUTBREAK_FIELD_LABEL_START_DATE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
+        'LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
+        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
+        'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
+        'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
+        'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS_DESCRIPTION': '',
 
         /**
          * Outbreak List Page
@@ -1064,7 +1182,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
-        'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE': 'Done',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak created',
 
@@ -1078,6 +1195,59 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
+
+        /**
+         * Outbreak Template Fields
+         */
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME': 'Name',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' : 'Disease',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION' : '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY': 'Follow-up frequency',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
+
+        /**
+         * Outbreak Template List Page
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE': 'Outbreak Templates',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK': 'Generate Outbreak',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak template deleted',
+
+        /**
+         * Create Outbreak Template Page
+         */
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE': 'Create New Outbreak Template',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak template',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak template created',
+
+        /**
+         * Modify Outbreak Template page
+         */
+        'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'View {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
 
         /**
          * Form Range Fields
@@ -1138,9 +1308,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE': 'Relationship Details',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Name Color',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE': 'events without date',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
 
 
         /**
@@ -1158,6 +1334,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in the previous {{x}} days among known contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
+        'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
+        'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
+        'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -1202,6 +1381,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH': 'Starts with',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS': 'Is',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT': 'Contains',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD': 'Keyword',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
@@ -1211,7 +1391,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION': 'Place',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN': 'Within radius',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE': 'Max Distance ( miles )',
-        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Direction',
+        'LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL': 'Order',
         'LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER': 'Sort By',
         'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
         'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
@@ -1300,6 +1480,15 @@ export const EnglishUsLang = {
         /**
          * Import outbreak data
          */
-        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data'
+        'LNG_PAGE_IMPORT_OUTBREAK_DATA_TITLE': 'Import Outbreak Data',
+
+        /**
+         * Age Fields
+         */
+        'LNG_AGE_FIELD_LABEL_TYPE': 'Years / Months',
+        'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
+        'LNG_AGE_FIELD_LABEL_MONTHS': 'Months',
+        'LNG_AGE_FIELD_FILTER_LABEL_FROM': 'From years',
+        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years'
     }
 };

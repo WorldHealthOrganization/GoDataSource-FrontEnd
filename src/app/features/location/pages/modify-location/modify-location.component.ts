@@ -33,6 +33,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     locationData: LocationModel = new LocationModel();
     authUser: UserModel;
 
+    backToCurrent: boolean = false;
+
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
@@ -47,6 +49,11 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.route.queryParams
+            .subscribe((params: { backToCurrent }) => {
+                this.backToCurrent = params.backToCurrent;
+            });
 
         this.route.params
             .subscribe((params: { locationId }) => {

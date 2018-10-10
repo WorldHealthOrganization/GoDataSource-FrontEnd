@@ -191,7 +191,13 @@ export abstract class ListComponent {
      * Sort asc / desc by specific fields
      * @param data
      */
-    public sortBy(data) {
+    public sortBy(
+        data: any,
+        objectDetailsSort?: {
+            [property: string]: string[]
+        }
+    ) {
+        // sort information
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
 
@@ -212,8 +218,23 @@ export abstract class ListComponent {
             property &&
             direction
         ) {
-            // apply sort
-            this.queryBuilder.sort.by(property, direction);
+            // add sorting criteria
+            if (
+                objectDetailsSort &&
+                objectDetailsSort[property]
+            ) {
+                _.each(objectDetailsSort[property], (childProperty: string) => {
+                    this.queryBuilder.sort.by(
+                        `${property}.${childProperty}`,
+                        direction
+                    );
+                });
+            } else {
+                this.queryBuilder.sort.by(
+                    property,
+                    direction
+                );
+            }
         }
 
         // refresh list
@@ -268,6 +289,22 @@ export abstract class ListComponent {
      */
     filterByRangeField(property: string, value: FormRangeModel) {
         this.queryBuilder.filter.byRange(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter the list by an age range field ('from' / 'to')
+     * @param {string} property
+     * @param {FormRangeModel} value Object with 'from' and 'to' properties
+     */
+    filterByAgeRangeField(
+        property: string,
+        value: FormRangeModel
+    ) {
+        // filter by age range
+        this.queryBuilder.filter.byAgeRange(property, value);
 
         // refresh list
         this.needsRefreshList();
@@ -789,6 +826,58 @@ export abstract class ListComponent {
                         this.needsRefreshList(true);
                     });
                 break;
+
+            // Filter cases without date of onset.
+            case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN:
+                // get the case ids that need to be updated
+                const caseIds = _.get(queryParams, 'caseIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': caseIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            // Filter contacts without date of last contact.
+            case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
+                // get the contact ids that need to be updated
+                const contactIds = _.get(queryParams, 'contactIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': contactIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
+            // Filter events without date
+            case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN:
+                // get the event ids that need to be updated
+                const eventIds = _.get(queryParams, 'eventIds', null);
+                // get the correct query builder and merge with the existing one
+                // merge query builder
+                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder.filter.where({
+                    id: {
+                        'inq': eventIds
+                    }
+                }, true);
+                this.mergeListFilterToMainFilter();
+                // refresh list
+                this.needsRefreshList(true);
+                break;
+
         }
     }
 

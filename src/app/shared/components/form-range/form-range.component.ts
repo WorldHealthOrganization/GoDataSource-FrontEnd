@@ -17,6 +17,13 @@ import { FormRangeModel } from './form-range.model';
 export class FormRangeComponent extends GroupBase<FormRangeModel> {
     @HostBinding('class.form-element-host') isFormElement = true;
 
+    @Input() step: number = 1;
+    @Input() min: number;
+    @Input() max: number;
+
+    @Input() fromPlaceholder: string = 'LNG_FORM_RANGE_FIELD_LABEL_FROM';
+    @Input() toPlaceholder: string = 'LNG_FORM_RANGE_FIELD_LABEL_TO';
+
     // from
     private _fromVisible: boolean = true;
     @Input() set fromVisible(value: boolean) {

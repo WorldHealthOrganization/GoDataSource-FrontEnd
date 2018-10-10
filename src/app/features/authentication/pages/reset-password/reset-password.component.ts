@@ -58,6 +58,11 @@ export class ResetPasswordComponent implements OnInit {
 
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // remove password confirm
+        if (dirtyFields.passwordConfirm) {
+            delete dirtyFields.passwordConfirm;
+        }
+
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
             // reset user's password
