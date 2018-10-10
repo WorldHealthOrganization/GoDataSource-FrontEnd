@@ -10,7 +10,7 @@
             type="button"
             *ngIf="!viewOnly"
             (click)="addAnswer()">
-            {{'LNG_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}
+            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}
         </button>
     </div>
 
@@ -22,15 +22,15 @@
                 <div fxLayout="row" class="answer-wrapper">
                     <!-- form-answer badge -->
                     <div class="answer-badge" fxFlex="40px">
-                        {{ ('LNG_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) }}
+                        {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) }}
                     </div>
                     <!-- form-answer label -->
                     <div fxFlex="40" class="answer-box">
                         <app-form-input
                             [name]="name + '[' + i + '][label]'"
                             [ngModel]="answer.label | translate"
-                            [placeholder]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
-                            tooltip="LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
+                            [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
+                            tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly"
                             (optionChanged)="onChangeBind(i, 'label', $event)"
@@ -43,8 +43,8 @@
                         <app-form-input
                             [name]="name + '[' + i + '][value]'"
                             [(ngModel)]="values[i].value"
-                            [placeholder]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
-                            tooltip="LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
+                            [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
+                            tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly"
                             (optionChanged)="onChange()">
@@ -59,7 +59,7 @@
                             <app-form-slide-toggle
                                 [name]="name + '[' + i + '][additionalQuestionsShow]'"
                                 [(ngModel)]="values[i].additionalQuestionsShow"
-                                [label]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
+                                [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
                                 required="false"
                                 (optionChanged)="onChange()">
                             </app-form-slide-toggle>
@@ -68,7 +68,7 @@
                             <app-form-slide-toggle
                                 [name]="name + '[' + i + '][alert]'"
                                 [(ngModel)]="values[i].alert"
-                                [label]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
+                                [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
                                 required="false"
                                 (optionChanged)="onChange()">
                             </app-form-slide-toggle>
@@ -81,7 +81,7 @@
 
                         <!-- View only  -->
                         <div *ngIf="viewOnly">
-                            <div>{{ (answer.alert ? 'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT' : '') | translate}}</div>
+                            <div>{{ (answer.alert ? 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT' : '') | translate}}</div>
                         </div>
                     </div>
                 </div>

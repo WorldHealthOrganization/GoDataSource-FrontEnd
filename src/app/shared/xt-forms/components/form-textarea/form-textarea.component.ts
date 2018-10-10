@@ -31,7 +31,7 @@ export class FormTextareaComponent extends ElementBase<string> {
 
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
-        this._tooltip = this.i18nService.instant(tooltip);
+        this._tooltip = tooltip ? this.i18nService.instant(tooltip) : tooltip;
     }
     get tooltip(): string {
         return this._tooltip;
