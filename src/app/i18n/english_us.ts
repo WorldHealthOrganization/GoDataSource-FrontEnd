@@ -1172,7 +1172,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
-        'LNG_PAGE_CREATE_OUTBREAK_TAB_DONE': 'Done',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak created',
 
@@ -1211,41 +1210,34 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
 
-        // 'LNG_TEMPLATE_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak template created',
-        // 'LNG_TEMPLATE_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak template deleted',
-
-        // 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
-        // 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
-        // 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
-        // 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_DONE': 'Done',
-        // 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak template',
-        //
-        // 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'View {{name}}',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_LINK_MODIFY': 'Modify {{name}}',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
-        // 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
-
-        // caseInvestigationTemplate: QuestionModel;
-        // contactFollowUpTemplate: QuestionModel;
-        // labResultsTemplate: QuestionModel;
-
         /**
          * Outbreak Template List Page
          */
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE': 'Outbreak Templates',
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK': 'Generate Outbreak',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak template deleted',
 
         /**
-         * Create Template Outbreak Page
+         * Create Outbreak Template Page
          */
         'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE': 'Create New Outbreak Template',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON': 'Create outbreak template',
+        'LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON': 'Outbreak template created',
 
         /**
-         * Modify Template Outbreak page
+         * Modify Outbreak Template page
          */
+        'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'View {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
 
         /**
          * Form Range Fields

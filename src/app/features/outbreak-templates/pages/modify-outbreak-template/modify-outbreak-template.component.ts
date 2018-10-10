@@ -5,16 +5,12 @@ import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import * as _ from 'lodash';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { MatTabChangeEvent } from '@angular/material';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
@@ -38,11 +34,6 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     outbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
     // list of diseases
     diseasesList$: Observable<any[]>;
-    // list of countries
-    countriesList$: Observable<any[]>;
-
-    // index of the current tab
-    currentTabIndex = 0;
 
     constructor(
         protected route: ActivatedRoute,
@@ -50,7 +41,6 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private i18nService: I18nService,
         private router: Router,
         private authDataService: AuthDataService)
     {
@@ -60,16 +50,9 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the lists for form
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
 
         this.route.params
             .subscribe((params: { outbreakTemplateId }) => {
@@ -81,7 +64,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                         this.outbreakTemplate = outbreakTemplateData;
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_LINK_MODIFY',
+                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
                                 '.',
                                 true,
                                 {},
@@ -112,9 +95,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                // update language tokens to get the translation of submitted questions and answers
-                this.i18nService.loadUserLanguage().subscribe();
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 this.router.navigate(['/outbreak-templates']);
@@ -122,18 +104,10 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     }
 
     /**
-     * Check if we have write access to outbreaks
+     * Check if we have write access to outbreak templates
      * @returns {boolean}
      */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-
-    /**
-     *  Save the current tab index
-     */
-    selectTab(tabChangeEvent: MatTabChangeEvent): void {
-        this.currentTabIndex = tabChangeEvent.index;
+    hasOutbreakTemplateWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 }

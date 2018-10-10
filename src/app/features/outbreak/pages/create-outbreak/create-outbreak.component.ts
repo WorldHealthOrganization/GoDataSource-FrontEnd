@@ -61,14 +61,16 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         );
         // get the outbreak template
         this.route.queryParams
-            .subscribe((queryParams: {outbreakTemplateId}) => {
-                this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
-                    .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
-                        // delete the id of the outbreak template
-                        delete outbreakTemplate.id;
-                        // make the new outbreak which is merged with the outbreak template
-                        this.newOutbreak = _.merge(this.newOutbreak, outbreakTemplate);
-                    });
+            .subscribe((queryParams: { outbreakTemplateId }) => {
+                if (queryParams.outbreakTemplateId) {
+                    this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
+                        .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
+                            // delete the id of the outbreak template
+                            delete outbreakTemplate.id;
+                            // make the new outbreak which is merged with the outbreak template
+                            this.newOutbreak = _.merge(this.newOutbreak, outbreakTemplate);
+                        });
+                }
             });
     }
 

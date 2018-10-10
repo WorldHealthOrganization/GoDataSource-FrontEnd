@@ -60,7 +60,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_TEMPLATE_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
                     // navigate to listing page
                     this.disableDirtyConfirm();
                     this.router.navigate(['/outbreak-templates']);

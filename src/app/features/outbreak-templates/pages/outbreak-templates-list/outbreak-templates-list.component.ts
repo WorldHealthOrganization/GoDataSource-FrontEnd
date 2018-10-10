@@ -131,7 +131,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                                 .subscribe((authenticatedUser) => {
                                     this.authUser = authenticatedUser.user;
                                 });
-                            this.snackbarService.showSuccess('LNG_TEMPLATE_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE');
                             this.needsRefreshList(true);
                         });
                 }
