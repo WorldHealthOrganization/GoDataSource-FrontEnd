@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { MatTabChangeEvent } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
@@ -41,10 +40,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     diseasesList$: Observable<any[]>;
     // list of countries
     countriesList$: Observable<any[]>;
-
-    // index of the current tab
-    currentTabIndex = 0;
-
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -139,12 +134,5 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     *  Save the current tab index
-     */
-    selectTab(tabChangeEvent: MatTabChangeEvent): void {
-        this.currentTabIndex = tabChangeEvent.index;
     }
 }
