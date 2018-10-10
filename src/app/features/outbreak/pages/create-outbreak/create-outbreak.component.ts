@@ -68,7 +68,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                             // delete the id of the outbreak template
                             delete outbreakTemplate.id;
                             // make the new outbreak which is merged with the outbreak template
-                            this.newOutbreak = _.merge(this.newOutbreak, outbreakTemplate);
+                            this.newOutbreak = new OutbreakModel(outbreakTemplate);
                         });
                 }
             });

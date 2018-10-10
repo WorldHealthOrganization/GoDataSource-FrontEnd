@@ -16,7 +16,6 @@ export class OutbreakTemplateModel {
     caseInvestigationTemplate: QuestionModel;
     contactFollowUpTemplate: QuestionModel;
     labResultsTemplate: QuestionModel;
-    deleted: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -29,7 +28,6 @@ export class OutbreakTemplateModel {
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
-        this.deleted = _.get(data, 'deleted');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),
