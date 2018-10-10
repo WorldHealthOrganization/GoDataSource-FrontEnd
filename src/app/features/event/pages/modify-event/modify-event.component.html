@@ -19,6 +19,7 @@
                                 name="name"
                                 [(ngModel)]="eventData.name"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="100"
                                 [disabled]="viewOnly">
@@ -28,6 +29,7 @@
                                 name="date"
                                 [(ngModel)]="eventData.date"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
@@ -39,6 +41,7 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="eventData.dateOfReporting"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
@@ -50,6 +53,7 @@
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="eventData.isDateOfReportingApproximate"
                                 [label]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
                         </div>
@@ -59,6 +63,7 @@
                                 name="description"
                                 [(ngModel)]="eventData.description"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
                                 maxlength="500"
                                 [disabled]="viewOnly">
                             </app-form-textarea>

@@ -1,5 +1,5 @@
 <div class="form-element"
-     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+     [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip }">
 
     <form #groupForm="ngForm">
         <ng-select
@@ -32,6 +32,8 @@
                 </span>
             </ng-template>
         </ng-select>
+
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
 
         <!--[messages]="failures"-->
         <app-form-validation

@@ -14,6 +14,7 @@
                 <app-form-slide-toggle
                     name="active"
                     [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION"
                     [ngModel]="entry.active">
                 </app-form-slide-toggle>
 
@@ -22,6 +23,10 @@
                     <div
                         fxFlex>
                         {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
+                        <span
+                            *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                            [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
+                            class="xt-icon form-icon">help</span>
                     </div>
 
                     <input
@@ -77,6 +82,7 @@
                         name="iconId"
                         [ngModel]="entry.iconId"
                         [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate"
+                        tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION"
                         [options]="iconsList$ | async"
                         optionLabelKey="name"
                         optionValueKey="id"
@@ -92,6 +98,7 @@
                     name="value"
                     [ngModel]="entry.value"
                     [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
                     required="true">
                 </app-form-input>
 
@@ -99,6 +106,7 @@
                     name="description"
                     [ngModel]="entry.description"
                     [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
                     minRows="1">
                 </app-form-textarea>
             </div>

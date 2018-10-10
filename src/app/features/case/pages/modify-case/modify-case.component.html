@@ -20,6 +20,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 required="true"
                                 [options]="caseRiskLevelsList$ | async"
                                 [disabled]="viewOnly">
@@ -29,6 +30,7 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
@@ -43,6 +45,7 @@
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
                                 [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
@@ -50,6 +53,7 @@
                                 name="transferRefused"
                                 [(ngModel)]="caseData.transferRefused"
                                 [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
                         </div>
@@ -58,6 +62,7 @@
                             name="riskReason"
                             [(ngModel)]="caseData.riskReason"
                             [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
                             [disabled]="viewOnly">
                         </app-form-textarea>
 
@@ -73,6 +78,7 @@
                                 name="firstName"
                                 [(ngModel)]="caseData.firstName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="200"
                                 [disabled]="viewOnly">
@@ -82,6 +88,7 @@
                                 name="middleName"
                                 [(ngModel)]="caseData.middleName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
                                 maxlength="200"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -90,6 +97,7 @@
                                 name="lastName"
                                 [(ngModel)]="caseData.lastName"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                                 maxlength="200"
                                 [disabled]="viewOnly">
                             </app-form-input>
@@ -98,6 +106,7 @@
                                 name="gender"
                                 [(ngModel)]="caseData.gender"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION"
                                 required="true"
                                 [options]="genderList$ | async"
                                 [disabled]="viewOnly">
@@ -111,6 +120,7 @@
                                     name="phoneNumber"
                                     [(ngModel)]="caseData.phoneNumber"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
                                     maxlength="50"
                                     [disabled]="viewOnly">
                                 </app-form-input>
@@ -119,6 +129,7 @@
                                     name="occupation"
                                     [(ngModel)]="caseData.occupation"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
                                     [options]="occupationsList$ | async"
                                     [disabled]="viewOnly">
                                 </app-form-select>
@@ -129,7 +140,12 @@
                                 name="ageDob"
                                 [(ngModel)]="caseData"
                                 [required]="false"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
                             </app-form-age-dob>
                         </div>
 
@@ -167,6 +183,7 @@
                                 name="classification"
                                 [(ngModel)]="caseData.classification"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION"
                                 required="true"
                                 [options]="caseClassificationsList$ | async"
                                 [disabled]="viewOnly">
@@ -176,6 +193,7 @@
                                 name="dateBecomeCase"
                                 [(ngModel)]="caseData.dateBecomeCase"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -186,6 +204,7 @@
                                 name="dateOfInfection"
                                 [(ngModel)]="caseData.dateOfInfection"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -199,6 +218,7 @@
                                 name="dateOfOutcome"
                                 [(ngModel)]="caseData.dateOfOutcome"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -212,6 +232,7 @@
                                 name="dateOfOnset"
                                 [(ngModel)]="caseData.dateOfOnset"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -222,6 +243,7 @@
                                 name="isDateOfOnsetApproximate"
                                 [(ngModel)]="caseData.isDateOfOnsetApproximate"
                                 [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
@@ -229,6 +251,7 @@
                                 name="deceased"
                                 [(ngModel)]="caseData.deceased"
                                 [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
@@ -238,6 +261,7 @@
                                     [(ngModel)]="caseData.dateDeceased"
                                     [disabled]="!caseData.deceased || viewOnly"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
                                     [maxDate]="serverToday"
                                     app-date-validator
                                     [dateSameOrBefore]="serverToday"
@@ -262,6 +286,8 @@
                     [(ngModel)]="caseData.hospitalizationDates"
                     [disabled]="viewOnly"
                     [required]="true"
+                    fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
+                    toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
                     [readOnly]="viewOnly">
                 </app-form-daterange-list>
 
@@ -273,6 +299,8 @@
                     [(ngModel)]="caseData.isolationDates"
                     [disabled]="viewOnly"
                     [required]="true"
+                    fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
+                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
                     [readOnly]="viewOnly">
                 </app-form-daterange-list>
 

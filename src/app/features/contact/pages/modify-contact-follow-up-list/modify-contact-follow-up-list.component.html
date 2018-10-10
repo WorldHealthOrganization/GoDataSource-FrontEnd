@@ -41,6 +41,7 @@
                                         [name]="'followUps[' + i + '][date]'"
                                         [(ngModel)]="followUpData.date"
                                         [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
                                         required="true"
                                         app-date-validator>
                                     </app-form-datepicker>
@@ -63,6 +64,7 @@
                                     [name]="'followUps[' + i + '][performed]'"
                                     [ngModel]="followUpData.performed"
                                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
+                                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION"
                                     [disabled]="dateInTheFuture(followUpData)">
                                 </app-form-slide-toggle>
 
@@ -70,6 +72,7 @@
                                     [name]="'followUps[' + i + '][lostToFollowUp]'"
                                     [ngModel]="followUpData.lostToFollowUp"
                                     [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
+                                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION"
                                     [disabled]="dateInTheFuture(followUpData)">
                                 </app-form-slide-toggle>
                             </div>
