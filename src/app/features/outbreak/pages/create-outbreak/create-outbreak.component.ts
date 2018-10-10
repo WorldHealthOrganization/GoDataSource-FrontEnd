@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable } from 'rxjs/Observable';
@@ -39,11 +38,9 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private outbreakDataService: OutbreakDataService,
         private router: Router,
         private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        private route: ActivatedRoute
     ) {
         super();
     }
