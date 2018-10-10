@@ -99,7 +99,7 @@ export class SidenavComponent implements OnInit {
                 new ChildNavItem(
                     'outbreak-templates',
                     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
-                    [PERMISSION.READ_OUTBREAK],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/outbreak-templates'
                 )
             ]
