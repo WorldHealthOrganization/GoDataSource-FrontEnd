@@ -4,6 +4,7 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-textarea',
@@ -27,7 +28,14 @@ export class FormTextareaComponent extends ElementBase<string> {
     @Input() disabled: boolean = false;
     @Input() readonly: boolean = false;
     @Input() name: string;
-    @Input() tooltip: string = null;
+
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltip = this.i18nService.instant(tooltip);
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
 
     @Input() maxlength: number;
     @Input() minRows: number = 2;
@@ -40,7 +48,8 @@ export class FormTextareaComponent extends ElementBase<string> {
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
     }

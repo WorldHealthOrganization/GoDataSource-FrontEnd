@@ -4,6 +4,7 @@ import {
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 
 import { ElementBase } from '../../core/index';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-slide-toggle',
@@ -29,7 +30,14 @@ export class FormSlideToggleComponent extends ElementBase<string> {
     @Input() labelBefore: boolean;
     @Input() readonly: boolean = false;
     @Input() disabled: boolean = false;
-    @Input() tooltip: string = null;
+
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltip = this.i18nService.instant(tooltip);
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
 
     public identifier = `form-slide-toggle-${FormSlideToggleComponent.identifier++}`;
 
@@ -38,7 +46,8 @@ export class FormSlideToggleComponent extends ElementBase<string> {
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
     }

@@ -1,4 +1,4 @@
-<div class="form-slide-toggle-container form-element {{ (tooltip !== null ? 'form-slide-tooltip' : '' ) }}"
+<div class="form-slide-toggle-container form-element {{ tooltip ? 'form-slide-tooltip' : '' }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <div
@@ -27,7 +27,7 @@
             </span>
         </div>
 
-        <span *ngIf="tooltip" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
     </div>
 
     <app-form-validation

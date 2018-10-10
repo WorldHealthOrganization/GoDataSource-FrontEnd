@@ -16,6 +16,7 @@ import { ElementBase } from '../../core/index';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { Moment } from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -59,7 +60,14 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @Input() maxDate: string | Moment;
     @Input() minDate: string | Moment;
-    @Input() tooltip: string = null;
+
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltip = this.i18nService.instant(tooltip);
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
 
     public identifier = `form-datepicker-${FormDatepickerComponent.identifier++}`;
 
@@ -68,7 +76,8 @@ export class FormDatepickerComponent extends ElementBase<string> {
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
     }

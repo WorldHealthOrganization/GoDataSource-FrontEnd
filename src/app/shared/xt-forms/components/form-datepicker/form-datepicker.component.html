@@ -1,4 +1,4 @@
-<div class="form-datepicker-container form-element {{ (tooltip !== null ? 'form-datepicker-tooltip' : '' ) }}"
+<div class="form-datepicker-container form-element {{ tooltip ? 'form-datepicker-tooltip' : '' }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field>
@@ -19,7 +19,7 @@
         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
         <mat-datepicker #pickerStartDate (selectedChanged)="onChange()"></mat-datepicker>
 
-        <span *ngIf="tooltip" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
     </mat-form-field>
 
     <app-form-validation
