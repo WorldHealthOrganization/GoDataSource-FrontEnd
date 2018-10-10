@@ -23,6 +23,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -97,7 +98,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private referenceDataDataService: ReferenceDataDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private router: Router
     ) {
         super(
             snackbarService
@@ -324,7 +326,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.outbreakDataService.getOutbreak(outbreakModel.id)
             .subscribe((outbreak: OutbreakModel) => {
                 // create the clone of the parent outbreak
-                const clonedOutbreak: OutbreakModel = outbreak;
                 this.dialogService.showInput(
                     new DialogConfiguration({
                         message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
@@ -335,22 +336,27 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
                             required: true,
                             type: 'text',
-                            value: outbreak.name + this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME')
+                            value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
                         })],
                     }), true)
                     .subscribe((answer) => {
                         if (answer.button === DialogAnswerButton.Yes) {
                             // delete the id from the parent outbreak
-                            delete clonedOutbreak.id;
+                            delete outbreak.id;
                             // set the name for the cloned outbreak
-                            clonedOutbreak.name = answer.inputValue.value.clonedOutbreakName;
-                            this.outbreakDataService.createOutbreak(clonedOutbreak)
+                            outbreak.name = answer.inputValue.value.clonedOutbreakName;
+                            this.outbreakDataService.createOutbreak(outbreak)
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
                                     return ErrorObservable.create(err);
                                 })
-                                .subscribe(() => {
+                                .subscribe((clonedOutbreak) => {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+                                    this.router.navigate(['outbreaks/create'], {
+                                        queryParams: {
+                                            clonedOutbreakId: clonedOutbreak.id
+                                        }
+                                    });
                                     // refresh the listing page
                                     this.needsRefreshList(true);
                             });

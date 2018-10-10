@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -42,7 +42,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private route: ActivatedRoute
     ) {
         super();
     }
@@ -57,6 +58,12 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 return country;
             })
         );
+        this.route.queryParams.subscribe((queryParams: {clonedOutbreakId}) => {
+            this.outbreakDataService.getOutbreak(queryParams.clonedOutbreakId)
+                .subscribe((clonedOutbreak) => {
+                    this.newOutbreak = clonedOutbreak;
+                });
+        });
     }
 
     /**
