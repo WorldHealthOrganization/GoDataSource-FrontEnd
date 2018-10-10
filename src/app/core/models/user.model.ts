@@ -12,6 +12,7 @@ export enum UserSettings {
     EVENT_FIELDS = 'eventFields',
     RELATIONSHIP_FIELDS = 'relationshipFields',
     OUTBREAK_FIELDS = 'outbreakFields',
+    OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
     FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields',
     FOLLOW_UPS_UPCOMING_FIELDS = 'upcomingFollowUpFields',
     FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields'

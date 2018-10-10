@@ -81,7 +81,7 @@ const routes: Routes = [
                         PasswordChangeGuard
                     ],
                     data: {
-                        permissions: [PERMISSION.READ_OUTBREAK]
+                        permissions: [PERMISSION.READ_SYS_CONFIG]
                     }
                 },
             // Contacts Module routes

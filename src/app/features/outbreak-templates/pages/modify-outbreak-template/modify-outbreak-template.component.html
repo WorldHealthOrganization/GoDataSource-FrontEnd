@@ -21,14 +21,16 @@
                             <app-form-input
                                 name="name"
                                 [(ngModel)]="outbreakTemplate.name"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_NAME' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-select
                                 name="disease"
                                 [(ngModel)]="outbreakTemplate.disease"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DISEASE' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION"
                                 [options]="diseasesList$ | async"
                                 required="true"
                                 [disabled]="viewOnly">
@@ -42,16 +44,20 @@
                             <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="outbreakTemplate.periodOfFollowup"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                             <app-form-input
                                 name="frequencyOfFollowUp"
                                 [(ngModel)]="outbreakTemplate.frequencyOfFollowUp"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                         </div>
 
@@ -59,16 +65,20 @@
                             <app-form-input
                                 name="noDaysAmongContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysAmongContacts"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysInChains"
                                 [(ngModel)]="outbreakTemplate.noDaysInChains"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                         </div>
 
@@ -76,28 +86,35 @@
                             <app-form-input
                                 name="noDaysNotSeen"
                                 [(ngModel)]="outbreakTemplate.noDaysNotSeen"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                             <app-form-input
                                 name="noLessContacts"
                                 [(ngModel)]="outbreakTemplate.noLessContacts"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                             <app-form-input
                                 name="longPeriodsBetweenCaseOnset"
                                 [(ngModel)]="outbreakTemplate.longPeriodsBetweenCaseOnset"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS_DESCRIPTION"
                                 required="true"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                type="number">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysNewContacts"
                                 [(ngModel)]="outbreakTemplate.noDaysNewContacts"
-                                [placeholder]="'LNG_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION"
                                 type="number"
                                 [disabled]="viewOnly">
                             </app-form-input>

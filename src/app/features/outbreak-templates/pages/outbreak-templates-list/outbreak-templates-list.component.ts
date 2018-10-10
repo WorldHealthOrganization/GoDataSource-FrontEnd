@@ -2,23 +2,19 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { Router } from '@angular/router';
+import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -29,28 +25,26 @@ import { Router } from '@angular/router';
 export class OutbreakTemplatesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
     ];
 
     outbreakTemplatesList$: Observable<any>;
     diseasesList$: Observable<any[]>;
-    countriesList$: Observable<any[]>;
-    activeOptionsList$: Observable<any[]>;
 
-    selectedOutbreak: OutbreakModel;
     authUser: UserModel;
 
+    // constants
+    UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(
         protected snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private dialogService: DialogService,
-        private router: Router)
-    {
+        private outbreakTemplateDataService: OutbreakTemplateDataService
+    ) {
         super(
             snackbarService
         );
@@ -59,30 +53,14 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
 
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak) => {
-                this.selectedOutbreak = selectedOutbreak;
-                if (this.selectedOutbreak) {
-                    // retrieve the list of outbreak templates
-                    this.outbreakTemplatesList$ = this.outbreakDataService.getOutbreakTemplatesList();
-                }
-            });
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-        // refresh
+
+        // ...and re-load the list when the Selected Outbreak is changed
         this.needsRefreshList(true);
     }
 
@@ -113,15 +91,20 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      * Re(load) the Outbreak Templates list
      */
     refreshList() {
-        if (this.selectedOutbreak) {
-            // retrieve the list of Events
-            this.outbreakTemplatesList$ = this.outbreakDataService.getOutbreakTemplatesList();
-        }
+        // retrieve the list of Events
+        this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder);
+    }
+
+    /**
+     * Check if we have write access to outbreak templates
+     * @returns {boolean}
+     */
+    hasOutbreakTemplateWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
     }
 
     /**
      * Check if we have write access to outbreaks
-     * @returns {boolean}
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
@@ -135,7 +118,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE', outbreakTemplate)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.outbreakDataService
+                    this.outbreakTemplateDataService
                         .deleteOutbreakTemplate(outbreakTemplate.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
@@ -153,15 +136,5 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
                         });
                 }
             });
-    }
-
-    /**
-     * Generate an outbreak from a template
-     * @param outbreakTemplate
-     */
-    generateOutbreak(outbreakTemplate: OutbreakTemplateModel) {
-        this.router.navigate(
-            [`outbreaks/create`],
-            {queryParams: {outbreakTemplateId: outbreakTemplate.id}});
     }
 }

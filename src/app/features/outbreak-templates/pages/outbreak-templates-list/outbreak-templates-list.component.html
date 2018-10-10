@@ -4,12 +4,14 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <ng-container *app-selected-outbreak-is-active>
-                    <button class="button-primary" mat-raised-button color="primary"
-                            [routerLink]="'./create'">
-                        {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
-                    </button>
-                </ng-container>
+                <button
+                    *ngIf="hasOutbreakTemplateWriteAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
+                </button>
             </div>
         </div>
     </ng-container>
@@ -17,7 +19,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_TEMPLATE_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -39,7 +41,7 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_TEMPLATE_FIELD_LABEL_NAME" | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME" | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
@@ -64,7 +66,7 @@
         <ng-container matColumnDef="disease">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_TEMPLATE_FIELD_LABEL_DISEASE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="diseaseFilter"
@@ -98,24 +100,38 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <button *ngIf="hasOutbreakWriteAccess()" (click)="generateOutbreak(item)"
-                            mat-menu-item class="mat-menu-item">
-                        {{ 'Generate outbreak' | translate}}
-                    </button>
+                    <ng-container
+                        *ngIf="hasOutbreakWriteAccess()">
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item"
+                            routerLink="/outbreaks/create"
+                            [queryParams]="{ outbreakTemplateId: item.id }">
+                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK' | translate}}
+                        </button>
+
+                        <mat-divider></mat-divider>
+                    </ng-container>
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW'| translate}}
+                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                     </button>
 
-                    <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item
+                    <ng-container
+                        *ngIf="hasOutbreakTemplateWriteAccess()">
+                        <button
+                            mat-menu-item
                             [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY'| translate}}
-                    </button>
+                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                        </button>
 
-                    <button *ngIf="hasOutbreakWriteAccess()" (click)="deleteOutbreakTemplate(item)"
-                            mat-menu-item class="mat-menu-item-delete">
-                        {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                    </button>
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteOutbreakTemplate(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
                 </mat-menu>
             </mat-cell>
         </ng-container>
@@ -123,5 +139,4 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
-
 </mat-card>

@@ -19,7 +19,7 @@ const routes: Routes = [
         component: fromPages.CreateOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [PERMISSION.WRITE_SYS_CONFIG],
         },
         canDeactivate: [
             PageChangeConfirmationGuard
@@ -31,7 +31,7 @@ const routes: Routes = [
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [PERMISSION.READ_SYS_CONFIG],
             action: ViewModifyComponentAction.VIEW
         }
     },
@@ -41,7 +41,7 @@ const routes: Routes = [
         component: fromPages.ModifyOutbreakTemplateComponent,
         canActivate: [AuthGuard],
         data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK],
+            permissions: [PERMISSION.WRITE_SYS_CONFIG],
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [

@@ -6,13 +6,12 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 @Component({
     selector: 'app-create-outbreak-template',
@@ -22,36 +21,27 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '..'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '..'),
         new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true)
     ];
 
     diseasesList$: Observable<any[]>;
-    countriesList$: Observable<any[]>;
 
     newOutbreakTemplate: OutbreakTemplateModel = new OutbreakTemplateModel();
 
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
-        private outbreakDataService: OutbreakDataService,
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
         private snackbarService: SnackbarService,
-        private router: Router)
-    {
+        private router: Router
+    ) {
         super();
     }
 
     ngOnInit() {
         // get the lists for forms
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
-            (countries) => _.map(countries, (country: LabelValuePair) => {
-                country.value = {
-                    id: country.value
-                };
-                return country;
-            })
-        );
     }
 
     createOutbreakTemplate(stepForms: NgForm[]) {
@@ -63,7 +53,7 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
         ) {
             const outbreakTemplateData = new OutbreakTemplateModel(dirtyFields);
 
-            this.outbreakDataService
+            this.outbreakTemplateDataService
                 .createOutbreakTemplate(outbreakTemplateData)
                 .catch((err) => {
                     this.snackbarService.showError((err.message));

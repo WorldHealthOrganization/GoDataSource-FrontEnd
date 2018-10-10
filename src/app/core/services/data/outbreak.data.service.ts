@@ -12,7 +12,6 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { AuthDataService } from './auth.data.service';
 import { Subject } from 'rxjs/Subject';
 import { SnackbarService } from '../helper/snackbar.service';
-import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 
 @Injectable()
 export class OutbreakDataService {
@@ -45,17 +44,6 @@ export class OutbreakDataService {
     }
 
     /**
-     * Retrieve the list of Outbreak Templates
-     * @returns {Observable<OutbreakTemplateModel[]>}
-     */
-    getOutbreakTemplatesList(): Observable<OutbreakTemplateModel> {
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`/templates`),
-            OutbreakTemplateModel
-        );
-    }
-
-    /**
      * Delete an existing Outbreak
      * @param {string} outbreakId
      * @returns {Observable<any>}
@@ -70,15 +58,6 @@ export class OutbreakDataService {
                         return res;
                     });
             });
-    }
-
-    /**
-     * Delete an existing outbreak template
-     * @param {string} outbreakTemplateId
-     * @returns {Observable<any>}
-     */
-    deleteOutbreakTemplate(outbreakTemplateId: string): Observable<any> {
-        return this.http.delete(`templates/${outbreakTemplateId}`);
     }
 
     /**
@@ -99,15 +78,6 @@ export class OutbreakDataService {
     }
 
     /**
-     * Create a new OutbreakTemplate
-     * @param {OutbreakTemplateModel} outbreakTemplate
-     * @returns {Observable<any>}
-     */
-    createOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel): Observable<any>{
-        return this. http.post(`templates`, outbreakTemplate);
-    }
-
-    /**
      * Retrieve an Outbreak
      * @param {string} outbreakId
      * @returns {Observable<OutbreakModel>}
@@ -116,18 +86,6 @@ export class OutbreakDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}`),
             OutbreakModel
-        );
-    }
-
-    /**
-     * Retrieve an OutbreakTemplate
-     * @param {string} outbreakTemplateId
-     * @returns {Observable<OutbreakTemplateModel>}
-     */
-    getOutbreakTemplate(outbreakTemplateId: string): Observable<OutbreakTemplateModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`templates/${outbreakTemplateId}`),
-            OutbreakTemplateModel
         );
     }
 
@@ -145,18 +103,6 @@ export class OutbreakDataService {
                         // preserve the output of the main request
                         return res;
                     });
-            });
-    }
-
-    /**
-     * Modify an existing Outbreak template
-     * @param {string} outbreakTemplateId
-     * @returns {Observable<any>}
-     */
-    modifyOutbreakTemplate(outbreakTemplateId: string, data: any): Observable<any> {
-        return this.http.put(`templates/${outbreakTemplateId}`, data)
-            .map((res) => {
-                return res;
             });
     }
 

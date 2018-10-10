@@ -15,6 +15,7 @@ import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
+import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -42,7 +43,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private outbreakTemplateDataService: OutbreakTemplateDataService
     ) {
         super();
     }
@@ -60,7 +62,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         // get the outbreak template
         this.route.queryParams
             .subscribe((queryParams: {outbreakTemplateId}) => {
-                this.outbreakDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
+                this.outbreakTemplateDataService.getOutbreakTemplate(queryParams.outbreakTemplateId)
                     .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
                         // delete the id of the outbreak template
                         delete outbreakTemplate.id;

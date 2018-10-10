@@ -9,7 +9,6 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import * as _ from 'lodash';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -18,6 +17,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { MatTabChangeEvent } from '@angular/material';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -27,7 +27,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_TEMPLATE_TITLE', '/outbreak-templates')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates')
     ];
 
     // authenticated user
@@ -47,7 +47,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
-        private outbreakDataService: OutbreakDataService,
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
@@ -75,7 +75,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
             .subscribe((params: { outbreakTemplateId }) => {
                 this.outbreakTemplateId = params.outbreakTemplateId;
                 // get the outbreak to modify
-                this.outbreakDataService
+                this.outbreakTemplateDataService
                     .getOutbreakTemplate(this.outbreakTemplateId)
                     .subscribe(outbreakTemplateData => {
                         this.outbreakTemplate = outbreakTemplateData;
@@ -105,7 +105,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // modify the outbreak template
-        this.outbreakDataService
+        this.outbreakTemplateDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
