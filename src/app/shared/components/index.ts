@@ -25,6 +25,9 @@ import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { SideColumnsComponent } from './side-columns/side-columns.component';
+import { FormAgeComponent } from './form-age/form-age.component';
+import { AgeLabelComponent } from './age-label/age-label.component';
+import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -63,6 +66,8 @@ export const components: any[] = [
     FormInputListComponent,
     FormLocationDropdownComponent,
     FormFillQuestionnaireComponent,
+    FormAgeComponent,
+    FormAgeDobComponent,
 
     // display information
     CountedItemsListComponent,
@@ -70,6 +75,7 @@ export const components: any[] = [
     ReferenceDataLabelComponent,
     LocationBreadcrumbsComponent,
     ChronologyComponent,
+    AgeLabelComponent,
 
     // dialogs
     DialogComponent,

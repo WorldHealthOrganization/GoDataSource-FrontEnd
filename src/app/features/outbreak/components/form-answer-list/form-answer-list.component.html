@@ -30,6 +30,7 @@
                             [name]="name + '[' + i + '][label]'"
                             [ngModel]="answer.label | translate"
                             [placeholder]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
+                            tooltip="LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly"
                             (optionChanged)="onChangeBind(i, 'label', $event)"
@@ -43,6 +44,7 @@
                             [name]="name + '[' + i + '][value]'"
                             [(ngModel)]="values[i].value"
                             [placeholder]="'LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
+                            tooltip="LNG_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly"
                             (optionChanged)="onChange()">

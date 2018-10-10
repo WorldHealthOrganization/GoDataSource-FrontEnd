@@ -41,7 +41,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseId: string;
 
     caseData: CaseModel = new CaseModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -112,6 +111,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
     }
 
+    /**
+     * Breadcrumbs
+     */
     buildBreadcrumbs() {
         if (this.caseData) {
             // initialize breadcrumbs
@@ -154,6 +156,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         }
     }
 
+    /**
+     * Case data
+     */
     retrieveCaseData() {
         // get case
         if (
@@ -220,7 +225,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
                         const parentPerson = _.find(relationship.persons, { source: true });
                         const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
-                        if (parentCase.dateOfOnset) {
+                        if (
+                            parentCase &&
+                            parentCase.dateOfOnset
+                        ) {
                             uniqueDates[moment(parentCase.dateOfOnset).startOf('day').toISOString()] = true;
                         }
                     });
@@ -244,13 +252,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
-    }
-
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {
@@ -260,11 +261,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
         // modify the Case

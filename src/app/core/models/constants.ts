@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
 /**
  * Apply List Filter
  */
@@ -35,6 +38,9 @@ export class Constants {
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // AGE constants
+    static DEFAULT_AGE_MAX_YEARS = 150;
 
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
@@ -180,4 +186,11 @@ export class Constants {
             value: 'TIMELINE_NETWORK'
         }
     };
+
+    /**
+     * Today date
+     */
+    static getCurrentDate(): Moment {
+        return moment().startOf('day');
+    }
 }

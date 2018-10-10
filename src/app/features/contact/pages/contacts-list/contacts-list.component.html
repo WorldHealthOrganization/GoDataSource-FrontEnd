@@ -57,7 +57,7 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef fxFlex="60px">
@@ -154,14 +154,18 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterByRangeField('age', $event)"
-                            app-reset-input-on-side-filter>
+                            (changed)="filterByAgeRangeField('age', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0"
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
                         </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.age }}
+                <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
 

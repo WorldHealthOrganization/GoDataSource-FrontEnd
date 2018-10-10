@@ -7,6 +7,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { Constants } from '../../../core/models/constants';
 
 @Component({
     selector: 'app-side-filters',
@@ -52,6 +53,7 @@ export class SideFiltersComponent {
     RequestFilterOperator = RequestFilterOperator;
     FilterType = FilterType;
     FilterComparator = FilterComparator;
+    Constants = Constants;
 
     // keep query builder
     queryBuilder: RequestQueryBuilder;
@@ -284,6 +286,11 @@ export class SideFiltersComponent {
                     qb.filter.byRange(filter.fieldName, appliedFilter.value, false);
                     break;
 
+                case FilterType.RANGE_AGE:
+                    // between / from / to
+                    qb.filter.byAgeRange(filter.fieldName, appliedFilter.value, false);
+                    break;
+
                 case FilterType.RANGE_DATE:
                     // between / before / after
                     qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
@@ -308,11 +315,29 @@ export class SideFiltersComponent {
             .value();
 
         // set sort by fields
+        const objectDetailsSort: {
+            [property: string]: string[]
+        } = {
+            age: ['years', 'months']
+        };
         _.each(sorts, (appliedSort: AppliedSortModel) => {
-            queryBuilder.sort.by(
-                appliedSort.sort.fieldName,
-                appliedSort.direction
-            );
+            // add sorting criteria
+            if (
+                objectDetailsSort &&
+                objectDetailsSort[appliedSort.sort.fieldName]
+            ) {
+                _.each(objectDetailsSort[appliedSort.sort.fieldName], (childProperty: string) => {
+                    queryBuilder.sort.by(
+                        `${appliedSort.sort.fieldName}.${childProperty}`,
+                        appliedSort.direction
+                    );
+                });
+            } else {
+                queryBuilder.sort.by(
+                    appliedSort.sort.fieldName,
+                    appliedSort.direction
+                );
+            }
         });
 
         // emit the Request Query Builder
