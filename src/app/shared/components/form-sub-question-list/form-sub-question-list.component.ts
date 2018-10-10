@@ -1,16 +1,3 @@
-// import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, ViewChild } from '@angular/core';
-// import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl, NgForm } from '@angular/forms';
-// import { ListBase } from '../../../../shared/xt-forms/core/list-base';
-// import { DialogService } from '../../../../core/services/helper/dialog.service';
-// import { QuestionModel } from '../../../../core/models/question.model';
-// import { Subscriber } from 'rxjs/Subscriber';
-// import { DomService } from '../../../../core/services/helper/dom.service';
-// import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-// import { Observable } from 'rxjs/Observable';
-// import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-// import { Constants } from '../../../../core/models/constants';
-// import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-// import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import {
     Component, Host, Inject, Input, OnInit, Optional, SkipSelf, ViewChild,

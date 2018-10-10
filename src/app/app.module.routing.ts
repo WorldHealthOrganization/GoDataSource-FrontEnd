@@ -73,17 +73,17 @@ const routes: Routes = [
                 }
             },
             // Outbreak Templates Module routes
-                {
-                    path: ModulePath.OutbreakTemplatesModule,
-                    loadChildren: './features/outbreak-templates/outbreak-templates.module#OutbreakTemplatesModule',
-                    canActivate: [
-                        AuthGuard,
-                        PasswordChangeGuard
-                    ],
-                    data: {
-                        permissions: [PERMISSION.READ_SYS_CONFIG]
-                    }
-                },
+            {
+                path: ModulePath.OutbreakTemplatesModule,
+                loadChildren: './features/outbreak-templates/outbreak-templates.module#OutbreakTemplatesModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Contacts Module routes
             {
                 path: ModulePath.ContactModule,
