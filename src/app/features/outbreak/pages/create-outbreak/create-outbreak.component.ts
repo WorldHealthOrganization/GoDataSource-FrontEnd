@@ -58,12 +58,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 return country;
             })
         );
-        this.route.queryParams.subscribe((queryParams: {clonedOutbreakId}) => {
-            this.outbreakDataService.getOutbreak(queryParams.clonedOutbreakId)
-                .subscribe((clonedOutbreak) => {
-                    this.newOutbreak = clonedOutbreak;
-                });
-        });
     }
 
     /**

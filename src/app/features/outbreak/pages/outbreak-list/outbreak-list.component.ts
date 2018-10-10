@@ -350,13 +350,9 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.snackbarService.showError(err.message);
                                     return ErrorObservable.create(err);
                                 })
-                                .subscribe((clonedOutbreak) => {
+                                .subscribe((clonedOutbreak: OutbreakModel) => {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
-                                    this.router.navigate(['outbreaks/create'], {
-                                        queryParams: {
-                                            clonedOutbreakId: clonedOutbreak.id
-                                        }
-                                    });
+                                    this.router.navigate([`outbreaks/${clonedOutbreak.id}/modify`]);
                             });
                         }
                     });
