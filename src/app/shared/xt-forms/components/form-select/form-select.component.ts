@@ -1,11 +1,8 @@
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, EventEmitter, Output, HostBinding, AfterViewInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
 import { ElementBase } from '../../core/index';
 import * as _ from 'lodash';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-form-select',
@@ -23,25 +20,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    _placeholder: string;
-    @Input() set placeholder(placeholder: string) {
-        this._placeholder = placeholder;
-
-        if (
-            this.authUser &&
-            this.placeholder
-        ) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                if (!_.isEmpty(glossaryData[labelValue])) {
-                    this.tooltip = glossaryData[labelValue];
-                }
-            });
-        }
-    }
-    get placeholder(): string {
-        return this._placeholder;
-    }
+    @Input() placeholder: string;
 
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
@@ -57,7 +36,14 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() clearable: boolean = true;
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
     @Input() allowSelectionOfDisabledItems: boolean = false;
-    @Input() tooltip: string = null;
+
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltip = this.i18nService.instant(tooltip);
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
 
     @Input() displayFilterIcon: boolean = false;
 
@@ -65,8 +51,6 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
-
-    authUser: UserModel;
 
     public identifier = `form-select-${FormSelectComponent.identifier++}`;
 
@@ -78,12 +62,9 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
-
-        this.authUser = this.authDataService.getAuthenticatedUser();
     }
 
     /**

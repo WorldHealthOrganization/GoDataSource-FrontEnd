@@ -7,6 +7,7 @@
                 [name]="name + '[type]'"
                 [(ngModel)]="document.type"
                 [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE' | translate"
+                tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
                 [options]="documentTypesList$ | async"
                 [disabled]="disabled"
                 [required]="required"
@@ -19,6 +20,7 @@
                 [name]="name + '[number]'"
                 [(ngModel)]="document.number"
                 [placeholder]="'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER' | translate"
+                tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
                 [disabled]="disabled"
                 [required]="required"
                 (input)="onChange()">

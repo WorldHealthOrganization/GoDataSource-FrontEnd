@@ -13,7 +13,7 @@
                     type="button"
                     [color]="ageSelected ? 'primary' : ''"
                     (click)="switchAgeDob(true)">
-                    {{'LNG_CASE_FIELD_LABEL_AGE_BUTTON' | translate}}
+                    {{ ageButtonLabel | translate }}
                 </button>
                 <button
                     fxFlex
@@ -21,7 +21,7 @@
                     type="button"
                     [color]="!ageSelected ? 'primary' : ''"
                     (click)="switchAgeDob(false)">
-                    {{'LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON' | translate}}
+                    {{ dobButtonLabel | translate }}
                 </button>
             </div>
 
@@ -33,7 +33,8 @@
                     [(ngModel)]="ageDob.age"
                     [disabled]="disabled"
                     [required]="required"
-                    (changed)="ageChanged()">
+                    (changed)="ageChanged()"
+                    [tooltip]="ageTooltip">
                 </app-form-age>
 
                 <app-form-datepicker
@@ -41,7 +42,8 @@
                     #dob
                     name="dob"
                     [(ngModel)]="ageDob.dob"
-                    [placeholder]="'LNG_CASE_FIELD_LABEL_DOB' | translate"
+                    [placeholder]="dobPlaceholder | translate"
+                    [tooltip]="dobTooltip"
                     [disabled]="disabled"
                     [required]="required"
                     [maxDate]="today"
