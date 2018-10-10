@@ -42,8 +42,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private authDataService: AuthDataService)
-    {
+        private authDataService: AuthDataService
+    ) {
         super(route);
     }
 

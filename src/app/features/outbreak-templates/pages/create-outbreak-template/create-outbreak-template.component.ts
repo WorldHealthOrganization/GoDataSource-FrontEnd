@@ -66,5 +66,5 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     this.router.navigate(['/outbreak-templates']);
                 });
         }
-    };
+    }
 }
