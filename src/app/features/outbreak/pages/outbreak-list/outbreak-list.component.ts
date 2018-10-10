@@ -357,8 +357,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                             clonedOutbreakId: clonedOutbreak.id
                                         }
                                     });
-                                    // refresh the listing page
-                                    this.needsRefreshList(true);
                             });
                         }
                     });
