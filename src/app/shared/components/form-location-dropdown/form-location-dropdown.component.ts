@@ -47,9 +47,14 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
 
+    private _tooltipToken: string;
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
-        this._tooltip = tooltip ? this.i18nService.instant(tooltip) : tooltip;
+        this._tooltipToken = tooltip;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+
+        // fix for missing from language... ( e.g. english has it, japanese doesn't.. this will display all new tokens... )
+        this._tooltip = this._tooltip && this._tooltip.startsWith('LNG_') ? '' : this._tooltip;
     }
     get tooltip(): string {
         return this._tooltip;
@@ -78,6 +83,11 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        // on language change..we need to translate again the token
+        this.i18nService.languageChangedEvent.subscribe(() => {
+            this.tooltip = this._tooltipToken;
+        });
     }
 
     /**
