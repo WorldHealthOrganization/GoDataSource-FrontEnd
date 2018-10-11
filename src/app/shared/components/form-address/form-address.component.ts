@@ -1,13 +1,11 @@
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
-
-import { GroupBase } from '../../xt-forms/core';
+import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { AddressModel } from '../../../core/models/address.model';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Observable } from '../../../../../node_modules/rxjs/Observable';
 import { Moment } from 'moment';
-import * as moment from 'moment';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 
 @Component({
@@ -21,7 +19,7 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
         multi: true
     }]
 })
-export class FormAddressComponent extends GroupBase<AddressModel> implements OnInit {
+export class FormAddressComponent extends GroupBase<AddressModel> implements OnInit, GroupFilteredValue<any> {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
@@ -74,4 +72,15 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     triggerCopyValue(property) {
         this.copyValue.emit(property);
     }
+
+    /**
+     * Get Filtered Value
+     */
+    getFilteredValue(): any {
+        // strip unnecessary data
+        return this.value ?
+            new AddressModel(this.address).cleanObject() :
+            this.value;
+    }
+
 }

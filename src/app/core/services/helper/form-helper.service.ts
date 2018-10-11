@@ -20,7 +20,13 @@ export class FormHelperService {
         const fields = {};
 
         _.forEach(form.controls, (control: FormControl, controlName: string) => {
-            _.set(fields, controlName, control.value);
+            _.set(
+                fields,
+                controlName,
+                (control as any).getFilteredValue ?
+                    (control as any).getFilteredValue() :
+                    control.value
+            );
         });
 
         return fields;
@@ -44,7 +50,13 @@ export class FormHelperService {
                         _.set(dirtyFields, childControlName, childControl.value);
                     });
                 } else {
-                    _.set(dirtyFields, controlName, control.value);
+                    _.set(
+                        dirtyFields,
+                        controlName,
+                        (control as any).getFilteredValue ?
+                            (control as any).getFilteredValue() :
+                            control.value
+                    );
                 }
             }
         });

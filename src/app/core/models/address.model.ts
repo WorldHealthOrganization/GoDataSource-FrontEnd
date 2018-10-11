@@ -89,4 +89,20 @@ export class AddressModel {
         // nothing to search for
         return null;
     }
+
+    /**
+     * Clone class
+     */
+    cleanObject(): Object {
+        // create clone
+        const address = {
+            ...(this as any)
+        };
+
+        // remove properties that we don't want to save
+        delete address.location;
+
+        // finished
+        return address;
+    }
 }
