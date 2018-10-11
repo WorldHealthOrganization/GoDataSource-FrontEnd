@@ -66,9 +66,6 @@ export class FormDatepickerComponent extends ElementBase<string> {
     @Input() set tooltip(tooltip: string) {
         this._tooltipToken = tooltip;
         this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
-
-        // fix for missing from language... ( e.g. english has it, japanese doesn't.. this will display all new tokens... )
-        this._tooltip = this._tooltip && this._tooltip.startsWith('LNG_') ? '' : this._tooltip;
     }
     get tooltip(): string {
         return this._tooltip;
