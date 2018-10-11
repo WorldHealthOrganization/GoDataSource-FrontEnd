@@ -37,9 +37,11 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
     @Input() allowSelectionOfDisabledItems: boolean = false;
 
+    private _tooltipToken: string;
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
-        this._tooltip = tooltip ? this.i18nService.instant(tooltip) : tooltip;
+        this._tooltipToken = tooltip;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
     }
     get tooltip(): string {
         return this._tooltip;
@@ -65,6 +67,11 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
         private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        // on language change..we need to translate again the token
+        this.i18nService.languageChangedEvent.subscribe(() => {
+            this.tooltip = this._tooltipToken;
+        });
     }
 
     /**
