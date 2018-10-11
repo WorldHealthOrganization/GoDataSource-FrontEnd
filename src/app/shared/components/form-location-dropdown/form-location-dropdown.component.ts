@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -46,6 +46,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
+
+    @HostBinding('class.form-element-host') isFormElement = true;
 
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
