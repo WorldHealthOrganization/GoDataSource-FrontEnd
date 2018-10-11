@@ -16,6 +16,7 @@ export class I18nService {
     private defaultLanguageId = 'english_us';
 
     private languageLoadedEvent = new EventEmitter<void>();
+    public languageChangedEvent = new EventEmitter<void>();
 
     constructor(
         private translateService: TranslateService,
@@ -24,8 +25,7 @@ export class I18nService {
         private modelHelperService: ModelHelperService,
         private userDataService: UserDataService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Get the ID of the language selected by User in UI
@@ -66,6 +66,9 @@ export class I18nService {
                 // configure the TranslateService
                 this.translateService.setTranslation(selectedLanguage.id, selectedLanguage.getTokensObject());
                 this.translateService.use(selectedLanguage.id);
+
+                // trigger language change events
+                this.languageChangedEvent.emit();
 
                 return this.persistUserLanguage(language.id);
             });
