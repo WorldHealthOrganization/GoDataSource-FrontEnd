@@ -31,6 +31,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
         'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
+        'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL': 'Teams & Assignments',
 
         /**
          * Stepper buttons
@@ -128,6 +129,9 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
         'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
         'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK': 'Name the clone of the outbreak',
+        'LNG_DIALOG_CONFIRM_DELETE_TEAM': 'Are you sure you want to delete this team: "{{name}}" ?',
+        'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
+        'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
 
         /**
          * Dialogs fields placeholders
@@ -579,6 +583,39 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK': 'Outbreak',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS': 'Only the first {{displayed}} of {{total}} records are displayed',
+
+        /**
+         * Teams fields
+         */
+        'LNG_TEAM_FIELD_LABEL_NAME': 'Name',
+        'LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_TEAM_FIELD_LABEL_USERS': 'Members',
+        'LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION': '',
+        'LNG_TEAM_FIELD_LABEL_LOCATIONS': 'Locations',
+        'LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION': '',
+
+
+        /**
+         * Teams list page
+         */
+        'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
+        'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
+        'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+
+        /**
+         * Create Team page
+         */
+        'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE': 'Team created',
+        'LNG_PAGE_CREATE_TEAM_TITLE': 'Create Team',
+        'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON': 'Create team',
+        'LNG_PAGE_CREATE_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Modify Team page
+         */
+        'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
+        'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
+        'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * User fields

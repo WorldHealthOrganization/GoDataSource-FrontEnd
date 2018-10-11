@@ -21,6 +21,7 @@ import { TransmissionChainDataService } from './data/transmission-chain.data.ser
 import { ImportExportDataService } from './data/import-export.data.service';
 import { IconDataService } from './data/icon.data.service';
 import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
+import { TeamDataService } from './data/team.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -70,6 +71,7 @@ export const services: any[] = [
     TransmissionChainDataService,
     ImportExportDataService,
     IconDataService,
+    TeamDataService,
 
     // guard services
     AuthGuard,

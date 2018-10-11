@@ -162,6 +162,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
             },
+            // Teams Module routes
+            {
+                path: ModulePath.TeamModule,
+                loadChildren: './features/team/team.module#TeamModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_TEAM]
+                }
+            },
             // Dashboard Module routes
             {
                 path: ModulePath.DashboardModule,
