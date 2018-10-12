@@ -11,6 +11,11 @@ export * from './create-system-upstream-sync/create-system-upstream-sync.compone
 // export the list of all page components
 export const pageComponents: any[] = [
     SystemConfigComponent,
+
+    // Sync Upstream Servers
     SystemUpstreamSyncComponent,
     CreateSystemUpstreamSyncComponent
+
+    // Sync Client Servers
+    // #TODO
 ];
