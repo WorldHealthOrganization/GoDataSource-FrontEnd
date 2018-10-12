@@ -31,6 +31,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
     graphElements: any;
+    selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
@@ -107,6 +108,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         nodeColor: [],
         nodeNameColor: [],
+        nodeNameColorAdditionalInfo: {
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE': 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT': 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT': 'LNG_EVENT_FIELD_LABEL_DATE'
+        },
         edgeColor: []
     };
 
@@ -129,7 +135,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
 
-
         this.initializeReferenceData()
             .catch((err) => {
                 this.snackbarService.showError(err.message);
@@ -151,66 +156,89 @@ export class TransmissionChainsDashletComponent implements OnInit {
     displayChainsOfTransmission() {
         this.mapColorCriteria();
         if (this.selectedOutbreak) {
-            const requestQueryBuilder = new RequestQueryBuilder();
             // create queryBuilder for filters
+            const requestQueryBuilder = new RequestQueryBuilder();
             if (this.filters) {
-                const conditions: any = {};
-                // create conditions based on filters
                 // occupation
                 if (!_.isEmpty(this.filters.occupation)) {
-                    conditions['occupation'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.occupation) + '/i'};
-                }
-                // gender
-                if (!_.isEmpty(this.filters.gender)) {
-                    conditions['gender'] = {inq: this.filters.gender};
-                }
-                // case classification
-                if (!_.isEmpty(this.filters.classification)) {
-                    conditions['classification'] = this.filters.classification;
-                }
-                // case classification
-                if (!_.isEmpty(this.filters.locationId)) {
-                    conditions['addresses.locationId'] = this.filters.locationId;
-                }
-                // firstName
-                if (!_.isEmpty(this.filters.firstName)) {
-                    conditions['firstName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.firstName) + '/i'};
-                }
-                // lastName
-                if (!_.isEmpty(this.filters.lastName)) {
-                    conditions['lastName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.lastName) + '/i'};
-                }
-                // age
-                if (!_.isEmpty(this.filters.age)) {
-                    if (this.filters.age.from && this.filters.age.to) {
-                        conditions['age'] = {between: [this.filters.age.from, this.filters.age.to]};
-                    } else if (this.filters.age.from) {
-                        conditions['age'] = {gt: this.filters.age.from};
-                    } else {
-                        conditions['age'] = {lt: this.filters.age.to};
-                    }
-                }
-                // date of reporting
-                if (!_.isEmpty(this.filters.date)) {
-                    if (!_.isEmpty(this.filters.date.startDate) && !_.isEmpty(this.filters.date.endDate)) {
-                        conditions['dateOfReporting'] = {between: [this.filters.date.startDate, this.filters.date.endDate]};
-                    } else if (!_.isEmpty(this.filters.date.startDate)) {
-                        conditions['dateOfReporting'] = {gt: this.filters.date.startDate};
-                    } else {
-                        conditions['dateOfReporting'] = {lt: this.filters.date.endDate};
-                    }
+                    requestQueryBuilder.filter.byEquality(
+                        'occupation',
+                        this.filters.occupation
+                    );
                 }
 
-                requestQueryBuilder.filter.where({
+                // gender
+                if (!_.isEmpty(this.filters.gender)) {
+                    requestQueryBuilder.filter.bySelect(
+                        'gender',
+                        this.filters.gender,
+                        true,
+                        null
+                    );
+                }
+
+                // case classification
+                if (!_.isEmpty(this.filters.classification)) {
+                    requestQueryBuilder.filter.byEquality(
+                        'classification',
+                        this.filters.classification
+                    );
+                }
+
+                // case location
+                if (!_.isEmpty(this.filters.locationId)) {
+                    requestQueryBuilder.filter.byEquality(
+                        'addresses.locationId',
+                        this.filters.locationId
+                    );
+                }
+
+                // firstName
+                if (!_.isEmpty(this.filters.firstName)) {
+                    requestQueryBuilder.filter.byText(
+                        'firstName',
+                        this.filters.firstName
+                    );
+                }
+
+                // lastName
+                if (!_.isEmpty(this.filters.lastName)) {
+                    requestQueryBuilder.filter.byText(
+                        'lastName',
+                        this.filters.lastName
+                    );
+                }
+
+                // age
+                if (!_.isEmpty(this.filters.age)) {
+                    requestQueryBuilder.filter.byAgeRange(
+                        'age',
+                        this.filters.age
+                    );
+                }
+
+                // date of reporting
+                if (!_.isEmpty(this.filters.date)) {
+                    requestQueryBuilder.filter.byDateRange(
+                        'dateOfReporting',
+                        this.filters.date
+                    );
+                }
+            }
+
+            // configure
+            this.filters.filtersDefault = this.filtersDefault();
+            const rQB = new RequestQueryBuilder();
+            if (!requestQueryBuilder.filter.isEmpty()) {
+                rQB.filter.where({
                     person: {
-                        where: conditions
+                        where: requestQueryBuilder.filter.generateFirstCondition()
                     }
                 });
             }
 
-            this.filters.filtersDefault = this.filtersDefault();
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
                 } else {
@@ -315,7 +343,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     }
 
     /**
-     *
+     * return mapping between criteria and colors to use
      * @param colorCriteria
      */
     mapColorCriteria() {
@@ -346,6 +374,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         });
     }
 
+    /**
+     * initialize the reference data objects needed for legend
+     * @returns {Observable<any>}
+     */
     private initializeReferenceData() {
         // call observables in parallel
         const referenceDataCategories$ = _.map(
@@ -358,6 +390,33 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
         );
         return forkJoin(referenceDataCategories$);
+    }
+
+    /**
+     * triggered when the view type is changed
+     * @param viewType
+     */
+    viewTypeChanged(viewType) {
+        this.selectedViewType = viewType.value;
+        if (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+            // if node label criteria is already 'type' then do not reload the graph data.
+            if (this.colorCriteria.nodeNameColorCriteria !== 'type') {
+                this.colorCriteria.nodeNameColorCriteria = 'type';
+                // refresh chain to load the new criteria
+                this.displayChainsOfTransmission();
+            }
+        }
+    }
+
+    /**
+     * return the tooltip for criteria based on the selected view type
+     * @returns {string}
+     */
+    tooltipViewTimeline() {
+        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
+                : null
+        );
     }
 
 }

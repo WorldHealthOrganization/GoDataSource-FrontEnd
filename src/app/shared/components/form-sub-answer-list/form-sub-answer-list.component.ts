@@ -1,10 +1,10 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, AbstractControl } from '@angular/forms';
-import { ListBase } from '../../../../shared/xt-forms/core/list-base';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { Component, Host, Inject, Input, OnInit, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
+import { ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ListBase } from '../../xt-forms/core/list-base';
+import { DialogService } from '../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { AnswerModel } from '../../../../core/models/question.model';
+import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { AnswerModel } from '../../../core/models/question.model';
 
 @Component({
     selector: 'app-form-sub-answer-list',

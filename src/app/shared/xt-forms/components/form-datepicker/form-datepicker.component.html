@@ -1,8 +1,7 @@
-<div class="form-datepicker-container form-element"
+<div class="form-datepicker-container form-element {{ tooltip ? 'form-datepicker-tooltip' : '' }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <mat-form-field
-    [matTooltip]="tooltip | translate">
+    <mat-form-field>
         <input
             matInput
             [(ngModel)]="value"
@@ -16,8 +15,11 @@
             (focus)="pickerStartDate.open()"
             [max]="maxDate"
             [min]="minDate"/>
+
         <mat-datepicker-toggle matSuffix [for]="pickerStartDate"></mat-datepicker-toggle>
         <mat-datepicker #pickerStartDate (selectedChanged)="onChange()"></mat-datepicker>
+
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
     </mat-form-field>
 
     <app-form-validation

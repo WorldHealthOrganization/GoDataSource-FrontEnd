@@ -20,6 +20,7 @@ import { EntityDataService } from './data/entity.data.service';
 import { TransmissionChainDataService } from './data/transmission-chain.data.service';
 import { ImportExportDataService } from './data/import-export.data.service';
 import { IconDataService } from './data/icon.data.service';
+import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -51,6 +52,7 @@ export const services: any[] = [
     UserDataService,
     UserRoleDataService,
     OutbreakDataService,
+    OutbreakTemplateDataService,
     ContactDataService,
     CaseDataService,
     EventDataService,

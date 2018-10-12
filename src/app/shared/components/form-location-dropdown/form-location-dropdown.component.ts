@@ -12,6 +12,7 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/debounceTime';
 import { Subscription } from 'rxjs/Subscription';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 class LocationAutoItem {
     constructor(
@@ -46,6 +47,16 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
 
+    private _tooltipToken: string;
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltipToken = tooltip;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
+
     locationItems: LocationAutoItem[];
 
     locationLoading: boolean = false;
@@ -65,9 +76,15 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private locationDataService: LocationDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        // on language change..we need to translate again the token
+        this.i18nService.languageChangedEvent.subscribe(() => {
+            this.tooltip = this._tooltipToken;
+        });
     }
 
     /**
