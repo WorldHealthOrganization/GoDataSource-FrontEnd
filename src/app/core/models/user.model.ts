@@ -15,7 +15,8 @@ export enum UserSettings {
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
     FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields',
     FOLLOW_UPS_UPCOMING_FIELDS = 'upcomingFollowUpFields',
-    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields'
+    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields',
+    UPSTREAM_SERVERS_FIELDS = 'upstreamServersFields'
 }
 
 /**
