@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -12,13 +12,18 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/debounceTime';
 import { Subscription } from 'rxjs/Subscription';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 class LocationAutoItem {
     constructor(
         public id: string,
         public label: string,
         public level: number,
-        public disabled: boolean = false
+        public disabled: boolean = false,
+        public geoLocation: {
+            lat: number,
+            lng: number
+        } = null
     ) {}
 }
 
@@ -42,6 +47,16 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
 
+    private _tooltipToken: string;
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltipToken = tooltip;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
+
     locationItems: LocationAutoItem[];
 
     locationLoading: boolean = false;
@@ -53,14 +68,23 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
     needToRetrieveBackData: boolean = false;
 
+    @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
+    @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private locationDataService: LocationDataService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
+
+        // on language change..we need to translate again the token
+        this.i18nService.languageChangedEvent.subscribe(() => {
+            this.tooltip = this._tooltipToken;
+        });
     }
 
     /**
@@ -150,7 +174,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                         currentItem.location.parentLocationId ?
                             levels[currentItem.location.parentLocationId] + 1 :
                             0,
-                        !currentItem.location.active
+                        !currentItem.location.active,
+                        currentItem.location.geoLocation
                     );
 
                     // add item to list
@@ -168,6 +193,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
                 // set locations
                 this.locationItems = locationItems;
+                this.locationsLoaded.emit(this.locationItems);
             });
 
         // stop previous subscription
@@ -253,5 +279,13 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         return this.groupForm && this.groupForm.controls[this.name] ?
             this.groupForm.controls[this.name].invalid :
             false;
+    }
+
+    /**
+     * Item changed
+     * @param item
+     */
+    triggerItemChanged(item: LocationAutoItem) {
+        this.itemChanged.emit(item);
     }
 }

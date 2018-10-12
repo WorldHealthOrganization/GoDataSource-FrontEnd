@@ -18,15 +18,21 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Input() elements: any;
     @Input() style;
     @Input() transmissionChainViewType: string;
+    @Input() legend: any;
 
     @Output() nodeTapped = new EventEmitter<any>();
     @Output() edgeTapped = new EventEmitter<any>();
+    @Output() viewTypeChanged = new EventEmitter<any>();
 
     cy: any;
     container: string = 'cy';
 
-    transmissionChainViewTypes$: Observable<any[]>;
+    Constants = Constants;
 
+    transmissionChainViewTypes$: Observable<any[]>;
+    timelineViewType: string = 'horizontal';
+
+    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -86,6 +92,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             }
         },
         positions: (node) => {
+            let posX;
+            let posY;
             // restrict position of the node on the x axis for the timeline view
             const nodeData = node.json().data;
             // calculate position on x axis based on the index of the date.
@@ -94,8 +102,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 function (o) {
                     return o === nodeData.dateTimeline;
                 });
-            // using 150px as it looks fine
-            const posX = datesIndex * 150;
+            if (this.timelineViewType === 'horizontal') {
+                // using 150px as it looks fine
+                posX = datesIndex * 150;
+            } else {
+                // timeline vertical view
+                // using 100px as it looks fine
+                posY = datesIndex * 100;
+            }
+
             // calculate position on y axis based on the index of the node from that respective date
             if (!_.isEmpty(nodeData.dateTimeline)) {
                 const nodesArray = this.timelineDates[nodeData.dateTimeline];
@@ -107,8 +122,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                             return n === nodeData.id;
                         });
                 }
-                // using 100 px as it looks fine
-                const posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                if (this.timelineViewType === 'horizontal') {
+                    // using 100 px as it looks fine
+                    posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                } else {
+                    // timeline vertical view
+                    // using 200 px as it looks fine
+                    posX = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 200 : (nodeIndex - 1) * 200 * -1;
+                }
                 return {x: posX, y: posY};
             }
         }
@@ -128,6 +149,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
+                'color': 'data(nodeNameColor)',
                 'label': 'data(name)'
             }
         },
@@ -147,6 +169,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
+                'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)'
@@ -251,8 +274,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     /**
      * re-render the layout on view type change
      */
-    updateView() {
+    updateView($event) {
+        this.transmissionChainViewType = $event.value;
         this.render();
+        this.viewTypeChanged.emit($event);
     }
 
     /**
@@ -273,6 +298,50 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             this.style = this.timelineStyle;
             this.layout = this.layoutPreset;
         }
+    }
+
+    /**
+     * decide if the link to cases without dates will be displayed
+     * @returns {boolean}
+     */
+    showCaseNodesWithoutDates() {
+       return (
+           this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+           && this.elements
+           && this.elements.caseNodesWithoutDates.length
+       );
+    }
+
+    /**
+     * decide if the link to contacts without dates will be displayed
+     * @returns {boolean}
+     */
+    showContactNodesWithoutDates() {
+        return (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            && this.elements
+            && this.elements.contactNodesWithoutDates.length
+        );
+    }
+
+    /**
+     * decide if the link to events without dates will be displayed
+     * @returns {boolean}
+     */
+    showEventNodesWithoutDates() {
+        return (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            && this.elements
+            && this.elements.eventNodesWithoutDates.length
+        );
+    }
+    /**
+     * switch timeline view type: vertical / horizontal
+     * @param timelineViewType
+     */
+    switchTimelineView(timelineViewType) {
+        this.timelineViewType = timelineViewType;
+        this.render();
     }
 
 }

@@ -17,7 +17,7 @@
                 <mat-card class="page-section">
                     <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <div>{{'LNG_ENTITY_TYPE_LABEL_CONTACT' | translate}}</div>
+                            <div>{{EntityType.CONTACT | translate}}</div>
                             <a [routerLink]="['/contacts', contactData.id, 'modify']">{{ contactData.name }}</a>
                         </div>
 
@@ -26,6 +26,7 @@
                                 name="date"
                                 [(ngModel)]="followUpData.date"
                                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
                                 required="true"
                                 app-date-validator>
                             </app-form-datepicker>
@@ -34,6 +35,7 @@
                                 name="performed"
                                 [(ngModel)]="followUpData.performed"
                                 [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION"
                                 [disabled]="dateInTheFuture()">
                             </app-form-slide-toggle>
 
@@ -41,6 +43,7 @@
                                 name="lostToFollowUp"
                                 [(ngModel)]="followUpData.lostToFollowUp"
                                 [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION"
                                 [disabled]="dateInTheFuture()">
                             </app-form-slide-toggle>
                         </div>

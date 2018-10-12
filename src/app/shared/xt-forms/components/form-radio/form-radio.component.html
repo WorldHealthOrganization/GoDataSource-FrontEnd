@@ -1,0 +1,13 @@
+<div class="form-radio-container form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <mat-radio-group class="radio-group" [(ngModel)]="value" [disabled]="disabled">
+        <mat-radio-button class="radio-button" *ngFor="let option of options" [value]="option.value">
+            {{option.label | translate}}
+        </mat-radio-button>
+    </mat-radio-group>
+    <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
+
+    <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>
+
+</div>

@@ -1,5 +1,5 @@
 <div class="form-element"
-     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+     [id]="identifier" [ngClass]="{ invalid: (invalid), 'form-locations-select-tooltip': tooltip }">
 
     <form #groupForm="ngForm">
         <ng-select
@@ -24,13 +24,16 @@
             [clearable]="true"
             [disabled]="disabled"
             [required]="required"
-            [matTooltip]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP' | translate">
+            [matTooltip]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP' | translate"
+            (change)="triggerItemChanged($event)">
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                 <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
                     {{ item.label }}
                 </span>
             </ng-template>
         </ng-select>
+
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
 
         <!--[messages]="failures"-->
         <app-form-validation

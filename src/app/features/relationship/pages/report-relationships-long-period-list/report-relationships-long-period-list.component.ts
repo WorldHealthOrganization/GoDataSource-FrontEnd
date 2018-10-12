@@ -10,6 +10,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -37,11 +38,14 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
     EntityType = EntityType;
 
     constructor(
+        protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private relationshipDataService: RelationshipDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {

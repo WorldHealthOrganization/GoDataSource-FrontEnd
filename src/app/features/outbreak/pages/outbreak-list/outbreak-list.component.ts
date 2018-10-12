@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -7,9 +7,9 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
@@ -17,11 +17,13 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { DialogAnswer, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -44,13 +46,18 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     activeOptionsList$: Observable<any[]>;
     // list of diseases
     diseasesList$: Observable<any[]>;
+    // countries list
+    countriesList$: Observable<any[]>;
     // authenticated user
     authUser: UserModel;
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
+    UserSettings = UserSettings;
 
+    exportOutbreaksUrl: string = 'outbreaks/export';
     outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -89,25 +96,82 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private router: Router
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
+            (countries) => _.map(countries, (country: LabelValuePair) => {
+                country.value = {
+                    id: country.value
+                };
+                return country;
+            })
+        );
 
         // add page title
         this.outbreaksDataExporFileName = this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_TITLE') +
             ' - ' +
             this.outbreaksDataExporFileName;
 
+        // initialize Side Table Columns
+        this.initializeSideTableColumns();
+
         // refresh
         this.needsRefreshList(true);
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'disease',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+            }),
+            new VisibleColumnModel({
+                field: 'country',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
+            }),
+            new VisibleColumnModel({
+                field: 'startDate',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'endDate',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE'
+            }),
+            new VisibleColumnModel({
+                field: 'active',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
@@ -215,5 +279,83 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedOutbreaks() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE',
+            url: this.exportOutbreaksUrl,
+            fileName: this.outbreaksDataExporFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
+    }
+
+    /**
+     * Clone an existing outbreak
+     * @param {OutbreakModel} outbreak
+     */
+    cloneOutbreak(outbreakModel: OutbreakModel) {
+        // get the outbreak to clone
+        this.outbreakDataService.getOutbreak(outbreakModel.id)
+            .subscribe((outbreak: OutbreakModel) => {
+                // create the clone of the parent outbreak
+                this.dialogService.showInput(
+                    new DialogConfiguration({
+                        message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK',
+                        yesLabel: 'LNG_COMMON_BUTTON_CLONE',
+                        required: true,
+                        fieldsList: [new DialogField({
+                            name: 'clonedOutbreakName',
+                            placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
+                            required: true,
+                            type: 'text',
+                            value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', {name: outbreak.name})
+                        })],
+                    }), true)
+                    .subscribe((answer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // delete the id from the parent outbreak
+                            delete outbreak.id;
+                            // set the name for the cloned outbreak
+                            outbreak.name = answer.inputValue.value.clonedOutbreakName;
+                            this.outbreakDataService.createOutbreak(outbreak)
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe((clonedOutbreak: OutbreakModel) => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+                                    this.router.navigate([`outbreaks/${clonedOutbreak.id}/modify`]);
+                            });
+                        }
+                    });
+            });
     }
 }

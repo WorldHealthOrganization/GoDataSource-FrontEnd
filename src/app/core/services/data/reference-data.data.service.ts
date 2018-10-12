@@ -178,39 +178,5 @@ export class ReferenceDataDataService {
      */
     clearReferenceDataCache() {
         this.cacheService.remove(CacheKey.REFERENCE_DATA);
-        this.cacheService.remove(CacheKey.REFERENCE_DATA_GLOSSARY);
-    }
-
-    /**
-     * Return a map of glossary terms
-     */
-    getGlossaryItems(): Observable<any> {
-        const glossaryDataCache = this.cacheService.get(CacheKey.REFERENCE_DATA_GLOSSARY);
-        if (glossaryDataCache) {
-            return Observable.of(glossaryDataCache);
-        } else {
-            return this.getReferenceDataByCategory(ReferenceDataCategory.GLOSSARY)
-                .map((data) => {
-                    // map data
-                    const glossaryMap = {};
-                    _.forEach(data.entries, (entry) => {
-                        const entryValue = this.stringifyGlossaryTerm(entry.value);
-                        glossaryMap[entryValue] = entry.description;
-                    });
-                    // set cache
-                    this.cacheService.set(CacheKey.REFERENCE_DATA_GLOSSARY, glossaryMap);
-                    // finished
-                    return glossaryMap;
-                });
-        }
-    }
-
-    /**
-     * Stringify glossary term
-     * @param entry
-     * @returns {string}
-     */
-    stringifyGlossaryTerm(entry: string): string {
-        return _.camelCase(this.i18nService.instant(entry)).toLowerCase();
     }
 }
