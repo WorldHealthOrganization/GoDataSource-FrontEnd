@@ -32,6 +32,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
 
+    showLegend: boolean = true;
+
     objectKeys = Object.keys;
     /**
      *  layout cola - bubble view

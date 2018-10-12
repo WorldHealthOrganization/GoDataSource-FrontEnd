@@ -17,7 +17,7 @@
 
     <!-- legend -->
     <div class="graph-legend"
-         *ngIf="legend">
+         *ngIf="legend && showLegend">
         <!-- node color -->
         <div *ngIf="objectKeys(legend.nodeColor).length"
              class="legend-name">
@@ -122,3 +122,12 @@
     (click)="switchTimelineView('horizontal')">
     {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
 </button>
+
+<!--  show / hide legend -->
+<div class="toggle-legend">
+    <app-form-slide-toggle
+        name="showLegend"
+        [label]="'LNG_PAGE_GRAPH_TRANSMISSION_CHAINS_SHOW_LEGEND_LABEL' | translate"
+        [(ngModel)]="showLegend">
+    </app-form-slide-toggle>
+</div>
