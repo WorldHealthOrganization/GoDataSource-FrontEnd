@@ -10,7 +10,6 @@ export class TeamModel {
     locationIds: string[];
     locations: LocationModel[] = [];
 
-
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.name = _.get(data, 'name');
