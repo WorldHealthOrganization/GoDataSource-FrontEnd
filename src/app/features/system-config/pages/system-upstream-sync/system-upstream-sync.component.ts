@@ -169,6 +169,8 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                                 // IGNORE...
                                 this.needsRefreshList(true);
                             }
-                });
+                        });
+                }
+            });
     }
 }
