@@ -25,6 +25,12 @@ export class FormAgeDobComponent extends GroupBase<CaseModel | ContactModel> imp
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    @Input() ageButtonLabel: string;
+    @Input() ageTooltip: string;
+    @Input() dobButtonLabel: string;
+    @Input() dobPlaceholder: string;
+    @Input() dobTooltip: string;
+
     ageSelected: boolean = true;
 
     today: Moment;

@@ -11,12 +11,14 @@
                     (changed)="onChange(false)"
                     [required]="required"
                     (groupValidated)="validateGroup()"
-                    [disabled]="disabled">
+                    [disabled]="disabled"
+                    [fromTooltip]="fromTooltip"
+                    [toTooltip]="toTooltip">
                 </app-form-daterange>
 
             </mat-card>
 
-            <button type="button" mat-icon-button (click)="delete(i)">
+            <button *ngIf="!readOnly" type="button" mat-icon-button (click)="delete(i)">
                 <span class="xt-icon">delete</span>
             </button>
 

@@ -13,73 +13,6 @@
             <form #personalForm="ngForm">
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' | translate}}</ng-template>
 
-                <!-- Personal Details section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
-                                name="firstName"
-                                [(ngModel)]="caseData.firstName"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
-                                required="true"
-                                maxlength="200">
-                            </app-form-input>
-
-                            <app-form-input
-                                name="middleName"
-                                [(ngModel)]="caseData.middleName"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
-                                maxlength="200">
-                            </app-form-input>
-
-                            <app-form-input
-                                name="lastName"
-                                [(ngModel)]="caseData.lastName"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
-                                maxlength="200">
-                            </app-form-input>
-
-                            <app-form-select
-                                name="gender"
-                                [(ngModel)]="caseData.gender"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
-                                required="true"
-                                [options]="genderList$ | async">
-                            </app-form-select>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <div
-                                fxFlex fxLayout="row" fxLayoutGap="20px">
-                                <app-form-input
-                                    fxFlex="25%"
-                                    name="phoneNumber"
-                                    [(ngModel)]="caseData.phoneNumber"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
-                                    maxlength="50">
-                                </app-form-input>
-
-                                <app-form-select
-                                    fxFlex="25%"
-                                    name="occupation"
-                                    [(ngModel)]="caseData.occupation"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
-                                    [options]="occupationsList$ | async">
-                                </app-form-select>
-                            </div>
-
-                            <app-form-age-dob
-                                fxFlex
-                                name="ageDob"
-                                [(ngModel)]="caseData"
-                                [required]="false">
-                            </app-form-age-dob>
-                        </div>
-
-                    </div>
-                </mat-card>
-
                 <!-- Flagged section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -89,6 +22,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 required="true"
                                 [options]="caseRiskLevelsList$ | async">
                             </app-form-select>
@@ -97,6 +31,7 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [maxDate]="serverToday"
                                 app-date-validator
@@ -109,21 +44,100 @@
                             <app-form-slide-toggle
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="transferRefused"
                                 [(ngModel)]="caseData.transferRefused"
-                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
                             </app-form-slide-toggle>
                         </div>
 
                         <app-form-textarea
                             name="riskReason"
                             [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate">
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
                         </app-form-textarea>
+
+                    </div>
+                </mat-card>
+
+                <!-- Personal Details section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="caseData.firstName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                required="true"
+                                maxlength="200">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="middleName"
+                                [(ngModel)]="caseData.middleName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_MIDDLE_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="caseData.lastName"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="gender"
+                                [(ngModel)]="caseData.gender"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION"
+                                required="true"
+                                [options]="genderList$ | async">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <div
+                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                                <app-form-input
+                                    name="phoneNumber"
+                                    [(ngModel)]="caseData.phoneNumber"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_PHONE_NUMBER' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
+                                    maxlength="50">
+                                </app-form-input>
+
+                                <app-form-select
+                                    name="occupation"
+                                    [(ngModel)]="caseData.occupation"
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_OCCUPATION' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                    [options]="occupationsList$ | async">
+                                </app-form-select>
+                            </div>
+
+                            <app-form-age-dob
+                                fxFlex
+                                name="ageDob"
+                                [(ngModel)]="caseData"
+                                [required]="false"
+                                ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
+                                dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
+                                dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
+                                dobTooltip="LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION"
+                                ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
+                            </app-form-age-dob>
+                        </div>
 
                     </div>
                 </mat-card>
@@ -174,6 +188,7 @@
                                 name="classification"
                                 [(ngModel)]="caseData.classification"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_CLASSIFICATION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION"
                                 required="true"
                                 [options]="caseClassificationsList$ | async">
                             </app-form-select>
@@ -182,6 +197,7 @@
                                 name="dateBecomeCase"
                                 [(ngModel)]="caseData.dateBecomeCase"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday">
@@ -191,6 +207,7 @@
                                 name="dateOfInfection"
                                 [(ngModel)]="caseData.dateOfInfection"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -204,6 +221,7 @@
                                 name="dateOfOutcome"
                                 [(ngModel)]="caseData.dateOfOutcome"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday">
@@ -216,6 +234,7 @@
                                 name="dateOfOnset"
                                 [(ngModel)]="caseData.dateOfOnset"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -230,13 +249,15 @@
                             <app-form-slide-toggle
                                 name="isDateOfOnsetApproximate"
                                 [(ngModel)]="caseData.isDateOfOnsetApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION">
                             </app-form-slide-toggle>
 
                             <app-form-slide-toggle
                                 name="deceased"
                                 [(ngModel)]="caseData.deceased"
-                                [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate">
+                                [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION">
                             </app-form-slide-toggle>
 
                             <div fxFlex>
@@ -245,6 +266,7 @@
                                     [(ngModel)]="caseData.dateDeceased"
                                     [disabled]="!caseData.deceased"
                                     [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
                                     [maxDate]="serverToday"
                                     app-date-validator
                                     [dateSameOrBefore]="serverToday"
@@ -267,7 +289,9 @@
                 <app-form-daterange-list
                     name="hospitalizationDates"
                     [(ngModel)]="caseData.hospitalizationDates"
-                    [required]="true">
+                    [required]="true"
+                    fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
+                    toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
                 </app-form-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate}}</div>
@@ -276,7 +300,9 @@
                 <app-form-daterange-list
                     name="isolationDates"
                     [(ngModel)]="caseData.isolationDates"
-                    [required]="true">
+                    [required]="true"
+                    fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
+                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
                 </app-form-daterange-list>
 
                 <div>
