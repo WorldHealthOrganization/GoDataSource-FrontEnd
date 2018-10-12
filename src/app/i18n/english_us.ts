@@ -239,7 +239,6 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
 
         /**
-<<<<<<< HEAD
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
@@ -265,8 +264,6 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
 
         /**
-=======
->>>>>>> master
          * Entity Fields
          */
         'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',
