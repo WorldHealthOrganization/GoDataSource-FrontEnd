@@ -22,6 +22,7 @@ import { ImportExportDataService } from './data/import-export.data.service';
 import { IconDataService } from './data/icon.data.service';
 import { SystemSettingsDataService } from './data/system-settings.data.service';
 import { SystemBackupDataService } from './data/system-backup.data.service';
+import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
 
 // import helper services
 import { StorageService } from './helper/storage.service';
@@ -53,6 +54,7 @@ export const services: any[] = [
     UserDataService,
     UserRoleDataService,
     OutbreakDataService,
+    OutbreakTemplateDataService,
     ContactDataService,
     CaseDataService,
     EventDataService,

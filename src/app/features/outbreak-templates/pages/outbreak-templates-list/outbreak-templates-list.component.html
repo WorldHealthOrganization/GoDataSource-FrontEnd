@@ -1,0 +1,142 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    *ngIf="hasOutbreakTemplateWriteAccess()"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="'./create'">
+                    {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.OUTBREAK_TEMPLATE_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+    <!-- Reset Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button mat-raised-button (click)="needsRefreshList()">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="outbreakTemplatesList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME" | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('name', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <a [routerLink]="['/outbreak-templates', item.id, 'view']">
+                    {{ item.name }}
+                </a>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Disease -->
+        <ng-container matColumnDef="disease">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="diseaseFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="diseasesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('disease', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.DISEASE"
+                    [value]="outbreak.disease">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <ng-container
+                        *ngIf="hasOutbreakWriteAccess()">
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item"
+                            routerLink="/outbreaks/create"
+                            [queryParams]="{ outbreakTemplateId: item.id }">
+                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK' | translate}}
+                        </button>
+
+                        <mat-divider></mat-divider>
+                    </ng-container>
+
+                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                    </button>
+
+                    <ng-container
+                        *ngIf="hasOutbreakTemplateWriteAccess()">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteOutbreakTemplate(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+</mat-card>
