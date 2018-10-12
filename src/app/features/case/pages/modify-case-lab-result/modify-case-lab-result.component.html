@@ -19,6 +19,7 @@
                                 name="sampleIdentifier"
                                 [ngModel]="labResultData.sampleIdentifier"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-input>
 
@@ -27,6 +28,7 @@
                                 [ngModel]="labResultData.dateSampleTaken"
                                 required="true"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -42,6 +44,7 @@
                                 name="dateSampleDelivered"
                                 [ngModel]="labResultData.dateSampleDelivered"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -59,6 +62,7 @@
                                 name="dateTesting"
                                 [ngModel]="labResultData.dateTesting"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
@@ -78,6 +82,7 @@
                                 name="dateOfResult"
                                 [ngModel]="labResultData.dateOfResult"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION"
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
@@ -93,6 +98,7 @@
                                 name="labName"
                                 [ngModel]="labResultData.labName"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION"
                                 [options]="labNameOptionsList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -103,6 +109,7 @@
                                 name="sampleType"
                                 [ngModel]="labResultData.sampleType"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION"
                                 [options]="sampleTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -113,6 +120,7 @@
                                 name="testType"
                                 [ngModel]="labResultData.testType"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION"
                                 [options]="testTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -125,6 +133,7 @@
                                 name="result"
                                 [ngModel]="labResultData.result"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION"
                                 [options]="resultTypesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -135,6 +144,7 @@
                                 name="notes"
                                 [ngModel]="labResultData.notes"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION"
                                 minRows="1"
                                 [disabled]="viewOnly">
                             </app-form-textarea>
@@ -143,6 +153,7 @@
                                 name="status"
                                 [ngModel]="labResultData.status"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION"
                                 [options]="progressOptionsList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
@@ -153,6 +164,7 @@
                                 name="quantitativeResult"
                                 [ngModel]="labResultData.quantitativeResult"
                                 [placeholder]="'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT' | translate"
+                                tooltip="LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION"
                                 minRows="1"
                                 [disabled]="viewOnly">
                             </app-form-textarea>

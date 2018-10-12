@@ -6,7 +6,7 @@
         <button mat-button type="button" *ngIf="!viewOnly"
                 color="primary" class="link-primary"
                 (click)="addNewQuestion()">
-            {{'LNG_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
+            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
         </button>
     </div>
 
@@ -20,7 +20,7 @@
 
                         <!-- question badge -->
                         <div class="question-badge" fxFlex="40px">
-                            {{ ('LNG_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
+                            {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
                         </div>
 
                         <!-- question text -->
@@ -28,7 +28,8 @@
                             <app-form-input
                                 [name]="name + '[' + i + '][text]'"
                                 [ngModel]="question.text | translate"
-                                [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChangeBind(i, 'text', $event)"
@@ -41,7 +42,8 @@
                             <app-form-input
                                 [name]="name + '[' + i + '][variable]'"
                                 [(ngModel)]="values[i].variable"
-                                [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
                                 required="true"
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
@@ -56,7 +58,8 @@
                             <app-form-select
                                 [name]="name + '[' + i + '][category]'"
                                 [(ngModel)]="values[i].category"
-                                [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION"
                                 required="true"
                                 [options]="questionCategoriesList$ | async"
                                 [disabled]="viewOnly || defaultQuestionCategory"
@@ -69,7 +72,8 @@
                             <app-form-select
                                 [name]="name + '[' + i + '][answerType]'"
                                 [(ngModel)]="values[i].answerType"
-                                [placeholder]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
                                 required="true"
                                 [options]="answerTypesList$ | async"
                                 multiple="false"
@@ -83,7 +87,7 @@
                             <app-form-slide-toggle
                                 [name]="name + '[' + i + '][required]'"
                                 [(ngModel)]="values[i].required"
-                                [label]="'LNG_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
+                                [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
                                 required="false"
                                 (optionChanged)="onChange()">
                             </app-form-slide-toggle>
@@ -96,7 +100,7 @@
                             </button>
                         </div>
                         <div class="question-box text-right" fxFlex="20" *ngIf="viewOnly">
-                            <div>{{ (question.required ? 'LNG_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED' : '') | translate}}</div>
+                            <div>{{ (question.required ? 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED' : '') | translate}}</div>
                         </div>
                     </div>
 

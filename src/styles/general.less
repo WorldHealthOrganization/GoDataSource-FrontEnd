@@ -128,10 +128,18 @@ html, body, ul, li, div, span {
     .form-input-tooltip,
     .form-datepicker-tooltip,
     .form-select-tooltip,
-    .form-textarea-tooltip {
+    .form-textarea-tooltip,
+    .form-slide-tooltip,
+    .form-locations-select-tooltip {
         .mat-input-element,
-        .mat-select {
+        .mat-select,
+        .slide-with-icon,
+        ng-select {
             width: ~'calc(100% - 24px)';
+        }
+
+        ng-select {
+            display: inline-block;
         }
 
         .form-icon {

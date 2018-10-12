@@ -54,6 +54,8 @@ export class FormAgeComponent extends GroupBase<AgeModel> {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
+    @Input() tooltip: string;
+
     /**
      * Years
      */

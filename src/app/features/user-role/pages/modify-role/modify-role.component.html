@@ -20,6 +20,7 @@
                             name="name"
                             [(ngModel)]="userRole.name"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly">
                         </app-form-input>
@@ -28,6 +29,7 @@
                             name="description"
                             [(ngModel)]="userRole.description"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
                             [disabled]="viewOnly">
                         </app-form-textarea>
 
@@ -35,6 +37,7 @@
                             name="permissionIds"
                             [(ngModel)]="userRole.permissionIds"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
                             required="true"
                             [options]="availablePermissions$ | async"
                             optionLabelKey="label"
