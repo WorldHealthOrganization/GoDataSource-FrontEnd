@@ -1360,6 +1360,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON': 'List',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON': 'Graph',
 
         /**
          * Transmission Chains Geo map

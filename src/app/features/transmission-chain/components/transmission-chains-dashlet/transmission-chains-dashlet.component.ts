@@ -15,7 +15,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
