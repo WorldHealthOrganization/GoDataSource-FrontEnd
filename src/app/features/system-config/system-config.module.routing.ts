@@ -31,6 +31,28 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+
+    // Client applications
+    {
+        path: 'system-client-applications',
+        component: fromPages.SystemClientApplicationsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_SYS_CONFIG]
+        }
+    },
+    // Create System Client application
+    {
+        path: 'system-client-applications/create',
+        component: fromPages.CreateSystemClientApplicationComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     }
 ];
 

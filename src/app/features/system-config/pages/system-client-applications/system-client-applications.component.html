@@ -1,0 +1,162 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <!-- Sync general settings-->
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    (click)="configureSyncSettings()">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON' | translate }}
+                </button>
+
+                <!-- Create upstream server -->
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/system-config', 'system-upstream-sync', 'create']">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.UPSTREAM_SERVERS_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="upstreamServerList">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Url -->
+        <ng-container matColumnDef="url">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.url }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.description }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Timeout -->
+        <ng-container matColumnDef="timeout">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.timeout }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sync Interval -->
+        <ng-container matColumnDef="syncInterval">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.syncInterval }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sync On Every Change -->
+        <ng-container matColumnDef="syncOnEveryChange">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.syncOnEveryChange"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sync Enabled -->
+        <ng-container matColumnDef="syncEnabled">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.syncEnabled"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <ng-container
+                        *ngIf="hasSysConfigWriteAccess()">
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteUpstreamServer(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+</mat-card>
