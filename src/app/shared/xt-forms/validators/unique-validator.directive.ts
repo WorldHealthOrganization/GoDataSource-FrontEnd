@@ -29,7 +29,7 @@ export class UniqueValidatorDirective implements Validator {
         return this._appUniqueValidatorExpression;
     }
 
-    @Input() additionalControlsToCheck: AbstractControl[];
+    @Input() additionalControlsToCheck: { [ name: string ]: AbstractControl };
 
     constructor(
         @Attribute('app-unique-validator') private appUniqueValidator: string

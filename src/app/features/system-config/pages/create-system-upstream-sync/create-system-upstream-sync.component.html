@@ -40,7 +40,9 @@
                                 [(ngModel)]="upstreamServerData.url"
                                 [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL' | translate"
                                 tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_URL_DESCRIPTION"
-                                required="true">
+                                required="true"
+                                app-unique-validator="url$"
+                                [additionalControlsToCheck]="duplicateUrls">
                             </app-form-input>
                         </div>
 

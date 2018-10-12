@@ -1,8 +1,8 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { AbstractControl, NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
@@ -17,7 +17,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
     templateUrl: './create-system-upstream-sync.component.html',
     styleUrls: ['./create-system-upstream-sync.component.less']
 })
-export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges {
+export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
@@ -31,6 +31,9 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges {
         )
     ];
 
+    // check for duplicate urls
+    duplicateUrls: { [ name: string ]: AbstractControl };
+
     upstreamServerData: SystemUpstreamServerModel = new SystemUpstreamServerModel();
 
     constructor(
@@ -40,6 +43,21 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges {
         private systemSettingsDataService: SystemSettingsDataService
     ) {
         super();
+    }
+
+    /**
+     * On init
+     */
+    ngOnInit() {
+        this.systemSettingsDataService
+            .getSystemSettings()
+            .subscribe((settings: SystemSettingsModel) => {
+                this.duplicateUrls = _.transform(settings.upstreamServers, (result, upstreamServer: SystemUpstreamServerModel, index: number) => {
+                    result[index + 'url'] = {
+                        value: upstreamServer.url
+                    };
+                }, {});
+            });
     }
 
     /**

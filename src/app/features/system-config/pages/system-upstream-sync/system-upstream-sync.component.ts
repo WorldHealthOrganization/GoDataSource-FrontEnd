@@ -142,8 +142,8 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             return ErrorObservable.create(err);
                         })
                         .subscribe((settings: SystemSettingsModel) => {
-                            // remove first upstream server that matches all properties since we don't have an id, and removing it by index..ins't a good idea
-                            const upIndex: number = _.findIndex(settings.upstreamServers, upstreamServer);
+                            // remove upstream server
+                            const upIndex: number = _.findIndex(settings.upstreamServers, { url: upstreamServer.url });
                             if (upIndex > -1) {
                                 // remove server
                                 settings.upstreamServers.splice(upIndex, 1);
