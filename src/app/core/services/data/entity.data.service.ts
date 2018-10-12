@@ -136,7 +136,7 @@ export class EntityDataService {
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_AGE',
-                String(entity.age)
+                String(entity.age.years)
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_GENDER',
@@ -215,7 +215,7 @@ export class EntityDataService {
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_AGE',
-                String(entity.age)
+                String(entity.age.years)
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_GENDER',

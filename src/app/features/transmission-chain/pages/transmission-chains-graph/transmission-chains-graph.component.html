@@ -23,11 +23,9 @@
 
 <mat-card class="page-section page-content">
 
-        <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE' | translate}}</div>
-
         <!-- Chains of transmission -->
-        <app-transmission-chains-dashlet>
-            <!--*ngIf="hasReadCasePermissions() && hasReadReportPermissions()">-->
+        <app-transmission-chains-dashlet
+            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
         </app-transmission-chains-dashlet>
 
 </mat-card>

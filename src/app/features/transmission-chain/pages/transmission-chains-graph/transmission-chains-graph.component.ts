@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -15,28 +16,40 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 export class TransmissionChainsGraphComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
+        new BreadcrumbItemModel('LNG_PAGE_GRAPH_TRANSMISSION_CHAINS_TITLE', null, true)
     ];
-
-    // selected Outbreak
-    selectedOutbreak: OutbreakModel;
 
     // provide constants to template
     Constants = Constants;
 
+    // authenticated user
+    authUser: UserModel;
+
     constructor(
         private router: Router,
-        private outbreakDataService: OutbreakDataService,
-        protected snackbarService: SnackbarService,
+        private authDataService: AuthDataService,
+        protected snackbarService: SnackbarService
     ) {}
 
     ngOnInit() {
-        // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                this.selectedOutbreak = selectedOutbreak;
-            });
+        // get authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+    }
+
+    /**
+     * Check if the user has read access to cases
+     * @returns {boolean}
+     */
+    hasReadCasePermissions(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    }
+
+    /**
+     * Check if the user has read report permission
+     * @returns {boolean}
+     */
+    hasReadReportPermissions(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
 
 }
