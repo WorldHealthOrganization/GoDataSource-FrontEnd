@@ -69,6 +69,7 @@
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [tooltip]="field.description"
                         [options]="field.inputOptions"
                         optionLabelKey="label"
                         optionValueKey="value"
@@ -85,6 +86,7 @@
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [tooltip]="field.description"
                         [required]="field.required"
                         [type]="field.type"
                         app-required-one-or-other-validator

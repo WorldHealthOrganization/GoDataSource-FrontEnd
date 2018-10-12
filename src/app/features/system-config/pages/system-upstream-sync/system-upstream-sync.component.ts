@@ -10,9 +10,11 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-system-upstream-sync-list',
@@ -34,6 +36,9 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
 
+    // settings
+    settings: SystemSettingsModel;
+
     // constants
     UserSettings = UserSettings;
 
@@ -44,7 +49,8 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
@@ -115,7 +121,8 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
         this.systemSettingsDataService
             .getSystemSettings()
             .subscribe((settings: SystemSettingsModel) => {
-                this.upstreamServerList = _.get(settings, 'upstreamServers', []);
+                this.settings = settings;
+                this.upstreamServerList = _.get(this.settings, 'upstreamServers', []);
             });
     }
 
@@ -171,6 +178,49 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             }
                         });
                 }
+            });
+    }
+
+    /**
+     * Configure sync settings
+     */
+    configureSyncSettings() {
+        this.genericDataService
+            .getFilterYesNoOptions()
+            .subscribe((yesNoOptions: LabelValuePair[]) => {
+                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                this.dialogService.showInput(new DialogConfiguration({
+                    message: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE',
+                    yesLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON',
+                    fieldsList: [
+                        new DialogField({
+                            name: 'triggerBackupBeforeSync',
+                            placeholder: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC',
+                            description: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
+                            inputOptions: yesNoOptionsFiltered,
+                            required: true,
+                            value: this.settings.sync.triggerBackupBeforeSync
+                        })
+                    ]
+                })).subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.systemSettingsDataService
+                            .modifySystemSettings({
+                                sync: answer.inputValue.value
+                            })
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe(() => {
+                                // display success message
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+
+                                // refresh settings
+                                this.needsRefreshList(true);
+                            });
+                    }
+                });
             });
     }
 }

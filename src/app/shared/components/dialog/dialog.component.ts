@@ -67,6 +67,7 @@ export class DialogField {
     public requiredOneOfTwo: string;
     public value: any;
     public disabled: boolean = false;
+    public description: string;
 
     constructor(data: {
         name: string,
@@ -77,7 +78,8 @@ export class DialogField {
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
-        disabled?: boolean
+        disabled?: boolean,
+        description?: string
     }) {
         Object.assign(
             this,

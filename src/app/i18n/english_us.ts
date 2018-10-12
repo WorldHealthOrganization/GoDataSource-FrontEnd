@@ -1305,7 +1305,9 @@ export const EnglishUsLang = {
          * Backup Fields
          */
         'LNG_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION': '',
         'LNG_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION': '',
         'LNG_BACKUP_FIELD_LABEL_DATE': 'Date',
         'LNG_BACKUP_FIELD_LABEL_STATUS': 'Status',
         'LNG_BACKUP_FIELD_LABEL_ERROR': 'Error',
@@ -1314,9 +1316,13 @@ export const EnglishUsLang = {
          * Automatic Backup Fields
          */
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION': '',
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION': '',
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL': 'Backup interval',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_DESCRIPTION': '',
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL': 'Retention interval',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
 
         /**
          * System Config Main page
@@ -1362,10 +1368,20 @@ export const EnglishUsLang = {
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION': '',
 
         /**
+         * Sync settings fields
+         */
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
+
+        /**
          * Sync Upstream Servers List page
          */
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE': 'Upstream servers',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Upstream server deleted!',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
 
         /**
          * Create Upstream Server Page
