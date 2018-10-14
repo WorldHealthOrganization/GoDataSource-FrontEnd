@@ -70,7 +70,7 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        <mat-chip-list>
+                        <mat-chip-list *ngIf="item.locationIds.length > 0">
                             <mat-chip *ngFor="let location of item.locations" [matTooltip]="location.name">{{ location.name }}</mat-chip>
                         </mat-chip-list>
                     </mat-cell>
