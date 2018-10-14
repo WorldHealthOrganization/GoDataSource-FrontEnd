@@ -95,7 +95,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
     colorCriteria: any = {
         nodeColorCriteria: 'type',
         nodeNameColorCriteria: 'classification',
-        edgeColorCriteria: 'certaintyLevelId'
+        edgeColorCriteria: 'certaintyLevelId',
+        nodeLabelCriteria: 'name'
     };
     // default legend
     legend: any = {
