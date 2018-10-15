@@ -19,13 +19,13 @@
     <div class="graph-legend"
          *ngIf="legend">
         <!-- node color -->
-        <div *ngIf="objectKeys(legend.nodeColor).length"
+        <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
             {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
         </div>
         <div
-            *ngFor="let nodeColorItem of objectKeys(legend.nodeColor)" class="legend-item">
+            *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
             <div
                 class="legend-color"
                 [style.background-color]="legend.nodeColor[nodeColorItem]">
@@ -36,13 +36,13 @@
         </div>
 
         <!-- node name color -->
-        <div *ngIf="objectKeys(legend.nodeNameColor).length"
+        <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
              class="legend-name">
             {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
         </div>
         <div
-            *ngFor="let nodeNameColorItem of objectKeys(legend.nodeNameColor)" class="legend-item">
+            *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
             <div
                 class="legend-color"
                 [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
@@ -56,14 +56,14 @@
         </div>
 
         <!-- edge color -->
-        <div *ngIf="objectKeys(legend.edgeColor).length"
+        <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
              class="legend-name">
             {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
         </div>
 
         <div
-            *ngFor="let edgeColorItem of objectKeys(legend.edgeColor)" class="legend-item">
+            *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
             <div
                 class="legend-color"
                 [style.background-color]="legend.edgeColor[edgeColorItem]">
@@ -74,13 +74,13 @@
         </div>
 
         <!-- node icon -->
-        <div *ngIf="objectKeys(legend.nodeIcon).length"
+        <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
              class="legend-name">
             {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
         </div>
         <div
-            *ngFor="let nodeIconItem of objectKeys(legend.nodeIcon)" class="legend-item">
+            *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
             <div
                 class="legend-icon"
                 [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">

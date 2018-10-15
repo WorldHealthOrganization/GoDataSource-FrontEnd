@@ -350,27 +350,35 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
         // re-initialize legend entries
         this.legend.nodeColor = {};
+        this.legend.nodeColorKeys = [];
         this.legend.nodeNameColor = {};
+        this.legend.nodeNameColorKeys = [];
         this.legend.edgeColor = {};
+        this.legend.edgeColorKeys = [];
         this.legend.nodeIcon = {};
+        this.legend.nodeIconKeys = [];
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeColorReferenceDataEntries, (value, key) => {
             this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.nodeColorKeys = Object.keys(this.legend.nodeColor);
         const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeNameColorReferenceDataEntries, (value, key) => {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
         const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(edgeColorReferenceDataEntries, (value, key) => {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
         if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
             const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
             _.forEach(nodeIconReferenceDataEntries, (value, key) => {
                 this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
             });
+            this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
         }
     }
 
