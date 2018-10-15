@@ -68,6 +68,19 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Credentials -->
+        <ng-container matColumnDef="credentials">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Description -->
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>

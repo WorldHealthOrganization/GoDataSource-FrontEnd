@@ -86,6 +86,10 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                 label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
             }),
             new VisibleColumnModel({
+                field: 'credentials',
+                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS'
+            }),
+            new VisibleColumnModel({
                 field: 'description',
                 label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
             }),
