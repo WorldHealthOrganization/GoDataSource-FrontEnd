@@ -1,12 +1,15 @@
 import * as _ from 'lodash';
 import { SystemUpstreamServerCredentialsModel } from './system-upstream-server-credentials.model';
+import { OutbreakModel } from './outbreak.model';
 
 export class SystemClientApplicationModel {
     id: string;
     name: string;
     credentials: SystemUpstreamServerCredentialsModel;
     active: boolean;
+
     outbreakIDs: string[];
+    outbreaks: OutbreakModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

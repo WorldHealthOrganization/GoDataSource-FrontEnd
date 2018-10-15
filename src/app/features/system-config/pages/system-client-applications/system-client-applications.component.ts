@@ -13,6 +13,10 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components'
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/forkJoin';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
     selector: 'app-system-upstream-sync-list',
@@ -47,7 +51,8 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super(
             snackbarService
@@ -103,12 +108,39 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
      */
     refreshList() {
         this.clientApplicationsServerList = [];
-        this.systemSettingsDataService
-            .getSystemSettings()
-            .subscribe((settings: SystemSettingsModel) => {
-                this.settings = settings;
-                this.clientApplicationsServerList = _.get(this.settings, 'clientApplications', []);
-            });
+        Observable.forkJoin([
+            this.outbreakDataService.getOutbreaksList(),
+            this.systemSettingsDataService.getSystemSettings()
+        ]).catch((err) => {
+            this.snackbarService.showError(err.message);
+            return ErrorObservable.create(err);
+        }).subscribe((data: any) => {
+            // map outbreaks
+            const mappedOutbreaks: {
+                [outbreakID: string]: OutbreakModel
+            } = _.groupBy(data[0], 'id');
+
+            // get settings
+            this.settings = data[1];
+            this.clientApplicationsServerList = _.map(
+                _.get(this.settings, 'clientApplications', []),
+                (item: SystemClientApplicationModel) => {
+                    // set outbreak
+                    item.outbreaks = _.transform(
+                        item.outbreakIDs,
+                        (result, outbreakID: string) => {
+                            // outbreak not deleted ?
+                            if (!_.isEmpty(mappedOutbreaks[outbreakID])) {
+                                result.push(mappedOutbreaks[outbreakID][0]);
+                            }
+                        },
+                        []
+                    );
+
+                    // finished
+                    return item;
+                });
+        });
     }
 
     /**
@@ -135,7 +167,9 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                         })
                         .subscribe((settings: SystemSettingsModel) => {
                             // remove client application
-                            const upIndex: number = _.findIndex(settings.clientApplications, clientApplication);
+                            const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
+                            delete cleanClientApplication.outbreaks;
+                            const upIndex: number = _.findIndex(settings.clientApplications, cleanClientApplication);
                             if (upIndex > -1) {
                                 // remove server
                                 settings.clientApplications.splice(upIndex, 1);
@@ -180,7 +214,9 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
             })
             .subscribe((settings: SystemSettingsModel) => {
                 // client application
-                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, clientApplication);
+                const cleanClientApplication: SystemClientApplicationModel = _.cloneDeep(clientApplication);
+                delete cleanClientApplication.outbreaks;
+                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, cleanClientApplication);
                 if (clientApplicationItem) {
                     // set flag
                     clientApplication.active = !clientApplication.active;

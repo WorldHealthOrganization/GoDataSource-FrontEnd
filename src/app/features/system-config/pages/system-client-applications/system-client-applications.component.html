@@ -81,7 +81,15 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                TODO
+                <span
+                    *ngIf="item.outbreaks?.length < 1; else outbreaksList">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS' | translate }}
+                </span>
+                <span
+                    *ngFor="let outbreak of item.outbreaks; let isFirst = first;"
+                    #outbreaksList>
+                    {{ (isFirst ? '' : ' / ') + outbreak.name }}
+                </span>
             </mat-cell>
         </ng-container>
 
