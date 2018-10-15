@@ -19,6 +19,7 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -124,7 +125,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private i18nService: I18nService
     ) {}
 
     ngOnInit() {
@@ -375,6 +377,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
         });
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+        if ( this.legend.nodeLabel === 'gender') {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(nodeLabelValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] =  this.i18nService.instant(value.value);
+            });
+        }
+
     }
 
     /**

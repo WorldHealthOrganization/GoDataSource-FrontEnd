@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
-import { DateRangeModel } from '../../models/date-range.model';
-import { ReferenceDataCategory } from '../../models/reference-data.model';
-import { ReferenceDataDataService } from './reference-data.data.service';
+import { Constants } from '../../models/constants';
+import { I18nService } from '../helper/i18n.service';
+import * as moment from 'moment';
+import * as _ from 'lodash';
+import { CaseModel } from '../../models/case.model';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -19,7 +20,7 @@ export class TransmissionChainDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private referenceDataDataService: ReferenceDataDataService
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -138,6 +139,9 @@ export class TransmissionChainDataService {
     convertChainToGraphElements(chains, filters: any, colorCriteria: any): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [] };
         let selectedNodeIds: string[] = [];
+        // get labels for uears / months - age field
+        const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+        const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
@@ -196,26 +200,40 @@ export class TransmissionChainDataService {
                         if (colorCriteria.nodeLabel === 'name') {
                             nodeData.label = nodeData.name;
                         } else if (colorCriteria.nodeLabel === 'age-years') {
-                            if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                nodeData.label = node.model.age.years;
+                            if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                nodeData.label = node.model.age.years + ' ' + yearsLabel;
                             } else {
                                 nodeData.label = '';
                             }
                         } else if (colorCriteria.nodeLabel === 'age-months') {
                             if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                nodeData.label = node.model.age.months;
+                                nodeData.label = node.model.age.months + ' ' + monthsLabel;
                             } else {
                                 nodeData.label = '';
                             }
                         } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
-                            if (node.entityType === EntityType.CASE) {
-                                nodeData.label = node.model.dateOfOnset;
+                            if (node.type === EntityType.CASE) {
+                                nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                             } else {
                                 nodeData.label = '';
                             }
                         } else if (colorCriteria.nodeLabel === 'gender') {
-                            if (node.entityType !== EntityType.EVENT) {
-                                nodeData.label = node.model.gender;
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === 'location') {
+                            // TODO display location name
+                            if (node.type !== EntityType.EVENT) {
+                                if (node.type === EntityType.CASE) {
+                                    const case1 = new CaseModel(node.model);
+                                    const mainAddr = case1.mainAddress;
+                                    console.log(case1.mainAddress);
+                                    console.log(case1.mainAddress.location);
+                                    console.log(case1.mainAddress.location.name);
+                                }
+                                nodeData.label = '';
                             } else {
                                 nodeData.label = '';
                             }
@@ -270,26 +288,26 @@ export class TransmissionChainDataService {
                             if (colorCriteria.nodeLabel === 'name') {
                                 nodeData.label = nodeData.name;
                             } else if (colorCriteria.nodeLabel === 'age-years') {
-                                if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                    nodeData.label = node.model.age.years;
+                                if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                    nodeData.label = node.model.age.years + ' ' + yearsLabel;
                                 } else {
                                     nodeData.label = '';
                                 }
                             } else if (colorCriteria.nodeLabel === 'age-months') {
                                 if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                    nodeData.label = node.model.age.months;
+                                    nodeData.label = node.model.age.months + ' ' + monthsLabel;
                                 } else {
                                     nodeData.label = '';
                                 }
                             } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
-                                if (node.entityType === EntityType.CASE) {
-                                    nodeData.label = node.model.dateOfOnset;
+                                if (node.type === EntityType.CASE) {
+                                    nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                                 } else {
                                     nodeData.label = '';
                                 }
                             } else if (colorCriteria.nodeLabel === 'gender') {
-                                if (node.entityType !== EntityType.EVENT) {
-                                    nodeData.label = node.model.gender;
+                                if (node.type !== EntityType.EVENT) {
+                                    nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
                                 } else {
                                     nodeData.label = '';
                                 }

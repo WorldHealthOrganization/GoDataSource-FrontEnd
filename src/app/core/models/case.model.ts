@@ -101,6 +101,7 @@ export class CaseModel {
 
     /**
      * Get the main Address
+     * @returns {AddressModel}
      */
     get mainAddress(): AddressModel {
         // get main address
