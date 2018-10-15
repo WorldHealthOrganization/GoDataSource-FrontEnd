@@ -323,7 +323,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             }
                         });
                 },
-                300
+                Constants.DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN
             );
         };
 

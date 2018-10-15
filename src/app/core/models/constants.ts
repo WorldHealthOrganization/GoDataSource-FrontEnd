@@ -33,6 +33,7 @@ export class Constants {
 
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+    static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
