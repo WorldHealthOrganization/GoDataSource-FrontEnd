@@ -2,14 +2,17 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { AbstractControl, NgForm } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
+import { Observable } from 'rxjs/Observable';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 
 @Component({
     selector: 'app-create-system-upstream-sync',
@@ -21,50 +24,40 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE',
-            '/system-config/system-upstream-sync'
+            'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE',
+            '/system-config/system-client-applications'
         ),
         new BreadcrumbItemModel(
-            'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE',
+            'LNG_PAGE_CREATE_CLIENT_APPLICATION_TITLE',
             '.',
             true
         )
     ];
 
-    // check for duplicate urls
-    duplicateUrls: { [ name: string ]: AbstractControl };
+    clientApplicationData: SystemClientApplicationModel = new SystemClientApplicationModel();
 
-    upstreamServerData: SystemUpstreamServerModel = new SystemUpstreamServerModel();
+    outbreaksOptionsList$: Observable<OutbreakModel[]>;
 
     constructor(
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super();
     }
 
-    /**
-     * On init
-     */
     ngOnInit() {
-        this.systemSettingsDataService
-            .getSystemSettings()
-            .subscribe((settings: SystemSettingsModel) => {
-                this.duplicateUrls = _.transform(settings.upstreamServers, (result, upstreamServer: SystemUpstreamServerModel, index: number) => {
-                    result[index + 'url'] = {
-                        value: upstreamServer.url
-                    };
-                }, {});
-            });
+        // retrieve outbreaks
+        this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksList();
     }
 
     /**
-     * Create Upstream server
+     * Create Application Client
      * @param {NgForm[]} stepForms
      */
-    createNewUpstreamServer(stepForms: NgForm[]) {
+    createNewApplicationClient(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -80,13 +73,13 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
                     return ErrorObservable.create(err);
                 })
                 .subscribe((settings: SystemSettingsModel) => {
-                    // add the new upstream server
-                    settings.upstreamServers.push(dirtyFields);
+                    // add the new client application
+                    settings.clientApplications.push(dirtyFields);
 
-                    // save upstream servers
+                    // save client applications
                     this.systemSettingsDataService
                         .modifySystemSettings({
-                            upstreamServers: settings.upstreamServers
+                            clientApplications: settings.clientApplications
                         })
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
@@ -94,11 +87,11 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/system-config/system-upstream-sync']);
+                            this.router.navigate(['/system-config/system-client-applications']);
                         });
 
                 });

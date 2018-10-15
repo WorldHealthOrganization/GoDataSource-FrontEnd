@@ -7,7 +7,16 @@
                 <ng-container
                     *ngIf="hasSysConfigWriteAccess() && settings && !waitForBackupIdToBeReady && !loading">
 
-                    <!-- Sync client servers -->
+                    <!-- Sync client applications -->
+                    <button
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        [routerLink]="['/system-config', 'system-client-applications']">
+                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON' | translate }}
+                    </button>
+
+                    <!-- Sync upstream servers -->
                     <button
                         class="button-primary"
                         mat-raised-button

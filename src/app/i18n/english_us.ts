@@ -92,6 +92,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER': 'Are you sure you want to delete this upstream server: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION': 'Are you sure you want to delete this client application: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_BACKUP': 'Are you sure you want to delete this backup "{{location}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE': 'Restore Confirmation<br /><br />Notice: Restoring system data to selected state will revert all the data to the point of the backup ( removing any new data added ). Are you sure you want to continue?',
         'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: "{{name}}"?',
@@ -1330,6 +1331,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE': 'Automatic backup settings',
@@ -1343,6 +1345,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+
+        /**
+         * Sync settings fields
+         */
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
 
         /**
          * Upstream server fields
@@ -1368,12 +1376,6 @@ export const EnglishUsLang = {
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION': '',
 
         /**
-         * Sync settings fields
-         */
-        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
-        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
-
-        /**
          * Sync Upstream Servers List page
          */
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE': 'Upstream servers',
@@ -1382,6 +1384,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_ENABLE_SYNC': 'Enable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DISABLE_SYNC': 'Disable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE': 'Sync enabled flag changed',
 
         /**
          * Create Upstream Server Page
@@ -1389,6 +1394,39 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE': 'Create Upstream Server',
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create upstream server',
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE': 'Upstream server created',
+        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Client Application fields
+         */
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME': 'Name',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS': 'Credentials',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID': 'Credentials Client ID',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET': 'Credentials Client Secret',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+
+        /**
+         * Sync Client Applications List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE': 'Client applications',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Client application deleted!',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE': 'Active flag changed',
+
+        /**
+         * Create Client Application Page
+         */
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TITLE': 'Create Client Application',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * Chains of Transmission

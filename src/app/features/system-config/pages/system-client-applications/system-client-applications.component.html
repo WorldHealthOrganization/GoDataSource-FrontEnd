@@ -4,21 +4,12 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Sync general settings-->
+                <!-- Create client application -->
                 <button
                     class="button-primary"
                     mat-raised-button
                     color="primary"
-                    (click)="configureSyncSettings()">
-                    {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON' | translate }}
-                </button>
-
-                <!-- Create upstream server -->
-                <button
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/system-config', 'system-upstream-sync', 'create']">
+                    [routerLink]="['/system-config', 'system-client-applications', 'create']">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -28,7 +19,7 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.UPSTREAM_SERVERS_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.SYNC_CLIENT_APPLICATIONS_FIELDS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
@@ -41,12 +32,12 @@
         </button>
     </div>
 
-    <mat-table #table [dataSource]="upstreamServerList">
+    <mat-table #table [dataSource]="clientApplicationsServerList">
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME' | translate}}</div>
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME' | translate}}</div>
                 </div>
             </mat-header-cell>
 
@@ -55,81 +46,42 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Url -->
-        <ng-container matColumnDef="url">
+        <!-- Credentials -->
+        <ng-container matColumnDef="credentials">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL' | translate}}</div>
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.url }}
+                {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
             </mat-cell>
         </ng-container>
 
-        <!-- Description -->
-        <ng-container matColumnDef="description">
+        <!-- Active -->
+        <ng-container matColumnDef="active">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.description }}
+                <app-yes-no-label [value]="item.active"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
-        <!-- Timeout -->
-        <ng-container matColumnDef="timeout">
+        <!-- Outbreaks -->
+        <ng-container matColumnDef="outbreaks">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT' | translate}}</div>
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.timeout }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Sync Interval -->
-        <ng-container matColumnDef="syncInterval">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.syncInterval }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Sync On Every Change -->
-        <ng-container matColumnDef="syncOnEveryChange">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.syncOnEveryChange"></app-yes-no-label>
-            </mat-cell>
-        </ng-container>
-
-        <!-- Sync Enabled -->
-        <ng-container matColumnDef="syncEnabled">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.syncEnabled"></app-yes-no-label>
+                TODO
             </mat-cell>
         </ng-container>
 
@@ -147,8 +99,14 @@
                         *ngIf="hasSysConfigWriteAccess()">
                         <button
                             mat-menu-item
+                            (click)="toggleActiveFlag(item)">
+                            {{ (item.active ? 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE' : 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE') | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
                             class="mat-menu-item-delete"
-                            (click)="deleteUpstreamServer(item)">
+                            (click)="deleteClientApplication(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
                     </ng-container>

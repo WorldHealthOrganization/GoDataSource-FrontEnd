@@ -228,4 +228,47 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                 });
             });
     }
+
+    /**
+     * Toggle sync enabled flag
+     * @param upstreamServer
+     */
+    toggleSyncEnableFlag(upstreamServer: SystemUpstreamServerModel) {
+        // toggle flag
+        upstreamServer.syncEnabled = !upstreamServer.syncEnabled;
+
+        // save sync
+        this.systemSettingsDataService
+            .getSystemSettings()
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((settings: SystemSettingsModel) => {
+                // upstream server
+                const upstreamItem: SystemUpstreamServerModel = _.find(settings.upstreamServers, { url: upstreamServer.url });
+                if (upstreamItem) {
+                    // set flag
+                    upstreamItem.syncEnabled = upstreamServer.syncEnabled;
+
+                    // save upstream servers
+                    this.systemSettingsDataService
+                        .modifySystemSettings({
+                            upstreamServers: settings.upstreamServers
+                        })
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
+                        });
+                } else {
+                    // not found ?
+                    // IGNORE...
+                    this.needsRefreshList(true);
+                }
+            });
+    }
 }

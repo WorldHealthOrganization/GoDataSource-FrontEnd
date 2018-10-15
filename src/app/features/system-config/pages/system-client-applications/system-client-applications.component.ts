@@ -7,14 +7,12 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 
 @Component({
     selector: 'app-system-upstream-sync-list',
@@ -27,14 +25,14 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
      * Breadcrumbs
      */
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '.', true)
     ];
 
     // authenticated user
     authUser: UserModel;
 
-    // upstream servers
-    upstreamServerList: SystemUpstreamServerModel[] = [];
+    // client applications servers
+    clientApplicationsServerList: SystemClientApplicationModel[] = [];
 
     // settings
     settings: SystemSettingsModel;
@@ -49,8 +47,7 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         private authDataService: AuthDataService,
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private dialogService: DialogService
     ) {
         super(
             snackbarService
@@ -79,31 +76,19 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         this.tableColumns = [
             new VisibleColumnModel({
                 field: 'name',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME'
+                label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
             }),
             new VisibleColumnModel({
-                field: 'url',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL'
+                field: 'credentials',
+                label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS'
             }),
             new VisibleColumnModel({
-                field: 'description',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION'
+                field: 'active',
+                label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE'
             }),
             new VisibleColumnModel({
-                field: 'timeout',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT'
-            }),
-            new VisibleColumnModel({
-                field: 'syncInterval',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL'
-            }),
-            new VisibleColumnModel({
-                field: 'syncOnEveryChange',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE'
-            }),
-            new VisibleColumnModel({
-                field: 'syncEnabled',
-                label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED'
+                field: 'outbreaks',
+                label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -117,12 +102,12 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
      * Refresh list
      */
     refreshList() {
-        this.upstreamServerList = [];
+        this.clientApplicationsServerList = [];
         this.systemSettingsDataService
             .getSystemSettings()
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
-                this.upstreamServerList = _.get(this.settings, 'upstreamServers', []);
+                this.clientApplicationsServerList = _.get(this.settings, 'clientApplications', []);
             });
     }
 
@@ -138,8 +123,8 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
      * Delete record
      * @param item
      */
-    deleteUpstreamServer(upstreamServer: SystemUpstreamServerModel) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER', upstreamServer)
+    deleteClientApplication(clientApplication: SystemClientApplicationModel) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION', clientApplication)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.systemSettingsDataService
@@ -149,16 +134,16 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                             return ErrorObservable.create(err);
                         })
                         .subscribe((settings: SystemSettingsModel) => {
-                            // remove upstream server
-                            const upIndex: number = _.findIndex(settings.upstreamServers, { url: upstreamServer.url });
+                            // remove client application
+                            const upIndex: number = _.findIndex(settings.clientApplications, clientApplication);
                             if (upIndex > -1) {
                                 // remove server
-                                settings.upstreamServers.splice(upIndex, 1);
+                                settings.clientApplications.splice(upIndex, 1);
 
                                 // save upstream servers
                                 this.systemSettingsDataService
                                     .modifySystemSettings({
-                                        upstreamServers: settings.upstreamServers
+                                        clientApplications: settings.clientApplications
                                     })
                                     .catch((err) => {
                                         this.snackbarService.showError(err.message);
@@ -166,7 +151,7 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                                     })
                                     .subscribe(() => {
                                         // display success message
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
+                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                                         // refresh
                                         this.needsRefreshList(true);
@@ -182,45 +167,43 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
     }
 
     /**
-     * Configure sync settings
+     * Toggle active flag
+     * @param upstreamServer
      */
-    configureSyncSettings() {
-        this.genericDataService
-            .getFilterYesNoOptions()
-            .subscribe((yesNoOptions: LabelValuePair[]) => {
-                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                this.dialogService.showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE',
-                    yesLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON',
-                    fieldsList: [
-                        new DialogField({
-                            name: 'triggerBackupBeforeSync',
-                            placeholder: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC',
-                            description: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
-                            inputOptions: yesNoOptionsFiltered,
-                            required: true,
-                            value: this.settings.sync.triggerBackupBeforeSync
-                        })
-                    ]
-                })).subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        this.systemSettingsDataService
-                            .modifySystemSettings({
-                                sync: answer.inputValue.value
-                            })
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe(() => {
-                                // display success message
-                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+    toggleActiveFlag(clientApplication: SystemClientApplicationModel) {
+        // save
+        this.systemSettingsDataService
+            .getSystemSettings()
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((settings: SystemSettingsModel) => {
+                // client application
+                const clientApplicationItem: SystemClientApplicationModel = _.find(settings.clientApplications, clientApplication);
+                if (clientApplicationItem) {
+                    // set flag
+                    clientApplication.active = !clientApplication.active;
+                    clientApplicationItem.active = clientApplication.active;
 
-                                // refresh settings
-                                this.needsRefreshList(true);
-                            });
-                    }
-                });
+                    // save client applications
+                    this.systemSettingsDataService
+                        .modifySystemSettings({
+                            clientApplications: settings.clientApplications
+                        })
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+                        });
+                } else {
+                    // not found ?
+                    // IGNORE...
+                    this.needsRefreshList(true);
+                }
             });
     }
 }

@@ -10,7 +10,7 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -19,81 +19,46 @@
                             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                                 <app-form-input
                                     name="name"
-                                    [(ngModel)]="upstreamServerData.name"
-                                    [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME' | translate"
-                                    tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME_DESCRIPTION"
+                                    [(ngModel)]="clientApplicationData.name"
+                                    [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME' | translate"
+                                    tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME_DESCRIPTION"
                                     required="true">
                                 </app-form-input>
 
-                                <app-form-input
-                                    name="timeout"
-                                    [(ngModel)]="upstreamServerData.timeout"
-                                    [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT' | translate"
-                                    tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT_DESCRIPTION"
-                                    required="true"
-                                    type="number">
-                                </app-form-input>
+                                <app-form-slide-toggle
+                                    name="active"
+                                    [(ngModel)]="clientApplicationData.active"
+                                    [label]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE' | translate"
+                                    tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE_DESCRIPTION">
+                                </app-form-slide-toggle>
                             </div>
 
-                            <app-form-input
-                                name="url"
-                                [(ngModel)]="upstreamServerData.url"
-                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_URL_DESCRIPTION"
-                                required="true"
-                                app-unique-validator="url$"
-                                [additionalControlsToCheck]="duplicateUrls">
-                            </app-form-input>
-                        </div>
-
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="upstreamServerData.description"
-                            [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
-                                name="syncInterval"
-                                [(ngModel)]="upstreamServerData.syncInterval"
-                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL_DESCRIPTION"
-                                type="number"
-                                required="true">
-                            </app-form-input>
-
-                            <app-form-slide-toggle
-                                name="syncOnEveryChange"
-                                [(ngModel)]="upstreamServerData.syncOnEveryChange"
-                                [label]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE_DESCRIPTION">
-                            </app-form-slide-toggle>
-
-                            <app-form-slide-toggle
-                                name="syncEnabled"
-                                [(ngModel)]="upstreamServerData.syncEnabled"
-                                [label]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED_DESCRIPTION">
-                            </app-form-slide-toggle>
-
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-select
+                                name="outbreakIDs"
+                                [ngModel]="clientApplicationData.outbreakIDs"
+                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS' | translate"
+                                tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION"
+                                [options]="outbreaksOptionsList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                [multiple]="true">
+                            </app-form-select>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="credentials[clientId]"
-                                [(ngModel)]="upstreamServerData.credentials.clientId"
-                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID_DESCRIPTION"
+                                [(ngModel)]="clientApplicationData.credentials.clientId"
+                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID' | translate"
+                                tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION"
                                 required="true">
                             </app-form-input>
 
                             <app-form-input
                                 name="credentials[clientSecret]"
-                                [(ngModel)]="upstreamServerData.credentials.clientSecret"
-                                [placeholder]="'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET' | translate"
-                                tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION"
+                                [(ngModel)]="clientApplicationData.credentials.clientSecret"
+                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET' | translate"
+                                tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION"
                                 required="true">
                             </app-form-input>
 
@@ -124,8 +89,8 @@
                 <button
                     type="button"
                     mat-button
-                    (click)="createNewUpstreamServer([detailsForm])">
-                    {{'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
+                    (click)="createNewApplicationClient([detailsForm])">
+                    {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>
