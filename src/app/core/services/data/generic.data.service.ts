@@ -108,5 +108,12 @@ export class GenericDataService {
     getBackupStatusList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.SYSTEM_BACKUP_STATUS));
     }
+
+    /**
+     * Retrieve backup status list
+     */
+    getSyncLogStatusList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
+    }
 }
 

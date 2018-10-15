@@ -15,6 +15,11 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { SystemSyncDataService } from '../../../../core/services/data/system-sync.data.service';
+import { SystemSyncModel } from '../../../../core/models/system-sync.model';
+import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
+import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-system-upstream-sync-list',
@@ -36,6 +41,9 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
     // upstream servers
     upstreamServerList: SystemUpstreamServerModel[] = [];
 
+    // sync in progress ?
+    loading: boolean = false;
+
     // settings
     settings: SystemSettingsModel;
 
@@ -50,7 +58,9 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private systemSyncDataService: SystemSyncDataService,
+        private systemSyncLogDataService: SystemSyncLogDataService
     ) {
         super(
             snackbarService
@@ -270,5 +280,66 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                     this.needsRefreshList(true);
                 }
             });
+    }
+
+    /**
+     * Start sync
+     * @param upstreamServer
+     */
+    startSync(upstreamServer: SystemUpstreamServerModel) {
+        // check if sync is done
+        const syncCheckIfDone = (syncLogId: string) => {
+            setTimeout(
+                () => {
+                    // check if backup is ready
+                    this.systemSyncLogDataService
+                        .getSyncLog(syncLogId)
+                        .catch((err) => {
+                            this.loading = false;
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe((systemSyncLogModel: SystemSyncLogModel) => {
+                            switch (systemSyncLogModel.status) {
+                                // sync ready ?
+                                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value:
+                                case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value:
+                                    // display success message
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SUCCESS_MESSAGE');
+                                    this.loading = false;
+                                    break;
+
+                                // sync error ?
+                                case Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value:
+                                    this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_FAILED_MESSAGE');
+                                    this.loading = false;
+                                    break;
+
+                                // sync isn't ready ?
+                                // Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value
+                                default:
+                                    syncCheckIfDone(syncLogId);
+                                    break;
+                            }
+                        });
+                },
+                300
+            );
+        };
+
+        // start sync ?
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION', upstreamServer)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // start sync
+                    this.loading = true;
+                    this.systemSyncDataService
+                        .sync(upstreamServer.url)
+                        .subscribe((result: SystemSyncModel) => {
+                            syncCheckIfDone(result.syncLogId);
+                        });
+                }
+            });
+
     }
 }

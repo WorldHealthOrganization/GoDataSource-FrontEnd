@@ -92,6 +92,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER': 'Are you sure you want to delete this upstream server: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION': 'Are you sure you want to sync with upstream server: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION': 'Are you sure you want to delete this client application: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_BACKUP': 'Are you sure you want to delete this backup "{{location}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE': 'Restore Confirmation<br /><br />Notice: Restoring system data to selected state will revert all the data to the point of the backup ( removing any new data added ). Are you sure you want to continue?',
@@ -1387,6 +1388,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_ENABLE_SYNC': 'Enable sync',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DISABLE_SYNC': 'Disable sync',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE': 'Sync enabled flag changed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_START_SYNC': 'Start sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SUCCESS_MESSAGE': 'Sync done',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_FAILED_MESSAGE': 'Sync failed',
 
         /**
          * Create Upstream Server Page

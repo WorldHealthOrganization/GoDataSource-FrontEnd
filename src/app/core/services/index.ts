@@ -1,4 +1,3 @@
-// import data services
 import { AuthDataService } from './data/auth.data.service';
 import { UserDataService } from './data/user.data.service';
 import { OutbreakDataService } from './data/outbreak.data.service';
@@ -23,8 +22,8 @@ import { IconDataService } from './data/icon.data.service';
 import { SystemSettingsDataService } from './data/system-settings.data.service';
 import { SystemBackupDataService } from './data/system-backup.data.service';
 import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
-
-// import helper services
+import { SystemSyncDataService } from './data/system-sync.data.service';
+import { SystemSyncLogDataService } from './data/system-sync-log.data.service';
 import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
 import { SnackbarService } from './helper/snackbar.service';
@@ -35,13 +34,9 @@ import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
 import { DialogService } from './helper/dialog.service';
 import { DomService } from './helper/dom.service';
-
-// guards
 import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
-
-// resolvers
 import { LanguageResolver } from './resolvers/language.resolver';
 
 // export the list of services
@@ -74,6 +69,8 @@ export const services: any[] = [
     IconDataService,
     SystemSettingsDataService,
     SystemBackupDataService,
+    SystemSyncDataService,
+    SystemSyncLogDataService,
 
     // guard services
     AuthGuard,

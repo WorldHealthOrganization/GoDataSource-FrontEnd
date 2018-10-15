@@ -109,6 +109,28 @@ export class Constants {
         }
     };
 
+    /**
+     * System sync log status
+     */
+    static SYSTEM_SYNC_LOG_STATUS = {
+        SUCCESS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS',
+            value: 'LNG_SYNC_STATUS_SUCCESS'
+        },
+        SUCCESS_WITH_WARNINGS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS',
+            value: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS'
+        },
+        FAILED: {
+            label: 'LNG_SYNC_STATUS_FAILED',
+            value: 'LNG_SYNC_STATUS_FAILED'
+        },
+        IN_PROGRESS: {
+            label: 'LNG_SYNC_STATUS_IN_PROGRESS',
+            value: 'LNG_SYNC_STATUS_IN_PROGRESS'
+        }
+    };
+
     // keep functionality
     static APPLY_LIST_FILTER = ApplyListFilter;
 
