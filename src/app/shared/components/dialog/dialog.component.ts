@@ -62,6 +62,7 @@ export class DialogField {
     public placeholder: string;
     public inputOptions: LabelValuePair[];
     public inputOptionsMultiple: boolean = false;
+    public inputOptionsClearable: boolean = true;
     public required: boolean = false;
     public type: string = 'text';
     public requiredOneOfTwo: string;
@@ -74,6 +75,7 @@ export class DialogField {
         placeholder: string,
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
+        inputOptionsClearable?: boolean,
         required?: boolean,
         type?: string,
         requiredOneOfTwo?: string,

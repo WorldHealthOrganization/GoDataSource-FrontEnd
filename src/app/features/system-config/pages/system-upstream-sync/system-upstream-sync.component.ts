@@ -198,6 +198,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             placeholder: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC',
                             description: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
                             inputOptions: yesNoOptionsFiltered,
+                            inputOptionsClearable: false,
                             required: true,
                             value: this.settings.sync.triggerBackupBeforeSync
                         })
