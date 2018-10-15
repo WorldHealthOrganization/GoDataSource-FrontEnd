@@ -192,6 +192,34 @@ export class TransmissionChainDataService {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                             }
                         }
+                        // determine label
+                        if (colorCriteria.nodeLabel === 'name') {
+                            nodeData.label = nodeData.name;
+                        } else if (colorCriteria.nodeLabel === 'age-years') {
+                            if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                nodeData.label = node.model.age.years;
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === 'age-months') {
+                            if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                nodeData.label = node.model.age.months;
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
+                            if (node.entityType === EntityType.CASE) {
+                                nodeData.label = node.model.dateOfOnset;
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === 'gender') {
+                            if (node.entityType !== EntityType.EVENT) {
+                                nodeData.label = node.model.gender;
+                            } else {
+                                nodeData.label = '';
+                            }
+                        }
                         graphData.nodes.push({data: nodeData});
                     }
                 });
@@ -236,6 +264,34 @@ export class TransmissionChainDataService {
                             if (Object.keys(colorCriteria.nodeNameColor).length) {
                                 if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
                                     nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                                }
+                            }
+                            // determine label
+                            if (colorCriteria.nodeLabel === 'name') {
+                                nodeData.label = nodeData.name;
+                            } else if (colorCriteria.nodeLabel === 'age-years') {
+                                if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                    nodeData.label = node.model.age.years;
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === 'age-months') {
+                                if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                    nodeData.label = node.model.age.months;
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
+                                if (node.entityType === EntityType.CASE) {
+                                    nodeData.label = node.model.dateOfOnset;
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === 'gender') {
+                                if (node.entityType !== EntityType.EVENT) {
+                                    nodeData.label = node.model.gender;
+                                } else {
+                                    nodeData.label = '';
                                 }
                             }
                             graphData.nodes.push({data: nodeData});

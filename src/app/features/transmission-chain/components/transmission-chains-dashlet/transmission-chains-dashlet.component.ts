@@ -113,7 +113,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT': 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT': 'LNG_EVENT_FIELD_LABEL_DATE'
         },
-        edgeColor: []
+        edgeColor: [],
+        nodeLabel: 'name'
     };
 
     constructor(
@@ -372,6 +373,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         _.forEach(edgeColorReferenceDataEntries, (value, key) => {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        // set node label to be displayed
+        this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
     }
 
     /**
