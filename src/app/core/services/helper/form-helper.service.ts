@@ -12,6 +12,16 @@ export class FormHelperService {
     ) {}
 
     /**
+     * Retrieve control value
+     * @param control
+     */
+    getControlValue(control: FormControl): any {
+        return (control as any).getFilteredValue ?
+            (control as any).getFilteredValue() :
+            control.value;
+    }
+
+    /**
      * Get all fields of a form, with their values
      * @param {NgForm} form
      * @returns {any}
@@ -20,7 +30,11 @@ export class FormHelperService {
         const fields = {};
 
         _.forEach(form.controls, (control: FormControl, controlName: string) => {
-            _.set(fields, controlName, control.value);
+            _.set(
+                fields,
+                controlName,
+                this.getControlValue(control)
+            );
         });
 
         return fields;
@@ -44,7 +58,11 @@ export class FormHelperService {
                         _.set(dirtyFields, childControlName, childControl.value);
                     });
                 } else {
-                    _.set(dirtyFields, controlName, control.value);
+                    _.set(
+                        dirtyFields,
+                        controlName,
+                        this.getControlValue(control)
+                    );
                 }
             }
         });
