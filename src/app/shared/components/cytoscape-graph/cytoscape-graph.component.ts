@@ -172,7 +172,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(label)',
+                'label': 'data(labelTimeline)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)'
             }

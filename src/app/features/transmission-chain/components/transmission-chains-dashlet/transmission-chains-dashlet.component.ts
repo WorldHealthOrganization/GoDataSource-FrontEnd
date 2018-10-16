@@ -20,6 +20,8 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -38,6 +40,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    locationsList: LocationModel[];
     // reference data categories needed for filters
     referenceDataCategories: any = [
         ReferenceDataCategory.PERSON_TYPE,
@@ -126,7 +129,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private relationshipDataService: RelationshipDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private locationDataService: LocationDataService
     ) {}
 
     ngOnInit() {
@@ -137,6 +141,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const locationQueryBuilder = new RequestQueryBuilder();
+        locationQueryBuilder.fieldsInResponse = ['id', 'name'];
+        this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
+            this.locationsList = results;
+        });
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -243,7 +252,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
                 } else {
                     this.graphElements = [];
                 }
@@ -377,12 +386,12 @@ export class TransmissionChainsDashletComponent implements OnInit {
         });
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
-        if ( this.legend.nodeLabel === 'gender') {
+        if (this.legend.nodeLabel === 'gender') {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
             _.forEach(nodeLabelValues, (value, key) => {
                 // get gender transcriptions
-                this.legend.nodeLabelValues[value.value] =  this.i18nService.instant(value.value);
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
         }
 
