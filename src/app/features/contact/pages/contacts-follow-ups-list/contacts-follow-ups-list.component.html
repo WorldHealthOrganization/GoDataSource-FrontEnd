@@ -11,6 +11,17 @@
                 </ng-container>
 
                 <app-export-button
+                    *ngIf="printDailyFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
+                    [url]="printDailyFollowUpsUrl"
+                    [fileName]="followUpsPrintDailyFileName"
+                    [fileType]="printDailyFollowUpsFileType"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
+                </app-export-button>
+
+                <app-export-button
                     *ngIf="exportFollowUpsUrl"
                     [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
