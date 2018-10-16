@@ -1,0 +1,128 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <!-- Create client application -->
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/system-config', 'system-client-applications', 'create']">
+                    {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.SYNC_CLIENT_APPLICATIONS_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="clientApplicationsServerList">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Credentials -->
+        <ng-container matColumnDef="credentials">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.credentials?.clientId + ' / ' + item.credentials?.clientSecret }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Active -->
+        <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.active"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Outbreaks -->
+        <ng-container matColumnDef="outbreaks">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <span
+                    *ngIf="item.outbreaks?.length < 1; else outbreaksList">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS' | translate }}
+                </span>
+                <span
+                    *ngFor="let outbreak of item.outbreaks; let isFirst = first;"
+                    #outbreaksList>
+                    {{ (isFirst ? '' : ' / ') + outbreak.name }}
+                </span>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <ng-container
+                        *ngIf="hasSysConfigWriteAccess()">
+                        <button
+                            mat-menu-item
+                            (click)="toggleActiveFlag(item)">
+                            {{ (item.active ? 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE' : 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE') | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteClientApplication(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+</mat-card>

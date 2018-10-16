@@ -70,6 +70,7 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_CLOSE': 'Close',
         'LNG_COMMON_BUTTON_BACK': 'Back',
         'LNG_COMMON_BUTTON_ADD': 'Add',
         'LNG_COMMON_BUTTON_MODIFY': 'Modify',
@@ -91,6 +92,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER': 'Are you sure you want to delete this upstream server: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG': 'Are you sure you want to delete this log?',
+        'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION': 'Are you sure you want to sync with upstream server: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION': 'Are you sure you want to delete this client application: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_BACKUP': 'Are you sure you want to delete this backup "{{location}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE': 'Restore Confirmation<br /><br />Notice: Restoring system data to selected state will revert all the data to the point of the backup ( removing any new data added ). Are you sure you want to continue?',
         'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE': 'Are you sure you want to convert contact: "{{name}}" to case?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: "{{name}}"?',
@@ -239,31 +246,6 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
 
         /**
-         * Outbreak Fields
-         */
-        'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
-        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
-        'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
-        'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
-        'LNG_OUTBREAK_FIELD_LABEL_COUNTRY_ID': 'ID',
-        'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
-        'LNG_OUTBREAK_FIELD_LABEL_START_DATE_TOOLTIP': 'For info only',
-        'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
-        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
-        'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
-        'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_TOOLTIP': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN': 'Days not seen',
-        'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS': 'Less than X contacts',
-        'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS': 'Long Periods ( days )',
-
-        /**
          * Entity Fields
          */
         'LNG_ENTITY_FIELD_LABEL_TYPE': 'Type',
@@ -276,6 +258,12 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
+        'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
+
+        /**
+         * Outbreak date inconsistencies list page
+         */
+        'LNG_PAGE_LIST_INCONSISTENCIES_TITLE': 'Inconsistencies in key dates',
 
         /**
          * Case Fields
@@ -314,10 +302,14 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
         'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_OUTCOME': 'Outcome',
+        'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_OCCUPATION': 'Occupation',
         'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
         'LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL': 'Was Burial Safety Performed?',
+        'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
@@ -841,6 +833,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
 
         /**
          * Create Follow-up page
@@ -1078,9 +1072,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1': 'Answer 1',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2': 'Answer 2',
 
-
-
-
         /**
          * Forgot Password Page
          */
@@ -1159,7 +1150,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
-        'LNG_OUTBREAK_FIELD_LABEL_START_DATE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_START_DATE_DESCRIPTION': 'For info only',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
@@ -1191,6 +1182,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES': 'View Inconsistencies',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak successfully cloned',
         'LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME': '{{name}} Clone',
@@ -1320,6 +1312,167 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
 
+        /**
+         * Backup modules
+         */
+        'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION': 'System Configuration',
+        'LNG_BACKUP_MODULE_LABEL_SYSTEM_DATA': 'Data',
+
+        /**
+         * Backup Fields
+         */
+        'LNG_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION': '',
+        'LNG_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION': '',
+        'LNG_BACKUP_FIELD_LABEL_DATE': 'Date',
+        'LNG_BACKUP_FIELD_LABEL_STATUS': 'Status',
+        'LNG_BACKUP_FIELD_LABEL_ERROR': 'Error',
+
+        /**
+         * Automatic Backup Fields
+         */
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION': '',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION': '',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL': 'Backup interval',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_DESCRIPTION': '',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL': 'Retention interval',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
+
+        /**
+         * System Config Main page
+         */
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE': 'Automatic backup settings',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON': 'Backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON': 'Create Backup & Restore',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON': 'Restore',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE': 'Backup initialized',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Automatic backup settings changed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_FAILED_MESSAGE': 'Backup failed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+
+        /**
+         * Sync settings fields
+         */
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
+
+        /**
+         * Upstream server fields
+         */
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME': 'Name',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT': 'Timeout',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_TIMEOUT_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL': 'URL',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_URL_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL': 'Sync interval',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_INTERVAL_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE': 'Sync on every change',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ON_EVERY_CHANGE_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED': 'Sync enabled',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SYNC_ENABLED_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS': 'Credentials',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID': 'Credentials Client ID',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_ID_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET': 'Credentials Client Secret',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION': '',
+
+        /**
+         * Sync Upstream Servers List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE': 'Upstream servers',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Upstream server deleted!',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON': 'Sync logs',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_ENABLE_SYNC': 'Enable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DISABLE_SYNC': 'Disable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE': 'Sync enabled flag changed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_START_SYNC': 'Start sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SUCCESS_MESSAGE': 'Sync done',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_FAILED_MESSAGE': 'Sync failed',
+
+        /**
+         * Create Upstream Server Page
+         */
+        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE': 'Create Upstream Server',
+        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create upstream server',
+        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE': 'Upstream server created',
+        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Sync Logs fields
+         */
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL': 'Server URL',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL_DESCRIPTION': '',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID': 'Client ID',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE': 'Action Start Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE': 'Action Completion Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_STATUS': 'Status',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE': 'Information Start Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ERROR': 'Error',
+
+        /**
+         * Sync Logs List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE': 'Sync Logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON': 'Remove sync logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE': 'Sync log deleted!',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE': 'Sync logs deleted!',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR': 'View Error details',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE': 'Remove sync logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_DELETE_BUTTON': 'Delete',
+
+        /**
+         * Client Application fields
+         */
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME': 'Name',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS': 'Credentials',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID': 'Credentials Client ID',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET': 'Credentials Client Secret',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+
+        /**
+         * Sync Client Applications List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE': 'Client applications',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Client application deleted!',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE': 'Active flag changed',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
+
+        /**
+         * Create Client Application Page
+         */
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TITLE': 'Create Client Application',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * Chains of Transmission
@@ -1342,6 +1495,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE': 'Node Icon',
 
 
         /**
@@ -1441,6 +1595,16 @@ export const EnglishUsLang = {
         'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
         'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
         'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+
+        /**
+         * Inconsistency labels
+         */
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER': '"{{date1}}" is smaller than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL': '"{{date1}}" is smaller or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER': '"{{date1}}" is bigger than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL': '"{{date1}}" is bigger or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL': '"{{date1}}" is not equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL': '"{{date1}}" is equal to "{{date2}}"',
 
         /**
          * Import data

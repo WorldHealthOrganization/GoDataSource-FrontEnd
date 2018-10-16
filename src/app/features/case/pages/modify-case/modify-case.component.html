@@ -11,64 +11,6 @@
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE' | translate">
 
-                <!-- Flagged section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="riskLevel"
-                                [(ngModel)]="caseData.riskLevel"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
-                                required="true"
-                                [options]="caseRiskLevelsList$ | async"
-                                [disabled]="viewOnly">
-                            </app-form-select>
-
-                            <app-form-datepicker
-                                name="dateOfReporting"
-                                [(ngModel)]="caseData.dateOfReporting"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                required="true"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="[
-                                    serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
-                                ]">
-                            </app-form-datepicker>
-
-                            <app-form-slide-toggle
-                                name="isDateOfReportingApproximate"
-                                [(ngModel)]="caseData.isDateOfReportingApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
-                                [disabled]="viewOnly">
-                            </app-form-slide-toggle>
-
-                            <app-form-slide-toggle
-                                name="transferRefused"
-                                [(ngModel)]="caseData.transferRefused"
-                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION"
-                                [disabled]="viewOnly">
-                            </app-form-slide-toggle>
-                        </div>
-
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-textarea>
-
-                    </div>
-                </mat-card>
-
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -107,7 +49,6 @@
                                 [(ngModel)]="caseData.gender"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_GENDER' | translate"
                                 tooltip="LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION"
-                                required="true"
                                 [options]="genderList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
@@ -161,7 +102,7 @@
                                 name="riskLevel"
                                 [(ngModel)]="caseData.riskLevel"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
-                                required="true"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
                                 [options]="caseRiskLevelsList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
@@ -170,6 +111,7 @@
                                 name="dateOfReporting"
                                 [(ngModel)]="caseData.dateOfReporting"
                                 [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
@@ -184,6 +126,7 @@
                                 name="isDateOfReportingApproximate"
                                 [(ngModel)]="caseData.isDateOfReportingApproximate"
                                 [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
@@ -191,6 +134,7 @@
                                 name="transferRefused"
                                 [(ngModel)]="caseData.transferRefused"
                                 [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION"
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
                         </div>
@@ -199,6 +143,7 @@
                             name="riskReason"
                             [(ngModel)]="caseData.riskReason"
                             [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
                             [disabled]="viewOnly">
                         </app-form-textarea>
 
@@ -242,42 +187,9 @@
                                 [disabled]="viewOnly">
                             </app-form-select>
 
-                            <app-form-datepicker
-                                name="dateBecomeCase"
-                                [(ngModel)]="caseData.dateBecomeCase"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
-
-                            <app-form-datepicker
-                                name="dateOfInfection"
-                                [(ngModel)]="caseData.dateOfInfection"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="[
-                                    serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
-                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
-                                ]">
-                            </app-form-datepicker>
-
-                            <app-form-datepicker
-                                name="dateOfOutcome"
-                                [(ngModel)]="caseData.dateOfOutcome"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
@@ -304,34 +216,91 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <app-form-slide-toggle
-                                name="deceased"
-                                [(ngModel)]="caseData.deceased"
-                                [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
-                                [disabled]="viewOnly">
-                            </app-form-slide-toggle>
+                            <app-form-datepicker
+                                name="dateBecomeCase"
+                                [(ngModel)]="caseData.dateBecomeCase"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday">
+                            </app-form-datepicker>
 
-                            <div fxFlex>
-                                <app-form-datepicker
-                                    name="dateDeceased"
-                                    [(ngModel)]="caseData.dateDeceased"
-                                    [disabled]="!caseData.deceased || viewOnly"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
-                                    tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
-                                    [maxDate]="serverToday"
-                                    app-date-validator
-                                    [dateSameOrBefore]="serverToday"
-                                    [dateSameOrAfter]="[
+                            <app-form-datepicker
+                                name="dateOfInfection"
+                                [(ngModel)]="caseData.dateOfInfection"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
+                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
+                                ]">
+                            </app-form-datepicker>
+                        </div>
+
+                    </div>
+                </mat-card>
+
+                <!--Outcome section-->
+                <mat-card class="page-section">
+                    <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <app-form-select
+                            name="outcome"
+                            [(ngModel)]="caseData.outcomeId"
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
+                            [options]="outcomeList$ | async">
+                        </app-form-select>
+
+                        <app-form-datepicker
+                            name="dateOfOutcome"
+                            [(ngModel)]="caseData.dateOfOutcome"
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
+                            [disabled]="viewOnly"
+                            [maxDate]="serverToday"
+                            app-date-validator
+                            [dateSameOrBefore]="serverToday">
+                        </app-form-datepicker>
+
+                        <app-form-slide-toggle
+                            name="deceased"
+                            [(ngModel)]="caseData.deceased"
+                            [label]="'LNG_CASE_FIELD_LABEL_DECEASED' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_DECEASED_DESCRIPTION"
+                            [disabled]="viewOnly">
+                        </app-form-slide-toggle>
+
+                        <app-form-slide-toggle
+                            name="safeBurial"
+                            [(ngModel)]="caseData.safeBurial"
+                            [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
+                            [disabled]="viewOnly">
+                        </app-form-slide-toggle>
+
+                        <div fxFlex>
+                            <app-form-datepicker
+                                name="dateDeceased"
+                                [(ngModel)]="caseData.dateDeceased"
+                                [disabled]="!caseData.deceased || viewOnly"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="serverToday"
+                                [dateSameOrAfter]="[
                                         [caseData.dateOfReporting, 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING' | translate],
                                         [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate],
                                         [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
                                     ]">
-                                </app-form-datepicker>
-                            </div>
-
+                            </app-form-datepicker>
                         </div>
-
                     </div>
                 </mat-card>
 
@@ -342,7 +311,6 @@
                     name="hospitalizationDates"
                     [(ngModel)]="caseData.hospitalizationDates"
                     [disabled]="viewOnly"
-                    [required]="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
                     [readOnly]="viewOnly">
@@ -355,7 +323,6 @@
                     name="isolationDates"
                     [(ngModel)]="caseData.isolationDates"
                     [disabled]="viewOnly"
-                    [required]="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
                     [readOnly]="viewOnly">
@@ -392,6 +359,13 @@
                 mat-raised-button color="primary" class="button-primary"
                 [routerLink]="['/cases', caseData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <button *ngIf="hasContactWriteAccess()"
+                mat-raised-button color="primary" class="button-primary"
+                routerLink="/contacts/create"
+                [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
+            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
         </button>
 
         <div class="page-tabs-navbar-placeholder"></div>
