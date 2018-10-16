@@ -115,5 +115,29 @@ export class GenericDataService {
     getSyncLogStatusList(): Observable<any[]> {
         return Observable.of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
     }
+
+    /**
+     * Retrieve the list of criteria used for node color - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeColorCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of criteria used for edge color - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainEdgeColorCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of criteria used for node icon - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeIconCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS));
+    }
 }
 
