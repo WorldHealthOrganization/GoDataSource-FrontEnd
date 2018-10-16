@@ -337,6 +337,13 @@
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
+        <button *ngIf="hasContactWriteAccess()"
+                mat-raised-button color="primary" class="button-primary"
+                routerLink="/contacts/create"
+                [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
+            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+        </button>
+
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id]">

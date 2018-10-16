@@ -252,6 +252,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
+    /**
+     * Check if we have access to create a contact
+     * @returns {boolean}
+     */
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
     modifyCase(form: NgForm) {
         // validate form
         if (!this.formHelper.validateForm(form)) {

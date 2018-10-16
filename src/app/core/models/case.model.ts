@@ -25,6 +25,7 @@ export class CaseModel {
     dateOfOutcome: string;
     dateBecomeCase: string;
     deceased: boolean;
+    safetyBurial: boolean;
     dateDeceased: string;
     hospitalizationDates: DateRangeModel[];
     isolationDates: DateRangeModel[];
@@ -35,6 +36,7 @@ export class CaseModel {
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
+    outcomeId: string
     deleted: boolean;
 
     relationships: {
@@ -74,6 +76,7 @@ export class CaseModel {
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
         this.deceased = _.get(data, 'deceased');
         this.dateDeceased = _.get(data, 'dateDeceased');
+        this.safetyBurial= _.get(data, 'safetyBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
@@ -82,6 +85,7 @@ export class CaseModel {
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
         this.outbreakId = _.get(data, 'outbreakId');
+        this.outcomeId = _.get(data, 'outcomeId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 

@@ -39,6 +39,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -61,7 +62,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         // get today time
         this.genericDataService
             .getServerUTCToday()

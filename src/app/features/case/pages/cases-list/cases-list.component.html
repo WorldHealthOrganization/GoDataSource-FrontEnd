@@ -321,11 +321,6 @@
                             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                         </button>
 
-                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item
-                                [routerLink]="['.', item.id, 'lab-results', 'create']">
-                            {{'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT' | translate}}
-                        </button>
-
                         <mat-divider *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"></mat-divider>
                     </ng-container>
 
