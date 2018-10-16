@@ -70,7 +70,7 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         this.initializeSideTableColumns();
 
         // retrieve backups
-        this.needsRefreshList();
+        this.needsRefreshList(true);
     }
 
     /**

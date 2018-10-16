@@ -90,7 +90,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         this.backupStatusList$ = this.genericDataService.getBackupStatusList();
 
         // retrieve backups
-        this.needsRefreshList();
+        this.needsRefreshList(true);
     }
 
     /**

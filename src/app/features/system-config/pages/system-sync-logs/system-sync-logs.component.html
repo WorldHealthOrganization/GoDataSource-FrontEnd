@@ -1,0 +1,252 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <!-- Delete sync logs -->
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    (click)="deleteServerSyncLogs()">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.SYNC_LOGS_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+    <!-- Filters -->
+    <div class="reset-filters">
+        <button mat-raised-button (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
+    </div>
+
+    <mat-table #table [dataSource]="syncLogsList$" matSort (matSortChange)="sortBy($event)">
+        <!-- Sync Server URL -->
+        <ng-container matColumnDef="syncServerUrl">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="syncServerUrl"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByTextContainingField('syncServerUrl', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.syncServerUrl }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sync Client ID -->
+        <ng-container matColumnDef="syncClientId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="syncClientId"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByTextField('syncClientId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.syncClientId }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Action Start Date -->
+        <ng-container matColumnDef="actionStartDate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="actionStartDate"
+                            ngModel
+                            (changed)="filterByDateRangeField('actionStartDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.actionStartDate | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Action Completion Date -->
+        <ng-container matColumnDef="actionCompletionDate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="actionCompletionDate"
+                            ngModel
+                            (changed)="filterByDateRangeField('actionCompletionDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.actionCompletionDate | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Outbreaks -->
+        <ng-container matColumnDef="outbreaks">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS' | translate}}</div>
+                </div>
+                <div class="column-filter">
+                    <app-form-select
+                        name="outbreaks"
+                        ngModel
+                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                        [options]="outbreaks"
+                        [multiple]="true"
+                        (optionChanged)="filterBySelectField('outbreakIDs', $event, 'id')"
+                        app-reset-input-on-side-filter
+                        [allowSelectionOfDisabledItems]="true"
+                        [displayFilterIcon]="true"
+                        optionLabelKey="name"
+                        optionValueKey="id">
+                    </app-form-select>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <span
+                    *ngIf="item.outbreaks?.length < 1; else outbreaksList">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS' | translate }}
+                </span>
+                <span
+                    *ngFor="let outbreak of item.outbreaks; let isFirst = first;"
+                    #outbreaksList>
+                    {{ (isFirst ? '' : ' / ') + outbreak.name }}
+                </span>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sync Status -->
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_STATUS' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="status"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="syncLogsStatusList$ | async"
+                            [multiple]="true"
+                            (optionChanged)="filterBySelectField('status', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.status | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Information Start Date -->
+        <ng-container matColumnDef="informationStartDate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">
+                        {{'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE' | translate}}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="informationStartDate"
+                            ngModel
+                            (changed)="filterByDateRangeField('informationStartDate', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.informationStartDate | dateTimeDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
+
+                <mat-menu #actionsMenu="matMenu">
+                    <ng-container
+                        *ngIf="hasSysConfigWriteAccess()">
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteSyncLog(item)">
+                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+
+    <mat-paginator
+        [length]="(syncLogsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
+</mat-card>

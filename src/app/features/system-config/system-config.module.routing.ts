@@ -33,6 +33,16 @@ const routes: Routes = [
         ]
     },
 
+    // Sync sync logs
+    {
+        path: 'system-sync-logs',
+        component: fromPages.SystemSyncLogsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_SYS_CONFIG]
+        }
+    },
+
     // Client applications
     {
         path: 'system-client-applications',

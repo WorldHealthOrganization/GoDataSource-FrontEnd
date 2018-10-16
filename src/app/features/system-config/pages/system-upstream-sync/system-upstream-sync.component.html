@@ -4,7 +4,16 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Sync general settings-->
+                <!-- Sync logs -->
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/system-config', 'system-sync-logs']">
+                    {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON' | translate }}
+                </button>
+
+                <!-- Sync general settings -->
                 <button
                     class="button-primary"
                     mat-raised-button

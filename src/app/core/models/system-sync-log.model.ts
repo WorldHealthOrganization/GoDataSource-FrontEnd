@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { OutbreakModel } from './outbreak.model';
 
 export class SystemSyncLogModel {
     id: string;
@@ -7,9 +8,11 @@ export class SystemSyncLogModel {
     actionStartDate: string;
     actionCompletionDate: string;
     status: string;
-    outbreakIDs: string[];
     informationStartDate: string;
     error: string;
+
+    outbreakIDs: string[];
+    outbreaks: OutbreakModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

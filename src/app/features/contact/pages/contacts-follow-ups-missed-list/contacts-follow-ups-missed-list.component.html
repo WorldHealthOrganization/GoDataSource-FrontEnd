@@ -183,7 +183,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
-                            [ngModel]="false"
+                            ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"

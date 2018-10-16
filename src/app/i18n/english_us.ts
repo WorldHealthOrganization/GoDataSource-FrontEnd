@@ -92,6 +92,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER': 'Are you sure you want to delete this upstream server: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG': 'Are you sure you want to delete this log?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION': 'Are you sure you want to sync with upstream server: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION': 'Are you sure you want to delete this client application: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_BACKUP': 'Are you sure you want to delete this backup "{{location}}"?',
@@ -1382,6 +1383,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE': 'Upstream servers',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Upstream server deleted!',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON': 'Sync logs',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
         'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
@@ -1399,6 +1401,26 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create upstream server',
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE': 'Upstream server created',
         'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Sync Logs fields
+         */
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL': 'Server URL',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID': 'Client ID',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE': 'Action Start Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE': 'Action Completion Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_STATUS': 'Status',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_INFORMATION_START_DATE': 'Information Start Date',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_ERROR': 'Error',
+
+        /**
+         * Sync Logs List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE': 'Sync Logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON': 'Remove logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE': 'Sync log deleted!',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
 
         /**
          * Client Application fields

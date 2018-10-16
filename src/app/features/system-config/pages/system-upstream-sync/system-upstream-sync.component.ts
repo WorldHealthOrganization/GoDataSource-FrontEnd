@@ -78,7 +78,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
         this.initializeSideTableColumns();
 
         // retrieve backups
-        this.needsRefreshList();
+        this.needsRefreshList(true);
     }
 
     /**
