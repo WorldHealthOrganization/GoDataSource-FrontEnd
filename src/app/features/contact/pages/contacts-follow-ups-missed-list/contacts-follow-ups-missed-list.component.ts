@@ -420,4 +420,25 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             anonymizeFields: this.anonymizeFields
         });
     }
+
+    /**
+     * Export filtered list
+     */
+    exportEntireListOfFollowUps() {
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
+            url: this.exportFollowUpsUrl,
+            fileName: this.followUpsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: _.cloneDeep(this.queryBuilder),
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
+    }
 }

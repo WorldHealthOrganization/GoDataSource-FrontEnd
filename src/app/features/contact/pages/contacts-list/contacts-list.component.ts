@@ -544,4 +544,25 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             anonymizeFields: this.anonymizeFields
         });
     }
+
+    /**
+     * Export filtered list
+     */
+    exportEntireListOfContacts() {
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportContactsUrl,
+            fileName: this.contactsDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: _.cloneDeep(this.queryBuilder),
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
+    }
 }
