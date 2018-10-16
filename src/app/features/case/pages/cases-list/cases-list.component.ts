@@ -416,4 +416,25 @@ export class CasesListComponent extends ListComponent implements OnInit {
             anonymizeFields: this.anonymizeFields
         });
     }
+
+    /**
+     * Export entire list of cases
+     */
+    exportEntireListOfCases() {
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportCasesUrl,
+            fileName: this.casesDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: _.cloneDeep(this.queryBuilder),
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
+    }
 }

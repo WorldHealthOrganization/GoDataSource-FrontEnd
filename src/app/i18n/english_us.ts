@@ -327,6 +327,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
+        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_LIST_CASES': 'Export entire list',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
         'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
         'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
