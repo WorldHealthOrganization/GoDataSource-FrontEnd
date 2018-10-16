@@ -155,13 +155,6 @@ export class Constants {
         }
     };
 
-    /**
-     * Today date
-     */
-    static getCurrentDate(): Moment {
-        return moment().startOf('day');
-    }
-
     static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
         TYPE: {
             label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
@@ -226,4 +219,12 @@ export class Constants {
             value: 'gender'
         }
     };
+
+    /**
+     * Today date
+     */
+    static getCurrentDate(): Moment {
+        return moment().startOf('day');
+    }
+
 }
