@@ -114,14 +114,14 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         ]).catch((err) => {
             this.snackbarService.showError(err.message);
             return ErrorObservable.create(err);
-        }).subscribe((data: any) => {
+        }).subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
             // map outbreaks
             const mappedOutbreaks: {
                 [outbreakID: string]: OutbreakModel
-            } = _.groupBy(data[0], 'id');
+            } = _.groupBy(outbreaksList, 'id');
 
             // get settings
-            this.settings = data[1];
+            this.settings = systemSettings;
             this.clientApplicationsServerList = _.map(
                 _.get(this.settings, 'clientApplications', []),
                 (item: SystemClientApplicationModel) => {
