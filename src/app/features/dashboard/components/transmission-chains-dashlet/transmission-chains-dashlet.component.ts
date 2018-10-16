@@ -20,6 +20,7 @@ import { RequestFilter } from '../../../../core/helperClasses/request-query-buil
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Observable } from 'rxjs/Observable';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -38,6 +39,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+
+    nodeColorCriteriaOptions$: Observable<any[]>;
+    edgeColorCriteriaOptions$: Observable<any[]>;
+    nodeIconCriteriaOptions$: Observable<any[]>;
     // reference data categories needed for filters
     referenceDataCategories: any = [
         ReferenceDataCategory.PERSON_TYPE,
@@ -94,26 +99,30 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     // default color criteria
     colorCriteria: any = {
-        nodeColorCriteria: 'type',
-        nodeNameColorCriteria: 'classification',
-        edgeColorCriteria: 'certaintyLevelId'
+        nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
+        nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
+        edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
+        nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value
     };
     // default legend
     legend: any = {
         nodeColorField: 'type',
         nodeNameColorField: 'classification',
         edgeColorField: 'certaintyLevelId',
+        nodeIconField: '',
         nodeColorLabel: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
         nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-        nodeColor: [],
-        nodeNameColor: [],
+        nodeIconLabel: '',
+        nodeColor: {},
+        nodeNameColor: {},
+        nodeIcon: {},
         nodeNameColorAdditionalInfo: {
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE': 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT': 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT': 'LNG_EVENT_FIELD_LABEL_DATE'
         },
-        edgeColor: []
+        edgeColor: {}
     };
 
     constructor(
@@ -123,7 +132,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private genericDataService: GenericDataService
     ) {}
 
     ngOnInit() {
@@ -134,6 +144,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+
+        this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
+        this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
+        this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -351,32 +365,49 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
         this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+        this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
         // set legend labels
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
         this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
         this.legend.edgeColorLabel = this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
+        this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
         // re-initialize legend entries
-        this.legend.nodeColor = [];
-        this.legend.nodeNameColor = [];
-        this.legend.edgeColor = [];
+        this.legend.nodeColor = {};
+        this.legend.nodeColorKeys = [];
+        this.legend.nodeNameColor = {};
+        this.legend.nodeNameColorKeys = [];
+        this.legend.edgeColor = {};
+        this.legend.edgeColorKeys = [];
+        this.legend.nodeIcon = {};
+        this.legend.nodeIconKeys = [];
         // set legend entries
         const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeColorReferenceDataEntries, (value, key) => {
             this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.nodeColorKeys = Object.keys(this.legend.nodeColor);
         const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
         _.forEach(nodeNameColorReferenceDataEntries, (value, key) => {
             this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
         const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
         _.forEach(edgeColorReferenceDataEntries, (value, key) => {
             this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
         });
+        this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+        if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
+            const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
+            _.forEach(nodeIconReferenceDataEntries, (value, key) => {
+                this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
+            });
+            this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
+        }
     }
 
     /**
-     * initialize the reference data objects needed for legend
-     * @returns {Observable<any>}
+     * initialize reference data objects with the needed entities
+     * @returns {Observable<any[]>}
      */
     private initializeReferenceData() {
         // call observables in parallel
