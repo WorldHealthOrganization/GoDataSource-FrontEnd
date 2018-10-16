@@ -1407,6 +1407,7 @@ export const EnglishUsLang = {
          * Sync Logs fields
          */
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL': 'Server URL',
+        'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL_DESCRIPTION': '',
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID': 'Client ID',
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_START_DATE': 'Action Start Date',
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_ACTION_COMPLETION_DATE': 'Action Completion Date',
@@ -1419,10 +1420,13 @@ export const EnglishUsLang = {
          * Sync Logs List page
          */
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE': 'Sync Logs',
-        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON': 'Remove logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON': 'Remove sync logs',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE': 'Sync log deleted!',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE': 'Sync logs deleted!',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR': 'View Error details',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE': 'Remove sync logs',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_DELETE_BUTTON': 'Delete',
 
         /**
          * Client Application fields

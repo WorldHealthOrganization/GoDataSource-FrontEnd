@@ -6,6 +6,7 @@
             <div class="topnav-actions">
                 <!-- Delete sync logs -->
                 <button
+                    *ngIf="hasSysConfigWriteAccess()"
                     class="button-primary"
                     mat-raised-button
                     color="primary"

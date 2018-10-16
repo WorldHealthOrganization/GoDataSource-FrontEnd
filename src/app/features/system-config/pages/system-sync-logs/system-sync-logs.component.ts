@@ -11,12 +11,17 @@ import { SystemSyncLogDataService } from '../../../../core/services/data/system-
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { MatDialogRef } from '@angular/material';
+import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -40,6 +45,9 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
     syncLogsListCount$: Observable<any>;
     syncLogsStatusList$: Observable<any>;
 
+    // upstream servers
+    upstreamServerList: LabelValuePair[];
+
     // outbreaks
     outbreaks: OutbreakModel[];
     mappedOutbreaks: {
@@ -58,7 +66,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         private systemSyncLogDataService: SystemSyncLogDataService,
         private genericDataService: GenericDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private systemSettingsDataService: SystemSettingsDataService
     ) {
         super(
             snackbarService
@@ -74,6 +83,18 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
 
         // retrieve sync logs
         this.syncLogsStatusList$ = this.genericDataService.getSyncLogStatusList();
+
+        // upstream servers
+        this.systemSettingsDataService
+            .getSystemSettings()
+            .subscribe((settings: SystemSettingsModel) => {
+                this.upstreamServerList = _.map(_.get(settings, 'upstreamServers', []), (upstreamServer: SystemUpstreamServerModel) => {
+                    return new LabelValuePair(
+                        upstreamServer.name,
+                        upstreamServer.url
+                    );
+                });
+            });
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -232,5 +253,51 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                 ]
             }))
             .subscribe();
+    }
+
+    /**
+     * Delete all sync logs from a specific server
+     */
+    deleteServerSyncLogs() {
+        this.dialogService
+            .showInput(new DialogConfiguration({
+                message: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE',
+                yesLabel: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_DELETE_BUTTON',
+                fieldsList: [
+                    // upstream server url
+                    new DialogField({
+                        name: 'syncServerUrl',
+                        placeholder: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL',
+                        description: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL_DESCRIPTION',
+                        inputOptions: this.upstreamServerList,
+                        inputOptionsMultiple: false,
+                        required: true
+                    })
+                ]
+            })).subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // construct query
+                    const qb = new RequestQueryBuilder();
+                    qb.filter.byEquality(
+                        'syncServerUrl',
+                        answer.inputValue.value.syncServerUrl
+                    );
+
+                    // send request
+                    this.systemSyncLogDataService
+                        .deleteSyncLogs(qb)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            // display success message
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SERVER_SUCCESS_MESSAGE');
+
+                            // refresh
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
     }
 }

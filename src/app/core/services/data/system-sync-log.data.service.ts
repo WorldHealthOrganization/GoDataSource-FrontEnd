@@ -60,4 +60,15 @@ export class SystemSyncLogDataService {
     deleteSyncLog(syncLogId: string): Observable<any> {
         return this.http.delete(`sync-logs/${syncLogId}`);
     }
+
+    /**
+     * Delete an existing Sync log
+     * @returns {Observable<any>}
+     */
+    deleteSyncLogs(
+        queryBuilder: RequestQueryBuilder
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.delete(`sync-logs?where=${whereFilter}`);
+    }
 }
