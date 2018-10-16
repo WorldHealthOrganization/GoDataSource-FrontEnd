@@ -36,7 +36,7 @@ export class CaseModel {
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
-    outcomeId: string
+    outcomeId: string;
     deleted: boolean;
 
     relationships: {
@@ -76,7 +76,7 @@ export class CaseModel {
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
         this.deceased = _.get(data, 'deceased');
         this.dateDeceased = _.get(data, 'dateDeceased');
-        this.safetyBurial= _.get(data, 'safetyBurial');
+        this.safetyBurial = _.get(data, 'safetyBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
