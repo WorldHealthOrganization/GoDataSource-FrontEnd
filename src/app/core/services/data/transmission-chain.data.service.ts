@@ -225,6 +225,7 @@ export class TransmissionChainDataService {
                             }
                         } else if (colorCriteria.nodeLabel === 'location') {
                             // TODO display location name
+                            console.log(node);
                             if (node.type !== EntityType.EVENT) {
                                 if (node.type === EntityType.CASE) {
                                     const case1 = new CaseModel(node.model);
