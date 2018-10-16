@@ -48,8 +48,8 @@ export class SystemSyncLogDataService {
     getSyncLogsCount(
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-        const filter = queryBuilder.buildQuery();
-        return this.http.get(`sync-logs/count?filter=${filter}`);
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`sync-logs/count?where=${whereFilter}`);
     }
 
     /**

@@ -70,6 +70,7 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_BUTTON_SAVE': 'Save',
         'LNG_COMMON_BUTTON_CANCEL': 'Cancel',
+        'LNG_COMMON_BUTTON_CLOSE': 'Close',
         'LNG_COMMON_BUTTON_BACK': 'Back',
         'LNG_COMMON_BUTTON_ADD': 'Add',
         'LNG_COMMON_BUTTON_MODIFY': 'Modify',
@@ -1421,6 +1422,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON': 'Remove logs',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE': 'Sync log deleted!',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR': 'View Error details',
 
         /**
          * Client Application fields

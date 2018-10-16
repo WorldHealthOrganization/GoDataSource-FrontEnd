@@ -226,6 +226,13 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+                    <button
+                        *ngIf="item.error"
+                        mat-menu-item
+                        (click)="viewError(item)">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR' | translate }}
+                    </button>
+
                     <ng-container
                         *ngIf="hasSysConfigWriteAccess()">
                         <button

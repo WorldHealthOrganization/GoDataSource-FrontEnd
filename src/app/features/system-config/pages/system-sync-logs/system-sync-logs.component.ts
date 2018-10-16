@@ -11,11 +11,12 @@ import { SystemSyncLogDataService } from '../../../../core/services/data/system-
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -210,5 +211,26 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * View Error details
+     * @param systemSyncLogModel
+     */
+    viewError(systemSyncLogModel: SystemSyncLogModel) {
+        this.dialogService
+            .showConfirm(new DialogConfiguration({
+                message: systemSyncLogModel.error,
+                addDefaultButtons: false,
+                buttons: [
+                    new DialogButton({
+                        label: 'LNG_COMMON_BUTTON_CLOSE',
+                        clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                            dialogHandler.close();
+                        }
+                    })
+                ]
+            }))
+            .subscribe();
     }
 }
