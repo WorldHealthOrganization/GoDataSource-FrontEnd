@@ -32,7 +32,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
 
-    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -150,7 +149,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(name)'
+                'label': 'data(name)',
+                'background-image': 'data(picture)',
+                'height': 30,
+                'width': 30,
+                'background-fit': 'cover',
+                'border-color': 'data(nodeColor)',
+                'border-width': 3
             }
         },
         {
@@ -172,7 +177,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
-                'display': 'data(displayTimeline)'
+                'display': 'data(displayTimeline)',
+                'background-image': 'data(picture)',
+                'height': 30,
+                'width': 30,
+                'background-fit': 'cover',
+                'border-color': 'data(nodeColor)',
+                'border-width': 3
             }
         },
         {
@@ -206,6 +217,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
+
     }
 
     public ngOnChanges(): any {
