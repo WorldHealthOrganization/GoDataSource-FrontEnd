@@ -47,6 +47,16 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+
+    // Inconsistencies
+    {
+        path: ':outbreakId/inconsistencies',
+        component: fromPages.InconsistenciesListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_OUTBREAK]
+        }
     }
 ];
 

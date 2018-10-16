@@ -4,6 +4,7 @@ import { DocumentModel } from './document.model';
 import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
+import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 
 export class CaseModel {
@@ -43,6 +44,8 @@ export class CaseModel {
 
     dob: string;
     age: AgeModel;
+
+    inconsistencies: InconsistencyModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -87,6 +90,11 @@ export class CaseModel {
 
         this.relationships = _.get(data, 'relationships', []);
         this.deleted = _.get(data, 'deleted');
+
+        this.inconsistencies = _.get(data, 'inconsistencies', []);
+        _.each(this.inconsistencies, (inconsistency, index) => {
+            this.inconsistencies[index] = new InconsistencyModel(inconsistency);
+        });
     }
 
     /**
