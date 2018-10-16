@@ -38,6 +38,7 @@
                         [required]="required"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
+                        [disabled]="disabled"
                         [maxDate]="serverToday"
                         app-date-validator
                         [dateSameOrBefore]="serverToday"
