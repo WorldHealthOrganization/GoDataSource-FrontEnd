@@ -134,7 +134,8 @@ export class DialogService {
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
         yesLabel?: string,
-        queryBuilder?: RequestQueryBuilder
+        queryBuilder?: RequestQueryBuilder,
+        queryBuilderClearOthers?: string[]
     }) {
         // default values
         if (!data.extensionPlaceholder) {
@@ -158,6 +159,14 @@ export class DialogService {
         }
         if (!data.yesLabel) {
             data.yesLabel = 'LNG_COMMON_LABEL_EXPORT';
+        }
+        if (_.isEmpty(data.queryBuilderClearOthers)) {
+            data.queryBuilderClearOthers = [
+                'includedRelations',
+                'filter',
+                'sort',
+                'deleted'
+            ];
         }
 
         // construct list of inputs that we need in the dialog
@@ -200,6 +209,22 @@ export class DialogService {
             );
         }
 
+        // construct query builder
+        let qb: RequestQueryBuilder;
+        if (
+            data.queryBuilder &&
+            !data.queryBuilder.isEmpty()
+        ) {
+            if (_.isEmpty(data.queryBuilderClearOthers)) {
+                qb = _.cloneDeep(data.queryBuilder);
+            } else {
+                qb = new RequestQueryBuilder();
+                _.each(data.queryBuilderClearOthers, (property: string) => {
+                    qb[property] = _.cloneDeep(data.queryBuilder[property]);
+                });
+            }
+        }
+
         // display dialog
         this.showInput(new DialogConfiguration({
                 message: data.message,
@@ -212,7 +237,7 @@ export class DialogService {
                         .exportData(
                             data.url,
                             answer.inputValue.value,
-                            data.queryBuilder
+                            qb
                         ).catch((err) => {
                         this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
                         return ErrorObservable.create(err);

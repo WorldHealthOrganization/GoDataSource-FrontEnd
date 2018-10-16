@@ -2,6 +2,21 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <app-export-button
+                    *ngIf="exportFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
+                    [url]="exportFollowUpsUrl"
+                    [fileName]="followUpsDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
+                </app-export-button>
+            </div>
         </div>
     </ng-container>
 </app-topnav>
@@ -63,12 +78,6 @@
                                 mat-menu-item
                                 (click)="exportSelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
-                            </button>
-                            <button
-                                *ngIf="exportFollowUpsUrl"
-                                mat-menu-item
-                                (click)="exportEntireListOfFollowUps()">
-                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_LIST_FOLLOW_UPS' | translate }}
                             </button>
                         </mat-menu>
                     </div>

@@ -327,7 +327,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
-        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_LIST_CASES': 'Export entire list',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
         'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
         'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
@@ -705,7 +704,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
-        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_LIST_CONTACTS': 'Export entire list',
         'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE': 'Convert to case',
         'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Contact restored!',
@@ -816,7 +814,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL': 'Follow-up days',
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS': 'Modify the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_LIST_FOLLOW_UPS': 'Export entire list',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
 
@@ -1175,7 +1172,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS': 'Export the selected outbreaks',
-        'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_LIST_OUTBREAKS': 'Export entire list',
         'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON': 'Import Outbreak Data',
 
         /**

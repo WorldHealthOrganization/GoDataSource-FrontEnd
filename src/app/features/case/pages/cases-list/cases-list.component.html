@@ -40,7 +40,8 @@
                     [allowedExportTypes]="allowedExportTypes"
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields">
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <ng-container *app-selected-outbreak-is-active>
@@ -127,12 +128,6 @@
                                 mat-menu-item
                                 (click)="exportSelectedCases()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES' | translate }}
-                            </button>
-                            <button
-                                *ngIf="exportCasesUrl"
-                                mat-menu-item
-                                (click)="exportEntireListOfCases()">
-                                {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_LIST_CASES' | translate }}
                             </button>
                         </mat-menu>
                     </div>

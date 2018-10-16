@@ -77,7 +77,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
-    exportQueryBuilder: RequestQueryBuilder;
 
     serverToday: Moment = null;
 
@@ -321,9 +320,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             }
                         }]
                     }, true);
-
-                    // use the same query builder to export follow-ups
-                    this.exportQueryBuilder = _.cloneDeep(this.queryBuilder);
 
                     // finished configuring query builder
                     observer.next();
@@ -572,27 +568,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
             // // optional
             allowedExportTypes: this.allowedExportTypes,
             queryBuilder: qb,
-            displayEncrypt: true,
-            displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
-        });
-    }
-
-    /**
-     * Export filtered list
-     */
-    exportEntireListOfFollowUps() {
-        // display export dialog
-        this.dialogService.showExportDialog({
-            // required
-            message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
-            url: this.exportFollowUpsUrl,
-            fileName: this.followUpsDataExportFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
-
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
-            queryBuilder: _.cloneDeep(this.queryBuilder),
             displayEncrypt: true,
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields

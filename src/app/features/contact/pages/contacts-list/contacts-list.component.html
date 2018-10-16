@@ -13,7 +13,8 @@
                     [allowedExportTypes]="allowedExportTypes"
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields">
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <button
@@ -83,12 +84,6 @@
                                 mat-menu-item
                                 (click)="exportSelectedContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
-                            </button>
-                            <button
-                                *ngIf="exportContactsUrl"
-                                mat-menu-item
-                                (click)="exportEntireListOfContacts()">
-                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_LIST_CONTACTS' | translate }}
                             </button>
                         </mat-menu>
                     </div>

@@ -318,27 +318,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Export filtered list
-     */
-    exportEntireListOfOutbreaks() {
-        // display export dialog
-        this.dialogService.showExportDialog({
-            // required
-            message: 'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE',
-            url: this.exportOutbreaksUrl,
-            fileName: this.outbreaksDataExporFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
-
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
-            queryBuilder: _.cloneDeep(this.queryBuilder),
-            displayEncrypt: true,
-            displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
-        });
-    }
-
-    /**
      * Clone an existing outbreak
      * @param {OutbreakModel} outbreak
      */

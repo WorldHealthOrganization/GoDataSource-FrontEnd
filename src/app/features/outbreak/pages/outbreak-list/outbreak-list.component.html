@@ -13,7 +13,8 @@
                     [allowedExportTypes]="allowedExportTypes"
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields">
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <button
@@ -77,11 +78,6 @@
                                 mat-menu-item
                                 (click)="exportSelectedOutbreaks()">
                                 {{ 'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS' | translate }}
-                            </button>
-                            <button
-                                mat-menu-item
-                                (click)="exportEntireListOfOutbreaks()">
-                                {{ 'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_LIST_OUTBREAKS' | translate }}
                             </button>
                         </mat-menu>
                     </div>

@@ -20,7 +20,7 @@
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
                     [anonymizeFields]="anonymizeFields"
-                    [queryBuilder]="exportQueryBuilder">
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <button *ngIf="!showPastFollowUps" mat-raised-button (click)="switchToPastFollowUps()">
@@ -91,12 +91,6 @@
                                 mat-menu-item
                                 (click)="exportSelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
-                            </button>
-                            <button
-                                *ngIf="exportFollowUpsUrl"
-                                mat-menu-item
-                                (click)="exportEntireListOfFollowUps()">
-                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_LIST_FOLLOW_UPS' | translate }}
                             </button>
                         </mat-menu>
                     </div>
