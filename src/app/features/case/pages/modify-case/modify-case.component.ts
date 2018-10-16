@@ -46,6 +46,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     occupationsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -82,6 +83,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
         // retrieve query params
         this.route.queryParams
@@ -219,7 +221,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
-
                     // determine parent onset dates
                     const uniqueDates: {} = {};
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
