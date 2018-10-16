@@ -191,7 +191,13 @@ export abstract class ListComponent {
      * Sort asc / desc by specific fields
      * @param data
      */
-    public sortBy(data) {
+    public sortBy(
+        data: any,
+        objectDetailsSort?: {
+            [property: string]: string[]
+        }
+    ) {
+        // sort information
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
 
@@ -212,8 +218,23 @@ export abstract class ListComponent {
             property &&
             direction
         ) {
-            // apply sort
-            this.queryBuilder.sort.by(property, direction);
+            // add sorting criteria
+            if (
+                objectDetailsSort &&
+                objectDetailsSort[property]
+            ) {
+                _.each(objectDetailsSort[property], (childProperty: string) => {
+                    this.queryBuilder.sort.by(
+                        `${property}.${childProperty}`,
+                        direction
+                    );
+                });
+            } else {
+                this.queryBuilder.sort.by(
+                    property,
+                    direction
+                );
+            }
         }
 
         // refresh list
@@ -268,6 +289,22 @@ export abstract class ListComponent {
      */
     filterByRangeField(property: string, value: FormRangeModel) {
         this.queryBuilder.filter.byRange(property, value);
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
+     * Filter the list by an age range field ('from' / 'to')
+     * @param {string} property
+     * @param {FormRangeModel} value Object with 'from' and 'to' properties
+     */
+    filterByAgeRangeField(
+        property: string,
+        value: FormRangeModel
+    ) {
+        // filter by age range
+        this.queryBuilder.filter.byAgeRange(property, value);
 
         // refresh list
         this.needsRefreshList();

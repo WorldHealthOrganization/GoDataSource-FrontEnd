@@ -20,6 +20,7 @@
                                 name="name"
                                 [ngModel]="clusterData.name"
                                 [placeholder]="'LNG_CLUSTER_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_CLUSTER_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
                                 maxlength="200"
                                 [disabled]="viewOnly">
@@ -34,6 +35,7 @@
                             name="description"
                             [ngModel]="clusterData.description"
                             [placeholder]="'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION' | translate"
+                            tooltip="LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
                             [disabled]="viewOnly">
                         </app-form-textarea>
 

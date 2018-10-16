@@ -20,6 +20,7 @@
                             name="firstName"
                             [(ngModel)]="user.firstName"
                             [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly">
                         </app-form-input>
@@ -28,6 +29,7 @@
                             name="lastName"
                             [(ngModel)]="user.lastName"
                             [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION"
                             required="true"
                             [disabled]="viewOnly">
                         </app-form-input>
@@ -36,6 +38,7 @@
                             name="email"
                             [(ngModel)]="user.email"
                             [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION"
                             required="true"
                             app-email-validator
                             [disabled]="viewOnly">
@@ -45,6 +48,7 @@
                             name="roleIds"
                             [(ngModel)]="user.roleIds"
                             [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION"
                             required="true"
                             [options]="rolesList$ | async"
                             optionLabelKey="name"
@@ -59,6 +63,7 @@
                             name="activeOutbreakId"
                             [(ngModel)]="user.activeOutbreakId"
                             [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"
                             optionLabelKey="name"
                             optionValueKey="id"
                             optionTooltipKey="description"
@@ -66,12 +71,12 @@
                             [disabled]="viewOnly">
                         </app-form-select>
 
-
                         <app-form-input
                             type="password"
                             name="password"
                             [(ngModel)]="user.password"
                             [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD' | translate"
+                            tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION"
                             app-password-validator
                             app-trigger-validation-for="passwordConfirm"
                             [disabled]="viewOnly">
@@ -82,6 +87,7 @@
                             name="passwordConfirm"
                             [(ngModel)]="passwordConfirmModel"
                             [placeholder]="'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD' | translate"
+                            tooltip="LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD_DESCRIPTION"
                             [required]="!!user.password"
                             app-equal-validator="password"
                             [disabled]="viewOnly">

@@ -16,10 +16,7 @@ import { ElementBase } from '../../core/index';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { Moment } from 'moment';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -55,23 +52,7 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
-    _placeholder: string;
-    @Input() set placeholder(placeholder: string) {
-        this._placeholder = placeholder;
-
-        if (
-            this.authUser &&
-            this.placeholder
-        ) {
-            const labelValue = this.referenceDataDataService.stringifyGlossaryTerm(this.placeholder);
-            this.referenceDataDataService.getGlossaryItems().subscribe((glossaryData) => {
-                this.tooltip = _.isEmpty(glossaryData[labelValue]) ? null : glossaryData[labelValue];
-            });
-        }
-    }
-    get placeholder(): string {
-        return this._placeholder;
-    }
+    @Input() placeholder: string;
 
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
@@ -79,24 +60,33 @@ export class FormDatepickerComponent extends ElementBase<string> {
 
     @Input() maxDate: string | Moment;
     @Input() minDate: string | Moment;
-    @Input() tooltip: string = null;
+
+    private _tooltipToken: string;
+    private _tooltip: string;
+    @Input() set tooltip(tooltip: string) {
+        this._tooltipToken = tooltip;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+    }
+    get tooltip(): string {
+        return this._tooltip;
+    }
 
     public identifier = `form-datepicker-${FormDatepickerComponent.identifier++}`;
 
     @Output() optionChanged = new EventEmitter<any>();
 
-    authUser: UserModel;
-
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService
+        private i18nService: I18nService
     ) {
         super(controlContainer, validators, asyncValidators);
 
-        this.authUser = this.authDataService.getAuthenticatedUser();
+        // on language change..we need to translate again the token
+        this.i18nService.languageChangedEvent.subscribe(() => {
+            this.tooltip = this._tooltipToken;
+        });
     }
 
     /**

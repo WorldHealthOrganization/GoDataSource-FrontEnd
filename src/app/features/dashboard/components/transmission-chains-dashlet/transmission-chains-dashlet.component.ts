@@ -170,66 +170,89 @@ export class TransmissionChainsDashletComponent implements OnInit {
     displayChainsOfTransmission() {
         this.mapColorCriteria();
         if (this.selectedOutbreak) {
-            const requestQueryBuilder = new RequestQueryBuilder();
             // create queryBuilder for filters
+            const requestQueryBuilder = new RequestQueryBuilder();
             if (this.filters) {
-                const conditions: any = {};
-                // create conditions based on filters
                 // occupation
                 if (!_.isEmpty(this.filters.occupation)) {
-                    conditions['occupation'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.occupation) + '/i'};
-                }
-                // gender
-                if (!_.isEmpty(this.filters.gender)) {
-                    conditions['gender'] = {inq: this.filters.gender};
-                }
-                // case classification
-                if (!_.isEmpty(this.filters.classification)) {
-                    conditions['classification'] = this.filters.classification;
-                }
-                // case classification
-                if (!_.isEmpty(this.filters.locationId)) {
-                    conditions['addresses.locationId'] = this.filters.locationId;
-                }
-                // firstName
-                if (!_.isEmpty(this.filters.firstName)) {
-                    conditions['firstName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.firstName) + '/i'};
-                }
-                // lastName
-                if (!_.isEmpty(this.filters.lastName)) {
-                    conditions['lastName'] = {regexp: '/^' + RequestFilter.escapeStringForRegex(this.filters.lastName) + '/i'};
-                }
-                // age
-                if (!_.isEmpty(this.filters.age)) {
-                    if (this.filters.age.from && this.filters.age.to) {
-                        conditions['age'] = {between: [this.filters.age.from, this.filters.age.to]};
-                    } else if (this.filters.age.from) {
-                        conditions['age'] = {gt: this.filters.age.from};
-                    } else {
-                        conditions['age'] = {lt: this.filters.age.to};
-                    }
-                }
-                // date of reporting
-                if (!_.isEmpty(this.filters.date)) {
-                    if (!_.isEmpty(this.filters.date.startDate) && !_.isEmpty(this.filters.date.endDate)) {
-                        conditions['dateOfReporting'] = {between: [this.filters.date.startDate, this.filters.date.endDate]};
-                    } else if (!_.isEmpty(this.filters.date.startDate)) {
-                        conditions['dateOfReporting'] = {gt: this.filters.date.startDate};
-                    } else {
-                        conditions['dateOfReporting'] = {lt: this.filters.date.endDate};
-                    }
+                    requestQueryBuilder.filter.byEquality(
+                        'occupation',
+                        this.filters.occupation
+                    );
                 }
 
-                requestQueryBuilder.filter.where({
+                // gender
+                if (!_.isEmpty(this.filters.gender)) {
+                    requestQueryBuilder.filter.bySelect(
+                        'gender',
+                        this.filters.gender,
+                        true,
+                        null
+                    );
+                }
+
+                // case classification
+                if (!_.isEmpty(this.filters.classification)) {
+                    requestQueryBuilder.filter.byEquality(
+                        'classification',
+                        this.filters.classification
+                    );
+                }
+
+                // case location
+                if (!_.isEmpty(this.filters.locationId)) {
+                    requestQueryBuilder.filter.byEquality(
+                        'addresses.locationId',
+                        this.filters.locationId
+                    );
+                }
+
+                // firstName
+                if (!_.isEmpty(this.filters.firstName)) {
+                    requestQueryBuilder.filter.byText(
+                        'firstName',
+                        this.filters.firstName
+                    );
+                }
+
+                // lastName
+                if (!_.isEmpty(this.filters.lastName)) {
+                    requestQueryBuilder.filter.byText(
+                        'lastName',
+                        this.filters.lastName
+                    );
+                }
+
+                // age
+                if (!_.isEmpty(this.filters.age)) {
+                    requestQueryBuilder.filter.byAgeRange(
+                        'age',
+                        this.filters.age
+                    );
+                }
+
+                // date of reporting
+                if (!_.isEmpty(this.filters.date)) {
+                    requestQueryBuilder.filter.byDateRange(
+                        'dateOfReporting',
+                        this.filters.date
+                    );
+                }
+            }
+
+            // configure
+            this.filters.filtersDefault = this.filtersDefault();
+            const rQB = new RequestQueryBuilder();
+            if (!requestQueryBuilder.filter.isEmpty()) {
+                rQB.filter.where({
                     person: {
-                        where: conditions
+                        where: requestQueryBuilder.filter.generateFirstCondition()
                     }
                 });
             }
 
-            this.filters.filtersDefault = this.filtersDefault();
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder).subscribe((chains) => {
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
                 } else {

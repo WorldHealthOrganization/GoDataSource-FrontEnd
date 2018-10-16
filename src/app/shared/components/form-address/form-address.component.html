@@ -8,7 +8,8 @@
                     <app-form-select
                         [name]="name + '[typeId]'"
                         [(ngModel)]="address.typeId"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_TYPE' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         [options]="addressTypes$ | async"
@@ -36,6 +37,7 @@
                         [(ngModel)]="address.date"
                         [required]="required"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
                         [maxDate]="serverToday"
                         app-date-validator
                         [dateSameOrBefore]="serverToday"
@@ -68,6 +70,7 @@
                         [name]="name + '[locationId]'"
                         [(ngModel)]="address.locationId"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (changed)="onChange()">
@@ -95,6 +98,7 @@
                         [name]="name + '[city]'"
                         [(ngModel)]="address.city"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (input)="onChange()">
@@ -120,6 +124,7 @@
                         [name]="name + '[postalCode]'"
                         [(ngModel)]="address.postalCode"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (input)="onChange()">
@@ -145,6 +150,7 @@
                         [name]="name + '[addressLine1]'"
                         [(ngModel)]="address.addressLine1"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (input)="onChange()">

@@ -6,7 +6,7 @@
             {{option.label | translate}}
         </mat-radio-button>
     </mat-radio-group>
-    <span [fxShow]="tooltip !== null" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
+    <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
 
     <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>
 

@@ -261,6 +261,10 @@
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate}}
                     </button>
                     <ng-container *ngIf="hasOutbreakWriteAccess()">
+                        <button mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
+                            {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
+                        </button>
+
                         <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{ 'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>

@@ -253,6 +253,66 @@ export class RequestFilter {
     }
 
     /**
+     * Filter by an age range field ('from' / 'to')
+     * @param {string} property
+     * @param value Object with 'from' and 'to' properties
+     * @param {boolean} replace
+     * @returns {RequestFilter}
+     */
+    byAgeRange(property: string, value: any, replace: boolean = true) {
+        // remove conditions
+        this.remove(`${property}.months`);
+        this.remove(`${property}.years`);
+        this.removeCondition({
+            or: [
+                { [`${property}.months`]: true },
+                { [`${property}.years`]: true }
+            ]
+        });
+
+        // determine what filters we need to add
+        const fromValue: number = _.isNumber(value.from) ? value.from : null;
+        const toValue: number = _.isNumber(value.to) ? value.to : null;
+
+        // do we need to add any conditions ?
+        if (
+            fromValue !== null ||
+            toValue !== null
+        ) {
+            // construct array of conditions
+            let operator;
+            let valueToCompare;
+
+            // between
+            if (
+                fromValue !== null &&
+                toValue !== null
+            ) {
+                operator = 'between';
+                valueToCompare = [fromValue, toValue];
+            } else if (
+                fromValue !== null
+            ) {
+                operator = 'gte';
+                valueToCompare = fromValue;
+            } else {
+                operator = 'lte';
+                valueToCompare = toValue;
+            }
+
+            // single condition ( either years or months )
+            this.where({
+                [`${property}.years`]: {
+                    [operator]: valueToCompare
+                }},
+                true
+            );
+        }
+
+        return this;
+    }
+
+    /**
      * Filter by date range
      * @param property
      * @param value
