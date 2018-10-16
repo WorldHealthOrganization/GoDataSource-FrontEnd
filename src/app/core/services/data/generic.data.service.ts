@@ -110,6 +110,13 @@ export class GenericDataService {
     }
 
     /**
+     * Retrieve backup status list
+     */
+    getSyncLogStatusList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
+    }
+
+    /**
      * Retrieve the list of criteria used for node color - radio button
      * @returns {Observable<any[]>}
      */

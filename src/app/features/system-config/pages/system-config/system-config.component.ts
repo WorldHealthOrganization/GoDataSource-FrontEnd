@@ -90,7 +90,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         this.backupStatusList$ = this.genericDataService.getBackupStatusList();
 
         // retrieve backups
-        this.needsRefreshList();
+        this.needsRefreshList(true);
     }
 
     /**
@@ -157,6 +157,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'location',
                     placeholder: 'LNG_BACKUP_FIELD_LABEL_LOCATION',
+                    description: 'LNG_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION',
                     required: true,
                     value: this.settings.dataBackup.location
                 }),
@@ -165,6 +166,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'modules',
                     placeholder: 'LNG_BACKUP_FIELD_LABEL_MODULES',
+                    description: 'LNG_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION',
                     inputOptions: this.moduleList,
                     inputOptionsMultiple: true,
                     required: true,
@@ -285,7 +287,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                             }
                         });
                 },
-                300
+                Constants.DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN
             );
         };
 
@@ -353,6 +355,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'location',
                     placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION',
+                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION',
                     required: true,
                     value: this.settings.dataBackup.location
                 }),
@@ -361,6 +364,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'backupInterval',
                     placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL',
+                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL_DESCRIPTION',
                     required: true,
                     value: this.settings.dataBackup.backupInterval,
                     type: 'number'
@@ -370,6 +374,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'dataRetentionInterval',
                     placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL',
+                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION',
                     required: true,
                     value: this.settings.dataBackup.dataRetentionInterval,
                     type: 'number'
@@ -379,6 +384,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 new DialogField({
                     name: 'modules',
                     placeholder: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES',
+                    description: 'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION',
                     inputOptions: this.moduleList,
                     inputOptionsMultiple: true,
                     required: true,

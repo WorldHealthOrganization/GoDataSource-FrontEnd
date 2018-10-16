@@ -30,9 +30,11 @@ export enum ApplyListFilter {
 export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+    static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+    static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
@@ -109,6 +111,28 @@ export class Constants {
         PENDING: {
             label: 'LNG_BACKUP_STATUS_PENDING',
             value: 'LNG_BACKUP_STATUS_PENDING'
+        }
+    };
+
+    /**
+     * System sync log status
+     */
+    static SYSTEM_SYNC_LOG_STATUS = {
+        SUCCESS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS',
+            value: 'LNG_SYNC_STATUS_SUCCESS'
+        },
+        SUCCESS_WITH_WARNINGS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS',
+            value: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS'
+        },
+        FAILED: {
+            label: 'LNG_SYNC_STATUS_FAILED',
+            value: 'LNG_SYNC_STATUS_FAILED'
+        },
+        IN_PROGRESS: {
+            label: 'LNG_SYNC_STATUS_IN_PROGRESS',
+            value: 'LNG_SYNC_STATUS_IN_PROGRESS'
         }
     };
 

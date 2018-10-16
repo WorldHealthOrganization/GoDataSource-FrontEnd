@@ -7,6 +7,24 @@
                 <ng-container
                     *ngIf="hasSysConfigWriteAccess() && settings && !waitForBackupIdToBeReady && !loading">
 
+                    <!-- Sync client applications -->
+                    <button
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        [routerLink]="['/system-config', 'system-client-applications']">
+                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON' | translate }}
+                    </button>
+
+                    <!-- Sync upstream servers -->
+                    <button
+                        class="button-primary"
+                        mat-raised-button
+                        color="primary"
+                        [routerLink]="['/system-config', 'system-upstream-sync']">
+                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON' | translate }}
+                    </button>
+
                     <!-- Modify settings -->
                     <button
                         class="button-primary"
@@ -39,7 +57,7 @@
             <button mat-raised-button (click)="resetFiltersToSideFilters()">
                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
             </button>
-            <button mat-raised-button (click)="needsRefreshList()">
+            <button mat-raised-button (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>

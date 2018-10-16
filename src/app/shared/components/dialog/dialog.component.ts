@@ -62,22 +62,26 @@ export class DialogField {
     public placeholder: string;
     public inputOptions: LabelValuePair[];
     public inputOptionsMultiple: boolean = false;
+    public inputOptionsClearable: boolean = true;
     public required: boolean = false;
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
     public disabled: boolean = false;
+    public description: string;
 
     constructor(data: {
         name: string,
         placeholder: string,
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
+        inputOptionsClearable?: boolean,
         required?: boolean,
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
-        disabled?: boolean
+        disabled?: boolean,
+        description?: string
     }) {
         Object.assign(
             this,
