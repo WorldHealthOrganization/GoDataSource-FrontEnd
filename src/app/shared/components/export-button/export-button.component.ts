@@ -28,6 +28,7 @@ export class ExportButtonComponent {
     @Input() yesLabel: string;
     @Input() fileName: string;
     @Input() queryBuilder: RequestQueryBuilder;
+    @Input() queryBuilderClearOthers: string[];
 
     /**
      * If file type is provided, allowedExportTypes will be ignored
@@ -56,7 +57,8 @@ export class ExportButtonComponent {
             yesLabel: this.yesLabel,
             fileName: this.fileName,
             buttonDownloadFile: this.buttonDownloadFile,
-            queryBuilder: this.queryBuilder
+            queryBuilder: this.queryBuilder,
+            queryBuilderClearOthers: this.queryBuilderClearOthers
         });
     }
 }
