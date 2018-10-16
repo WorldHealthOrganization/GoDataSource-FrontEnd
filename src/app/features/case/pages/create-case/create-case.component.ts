@@ -73,10 +73,6 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
         // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());
-        // ...and a hospitalization date range
-        this.caseData.hospitalizationDates.push(new DateRangeModel());
-        // ...and an isolation date range
-        this.caseData.isolationDates.push(new DateRangeModel());
 
         // get selected outbreak
         this.outbreakDataService
