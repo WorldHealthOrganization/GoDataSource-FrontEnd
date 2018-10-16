@@ -820,6 +820,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
 
         /**
          * Create Follow-up page
@@ -1321,6 +1323,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE': 'Node Icon',
 
 
         /**

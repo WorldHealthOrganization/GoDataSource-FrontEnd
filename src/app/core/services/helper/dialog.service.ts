@@ -127,6 +127,7 @@ export class DialogService {
 
         // optional
         extensionPlaceholder?: string,
+        fileType?: ExportDataExtension,
         allowedExportTypes?: ExportDataExtension[],
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
@@ -140,15 +141,19 @@ export class DialogService {
         if (!data.extensionPlaceholder) {
             data.extensionPlaceholder = 'LNG_COMMON_LABEL_EXPORT_TYPE';
         }
-        if (_.isEmpty(data.allowedExportTypes)) {
-            data.allowedExportTypes = [
-                ExportDataExtension.CSV,
-                ExportDataExtension.XLS,
-                ExportDataExtension.XLSX,
-                ExportDataExtension.XML,
-                ExportDataExtension.ODS,
-                ExportDataExtension.JSON
-            ];
+        if (data.fileType) {
+            data.allowedExportTypes = [data.fileType];
+        } else {
+            if (_.isEmpty(data.allowedExportTypes)) {
+                data.allowedExportTypes = [
+                    ExportDataExtension.CSV,
+                    ExportDataExtension.XLS,
+                    ExportDataExtension.XLSX,
+                    ExportDataExtension.XML,
+                    ExportDataExtension.ODS,
+                    ExportDataExtension.JSON
+                ];
+            }
         }
         if (!data.encryptPlaceholder) {
             data.encryptPlaceholder = 'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD';
@@ -172,7 +177,9 @@ export class DialogService {
                     );
                 }),
                 inputOptionsMultiple: false,
-                required: true
+                required: true,
+                value: data.fileType ? data.fileType : null,
+                disabled: !!data.fileType
             })
         ];
 
