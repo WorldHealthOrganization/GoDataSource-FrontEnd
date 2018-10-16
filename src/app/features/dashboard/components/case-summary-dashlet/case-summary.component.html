@@ -1,0 +1,13 @@
+<div fxLayout="column" fxFlex fxLayoutAlign="center">
+
+    <ngx-charts-pie-chart
+        class="case-summary-pie-chart"
+        [scheme]="{ domain: ['#4DB0A0'] }"
+        [results]="histogramResults"
+        [legend]="true"
+        [explodeSlices]="false"
+        [labels]="true"
+        [doughnut]="false">
+    </ngx-charts-pie-chart>
+
+</div>

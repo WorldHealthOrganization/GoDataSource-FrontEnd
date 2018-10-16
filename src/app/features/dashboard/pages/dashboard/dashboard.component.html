@@ -29,6 +29,17 @@
 
         </mat-card>
 
+        <mat-card class="page-section">
+
+            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
+
+            <!-- case summary pie chart -->
+            <app-case-summary-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-case-summary-dashlet>
+
+        </mat-card>
+
         <!-- KPIs -->
         <mat-card
             *ngFor="let group of kpiGroups"
