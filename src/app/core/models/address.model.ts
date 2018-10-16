@@ -93,11 +93,9 @@ export class AddressModel {
     /**
      * Clone class
      */
-    cleanObject(): Object {
+    sanitize(): Object {
         // create clone
-        const address = {
-            ...(this as any)
-        };
+        const address = _.cloneDeep(this);
 
         // remove properties that we don't want to save
         delete address.location;

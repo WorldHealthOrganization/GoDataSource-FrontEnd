@@ -194,9 +194,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                                             item.count,
                                             item.id,
                                             item.contactIDs,
-                                            refItem && refItem.colorCode ?
-                                                refItem.colorCode :
-                                                '#CCC'
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
                                         );
                                     });
                                 });

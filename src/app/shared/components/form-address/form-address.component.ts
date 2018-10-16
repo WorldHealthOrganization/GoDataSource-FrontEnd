@@ -79,7 +79,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
     getFilteredValue(): any {
         // strip unnecessary data
         return this.value ?
-            new AddressModel(this.address).cleanObject() :
+            new AddressModel(this.address).sanitize() :
             this.value;
     }
 

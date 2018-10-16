@@ -58,7 +58,7 @@ export class FormAddressListComponent extends ListBase<AddressModel> implements 
             _.map(
                 this.value,
                 (address: AddressModel) => {
-                    return new AddressModel(address).cleanObject();
+                    return new AddressModel(address).sanitize();
                 }
             ) :
             this.value;
