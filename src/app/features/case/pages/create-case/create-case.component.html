@@ -13,59 +13,6 @@
             <form #personalForm="ngForm">
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' | translate}}</ng-template>
 
-                <!-- Flagged section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="riskLevel"
-                                [(ngModel)]="caseData.riskLevel"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
-                                required="true"
-                                [options]="caseRiskLevelsList$ | async">
-                            </app-form-select>
-
-                            <app-form-datepicker
-                                name="dateOfReporting"
-                                [(ngModel)]="caseData.dateOfReporting"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                required="true"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="[
-                                    serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
-                                ]">
-                            </app-form-datepicker>
-
-                            <app-form-slide-toggle
-                                name="isDateOfReportingApproximate"
-                                [(ngModel)]="caseData.isDateOfReportingApproximate"
-                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
-                            </app-form-slide-toggle>
-
-                            <app-form-slide-toggle
-                                name="transferRefused"
-                                [(ngModel)]="caseData.transferRefused"
-                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
-                            </app-form-slide-toggle>
-                        </div>
-
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
-                        </app-form-textarea>
-
-                    </div>
-                </mat-card>
-
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
                     <div fxLayout="column">
@@ -138,6 +85,59 @@
                                 ageTooltip="LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION">
                             </app-form-age-dob>
                         </div>
+
+                    </div>
+                </mat-card>
+
+                <!-- Flagged section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-select
+                                name="riskLevel"
+                                [(ngModel)]="caseData.riskLevel"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_LEVEL' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+                                required="true"
+                                [options]="caseRiskLevelsList$ | async">
+                            </app-form-select>
+
+                            <app-form-datepicker
+                                name="dateOfReporting"
+                                [(ngModel)]="caseData.dateOfReporting"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                required="true"
+                                [maxDate]="serverToday"
+                                app-date-validator
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]">
+                            </app-form-datepicker>
+
+                            <app-form-slide-toggle
+                                name="isDateOfReportingApproximate"
+                                [(ngModel)]="caseData.isDateOfReportingApproximate"
+                                [label]="'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
+                            </app-form-slide-toggle>
+
+                            <app-form-slide-toggle
+                                name="transferRefused"
+                                [(ngModel)]="caseData.transferRefused"
+                                [label]="'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION">
+                            </app-form-slide-toggle>
+                        </div>
+
+                        <app-form-textarea
+                            name="riskReason"
+                            [(ngModel)]="caseData.riskReason"
+                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                        </app-form-textarea>
 
                     </div>
                 </mat-card>

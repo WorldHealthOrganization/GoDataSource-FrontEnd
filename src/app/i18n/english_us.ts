@@ -258,6 +258,12 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
+        'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
+
+        /**
+         * Outbreak date inconsistencies list page
+         */
+        'LNG_PAGE_LIST_INCONSISTENCIES_TITLE': 'Inconsistencies in key dates',
 
         /**
          * Case Fields
@@ -823,6 +829,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
 
         /**
          * Create Follow-up page
@@ -1170,6 +1178,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_TITLE': 'Outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE': 'Set Active',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE': 'Active outbreak changed successfully',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES': 'View Inconsistencies',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE': 'Outbreak deleted',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak successfully cloned',
         'LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME': '{{name}} Clone',
@@ -1582,6 +1591,16 @@ export const EnglishUsLang = {
         'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
         'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
         'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+
+        /**
+         * Inconsistency labels
+         */
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER': '"{{date1}}" is smaller than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL': '"{{date1}}" is smaller or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER': '"{{date1}}" is bigger than "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL': '"{{date1}}" is bigger or equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL': '"{{date1}}" is not equal to "{{date2}}"',
+        'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL': '"{{date1}}" is equal to "{{date2}}"',
 
         /**
          * Import data

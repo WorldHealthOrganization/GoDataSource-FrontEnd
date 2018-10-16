@@ -44,6 +44,9 @@ export class Constants {
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
 
+    // default color used by reference data
+    static DEFAULT_COLOR_REF_DATA = '#CCC';
+
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 

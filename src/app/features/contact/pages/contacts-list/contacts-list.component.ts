@@ -36,6 +36,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import 'rxjs/add/operator/mergeMap';
 
 @Component({
     selector: 'app-contacts-list',
@@ -181,16 +182,24 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
                 // get new contacts grouped by exposure types
                 if (this.selectedOutbreak) {
-                    this.countedNewContactsGroupedByExposureType$ = this.contactDataService
-                        .getNewContactsGroupedByExposureType(this.selectedOutbreak.id)
-                        .map((data: ExposureTypeGroupModel) => {
-                            return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
-                                return new CountedItemsListItem(
-                                    item.count,
-                                    item.id,
-                                    item.contactIDs
-                                );
-                            });
+                    this.countedNewContactsGroupedByExposureType$ = this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
+                        .mergeMap((refExposureTypeData: ReferenceDataCategoryModel) => {
+                            return this.contactDataService
+                                .getNewContactsGroupedByExposureType(this.selectedOutbreak.id)
+                                .map((data: ExposureTypeGroupModel) => {
+                                    return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refExposureTypeData.entries, { id: item.id });
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            item.id,
+                                            item.contactIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        );
+                                    });
+                                });
                         });
                 }
 
