@@ -141,7 +141,10 @@
 
                 <!-- Documents section -->
                 <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>
-                <app-form-document-list>
+                <app-form-document-list
+                    name="documents"
+                    [(ngModel)]="caseData.documents"
+                    [required]="true">
                 </app-form-document-list>
 
                 <div>
