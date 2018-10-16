@@ -80,6 +80,38 @@ export class Constants {
         // }
     };
 
+    /**
+     * System settings backup modules
+     */
+    static SYSTEM_BACKUP_MODULES = {
+        SYSTEM_CONFIGURATION: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',
+            value: 'System Configuration'
+        },
+        DATA: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_DATA',
+            value: 'Data'
+        }
+    };
+
+    /**
+     * System settings backup status
+     */
+    static SYSTEM_BACKUP_STATUS = {
+        SUCCESS: {
+            label: 'LNG_BACKUP_STATUS_SUCCESS',
+            value: 'LNG_BACKUP_STATUS_SUCCESS'
+        },
+        FAILED: {
+            label: 'LNG_BACKUP_STATUS_FAILED',
+            value: 'LNG_BACKUP_STATUS_FAILED'
+        },
+        PENDING: {
+            label: 'LNG_BACKUP_STATUS_PENDING',
+            value: 'LNG_BACKUP_STATUS_PENDING'
+        }
+    };
+
     // keep functionality
     static APPLY_LIST_FILTER = ApplyListFilter;
 

@@ -91,6 +91,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_BACKUP': 'Are you sure you want to delete this backup "{{location}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE': 'Restore Confirmation<br /><br />Notice: Restoring system data to selected state will revert all the data to the point of the backup ( removing any new data added ). Are you sure you want to continue?',
         'LNG_DIALOG_CONFIRM_DELETE_ICON': 'Are you sure you want to delete this icon: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE': 'Are you sure you want to convert contact: "{{name}}" to case?',
         'LNG_DIALOG_CONFIRM_DELETE_CONTACT': 'Are you sure you want to delete this contact: "{{name}}"?',
@@ -1055,9 +1057,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1': 'Answer 1',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2': 'Answer 2',
 
-
-
-
         /**
          * Forgot Password Page
          */
@@ -1297,6 +1296,47 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
 
+        /**
+         * Backup modules
+         */
+        'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION': 'System Configuration',
+        'LNG_BACKUP_MODULE_LABEL_SYSTEM_DATA': 'Data',
+
+        /**
+         * Backup Fields
+         */
+        'LNG_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_BACKUP_FIELD_LABEL_DATE': 'Date',
+        'LNG_BACKUP_FIELD_LABEL_STATUS': 'Status',
+        'LNG_BACKUP_FIELD_LABEL_ERROR': 'Error',
+
+        /**
+         * Automatic Backup Fields
+         */
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION': 'Location',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES': 'Modules',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL': 'Backup interval',
+        'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL': 'Retention interval',
+
+        /**
+         * System Config Main page
+         */
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE': 'Automatic backup settings',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON': 'Backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON': 'Create Backup & Restore',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON': 'Restore',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE': 'Backup initialized',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Automatic backup settings changed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_FAILED_MESSAGE': 'Backup failed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
 
         /**
          * Chains of Transmission

@@ -1,7 +1,8 @@
 <div
     class="dialog-main">
     <div
-        class="dialog-main-msg" [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
+        class="dialog-main-msg"
+        [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
     <!-- section for showDataDialog: display a list of label: value objects -->
@@ -97,19 +98,14 @@
         <div *ngIf="!confirmData?.data"
              fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
-                class="dialog-button"
+                *ngFor="let dialogButton of confirmData?.buttons"
                 mat-button
-                (click)="cancel()"
-                type="button">
-                {{ confirmData?.cancelLabel | translate:confirmData?.translateData }}
-            </button>
-            <button
+                type="button"
                 class="dialog-button"
-                mat-button
-                [disabled]="confirmData?.customInput && form?.invalid"
-                (click)="yes()"
-                type="button">
-                {{ confirmData?.yesLabel | translate:confirmData?.translateData }}
+                [ngClass]="dialogButton.cssClass"
+                (click)="dialogButton.clickCallback(dialogRef, dialogAnswerInputValue)"
+                [disabled]="dialogButton.disabled()">
+                {{ dialogButton.label | translate:confirmData?.translateData }}
             </button>
         </div>
     </form>
@@ -120,7 +116,7 @@
         <button
             class="dialog-button"
             mat-button
-            (click)="cancel()"
+            (click)="cancel(dialogRef)"
             type="button">
             {{ confirmData?.cancelLabel | translate }}
         </button>

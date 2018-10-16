@@ -20,6 +20,8 @@ import { EntityDataService } from './data/entity.data.service';
 import { TransmissionChainDataService } from './data/transmission-chain.data.service';
 import { ImportExportDataService } from './data/import-export.data.service';
 import { IconDataService } from './data/icon.data.service';
+import { SystemSettingsDataService } from './data/system-settings.data.service';
+import { SystemBackupDataService } from './data/system-backup.data.service';
 import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
 
 // import helper services
@@ -70,6 +72,8 @@ export const services: any[] = [
     TransmissionChainDataService,
     ImportExportDataService,
     IconDataService,
+    SystemSettingsDataService,
+    SystemBackupDataService,
 
     // guard services
     AuthGuard,
