@@ -152,7 +152,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(label)'
+                'label': 'data(label)',
+                'background-image': 'data(picture)',
+                'height': 30,
+                'width': 30,
+                'background-fit': 'cover',
+                'border-color': 'data(nodeColor)',
+                'border-width': 3
             }
         },
         {
@@ -174,7 +180,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'color': 'data(nodeNameColor)',
                 'label': 'data(labelTimeline)',
                 'text-wrap': 'wrap',
-                'display': 'data(displayTimeline)'
+                'display': 'data(displayTimeline)',
+                'background-image': 'data(picture)',
+                'height': 30,
+                'width': 30,
+                'background-fit': 'cover',
+                'border-color': 'data(nodeColor)',
+                'border-width': 3
             }
         },
         {

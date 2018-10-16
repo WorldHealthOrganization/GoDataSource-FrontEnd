@@ -188,15 +188,22 @@ export class TransmissionChainDataService {
                         }
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
-                        // set colors
+                        // set node color
                         if (Object.keys(colorCriteria.nodeColor).length) {
                             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                 nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                             }
                         }
+                        // set node label color
                         if (Object.keys(colorCriteria.nodeNameColor).length) {
                             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
+                            }
+                        }
+                        // set node icon
+                        if (Object.keys(colorCriteria.nodeIcon).length) {
+                            if ( colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]] ) {
+                                nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                             }
                         }
                         // determine label
@@ -275,17 +282,25 @@ export class TransmissionChainDataService {
                         if (allowAdd) {
                             const nodeData = new GraphNodeModel(nodeProps);
                             nodeData.type = node.type;
-                            // set colors
+                            // set node color
                             if (Object.keys(colorCriteria.nodeColor).length) {
                                 if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                     nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                                 }
                             }
+                            // set node label color
                             if (Object.keys(colorCriteria.nodeNameColor).length) {
                                 if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                     nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                                 }
                             }
+                            // set node icon
+                            if (Object.keys(colorCriteria.nodeIcon).length) {
+                                if ( colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]] ) {
+                                    nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
+                                }
+                            }
+
                             // determine label
                             if (colorCriteria.nodeLabel === 'name') {
                                 nodeData.label = nodeData.name;
