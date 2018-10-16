@@ -22,8 +22,7 @@ export class TransmissionChainDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     /**
      * Map Transmission chain to Chain model
@@ -207,33 +206,33 @@ export class TransmissionChainDataService {
                             }
                         }
                         // determine label
-                        if (colorCriteria.nodeLabel === 'name') {
+                        if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                             nodeData.label = nodeData.name;
-                        } else if (colorCriteria.nodeLabel === 'age-years') {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_YEARS.value) {
                             if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
                                 nodeData.label = node.model.age.years + ' ' + yearsLabel;
                             } else {
                                 nodeData.label = '';
                             }
-                        } else if (colorCriteria.nodeLabel === 'age-months') {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_MONTHS.value) {
                             if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
                                 nodeData.label = node.model.age.months + ' ' + monthsLabel;
                             } else {
                                 nodeData.label = '';
                             }
-                        } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
                             if (node.type === EntityType.CASE) {
                                 nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                             } else {
                                 nodeData.label = '';
                             }
-                        } else if (colorCriteria.nodeLabel === 'gender') {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
                             } else {
                                 nodeData.label = '';
                             }
-                        } else if (colorCriteria.nodeLabel === 'location') {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
                             nodeData.label = '';
                             if (node.type !== EntityType.EVENT) {
                                 const mainAddr = node.model.mainAddress;
@@ -302,33 +301,33 @@ export class TransmissionChainDataService {
                             }
 
                             // determine label
-                            if (colorCriteria.nodeLabel === 'name') {
+                            if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                                 nodeData.label = nodeData.name;
-                            } else if (colorCriteria.nodeLabel === 'age-years') {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_YEARS.value) {
                                 if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
                                     nodeData.label = node.model.age.years + ' ' + yearsLabel;
                                 } else {
                                     nodeData.label = '';
                                 }
-                            } else if (colorCriteria.nodeLabel === 'age-months') {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_MONTHS.value) {
                                 if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
                                     nodeData.label = node.model.age.months + ' ' + monthsLabel;
                                 } else {
                                     nodeData.label = '';
                                 }
-                            } else if (colorCriteria.nodeLabel === 'dateOfOnset') {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
                                 if (node.type === EntityType.CASE) {
                                     nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                                 } else {
                                     nodeData.label = '';
                                 }
-                            } else if (colorCriteria.nodeLabel === 'gender') {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
                                 if (node.type !== EntityType.EVENT) {
                                     nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
                                 } else {
                                     nodeData.label = '';
                                 }
-                            } else if (colorCriteria.nodeLabel === 'location') {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
                                 nodeData.label = '';
                                 if (node.type !== EntityType.EVENT) {
                                     const mainAddr = node.model.mainAddress;

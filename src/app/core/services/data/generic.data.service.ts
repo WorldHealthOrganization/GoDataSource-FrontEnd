@@ -119,5 +119,13 @@ export class GenericDataService {
     getTransmissionChainNodeIconCriteriaOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS));
     }
+
+    /**
+     * Retrieve the list of criteria used for node label - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeLabelCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS));
+    }
 }
 

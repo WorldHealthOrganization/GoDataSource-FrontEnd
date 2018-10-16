@@ -146,14 +146,7 @@
         <app-form-radio
             name="nodeLabelCriteria"
             [(ngModel)]="colorCriteria.nodeLabelCriteria"
-            [options]="[
-                {value: 'name', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME'},
-                {value: 'age-years', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE_YEARS'},
-                {value: 'age-months', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE_MONTHS'},
-                {value: 'dateOfOnset', label:'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'},
-                {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'},
-                {value: 'location', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION'}
-                ]">
+            [options]="nodeLabelCriteriaOptions$ | async">
         </app-form-radio>
 
         <div>

@@ -46,6 +46,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
     nodeColorCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
     nodeIconCriteriaOptions$: Observable<any[]>;
+    nodeLabelCriteriaOptions$: Observable<any[]>;
+
     // reference data categories needed for filters
     referenceDataCategories: any = [
         ReferenceDataCategory.PERSON_TYPE,
@@ -102,7 +104,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     // default color criteria
     colorCriteria: any = {
-        nodeLabelCriteria: 'name',
+        nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
@@ -160,6 +162,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
+        this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -417,7 +420,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         }
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
-        if (this.legend.nodeLabel === 'gender') {
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
             _.forEach(nodeLabelValues, (value, key) => {
