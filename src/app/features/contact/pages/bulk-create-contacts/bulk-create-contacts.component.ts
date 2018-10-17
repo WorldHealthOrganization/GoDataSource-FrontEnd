@@ -343,8 +343,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                         .subscribe((data) => {
                             // create contacts
                             this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityId, data)
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+
+                                    return ErrorObservable.create(err);
+                                })
                                 .subscribe(() => {
-                                    this.snackbarService.showSuccess('TODO API call :)');
+                                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+
+                                    // navigate to listing page
+                                    this.router.navigate(['/contacts']);
                                 });
                         });
                 }
