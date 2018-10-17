@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
+import { InconsistencyModel } from './inconsistency.model';
 
 export class EventModel {
     id: string;
@@ -14,6 +15,8 @@ export class EventModel {
     isDateOfReportingApproximate: boolean;
     outbreakId: string;
     deleted: boolean;
+
+    inconsistencies: InconsistencyModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -29,6 +32,11 @@ export class EventModel {
         // we need the object to use the custom getter that constructs the address from all fields
         const location = _.get(data, 'location');
         this.address = new AddressModel(_.get(data, 'address'), [location]);
+
+        this.inconsistencies = _.get(data, 'inconsistencies', []);
+        _.each(this.inconsistencies, (inconsistency, index) => {
+            this.inconsistencies[index] = new InconsistencyModel(inconsistency);
+        });
     }
 
     /**

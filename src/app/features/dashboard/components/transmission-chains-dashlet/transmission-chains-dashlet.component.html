@@ -107,12 +107,7 @@
         <app-form-radio
             name="nodeColorCriteria"
             [(ngModel)]="colorCriteria.nodeColorCriteria"
-            [options]="[
-                {value: 'type', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL'},
-                {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
-                {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
-                {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
-                ]">
+            [options]="nodeColorCriteriaOptions$ | async">
         </app-form-radio>
 
         <div>
@@ -121,12 +116,7 @@
         <app-form-radio
             name="nodeNameColorCriteria"
             [(ngModel)]="colorCriteria.nodeNameColorCriteria"
-            [options]="[
-                {value: 'classification', label:'LNG_CASE_FIELD_LABEL_CLASSIFICATION'},
-                {value: 'type', label:'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL'},
-                {value: 'riskLevel', label:'LNG_CASE_FIELD_LABEL_RISK_LEVEL'},
-                {value: 'gender', label:'LNG_CASE_FIELD_LABEL_GENDER'}
-                ]"
+            [options]="nodeColorCriteriaOptions$ | async"
             [disabled]="selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value"
             [tooltip]="tooltipViewTimeline() | translate">
         </app-form-radio>
@@ -137,13 +127,17 @@
         <app-form-radio
             name="edgeColorCriteria"
             [(ngModel)]="colorCriteria.edgeColorCriteria"
-            [options]="[
-                {value: 'certaintyLevelId', label:'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL'},
-                {value: 'socialRelationshipTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_RELATION'},
-                {value: 'exposureTypeId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE'},
-                {value: 'exposureFrequencyId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY'},
-                {value: 'exposureDurationId', label:'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION'}
-                ]">
+            [options]="edgeColorCriteriaOptions$ | async">
+        </app-form-radio>
+
+        <!-- node icon -->
+        <div>
+            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeIconCriteria"
+            [(ngModel)]="colorCriteria.nodeIconCriteria"
+            [options]="nodeIconCriteriaOptions$ | async">
         </app-form-radio>
 
         <div>
