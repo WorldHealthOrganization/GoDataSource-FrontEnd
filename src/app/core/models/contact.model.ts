@@ -25,6 +25,7 @@ export class ContactModel {
     dateDeceased: string;
     outbreakId: string;
     deleted: boolean;
+    dateBecomeContact: string;
 
     dob: string;
     age: AgeModel;
@@ -60,6 +61,7 @@ export class ContactModel {
         this.dateDeceased = _.get(data, 'dateDeceased');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.deleted = _.get(data, 'deleted');
+        this.dateBecomeContact = _.get(data, 'dateBecomeContact');
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {

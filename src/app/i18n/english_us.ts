@@ -409,7 +409,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE': 'Isolation Start Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE': 'Isolation End Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE': 'Lab Result Date',
-
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_START_DATE': 'Classification "{{classification}}" Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_END_DATE': 'Classification "{{classification}}" End Date',
 
         /**
          * Case lab results fields
@@ -705,6 +706,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
+        'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT': 'Date Become Contact',
         'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP': 'Relationship',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS': 'Persons',

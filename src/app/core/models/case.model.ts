@@ -49,6 +49,12 @@ export class CaseModel {
 
     inconsistencies: InconsistencyModel[];
 
+    classificationHistory: {
+        classification: string,
+        startDate: string,
+        endDate: string
+    }[];
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -99,6 +105,8 @@ export class CaseModel {
         _.each(this.inconsistencies, (inconsistency, index) => {
             this.inconsistencies[index] = new InconsistencyModel(inconsistency);
         });
+
+        this.classificationHistory = _.get(data, 'classificationHistory', []);
     }
 
     /**

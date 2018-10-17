@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
 import 'rxjs/add/observable/forkJoin';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -22,13 +23,14 @@ export class ViewChronologyCaseComponent implements OnInit {
     ];
 
     caseData: CaseModel = new CaseModel();
-    chronologyEntries: any[] = [];
+    chronologyEntries: ChronologyItem[] = [];
 
     constructor(
         protected route: ActivatedRoute,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private labResultDataService: LabResultDataService
+        private labResultDataService: LabResultDataService,
+        private i18nService: I18nService
     ) {}
 
     ngOnInit() {
@@ -65,6 +67,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
                                 }));
                             }
+
                             // date of infection
                             if (!_.isEmpty(this.caseData.dateOfInfection)) {
                                 chronologyEntries.push(new ChronologyItem({
@@ -72,6 +75,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
                                 }));
                             }
+
                             // date of outcome
                             if (!_.isEmpty(this.caseData.dateOfOutcome)) {
                                 chronologyEntries.push(new ChronologyItem({
@@ -79,6 +83,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
                                 }));
                             }
+
                             // date deceased
                             if (!_.isEmpty(this.caseData.dateDeceased)) {
                                 chronologyEntries.push(new ChronologyItem({
@@ -86,6 +91,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     label: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED'
                                 }));
                             }
+
                             // date contact become case
                             if (!_.isEmpty(this.caseData.dateBecomeCase)) {
                                 chronologyEntries.push(new ChronologyItem({
@@ -93,6 +99,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
                                 }));
                             }
+
                             // hospitalization dates
                             _.forEach(this.caseData.hospitalizationDates, (hospitalization) => {
                                 if (!_.isEmpty(hospitalization.startDate)) {
@@ -108,6 +115,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     }));
                                 }
                             });
+
                             // incubation dates
                             _.forEach(this.caseData.incubationDates, (incubation) => {
                                 if (!_.isEmpty(incubation.startDate)) {
@@ -123,6 +131,7 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     }));
                                 }
                             });
+
                             // isolation dates
                             _.forEach(this.caseData.isolationDates, (isolation) => {
                                 if (!_.isEmpty(isolation.startDate)) {
@@ -138,21 +147,54 @@ export class ViewChronologyCaseComponent implements OnInit {
                                     }));
                                 }
                             });
-                            // lab sample taken and lab result dates
-                            this.labResultDataService.getCaseLabResults(selectedOutbreak.id, this.caseData.id).subscribe((labResults) => {
-                                // isolation dates
-                                _.forEach(labResults, (labResult) => {
-                                    if (!_.isEmpty(labResult.dateOfResult)) {
-                                        chronologyEntries.push(new ChronologyItem({
-                                            date: labResult.dateOfResult,
-                                            label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE'
-                                        }));
-                                    }
-                                });
 
-                                // set data
-                                this.chronologyEntries = chronologyEntries;
-                            });
+                            // classification dates
+                            if (!_.isEmpty(this.caseData.classificationHistory)) {
+                                _.forEach(
+                                    this.caseData.classificationHistory, (
+                                        classificationHistory: {
+                                            classification: string,
+                                            startDate: string,
+                                            endDate: string
+                                        }
+                                    ) => {
+                                        const translateData = {
+                                            classification: this.i18nService.instant(classificationHistory.classification)
+                                        };
+                                        if (!_.isEmpty(classificationHistory.startDate)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: classificationHistory.startDate,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_START_DATE',
+                                                translateData: translateData
+                                            }));
+                                        }
+                                        if (!_.isEmpty(classificationHistory.endDate)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: classificationHistory.endDate,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_END_DATE',
+                                                translateData: translateData
+                                            }));
+                                        }
+                                    });
+                            }
+
+                            // lab sample taken and lab result dates
+                            this.labResultDataService
+                                .getCaseLabResults(selectedOutbreak.id, this.caseData.id)
+                                .subscribe((labResults) => {
+                                    // isolation dates
+                                    _.forEach(labResults, (labResult) => {
+                                        if (!_.isEmpty(labResult.dateOfResult)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: labResult.dateOfResult,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE'
+                                            }));
+                                        }
+                                    });
+
+                                    // set data
+                                    this.chronologyEntries = chronologyEntries;
+                                });
                         });
                 });
         });
