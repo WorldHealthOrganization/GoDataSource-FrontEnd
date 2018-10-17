@@ -33,37 +33,37 @@
                     <ng-container *ngFor="let column of sheetColumns">
                         <!-- Text column -->
                         <hot-column
-                            *ngIf="column.type === SheetColumnType.TEXT"
+                            *ngIf="column.type === SheetCellType.TEXT"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
-                            [validator]="column.validate()">
+                            [validator]="column.validationFunc">
                         </hot-column>
 
                         <!-- Numeric column -->
                         <hot-column
-                            *ngIf="column.type === SheetColumnType.NUMERIC"
+                            *ngIf="column.type === SheetCellType.NUMERIC"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="numeric"
-                            [validator]="column.validate()">
+                            [validator]="column.validationFunc">
                         </hot-column>
 
                         <!-- Date column -->
                         <hot-column
-                            *ngIf="column.type === SheetColumnType.DATE"
+                            *ngIf="column.type === SheetCellType.DATE"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="date"
                             [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
                             [correctFormat]="true"
-                            [validator]="column.validate()">
+                            [validator]="column.validationFunc">
                         </hot-column>
 
                         <!-- Dropdown column -->
                         <hot-column
-                            *ngIf="column.type === SheetColumnType.DROPDOWN"
+                            *ngIf="column.type === SheetCellType.DROPDOWN"
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="dropdown"
                             [trimDropdown]="false"
                             [source]="column.options$ | async"
-                            [validator]="column.validate()">
+                            [validator]="column.validationFunc">
                         </hot-column>
 
                     </ng-container>

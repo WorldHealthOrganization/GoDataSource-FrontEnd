@@ -17,7 +17,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DateSheetColumn, DropdownSheetColumn, NumericSheetColumn, SheetColumnType, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { DateSheetColumn, DropdownSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { BulkAddContactsService } from '../../../../core/services/helper/bulk-add-contacts.service';
@@ -62,7 +63,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     socialRelationshipOptions$: Observable<any[]>;
     socialRelationshipLabelsOptions$: Observable<string[]>;
 
-    relatedEntityData: CaseModel|EventModel;
+    relatedEntityData: CaseModel | EventModel;
 
     // sheet widget configuration
     sheetWidth = 500;
@@ -72,7 +73,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     // provide constants to template
     Constants = Constants;
-    SheetColumnType = SheetColumnType;
+    SheetCellType = SheetCellType;
 
     constructor(
         private router: Router,
@@ -118,7 +119,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
         // retrieve query params
         this.route.queryParams
-            .subscribe((params: {entityType, entityId}) => {
+            .subscribe((params: { entityType, entityId }) => {
                 this.relatedEntityType = _.get(params, 'entityType');
                 this.relatedEntityId = _.get(params, 'entityId');
 
@@ -174,8 +175,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new DropdownSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
                 .setProperty('contact.gender')
-                .setOptions(this.genderLabelsList$)
-                .setRequired(),
+                .setOptions(this.genderLabelsList$),
             new TextSheetColumn()
                 .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE')
                 .setProperty('contact.phone'),
@@ -235,18 +235,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             new DropdownSheetColumn()
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
                 .setProperty('relationship.exposureTypeId')
-                .setOptions(this.exposureTypeLabelsOptions$)
-                .setRequired(),
+                .setOptions(this.exposureTypeLabelsOptions$),
             new DropdownSheetColumn()
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
                 .setProperty('relationship.exposureFrequencyId')
-                .setOptions(this.exposureFrequencyLabelsOptions$)
-                .setRequired(),
+                .setOptions(this.exposureFrequencyLabelsOptions$),
             new DropdownSheetColumn()
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
                 .setProperty('relationship.exposureDurationId')
-                .setOptions(this.exposureDurationLabelsOptions$)
-                .setRequired(),
+                .setOptions(this.exposureDurationLabelsOptions$),
             new DropdownSheetColumn()
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
                 .setProperty('relationship.socialRelationshipTypeId')
@@ -273,45 +270,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 }
             }
         };
-
-        // configure custom validators
-        // this.sheetColumnValidators = {
-        //     // required field
-        //     required: (value, callback) => {
-        //         if (value === 'empty-row') {
-        //             // do not validate empty rows
-        //             callback(true);
-        //             return;
-        //         }
-        //
-        //         if (value && value.length > 0) {
-        //             callback(true);
-        //             return;
-        //         }
-        //
-        //         callback(false);
-        //     },
-        //     // positive integer
-        //     positiveInteger: (value, callback) => {
-        //         if (value === 'empty-row') {
-        //             // do not validate empty rows
-        //             callback(true);
-        //             return;
-        //         }
-        //
-        //         callback(/^([1-9]*|null)$/.test(value));
-        //     },
-        //     // required positive integer
-        //     requiredPositiveInteger: (value, callback) => {
-        //         if (value === 'empty-row') {
-        //             // do not validate empty rows
-        //             callback(true);
-        //             return;
-        //         }
-        //
-        //         callback(/^[1-9]+$/.test(value));
-        //     }
-        // };
     }
 
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
@@ -347,7 +305,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe((relatedEntityData: CaseModel|EventModel) => {
+                .subscribe((relatedEntityData: CaseModel | EventModel) => {
                     // initialize Case/Event
                     this.relatedEntityData = relatedEntityData;
                 });
