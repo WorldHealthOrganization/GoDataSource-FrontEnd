@@ -3,6 +3,9 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
+import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -15,14 +18,20 @@ export class CaseSummaryComponent implements OnInit {
     selectedOutbreak: OutbreakModel;
     chainsSize: any;
     histogramResults: any = [];
-    selectedSizeOfChains = 0;
+    caseClassificationsList: LabelValuePair[];
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
+
+        this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).subscribe( (resultCases) => {
+            this.caseClassificationsList = resultCases;
+        });
+
         this.outbreakDataService.getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
