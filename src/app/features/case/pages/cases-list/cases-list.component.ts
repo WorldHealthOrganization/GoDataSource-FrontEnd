@@ -384,7 +384,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
      * Convert a case to contact
      * @param caseModel
      */
-    convertCaseToContact(caseModel: CaseModel){
+    convertCaseToContact(caseModel: CaseModel) {
         // show confirm dialog to confirm the action
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
             .subscribe((answer: DialogAnswer) => {
