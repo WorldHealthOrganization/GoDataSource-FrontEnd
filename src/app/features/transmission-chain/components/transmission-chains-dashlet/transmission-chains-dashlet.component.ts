@@ -15,12 +15,11 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder/request-filter';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -60,7 +59,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     // reference data labels and categories
     referenceDataLabelMap: any = {
         type: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
             refDataCateg: ReferenceDataCategory.PERSON_TYPE
         },
         gender: {
@@ -110,7 +109,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         nodeNameColorField: 'classification',
         edgeColorField: 'certaintyLevelId',
         nodeIconField: '',
-        nodeColorLabel: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+        nodeColorLabel: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
         nodeNameColorLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         edgeColorLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         nodeIconLabel: '',
@@ -445,7 +444,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     tooltipViewTimeline() {
         return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                ? 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
+                ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
                 : null
         );
     }
