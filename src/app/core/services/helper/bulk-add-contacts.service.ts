@@ -17,7 +17,7 @@ export class BulkAddContactsService {
     }
 
     /**
-     * Check if all table cells are valid
+     * Validate all table cells
      * @param sheetCore
      */
     validateTable(sheetCore: Handsontable): Observable<boolean> {
@@ -30,6 +30,11 @@ export class BulkAddContactsService {
         });
     }
 
+    /**
+     * Get contacts data from table, ready to be sent in the API call for creating the contacts
+     * @param sheetCore
+     * @param sheetColumns
+     */
     getData(sheetCore: Handsontable, sheetColumns: AbstractSheetColumn[]): Observable<any[]> {
         const data = [];
 
@@ -44,8 +49,10 @@ export class BulkAddContactsService {
                     if (!sheetCore.isEmptyRow(rowIndex)) {
                         // create new object for current row
                         const rowObj = {};
+
+                        // get row data cell by cell
                         _.each(rowData, (columnValue, columnIndex) => {
-                            // omit empty columns
+                            // omit empty cells
                             if (
                                 columnValue !== null &&
                                 columnValue !== ''
@@ -59,10 +66,12 @@ export class BulkAddContactsService {
                                     cellValue = dropdownsMap[columnIndex][columnValue];
                                 }
 
+                                // add cell data to the row object
                                 _.set(rowObj, sheetColumns[columnIndex].property, cellValue);
                             }
                         });
 
+                        // add row data
                         data.push(rowObj);
                     }
                 });
@@ -89,14 +98,15 @@ export class BulkAddContactsService {
                 // collect the list of observables to be called to get dropdown items
                 ((index) => {
                     dropdownItemsObservables.push(
-                        sheetColumn.options$.do((dropdownItems) => {
-                            // go through all items of each dropdown
-                            _.each(dropdownItems, (item) => {
-                                // keep the value of each translated label
-                                const label = this.i18nService.instant(item.label);
-                                dropdownsMap[index][label] = item.value;
-                            });
-                        })
+                        sheetColumn.options$
+                            .do((dropdownItems) => {
+                                // go through all items of each dropdown
+                                _.each(dropdownItems, (item) => {
+                                    // keep the value associated to each translated label
+                                    const label = this.i18nService.instant(item.label);
+                                    dropdownsMap[index][label] = item.value;
+                                });
+                            })
                     );
                 })(i);
             }

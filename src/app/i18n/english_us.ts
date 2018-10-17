@@ -209,7 +209,6 @@ export const EnglishUsLang = {
         /**
          * Address Fields
          */
-        'LNG_ADDRESS_FIELD_LABEL_ADDRESS_TYPE': 'Address Type',
         'LNG_ADDRESS_FIELD_LABEL_TYPE': 'Type',
         'LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',

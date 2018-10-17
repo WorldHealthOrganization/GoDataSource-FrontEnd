@@ -2,18 +2,17 @@ import { Observable } from 'rxjs/Observable';
 import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
-import { LabelValuePair } from '../label-value-pair';
 
 export abstract class AbstractSheetColumn {
     // translation key for column name
     title: string;
-    // property used to populate the resulted object after saving data
+    // property used to populate the resulted object when saving data
     property: string;
     // required field?
     required: boolean = false;
-    // custom cell validation function
+    // cell validation function
     validationFunc: (value: string, callback: (result: boolean) => any) => any;
-    // validations to be applied
+    // list of all individual validations to be applied on cells
     private validations: SheetCellValidationType[] = [];
 
     constructor(
@@ -48,13 +47,21 @@ export abstract class AbstractSheetColumn {
         return this;
     }
 
+    /**
+     * Add an individual validation for cells under this column
+     * @param validationType
+     */
     public addValidation(validationType: SheetCellValidationType) {
         this.validations.push(validationType);
 
+        // merge all individual validators into a single validation function that will be passed to 'handsontable'
         this.validationFunc = SheetCellValidator.mergeValidations(this.validations);
     }
 }
 
+/**
+ * Free text cell
+ */
 export class TextSheetColumn extends AbstractSheetColumn {
     constructor(
     ) {
@@ -62,6 +69,9 @@ export class TextSheetColumn extends AbstractSheetColumn {
     }
 }
 
+/**
+ * Date picker cell
+ */
 export class DateSheetColumn extends AbstractSheetColumn {
     constructor(
     ) {
@@ -69,6 +79,9 @@ export class DateSheetColumn extends AbstractSheetColumn {
     }
 }
 
+/**
+ * Numeric cell
+ */
 export class NumericSheetColumn extends AbstractSheetColumn {
     constructor(
     ) {
@@ -76,9 +89,13 @@ export class NumericSheetColumn extends AbstractSheetColumn {
     }
 }
 
+/**
+ * Dropdown cell
+ */
 export class DropdownSheetColumn extends AbstractSheetColumn {
     // list of options for dropdown
     public options$: Observable<any>;
+    // list of translated labels to be used as dropdown options ('handsontable' expects a list of strings)
     public optionLabels$: Observable<string[]>;
 
     constructor(
@@ -87,8 +104,11 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
     }
 
     setOptions(options$: Observable<any>, i18nService) {
+        // keep the observable of LabelValue options
         this.options$ = options$;
+        // get the list of string labels
         this.optionLabels$ = this.options$.map((items) => items.map((item) => i18nService.instant(item.label)));
+
         return this;
     }
 }

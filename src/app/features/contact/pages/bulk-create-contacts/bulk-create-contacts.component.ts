@@ -22,6 +22,7 @@ import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { BulkAddContactsService } from '../../../../core/services/helper/bulk-add-contacts.service';
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -42,16 +43,17 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     relatedEntityType: EntityType;
     relatedEntityId: string;
 
-    genderList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-    addressTypesList$: Observable<any[]>;
-    riskLevelsList$: Observable<any[]>;
-    documentTypesList$: Observable<any[]>;
-    certaintyLevelOptions$: Observable<any[]>;
-    exposureTypeOptions$: Observable<any[]>;
-    exposureFrequencyOptions$: Observable<any[]>;
-    exposureDurationOptions$: Observable<any[]>;
-    socialRelationshipOptions$: Observable<any[]>;
+    // options for dropdown cells
+    genderList$: Observable<LabelValuePair[]>;
+    occupationsList$: Observable<LabelValuePair[]>;
+    addressTypesList$: Observable<LabelValuePair[]>;
+    riskLevelsList$: Observable<LabelValuePair[]>;
+    documentTypesList$: Observable<LabelValuePair[]>;
+    certaintyLevelOptions$: Observable<LabelValuePair[]>;
+    exposureTypeOptions$: Observable<LabelValuePair[]>;
+    exposureFrequencyOptions$: Observable<LabelValuePair[]>;
+    exposureDurationOptions$: Observable<LabelValuePair[]>;
+    socialRelationshipOptions$: Observable<LabelValuePair[]>;
 
     relatedEntityData: CaseModel | EventModel;
 
@@ -93,7 +95,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).share();
         this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).share();
 
-        // configure spreadsheet widget
+        // configure Sheet widget
         this.configureSheetWidget();
 
         // retrieve query params
@@ -106,6 +108,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     return;
                 }
 
+                // retrieve related person information
                 this.retrieveRelatedPerson();
             });
 
@@ -136,6 +139,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         this.sheetWidth = window.innerWidth - 340;
     }
 
+    /**
+     * Configure 'Handsontable'
+     */
     private configureSheetWidget() {
         // configure columns
         this.sheetColumns = [
@@ -190,14 +196,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
             // Address(es)
             new DropdownSheetColumn()
-                .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_TYPE')
+                .setTitle('LNG_ADDRESS_FIELD_LABEL_TYPE')
                 .setProperty('contact.addresses[0].typeId')
                 .setOptions(this.addressTypesList$, this.i18nService),
             new TextSheetColumn()
                 .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
                 .setProperty('contact.addresses[0].addressLine1'),
 
-            // Relationship
+            // Relationship properties
             new DateSheetColumn()
                 .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
                 .setProperty('relationship.contactDate')
@@ -225,7 +231,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setOptions(this.socialRelationshipOptions$, this.i18nService)
         ];
 
-        // configure context menu
+        // configure the context menu
         this.sheetContextMenu = {
             items: {
                 row_above: {
@@ -247,6 +253,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         };
     }
 
+    /**
+     * 'Handsontable' hook before running validation on a cell
+     */
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
         if (
             value === null &&
@@ -260,7 +269,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     /**
-     * Retrieve information of related person
+     * Retrieve information of related person (Case or Event)
      */
     private retrieveRelatedPerson() {
         if (
@@ -268,7 +277,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             this.relatedEntityType &&
             this.relatedEntityId
         ) {
-            // retrieve Case/Event information
+            // retrieve related person information
             this.entityDataService
                 .getEntity(this.relatedEntityType, this.outbreakId, this.relatedEntityId)
                 .catch((err) => {
@@ -281,14 +290,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     return ErrorObservable.create(err);
                 })
                 .subscribe((relatedEntityData: CaseModel | EventModel) => {
-                    // initialize Case/Event
+                    // keep person data
                     this.relatedEntityData = relatedEntityData;
                 });
         }
     }
 
     /**
-     * Check that we have related Entity Type and ID
+     * Check that we have related Person Type and ID
      */
     private validateRelatedEntity() {
         if (
@@ -314,8 +323,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * Redirect to Cases or Events list, based on related Entity Type
      */
     private redirectToRelatedEntityList() {
-        this.disableDirtyConfirm();
-
         if (this.relatedEntityType === EntityType.EVENT) {
             this.router.navigate(['/events']);
         } else {
