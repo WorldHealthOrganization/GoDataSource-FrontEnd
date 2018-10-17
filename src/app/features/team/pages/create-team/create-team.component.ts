@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
@@ -23,7 +23,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
     templateUrl: './create-team.component.html',
     styleUrls: ['./create-team.component.less']
 })
-export class CreateTeamComponent extends ConfirmOnFormChanges {
+export class CreateTeamComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '..'),
@@ -43,6 +43,9 @@ export class CreateTeamComponent extends ConfirmOnFormChanges {
         private dialogService: DialogService
     ) {
         super();
+    }
+
+    ngOnInit() {
         this.usersList$ = this.userDataService.getUsersList();
     }
 
@@ -54,56 +57,24 @@ export class CreateTeamComponent extends ConfirmOnFormChanges {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
         if (form.valid && !_.isEmpty(dirtyFields)) {
 
-            // check if there are existing teams in the same locations
-            const qb = new RequestQueryBuilder();
+            this.checkTeamsInSameLocations(this.teamData.locationIds)
+                .subscribe((createTeam: boolean) => {
+                    if (createTeam) {
+                        this.teamDataService
+                            .createTeam(dirtyFields)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe(() => {
+                                this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
 
-            qb.filter
-                .where({
-                    locationIds: {
-                        'inq': this.teamData.locationIds
+                                // navigate to listing page
+                                this.disableDirtyConfirm();
+                                this.router.navigate(['/teams']);
+                            });
                     }
-                }, true);
-
-            this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
-                if (teamsList.length > 0) {
-                    const teamsNames = [];
-                    _.forEach(teamsList, (team, key) => {
-                        teamsNames.push(team.name);
-                    });
-                    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamsNames.join()})
-                        .subscribe((answer: DialogAnswer) => {
-                            if (answer.button === DialogAnswerButton.Yes) {
-                                this.teamDataService
-                                    .createTeam(dirtyFields)
-                                    .catch((err) => {
-                                        this.snackbarService.showError(err.message);
-                                        return ErrorObservable.create(err);
-                                    })
-                                    .subscribe(() => {
-                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
-
-                                        // navigate to listing page
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/teams']);
-                                    });
-                            }
-                        });
-                } else {
-                    this.teamDataService
-                        .createTeam(dirtyFields)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE');
-
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            this.router.navigate(['/teams']);
-                        });
-                }
-            });
+                });
         }
     }
 
@@ -155,6 +126,48 @@ export class CreateTeamComponent extends ConfirmOnFormChanges {
                         }
                     });
             }
+        });
+    }
+
+    /**
+     * check if there are multiple teams in the same locations
+     * @param {string[]} locationIds
+     * @returns {Observable<boolean>}
+     */
+    private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
+        return Observable.create((observer) => {
+            // check if there are existing teams in the same locations
+            const qb = new RequestQueryBuilder();
+
+            qb.filter
+                .where({
+                    locationIds: {
+                        'inq': this.teamData.locationIds
+                    }
+                }, true);
+
+            this.teamDataService.getTeamsList(qb)
+                .subscribe((teamsList) => {
+                    if (teamsList.length > 0) {
+                        const teamNames = _.map(teamsList, (team) => team.name);
+                        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamNames.join(', ')})
+                            .subscribe((answer: DialogAnswer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    // user accepts the action
+                                    observer.next(true);
+                                } else {
+                                    // user refuses the action
+                                    observer.next(false);
+                                }
+
+                                observer.complete();
+                            });
+                    } else {
+                        // there aren't any teams in same locations; move on to the next step
+                        observer.next(true);
+                        observer.complete();
+                    }
+                });
         });
     }
 }

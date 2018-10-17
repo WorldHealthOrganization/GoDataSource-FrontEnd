@@ -94,61 +94,24 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
-        // check if there are existing teams in the same locations
-        const qb = new RequestQueryBuilder();
+        this.checkTeamsInSameLocations(this.teamData.locationIds)
+            .subscribe((createTeam: boolean) => {
+                if (createTeam) {
+                    this.teamDataService
+                        .modifyTeam(this.teamId, dirtyFields)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
 
-        qb.filter
-            .where({
-                locationIds: {
-                    'inq': this.teamData.locationIds
-                },
-                id: {
-                    'neq': this.teamId
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
+                            // navigate to listing page
+                            this.disableDirtyConfirm();
+                            this.router.navigate(['/teams']);
+                        });
                 }
-            }, true);
-
-        this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
-            if (teamsList.length > 0) {
-                const teamsNames = [];
-                _.forEach(teamsList, (team, key ) => {
-                    teamsNames.push(team.name);
-                });
-                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamsNames.join()})
-                    .subscribe((answer: DialogAnswer) => {
-                        if (answer.button === DialogAnswerButton.Yes) {
-                            this.teamDataService
-                                .modifyTeam(this.teamId, dirtyFields)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
-
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
-                                    // navigate to listing page
-                                    this.disableDirtyConfirm();
-                                    this.router.navigate(['/teams']);
-                                });
-                        }
-                    });
-            } else {
-                this.teamDataService
-                    .modifyTeam(this.teamId, dirtyFields)
-                    .catch((err) => {
-                        this.snackbarService.showError(err.message);
-
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
-                        // navigate to listing page
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/teams']);
-                    });
-            }
-        });
-
-
+            });
     }
 
     /**
@@ -176,7 +139,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      */
     checkUsersMultipleTeams(users) {
         const userIds = [];
-        _.forEach(users, (user, key ) => {
+        _.forEach(users, (user, key) => {
             userIds.push(user.id);
         });
         const difUser = _.difference(userIds, this.existingUsers);
@@ -194,7 +157,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
         this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
             const teamsNames = [];
-            _.forEach(teamsList, (team, key ) => {
+            _.forEach(teamsList, (team, key) => {
                 teamsNames.push(team.name);
             });
 
@@ -210,6 +173,48 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                         }
                     });
             }
+        });
+    }
+
+    /**
+     * check if there are multiple teams in the same locations
+     * @param {string[]} locationIds
+     * @returns {Observable<boolean>}
+     */
+    private checkTeamsInSameLocations(locationIds: string[]): Observable<boolean> {
+        return Observable.create((observer) => {
+            // check if there are existing teams in the same locations
+            const qb = new RequestQueryBuilder();
+
+            qb.filter
+                .where({
+                    locationIds: {
+                        'inq': this.teamData.locationIds
+                    }
+                }, true);
+
+            this.teamDataService.getTeamsList(qb)
+                .subscribe((teamsList) => {
+                    if (teamsList.length > 0) {
+                        const teamNames = _.map(teamsList, (team) => team.name);
+                        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM', {teamNames: teamNames.join(', ')})
+                            .subscribe((answer: DialogAnswer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    // user accepts the action
+                                    observer.next(true);
+                                } else {
+                                    // user refuses the action
+                                    observer.next(false);
+                                }
+
+                                observer.complete();
+                            });
+                    } else {
+                        // there aren't any teams in same locations; move on to the next step
+                        observer.next(true);
+                        observer.complete();
+                    }
+                });
         });
     }
 }
