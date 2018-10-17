@@ -4,6 +4,8 @@ import * as _ from 'lodash';
 import { SheetCellType } from './sheet-cell-type';
 
 export class SheetCellValidator {
+    // cells being part of empty rows will get this value at validation time, so we know to skip validation for them (e.g. skip Required validation)
+    static EMPTY_ROW_CELL_VALUE = 'empty-row';
 
     static CELL_VALIDATION_TYPE = {
         [SheetCellType.DATE]: SheetCellValidationType.DATE,
@@ -18,7 +20,7 @@ export class SheetCellValidator {
     static mergeValidations(validationTypes: SheetCellValidationType[]) {
         return function(value, callback) {
             // do not validate empty rows
-            if (value === 'empty-row') {
+            if (value === SheetCellValidator.EMPTY_ROW_CELL_VALUE) {
                 // do not validate empty rows
                 callback(true);
                 return;

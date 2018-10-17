@@ -62,7 +62,7 @@
                             title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
                             type="dropdown"
                             [trimDropdown]="false"
-                            [source]="column.options$ | async"
+                            [source]="column.optionLabels$ | async"
                             [validator]="column.validationFunc">
                         </hot-column>
 

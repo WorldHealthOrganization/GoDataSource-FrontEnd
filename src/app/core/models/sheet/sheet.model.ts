@@ -2,6 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
+import { LabelValuePair } from '../label-value-pair';
 
 export abstract class AbstractSheetColumn {
     // translation key for column name
@@ -78,14 +79,16 @@ export class NumericSheetColumn extends AbstractSheetColumn {
 export class DropdownSheetColumn extends AbstractSheetColumn {
     // list of options for dropdown
     public options$: Observable<any>;
+    public optionLabels$: Observable<string[]>;
 
     constructor(
     ) {
         super(SheetCellType.DROPDOWN);
     }
 
-    setOptions(options$: Observable<any>) {
+    setOptions(options$: Observable<any>, i18nService) {
         this.options$ = options$;
+        this.optionLabels$ = this.options$.map((items) => items.map((item) => i18nService.instant(item.label)));
         return this;
     }
 }
