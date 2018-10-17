@@ -5,6 +5,14 @@
         </div>
 
         <div class="topnav-actions">
+            <app-export-button
+                [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
+                [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
+                url="locations/hierarchical/export"
+                [fileName]="hierarchicalLocationsDataExportFileName"
+                [allowedExportTypes]="allowedExportTypes">
+            </app-export-button>
+
             <ng-container
                 *ngIf="hasLocationWriteAccess()">
                 <button
