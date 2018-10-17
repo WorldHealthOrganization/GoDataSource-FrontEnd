@@ -1,7 +1,7 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
     [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS, x: xPreviousDays}"
-    [value]="(this.percentageCases()) + '%'"
+    [value]="percentageCases() + '%'"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()">

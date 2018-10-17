@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -42,7 +41,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     outbreakId: string;
 
     contactData: ContactModel = new ContactModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -158,13 +156,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     }
 
     /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
-    }
-
-    /**
      * Create Contact
      * @param {NgForm[]} stepForms
      */
@@ -174,13 +165,14 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         const relationship = _.get(dirtyFields, 'relationship');
         delete dirtyFields.relationship;
 
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
+        // create relationship & contact
         if (
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields) &&

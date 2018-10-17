@@ -1,0 +1,28 @@
+.dialog-btn-margin-right-10px {
+    margin-right: 10px;
+}
+
+app-system-config-main {
+    .wait-for-backup {
+        height: 100px;
+        text-align: center;
+
+        @mat-spinner-width: 64px;
+        @mat-spinner-height: 64px;
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}

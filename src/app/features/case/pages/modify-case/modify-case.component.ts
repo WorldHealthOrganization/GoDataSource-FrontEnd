@@ -41,12 +41,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     caseId: string;
 
     caseData: CaseModel = new CaseModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     caseRiskLevelsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -83,6 +83,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
         // retrieve query params
         this.route.queryParams
@@ -112,6 +113,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
     }
 
+    /**
+     * Breadcrumbs
+     */
     buildBreadcrumbs() {
         if (this.caseData) {
             // initialize breadcrumbs
@@ -154,6 +158,9 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         }
     }
 
+    /**
+     * Case data
+     */
     retrieveCaseData() {
         // get case
         if (
@@ -214,13 +221,15 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
-
                     // determine parent onset dates
                     const uniqueDates: {} = {};
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
                         const parentPerson = _.find(relationship.persons, { source: true });
                         const parentCase: CaseModel = _.find(relationship.people, { id: parentPerson.id });
-                        if (parentCase.dateOfOnset) {
+                        if (
+                            parentCase &&
+                            parentCase.dateOfOnset
+                        ) {
                             uniqueDates[moment(parentCase.dateOfOnset).startOf('day').toISOString()] = true;
                         }
                     });
@@ -245,10 +254,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     }
 
     /**
-     * Switch between Age and Date of birth
+     * Check if we have access to create a contact
+     * @returns {boolean}
      */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
+    hasContactWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
     modifyCase(form: NgForm) {
@@ -260,11 +270,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
         // modify the Case

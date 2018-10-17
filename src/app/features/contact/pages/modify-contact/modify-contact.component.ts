@@ -39,7 +39,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
     outbreakId: string;
 
     contactData: ContactModel = new ContactModel();
-    ageSelected: boolean = true;
 
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
@@ -117,25 +116,20 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
     }
 
-    /**
-     * Switch between Age and Date of birth
-     */
-    switchAgeDob(ageSelected: boolean = true) {
-        this.ageSelected = ageSelected;
-    }
-
     modifyContact(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        // omit fields that are NOT visible
-        if (this.ageSelected) {
-            delete dirtyFields.dob;
-        } else {
-            delete dirtyFields.age;
-        }
-
+        // validate form
         if (!this.formHelper.validateForm(form)) {
             return;
+        }
+
+        // retrieve dirty fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
         }
 
         // modify the contact

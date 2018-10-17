@@ -61,6 +61,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
     availableSideFilters: FilterModel[];
 
+    printDailyFollowUpsUrl: string;
+    followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
+    printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
@@ -77,7 +80,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
-    exportQueryBuilder: RequestQueryBuilder;
 
     serverToday: Moment = null;
 
@@ -102,6 +104,9 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
         this.followUpsDataExportFileName = this.i18nService.instant(this.showPastFollowUps ? 'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
+        this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
+            ' - ' +
+            this.followUpsPrintDailyFileName;
 
         // get today time
         this.genericDataService
@@ -132,11 +137,13 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
 
                 // export url
                 this.exportFollowUpsUrl = null;
+                this.printDailyFollowUpsUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
                 }
 
                 // initialize pagination
@@ -267,7 +274,7 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                     new FilterModel({
                         fieldName: 'age',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_AGE',
-                        type: FilterType.RANGE_NUMBER,
+                        type: FilterType.RANGE_AGE,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
@@ -321,9 +328,6 @@ export class ContactsFollowUpsListComponent extends ListComponent implements OnI
                             }
                         }]
                     }, true);
-
-                    // use the same query builder to export follow-ups
-                    this.exportQueryBuilder = _.cloneDeep(this.queryBuilder);
 
                     // finished configuring query builder
                     observer.next();

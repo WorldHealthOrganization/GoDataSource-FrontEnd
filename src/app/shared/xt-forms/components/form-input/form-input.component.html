@@ -1,4 +1,4 @@
-<div class="form-input-container form-element {{ (tooltip !== null ? 'form-input-tooltip' : '' ) }} "
+<div class="form-input-container form-element {{ tooltip ? 'form-input-tooltip' : '' }} "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
@@ -22,9 +22,12 @@
             [disabled]="disabled"
             [readonly]="readonly"
             (blur)="onBlur()"
-            (input)="onChange()"/>
+            (input)="onChange()"
+            [step]="step"
+            [min]="min"
+            [max]="max"/>
 
-        <span [fxShow]="tooltip !== null" [matTooltip]="tooltip | translate" class="xt-icon form-icon">help</span>
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
 
     </mat-form-field>
 

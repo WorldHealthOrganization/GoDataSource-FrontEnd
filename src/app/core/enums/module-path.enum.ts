@@ -4,6 +4,7 @@ export enum ModulePath {
     UserModule = 'users',
     UserRoleModule = 'user-roles',
     OutbreakModule = 'outbreaks',
+    OutbreakTemplatesModule = 'outbreak-templates',
     ContactModule = 'contacts',
     CaseModule = 'cases',
     EventModule = 'events',
@@ -13,5 +14,6 @@ export enum ModulePath {
     LocationModule = 'locations',
     DashboardModule = 'dashboard',
     TransmissionChainModule = 'transmission-chains',
-    ImportExportDataModule = 'import-export-data'
+    ImportExportDataModule = 'import-export-data',
+    SystemConfigModule = 'system-config'
 }

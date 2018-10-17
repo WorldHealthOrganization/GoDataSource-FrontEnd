@@ -40,7 +40,8 @@
                     [allowedExportTypes]="allowedExportTypes"
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields">
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <ng-container *app-selected-outbreak-is-active>
@@ -96,12 +97,12 @@
         <button mat-raised-button (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button mat-raised-button (click)="needsRefreshList()">
+        <button mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
 
-    <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef fxFlex="60px">
@@ -226,14 +227,18 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterByRangeField('age', $event)"
-                            app-reset-input-on-side-filter>
+                            (changed)="filterByAgeRangeField('age', $event)"
+                            app-reset-input-on-side-filter
+                            [min]="0"
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
                         </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.age }}
+                <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
 
@@ -285,14 +290,14 @@
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
-                            [ngModel]="false"
+                            ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                        ></app-form-select>
+                            [displayFilterIcon]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
@@ -315,11 +320,6 @@
                         <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
                                 [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
                             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                        </button>
-
-                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item
-                                [routerLink]="['.', item.id, 'lab-results', 'create']">
-                            {{'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT' | translate}}
                         </button>
 
                         <mat-divider *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"></mat-divider>

@@ -8,7 +8,8 @@
                     <app-form-select
                         [name]="name + '[typeId]'"
                         [(ngModel)]="address.typeId"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_NAME' | translate"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_TYPE' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         [options]="addressTypes$ | async"
@@ -36,6 +37,8 @@
                         [(ngModel)]="address.date"
                         [required]="required"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
+                        [disabled]="disabled"
                         [maxDate]="serverToday"
                         app-date-validator
                         [dateSameOrBefore]="serverToday"
@@ -68,6 +71,7 @@
                         [name]="name + '[locationId]'"
                         [(ngModel)]="address.locationId"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_LOCATION_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (changed)="onChange()">
@@ -90,61 +94,66 @@
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                <div fxFlex="25%" fxLayout="row" fxLayoutGap="5px">
-                    <app-form-input
-                        [name]="name + '[city]'"
-                        [(ngModel)]="address.city"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
-                        [disabled]="disabled"
-                        [required]="required"
-                        (input)="onChange()">
-                    </app-form-input>
-                    <div
-                        *ngIf="displayCopyField"
-                        fxFlex="40px"
-                        fxLayout="column"
-                        fxLayoutAlign="center">
-                        <button
-                            class="copy-field-button"
-                            type="button"
-                            mat-icon-button
-                            [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('city')">
-                            <span class="xt-icon">fileCopy</span>
-                        </button>
+                <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                        <app-form-input
+                            [name]="name + '[city]'"
+                            [(ngModel)]="address.city"
+                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
+                            tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
+                            [disabled]="disabled"
+                            [required]="required"
+                            (input)="onChange()">
+                        </app-form-input>
+                        <div
+                            *ngIf="displayCopyField"
+                            fxFlex="40px"
+                            fxLayout="column"
+                            fxLayoutAlign="center">
+                            <button
+                                class="copy-field-button"
+                                type="button"
+                                mat-icon-button
+                                [title]="displayCopyFieldDescription"
+                                (click)="triggerCopyValue('city')">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                        <app-form-input
+                            [name]="name + '[postalCode]'"
+                            [(ngModel)]="address.postalCode"
+                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
+                            tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
+                            [disabled]="disabled"
+                            [required]="required"
+                            (input)="onChange()">
+                        </app-form-input>
+                        <div
+                            *ngIf="displayCopyField"
+                            fxFlex="40px"
+                            fxLayout="column"
+                            fxLayoutAlign="center">
+                            <button
+                                class="copy-field-button"
+                                type="button"
+                                mat-icon-button
+                                [title]="displayCopyFieldDescription"
+                                (click)="triggerCopyValue('postalCode')">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div fxFlex="25%" fxLayout="row" fxLayoutGap="5px">
-                    <app-form-input
-                        [name]="name + '[postalCode]'"
-                        [(ngModel)]="address.postalCode"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
-                        [disabled]="disabled"
-                        [required]="required"
-                        (input)="onChange()">
-                    </app-form-input>
-                    <div
-                        *ngIf="displayCopyField"
-                        fxFlex="40px"
-                        fxLayout="column"
-                        fxLayoutAlign="center">
-                        <button
-                            class="copy-field-button"
-                            type="button"
-                            mat-icon-button
-                            [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('postalCode')">
-                            <span class="xt-icon">fileCopy</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div fxFlex="50%" fxLayout="row" fxLayoutGap="5px">
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
                         [name]="name + '[addressLine1]'"
                         [(ngModel)]="address.addressLine1"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                         [disabled]="disabled"
                         [required]="required"
                         (input)="onChange()">

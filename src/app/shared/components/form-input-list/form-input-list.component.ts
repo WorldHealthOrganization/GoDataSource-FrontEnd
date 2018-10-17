@@ -22,6 +22,7 @@ export class FormInputListComponent extends ListBase<string | number> implements
     @Input() required: boolean = false;
     @Input() disabled: boolean = false;
     @Input() placeholder: string = '';
+    @Input() tooltip: string;
     @Input() type: string = 'text';
     @Input() unique: boolean = false;
 

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Constants } from '../../../core/models/constants';
 
 export class CountedItemsListItem {
     /**
@@ -11,7 +12,7 @@ export class CountedItemsListItem {
         public count: number,
         public label: string,
         private _ids: string[],
-        public countBgColor: string = '#CCC'
+        public countBgColor: string = Constants.DEFAULT_COLOR_REF_DATA
     ) {}
 
     public get ids(): string[] | boolean {

@@ -1,12 +1,49 @@
-import { Component, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { NgForm } from '@angular/forms';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
     Cancel = 'Cancel',
+    Extra_1 = 'Extra_1'
+}
+
+export class DialogButton {
+    // required
+    label: string;
+    clickCallback: (
+        dialogHandler: MatDialogRef<DialogComponent>,
+        dialogAnswer: DialogAnswerInputValue
+    ) => void;
+
+    // optional
+    cssClass: string;
+    disabled: () => boolean = () => false;
+
+    /**
+     * Constructor
+     */
+    constructor(data: {
+        // required
+        label: string,
+        clickCallback: (
+            dialogHandler: MatDialogRef<DialogComponent>,
+            dialogAnswer: DialogAnswerInputValue
+        ) => void
+
+        // optional
+        cssClass?: string,
+        disabled?: () => boolean
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data
+        );
+    }
 }
 
 export class DialogAnswerInputValue {
@@ -25,22 +62,26 @@ export class DialogField {
     public placeholder: string;
     public inputOptions: LabelValuePair[];
     public inputOptionsMultiple: boolean = false;
+    public inputOptionsClearable: boolean = true;
     public required: boolean = false;
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
     public disabled: boolean = false;
+    public description: string;
 
     constructor(data: {
         name: string,
         placeholder: string,
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
+        inputOptionsClearable?: boolean,
         required?: boolean,
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
-        disabled?: boolean
+        disabled?: boolean,
+        description?: string
     }) {
         Object.assign(
             this,
@@ -52,7 +93,9 @@ export class DialogField {
 export class DialogConfiguration {
     public message: string;
     public yesLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_YES';
+    public yesCssClass: string;
     public cancelLabel: string = 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL';
+    public cancelCssClass: string;
     public placeholder: string = 'LNG_DIALOG_CONFIRM_FIELD_LABEL';
     public translateData: {} = {};
     public customInput: boolean = false;
@@ -61,6 +104,8 @@ export class DialogConfiguration {
     public required: boolean = false;
     public data: LabelValuePair[];
     public fieldsList: DialogField[];
+    public buttons: DialogButton[];
+    public addDefaultButtons: boolean = false;
 
     constructor(data: string | {
         message: string,
@@ -73,7 +118,11 @@ export class DialogConfiguration {
         customInputOptionsMultiple?: boolean,
         required?: boolean,
         data?: LabelValuePair[],
-        fieldsList?: DialogField[]
+        fieldsList?: DialogField[],
+        buttons?: DialogButton[],
+        addDefaultButtons?: boolean,
+        yesCssClass?: string,
+        cancelCssClass?: string
     }) {
         // assign properties
         if (_.isString(data)) {
@@ -109,6 +158,8 @@ export class DialogComponent {
     confirmData: DialogConfiguration;
     dialogAnswerInputValue: DialogAnswerInputValue = new DialogAnswerInputValue();
 
+    @ViewChild('form') form: NgForm;
+
     /**
      * Default configs with provided data
      * @param {DialogConfiguration | string} data
@@ -134,11 +185,44 @@ export class DialogComponent {
     }
 
     constructor(
-        private dialogRef: MatDialogRef<DialogComponent>,
+        public dialogRef: MatDialogRef<DialogComponent>,
         @Inject(MAT_DIALOG_DATA) private data: DialogConfiguration
     ) {
         // set confirm data
         this.confirmData = data;
+
+        // no dialog buttons provided, assign default ones ?
+        if (
+            _.isEmpty(this.confirmData.buttons) ||
+            this.confirmData.addDefaultButtons
+        ) {
+            this.confirmData.buttons = [
+                // add default buttons
+                new DialogButton({
+                    clickCallback: (
+                        dialogHandler: MatDialogRef<DialogComponent>
+                    ) => { this.cancel(dialogHandler); },
+                    label: this.confirmData.cancelLabel,
+                    cssClass: this.confirmData.cancelCssClass
+                }),
+                new DialogButton({
+                    disabled: (): boolean => {
+                        return this.confirmData.customInput &&
+                            this.form &&
+                            this.form.invalid;
+                    },
+                    clickCallback: (
+                        dialogHandler: MatDialogRef<DialogComponent>,
+                        dialogAnswer: DialogAnswerInputValue
+                    ) => { this.yes(dialogHandler, dialogAnswer); },
+                    label: this.confirmData.yesLabel,
+                    cssClass: this.confirmData.yesCssClass
+                }),
+
+                // add extra buttons
+                ...(this.confirmData.buttons ? this.confirmData.buttons : [])
+            ];
+        }
 
         // if we've assigned field lists then we need an object to keep properties
         if (!_.isEmpty(this.confirmData.fieldsList)) {
@@ -158,12 +242,15 @@ export class DialogComponent {
         }
     }
 
-    cancel() {
-        this.dialogRef.close(new DialogAnswer(DialogAnswerButton.Cancel));
+    cancel(dialogHandler: MatDialogRef<DialogComponent>) {
+        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Cancel));
     }
 
-    yes() {
-        this.dialogRef.close(new DialogAnswer(DialogAnswerButton.Yes, this.dialogAnswerInputValue));
+    yes(
+        dialogHandler: MatDialogRef<DialogComponent>,
+        dialogAnswer: DialogAnswerInputValue
+    ) {
+        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Yes, dialogAnswer));
     }
 
 }

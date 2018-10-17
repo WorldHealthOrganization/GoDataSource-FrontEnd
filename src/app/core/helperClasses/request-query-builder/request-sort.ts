@@ -16,7 +16,11 @@ export class RequestSort {
      * @param direction
      * @returns {RequestSort}
      */
-    by(property: string, direction: RequestSortDirection = RequestSortDirection.ASC) {
+    by(
+        property: string,
+        direction: RequestSortDirection = RequestSortDirection.ASC
+    ) {
+        // add sorting criteria
         this.criterias[property] = direction;
 
         return this;

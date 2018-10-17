@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
 /**
  * Apply List Filter
  */
@@ -27,14 +30,22 @@ export enum ApplyListFilter {
 export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+    static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+    static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // AGE constants
+    static DEFAULT_AGE_MAX_YEARS = 150;
+
+    // default color used by reference data
+    static DEFAULT_COLOR_REF_DATA = '#CCC';
 
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
@@ -69,6 +80,60 @@ export class Constants {
         //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME',
         //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME'
         // }
+    };
+
+    /**
+     * System settings backup modules
+     */
+    static SYSTEM_BACKUP_MODULES = {
+        SYSTEM_CONFIGURATION: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',
+            value: 'System Configuration'
+        },
+        DATA: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_DATA',
+            value: 'Data'
+        }
+    };
+
+    /**
+     * System settings backup status
+     */
+    static SYSTEM_BACKUP_STATUS = {
+        SUCCESS: {
+            label: 'LNG_BACKUP_STATUS_SUCCESS',
+            value: 'LNG_BACKUP_STATUS_SUCCESS'
+        },
+        FAILED: {
+            label: 'LNG_BACKUP_STATUS_FAILED',
+            value: 'LNG_BACKUP_STATUS_FAILED'
+        },
+        PENDING: {
+            label: 'LNG_BACKUP_STATUS_PENDING',
+            value: 'LNG_BACKUP_STATUS_PENDING'
+        }
+    };
+
+    /**
+     * System sync log status
+     */
+    static SYSTEM_SYNC_LOG_STATUS = {
+        SUCCESS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS',
+            value: 'LNG_SYNC_STATUS_SUCCESS'
+        },
+        SUCCESS_WITH_WARNINGS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS',
+            value: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS'
+        },
+        FAILED: {
+            label: 'LNG_SYNC_STATUS_FAILED',
+            value: 'LNG_SYNC_STATUS_FAILED'
+        },
+        IN_PROGRESS: {
+            label: 'LNG_SYNC_STATUS_IN_PROGRESS',
+            value: 'LNG_SYNC_STATUS_IN_PROGRESS'
+        }
     };
 
     // keep functionality
@@ -148,4 +213,77 @@ export class Constants {
             value: 'TIMELINE_NETWORK'
         }
     };
+
+    static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
+        TYPE: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
+        },
+        RISK_LEVEL: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            value: 'riskLevel'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        }
+    };
+
+    static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
+        CERTAINITY_LEVEL: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            value: 'certaintyLevelId'
+        },
+        SOCIAL_RELATIONSHIP_TYPE: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            value: 'socialRelationshipTypeId'
+        },
+        EXPOSURE_TYPE: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            value: 'exposureTypeId'
+        },
+        EXPOSURE_FREQUENCY: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            value: 'exposureFrequencyId'
+        },
+        EXPOSURE_DURATION: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            value: 'exposureDurationId'
+        }
+    };
+
+    static TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        TYPE: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
+        },
+        RISK_LEVEL: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            value: 'riskLevel'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        }
+    };
+
+    /**
+     * Today date
+     */
+    static getCurrentDate(): Moment {
+        return moment().startOf('day');
+    }
+
 }
