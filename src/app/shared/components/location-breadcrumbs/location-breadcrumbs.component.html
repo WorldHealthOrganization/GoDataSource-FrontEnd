@@ -2,6 +2,9 @@
     <div
         fxLayout="row" fxFlex fxLayoutAlign="space-between center"
         class="location-breadcrumbs">
-        <app-breadcrumbs [items]="locationBreadcrumbs"></app-breadcrumbs>
+        <app-breadcrumbs
+            [items]="locationBreadcrumbs"
+            [separator]="''"
+            [addSeparatorAtTheEnd]="true"></app-breadcrumbs>
     </div>
 </ng-container>

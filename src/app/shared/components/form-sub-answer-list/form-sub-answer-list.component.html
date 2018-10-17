@@ -1,0 +1,83 @@
+<div class="form-element"
+     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+
+    <div fxLayout="row">
+        <!-- btn to add answers -->
+        <button
+            flex mat-icon-button
+            color="primary"
+            class="link-primary add-answer-btn"
+            type="button"
+            *ngIf="!viewOnly"
+            (click)="addAnswer()">
+            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}
+        </button>
+    </div>
+
+    <form #groupForm="ngForm">
+        <!-- list of answers -->
+        <div *ngFor="let answer of values; let i = index" fxFlex fxLayout="row"
+             fxLayoutAlign="start center">
+            <div class="app-form-answer">
+                <div fxLayout="row" class="answer-wrapper">
+                    <!-- form-answer badge -->
+                    <div class="answer-badge" fxFlex="40px">
+                        {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) }}
+                    </div>
+                    <!-- form-answer label -->
+                    <div fxFlex="40" class="answer-box">
+                        <app-form-input
+                            [name]="name + '[' + i + '][label]'"
+                            [ngModel]="answer.label | translate"
+                            [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
+                            tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
+                            required="true"
+                            [disabled]="viewOnly"
+                            (optionChanged)="onChangeBind(i, 'label', $event)"
+                            (initialized)="onInitializeBind(i, 'label', $event)">
+                        </app-form-input>
+                    </div>
+
+                    <!-- form-answer value -->
+                    <div fxFlex class="answer-box">
+                        <app-form-input
+                            [name]="name + '[' + i + '][value]'"
+                            [(ngModel)]="values[i].value"
+                            [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
+                            tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
+                            required="true"
+                            [disabled]="viewOnly"
+                            (optionChanged)="onChange()">
+                        </app-form-input>
+                    </div>
+
+                    <!-- form-answer actions -->
+                    <div fxFlex="215px" class="answer-box text-right">
+                        <!-- Write access -->
+                        <div *ngIf="!viewOnly">
+                            <!-- Alert -->
+                            <app-form-slide-toggle
+                                [name]="name + '[' + i + '][alert]'"
+                                [(ngModel)]="values[i].alert"
+                                [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
+                                required="false"
+                                (optionChanged)="onChange()">
+                            </app-form-slide-toggle>
+
+                            <!-- Delete answer -->
+                            <button *ngIf="values.length > minItems" mat-icon-button type="button" (click)="delete(i)" color="warn">
+                                <span class="xt-icon">delete</span>
+                            </button>
+                        </div>
+
+                        <!-- View only  -->
+                        <div *ngIf="viewOnly">
+                            <div>{{ (answer.alert ? 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT' : '') | translate}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -10,7 +10,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -22,10 +22,11 @@ import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import * as moment from 'moment';
-import { ExportDataExtension } from '../../../../shared/components/export-button/export-button.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import * as _ from 'lodash';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
@@ -50,6 +51,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
 
     // available side filters
@@ -63,13 +65,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     exportCasesUrl: string;
     casesDataExportFileName: string = moment().format('YYYY-MM-DD');
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
         ExportDataExtension.XLSX,
         ExportDataExtension.XML,
         ExportDataExtension.JSON,
-        ExportDataExtension.ODS
+        ExportDataExtension.ODS,
+        ExportDataExtension.PDF
     ];
 
     anonymizeFields: LabelValuePair[] = [
@@ -107,15 +111,20 @@ export class CasesListComponent extends ListComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private dialogService: DialogService,
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
-        super(listFilterDataService, route.queryParams);
+        super(
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
+        );
     }
 
     ngOnInit() {
@@ -130,6 +139,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
@@ -167,6 +177,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'checkbox',
+                required: true,
+                excludeFromSave: true
+            }),
+            new VisibleColumnModel({
                 field: 'firstName',
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
@@ -189,6 +204,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'dateOfOnset',
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CASE_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -233,7 +252,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'age',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
-                type: FilterType.RANGE_NUMBER,
+                type: FilterType.RANGE_AGE,
                 sortable: true
             }),
             new FilterModel({
@@ -336,5 +355,65 @@ export class CasesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Restore a case that was deleted
+     * @param {CaseModel} caseModel
+     */
+    restoreCase(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_CASE', new CaseModel(caseModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService
+                        .restoreCase(this.selectedOutbreak.id, caseModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Export selected records
+     */
+    exportSelectedCases() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.bySelect(
+            'id',
+            selectedRecords,
+            true,
+            null
+        );
+
+        // display export dialog
+        this.dialogService.showExportDialog({
+            // required
+            message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
+            url: this.exportCasesUrl,
+            fileName: this.casesDataExportFileName,
+            buttonDownloadFile: this.buttonDownloadFile,
+
+            // // optional
+            allowedExportTypes: this.allowedExportTypes,
+            queryBuilder: qb,
+            displayEncrypt: true,
+            displayAnonymize: true,
+            anonymizeFields: this.anonymizeFields
+        });
     }
 }

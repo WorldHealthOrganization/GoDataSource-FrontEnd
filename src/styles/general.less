@@ -34,9 +34,11 @@ html, body, ul, li, div, span {
 
     // Reset filters
     .reset-filters {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+        width: 100%;
+        padding-bottom: 10px;
     }
 
     /* Mat Table overrides */
@@ -115,23 +117,38 @@ html, body, ul, li, div, span {
 
     // form elements having dynamic width
     .form-element-host {
-        flex: 1 auto;
+        flex: 1 1;
     }
 
     app-form-slide-toggle {
         display: inline-block;
     }
+}
 
-    // handle the tooltips on input fields
-    .form-input-tooltip {
-        .mat-input-element {
-            width: 85%;
-        }
+// handle the tooltips on input fields
+.form-input-tooltip,
+.form-datepicker-tooltip,
+.form-select-tooltip,
+.form-textarea-tooltip,
+.form-slide-tooltip,
+.form-locations-select-tooltip {
+    .mat-input-element,
+    .mat-select,
+    .slide-with-icon,
+    ng-select {
+        width: ~'calc(100% - 24px)';
+    }
 
-        .form-icon {
-            cursor: pointer;
-            line-height: 0;
-        }
+    ng-select {
+        display: inline-block;
+    }
+
+    .form-icon {
+        display: inline !important;
+        cursor: pointer;
+        line-height: 0;
+        float: right;
+        margin-top: 7px;
     }
 }
 
@@ -140,7 +157,7 @@ html, body, ul, li, div, span {
 }
 
 .page-tabs-navbar {
-    flex: 1 auto;
+    flex: 1 1;
 }
 
 .page-tabs-navbar-placeholder {
@@ -151,7 +168,7 @@ html, body, ul, li, div, span {
     display: flex;
 
     .form-content {
-        flex: 1 auto;
+        flex: 1 1;
         margin-right: 10px;
     }
 
@@ -188,7 +205,6 @@ html, body, ul, li, div, span {
 
 .switch-buttons {
     button {
-        height: 45px;
         border-radius: 5px;
     }
 }

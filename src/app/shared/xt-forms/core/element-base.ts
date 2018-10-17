@@ -93,6 +93,20 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
                 return;
             }
 
+            // set dirty handler if we have one
+            if ((this as any).getDirtyFields) {
+                (this.control as any).getDirtyFields = () => {
+                    return (this as any).getDirtyFields();
+                };
+            }
+
+            // set filtered fields handler if we have one
+            if ((this as any).getFilteredValue) {
+                (this.control as any).getFilteredValue = () => {
+                    return (this as any).getFilteredValue();
+                };
+            }
+
             // run validations when form control value is changed
             this.control.valueChanges
                 // add debounce to run validations when user stops typing

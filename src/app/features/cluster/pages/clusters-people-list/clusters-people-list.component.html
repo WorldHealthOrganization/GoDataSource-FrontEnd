@@ -13,13 +13,13 @@
         <button mat-raised-button (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button mat-raised-button (click)="needsRefreshList()">
+        <button mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
 
 
-    <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event)">
+    <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
 
             <!-- First Name -->
             <ng-container matColumnDef="firstName">
@@ -80,14 +80,18 @@
                         <app-form-range
                             name="ageFilter"
                             ngModel
-                            (changed)="filterByRangeField('age', $event)">
+                            (changed)="filterByAgeRangeField('age', $event)"
+                            [min]="0"
+                            [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                            fromPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_FROM"
+                            toPlaceholder="LNG_AGE_FIELD_FILTER_LABEL_TO">
                         </app-form-range>
                     </div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                {{item.age}}
+                <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
 

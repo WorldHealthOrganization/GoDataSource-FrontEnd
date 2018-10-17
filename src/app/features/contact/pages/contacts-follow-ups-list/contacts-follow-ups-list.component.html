@@ -10,6 +10,30 @@
                     </button>
                 </ng-container>
 
+                <app-export-button
+                    *ngIf="printDailyFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
+                    [url]="printDailyFollowUpsUrl"
+                    [fileName]="followUpsPrintDailyFileName"
+                    [fileType]="printDailyFollowUpsFileType"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
+                </app-export-button>
+
+                <app-export-button
+                    *ngIf="exportFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
+                    [url]="exportFollowUpsUrl"
+                    [fileName]="followUpsDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes"
+                    [displayEncrypt]="true"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields"
+                    [queryBuilder]="queryBuilder">
+                </app-export-button>
+
                 <button *ngIf="!showPastFollowUps" mat-raised-button (click)="switchToPastFollowUps()">
                     {{'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_PAST_FOLLOW_UPS' | translate}}
                 </button>
@@ -21,6 +45,14 @@
     </ng-container>
 </app-topnav>
 
+<!-- Side columns -->
+<app-side-columns
+    [tableColumnsUserSettingsKey]="showPastFollowUps ? UserSettings.FOLLOW_UPS_PAST_FIELDS : UserSettings.FOLLOW_UPS_UPCOMING_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
@@ -32,7 +64,7 @@
         <button mat-raised-button (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button mat-raised-button (click)="needsRefreshList()">
+        <button mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -58,9 +90,18 @@
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
                             <button
+                                *ngIf="hasFollowUpsWriteAccess()"
                                 mat-menu-item
                                 (click)="modifySelectedFollowUps()">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
+                            </button>
+
+                            <a hidden #buttonDownloadFile></a>
+                            <button
+                                *ngIf="exportFollowUpsUrl"
+                                mat-menu-item
+                                (click)="exportSelectedFollowUps()">
+                                {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS' | translate }}
                             </button>
                         </mat-menu>
                     </div>
@@ -79,7 +120,7 @@
         </ng-container>
 
         <!-- Contact First Name -->
-        <ng-container matColumnDef="firstName">
+        <ng-container matColumnDef="contact.firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
@@ -102,7 +143,7 @@
         </ng-container>
 
         <!-- Contact Last Name -->
-        <ng-container matColumnDef="lastName">
+        <ng-container matColumnDef="contact.lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
@@ -205,7 +246,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
-                            [ngModel]="false"
+                            ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
@@ -266,8 +307,8 @@
             </mat-cell>
         </ng-container>
 
-        <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
-        <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
 
     <mat-paginator

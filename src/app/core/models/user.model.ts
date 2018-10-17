@@ -6,7 +6,19 @@ import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
 export enum UserSettings {
     DASHBOARD = 'dashboard',
-    CASE_FIELDS = 'caseFields'
+    CASE_FIELDS = 'caseFields',
+    CASE_LAB_FIELDS = 'caseLabFields',
+    CONTACT_FIELDS = 'contactFields',
+    EVENT_FIELDS = 'eventFields',
+    RELATIONSHIP_FIELDS = 'relationshipFields',
+    OUTBREAK_FIELDS = 'outbreakFields',
+    OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
+    FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields',
+    FOLLOW_UPS_UPCOMING_FIELDS = 'upcomingFollowUpFields',
+    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields',
+    SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
+    SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
+    SYNC_LOGS_FIELDS = 'syncLogsFields'
 }
 
 /**
@@ -15,6 +27,14 @@ export enum UserSettings {
 abstract class UserSettingsHandlers {
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
+    static CASE_LAB_FIELDS = [];
+    static CONTACT_FIELDS = [];
+    static EVENT_FIELDS = [];
+    static RELATIONSHIP_FIELDS = [];
+    static OUTBREAK_FIELDS = [];
+    static FOLLOW_UPS_MISSED_FIELDS = [];
+    static FOLLOW_UPS_UPCOMING_FIELDS = [];
+    static FOLLOW_UPS_PAST_FIELDS = [];
 }
 
 export class UserModel {

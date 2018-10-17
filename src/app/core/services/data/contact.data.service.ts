@@ -118,5 +118,25 @@ export class ContactDataService {
             MetricContactsSeenEachDays
         );
     }
+
+    /**
+     * Restore a contact that was deleted
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<Object>}
+     */
+    restoreContact(outbreakId: string, contactId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/contacts/${contactId}/restore`, {});
+    }
+
+    /**
+     * Convert a contact to case
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<any>}
+     */
+    convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
+       return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+    }
 }
 

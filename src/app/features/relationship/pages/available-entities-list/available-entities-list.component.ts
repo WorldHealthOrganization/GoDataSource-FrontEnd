@@ -77,11 +77,13 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         private entityDataService: EntityDataService,
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService
     ) {
-        super();
+        super(
+            snackbarService
+        );
     }
 
     ngOnInit() {
@@ -219,7 +221,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             new FilterModel({
                 fieldName: 'age',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
-                type: FilterType.RANGE_NUMBER,
+                type: FilterType.RANGE_AGE,
                 sortable: true
             }),
             new FilterModel({
@@ -249,7 +251,12 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      *
      * @param data
      */
-    public sortBy(data) {
+    public sortBy(
+        data: any,
+        objectDetailsSort?: {
+            [property: string]: string[]
+        }
+    ) {
         const property = _.get(data, 'active');
         const direction = _.get(data, 'direction');
 
@@ -279,7 +286,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             this.needsRefreshList(false, false);
         } else {
             // call method from parent class
-            super.sortBy(data);
+            super.sortBy(data, objectDetailsSort);
         }
     }
 
@@ -297,9 +304,9 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     }
 
     selectEntities(form: NgForm) {
-        // get list
-        const selectedRecords: string[] = this.checkedRecords;
-        if (selectedRecords.length < 1) {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
             return;
         }
 

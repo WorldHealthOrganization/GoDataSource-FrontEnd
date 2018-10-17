@@ -72,6 +72,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_OUTBREAK]
                 }
             },
+            // Outbreak Templates Module routes
+            {
+                path: ModulePath.OutbreakTemplatesModule,
+                loadChildren: './features/outbreak-templates/outbreak-templates.module#OutbreakTemplatesModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Contacts Module routes
             {
                 path: ModulePath.ContactModule,
@@ -176,6 +188,18 @@ const routes: Routes = [
                     AuthGuard,
                     PasswordChangeGuard
                 ]
+            },
+            // System settings Module routes
+            {
+                path: ModulePath.SystemConfigModule,
+                loadChildren: './features/system-config/system-config.module#SystemConfigModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
             }
         ]
     },

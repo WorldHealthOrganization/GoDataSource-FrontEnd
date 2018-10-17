@@ -11,11 +11,11 @@ export class GraphNodeModel {
     dateTimeline: string;
     // use this field to remove nodes with no date for timeline
     displayTimeline: string;
-
-    // default node color
+    // default node colors and icon
     nodeColor: string;
+    nodeNameColor: string;
+    picture: string;
     label: string;
-
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -23,6 +23,9 @@ export class GraphNodeModel {
         this.type = _.get(data, 'type', '');
         this.dateTimeline = _.get(data, 'dateTimeline', '');
         this.displayTimeline = _.get(data, 'displayTimeline', 'element');
+        this.nodeColor = _.get(data, 'nodeColor', Constants.DEFAULT_COLOR_CHAINS);
+        this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
+        this.picture = _.get(data, 'picture', 'none');
 
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -32,26 +35,5 @@ export class GraphNodeModel {
 
         // label to be used when displaying the timeline view
         this.label = this.name + '\n' + this.dateTimeline;
-
-        // set the color based on node type
-        switch (this.type) {
-            case EntityType.CASE: {
-                this.nodeColor = '#4DB0A0';
-                break;
-            }
-            case EntityType.CONTACT: {
-                this.nodeColor = '#008DC9';
-                break;
-            }
-            case EntityType.EVENT: {
-                this.nodeColor = '#F44708';
-                break;
-            }
-            default: {
-                this.nodeColor = '#4DB0A0';
-                break;
-            }
-        }
     }
-
 }

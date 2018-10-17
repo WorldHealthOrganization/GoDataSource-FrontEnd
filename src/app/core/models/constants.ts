@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
 /**
  * Apply List Filter
  */
@@ -18,20 +21,34 @@ export enum ApplyListFilter {
     NO_OF_ACTIVE_TRANSMISSION_CHAINS = 'number_of_active_chains',
     NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES = 'no_of_new_chains_of_transmission_from_contacts_who_become_cases',
     CASES_WITHOUT_RELATIONSHIPS  = 'cases_without_relationships',
-    EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships'
+    EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships',
+    CASES_WITHOUT_DATE_OF_ONSET_CHAIN = 'cases_without_date_of_onset_chain',
+    CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN = 'contacts_without_date_of_last_contact_chain',
+    EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain'
 }
 
 export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+    static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
+    static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // AGE constants
+    static DEFAULT_AGE_MAX_YEARS = 150;
+
+    // default color used by reference data
+    static DEFAULT_COLOR_REF_DATA = '#CCC';
+
+    // default color to be used in chains of transmission
+    static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
     // address constants - mapped to reference tokens
     static ADDRESS_USUAL_PLACE_OF_RESIDENCE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE';
@@ -65,6 +82,60 @@ export class Constants {
         // }
     };
 
+    /**
+     * System settings backup modules
+     */
+    static SYSTEM_BACKUP_MODULES = {
+        SYSTEM_CONFIGURATION: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',
+            value: 'System Configuration'
+        },
+        DATA: {
+            label: 'LNG_BACKUP_MODULE_LABEL_SYSTEM_DATA',
+            value: 'Data'
+        }
+    };
+
+    /**
+     * System settings backup status
+     */
+    static SYSTEM_BACKUP_STATUS = {
+        SUCCESS: {
+            label: 'LNG_BACKUP_STATUS_SUCCESS',
+            value: 'LNG_BACKUP_STATUS_SUCCESS'
+        },
+        FAILED: {
+            label: 'LNG_BACKUP_STATUS_FAILED',
+            value: 'LNG_BACKUP_STATUS_FAILED'
+        },
+        PENDING: {
+            label: 'LNG_BACKUP_STATUS_PENDING',
+            value: 'LNG_BACKUP_STATUS_PENDING'
+        }
+    };
+
+    /**
+     * System sync log status
+     */
+    static SYSTEM_SYNC_LOG_STATUS = {
+        SUCCESS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS',
+            value: 'LNG_SYNC_STATUS_SUCCESS'
+        },
+        SUCCESS_WITH_WARNINGS: {
+            label: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS',
+            value: 'LNG_SYNC_STATUS_SUCCESS_WITH_WARNINGS'
+        },
+        FAILED: {
+            label: 'LNG_SYNC_STATUS_FAILED',
+            value: 'LNG_SYNC_STATUS_FAILED'
+        },
+        IN_PROGRESS: {
+            label: 'LNG_SYNC_STATUS_IN_PROGRESS',
+            value: 'LNG_SYNC_STATUS_IN_PROGRESS'
+        }
+    };
+
     // keep functionality
     static APPLY_LIST_FILTER = ApplyListFilter;
 
@@ -86,7 +157,10 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS]: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS',
         [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES',
         [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
-        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'
+        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
+        [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN',
+        [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
+        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN'
     };
 
     // Options for Yes/No dropdowns
@@ -139,4 +213,77 @@ export class Constants {
             value: 'TIMELINE_NETWORK'
         }
     };
+
+    static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
+        TYPE: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
+        },
+        RISK_LEVEL: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            value: 'riskLevel'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        }
+    };
+
+    static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
+        CERTAINITY_LEVEL: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            value: 'certaintyLevelId'
+        },
+        SOCIAL_RELATIONSHIP_TYPE: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            value: 'socialRelationshipTypeId'
+        },
+        EXPOSURE_TYPE: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            value: 'exposureTypeId'
+        },
+        EXPOSURE_FREQUENCY: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            value: 'exposureFrequencyId'
+        },
+        EXPOSURE_DURATION: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            value: 'exposureDurationId'
+        }
+    };
+
+    static TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        TYPE: {
+            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            value: 'type'
+        },
+        CLASSIFICATION: {
+            label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            value: 'classification'
+        },
+        RISK_LEVEL: {
+            label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            value: 'riskLevel'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        }
+    };
+
+    /**
+     * Today date
+     */
+    static getCurrentDate(): Moment {
+        return moment().startOf('day');
+    }
+
 }

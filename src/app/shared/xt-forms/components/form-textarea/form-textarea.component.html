@@ -1,13 +1,14 @@
 <div class="form-textarea-container form-element"
-     [id]="identifier" [ngClass]="{invalid: (invalid)}">
+     [id]="identifier" [ngClass]="{invalid: (invalid), 'form-select-tooltip': tooltip}">
 
     <mat-form-field>
         <textarea matInput [(ngModel)]="value" [maxlength]="maxlength" [attr.name]="name" [placeholder]="placeholder"
                   matTextareaAutosize [matAutosizeMinRows]="minRows" [matAutosizeMaxRows]="maxRows"
                   [required]="required" [disabled]="disabled" [readonly]="readonly"
-                  (blur)="onBlur()" (change)="onChange()"
-                  [matTooltip]="tooltip">
+                  (blur)="onBlur()" (change)="onChange()">
         </textarea>
+
+        <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
     </mat-form-field>
 
     <app-form-validation [controlContainer]="controlContainer" [controlName]="name" *ngIf="invalid" [messages]="failures"></app-form-validation>

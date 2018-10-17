@@ -4,7 +4,6 @@ import { Constants } from '../../models/constants';
 import { EntityType } from '../../models/entity-type';
 import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
-import { LabelValuePair } from '../../models/label-value-pair';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 
@@ -94,6 +93,51 @@ export class GenericDataService {
      */
     getTransmissionChainViewTypes(): Observable<any[]> {
         return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_VIEW_TYPES));
+    }
+
+    /**
+     * Retrieve backup module list
+     */
+    getBackupModuleList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_MODULES));
+    }
+
+    /**
+     * Retrieve backup status list
+     */
+    getBackupStatusList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_BACKUP_STATUS));
+    }
+
+    /**
+     * Retrieve backup status list
+     */
+    getSyncLogStatusList(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS));
+    }
+
+    /**
+     * Retrieve the list of criteria used for node color - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeColorCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of criteria used for edge color - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainEdgeColorCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of criteria used for node icon - radio button
+     * @returns {Observable<any[]>}
+     */
+    getTransmissionChainNodeIconCriteriaOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS));
     }
 }
 

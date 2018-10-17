@@ -20,19 +20,22 @@
                             name="name"
                             [(ngModel)]="newUserRole.name"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_NAME_DESCRIPTION"
                             required="true">
                         </app-form-input>
 
                         <app-form-textarea
                             name="description"
                             [(ngModel)]="newUserRole.description"
-                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate">
+                            [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
                         </app-form-textarea>
 
                         <app-form-select
                             name="permissionIds"
                             [(ngModel)]="newUserRole.permissionIds"
                             [placeholder]="'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate"
+                            tooltip="LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS_DESCRIPTION"
                             required="true"
                             [options]="availablePermissions$ | async"
                             optionLabelKey="label"
