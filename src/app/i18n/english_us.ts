@@ -1164,7 +1164,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': '0 – Digit (0 through 9) / 9 – Digit (auto-generated sequence number) / Y – Year (Using year from the date when a case has been reported) / @ – Letter (A through Z) / & - Any character(including spaces)',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',

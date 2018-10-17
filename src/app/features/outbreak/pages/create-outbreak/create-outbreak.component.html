@@ -105,7 +105,8 @@
                                 [(ngModel)]="newOutbreak.caseIdMask"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
                                 required="true"
-                                tooltip="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION">
+                                tooltip="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysAmongContacts"
