@@ -111,7 +111,7 @@ export class TransmissionChainModel {
 
     /**
      * Find the first Case in Chain
-     * @returns {CaseModel | null} NULL if not found, otherwise CaseModel
+     * @returns {CaseModel | undefined} undefined if not found, otherwise CaseModel
      */
     get firstCase() {
         // get the 'source' Case of the first Case-Case Relationship
@@ -120,6 +120,6 @@ export class TransmissionChainModel {
         });
 
         // return the corresponding CaseModel
-        return firstCasePerson ? this.casesMap[firstCasePerson.id] : null;
+        return firstCasePerson ? this.casesMap[firstCasePerson.id] : undefined;
     }
 }
