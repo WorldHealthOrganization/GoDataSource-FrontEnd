@@ -142,22 +142,22 @@ export class Constants {
     //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
             value: 'BUBBLE_NETWORK'
         },
         HIERARCHICAL_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
         },
         TIMELINE_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
             value: 'TIMELINE_NETWORK'
         }
     };
 
     static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
         TYPE: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
             value: 'type'
         },
         CLASSIFICATION: {
@@ -203,7 +203,7 @@ export class Constants {
             value: 'none'
         },
         TYPE: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
             value: 'type'
         },
         CLASSIFICATION: {
