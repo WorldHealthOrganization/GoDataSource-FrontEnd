@@ -122,7 +122,4 @@ export class TransmissionChainModel {
         // return the corresponding CaseModel
         return firstCasePerson ? this.casesMap[firstCasePerson.id] : null;
     }
-
-
-
 }
