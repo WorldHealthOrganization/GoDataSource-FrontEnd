@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { environment } from '../../../environments/environment';
+import { Constants } from './constants';
 
 export class ReferenceDataCategoryModel {
     id: string;
@@ -50,6 +51,15 @@ export class ReferenceDataEntryModel {
         if (categoryData) {
             this.category = new ReferenceDataCategoryModel(categoryData);
         }
+    }
+
+    /**
+     * Return color code / default color
+     */
+    getColorCode(): string {
+        return this.colorCode ?
+            this.colorCode :
+            Constants.DEFAULT_COLOR_REF_DATA;
     }
 }
 

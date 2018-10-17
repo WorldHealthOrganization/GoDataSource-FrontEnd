@@ -280,7 +280,7 @@ export class RelationshipDataService {
         const lightObject = [];
         // dialog title: Case Details
         lightObject.push(new LabelValuePair(
-            'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
             ''
         ));
 

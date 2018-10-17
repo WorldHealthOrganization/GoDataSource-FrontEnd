@@ -200,6 +200,18 @@ const routes: Routes = [
                     AuthGuard,
                     PasswordChangeGuard
                 ]
+            },
+            // System settings Module routes
+            {
+                path: ModulePath.SystemConfigModule,
+                loadChildren: './features/system-config/system-config.module#SystemConfigModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
             }
         ]
     },

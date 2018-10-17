@@ -1,5 +1,6 @@
 // interfaces
 export * from './group-dirty-fields';
+export * from './group-filtered-value';
 
 // classes
 export * from './element-base';
