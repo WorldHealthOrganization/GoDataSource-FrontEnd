@@ -32,6 +32,10 @@ export class Constants {
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
+    // default random configs
+    static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    static DEFAULT_RANDOM_KEY_LENGTH = 16;
+
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
@@ -284,6 +288,24 @@ export class Constants {
      */
     static getCurrentDate(): Moment {
         return moment().startOf('day');
+    }
+
+    /**
+     * Generate random string
+     * @param alphabet
+     */
+    static randomString(
+        length: number,
+        alphabet: string = Constants.DEFAULT_RANDOM_ALPHABET
+    ): string {
+        // generate string
+        let result: string = '';
+        while (result.length < length) {
+            result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+
+        // finished
+        return result;
     }
 
 }
