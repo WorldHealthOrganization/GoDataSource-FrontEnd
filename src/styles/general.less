@@ -117,38 +117,38 @@ html, body, ul, li, div, span {
 
     // form elements having dynamic width
     .form-element-host {
-        flex: 1 auto;
+        flex: 1 1;
     }
 
     app-form-slide-toggle {
         display: inline-block;
     }
+}
 
-    // handle the tooltips on input fields
-    .form-input-tooltip,
-    .form-datepicker-tooltip,
-    .form-select-tooltip,
-    .form-textarea-tooltip,
-    .form-slide-tooltip,
-    .form-locations-select-tooltip {
-        .mat-input-element,
-        .mat-select,
-        .slide-with-icon,
-        ng-select {
-            width: ~'calc(100% - 24px)';
-        }
+// handle the tooltips on input fields
+.form-input-tooltip,
+.form-datepicker-tooltip,
+.form-select-tooltip,
+.form-textarea-tooltip,
+.form-slide-tooltip,
+.form-locations-select-tooltip {
+    .mat-input-element,
+    .mat-select,
+    .slide-with-icon,
+    ng-select {
+        width: ~'calc(100% - 24px)';
+    }
 
-        ng-select {
-            display: inline-block;
-        }
+    ng-select {
+        display: inline-block;
+    }
 
-        .form-icon {
-            display: inline !important;
-            cursor: pointer;
-            line-height: 0;
-            float: right;
-            margin-top: 7px;
-        }
+    .form-icon {
+        display: inline !important;
+        cursor: pointer;
+        line-height: 0;
+        float: right;
+        margin-top: 7px;
     }
 }
 
@@ -157,7 +157,7 @@ html, body, ul, li, div, span {
 }
 
 .page-tabs-navbar {
-    flex: 1 auto;
+    flex: 1 1;
 }
 
 .page-tabs-navbar-placeholder {
@@ -168,7 +168,7 @@ html, body, ul, li, div, span {
     display: flex;
 
     .form-content {
-        flex: 1 auto;
+        flex: 1 1;
         margin-right: 10px;
     }
 

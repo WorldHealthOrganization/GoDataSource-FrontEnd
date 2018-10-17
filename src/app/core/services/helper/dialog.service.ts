@@ -127,6 +127,7 @@ export class DialogService {
 
         // optional
         extensionPlaceholder?: string,
+        fileType?: ExportDataExtension,
         allowedExportTypes?: ExportDataExtension[],
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
@@ -134,21 +135,26 @@ export class DialogService {
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
         yesLabel?: string,
-        queryBuilder?: RequestQueryBuilder
+        queryBuilder?: RequestQueryBuilder,
+        queryBuilderClearOthers?: string[]
     }) {
         // default values
         if (!data.extensionPlaceholder) {
             data.extensionPlaceholder = 'LNG_COMMON_LABEL_EXPORT_TYPE';
         }
-        if (_.isEmpty(data.allowedExportTypes)) {
-            data.allowedExportTypes = [
-                ExportDataExtension.CSV,
-                ExportDataExtension.XLS,
-                ExportDataExtension.XLSX,
-                ExportDataExtension.XML,
-                ExportDataExtension.ODS,
-                ExportDataExtension.JSON
-            ];
+        if (data.fileType) {
+            data.allowedExportTypes = [data.fileType];
+        } else {
+            if (_.isEmpty(data.allowedExportTypes)) {
+                data.allowedExportTypes = [
+                    ExportDataExtension.CSV,
+                    ExportDataExtension.XLS,
+                    ExportDataExtension.XLSX,
+                    ExportDataExtension.XML,
+                    ExportDataExtension.ODS,
+                    ExportDataExtension.JSON
+                ];
+            }
         }
         if (!data.encryptPlaceholder) {
             data.encryptPlaceholder = 'LNG_COMMON_LABEL_EXPORT_ENCRYPT_PASSWORD';
@@ -158,6 +164,14 @@ export class DialogService {
         }
         if (!data.yesLabel) {
             data.yesLabel = 'LNG_COMMON_LABEL_EXPORT';
+        }
+        if (_.isEmpty(data.queryBuilderClearOthers)) {
+            data.queryBuilderClearOthers = [
+                'includedRelations',
+                'filter',
+                'sort',
+                'deleted'
+            ];
         }
 
         // construct list of inputs that we need in the dialog
@@ -172,7 +186,9 @@ export class DialogService {
                     );
                 }),
                 inputOptionsMultiple: false,
-                required: true
+                required: true,
+                value: data.fileType ? data.fileType : null,
+                disabled: !!data.fileType
             })
         ];
 
@@ -200,6 +216,22 @@ export class DialogService {
             );
         }
 
+        // construct query builder
+        let qb: RequestQueryBuilder;
+        if (
+            data.queryBuilder &&
+            !data.queryBuilder.isEmpty()
+        ) {
+            if (_.isEmpty(data.queryBuilderClearOthers)) {
+                qb = _.cloneDeep(data.queryBuilder);
+            } else {
+                qb = new RequestQueryBuilder();
+                _.each(data.queryBuilderClearOthers, (property: string) => {
+                    qb[property] = _.cloneDeep(data.queryBuilder[property]);
+                });
+            }
+        }
+
         // display dialog
         this.showInput(new DialogConfiguration({
                 message: data.message,
@@ -212,7 +244,7 @@ export class DialogService {
                         .exportData(
                             data.url,
                             answer.inputValue.value,
-                            data.queryBuilder
+                            qb
                         ).catch((err) => {
                         this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
                         return ErrorObservable.create(err);

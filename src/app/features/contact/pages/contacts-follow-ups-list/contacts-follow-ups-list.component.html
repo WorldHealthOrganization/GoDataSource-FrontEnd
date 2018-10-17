@@ -11,6 +11,17 @@
                 </ng-container>
 
                 <app-export-button
+                    *ngIf="printDailyFollowUpsUrl"
+                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
+                    [url]="printDailyFollowUpsUrl"
+                    [fileName]="followUpsPrintDailyFileName"
+                    [fileType]="printDailyFollowUpsFileType"
+                    [displayAnonymize]="true"
+                    [anonymizeFields]="anonymizeFields">
+                </app-export-button>
+
+                <app-export-button
                     *ngIf="exportFollowUpsUrl"
                     [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                     [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
@@ -20,7 +31,7 @@
                     [displayEncrypt]="true"
                     [displayAnonymize]="true"
                     [anonymizeFields]="anonymizeFields"
-                    [queryBuilder]="exportQueryBuilder">
+                    [queryBuilder]="queryBuilder">
                 </app-export-button>
 
                 <button *ngIf="!showPastFollowUps" mat-raised-button (click)="switchToPastFollowUps()">
@@ -53,7 +64,7 @@
         <button mat-raised-button (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button mat-raised-button (click)="needsRefreshList()">
+        <button mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -235,7 +246,7 @@
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
-                            [ngModel]="false"
+                            ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
