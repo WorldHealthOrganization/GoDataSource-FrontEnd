@@ -31,7 +31,7 @@
             <ng-container
                 *ngFor="let option of options">
                 <mat-option
-                    *ngIf="displayInvisibleItems || option[optionVisibleKey]"
+                    *ngIf="displayInvisibleItems || option[optionVisibleKey] !== false"
                     [value]="option[optionValueKey]"
                     [matTooltip]="option[optionTooltipKey] | translate"
                     [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
