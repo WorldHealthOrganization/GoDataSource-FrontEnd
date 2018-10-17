@@ -6,6 +6,15 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import * as fromPages from './pages';
 
 const routes: Routes = [
+    // Import locations
+    {
+        path: 'location-data/import',
+        component: fromPages.ImportLocationDataComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        }
+    },
     // Import hierarchical locations
     {
         path: 'hierarchical-locations/import',

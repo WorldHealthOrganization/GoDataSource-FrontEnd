@@ -17,6 +17,15 @@
                 </button>
 
                 <button
+                    *ngIf="!parentId && !appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'location-data', 'import']">
+                    {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
+                </button>
+
+                <button
                     class="button-primary"
                     mat-raised-button
                     color="primary"
