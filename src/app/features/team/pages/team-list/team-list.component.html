@@ -53,7 +53,7 @@
 
                     <mat-cell *matCellDef="let item">
                         <mat-chip-list>
-                            <mat-chip *ngFor="let member of item.members" [matTooltip]="member.fullName">{{ member.fullName }}</mat-chip>
+                            <mat-chip *ngFor="let member of item.members" [matTooltip]="member.name">{{ member.name }}</mat-chip>
                         </mat-chip-list>
                     </mat-cell>
                 </ng-container>

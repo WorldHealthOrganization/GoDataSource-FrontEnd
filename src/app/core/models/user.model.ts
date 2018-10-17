@@ -49,8 +49,6 @@ export class UserModel {
     securityQuestions: SecurityQuestionModel[] = [];
     settings: { [key: string]: any } = {};
 
-    fullName: string;
-
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');
@@ -62,8 +60,6 @@ export class UserModel {
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);
         this.securityQuestions = _.get(data, 'securityQuestions', [new SecurityQuestionModel(), new SecurityQuestionModel()]);
-
-        this.fullName = this.firstName + ' ' + this.lastName;
 
         // initialize all settings
         this.initializeSettings(data);
@@ -113,5 +109,15 @@ export class UserModel {
      */
     getSettings(key: UserSettings) {
         return this.settings[key];
+    }
+
+    /**
+     * User Name
+     * @returns {string}
+     */
+    get name(): string {
+        const firstName = _.get(this, 'firstName', '');
+        const lastName = _.get(this, 'lastName', '');
+        return _.trim(`${firstName} ${lastName}`);
     }
 }
