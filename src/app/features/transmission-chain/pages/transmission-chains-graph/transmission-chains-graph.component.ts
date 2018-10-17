@@ -16,7 +16,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 export class TransmissionChainsGraphComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GRAPH_TRANSMISSION_CHAINS_TITLE', null, true)
+        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
     ];
 
     // provide constants to template

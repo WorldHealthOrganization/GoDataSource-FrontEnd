@@ -15,7 +15,10 @@ export enum UserSettings {
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
     FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields',
     FOLLOW_UPS_UPCOMING_FIELDS = 'upcomingFollowUpFields',
-    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields'
+    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields',
+    SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
+    SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
+    SYNC_LOGS_FIELDS = 'syncLogsFields'
 }
 
 /**

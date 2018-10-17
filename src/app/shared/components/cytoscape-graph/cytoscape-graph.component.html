@@ -21,7 +21,7 @@
         <!-- node color -->
         <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
              class="legend-name">
-            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
         </div>
         <div
@@ -38,7 +38,7 @@
         <!-- node name color -->
         <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
              class="legend-name">
-            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
         </div>
         <div
@@ -58,7 +58,7 @@
         <!-- edge color -->
         <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
              class="legend-name">
-            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
             <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
         </div>
 
@@ -76,7 +76,7 @@
         <!-- node icon -->
         <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
              class="legend-name">
-            {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
             <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
         </div>
         <div
@@ -105,7 +105,7 @@
        routerLink="/cases"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
         {{elements.caseNodesWithoutDates.length}}
-        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
     </a>
 </div>
 <div *ngIf="showContactNodesWithoutDates()"
@@ -114,7 +114,7 @@
        routerLink="/contacts"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
         {{elements.contactNodesWithoutDates.length}}
-        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
     </a>
 </div>
 <div *ngIf="showEventNodesWithoutDates()"
@@ -123,27 +123,27 @@
        routerLink="/events"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
         {{elements.eventNodesWithoutDates.length}}
-        {{'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
     </a>
 </div>
 
 <button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
     mat-raised-button
     (click)="switchTimelineView('vertical')">
-    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
+    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
 </button>
 
 <button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
     mat-raised-button
     (click)="switchTimelineView('horizontal')">
-    {{ 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
 </button>
 
 <!--  show / hide legend -->
 <div class="toggle-legend">
     <app-form-slide-toggle
         name="showLegend"
-        [label]="'LNG_PAGE_GRAPH_TRANSMISSION_CHAINS_SHOW_LEGEND_LABEL' | translate"
+        [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
         [(ngModel)]="showLegend">
     </app-form-slide-toggle>
 </div>

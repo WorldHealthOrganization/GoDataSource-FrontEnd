@@ -4,6 +4,7 @@ import { DocumentModel } from './document.model';
 import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
+import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 
 export class CaseModel {
@@ -25,6 +26,7 @@ export class CaseModel {
     dateOfOutcome: string;
     dateBecomeCase: string;
     deceased: boolean;
+    safeBurial: boolean;
     dateDeceased: string;
     hospitalizationDates: DateRangeModel[];
     isolationDates: DateRangeModel[];
@@ -35,6 +37,7 @@ export class CaseModel {
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
+    outcomeId: string;
     deleted: boolean;
 
     relationships: {
@@ -43,6 +46,8 @@ export class CaseModel {
 
     dob: string;
     age: AgeModel;
+
+    inconsistencies: InconsistencyModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -74,6 +79,7 @@ export class CaseModel {
         this.dateBecomeCase = _.get(data, 'dateBecomeCase');
         this.deceased = _.get(data, 'deceased');
         this.dateDeceased = _.get(data, 'dateDeceased');
+        this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
         this.isolationDates = _.get(data, 'isolationDates', []);
@@ -82,11 +88,17 @@ export class CaseModel {
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
         this.outbreakId = _.get(data, 'outbreakId');
+        this.outcomeId = _.get(data, 'outcomeId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
         this.relationships = _.get(data, 'relationships', []);
         this.deleted = _.get(data, 'deleted');
+
+        this.inconsistencies = _.get(data, 'inconsistencies', []);
+        _.each(this.inconsistencies, (inconsistency, index) => {
+            this.inconsistencies[index] = new InconsistencyModel(inconsistency);
+        });
     }
 
     /**
