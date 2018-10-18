@@ -33,14 +33,14 @@
                         <!-- Text column -->
                         <hot-column
                             *ngIf="column.type === SheetCellType.TEXT"
-                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
                             [validator]="column.validationFunc">
                         </hot-column>
 
                         <!-- Numeric column -->
                         <hot-column
                             *ngIf="column.type === SheetCellType.NUMERIC"
-                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
                             type="numeric"
                             [validator]="column.validationFunc">
                         </hot-column>
@@ -48,7 +48,7 @@
                         <!-- Date column -->
                         <hot-column
                             *ngIf="column.type === SheetCellType.DATE"
-                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
                             type="date"
                             [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
                             [correctFormat]="true"
@@ -58,7 +58,7 @@
                         <!-- Dropdown column -->
                         <hot-column
                             *ngIf="column.type === SheetCellType.DROPDOWN"
-                            title="{{(column.title | translate) + (column.required ? ' *' : '')}}"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
                             type="dropdown"
                             [trimDropdown]="false"
                             [source]="column.optionLabels$ | async"

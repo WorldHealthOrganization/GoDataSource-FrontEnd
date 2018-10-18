@@ -36,10 +36,11 @@ export class BulkAddContactsService {
      * @param sheetColumns
      */
     getData(sheetCore: Handsontable, sheetColumns: AbstractSheetColumn[]): Observable<any[]> {
-        const data = [];
-
+        // get the label-value map of Reference Data dropdowns (so we can replaced the labels used in the Sheet with the actual values)
         return this.getDropdownsLabelValueMap((sheetColumns as any))
             .map((dropdownsMap) => {
+                const data = [];
+
                 // get table data
                 const tableCellsData = sheetCore.getData();
 
