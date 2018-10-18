@@ -9,17 +9,13 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
-import { DateRangeModel } from '../../models/date-range.model';
-import { ReferenceDataCategory } from '../../models/reference-data.model';
-import { ReferenceDataDataService } from './reference-data.data.service';
 
 @Injectable()
 export class TransmissionChainDataService {
 
     constructor(
         private http: HttpClient,
-        private modelHelper: ModelHelperService,
-        private referenceDataDataService: ReferenceDataDataService
+        private modelHelper: ModelHelperService
     ) {}
 
     /**

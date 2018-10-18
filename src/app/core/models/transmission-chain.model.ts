@@ -111,18 +111,15 @@ export class TransmissionChainModel {
 
     /**
      * Find the first Case in Chain
-     * @returns {CaseModel}
+     * @returns {CaseModel | undefined} undefined if not found, otherwise CaseModel
      */
     get firstCase() {
         // get the 'source' Case of the first Case-Case Relationship
-        const firstCasePerson: RelationshipPersonModel = _.find(this.firstRelationship.persons, (person: RelationshipPersonModel) => {
+        const firstCasePerson: RelationshipPersonModel = _.find(_.get(this, 'firstRelationship.persons'), (person: RelationshipPersonModel) => {
             return person.source;
         });
 
         // return the corresponding CaseModel
-        return this.casesMap[firstCasePerson.id];
+        return firstCasePerson ? this.casesMap[firstCasePerson.id] : undefined;
     }
-
-
-
 }
