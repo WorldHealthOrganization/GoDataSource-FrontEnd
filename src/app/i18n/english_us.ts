@@ -565,6 +565,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
         'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
         'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
+        'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON': 'Export Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE': 'Export Hierarchical Locations',
 
         /**
          * Create Location page
