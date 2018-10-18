@@ -214,6 +214,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
         TYPE: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
@@ -233,6 +234,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
         CERTAINITY_LEVEL: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
@@ -256,6 +258,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS = {
         NONE: {
             label: 'LNG_COMMON_LABEL_NONE',
@@ -276,6 +279,30 @@ export class Constants {
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
             value: 'gender'
+        }
+    };
+
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS = {
+        NAME: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME',
+            value: 'name'
+        },
+        AGE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
+            value: 'age'
+        },
+        DATE_OF_ONSET: {
+            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            value: 'dateOfOnset'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        },
+        LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION',
+            value: 'location'
         }
     };
 

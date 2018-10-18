@@ -141,6 +141,15 @@
         </app-form-radio>
 
         <div>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeLabelCriteria"
+            [(ngModel)]="colorCriteria.nodeLabelCriteria"
+            [options]="nodeLabelCriteriaOptions$ | async">
+        </app-form-radio>
+
+        <div>
             <button mat-raised-button (click)="refreshChain()">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
