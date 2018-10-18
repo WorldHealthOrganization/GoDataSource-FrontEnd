@@ -266,6 +266,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                         })
                         .subscribe((isValid: boolean) => {
                             observer.next(isValid);
+                            observer.complete();
                         });
                     });
 

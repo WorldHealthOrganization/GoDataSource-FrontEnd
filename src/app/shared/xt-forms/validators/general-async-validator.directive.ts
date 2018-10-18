@@ -2,7 +2,9 @@ import { Directive, forwardRef, Input } from '@angular/core';
 import { AsyncValidator, AbstractControl, NG_ASYNC_VALIDATORS, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
-import { Subscriber } from 'rxjs/Subscriber';
+import 'rxjs/add/observable/timer';
+import 'rxjs/add/operator/switchMap';
+import { Constants } from '../../../core/models/constants';
 
 @Directive({
     selector: '[app-general-async-validator][ngModel]',
@@ -32,26 +34,22 @@ export class GeneralAsyncValidatorDirective implements AsyncValidator {
         ) {
             return Observable.of(null);
         } else {
-            return Observable.create((observer: Subscriber<ValidationErrors>) => {
-                this.asyncValidatorObservable
-                    .subscribe((isValid: boolean) => {
+            return Observable.timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS).switchMap(() => {
+                return this.asyncValidatorObservable
+                    .map((isValid: boolean) => {
                         // finished
                         if (isValid) {
-                            observer.next(null);
+                            return null;
                         } else {
-                            observer.next({
+                            return {
                                 generalAsyncValidatorDirective: {
                                     err: this.asyncValidatorErrMsg,
                                     details: this.asyncValidatorErrMsgTranslateData
                                 }
-                            });
+                            };
                         }
-
-                        // finished
-                        observer.complete();
                     });
             });
-
         }
     }
 }

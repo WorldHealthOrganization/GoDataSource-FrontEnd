@@ -100,6 +100,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                     })
                     .subscribe((isValid: boolean) => {
                         observer.next(isValid);
+                        observer.complete();
                     });
                 });
             });
