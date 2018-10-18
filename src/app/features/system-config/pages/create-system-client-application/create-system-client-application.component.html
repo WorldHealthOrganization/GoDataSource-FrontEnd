@@ -46,21 +46,47 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
-                                name="credentials[clientId]"
-                                [(ngModel)]="clientApplicationData.credentials.clientId"
-                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID' | translate"
-                                tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION"
-                                required="true">
-                            </app-form-input>
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-input
+                                    name="credentials[clientId]"
+                                    [(ngModel)]="clientApplicationData.credentials.clientId"
+                                    [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID' | translate"
+                                    tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION"
+                                    required="true">
+                                </app-form-input>
 
-                            <app-form-input
-                                name="credentials[clientSecret]"
-                                [(ngModel)]="clientApplicationData.credentials.clientSecret"
-                                [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET' | translate"
-                                tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION"
-                                required="true">
-                            </app-form-input>
+                                <div
+                                    fxFlex="100px">
+                                    <button
+                                        type="button"
+                                        mat-raised-button
+                                        color="primary"
+                                        (click)="generateKey('credentials[clientId]')">
+                                        {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-input
+                                    name="credentials[clientSecret]"
+                                    [(ngModel)]="clientApplicationData.credentials.clientSecret"
+                                    [placeholder]="'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET' | translate"
+                                    tooltip="LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION"
+                                    required="true">
+                                </app-form-input>
+
+                                <div
+                                    fxFlex="100px">
+                                    <button
+                                        type="button"
+                                        mat-raised-button
+                                        color="primary"
+                                        (click)="generateKey('credentials[clientSecret]')">
+                                        {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
+                                    </button>
+                                </div>
+                            </div>
 
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>

@@ -124,6 +124,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as present on follow-up?',
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_REPLACE_VALUE_WITH_NEW_ONE': 'Do you want to replace the old value with new one?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
@@ -1512,6 +1513,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
 
         /**
          * List Filters page titles
