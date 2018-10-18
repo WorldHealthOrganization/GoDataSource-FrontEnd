@@ -36,14 +36,27 @@
                                     <div fxFlex fxLayout="row" fxLayoutGap="5px">
                                         <!-- Free text -->
                                         <app-form-input
-                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value"
+                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
                                             [name]="name + '[' + question.variable + ']'"
                                             [(ngModel)]="value[question.variable]"
                                             [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
                                             [required]="question.required"
                                             (optionChanged)="onChange()"
-                                            [disabled]="disabled">
+                                            [disabled]="disabled"
+                                            [type]="question.answerType === Constants.ANSWER_TYPES.NUMERIC.value ? 'number' : 'text'">
                                         </app-form-input>
+
+                                        <!-- Date / Time Picker -->
+                                        <app-form-datepicker
+                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
+                                            [name]="name + '[' + question.variable + ']'"
+                                            [(ngModel)]="value[question.variable]"
+                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                            [required]="question.required"
+                                            [disabled]="disabled"
+                                            (optionChanged)="onChange()"
+                                            app-date-validator>
+                                        </app-form-datepicker>
 
                                         <!-- Multiple selections -->
                                         <app-form-select
