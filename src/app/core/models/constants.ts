@@ -288,13 +288,9 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME',
             value: 'name'
         },
-        AGE_YEARS: {
-            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE_YEARS',
-            value: 'age-years'
-        },
-        AGE_MONTHS: {
-            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE_MONTHS',
-            value: 'age-months'
+        AGE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
+            value: 'age'
         },
         DATE_OF_ONSET: {
             label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',

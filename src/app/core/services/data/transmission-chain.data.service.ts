@@ -208,15 +208,13 @@ export class TransmissionChainDataService {
                         // determine label
                         if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                             nodeData.label = nodeData.name;
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_YEARS.value) {
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
                             if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                nodeData.label = node.model.age.years + ' ' + yearsLabel;
-                            } else {
-                                nodeData.label = '';
-                            }
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_MONTHS.value) {
-                            if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                if (node.model.age.months > 0) {
+                                    nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                } else {
+                                    nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                                }
                             } else {
                                 nodeData.label = '';
                             }
@@ -303,15 +301,13 @@ export class TransmissionChainDataService {
                             // determine label
                             if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                                 nodeData.label = nodeData.name;
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_YEARS.value) {
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
                                 if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                    nodeData.label = node.model.age.years + ' ' + yearsLabel;
-                                } else {
-                                    nodeData.label = '';
-                                }
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE_MONTHS.value) {
-                                if (node.entityType !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                    nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                    if (node.model.age.months > 0) {
+                                        nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                    } else {
+                                        nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                                    }
                                 } else {
                                     nodeData.label = '';
                                 }
