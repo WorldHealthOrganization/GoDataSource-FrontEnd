@@ -59,9 +59,12 @@ export class CaseSummaryDashletComponent implements OnInit {
      * @returns {MetricChartDataModel[]}
      */
     buildChartData(casesList: CaseModel[]) {
-        const caseSummaryResults: MetricChartDataModel[] = [];
+        let caseSummaryResults: MetricChartDataModel[] = [];
         _.forEach(casesList, (casePerson, key) => {
             // ignore not a case classification
+            if(casePerson.classification == 'Confirmed') {
+                console.log(casePerson);
+            }
             if (casePerson.classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
                 const caseSummaryResult: MetricChartDataModel = _.find(caseSummaryResults, {name: casePerson.classification});
                 if (caseSummaryResult) {
@@ -79,6 +82,7 @@ export class CaseSummaryDashletComponent implements OnInit {
             result.name = this.i18nService.instant(result.name);
             return result;
         });
+        caseSummaryResults = _.orderBy(caseSummaryResults, ['value'], ['desc']);
         return caseSummaryResults;
     }
 
