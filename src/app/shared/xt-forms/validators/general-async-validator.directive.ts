@@ -37,17 +37,13 @@ export class GeneralAsyncValidatorDirective implements AsyncValidator {
             return Observable.timer(Constants.DEFAULT_DEBOUNCE_TIME_MILLISECONDS).switchMap(() => {
                 return this.asyncValidatorObservable
                     .map((isValid: boolean) => {
-                        // finished
-                        if (isValid) {
-                            return null;
-                        } else {
-                            return {
+                        return isValid ?
+                            null : {
                                 generalAsyncValidatorDirective: {
                                     err: this.asyncValidatorErrMsg,
                                     details: this.asyncValidatorErrMsgTranslateData
                                 }
                             };
-                        }
                     });
             });
         }
