@@ -116,7 +116,8 @@
                             (groupValidated)="validateGroup()"
                             [minItems]="2"
                             [parentControls]="groupForm.controls"
-                            [defaultQuestionCategory]="values[i].category">
+                            [defaultQuestionCategory]="values[i].category"
+                            [variableReadOnly]="variableReadOnly">
                         </app-form-answer-list>
                     </div>
                 </div>

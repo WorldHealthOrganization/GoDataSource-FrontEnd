@@ -73,7 +73,9 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     protected generateNewItem(): QuestionModel {
-        return new QuestionModel();
+        const q = new QuestionModel();
+        q.new = true;
+        return q;
     }
 
     /**
