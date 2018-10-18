@@ -82,6 +82,9 @@ export class CaseSummaryDashletComponent implements OnInit {
         return caseSummaryResults;
     }
 
+    /**
+     * Set custom colors of the chart - based on those chosen in ref data
+     */
     setCustomColors() {
         const customColors = [];
         if (!_.isEmpty(this.caseClassificationsList)) {
