@@ -1,9 +1,14 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { Constants } from '../../../core/models/constants';
+import { FileUploader } from 'ng2-file-upload';
+import { environment } from '../../../../environments/environment';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { OutbreakModel } from '../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 
 @Component({
     selector: 'app-form-fill-questionnaire',
@@ -16,7 +21,7 @@ import { Constants } from '../../../core/models/constants';
         multi: true
     }]
 })
-export class FormFillQuestionnaireComponent extends GroupBase<{}> {
+export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnInit {
     @Input() disabled: boolean = false;
 
     questionsGroupedByCategory: {
@@ -40,6 +45,18 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
     @Input() hideCategories: boolean = false;
 
     /**
+     * File uploader
+     */
+    uploaders: {
+        [questionVariable: string]: FileUploader
+    } = {};
+
+    /**
+     * Outbreak
+     */
+    selectedOutbreak: OutbreakModel;
+
+    /**
      * Set question and group them by category
      * @param {QuestionModel[]} questions
      */
@@ -48,11 +65,18 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
         this.additionalQuestions = {};
 
         // group them by category
+        this.uploaders = {};
         this.questionsGroupedByCategory = _.chain(questions)
             .groupBy('category')
             .transform((result, questionsData: QuestionModel[], category: string) => {
                 // map additional questions
                 _.each(questionsData, (question: QuestionModel) => {
+                    // add file upload handler if necessary
+                    if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
+                        this.uploaders[question.variable] = new FileUploader({});
+                    }
+
+                    // map answers
                     _.each(question.answers, (answer: AnswerModel) => {
                         if (!_.isEmpty(answer.additionalQuestions)) {
                             // answer value should be unique
@@ -72,17 +96,61 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> {
                 });
             }, [])
             .value();
+
+        // initialize uploader
+        this.initializeUploader();
     }
 
+    /**
+     * Constructor
+     */
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
-        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>
+        @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super(controlContainer, validators, asyncValidators);
 
         // initialize
         this.value = this.value ? this.value : {};
+    }
+
+    /**
+     * Component initialized
+     */
+    ngOnInit() {
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+                this.initializeUploader();
+            });
+    }
+
+    /**
+     * Initialize Uploader
+     */
+    initializeUploader() {
+        // do we have outbreak data ?
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id
+        ) {
+            return;
+        }
+
+        // initialize uploader
+        _.each(this.uploaders, (uploader: FileUploader) => {
+            uploader.setOptions({
+                authToken: this.authDataService.getAuthToken(),
+                url: `${environment.apiUrl}/outbreaks/${this.selectedOutbreak.id}/attachments`
+            });
+            // uploader.options.additionalParameter = {
+            //     name: this._model
+            // }
+        });
     }
 
     /**

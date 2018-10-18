@@ -51,7 +51,7 @@
                                             *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
                                             [name]="name + '[' + question.variable + ']'"
                                             [(ngModel)]="value[question.variable]"
-                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
+                                            [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
                                             [required]="question.required"
                                             [disabled]="disabled"
                                             (optionChanged)="onChange()"
@@ -72,6 +72,26 @@
                                             (optionChanged)="onChange()"
                                             [disabled]="disabled">
                                         </app-form-select>
+
+                                        <div
+                                            *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
+                                            fxFlex fxLayout="row" fxLayoutGap="20px">
+                                            <app-form-input
+                                                [name]="name + '[' + question.variable + ']'"
+                                                ngModel
+                                                [placeholder]="'LNG_QUESTIONNAIRE_LABEL_FILE_NAME' | translate"
+                                                [required]="question.required"
+                                                (optionChanged)="onChange()"
+                                                [disabled]="disabled">
+                                            </app-form-input>
+
+                                            <input
+                                                hidden
+                                                #importDataBtn
+                                                type="file"
+                                                ng2FileSelect
+                                                [uploader]="uploaders[question.variable]"/>
+                                        </div>
 
                                         <!-- copy value button -->
                                         <div

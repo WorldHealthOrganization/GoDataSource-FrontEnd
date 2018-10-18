@@ -38,6 +38,7 @@ import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
 import { LanguageResolver } from './resolvers/language.resolver';
+import { AttachmentDataService } from './data/attachment.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -71,6 +72,7 @@ export const services: any[] = [
     SystemBackupDataService,
     SystemSyncDataService,
     SystemSyncLogDataService,
+    AttachmentDataService,
 
     // guard services
     AuthGuard,
