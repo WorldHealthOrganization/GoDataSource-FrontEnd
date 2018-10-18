@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -19,27 +20,35 @@ export class CaseSummaryComponent implements OnInit {
     chainsSize: any;
     histogramResults: any = [];
     caseClassificationsList: LabelValuePair[];
+    caseSummary: any;
 
     constructor(
-        private transmissionChainDataService: TransmissionChainDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private caseDataService: CaseDataService
     ) {}
 
     ngOnInit() {
 
-        this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).subscribe( (resultCases) => {
-            this.caseClassificationsList = resultCases;
-        });
-
-        this.outbreakDataService.getSelectedOutbreak()
+        // get number of hospitalised cases
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
+                // get the results for hospitalised cases
                 if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-                    // get chain data and convert to array of size and number
-                    this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id).subscribe((chains) => {
-                        this.setHistogramResults(chains);
-                    });
+                    this.caseDataService
+                        .getCasesList(selectedOutbreak.id)
+                        .subscribe((casesList) => {
+
+                            _.forEach(casesList, (casePerson, key) => {
+                                if ( this.caseSummary[casePerson.classification] ) {
+                                    this.caseSummary[casePerson.classification] ++;
+                                } else {
+                                    this.caseSummary[casePerson.classification] = 1;
+                                }
+                            });
+                            console.log(this.caseSummary);
+                        });
                 }
             });
     }
@@ -74,15 +83,6 @@ export class CaseSummaryComponent implements OnInit {
         } else {
             return '';
         }
-    }
-
-    /**
-     * Handle click on a bar in the chart
-     * @param event
-     */
-    onSelectChart(event) {
-        this.selectedSizeOfChains = event.name;
-        // TODO open chains of transmission filtered by the size of the chains
     }
 
 }
