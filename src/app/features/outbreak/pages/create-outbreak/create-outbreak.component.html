@@ -39,7 +39,6 @@
                                 [options]="countriesList$ | async"
                                 optionLabelKey="label"
                                 optionValueKey="value"
-                                required="true"
                                 multiple="true"
                                 [compareWith]="compareCountryWith">
                             </app-form-select>
@@ -51,8 +50,7 @@
                             name="description"
                             [(ngModel)]="newOutbreak.description"
                             [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                            required="true">
+                            tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
                         </app-form-textarea>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
@@ -74,6 +72,21 @@
                                 [dateSameOrAfter]="'startDate'">
                             </app-form-datepicker>
                             <app-form-input
+                                name="caseIdMask"
+                                [(ngModel)]="newOutbreak.caseIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="newOutbreak.periodOfFollowup"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
@@ -82,30 +95,12 @@
                                 type="number">
                             </app-form-input>
                             <app-form-input
-                                name="frequencyOfFollowUp"
-                                [(ngModel)]="newOutbreak.frequencyOfFollowUp"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_DESCRIPTION"
-                                required="true"
-                                type="number">
-                            </app-form-input>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
                                 name="frequencyOfFollowUpPerDay"
                                 [(ngModel)]="newOutbreak.frequencyOfFollowUpPerDay"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION"
                                 required="true"
                                 type="number">
-                            </app-form-input>
-                            <app-form-input
-                                name="caseIdMask"
-                                [(ngModel)]="newOutbreak.caseIdMask"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
-                                required="true"
-                                tooltip="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysAmongContacts"

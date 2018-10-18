@@ -31,6 +31,7 @@
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_DISEASE_DESCRIPTION"
                                 [options]="diseasesList$ | async"
+                                required="true"
                                 [disabled]="viewOnly">
                             </app-form-select>
                             <app-form-select
@@ -42,7 +43,6 @@
                                 optionLabelKey="label"
                                 optionValueKey="value"
                                 multiple="true"
-                                required="true"
                                 [disabled]="viewOnly"
                                 [compareWith]="compareCountryWith">
                             </app-form-select>
@@ -55,7 +55,6 @@
                             [(ngModel)]="outbreak.description"
                             [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
                             tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                            required="true"
                             [disabled]="viewOnly">
                         </app-form-textarea>
 
@@ -80,6 +79,22 @@
                                 [disabled]="viewOnly">
                             </app-form-datepicker>
                             <app-form-input
+                                name="caseIdMask"
+                                [(ngModel)]="outbreak.caseIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+                    </div>
+                </mat-card>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
                                 name="periodOfFollowup"
                                 [(ngModel)]="outbreak.periodOfFollowup"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS' | translate"
@@ -89,18 +104,6 @@
                                 type="number">
                             </app-form-input>
                             <app-form-input
-                                name="frequencyOfFollowUp"
-                                [(ngModel)]="outbreak.frequencyOfFollowUp"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY' | translate"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_DESCRIPTION"
-                                required="true"
-                                [disabled]="viewOnly"
-                                type="number">
-                            </app-form-input>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
                                 name="frequencyOfFollowUpPerDay"
                                 [(ngModel)]="outbreak.frequencyOfFollowUpPerDay"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY' | translate"
@@ -108,14 +111,6 @@
                                 required="true"
                                 [disabled]="viewOnly"
                                 type="number">
-                            </app-form-input>
-                            <app-form-input
-                                name="caseIdMask"
-                                [(ngModel)]="outbreak.caseIdMask"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
-                                required="true"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
-                                [disabled]="viewOnly">
                             </app-form-input>
                             <app-form-input
                                 name="noDaysAmongContacts"
