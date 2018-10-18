@@ -5,6 +5,8 @@ import { UserModel } from '../../models/user.model';
 import { UserRoleModel } from '../../models/user-role.model';
 import { PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
+import { TeamModel } from '../../models/team.model';
+import { LocationModel } from '../../models/location.model';
 
 @Injectable()
 export class ModelHelperService {
@@ -95,6 +97,25 @@ export class ModelHelperService {
                 }
 
                 return userRole;
+
+            // custom instantiation routine for Team model
+            case TeamModel:
+                // create the Team instance
+                const team = new TeamModel(data);
+
+                // set locations
+                team.locations = this.mapListToModel(
+                    _.get(data, 'locations', []),
+                    LocationModel
+                );
+
+                // set users
+                team.members = this.mapListToModel(
+                    _.get(data, 'members', []),
+                    UserModel
+                );
+
+                return team;
 
             default:
                 return new modelClass(data);
