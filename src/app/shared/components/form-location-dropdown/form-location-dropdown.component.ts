@@ -93,6 +93,23 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * Initialize component elements
      */
     ngOnInit() {
+
+        // if this.value is set, then retrieve the corresponding location names for the ids
+        // TODO investigate a solution for not specifying the timeout value.
+        setTimeout(() => {
+            if (this.value) {
+                this.queryBuilder.filter
+                    .remove('parentLocationId')
+                    .remove('id')
+                    .where({
+                    id: {
+                        'inq': this.value
+                    }
+                }, true);
+                this.refreshLocationList();
+            }
+        }, 400);
+
         // handle server side search
         this.locationInput$
             .debounceTime(500)
