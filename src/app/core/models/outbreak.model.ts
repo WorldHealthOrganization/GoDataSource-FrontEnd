@@ -70,7 +70,7 @@ export class OutbreakModel {
      * Return case id mask with data replaced
      * @param caseIdMask
      */
-    static generateCaseIDMask(caseIdMask: string) : string {
+    static generateCaseIDMask(caseIdMask: string): string {
         // validate
         if (_.isEmpty(caseIdMask)) {
             return '';
