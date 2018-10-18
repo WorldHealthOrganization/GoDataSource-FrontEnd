@@ -42,6 +42,9 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
     contactData: ContactModel = new ContactModel();
 
+    entityType: EntityType;
+    entityId: string;
+
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
 
@@ -73,9 +76,6 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
 
-        // ...and a document
-        this.contactData.documents.push(new DocumentModel());
-
         // get today time
         this.genericDataService
             .getServerUTCToday()
@@ -86,19 +86,19 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         // retrieve query params
         this.route.queryParams
             .subscribe((params: {entityType, entityId}) => {
-                const entityType: EntityType = _.get(params, 'entityType');
-                const entityId: string = _.get(params, 'entityId');
+                this.entityType = _.get(params, 'entityType');
+                this.entityId = _.get(params, 'entityId');
 
                 // check if we have proper values ( case or event ID )
                 if (
-                    !entityType ||
-                    !entityId
+                    !this.entityType ||
+                    !this.entityId
                 ) {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
 
                     // navigate to Cases/Events listing page
                     this.disableDirtyConfirm();
-                    if (entityType === EntityType.EVENT) {
+                    if (this.entityType === EntityType.EVENT) {
                         this.router.navigate(['/events']);
                     } else {
                         this.router.navigate(['/cases']);
@@ -127,14 +127,14 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
                         // retrieve Case/Event information
                         this.entityDataService
-                            .getEntity(entityType, selectedOutbreak.id, entityId)
+                            .getEntity(this.entityType, selectedOutbreak.id, this.entityId)
                             .catch((err) => {
                                 // show error message
                                 this.snackbarService.showError(err.message);
 
                                 // navigate to Cases/Events listing page
                                 this.disableDirtyConfirm();
-                                if (entityType === EntityType.EVENT) {
+                                if (this.entityType === EntityType.EVENT) {
                                     this.router.navigate(['/events']);
                                 } else {
                                     this.router.navigate(['/cases']);
@@ -147,7 +147,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                                 this.relatedEntityData = relatedEntityData;
                                 this.relationship.persons.push(
                                     new RelationshipPersonModel({
-                                        id: entityId
+                                        id: this.entityId
                                     })
                                 );
                             });
@@ -214,7 +214,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/contacts']);
+                            this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
                         });
                 });
         }
