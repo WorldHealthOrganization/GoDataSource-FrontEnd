@@ -1,15 +1,14 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as _ from 'lodash';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -62,9 +61,6 @@ export class CaseSummaryDashletComponent implements OnInit {
         let caseSummaryResults: MetricChartDataModel[] = [];
         _.forEach(casesList, (casePerson, key) => {
             // ignore not a case classification
-            if(casePerson.classification == 'Confirmed') {
-                console.log(casePerson);
-            }
             if (casePerson.classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
                 const caseSummaryResult: MetricChartDataModel = _.find(caseSummaryResults, {name: casePerson.classification});
                 if (caseSummaryResult) {
