@@ -561,6 +561,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON': 'Import Location Data',
         'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
         'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
         'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
@@ -1646,6 +1647,11 @@ export const EnglishUsLang = {
          * Import hierarchical locations
          */
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
+
+        /**
+         * Import location data
+         */
+        'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
 
         /**
          * Import reference data

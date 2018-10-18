@@ -65,8 +65,8 @@ export class RequestInterceptor implements HttpInterceptor {
      */
     private normalizeUrl(url: string): string {
         if (
-            url.indexOf('http://') >= 0 ||
-            url.indexOf('https://') >= 0
+            url.indexOf('http://') === 0 ||
+            url.indexOf('https://') === 0
         ) {
             return url;
         } else {

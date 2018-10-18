@@ -27,7 +27,7 @@ export enum ImportDataExtension {
 export enum ImportServerModelNames {
     CASE_LAB_RESULTS = 'labResult',
     REFERENCE_DATA = 'referenceData',
-
+    LOCATION = 'location',
     OUTBREAK = 'outbreak',
     CASE = 'case',
     CONTACT = 'contact'
