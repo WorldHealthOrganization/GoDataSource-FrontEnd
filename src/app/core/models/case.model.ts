@@ -40,6 +40,8 @@ export class CaseModel {
     outcomeId: string;
     deleted: boolean;
 
+    visualId: string;
+
     relationships: {
         people: any[]
     }[];
@@ -71,6 +73,7 @@ export class CaseModel {
         this.age = new AgeModel(_.get(data, 'age'));
 
         this.classification = _.get(data, 'classification');
+        this.visualId = _.get(data, 'visualId');
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfInfection = _.get(data, 'dateOfInfection');
