@@ -31,6 +31,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
         'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
+        'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL': 'Teams & Assignments',
 
         /**
          * Stepper buttons
@@ -123,10 +124,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as present on follow-up?',
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
         'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP': 'Are you sure you want to delete this follow-up: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_REPLACE_VALUE_WITH_NEW_ONE': 'Do you want to replace the old value with new one?',
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
@@ -135,6 +138,9 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_LOCATION_USED': 'Location "{{name}}" can\'t be removed because it is used, do you want to see where?',
         'LNG_DIALOG_CONFIRM_LOCATION_HAS_CHILDREN': 'Location "{{name}}" can\'t be removed because it has children locations',
         'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK': 'Name the clone of the outbreak',
+        'LNG_DIALOG_CONFIRM_DELETE_TEAM': 'Are you sure you want to delete this team: "{{name}}" ?',
+        'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
+        'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
 
         /**
          * Dialogs fields placeholders
@@ -337,8 +343,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
         'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
+        'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT': 'Convert to contact',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
         'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE': 'Case restored!',
+        'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE': 'Case successfully converted to contact!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
@@ -561,9 +569,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE': 'Location Usage',
         'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Location deleted!',
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON': 'Import Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON': 'Import Location Data',
         'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
         'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
         'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
+        'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON': 'Export Hierarchical Locations',
+        'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE': 'Export Hierarchical Locations',
 
         /**
          * Create Location page
@@ -596,6 +607,39 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE': 'Type',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK': 'Outbreak',
         'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS': 'Only the first {{displayed}} of {{total}} records are displayed',
+
+        /**
+         * Teams fields
+         */
+        'LNG_TEAM_FIELD_LABEL_NAME': 'Name',
+        'LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_TEAM_FIELD_LABEL_USERS': 'Members',
+        'LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION': '',
+        'LNG_TEAM_FIELD_LABEL_LOCATIONS': 'Locations',
+        'LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION': '',
+
+
+        /**
+         * Teams list page
+         */
+        'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
+        'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
+        'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+
+        /**
+         * Create Team page
+         */
+        'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE': 'Team created',
+        'LNG_PAGE_CREATE_TEAM_TITLE': 'Create Team',
+        'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON': 'Create team',
+        'LNG_PAGE_CREATE_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Modify Team page
+         */
+        'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
+        'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
+        'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * User fields
@@ -1304,7 +1348,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'SUSPECT CASES WITH PENDING LAB RESULT',
         'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'SUSPECT CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TITLE': 'Chains of Transmission',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
         'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECAME CASES',
@@ -1473,30 +1516,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
-
-        /**
-         * Chains of Transmission
-         */
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW': 'Hierarchical Network',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW': 'Timeline Network',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE': 'View Full Resource',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE': 'Contact Details',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE': 'Case Details',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE': 'Relationship Details',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE': 'events without date',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE': 'Node Icon',
-
+        'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
 
         /**
          * List Filters page titles
@@ -1539,12 +1559,43 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON': 'List',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON': 'Graph',
 
         /**
          * Transmission Chains Geo map
          */
         'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE': 'Geospatially Map',
         'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA': 'No chains with geo location provided',
+
+        /**
+         * Chains of Transmission Graph
+         */
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE': 'Chains of Transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW': 'Hierarchical Network',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW': 'Timeline Network',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE': 'View Full Resource',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE': 'Contact Details',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE': 'Case Details',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE': 'Relationship Details',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE': 'events without date',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL': 'Show Vertical Timeline',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL': 'Show Horizontal Timeline',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE': 'Node Icon',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE': 'Node Label',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME': 'Name',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE': 'Age',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION': 'Location',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL': 'Show Legend',
 
         /**
          * Side filter
@@ -1645,6 +1696,11 @@ export const EnglishUsLang = {
          * Import hierarchical locations
          */
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
+
+        /**
+         * Import location data
+         */
+        'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
 
         /**
          * Import reference data

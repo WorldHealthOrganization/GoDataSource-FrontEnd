@@ -161,5 +161,15 @@ export class CaseDataService {
         return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/restore`, {});
     }
 
+    /**
+     * Convert a case to contact
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @returns {Observable<any>}
+     */
+    convertToContact(outbreakId: string, caseId: string): Observable<any> {
+        return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/convert-to-contact`, {});
+    }
+
 }
 

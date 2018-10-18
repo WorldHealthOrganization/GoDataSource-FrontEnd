@@ -15,6 +15,7 @@ import { EntityModel } from '../../models/entity.model';
 import { LabelValuePair } from '../../models/label-value-pair';
 import * as moment from 'moment';
 import { Constants } from '../../models/constants';
+import { I18nService } from '../helper/i18n.service';
 
 @Injectable()
 export class EntityDataService {
@@ -38,7 +39,8 @@ export class EntityDataService {
         private http: HttpClient,
         private caseDataService: CaseDataService,
         private contactDataService: ContactDataService,
-        private evenDataService: EventDataService
+        private evenDataService: EventDataService,
+        private i18nService: I18nService
     ) {
     }
 
@@ -121,7 +123,7 @@ export class EntityDataService {
 
             // dialog title: Case Details
             lightObject.push(new LabelValuePair(
-                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE',
+                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
@@ -134,9 +136,18 @@ export class EntityDataService {
                 'LNG_CASE_FIELD_LABEL_LAST_NAME',
                 entity.lastName
             ));
+            // display age. decide between years and months
+            let ageToDisplay;
+            if (entity.age.months > 0) {
+                const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+                ageToDisplay = String(entity.age.months) + ' ' + monthsLabel;
+            } else {
+                const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+                ageToDisplay = String(entity.age.years) + ' ' + yearsLabel;
+            }
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_AGE',
-                String(entity.age)
+                ageToDisplay
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_GENDER',
@@ -200,7 +211,7 @@ export class EntityDataService {
 
             // dialog title: Contact Details
             lightObject.push(new LabelValuePair(
-                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE',
+                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
@@ -213,9 +224,18 @@ export class EntityDataService {
                 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
                 entity.lastName
             ));
+            // display age. decide between years and months
+            let ageToDisplay;
+            if (entity.age.months > 0) {
+                const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+                ageToDisplay = String(entity.age.months) + ' ' + monthsLabel;
+            } else {
+                const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+                ageToDisplay = String(entity.age.years) + ' ' + yearsLabel;
+            }
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_AGE',
-                String(entity.age)
+                ageToDisplay
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_GENDER',
@@ -252,7 +272,7 @@ export class EntityDataService {
 
             // dialog title: Event Details
             lightObject.push(new LabelValuePair(
-                'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE',
+                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE',
                 ''
             ));
 
