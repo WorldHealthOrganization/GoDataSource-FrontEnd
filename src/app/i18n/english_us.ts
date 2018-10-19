@@ -530,7 +530,7 @@ export const EnglishUsLang = {
         /**
          * Available Entities for Relationship page
          */
-        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available people',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available People',
 
         /**
          * Create Entity Relationship page
