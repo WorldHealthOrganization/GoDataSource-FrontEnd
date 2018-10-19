@@ -24,6 +24,9 @@ import { SystemBackupDataService } from './data/system-backup.data.service';
 import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
 import { SystemSyncDataService } from './data/system-sync.data.service';
 import { SystemSyncLogDataService } from './data/system-sync-log.data.service';
+import { TeamDataService } from './data/team.data.service';
+
+// import helper services
 import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
 import { SnackbarService } from './helper/snackbar.service';
@@ -38,6 +41,7 @@ import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
 import { LanguageResolver } from './resolvers/language.resolver';
+import { BulkAddContactsService } from './helper/bulk-add-contacts.service';
 
 // export the list of services
 export const services: any[] = [
@@ -71,6 +75,7 @@ export const services: any[] = [
     SystemBackupDataService,
     SystemSyncDataService,
     SystemSyncLogDataService,
+    TeamDataService,
 
     // guard services
     AuthGuard,
@@ -87,5 +92,6 @@ export const services: any[] = [
     I18nService,
     CacheService,
     DialogService,
-    DomService
+    DomService,
+    BulkAddContactsService
 ];

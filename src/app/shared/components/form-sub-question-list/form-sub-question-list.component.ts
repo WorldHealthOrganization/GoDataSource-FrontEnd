@@ -95,6 +95,7 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
         if (this.defaultQuestionCategory) {
             q.category = this.defaultQuestionCategory;
         }
+        q.new = true;
         return q;
     }
 

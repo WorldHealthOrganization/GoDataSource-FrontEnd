@@ -22,6 +22,7 @@ import * as _ from 'lodash';
 export class FormAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
 
+    @Input() variableReadOnly: boolean = false;
     @Input() disableAdditionalQuestions: boolean = false;
     @Input() parentControls: {
         [name: string]: AbstractControl

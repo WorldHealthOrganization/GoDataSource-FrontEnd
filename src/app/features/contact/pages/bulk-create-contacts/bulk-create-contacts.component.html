@@ -1,0 +1,80 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+<form class="page-content form-section" (submit)="addContacts(sheetTable)">
+
+    <div class="form-content">
+        <mat-card class="page-section" fxLayout="column">
+
+            <div class="related-person" fxLayout="row" fxLayoutGap="20px">
+                <div>{{relatedEntityData?.type | translate}}</div>
+                <div>{{relatedEntityData?.name}}</div>
+            </div>
+
+            <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+
+                <hot-table
+                    #sheetTable
+                    [colHeaders]="true"
+                    [rowHeaders]="true"
+                    [manualColumnResize]="true"
+                    preventOverflow="horizontal"
+                    [width]="sheetWidth"
+                    [height]="520"
+                    [contextMenu]="sheetContextMenu"
+                    [colWidths]="150"
+                    [startRows]="20"
+                    [minSpareRows]="1"
+                    [beforeValidate]="beforeValidateSheet">
+
+                    <ng-container *ngFor="let column of sheetColumns">
+                        <!-- Text column -->
+                        <hot-column
+                            *ngIf="column.type === SheetCellType.TEXT"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+                            [validator]="column.validationFunc">
+                        </hot-column>
+
+                        <!-- Numeric column -->
+                        <hot-column
+                            *ngIf="column.type === SheetCellType.NUMERIC"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+                            type="numeric"
+                            [validator]="column.validationFunc">
+                        </hot-column>
+
+                        <!-- Date column -->
+                        <hot-column
+                            *ngIf="column.type === SheetCellType.DATE"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+                            type="date"
+                            [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
+                            [correctFormat]="true"
+                            [validator]="column.validationFunc">
+                        </hot-column>
+
+                        <!-- Dropdown column -->
+                        <hot-column
+                            *ngIf="column.type === SheetCellType.DROPDOWN"
+                            [title]="(column.title | translate) + (column.required ? ' *' : '')"
+                            type="dropdown"
+                            [trimDropdown]="false"
+                            [source]="column.optionLabels$ | async"
+                            [validator]="column.validationFunc">
+                        </hot-column>
+
+                    </ng-container>
+                </hot-table>
+            </div>
+
+        </mat-card>
+    </div>
+
+    <div class="form-actions">
+        <button mat-raised-button color="primary" class="button-primary">
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+    </div>
+</form>

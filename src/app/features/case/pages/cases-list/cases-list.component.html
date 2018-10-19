@@ -322,6 +322,11 @@
                             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
                         </button>
 
+                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create-bulk"
+                                [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
+                            {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                        </button>
+
                         <mat-divider *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"></mat-divider>
                     </ng-container>
 
@@ -355,6 +360,11 @@
                         <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCase(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                        </button>
+
+                        <button *ngIf="hasCaseWriteAccess() && hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                                (click)="convertCaseToContact(item)">
+                        {{'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT' | translate}}
                         </button>
 
                         <button *ngIf="item.deleted && hasCaseWriteAccess()" mat-menu-item class="mat-menu-item-restore"
