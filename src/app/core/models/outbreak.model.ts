@@ -27,6 +27,9 @@ export class OutbreakModel {
     countries: {
         id: string
     }[];
+    locations: {
+        id: string
+    }[];
     longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {
@@ -38,6 +41,7 @@ export class OutbreakModel {
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.countries = _.get(data, 'countries', []);
+        this.locations = _.get(data, 'locations', []);
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
         this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');
