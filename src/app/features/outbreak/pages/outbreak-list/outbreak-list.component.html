@@ -243,6 +243,30 @@
             </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="deleted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_DELETED' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="deletedFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByDeletedField($event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let outbreak">
+                <app-yes-no-label [value]="outbreak.deleted"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
@@ -255,7 +279,7 @@
                 <mat-menu #actionsMenu="matMenu">
 
                     <ng-container
-                        *ngIf="item.id != authUser.activeOutbreakId">
+                        *ngIf="item.id != authUser.activeOutbreakId && !item.deleted">
                         <button
                             mat-menu-item
                             (click)="setActive(item)">
@@ -276,21 +300,26 @@
                         <mat-divider></mat-divider>
                     </ng-container>
 
-                    <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
                         {{ 'LNG_PAGE_ACTION_VIEW' | translate}}
                     </button>
 
                     <ng-container *ngIf="hasOutbreakWriteAccess()">
-                        <button mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
+                        <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
                             {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
                         </button>
 
-                        <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
                             {{ 'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>
 
-                        <button mat-menu-item class="mat-menu-item-delete" (click)="delete(item)">
+                        <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="delete(item)">
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate}}
+                        </button>
+
+                        <button *ngIf="item.deleted && hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-restore"
+                                (click)="restoreOutbreak(item)">
+                            {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

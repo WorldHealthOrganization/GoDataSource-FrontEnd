@@ -128,6 +128,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK': 'Are you sure you want to restore this outbreak: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
@@ -1199,6 +1200,8 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_OUTBREAK_FIELD_LABEL_DELETED_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
@@ -1234,6 +1237,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS': 'Export the selected outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON': 'Import Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE': 'Outbreak restored!',
 
         /**
          * Create Outbreak Page
