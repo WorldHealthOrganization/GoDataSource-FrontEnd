@@ -76,8 +76,15 @@
                                         <div
                                             *ngIf="question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
                                             fxFlex fxLayout="row" fxLayoutGap="20px">
+                                            <input
+                                                hidden
+                                                #importDataBtn
+                                                type="file"
+                                                ng2FileSelect
+                                                [uploader]="uploaders[question.variable]"/>
+
                                             <app-form-input
-                                                [name]="name + '[' + question.variable + ']'"
+                                                [name]="name + '[' + question.variable + '].................................................................'"
                                                 ngModel
                                                 [placeholder]="'LNG_QUESTIONNAIRE_LABEL_FILE_NAME' | translate"
                                                 [required]="question.required"
@@ -85,12 +92,22 @@
                                                 [disabled]="disabled">
                                             </app-form-input>
 
-                                            <input
-                                                hidden
-                                                #importDataBtn
-                                                type="file"
-                                                ng2FileSelect
-                                                [uploader]="uploaders[question.variable]"/>
+                                            <div
+                                                fxFlex fxLayout="row" fxLayoutGap="0">
+                                                <div fxFlex>
+                                                    {{ uploaders[question.variable].queue.length > 0 ? uploaders[question.variable].queue[0].file.name : ('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) }}
+                                                </div>
+
+                                                <div fxFlex="90px">
+                                                    <button
+                                                        type="button"
+                                                        mat-raised-button
+                                                        color="primary"
+                                                        (click)="importDataBtn.click()">
+                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_BROWSE' | translate }}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <!-- copy value button -->

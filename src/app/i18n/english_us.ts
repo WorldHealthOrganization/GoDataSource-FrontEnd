@@ -246,6 +246,8 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE': 'Select date',
         'LNG_QUESTIONNAIRE_LABEL_FILE_NAME': 'Enter file name',
+        'LNG_QUESTIONNAIRE_BUTTON_BROWSE': 'Browse',
+        'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE': 'Choose file',
 
         /**
          * Entity Fields

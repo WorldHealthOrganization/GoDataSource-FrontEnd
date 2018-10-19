@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-form-fill-questionnaire',
@@ -162,7 +163,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     }
 
     /**
-     * Check if we have sub-questions for teh selected answers
+     * Check if we have sub-questions for the selected answers
      * @param question
      * @param selectedAnswers
      */
@@ -194,6 +195,11 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         return hasQuestions;
     }
 
+    /**
+     * Child Questions Answers
+     * @param question
+     * @param selectedAnswers
+     */
     subQuestionsAnswer(question: QuestionModel, selectedAnswers): string[] {
         // convert to array if necessary so we handle both single & multiple selects
         if (!_.isArray(selectedAnswers)) {
@@ -210,5 +216,12 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
         // finished
         return answers;
+    }
+
+    /**
+     * Trigger upload files...
+     */
+    startUploadFiles(): Observable<void> {
+        // #TODO
     }
 }
