@@ -362,7 +362,7 @@
                             {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
                         </button>
 
-                        <button *ngIf="hasCaseWriteAccess() && hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                        <button *ngIf="hasCaseWriteAccess() && hasContactWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
                                 (click)="convertCaseToContact(item)">
                         {{'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT' | translate}}
                         </button>
