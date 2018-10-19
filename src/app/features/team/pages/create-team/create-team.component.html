@@ -1,0 +1,80 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+        <!--Details step-->
+        <mat-step [stepControl]="form">
+            <form #form="ngForm">
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_USER_TAB_DETAILS_TITLE'| translate}}</ng-template>
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+
+                        <app-form-input
+                            name="name"
+                            [(ngModel)]="teamData.name"
+                            [placeholder]="'LNG_TEAM_FIELD_LABEL_NAME' | translate"
+                            tooltip="LNG_TEAM_FIELD_LABEL_NAME_DESCRIPTION"
+                            required="true">
+                        </app-form-input>
+
+                        <app-form-select
+                            name="userIds"
+                            [(ngModel)]="teamData.userIds"
+                            [placeholder]="'LNG_TEAM_FIELD_LABEL_USERS' | translate"
+                            tooltip="LNG_TEAM_FIELD_LABEL_USERS_DESCRIPTION"
+                            required="true"
+                            [options]="usersList$ | async"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            multiple="true"
+                            (optionChanged)="usersChanged($event)">
+                        </app-form-select>
+
+                        <app-form-location-dropdown
+                            fxFlex
+                            name="locationIds"
+                            [(ngModel)]="teamData.locationIds"
+                            [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
+                            tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
+                            [disabled]="false"
+                            [required]="false"
+                            [multiple]="true"
+                        >
+                        </app-form-location-dropdown>
+                    </div>
+                </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
+            </form>
+        </mat-step>
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+            </ng-template>
+
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+
+            <div>
+                <button mat-button matStepperPrevious>
+                    {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </button>
+                <button
+                    type="button"
+                    mat-button
+                    (click)="createTeam(form)">
+                    {{'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>

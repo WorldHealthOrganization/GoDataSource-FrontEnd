@@ -11,6 +11,7 @@ export class GraphNodeModel {
     dateTimeline: string;
     // use this field to remove nodes with no date for timeline
     displayTimeline: string;
+    labelTimeline: string;
     // default node colors and icon
     nodeColor: string;
     nodeNameColor: string;
@@ -34,6 +35,6 @@ export class GraphNodeModel {
         }
 
         // label to be used when displaying the timeline view
-        this.label = this.name + '\n' + this.dateTimeline;
+        this.labelTimeline = this.name + '\n' + this.dateTimeline;
     }
 }
