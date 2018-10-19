@@ -28,8 +28,7 @@
                                 [(ngModel)]="newOutbreak.disease"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DISEASE' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_DISEASE_DESCRIPTION"
-                                [options]="diseasesList$ | async"
-                                required="true">
+                                [options]="diseasesList$ | async">
                             </app-form-select>
                             <app-form-select
                                 name="countries"
