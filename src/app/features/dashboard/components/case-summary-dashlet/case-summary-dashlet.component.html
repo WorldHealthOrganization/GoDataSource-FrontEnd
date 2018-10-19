@@ -1,10 +1,18 @@
-<div fxLayout="column" fxFlex fxLayoutAlign="center">
 
-    <ngx-charts-advanced-pie-chart
+
+    <!--<ngx-charts-advanced-pie-chart-->
+        <!--[customColors]="customColors"-->
+        <!--[scheme]="{ domain: ['#4DB0A0'] }"-->
+        <!--[label]="'LNG_COMMON_LABEL_TOTAL' | translate"-->
+        <!--[results]="caseSummaryResults">-->
+    <!--</ngx-charts-advanced-pie-chart>-->
+
+    <ngx-charts-pie-chart
         [customColors]="customColors"
         [scheme]="{ domain: ['#4DB0A0'] }"
-        [label]="'LNG_COMMON_LABEL_TOTAL' | translate"
-        [results]="caseSummaryResults">
-    </ngx-charts-advanced-pie-chart>
+        [results]="caseSummaryResults"
+        [doughnut]="true"
+        [legend]="true"
+        [labels]="true">
+    </ngx-charts-pie-chart>
 
-</div>
