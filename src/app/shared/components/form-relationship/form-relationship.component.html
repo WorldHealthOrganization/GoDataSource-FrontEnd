@@ -194,8 +194,8 @@
 
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
-                        [name]="name + '[socialRelationshipTypeId]'"
-                        [(ngModel)]="relationship.socialRelationshipTypeId"
+                        [name]="name + '[socialRelationshipDetail]'"
+                        [(ngModel)]="relationship.socialRelationshipDetail"
                         [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
                         required="false">
@@ -210,7 +210,7 @@
                             type="button"
                             mat-icon-button
                             [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('socialRelationshipTypeId')">
+                            (click)="triggerCopyValue('socialRelationshipDetail')">
                             <span class="xt-icon">fileCopy</span>
                         </button>
                     </div>
