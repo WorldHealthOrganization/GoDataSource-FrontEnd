@@ -17,6 +17,7 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 class LocationAutoItem {
     constructor(
         public id: string,
+        public idObject: {id: string},
         public label: string,
         public level: number,
         public disabled: boolean = false,
@@ -46,6 +47,10 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
+    @Input() compareWith: (o1: any, o2: any) => boolean = FormLocationDropdownComponent.compareWithDefault;
+
+    @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
+    @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
 
     @HostBinding('class.form-element-host') isFormElement = true;
 
@@ -70,8 +75,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
     needToRetrieveBackData: boolean = false;
 
-    @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
-    @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
+    static compareWithDefault = (o1: any, o2: any) => {
+        return o1 === o2;
+    }
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -185,6 +191,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     // create auto complete item
                     const locationAI = new LocationAutoItem(
                         currentItem.location.id,
+                        {id: currentItem.location.id},
                         currentItem.location.name + (
                             !_.isEmpty(currentItem.location.synonyms) ?
                                 ` ( ${currentItem.location.synonymsAsString} )` :

@@ -33,20 +33,28 @@
                                 [options]="diseasesList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
-                            <app-form-select
-                                name="countries"
-                                [(ngModel)]="outbreak.countries"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION"
-                                [options]="countriesList$ | async"
-                                optionLabelKey="label"
-                                optionValueKey="value"
+                            <!--<app-form-select-->
+                                <!--name="countries"-->
+                                <!--[(ngModel)]="outbreak.countries"-->
+                                <!--[placeholder]="'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate"-->
+                                <!--tooltip="LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION"-->
+                                <!--[options]="countriesList$ | async"-->
+                                <!--optionLabelKey="label"-->
+                                <!--optionValueKey="value"-->
+                                <!--multiple="true"-->
+                                <!--[disabled]="viewOnly"-->
+                                <!--[compareWith]="compareMultiSelectWith">-->
+                            <!--</app-form-select>-->
+                            <app-form-location-dropdown
+                                fxFlex
+                                name="locations"
+                                [(ngModel)]="outbreak.locations"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_LOCATIONS_DESCRIPTION"
                                 multiple="true"
                                 [disabled]="viewOnly"
-                                [compareWith]="compareCountryWith">
-                            </app-form-select>
-
-                            <div fxFlex><!-- placeholder --></div>
+                                [compareWith]="compareMultiSelectWith">
+                            </app-form-location-dropdown>
                         </div>
 
                         <app-form-textarea
