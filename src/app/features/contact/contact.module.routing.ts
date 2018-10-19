@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -45,6 +44,19 @@ const routes: Routes = [
             action: ViewModifyComponentAction.MODIFY
         },
         canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // Bulk Add Contacts
+    {
+        path: 'create-bulk',
+        component: fromPages.BulkCreateContactsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CONTACT]
+        },
+        canDeactivate: [
+            // #TODO it's not working right now because we don't have a form on this page
             PageChangeConfirmationGuard
         ]
     },
