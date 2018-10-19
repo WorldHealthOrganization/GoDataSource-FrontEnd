@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import * as _ from 'lodash';
 import { TransmissionChainModel } from '../../models/transmission-chain.model';
 import { MetricIndependentTransmissionChainsModel } from '../../models/metrics/metric-independent-transmission-chains.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { GraphNodeModel } from '../../models/graph-node.model';
 import { GraphEdgeModel } from '../../models/graph-edge.model';
 import { EntityType } from '../../models/entity-type';
-import { DateRangeModel } from '../../models/date-range.model';
-import { ReferenceDataCategory } from '../../models/reference-data.model';
-import { ReferenceDataDataService } from './reference-data.data.service';
+import { Constants } from '../../models/constants';
+import { I18nService } from '../helper/i18n.service';
+import * as moment from 'moment';
+import * as _ from 'lodash';
+import { CaseModel } from '../../models/case.model';
+import { LocationModel } from '../../models/location.model';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -19,7 +21,7 @@ export class TransmissionChainDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private referenceDataDataService: ReferenceDataDataService
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -133,11 +135,15 @@ export class TransmissionChainDataService {
      * @param chains
      * @param filters
      * @param colorCriteria
+     * @param locationsList
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any, colorCriteria: any): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [] };
+    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
         let selectedNodeIds: string[] = [];
+        // get labels for uears / months - age field
+        const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+        const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
@@ -183,13 +189,13 @@ export class TransmissionChainDataService {
                         nodeData.type = node.type;
                         // set node color
                         if (Object.keys(colorCriteria.nodeColor).length) {
-                            if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                            if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                 nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                             }
                         }
                         // set node label color
                         if (Object.keys(colorCriteria.nodeNameColor).length) {
-                            if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                            if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                             }
                         }
@@ -197,6 +203,45 @@ export class TransmissionChainDataService {
                         if (Object.keys(colorCriteria.nodeIcon).length) {
                             if ( colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]] ) {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
+                            }
+                        }
+                        // determine label
+                        if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
+                            nodeData.label = nodeData.name;
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
+                            if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                if (node.model.age.months > 0) {
+                                    nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                } else {
+                                    nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                                }
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
+                            if (node.type === EntityType.CASE) {
+                                nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                            } else {
+                                nodeData.label = '';
+                            }
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
+                            nodeData.label = '';
+                            if (node.type !== EntityType.EVENT) {
+                                const mainAddr = node.model.mainAddress;
+                                if (!_.isEmpty(mainAddr.locationId)) {
+                                    const location = _.find(locationsList, function (l) {
+                                        return l.id === mainAddr.locationId;
+                                    });
+                                    if (location) {
+                                        nodeData.label = location.name;
+                                    }
+                                }
                             }
                         }
                         graphData.nodes.push({data: nodeData});
@@ -236,13 +281,13 @@ export class TransmissionChainDataService {
                             nodeData.type = node.type;
                             // set node color
                             if (Object.keys(colorCriteria.nodeColor).length) {
-                                if ( colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]] ) {
+                                if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                     nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                                 }
                             }
                             // set node label color
                             if (Object.keys(colorCriteria.nodeNameColor).length) {
-                                if ( colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] ) {
+                                if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                     nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                                 }
                             }
@@ -253,6 +298,45 @@ export class TransmissionChainDataService {
                                 }
                             }
 
+                            // determine label
+                            if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
+                                nodeData.label = nodeData.name;
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
+                                if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
+                                    if (node.model.age.months > 0) {
+                                        nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                                    } else {
+                                        nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                                    }
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
+                                if (node.type === EntityType.CASE) {
+                                    nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
+                                if (node.type !== EntityType.EVENT) {
+                                    nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                                } else {
+                                    nodeData.label = '';
+                                }
+                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
+                                nodeData.label = '';
+                                if (node.type !== EntityType.EVENT) {
+                                    const mainAddr = node.model.mainAddress;
+                                    if (!_.isEmpty(mainAddr.locationId)) {
+                                        const location = _.find(locationsList, function (l) {
+                                            return l.id === mainAddr.locationId;
+                                        });
+                                        if (location) {
+                                            nodeData.label = location.name;
+                                        }
+                                    }
+                                }
+                            }
                             graphData.nodes.push({data: nodeData});
                             selectedNodeIds.push(nodeData.id);
                         }
@@ -280,7 +364,7 @@ export class TransmissionChainDataService {
                         }
                         // set colors
                         if (Object.keys(colorCriteria.edgeColor).length) {
-                            if ( colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]] ) {
+                            if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }
                         }

@@ -24,6 +24,9 @@ import { SystemBackupDataService } from './data/system-backup.data.service';
 import { OutbreakTemplateDataService } from './data/outbreak-template.data.service';
 import { SystemSyncDataService } from './data/system-sync.data.service';
 import { SystemSyncLogDataService } from './data/system-sync-log.data.service';
+import { TeamDataService } from './data/team.data.service';
+
+// import helper services
 import { StorageService } from './helper/storage.service';
 import { LoggerService } from './helper/logger.service';
 import { SnackbarService } from './helper/snackbar.service';
@@ -71,6 +74,7 @@ export const services: any[] = [
     SystemBackupDataService,
     SystemSyncDataService,
     SystemSyncLogDataService,
+    TeamDataService,
 
     // guard services
     AuthGuard,

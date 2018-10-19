@@ -210,6 +210,14 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_SYS_CONFIG],
             [],
             '/locations'
+        ),
+        new NavItem(
+            'teams',
+            'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL',
+            'person_pin',
+            [PERMISSION.READ_TEAM],
+            [],
+            '/teams'
         )
         // new NavItem(
         //     'help',

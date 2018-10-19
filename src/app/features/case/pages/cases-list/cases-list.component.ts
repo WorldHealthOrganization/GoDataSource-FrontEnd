@@ -380,6 +380,29 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 }
             });
     }
+    /**
+     * Convert a case to contact
+     * @param caseModel
+     */
+    convertCaseToContact(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService
+                        .convertToContact(this.selectedOutbreak.id, caseModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
 
     /**
      * Export selected records

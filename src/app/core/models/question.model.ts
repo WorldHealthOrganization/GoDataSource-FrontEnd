@@ -2,14 +2,15 @@
 import * as _ from 'lodash';
 
 export class AnswerModel {
-    new: boolean | true;
     label: string;
     value: string;
     alert: boolean;
     additionalQuestions: QuestionModel[];
 
+    // new flag - DON'T save this field
+    new: boolean;
+
     constructor(data = null) {
-        this.new = _.get(data, 'new', true);
         this.label = _.get(data, 'label');
         this.value = _.get(data, 'value');
         this.alert = _.get(data, 'alert');
@@ -39,7 +40,6 @@ export class AnswerModel {
 }
 
 export class QuestionModel {
-    new: boolean;
     text: string;
     variable: string;
     category: string;
@@ -48,8 +48,10 @@ export class QuestionModel {
     answerType: string;
     answers: AnswerModel[];
 
+    // new flag - DON'T save this field
+    new: boolean;
+
     constructor(data = null) {
-        this.new = _.get(data, 'new', true);
         this.text = _.get(data, 'text');
         this.variable = _.get(data, 'variable');
         this.category = _.get(data, 'category');

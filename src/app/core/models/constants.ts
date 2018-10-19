@@ -32,6 +32,10 @@ export class Constants {
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
+    // default random configs
+    static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    static DEFAULT_RANDOM_KEY_LENGTH = 16;
+
     // default configurations
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
@@ -201,22 +205,23 @@ export class Constants {
     //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW',
             value: 'BUBBLE_NETWORK'
         },
         HIERARCHICAL_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_HIERARCHICAL_NETWORK_VIEW',
             value: 'HIERARCHICAL_NETWORK'
         },
         TIMELINE_NETWORK: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW',
             value: 'TIMELINE_NETWORK'
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
         TYPE: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
             value: 'type'
         },
         CLASSIFICATION: {
@@ -233,6 +238,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
         CERTAINITY_LEVEL: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
@@ -256,13 +262,14 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS = {
         NONE: {
             label: 'LNG_COMMON_LABEL_NONE',
             value: 'none'
         },
         TYPE: {
-            label: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
             value: 'type'
         },
         CLASSIFICATION: {
@@ -279,11 +286,53 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS = {
+        NAME: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME',
+            value: 'name'
+        },
+        AGE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
+            value: 'age'
+        },
+        DATE_OF_ONSET: {
+            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            value: 'dateOfOnset'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        },
+        LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION',
+            value: 'location'
+        }
+    };
+
     /**
      * Today date
      */
     static getCurrentDate(): Moment {
         return moment().startOf('day');
+    }
+
+    /**
+     * Generate random string
+     * @param alphabet
+     */
+    static randomString(
+        length: number,
+        alphabet: string = Constants.DEFAULT_RANDOM_ALPHABET
+    ): string {
+        // generate string
+        let result: string = '';
+        while (result.length < length) {
+            result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+
+        // finished
+        return result;
     }
 
 }
