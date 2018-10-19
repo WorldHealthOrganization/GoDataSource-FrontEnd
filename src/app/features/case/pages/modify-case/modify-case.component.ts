@@ -260,11 +260,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                             this.selectedOutbreak.id,
                             this.caseData.visualId,
                             this.caseData.id
-                        ).catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe((isValid: boolean) => {
+                        ).subscribe((isValid: boolean) => {
                             observer.next(isValid);
                             observer.complete();
                         });

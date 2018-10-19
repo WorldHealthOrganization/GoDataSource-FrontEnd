@@ -94,11 +94,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                     this.outbreakDataService.generateVisualIDCheckValidity(
                         this.selectedOutbreak.id,
                         this.caseData.visualId
-                    ).catch((err) => {
-                        this.snackbarService.showError(err.message);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe((isValid: boolean) => {
+                    ).subscribe((isValid: boolean) => {
                         observer.next(isValid);
                         observer.complete();
                     });
