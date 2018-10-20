@@ -125,6 +125,21 @@ export class CaseDataService {
     }
 
     /**
+     * Return count of isolated cases
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    getIsolatedCasesCount(outbreakId: string): Observable<any> {
+        // get the query builder and call the endpoint
+        return this.listFilterDataService.filterCasesIsolated()
+            .mergeMap((filterQueryBuilder) => {
+                const filter = filterQueryBuilder.buildQuery();
+                // call endpoint
+                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
+            });
+    }
+
+    /**
      * Return count of suspect cases pending lab result
      * @param {string} outbreakId
      * @returns {Observable<any>}
