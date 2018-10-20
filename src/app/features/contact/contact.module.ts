@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { HotTableModule } from '@handsontable/angular';
 
 // modules
 import { routing } from './contact.module.routing';
@@ -10,7 +11,8 @@ import * as fromPages from './pages';
 @NgModule({
     imports: [
         routing,
-        SharedModule
+        SharedModule,
+        HotTableModule.forRoot()
     ],
     declarations: [
         ...fromPages.pageComponents

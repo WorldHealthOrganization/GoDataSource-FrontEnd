@@ -62,6 +62,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_RESTORE': 'Restore',
         'LNG_PAGE_ACTION_SEE_RELATIONSHIPS': 'See Relationships',
         'LNG_PAGE_ACTION_ADD_CONTACT': 'Add Contact',
+        'LNG_PAGE_ACTION_BULK_ADD_CONTACTS': 'Bulk Add Contacts',
         'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_CLONE': 'Clone',
@@ -719,6 +720,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_AGE': 'Age',
         'LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_AGE_YEARS': 'Age (Years)',
+        'LNG_CONTACT_FIELD_LABEL_AGE_MONTHS': 'Age (Months)',
         'LNG_CONTACT_FIELD_LABEL_GENDER': 'Gender',
         'LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_PHONE': 'Phone',
@@ -793,6 +796,23 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+
+        /**
+         * Bulk Add Contacts page
+         */
+        'LNG_PAGE_BULK_ADD_CONTACTS_TITLE': 'Bulk Add Contacts',
+        'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
+        'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid!',
+        'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE': 'Contacts created!',
+
+        /**
+         * Excel-like Sheet (widget)
+         */
+        'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE': 'Add row above',
+        'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row below',
+        'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Remove row',
+        'LNG_SHEET_CONTEXT_MENU_CUT': 'Cut',
+        'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy',
 
         /**
          * Movement Contact page
@@ -1187,7 +1207,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
-        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Name',
+        'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Outbreak Name',
         'LNG_OUTBREAK_FIELD_LABEL_NAME_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE': 'Disease',
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE_DESCRIPTION': '',
@@ -1205,7 +1225,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_DESCRIPTION': '',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frecquency per day',
+        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Frequency of Contact Follow Up (per day)',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
         'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
