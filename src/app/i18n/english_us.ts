@@ -1355,6 +1355,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
+        'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
 
         /**
          * Backup modules
