@@ -1,0 +1,23 @@
+<div fxLayout="column" fxFlex fxLayoutAlign="center">
+
+    <ngx-charts-bar-vertical-stacked
+        [scheme]="{ domain: ['#4DB0A0'] }"
+        [results]="results"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [yAxisTickFormatting]="axisFormat"
+        [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
+        [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate">
+        <ng-template #tooltipTemplate let-model="model">
+            <div>
+                {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
+            </div>
+            <div>
+                {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
+            </div>
+        </ng-template>
+    </ngx-charts-bar-vertical-stacked>
+</div>
