@@ -16,7 +16,7 @@ import * as moment from 'moment';
 export class ContactsOnFollowupListDashletComponent extends DashletComponent implements OnInit {
 
     // number of contacts on the followup list
-    contactsOnFollowUpListCount: number;
+    contactsOnFollowUpListCount: number = 0;
     // constants to be used for applyListFilters
     Constants = Constants;
     // filter by day - default - yesterday

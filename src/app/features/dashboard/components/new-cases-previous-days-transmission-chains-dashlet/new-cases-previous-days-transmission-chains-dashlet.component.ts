@@ -16,9 +16,9 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases in previous x days in known transmission chains
-    casesKnownTransmissionChainsCount: number;
+    casesKnownTransmissionChainsCount: number = 0;
     // nr of new cases
-    totalCases: number;
+    totalCases: number = 0;
     // x metric set on outbreak
     xPreviousDays: number;
     // constants to be used for applyListFilters
