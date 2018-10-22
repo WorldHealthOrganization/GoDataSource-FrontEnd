@@ -20,6 +20,9 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -38,10 +41,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    locationsList: LocationModel[];
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
     nodeIconCriteriaOptions$: Observable<any[]>;
+    nodeLabelCriteriaOptions$: Observable<any[]>;
+
     // reference data categories needed for filters
     referenceDataCategories: any = [
         ReferenceDataCategory.PERSON_TYPE,
@@ -98,6 +104,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     // default color criteria
     colorCriteria: any = {
+        nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
@@ -121,7 +128,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT': 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
             'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT': 'LNG_EVENT_FIELD_LABEL_DATE'
         },
-        edgeColor: {}
+        edgeColor: {},
+        nodeLabel: 'name'
     };
 
     constructor(
@@ -131,8 +139,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
+        private genericDataService: GenericDataService,
         private relationshipDataService: RelationshipDataService,
-        private genericDataService: GenericDataService
+        private i18nService: I18nService,
+        private locationDataService: LocationDataService
     ) {}
 
     ngOnInit() {
@@ -143,10 +153,16 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const locationQueryBuilder = new RequestQueryBuilder();
+        locationQueryBuilder.fieldsInResponse = ['id', 'name'];
+        this.locationDataService.getLocationsList(locationQueryBuilder).subscribe((results) => {
+            this.locationsList = results;
+        });
 
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
+        this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -253,7 +269,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend);
+                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
                 } else {
                     this.graphElements = [];
                 }
@@ -402,6 +418,17 @@ export class TransmissionChainsDashletComponent implements OnInit {
             });
             this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
         }
+        // set node label to be displayed
+        this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(nodeLabelValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+            });
+        }
+
     }
 
     /**

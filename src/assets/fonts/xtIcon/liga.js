@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'person_pin': '&#xe91a;',
             'columns': '&#xe919;',
             'groupWork': '&#xe918;',
             'location': '&#xe917;',

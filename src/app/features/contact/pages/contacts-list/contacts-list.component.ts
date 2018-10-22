@@ -498,6 +498,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             });
     }
 
+    /**
+     * Convert a case to a contact
+     * @param contactModel
+     */
     convertContactToCase(contactModel: ContactModel) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE', contactModel)
             .subscribe((answer) => {
