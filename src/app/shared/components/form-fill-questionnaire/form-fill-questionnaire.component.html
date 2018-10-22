@@ -143,7 +143,7 @@
 
                                         <!-- copy value button -->
                                         <div
-                                            *ngIf="displayCopyField"
+                                            *ngIf="displayCopyField && question.answerType !== Constants.ANSWER_TYPES.FILE_UPLOAD.value"
                                             fxFlex="40px"
                                             fxLayout="column"
                                             fxLayoutAlign="center">
