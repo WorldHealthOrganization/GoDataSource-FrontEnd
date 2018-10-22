@@ -1375,6 +1375,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE': 'Cases counts over time stratified by classification',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL': 'Date of Onset',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL': 'No Cases',
+
 
         /**
          * Backup modules
