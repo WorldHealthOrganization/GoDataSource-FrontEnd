@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { MetricChartDataModel } from './metric-chart-data.model';
 
 export class MetricChartDataMultiModel {
-    name: number;
+    name: string;
     series:  MetricChartDataModel[];
 
     constructor(data = null) {
