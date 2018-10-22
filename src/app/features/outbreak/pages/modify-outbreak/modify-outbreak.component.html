@@ -33,27 +33,26 @@
                                 [options]="diseasesList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
-                            <!--<app-form-select-->
-                                <!--name="countries"-->
-                                <!--[(ngModel)]="outbreak.countries"-->
-                                <!--[placeholder]="'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate"-->
-                                <!--tooltip="LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION"-->
-                                <!--[options]="countriesList$ | async"-->
-                                <!--optionLabelKey="label"-->
-                                <!--optionValueKey="value"-->
-                                <!--multiple="true"-->
-                                <!--[disabled]="viewOnly"-->
-                                <!--[compareWith]="compareMultiSelectWith">-->
-                            <!--</app-form-select>-->
+                            <app-form-select
+                                name="countries"
+                                [(ngModel)]="outbreak.countries"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION"
+                                [options]="countriesList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                multiple="true"
+                                [disabled]="viewOnly"
+                                [compareWith]="compareCountryWith">
+                            </app-form-select>
                             <app-form-location-dropdown
                                 fxFlex
-                                name="locations"
-                                [(ngModel)]="outbreak.locations"
+                                name="locationIds"
+                                [(ngModel)]="outbreak.locationIds"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_LOCATIONS_DESCRIPTION"
                                 multiple="true"
-                                [disabled]="viewOnly"
-                                [compareWith]="compareMultiSelectWith">
+                                [disabled]="viewOnly">
                             </app-form-location-dropdown>
                         </div>
 

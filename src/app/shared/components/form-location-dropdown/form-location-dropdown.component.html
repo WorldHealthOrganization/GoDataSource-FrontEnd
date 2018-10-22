@@ -5,7 +5,6 @@
         <ng-select
             [name]="name"
             [(ngModel)]="value"
-            [compareWith]="compareWith"
             [items]="locationItems"
             [placeholder]="placeholder + (placeholder && required ? ' *' : '')"
             [loadingText]="loadingText | translate"
@@ -13,7 +12,7 @@
             (blur)="onBlur()"
             (focus)="touch()"
             bindLabel="label"
-            [bindValue]="multiple ? 'idObject' : 'id'"
+            bindValue="id"
             [hideSelected]="false"
             [multiple]="multiple"
             [searchable]="true"

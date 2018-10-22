@@ -92,9 +92,11 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     }
 
     /**
-     * Compare function for Multi-Select dropdowns
+     * Compare countries
+     * @param o1
+     * @param o2
      */
-    compareMultiSelectWith(o1: {id: string}, o2: {id: string}): boolean {
+    compareCountryWith(o1: {id: string}, o2: {id: string}): boolean {
         return (o1 ? o1.id : undefined) === (o2 ? o2.id : undefined);
     }
 
