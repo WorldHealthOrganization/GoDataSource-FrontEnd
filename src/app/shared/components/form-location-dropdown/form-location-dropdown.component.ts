@@ -73,10 +73,6 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
 
     needToRetrieveBackData: boolean = false;
 
-    static compareWithDefault = (o1: any, o2: any) => {
-        return o1 === o2;
-    }
-
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
