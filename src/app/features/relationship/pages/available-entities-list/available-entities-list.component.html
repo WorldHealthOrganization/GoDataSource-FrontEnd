@@ -185,7 +185,7 @@
                                     name="classificationFilter"
                                     ngModel
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    [options]="classificationList$ | async"
+                                    [options]="caseClassificationsList$ | async"
                                     (optionChanged)="filterBySelectField('classification', $event)"
                                     multiple="true"
                                     app-reset-input-on-side-filter
@@ -195,8 +195,11 @@
                         </div>
                     </mat-header-cell>
 
-                    <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                        {{item.classification}}
+                     <mat-cell *matCellDef="let item">
+                        <app-reference-data-label
+                            [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                            [value]="item.classification">
+                        </app-reference-data-label>
                     </mat-cell>
                 </ng-container>
 

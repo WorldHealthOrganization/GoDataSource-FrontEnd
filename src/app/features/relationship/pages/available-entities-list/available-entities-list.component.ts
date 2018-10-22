@@ -64,6 +64,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     genderList$: Observable<any[]>;
     entityTypesList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
 
     // provide constants to template
     Constants = Constants;
@@ -91,6 +92,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.entityTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_TYPE).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).share();
 
         // side filters
         this.generateSideFilters();
