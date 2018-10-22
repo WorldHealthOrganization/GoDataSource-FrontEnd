@@ -211,7 +211,6 @@ export class ListFilterDataService {
     filterCasesPendingLabResult(): RequestQueryBuilder {
         // generate a query builder for cases pending lab result
         const filterQueryBuilder = new RequestQueryBuilder();
-     
         const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
         labResultsQueryBuilder.queryBuilder.filter
             .where(
