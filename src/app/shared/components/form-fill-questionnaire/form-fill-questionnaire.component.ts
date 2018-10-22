@@ -230,6 +230,9 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
             uploaderData.uploader.onErrorItem = () => {
                 // display error
                 this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+
+                // reset uploading flag
+                uploaderData.uploading = false;
             };
 
             // handle errors when trying to upload files
