@@ -4,7 +4,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-import { Moment } from 'moment';
 import * as moment from 'moment';
 
 

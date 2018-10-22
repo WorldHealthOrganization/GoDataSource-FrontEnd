@@ -266,11 +266,17 @@ export class FollowUpsDataService {
     /**
      * Get the number of contacts who are lost to followup
      * @param outbreakId
+     * @param {string} date
      * @returns {Observable<Object>}
      */
-    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string): Observable<any> {
+    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string, date: string): Observable<any> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where(
+            {date: date}
+        );
+        const filter = qb.filter.generateFirstCondition(true, true);
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count`),
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count?filter=${filter}`),
             MetricContactsLostToFollowUpModel
         );
     }
