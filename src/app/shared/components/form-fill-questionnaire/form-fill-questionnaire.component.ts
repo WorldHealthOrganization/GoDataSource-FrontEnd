@@ -1,15 +1,25 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { Constants } from '../../../core/models/constants';
-import { FileUploader } from 'ng2-file-upload';
+import { FileItem, FileUploader } from 'ng2-file-upload';
 import { environment } from '../../../../environments/environment';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs/Observable';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import { AttachmentDataService } from '../../../core/services/data/attachment.data.service';
+import { AttachmentModel } from '../../../core/models/attachment.model';
+import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+
+interface UploaderData {
+    uploader: FileUploader;
+    attachment: AttachmentModel;
+    uploading: boolean;
+}
 
 @Component({
     selector: 'app-form-fill-questionnaire',
@@ -45,11 +55,13 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
     @Input() hideCategories: boolean = false;
 
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
     /**
      * File uploader
      */
-    uploaders: {
-        [questionVariable: string]: FileUploader
+    uploadersData: {
+        [questionVariable: string]: UploaderData
     } = {};
 
     /**
@@ -66,7 +78,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         this.additionalQuestions = {};
 
         // group them by category
-        this.uploaders = {};
+        this.uploadersData = {};
         this.questionsGroupedByCategory = _.chain(questions)
             .groupBy('category')
             .transform((result, questionsData: QuestionModel[], category: string) => {
@@ -74,7 +86,12 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
                 _.each(questionsData, (question: QuestionModel) => {
                     // add file upload handler if necessary
                     if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
-                        this.uploaders[question.variable] = new FileUploader({});
+                        // create file uploader
+                        this.uploadersData[question.variable] = {
+                            uploader: new FileUploader({}),
+                            attachment: null,
+                            uploading: false
+                        };
                     }
 
                     // map answers
@@ -110,7 +127,10 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService,
+        private attachmentDataService: AttachmentDataService,
+        private dialogService: DialogService
     ) {
         super(controlContainer, validators, asyncValidators);
 
@@ -125,9 +145,49 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         this.outbreakDataService
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
+                // outbreak
                 this.selectedOutbreak = selectedOutbreak;
+
+                // uploader
                 this.initializeUploader();
             });
+    }
+
+    /**
+     * Handle minimum number of items from the list
+     * @param value
+     */
+    writeValue(value: {}) {
+        // write value
+        super.writeValue(value);
+
+        // check if we have a file attachment saved
+        this.initializeAttachments();
+    }
+
+    /**
+     * Initialize attachments
+     */
+    initializeAttachments() {
+        // do we have outbreak data ?
+        if (
+            !this.selectedOutbreak ||
+            !this.selectedOutbreak.id ||
+            _.isEmpty(this.value)
+        ) {
+            return;
+        }
+
+        // initialize attachments
+        _.each(this.uploadersData, (uploaderData: UploaderData, questionVariable: string) => {
+            if (this.value[questionVariable]) {
+                this.attachmentDataService
+                    .getAttachment(this.selectedOutbreak.id, this.value[questionVariable])
+                    .subscribe((attachment: AttachmentModel) => {
+                        uploaderData.attachment = attachment;
+                    });
+            }
+        });
     }
 
     /**
@@ -143,15 +203,83 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         }
 
         // initialize uploader
-        _.each(this.uploaders, (uploader: FileUploader) => {
-            uploader.setOptions({
+        _.each(this.uploadersData, (uploaderData: UploaderData, questionVariable: string) => {
+            // configure options
+            uploaderData.uploader.setOptions({
                 authToken: this.authDataService.getAuthToken(),
-                url: `${environment.apiUrl}/outbreaks/${this.selectedOutbreak.id}/attachments`
+                url: `${environment.apiUrl}/outbreaks/${this.selectedOutbreak.id}/attachments`,
+                autoUpload: true
             });
-            // uploader.options.additionalParameter = {
-            //     name: this._model
-            // }
+
+            // don't allow multiple files to be uploaded
+            // we could set queueLimit to 1, but we won't be able to replace the file that way
+            uploaderData.uploader.onAfterAddingFile = () => {
+                // check if we need to replace existing item
+                if (uploaderData.uploader.queue.length > 1) {
+                    // remove old item
+                    uploaderData.uploader.removeFromQueue(uploaderData.uploader.queue[0]);
+                }
+
+                // set name property
+                uploaderData.uploader.options.additionalParameter = {
+                    name: uploaderData.uploader.queue[0].file.name
+                };
+            };
+
+            // handle server errors
+            uploaderData.uploader.onErrorItem = () => {
+                // display error
+                this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+            };
+
+            // handle errors when trying to upload files
+            uploaderData.uploader.onWhenAddingFileFailed = () => {
+                // display error
+                this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+            };
+
+            // progress handle
+            uploaderData.uploader.onBeforeUploadItem = () => {
+                // started uploading
+                uploaderData.uploading = true;
+
+                // make invalid for required files
+                this.value[questionVariable] = '';
+            };
+
+            // everything went smoothly ?
+            uploaderData.uploader.onCompleteItem = (item: FileItem, response: string, status: number) => {
+                // finished uploading
+                uploaderData.uploading = false;
+
+                // an error occurred ?
+                if (status !== 200) {
+                    return;
+                }
+
+                // we should get a ImportableFileModel object
+                let jsonResponse;
+                try { jsonResponse = JSON.parse(response); } catch {}
+                if (
+                    !response ||
+                    !jsonResponse
+                ) {
+                    this.snackbarService.showError('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+                    return;
+                }
+
+                // set file upload done
+                // closure not needed ..!?
+                uploaderData.attachment = jsonResponse;
+                this.value[questionVariable] = jsonResponse.id;
+                this.onChange();
+            };
         });
+
+        // check if we have a file attachment saved
+        if (this.value) {
+            this.initializeAttachments();
+        }
     }
 
     /**
@@ -219,9 +347,36 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     }
 
     /**
-     * Trigger upload files...
+     * Download attachment
+     * @param questionVariable
      */
-    startUploadFiles(): Observable<void> {
-        // #TODO
+    downloadAttachment(questionVariable: string) {
+        this.attachmentDataService
+            .downloadAttachment(this.selectedOutbreak.id, this.value[questionVariable])
+            .subscribe((blob) => {
+                const urlT = window.URL.createObjectURL(blob);
+
+                const link = this.buttonDownloadFile.nativeElement;
+                link.href = urlT;
+                link.download = this.uploadersData[questionVariable].attachment.name;
+                link.click();
+
+                window.URL.revokeObjectURL(urlT);
+            });
+    }
+
+    /**
+     * Remove attachment
+     * @param questionVariable
+     */
+    removeAttachment(questionVariable: string) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    delete this.value[questionVariable];
+                    this.uploadersData[questionVariable].uploader.clearQueue();
+                }
+            });
     }
 }

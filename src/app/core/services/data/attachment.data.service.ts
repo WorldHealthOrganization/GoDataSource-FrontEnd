@@ -34,5 +34,18 @@ export class AttachmentDataService {
     deleteAttachment(outbreakId: string, attachmentId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/attachments/${attachmentId}`);
     }
+
+    /**
+     * Download attachment
+     * @param outbreakId
+     * @param attachmentId
+     */
+    downloadAttachment(outbreakId: string, attachmentId: string): Observable<Blob> {
+        return this.http.get(
+            `outbreaks/${outbreakId}/attachments/${attachmentId}/download`, {
+                responseType: 'blob'
+            }
+        );
+    }
 }
 

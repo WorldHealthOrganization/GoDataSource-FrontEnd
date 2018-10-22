@@ -1,6 +1,7 @@
 <div class="form-element"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
+    <a hidden #buttonDownloadFile></a>
     <form #groupForm="ngForm">
         <mat-card class="page-section">
             <ng-content></ng-content>
@@ -81,30 +82,60 @@
                                                 #importDataBtn
                                                 type="file"
                                                 ng2FileSelect
-                                                [uploader]="uploaders[question.variable]"/>
-
-                                            <app-form-input
-                                                [name]="name + '[' + question.variable + '].................................................................'"
-                                                ngModel
-                                                [placeholder]="'LNG_QUESTIONNAIRE_LABEL_FILE_NAME' | translate"
-                                                [required]="question.required"
-                                                (optionChanged)="onChange()"
-                                                [disabled]="disabled">
-                                            </app-form-input>
-
+                                                [uploader]="uploadersData[question.variable]?.uploader"/>
                                             <div
-                                                fxFlex fxLayout="row" fxLayoutGap="0">
+                                                fxFlex fxLayout="row" fxLayoutGap="20px">
                                                 <div fxFlex>
-                                                    {{ uploaders[question.variable].queue.length > 0 ? uploaders[question.variable].queue[0].file.name : ('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) }}
+                                                    <div>
+                                                        {{ uploadersData[question.variable].uploader.queue.length > 0 ?
+                                                            uploadersData[question.variable].uploader.queue[0].file.name : (
+                                                                value[question.variable] && uploadersData[question.variable].attachment ?
+                                                                    uploadersData[question.variable].attachment.name :
+                                                                    (('LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE' | translate) + (question.required ? '*' : ''))
+                                                            )
+                                                        }}
+                                                    </div>
+
+                                                    <input
+                                                        #fileValidationHandler="ngModel"
+                                                        [name]="name + '[' + question.variable + ']'"
+                                                        [ngModel]="value[question.variable]"
+                                                        type="hidden"
+                                                        [required]="uploadersData[question.variable].uploading || question.required"/>
                                                 </div>
 
-                                                <div fxFlex="90px">
+                                                <div
+                                                    *ngIf="value[question.variable]"
+                                                    fxFlex="90px">
+                                                    <button
+                                                        type="button"
+                                                        mat-raised-button
+                                                        (click)="downloadAttachment(question.variable)">
+                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate }}
+                                                    </button>
+                                                </div>
+
+                                                <div
+                                                    *ngIf="!disabled && value[question.variable]"
+                                                    fxFlex="90px">
+                                                    <button
+                                                        type="button"
+                                                        mat-raised-button
+                                                        (click)="removeAttachment(question.variable)">
+                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate }}
+                                                    </button>
+                                                </div>
+
+                                                <div
+                                                    *ngIf="!disabled"
+                                                    fxFlex="90px">
                                                     <button
                                                         type="button"
                                                         mat-raised-button
                                                         color="primary"
-                                                        (click)="importDataBtn.click()">
-                                                        {{ 'LNG_QUESTIONNAIRE_BUTTON_BROWSE' | translate }}
+                                                        (click)="importDataBtn.click()"
+                                                        [disabled]="uploadersData[question.variable].uploading">
+                                                        {{ (value[question.variable] ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate }}
                                                     </button>
                                                 </div>
                                             </div>
