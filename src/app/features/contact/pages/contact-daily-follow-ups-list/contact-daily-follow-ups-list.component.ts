@@ -15,28 +15,29 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
-    selector: 'app-follow-ups-list',
+    selector: 'app-daily-follow-ups-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-follow-ups-missed-list.component.html',
-    styleUrls: ['./contacts-follow-ups-missed-list.component.less']
+    templateUrl: './contact-daily-follow-ups-list.component.html',
+    styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
-export class ContactsFollowUpsMissedListComponent extends ListComponent implements OnInit {
+export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '.', true)
     ];
 
     // import constants into template
@@ -45,7 +46,6 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     // authenticated user
     authUser: UserModel;
-
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
 
@@ -58,6 +58,9 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     availableSideFilters: FilterModel[];
 
+    printDailyFollowUpsUrl: string;
+    followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
+    printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
@@ -93,22 +96,16 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     ngOnInit() {
         // add page title
-        this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE') +
+        this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
+        this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
+            ' - ' +
+            this.followUpsPrintDailyFileName;
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-        // add missed / upcoming breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE',
-                '.',
-                true
-            )
-        );
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -119,11 +116,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
                 // export url
                 this.exportFollowUpsUrl = null;
+                this.printDailyFollowUpsUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
                 }
 
                 // initialize pagination
@@ -169,6 +168,10 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             new VisibleColumnModel({
                 field: 'fullAddress',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+            }),
+            new VisibleColumnModel({
+                field: 'lostToFollowUp',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP'
             }),
             new VisibleColumnModel({
                 field: 'deleted',
@@ -281,11 +284,14 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         }
     }
 
+    /**
+     * Refresh list
+     */
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
-                .getLastFollowUpsMissedList(this.selectedOutbreak.id, this.queryBuilder);
+                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -298,7 +304,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
-                .getLastFollowUpsMissedCount(this.selectedOutbreak.id, countQueryBuilder);
+                .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
@@ -365,6 +371,75 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     }
 
     /**
+     * Generate Follow Ups
+     */
+    generateFollowUps() {
+        if (this.selectedOutbreak) {
+            this.dialogService.showInput(new DialogConfiguration({
+                message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
+            })).subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe(() => {
+                                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                                // reload data
+                                this.needsRefreshList(true);
+                            });
+                    }
+            });
+        }
+    }
+
+    /**
+     * Mark a contact as missing from a follow-up
+     * @param {FollowUpModel} followUp
+     * @param {boolean} contactMissed
+     */
+    markContactAsMissedFromFollowUp(followUp: FollowUpModel, contactMissed?: boolean) {
+        // show confirm dialog to confirm the action and check if contact is missed or not to know what message to display
+        const confirmMessage = contactMissed ?
+            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP' :
+            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP';
+        this.dialogService.showConfirm(confirmMessage, new ContactModel(followUp.contact))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.outbreakDataService
+                        .getSelectedOutbreak()
+                        .subscribe((selectedOutbreak: OutbreakModel) => {
+                            // mark follow-up
+                            this.followUpsDataService
+                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
+                                    lostToFollowUp : !contactMissed
+                                })
+                                .catch((err) => {
+                                    this.snackbarService.showError(err.message);
+
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe(() => {
+                                    // mark follow-up as missed or as present
+                                    const successMessage =
+                                        contactMissed ?
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP_SUCCESS_MESSAGE' :
+                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE';
+                                    this.snackbarService.showSuccess(successMessage);
+
+                                    // refresh list
+                                    this.needsRefreshList(true);
+                                });
+                        });
+                }
+            });
+    }
+
+    /**
      * Modify selected follow-ups
      */
     modifySelectedFollowUps() {
@@ -419,5 +494,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Check if date is in future to know if we show "Missed to follow-up" option or not
+     */
+    dateInTheFuture(followUpDate): boolean {
+        const date = followUpDate ? moment(followUpDate) : null;
+        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 }

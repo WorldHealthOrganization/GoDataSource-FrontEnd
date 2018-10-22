@@ -27,14 +27,13 @@ import { Moment } from 'moment';
 export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
 
     followUpData: FollowUpModel = new FollowUpModel();
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
-
-    displayOnlyMissedFollowUps: boolean = false;
 
     contactId: string;
     followUpId: string;
@@ -73,49 +72,37 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             .subscribe((params: {contactId, followUpId}) => {
             this.contactId = params.contactId;
             this.followUpId = params.followUpId;
-                // retrieve query params
-                this.route.queryParams
-                    .subscribe((queryParams: {displayOnlyMissedFollowUps}) => {
-                        // display missed follow-ups or upcoming follow-ups link
-                        this.displayOnlyMissedFollowUps = queryParams.displayOnlyMissedFollowUps;
-                        if (this.displayOnlyMissedFollowUps) {
-                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE', '/contacts/follow-ups/missed'));
-                        } else {
-                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'));
-                        }
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // keep selected outbreak for later user
+                        this.selectedOutbreak = selectedOutbreak;
 
-                        // get selected outbreak
-                        this.outbreakDataService
-                            .getSelectedOutbreak()
-                            .subscribe((selectedOutbreak: OutbreakModel) => {
-                                // keep selected outbreak for later user
-                                this.selectedOutbreak = selectedOutbreak;
+                        // retrieve follow-up information
+                        this.followUpsDataService
+                            .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
+                            .catch((err) => {
+                                // show error message
+                                this.snackbarService.showError(err.message);
 
-                                // retrieve follow-up information
-                                this.followUpsDataService
-                                    .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
-                                    .catch((err) => {
-                                        // show error message
-                                        this.snackbarService.showError(err.message);
-
-                                        // redirect
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/contacts/follow-ups']);
-                                        return ErrorObservable.create(err);
-                                    })
-                                    .subscribe((followUpData: FollowUpModel) => {
-                                        // initialize follow-up
-                                        this.followUpData = new FollowUpModel(followUpData);
-                                        this.breadcrumbs.push(
-                                            new BreadcrumbItemModel(
-                                                this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
-                                                '.',
-                                                true,
-                                                {},
-                                                this.followUpData
-                                            )
-                                        );
-                                    });
+                                // redirect
+                                this.disableDirtyConfirm();
+                                this.router.navigate(['/contacts/follow-ups']);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((followUpData: FollowUpModel) => {
+                                // initialize follow-up
+                                this.followUpData = new FollowUpModel(followUpData);
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+                                        '.',
+                                        true,
+                                        {},
+                                        this.followUpData
+                                    )
+                                );
                             });
                     });
             });

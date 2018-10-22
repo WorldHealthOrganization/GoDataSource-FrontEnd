@@ -17,8 +17,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
         'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
-        'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Upcoming Follow-ups',
-        'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL': 'Missed Follow-ups',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
         'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL': 'Duplicated Records',
@@ -118,9 +117,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_COPY_VALUE': 'Are you sure you want to copy value from this field to all the other ones that are empty?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': 'Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': 'Are you sure you want to delete this question?',
-        'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': 'Are you sure you want to duplicate this question?',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER': 'Are you sure you want to delete this answer?',
-        'LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER': 'Are you sure you want to link this answer?',
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as missing from a follow-up?',
         'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP': 'Are you sure you want to mark "{{name}}" contact as present on follow-up?',
         'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY': 'Are you sure you want to delete this entry?',
@@ -190,8 +187,6 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DEFAULT': 'Validation Failed: {{validation}}',
         'LNG_FORM_VALIDATION_ERROR_INVALID_DATE': 'Invalid date',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE': 'Date needs to be {{comparator}} {{field}}',
-        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED': 'Enter {{field}} too',
-        'LNG_FORM_VALIDATION_ERROR_ALL_OR_NONE_REQUIRED_IF_FIELD_IS_SET': 'Required if {{field}} is set',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_AFTER': 'after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER': 'same or after',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME': 'same as',
@@ -203,7 +198,6 @@ export const EnglishUsLang = {
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': 'Something went wrong! Please contact an administrator.',
-        'LNG_API_ERROR_CODE_LOGIN_FAILED': 'Login failed!',
 
         /**
          * Common Fields
@@ -342,7 +336,6 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_CASES_TITLE': 'Cases',
         'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS': 'See Lab Results',
-        'LNG_PAGE_LIST_CASES_ACTION_ADD_LAB_RESULT': 'Add Lab Result',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT': 'Convert to contact',
         'LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE': 'Case deleted!',
@@ -733,8 +726,6 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
-        'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER': 'Phone number',
-        'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
         'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
@@ -780,7 +771,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED': 'You can add a contact only though a Case or an Event!',
         'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
-        'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_RELATE_TITLE': 'Case',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE': 'Contact created!',
 
@@ -877,13 +867,8 @@ export const EnglishUsLang = {
          * Follow-ups list page
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_UPCOMING_TITLE': 'Upcoming Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PAST_TITLE': 'Past Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE': 'Missed Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
-        'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_UPCOMING_FOLLOW_UPS': 'Show upcoming Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_BUTTON_SHOW_PAST_FOLLOW_UPS': 'Show past Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up marked as missed!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up marked as present!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING': 'Mark contact as missed',
@@ -1218,13 +1203,11 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
-        'LNG_OUTBREAK_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
         'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY': 'Follow-up frecquency',
-        'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Frequency of Contact Follow Up (per day)',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
@@ -1354,7 +1337,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE': 'CASES WHO HAVE DIED',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' : 'CONTACTS SEEN ON',
         'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE': 'CASES CURRENTLY HOSPITALISED',
-        'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE': 'CASES WITH LESS THAN {{x}} CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP': 'CONTACTS LOST TO FOLLOW-UP',
         'LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS': 'ACTIVE CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE': 'CONTACTS NOT SEEN IN ',
