@@ -4,6 +4,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { Moment } from 'moment';
+import * as moment from 'moment';
+
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -17,6 +20,8 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     contactsOnFollowUpListCount: number;
     // constants to be used for applyListFilters
     Constants = Constants;
+    // filter by day - default - yesterday
+    date: string = moment().add(-1, 'days').format('YYYY-MM-DD');
 
     constructor(
         private followUpDataService: FollowUpsDataService,
@@ -33,7 +38,7 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
                 // get the results for contacts on the follow up list
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.followUpDataService
-                        .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id)
+                        .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, this.date)
                         .subscribe((result) => {
                             this.contactsOnFollowUpListCount = result.contactsCount;
                         });

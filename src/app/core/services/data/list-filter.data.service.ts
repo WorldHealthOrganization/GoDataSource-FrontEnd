@@ -211,10 +211,7 @@ export class ListFilterDataService {
     filterCasesPendingLabResult(): RequestQueryBuilder {
         // generate a query builder for cases pending lab result
         const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where({
-            classification: Constants.CASE_CLASSIFICATION.SUSPECT
-        }, true);
-
+     
         const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
         labResultsQueryBuilder.queryBuilder.filter
             .where(
@@ -235,8 +232,6 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [{
                 transferRefused: true
-            }, {
-                classification: Constants.CASE_CLASSIFICATION.SUSPECT
             }]
         }, true);
 

@@ -227,11 +227,17 @@ export class FollowUpsDataService {
     /**
      * Get metrics for contacts on follow-up lists
      * @param {string} outbreakId
+     * @param {string} date
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string): Observable<MetricContactsModel> {
+    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string, date: string): Observable<MetricContactsModel> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where(
+            {date: date}
+        );
+        const filter = qb.filter.generateFirstCondition(true, true);
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count`),
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
             MetricContactsModel
         );
     }
@@ -272,6 +278,7 @@ export class FollowUpsDataService {
     /**
      * Retrieve the list of contacts who have successful followup
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
     getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {

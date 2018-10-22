@@ -17,9 +17,9 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 export class NewCasesPreviousDaysContactsDashletComponent extends DashletComponent implements OnInit {
 
     // number of cases with less than x contacts
-    casesAmongContactsCount: number;
+    casesAmongContactsCount: number = 0;
     // number of new cases
-    newCases: number;
+    newCases: number = 0;
     // x metric set on outbreak
     xDaysAmongContacts: number;
     // constants to be used for applyListFilters
@@ -75,16 +75,6 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
                     this.newCases = result.newCasesCount;
                 });
         }
-    }
-
-    /**
-     * Calculate percentage of new cases among contacts
-     * @returns {number}
-     */
-    percentageCases() {
-        return this.newCases ?
-            Math.round(this.casesAmongContactsCount / this.newCases * 100) :
-            0;
     }
 
 }
