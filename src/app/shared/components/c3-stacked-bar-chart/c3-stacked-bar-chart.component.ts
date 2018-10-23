@@ -24,21 +24,33 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     }
 
     render() {
-        console.log(this.chartData);
+
         this.chart = c3.generate({
             bindto: '#chart',
             zoom: {
                 enabled: true
             },
+            interaction: {
+                enabled: false
+            },
+            tooltip: {
+                show: true
+            },
+            transition: {
+                duration: 0
+            },
             data: {
-                columns:
-                this.chartData,
+                columns: this.chartData,
                 type: 'bar',
                 groups: [
                     this.chartDataColumns
-                ]
+                ],
+                labels: true
             },
             grid: {
+                x: {
+                    show: true
+                },
                 y: {
                     lines: [{value: 0}]
                 }
@@ -55,7 +67,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
                     tick: {
                         fit: true,
                         width: 100,
-                        culling: false,
+                        culling: true,
                         //     max: 5
                         // },
                         rotate: 70
