@@ -329,6 +329,28 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter the list by a date field ( startOf day => endOf day )
+     * @param {string} property
+     * @param value Date
+     */
+    filterByDateField(property: string, value: Moment) {
+        // filter by date
+        if (_.isEmpty(value)) {
+            this.queryBuilder.filter.byDateRange(property, value);
+        } else {
+            this.queryBuilder.filter.byDateRange(
+                property, {
+                    startDate: moment(value).startOf('day'),
+                    endDate: moment(value).endOf('day')
+                }
+            );
+        }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by a date range field ('startDate' / 'endDate')
      * @param {string} property
      * @param value Object with 'startDate' and 'endDate' properties
