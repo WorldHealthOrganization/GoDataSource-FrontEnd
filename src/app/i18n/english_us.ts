@@ -12,6 +12,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
+        'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -66,6 +67,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_CLONE': 'Clone',
+        'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD': 'Copy to clipboard',
 
         /**
          * Common buttons
@@ -1754,6 +1756,15 @@ export const EnglishUsLang = {
         'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
         'LNG_AGE_FIELD_LABEL_MONTHS': 'Months',
         'LNG_AGE_FIELD_FILTER_LABEL_FROM': 'From years',
-        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years'
+        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years',
+
+        /**
+         * Cloud backup page
+         */
+        'LNG_PAGE_CLOUD_BACKUP_TITLE' : 'Cloud Backup',
+        'LNG_PAGE_CLOUD_BACKUP_HEADER_TITLE' : 'If you want to sync your backups on cloud, you have to use and external tool (like Google Drive or Dropbox)',
+        'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at: ',
+        'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The back-up path is: ',
+        'LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE': 'Path copied!',
     }
 };
