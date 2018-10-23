@@ -866,7 +866,7 @@ export const EnglishUsLang = {
         /**
          * Follow-ups list page
          */
-        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up marked as missed!',
@@ -904,6 +904,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT': 'View Contact',
 
         /**
          * Modify Follow-up list page

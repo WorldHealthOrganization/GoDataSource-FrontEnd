@@ -163,10 +163,11 @@
                     <div class="column-filter">
                         <app-form-datepicker
                             name="dateFilter"
-                            ngModel
+                            [ngModel]="dateFilterDefaultValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByDateField('date', $event)"
-                            app-reset-input-on-side-filter>
+                            app-reset-input-on-side-filter
+                            [resetToPristineValue]="false">
                         </app-form-datepicker>
                     </div>
                 </div>
@@ -220,7 +221,8 @@
                             (optionChanged)="filterByBooleanField('lostToFollowUp', $event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
@@ -244,7 +246,8 @@
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
@@ -286,7 +289,7 @@
                         <ng-container *app-selected-outbreak-is-active>
                             <ng-container
                                 *ngIf="hasFollowUpsWriteAccess()">
-                                <button *ngIf="!item.deleted && item.personId" mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]">
+                                <button *ngIf="!item.deleted && item.personId && !dateInTheFuture(item.date)" mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'modify' ]">
                                     {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
                                 </button>
 

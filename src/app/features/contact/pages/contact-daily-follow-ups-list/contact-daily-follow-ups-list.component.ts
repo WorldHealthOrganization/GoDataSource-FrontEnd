@@ -27,6 +27,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -57,6 +58,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     yesNoOptionsList$: Observable<any[]>;
 
     availableSideFilters: FilterModel[];
+
+    dateFilterDefaultValue: Moment;
 
     printDailyFollowUpsUrl: string;
     followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
@@ -103,6 +106,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             ' - ' +
             this.followUpsPrintDailyFileName;
 
+        // set default filter rules
+        this.initializeHeaderFilters();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
@@ -136,6 +142,26 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize header filters
+     */
+    initializeHeaderFilters() {
+        this.dateFilterDefaultValue = moment();
+        this.queryBuilder.filter.byDateRange(
+            'date', {
+                startDate: moment(this.dateFilterDefaultValue).startOf('day'),
+                endDate: moment(this.dateFilterDefaultValue).endOf('day')
+            }
+        );
+    }
+
+    /**
+     * Add search criteria
+     */
+    resetFiltersAddDefault() {
+        this.initializeHeaderFilters();
     }
 
     /**

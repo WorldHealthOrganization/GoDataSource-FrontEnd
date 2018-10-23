@@ -490,6 +490,13 @@ export abstract class ListComponent {
     }
 
     /**
+     * Callback called when resetting search filters ( can be used to add default filter criteria )
+     */
+    resetFiltersAddDefault() {
+        // NOTHING
+    }
+
+    /**
      * Clear header filters & sort
      */
     resetFiltersToSideFilters() {
@@ -501,6 +508,9 @@ export abstract class ListComponent {
 
         // reset table sort columns
         this.clearHeaderSort();
+
+        // add default filter criteria
+        this.resetFiltersAddDefault();
 
         // retrieve Side filters
         let queryBuilder;

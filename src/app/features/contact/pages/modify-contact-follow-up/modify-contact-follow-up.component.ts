@@ -166,4 +166,12 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     hasFollowUpsWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
+
+    /**
+     * Check if we have access to view a contact
+     * @returns {boolean}
+     */
+    hasContactReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
 }
