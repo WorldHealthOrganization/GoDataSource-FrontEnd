@@ -12,7 +12,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
@@ -401,25 +401,53 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     generateFollowUps() {
         if (this.selectedOutbreak) {
-            this.dialogService.showInput(new DialogConfiguration({
-                message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-                yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_INPUT_LABEL'
-            })).subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        this.followUpsDataService.generateFollowUps(this.selectedOutbreak.id, answer.inputValue.value)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
+            this.genericDataService
+                .getFilterYesNoOptions()
+                .subscribe((yesNoOptions: LabelValuePair[]) => {
+                    const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                    this.dialogService.showInput(new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'dates',
+                                required: true,
+                                value: {
+                                    startDate: moment().add(1, 'days').startOf('day').format(),
+                                    endDate: moment().add(1, 'days').endOf('day').format()
+                                },
+                                fieldType: DialogFieldType.DATE_RANGE
+                            }),
+                            new DialogField({
+                                name: 'targeted',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: true
                             })
-                            .subscribe(() => {
-                                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+                        ]
+                    })).subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            this.followUpsDataService
+                                .generateFollowUps(
+                                    this.selectedOutbreak.id,
+                                    answer.inputValue.value.dates.startDate,
+                                    answer.inputValue.value.dates.endDate,
+                                    answer.inputValue.value.targeted
+                                ).catch((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
-                                // reload data
-                                this.needsRefreshList(true);
-                            });
-                    }
-            });
+                                    // reload data
+                                    this.needsRefreshList(true);
+                                });
+                        }
+                    });
+                });
         }
     }
 

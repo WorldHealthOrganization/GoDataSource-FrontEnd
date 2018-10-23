@@ -57,6 +57,12 @@ export class DialogAnswer {
     ) {}
 }
 
+export enum DialogFieldType {
+    SELECT = 'select',
+    TEXT = 'text',
+    DATE_RANGE = 'date-range'
+}
+
 export class DialogField {
     public name: string;
     public placeholder: string;
@@ -69,10 +75,11 @@ export class DialogField {
     public value: any;
     public disabled: boolean = false;
     public description: string;
+    public fieldType: DialogFieldType = DialogFieldType.TEXT;
 
     constructor(data: {
         name: string,
-        placeholder: string,
+        placeholder?: string,
         inputOptions?: LabelValuePair[],
         inputOptionsMultiple?: boolean,
         inputOptionsClearable?: boolean,
@@ -81,12 +88,19 @@ export class DialogField {
         requiredOneOfTwo?: string,
         value?: any,
         disabled?: boolean,
-        description?: string
+        description?: string,
+        fieldType?: DialogFieldType
     }) {
+        // set properties
         Object.assign(
             this,
             data
         );
+
+        // force select type
+        if (this.inputOptions !== undefined) {
+            this.fieldType = DialogFieldType.SELECT;
+        }
     }
 }
 
@@ -146,7 +160,7 @@ export class DialogConfiguration {
 export class DialogComponent {
     // default settings for this type of dialog
     static DEFAULT_CONFIG = {
-        autoFocus: true,
+        autoFocus: false,
         closeOnNavigation: true,
         disableClose: true,
         hasBackdrop: true,
@@ -159,6 +173,9 @@ export class DialogComponent {
     dialogAnswerInputValue: DialogAnswerInputValue = new DialogAnswerInputValue();
 
     @ViewChild('form') form: NgForm;
+
+    // constants
+    DialogFieldType = DialogFieldType;
 
     /**
      * Default configs with provided data

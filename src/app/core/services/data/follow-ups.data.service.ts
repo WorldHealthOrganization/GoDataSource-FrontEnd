@@ -23,13 +23,22 @@ export class FollowUpsDataService {
 
     /**
      * Generate followups for contacts
-     * @param {string} outbreakId
-     * @param {number} followUpPeriod
      * @returns {Observable<ContactFollowUpsModel[]>}
      */
-    generateFollowUps(outbreakId: string, followUpPeriod: number): Observable<ContactFollowUpsModel[]> {
+    generateFollowUps(
+        outbreakId: string,
+        startDate: any,
+        endDate: any,
+        targeted: boolean
+    ): Observable<ContactFollowUpsModel[]> {
         return this.modelHelper.mapObservableListToModel(
-            this.http.post(`outbreaks/${outbreakId}/generate-followups`, {followUpPeriod: followUpPeriod}),
+            this.http.post(
+                `outbreaks/${outbreakId}/generate-followups`, {
+                    startDate: startDate,
+                    endDate: endDate,
+                    targeted: targeted
+                }
+            ),
             ContactFollowUpsModel
         );
     }
