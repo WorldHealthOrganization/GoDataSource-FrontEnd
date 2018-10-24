@@ -228,12 +228,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 excludeFromSave: true
             }),
             new VisibleColumnModel({
-                field: 'firstName',
-                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
-            }),
-            new VisibleColumnModel({
                 field: 'lastName',
                 label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'age',
