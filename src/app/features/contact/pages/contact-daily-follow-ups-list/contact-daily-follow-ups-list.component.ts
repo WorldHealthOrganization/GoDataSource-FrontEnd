@@ -28,6 +28,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Moment } from 'moment';
+import { MatTable } from '@angular/material';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -461,7 +462,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     /**
      * Modify selected follow-ups
      */
-    modifySelectedFollowUps(table) {
+    modifySelectedFollowUps(table: MatTable<any>) {
         // get list of follow-ups that we want to modify
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
@@ -469,17 +470,38 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         }
 
         // check if we have future records
-        console.log(table);
-        //
-        // // redirect to next step
-        // this.router.navigate(
-        //     ['/contacts/follow-ups/modify-list'],
-        //     {
-        //         queryParams: {
-        //             followUpsIds: JSON.stringify(selectedRecords)
-        //         }
-        //     }
-        // );
+        let hasFutureFollowUps: boolean = false;
+        _.each(
+            table.dataSource,
+            (item: FollowUpModel) => {
+                if (
+                    selectedRecords.indexOf(item.id) > -1 &&
+                    this.dateInTheFuture(item.date)
+                ) {
+                    // found record that is in the future
+                    hasFutureFollowUps = true;
+
+                    // stop each
+                    return false;
+                }
+            }
+        );
+
+        // we aren't allowed to continue to modify follow-ups if in our list we have future follow-ups
+        if (hasFutureFollowUps) {
+            this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS');
+            return;
+        }
+
+        // redirect to next step
+        this.router.navigate(
+            ['/contacts/follow-ups/modify-list'],
+            {
+                queryParams: {
+                    followUpsIds: JSON.stringify(selectedRecords)
+                }
+            }
+        );
     }
 
     /**

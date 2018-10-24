@@ -159,7 +159,7 @@
         <ng-container matColumnDef="date">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
                     <div class="column-filter">
                         <app-form-datepicker
                             name="dateFilter"
@@ -211,7 +211,7 @@
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="statusIdFilter"
@@ -240,7 +240,7 @@
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
