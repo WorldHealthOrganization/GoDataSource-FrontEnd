@@ -133,6 +133,7 @@
                             (optionChanged)="filterBySelectField('disease', $event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
@@ -162,6 +163,7 @@
                             (optionChanged)="filterBySelectField('countries', $event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
@@ -231,6 +233,7 @@
                             (optionChanged)="filterByActiveOutbreak('id', $event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true"
                             [clearable]="false">
                         </app-form-select>

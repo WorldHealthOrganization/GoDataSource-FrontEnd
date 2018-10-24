@@ -132,6 +132,7 @@
                                     (optionChanged)="filterBySelectField('gender', $event)"
                                     multiple="true"
                                     [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
                                     [displayFilterIcon]="true">
                                 </app-form-select>
                             </div>
@@ -159,7 +160,8 @@
                                     (optionChanged)="filterBySelectField('riskLevel', $event)"
                                     multiple="true"
                                     app-reset-input-on-side-filter
-                                    [allowSelectionOfDisabledItems]="true">
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true">
                                 </app-form-select>
                             </div>
                         </div>
