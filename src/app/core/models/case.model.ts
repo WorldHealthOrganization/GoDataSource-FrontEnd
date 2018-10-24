@@ -39,6 +39,8 @@ export class CaseModel {
     outbreakId: string;
     outcomeId: string;
     deleted: boolean;
+    dateBecomeContact: string;
+    wasContact: boolean;
 
     relationships: {
         people: any[]
@@ -94,6 +96,8 @@ export class CaseModel {
 
         this.relationships = _.get(data, 'relationships', []);
         this.deleted = _.get(data, 'deleted');
+        this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+        this.wasContact = _.get(data, 'wasContact');
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {

@@ -271,6 +271,32 @@
             </mat-cell>
         </ng-container>
 
+        <!--Was Case -->
+        <ng-container matColumnDef="wasCase">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_WAS_CASE' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="wasCase"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('wasCase',$event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label
+                    [value]="item.wasCase">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>

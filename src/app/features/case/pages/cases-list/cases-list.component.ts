@@ -210,6 +210,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CASE_FIELD_LABEL_DELETED'
             }),
             new VisibleColumnModel({
+                field: 'wasContact',
+                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+            }),
+            new VisibleColumnModel({
                 field: 'actions',
                 required: true,
                 excludeFromSave: true

@@ -25,6 +25,8 @@ export class ContactModel {
     dateDeceased: string;
     outbreakId: string;
     deleted: boolean;
+    dateBecomeCase: string;
+    wasCase: boolean;
 
     dob: string;
     age: AgeModel;
@@ -41,6 +43,8 @@ export class ContactModel {
         this.occupation = _.get(data, 'occupation');
         this.outbreakId = _.get(data, 'outbreakId');
         this.documents = _.get(data, 'documents', []);
+        this.dateBecomeCase = _.get(data, 'dateBecomeCase');
+        this.wasCase = _.get(data, 'wasCase', []);
 
         this.dob = _.get(data, 'dob');
         this.age = new AgeModel(_.get(data, 'age'));
