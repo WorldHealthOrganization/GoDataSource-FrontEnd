@@ -13,6 +13,7 @@ import * as fromSharedPipes from './pipes';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MglTimelineModule } from 'angular-mgl-timeline';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { FileUploadModule } from 'ng2-file-upload';
 
 @NgModule({
     imports: [
@@ -25,7 +26,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         AngularMaterialModule,
         TranslateModule,
         MglTimelineModule,
-        NgxChartsModule
+        NgxChartsModule,
+        FileUploadModule
     ],
     declarations: [
         ...fromSharedComponents.components,

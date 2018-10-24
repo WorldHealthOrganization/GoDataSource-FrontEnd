@@ -132,6 +132,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK': 'Are you sure you want to restore this outbreak: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
+        'LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT': 'Are you sure you want to remove this attachment?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
@@ -252,6 +253,14 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
+        'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE': 'Select date',
+        'LNG_QUESTIONNAIRE_LABEL_FILE_NAME': 'Enter file name',
+        'LNG_QUESTIONNAIRE_BUTTON_BROWSE': 'Browse',
+        'LNG_QUESTIONNAIRE_BUTTON_REPLACE': 'Replace',
+        'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD': 'Download',
+        'LNG_QUESTIONNAIRE_BUTTON_REMOVE': 'Remove',
+        'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE': 'Choose file',
+        'LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE': 'Error uploading file',
 
         /**
          * Entity Fields
