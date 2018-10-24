@@ -93,7 +93,7 @@ export class EpiCurveDashletComponent implements OnInit {
     setEpiCurveResults() {
         const chartData = {};
         this.colorPattern = [];
-        _.forEach(this.metricData, (metric, key) => {
+        _.forEach(this.metricData, (metric, metricKey) => {
             // create the array with categories ( dates displayed on x axis )
             this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             // create an array with data for each classification

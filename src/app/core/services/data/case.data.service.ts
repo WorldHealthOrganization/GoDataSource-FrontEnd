@@ -16,8 +16,7 @@ export class CaseDataService {
         private modelHelper: ModelHelperService,
         private genericDataService: GenericDataService,
         private listFilterDataService: ListFilterDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Cases for an Outbreak
@@ -158,11 +157,8 @@ export class CaseDataService {
      * @returns {Observable<MetricCasesCountStratified[]>}
      */
     getCasesStratifiedByClassificationOverTime(outbreakId: string, periodType: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesCountStratified[]> {
-
-         queryBuilder.filter.where({periodType: periodType});
-         const filter = queryBuilder.filter.generateFirstCondition(true,true); //.buildQuery();
-
-   //     const filter = queryBuilder.buildQuery();
+        queryBuilder.filter.where({periodType: periodType});
+        const filter = queryBuilder.filter.generateFirstCondition(true, true);
 
         const obs = this.http.get(`outbreaks/${outbreakId}/contacts/classification-over-time/count?filter=${filter}`);
 
