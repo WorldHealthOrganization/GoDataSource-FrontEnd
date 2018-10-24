@@ -312,6 +312,10 @@ export class RelationshipDataService {
             relationship.socialRelationshipTypeId
         ));
         lightObject.push(new LabelValuePair(
+            'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            relationship.socialRelationshipDetail
+        ));
+        lightObject.push(new LabelValuePair(
             'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
             relationship.comment
         ));

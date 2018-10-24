@@ -110,29 +110,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Contact First Name -->
-        <ng-container matColumnDef="contact.firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="firstContactFirstName"
-                            ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
-                            (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.contact?.firstName }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Contact Last Name -->
         <ng-container matColumnDef="contact.lastName">
             <mat-header-cell *matHeaderCellDef>
@@ -150,8 +127,31 @@
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
                 {{ item.contact?.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Contact First Name -->
+        <ng-container matColumnDef="contact.firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstContactFirstName"
+                            ngModel
+                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.contact?.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -221,6 +221,7 @@
                             (optionChanged)="filterBySelectField('statusId', $event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true"
                             [multiple]="true">
                         </app-form-select>
@@ -249,8 +250,9 @@
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
-                            [clearable]="false">
+                            [clearable]="false"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
                 </div>

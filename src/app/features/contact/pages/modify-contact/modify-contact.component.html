@@ -49,7 +49,6 @@
                                 [(ngModel)]="contactData.gender"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
-                                required="true"
                                 [options]="genderList$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
@@ -81,7 +80,6 @@
                                 fxFlex
                                 name="ageDob"
                                 [(ngModel)]="contactData"
-                                [required]="false"
                                 [disabled]="viewOnly"
                                 ageButtonLabel="LNG_CONTACT_FIELD_LABEL_AGE_BUTTON"
                                 dobButtonLabel="LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
@@ -167,7 +165,6 @@
                 <app-form-address-list
                     name="addresses"
                     [(ngModel)]="contactData.addresses"
-                    [required]="true"
                     [disabled]="viewOnly">
                 </app-form-address-list>
             </mat-tab>

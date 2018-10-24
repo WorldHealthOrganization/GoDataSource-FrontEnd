@@ -182,12 +182,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 excludeFromSave: true
             }),
             new VisibleColumnModel({
-                field: 'contact.firstName',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
-            }),
-            new VisibleColumnModel({
                 field: 'contact.lastName',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'contact.firstName',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'date',
@@ -199,7 +199,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             }),
             new VisibleColumnModel({
                 field: 'fullAddress',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'statusId',

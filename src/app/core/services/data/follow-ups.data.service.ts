@@ -173,11 +173,17 @@ export class FollowUpsDataService {
     /**
      * Get metrics for contacts on follow-up lists
      * @param {string} outbreakId
+     * @param {string} date
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string): Observable<MetricContactsModel> {
+    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string, date: string): Observable<MetricContactsModel> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where(
+            {date: date}
+        );
+        const filter = qb.filter.generateFirstCondition(true, true);
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count`),
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
             MetricContactsModel
         );
     }
@@ -206,11 +212,17 @@ export class FollowUpsDataService {
     /**
      * Get the number of contacts who are lost to followup
      * @param outbreakId
+     * @param {string} date
      * @returns {Observable<Object>}
      */
-    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string): Observable<any> {
+    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string, date: string): Observable<any> {
+        const qb = new RequestQueryBuilder();
+        qb.filter.where(
+            {date: date}
+        );
+        const filter = qb.filter.generateFirstCondition(true, true);
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count`),
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count?filter=${filter}`),
             MetricContactsLostToFollowUpModel
         );
     }
@@ -218,6 +230,7 @@ export class FollowUpsDataService {
     /**
      * Retrieve the list of contacts who have successful followup
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
     getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {

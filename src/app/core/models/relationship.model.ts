@@ -25,6 +25,7 @@ export class RelationshipModel {
     exposureFrequencyId: string;
     exposureDurationId: string;
     socialRelationshipTypeId: string;
+    socialRelationshipDetail: string;
     clusterId: string;
     comment: string;
     people: EntityModel[];
@@ -39,6 +40,7 @@ export class RelationshipModel {
         this.exposureFrequencyId = _.get(data, 'exposureFrequencyId');
         this.exposureDurationId = _.get(data, 'exposureDurationId');
         this.socialRelationshipTypeId = _.get(data, 'socialRelationshipTypeId');
+        this.socialRelationshipDetail = _.get(data, 'socialRelationshipDetail');
         this.clusterId = _.get(data, 'clusterId');
         this.comment = _.get(data, 'comment');
 

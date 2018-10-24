@@ -228,12 +228,12 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 excludeFromSave: true
             }),
             new VisibleColumnModel({
-                field: 'firstName',
-                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
-            }),
-            new VisibleColumnModel({
                 field: 'lastName',
                 label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'age',
@@ -427,6 +427,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     hasContactWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+    }
+
+    /**
+     * Check if we have write access to case
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     /**
