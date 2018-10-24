@@ -268,6 +268,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     initializeSideFilters() {
         const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        const dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // case condition
         const caseCondition = new RequestQueryBuilder();
@@ -336,18 +337,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     }),
                     new FilterModel({
-                        fieldName: 'performed',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                        fieldName: 'targeted',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                         type: FilterType.SELECT,
                         options$: this.yesNoOptionsList$,
                         relationshipPath: ['followUps'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     }),
                     new FilterModel({
-                        fieldName: 'lostToFollowUp',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                        fieldName: 'statusId',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                         type: FilterType.SELECT,
-                        options$: this.yesNoOptionsList$,
+                        options$: dailyStatusTypeOptions$,
                         relationshipPath: ['followUps'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     })

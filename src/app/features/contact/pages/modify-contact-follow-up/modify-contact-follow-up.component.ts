@@ -4,19 +4,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import * as moment from 'moment';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Moment } from 'moment';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -35,37 +35,33 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
+    dailyStatusTypeOptions$: Observable<any[]>;
+
     contactId: string;
     followUpId: string;
 
     authUser: UserModel;
-
-    serverToday: Moment = null;
 
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
-
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // retrieve route params
         this.route.params
@@ -136,27 +132,6 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
                 this.disableDirtyConfirm();
                 this.router.navigate(['/contacts/follow-ups']);
             });
-    }
-
-    /**
-     * If date is in the future we need to reset performed & lost to follow-up
-     */
-    dateInTheFuture(): boolean {
-        const date = this.followUpData.date ?
-            moment(this.followUpData.date) :
-            null;
-
-        if (
-            this.serverToday &&
-            date &&
-            date.startOf('day').isAfter(this.serverToday)
-        ) {
-            this.followUpData.performed = false;
-            this.followUpData.lostToFollowUp = false;
-            return true;
-        }
-
-        return false;
     }
 
     /**

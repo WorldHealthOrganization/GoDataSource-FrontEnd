@@ -83,7 +83,7 @@
                             <button
                                 *ngIf="hasFollowUpsWriteAccess()"
                                 mat-menu-item
-                                (click)="modifySelectedFollowUps()">
+                                (click)="modifySelectedFollowUps(table)">
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
                             </button>
 
@@ -207,28 +207,31 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Missed contact -->
-        <ng-container matColumnDef="lostToFollowUp">
+        <!-- Status -->
+        <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="lostToFollowUpFilter"
+                            name="statusIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByBooleanField('lostToFollowUp', $event.value)"
+                            [options]="dailyStatusTypeOptions$ | async"
+                            (optionChanged)="filterBySelectField('statusId', $event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayFilterIcon]="true"
-                            [clearable]="false">
+                            [multiple]="true">
                         </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.lostToFollowUp"></app-yes-no-label>
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS"
+                    [value]="item.statusId">
+                </app-reference-data-label>
             </mat-cell>
         </ng-container>
 
@@ -267,21 +270,6 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-                        <ng-container *app-selected-outbreak-is-active>
-                            <ng-container
-                                *ngIf="!item.deleted && item.personId && hasFollowUpsWriteAccess() && !dateInTheFuture(item.date)">
-                                <button
-                                    mat-menu-item
-                                    (click)="item.lostToFollowUp ? markContactAsMissedFromFollowUp(item, true) : markContactAsMissedFromFollowUp(item)">
-                                    {{item.lostToFollowUp ?
-                                    ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT' | translate ) :
-                                    ('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING' | translate)}}
-                                </button>
-
-                                <mat-divider></mat-divider>
-                            </ng-container>
-                        </ng-container>
-
                         <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>

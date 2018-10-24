@@ -34,20 +34,24 @@
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
-                                name="performed"
-                                [(ngModel)]="followUpData.performed"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION"
-                                [disabled]="viewOnly || dateInTheFuture()">
+                                name="targeted"
+                                [(ngModel)]="followUpData.targeted"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <app-form-slide-toggle
-                                name="lostToFollowUp"
-                                [(ngModel)]="followUpData.lostToFollowUp"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION"
-                                [disabled]="viewOnly || dateInTheFuture()">
-                            </app-form-slide-toggle>
+                            <app-form-select
+                                name="statusId"
+                                [(ngModel)]="followUpData.statusId"
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                                [options]="dailyStatusTypeOptions$ | async"
+                                [disabled]="viewOnly"
+                                [required]="true"
+                                optionLabelKey="label"
+                                optionValueKey="value">
+                            </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
                         </div>

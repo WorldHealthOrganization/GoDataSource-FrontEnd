@@ -57,6 +57,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
 
+    ReferenceDataCategory = ReferenceDataCategory;
+    dailyStatusTypeOptions$: Observable<any[]>;
+
     availableSideFilters: FilterModel[];
 
     dateFilterDefaultValue: Moment;
@@ -75,8 +78,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED', 'performed'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP', 'lostToFollowUp'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', 'targeted'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID', 'statusId'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
@@ -105,6 +108,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
             ' - ' +
             this.followUpsPrintDailyFileName;
+
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // set default filter rules
         this.initializeHeaderFilters();
@@ -196,8 +202,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
             }),
             new VisibleColumnModel({
-                field: 'lostToFollowUp',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP'
+                field: 'statusId',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
             }),
             new VisibleColumnModel({
                 field: 'deleted',
@@ -231,16 +237,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 type: FilterType.RANGE_DATE
             }),
             new FilterModel({
-                fieldName: 'lostToFollowUp',
-                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                fieldName: 'targeted',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                 type: FilterType.SELECT,
                 options$: this.yesNoOptionsList$
             }),
             new FilterModel({
-                fieldName: 'performed',
-                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                fieldName: 'statusId',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                 type: FilterType.SELECT,
-                options$: this.yesNoOptionsList$
+                options$: this.dailyStatusTypeOptions$
             })
         ];
         if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
@@ -452,66 +458,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
-     * Mark a contact as missing from a follow-up
-     * @param {FollowUpModel} followUp
-     * @param {boolean} contactMissed
-     */
-    markContactAsMissedFromFollowUp(followUp: FollowUpModel, contactMissed?: boolean) {
-        // show confirm dialog to confirm the action and check if contact is missed or not to know what message to display
-        const confirmMessage = contactMissed ?
-            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP' :
-            'LNG_DIALOG_CONFIRM_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP';
-        this.dialogService.showConfirm(confirmMessage, new ContactModel(followUp.contact))
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.outbreakDataService
-                        .getSelectedOutbreak()
-                        .subscribe((selectedOutbreak: OutbreakModel) => {
-                            // mark follow-up
-                            this.followUpsDataService
-                                .modifyFollowUp(selectedOutbreak.id, followUp.personId, followUp.id, {
-                                    lostToFollowUp : !contactMissed
-                                })
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
-
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    // mark follow-up as missed or as present
-                                    const successMessage =
-                                        contactMissed ?
-                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_PRESENT_ON_FOLLOW_UP_SUCCESS_MESSAGE' :
-                                            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MARK_CONTACT_AS_MISSING_FROM_FOLLOW_UP_SUCCESS_MESSAGE';
-                                    this.snackbarService.showSuccess(successMessage);
-
-                                    // refresh list
-                                    this.needsRefreshList(true);
-                                });
-                        });
-                }
-            });
-    }
-
-    /**
      * Modify selected follow-ups
      */
-    modifySelectedFollowUps() {
+    modifySelectedFollowUps(table) {
         // get list of follow-ups that we want to modify
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
             return;
         }
 
-        // redirect to next step
-        this.router.navigate(
-            ['/contacts/follow-ups/modify-list'],
-            {
-                queryParams: {
-                    followUpsIds: JSON.stringify(selectedRecords)
-                }
-            }
-        );
+        // check if we have future records
+        console.log(table);
+        //
+        // // redirect to next step
+        // this.router.navigate(
+        //     ['/contacts/follow-ups/modify-list'],
+        //     {
+        //         queryParams: {
+        //             followUpsIds: JSON.stringify(selectedRecords)
+        //         }
+        //     }
+        // );
     }
 
     /**
