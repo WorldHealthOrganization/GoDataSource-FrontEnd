@@ -36,7 +36,6 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
                         .getDeceasedCasesCount(selectedOutbreak.id)
                         .subscribe((result) => {
                             this.casesDeceasedCount = result.count;
-                            console.log(this.casesDeceasedCount);
                         });
                 }
             });
