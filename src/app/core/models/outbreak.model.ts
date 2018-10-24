@@ -6,6 +6,7 @@ export class OutbreakModel {
     name: string;
     description: string;
     disease: string;
+    deleted: boolean;
     startDate: string;
     endDate: string | null;
     periodOfFollowup: number;
@@ -32,6 +33,7 @@ export class OutbreakModel {
         this.name = _.get(data, 'name');
         this.description = _.get(data, 'description');
         this.disease = _.get(data, 'disease');
+        this.deleted = _.get(data, 'deleted');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.countries = _.get(data, 'countries', []);
