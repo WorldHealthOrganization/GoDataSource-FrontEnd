@@ -14,6 +14,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-roles-list',
@@ -31,13 +32,16 @@ export class RolesListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
     // list of existing roles
     rolesList$: Observable<UserRoleModel[]>;
+    // list of permission
+    availablePermissions$: Observable<any>;
 
     constructor(
         private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private http: HttpClient
     ) {
         super(
             snackbarService
@@ -48,6 +52,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.availablePermissions$ = this.http.get(`roles/available-permissions`).share();
+
         this.needsRefreshList(true);
     }
 
