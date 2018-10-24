@@ -429,6 +429,14 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to case
+     * @returns {boolean}
+     */
+    hasCaseWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    /**
      * Check if we have write access to follow-ups
      * @returns {boolean}
      */
