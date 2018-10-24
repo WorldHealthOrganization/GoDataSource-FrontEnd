@@ -1,7 +1,7 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
     [params]="queryParams"
-    [value]="calculatePercent() + '%'"
+    [value]="contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount + '/' + contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()">
