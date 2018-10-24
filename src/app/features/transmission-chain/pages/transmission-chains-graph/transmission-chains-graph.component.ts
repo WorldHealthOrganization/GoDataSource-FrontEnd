@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -26,7 +25,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
     authUser: UserModel;
 
     constructor(
-        private router: Router,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService
     ) {}

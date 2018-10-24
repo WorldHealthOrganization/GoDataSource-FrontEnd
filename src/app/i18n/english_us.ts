@@ -262,6 +262,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_DOB': 'Date of birth',
         'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
         'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
+        'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION': 'Classification',
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
@@ -530,7 +531,7 @@ export const EnglishUsLang = {
         /**
          * Available Entities for Relationship page
          */
-        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available Entities',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available People',
 
         /**
          * Create Entity Relationship page
@@ -840,8 +841,10 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION': 'Exposure Duration',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION': '',
-        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Context of Exposure',
         'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
