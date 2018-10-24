@@ -48,6 +48,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     diseasesList$: Observable<any[]>;
     // countries list
     countriesList$: Observable<any[]>;
+    // yes/no option list for deleted
+    yesNoOptionsList$: Observable<any[]>;
     // authenticated user
     authUser: UserModel;
 
@@ -110,6 +112,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
                 country.value = {
@@ -167,6 +170,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 label: 'LNG_OUTBREAK_FIELD_LABEL_ACTIVE'
             }),
             new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
+                visible: false
+            }),
+            new VisibleColumnModel({
                 field: 'actions',
                 required: true,
                 excludeFromSave: true
@@ -209,6 +217,34 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                 }
             });
     }
+
+    /**
+     * Restore specific outbreak
+     * @param {OutbreakModel} outbreakId
+     */
+    restoreOutbreak(outbreak: OutbreakModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK', new OutbreakModel(outbreak))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete follow up
+                    this.outbreakDataService
+                        .restoreOutbreak(outbreak.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
 
     setActive(outbreak) {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE')

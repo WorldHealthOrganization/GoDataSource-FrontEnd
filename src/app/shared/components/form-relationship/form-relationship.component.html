@@ -85,7 +85,6 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION"
                         [options]="exposureTypeOptions$ | async"
                         [disabled]="disabled"
-                        [required]="required"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">
@@ -116,7 +115,6 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION"
                         [options]="exposureFrequencyOptions$ | async"
                         [disabled]="disabled"
-                        [required]="required"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">
@@ -145,7 +143,6 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION"
                         [options]="exposureDurationOptions$ | async"
                         [disabled]="disabled"
-                        [required]="required"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">
@@ -196,6 +193,36 @@
                 </div>
 
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[socialRelationshipDetail]'"
+                        [(ngModel)]="relationship.socialRelationshipDetail"
+                        [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
+                        tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
+                        [disabled]="disabled"
+                        optionLabelKey="label"
+                        optionValueKey="value"
+                        required="false"
+                        (optionChanged)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('socialRelationshipDetail')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-select
                         [name]="name + '[clusterId]'"
                         [(ngModel)]="relationship.clusterId"
@@ -223,6 +250,12 @@
                         </button>
                     </div>
                 </div>
+
+                <div fxFlex><!-- placeholder --></div>
+
+                <div fxFlex><!-- placeholder --></div>
+
+                <div fxFlex><!-- placeholder --></div>
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px">

@@ -66,6 +66,15 @@ export class OutbreakDataService {
     }
 
     /**
+     * Restore an outbreak that was deleted
+     * @param {string} outbreakId
+     * @returns {Observable<any>}
+     */
+    restoreOutbreak(outbreakId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/restore`, {});
+    }
+
+    /**
      * Create a new Outbreak
      * @param {OutbreakModle} outbreak
      * @returns {Observable<UserRoleModel[]>}
