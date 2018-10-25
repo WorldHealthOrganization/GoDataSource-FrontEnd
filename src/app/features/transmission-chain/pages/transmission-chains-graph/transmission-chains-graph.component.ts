@@ -5,6 +5,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -23,15 +24,25 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+    // filter used for size of chains
+    sizeOfChainsFilter: number = null;
 
     constructor(
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        protected route: ActivatedRoute
     ) {}
 
     ngOnInit() {
         // get authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.route.queryParams
+            .subscribe((params: {sizeOfChainsFilter}) => {
+                if (params.sizeOfChainsFilter) {
+                    this.sizeOfChainsFilter = params.sizeOfChainsFilter;
+                }
+            });
     }
 
     /**

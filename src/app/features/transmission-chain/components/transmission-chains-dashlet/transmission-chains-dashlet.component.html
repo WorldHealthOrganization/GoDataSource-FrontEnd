@@ -166,3 +166,11 @@
     (edgeTapped)="onEdgeTap($event)"
     (viewTypeChanged)="viewTypeChanged($event)">
 </app-cytoscape-graph>
+<div *ngIf="sizeOfChainsFilter">
+    <div>
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}}: {{sizeOfChainsFilter}}
+    </div>
+    <button mat-raised-button (click)="resetChain()">
+        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS' | translate }}
+    </button>
+</div>

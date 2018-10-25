@@ -57,14 +57,27 @@ export class TransmissionChainDataService {
     /**
      * Retrieve the list of Independent Transmission Chains, nodes, edges
      * @param {string} outbreakId
+     * @param {number} size
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<TransmissionChainModel[]>}
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
+        size: number = null,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-        const filter = queryBuilder.filter.generateFirstCondition(true, false);
+
+        let filter = queryBuilder.filter.generateFirstCondition(false, false);
+
+        if (size) {
+            const rQBSize = new RequestQueryBuilder();
+            rQBSize.filter.where({
+                        size: Number(size)
+                });
+            filter.where = rQBSize.filter.generateFirstCondition(false, false);
+        }
+        filter = JSON.stringify(filter);
+
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainDataToModel);
