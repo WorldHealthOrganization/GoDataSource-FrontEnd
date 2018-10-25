@@ -8,35 +8,41 @@
     <div class="page-content">
 
         <div
-            fxFlex fxLayout="row" fxLayoutGap="10px">
+            fxFlex fxLayout="row" fxLayoutAlign="space-between">
 
-            <div fxFlex="31">
+            <div fxFlex="33">
                 <mat-card class="dashboard-gauge">
                     <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
                     <!-- case summary pie chart -->
-                    <app-case-summary-dashlet
-                        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
-                    </app-case-summary-dashlet>
+                    <div fxLayoutAlign="center">
+                        <app-case-summary-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-case-summary-dashlet>
+                    </div>
                 </mat-card>
             </div>
 
-            <div fxFlex="31">
+            <div fxFlex="33">
                 <mat-card class="dashboard-gauge">
                     <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}</div>
                     <!-- case hospitalization status pie chart -->
-                    <app-cases-hospitalized-pie-chart-dashlet
-                        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
-                    </app-cases-hospitalized-pie-chart-dashlet>
+                    <div fxLayoutAlign="center">
+                        <app-cases-hospitalized-pie-chart-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-cases-hospitalized-pie-chart-dashlet>
+                    </div>
                 </mat-card>
             </div>
 
-            <div fxFlex="31">
+            <div fxFlex="33">
                 <!-- case summary pie chart -->
                 <mat-card class="dashboard-gauge">
                     <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
-                    <app-case-summary-dashlet
-                        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
-                    </app-case-summary-dashlet>
+                    <div fxLayoutAlign="center">
+                        <app-case-summary-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-case-summary-dashlet>
+                    </div>
                 </mat-card>
             </div>
         </div>

@@ -7,6 +7,7 @@ import { MetricChartDataModel } from '../../../../core/models/metrics/metric-cha
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 import 'rxjs/add/observable/forkJoin';
 
 @Component({
@@ -27,6 +28,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
+        private i18nService: I18nService,
         protected snackbarService: SnackbarService
     ) {}
 
@@ -34,7 +36,7 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                 if (selectedOutbreak && selectedOutbreak.id) {
+                if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
                     // get data
                     this.initializeData();
@@ -71,10 +73,22 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit {
      */
     buildChartData() {
         const caseHospitalizationSummaryResults: MetricChartDataModel[] = [];
-        caseHospitalizationSummaryResults.push({value: this.caseHospitalizationCount, name: 'Cases Hospitalized'});
-        caseHospitalizationSummaryResults.push({value: this.caseIsolationCount, name: 'Cases Isolated'});
+        caseHospitalizationSummaryResults.push(
+            {
+                value: this.caseHospitalizationCount,
+                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL')
+            });
+        caseHospitalizationSummaryResults.push(
+            {
+                value: this.caseIsolationCount,
+                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL')
+            });
         const caseNotHospitalized = this.caseListCount - this.caseHospitalizationCount - this.caseIsolationCount;
-        caseHospitalizationSummaryResults.push({value: caseNotHospitalized, name: 'Cases Not Hospitalized'});
+        caseHospitalizationSummaryResults.push(
+            {
+                value: caseNotHospitalized,
+                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL')
+            });
         return caseHospitalizationSummaryResults;
     }
 
