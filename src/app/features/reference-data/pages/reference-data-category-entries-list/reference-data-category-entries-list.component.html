@@ -107,6 +107,19 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Readonly-->
+        <ng-container matColumnDef="readonly">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_READONLY' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ (item.active ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
@@ -126,6 +139,7 @@
                     </button>
 
                     <button
+                        *ngIf="!item.readonly"
                         mat-menu-item
                         [routerLink]="['.', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY' | translate}}
