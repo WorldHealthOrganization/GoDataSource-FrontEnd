@@ -100,7 +100,8 @@ export class ReferenceDataDataService {
                     new LabelValuePair(
                         entry.value,
                         entry.id,
-                        !entry.active
+                        !entry.active,
+                        entry.active
                     )
                 );
             });

@@ -129,8 +129,10 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP': 'Are you sure you want to restore this follow-up: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CASE': 'Are you sure you want to restore this case: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK': 'Are you sure you want to restore this outbreak: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
+        'LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT': 'Are you sure you want to remove this attachment?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': 'Are you sure you want to delete this case lab result?',
         'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE': 'Are you sure you want to delete this date range?',
@@ -251,6 +253,14 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
         'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS': 'Select answers',
+        'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE': 'Select date',
+        'LNG_QUESTIONNAIRE_LABEL_FILE_NAME': 'Enter file name',
+        'LNG_QUESTIONNAIRE_BUTTON_BROWSE': 'Browse',
+        'LNG_QUESTIONNAIRE_BUTTON_REPLACE': 'Replace',
+        'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD': 'Download',
+        'LNG_QUESTIONNAIRE_BUTTON_REMOVE': 'Remove',
+        'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE': 'Choose file',
+        'LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE': 'Error uploading file',
 
         /**
          * Entity Fields
@@ -262,6 +272,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_DOB': 'Date of birth',
         'LNG_ENTITY_FIELD_LABEL_GENDER': 'Gender',
         'LNG_ENTITY_FIELD_LABEL_RISK': 'Risk',
+        'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION': 'Classification',
         'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP': 'Last Follow-up',
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
@@ -530,7 +541,7 @@ export const EnglishUsLang = {
         /**
          * Available Entities for Relationship page
          */
-        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available Entities',
+        'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE': 'Available People',
 
         /**
          * Create Entity Relationship page
@@ -840,8 +851,10 @@ export const EnglishUsLang = {
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION': 'Exposure Duration',
         'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION': '',
-        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Relation',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Context of Exposure',
         'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION': '',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER': 'Cluster',
         'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT': 'Comment',
@@ -1219,6 +1232,8 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE': 'Active?',
         'LNG_OUTBREAK_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_OUTBREAK_FIELD_LABEL_DELETED_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION': 'Description',
         'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
@@ -1254,6 +1269,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE': 'Export Outbreak Data',
         'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS': 'Export the selected outbreaks',
         'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON': 'Import Outbreak Data',
+        'LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE': 'Outbreak restored!',
 
         /**
          * Create Outbreak Page
@@ -1366,8 +1382,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE': 'NEW CASES IN THE PREVIOUS ',
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE': ' DAYS AMONG KNOWN CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
-        'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'SUSPECT CASES WITH PENDING LAB RESULT',
-        'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'SUSPECT CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'CASES WITH PENDING LAB RESULT',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
         'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECAME CASES',
@@ -1553,8 +1569,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP': 'Contacts with successful follow-up',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in the previous {{x}} days among known contacts',
-        'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Suspect cases with pending lab result',
-        'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Suspect cases refusing to be transferred to a treatment unit',
+        'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Cases with pending lab result',
+        'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Cases refusing to be transferred to a treatment unit',
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
         'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',

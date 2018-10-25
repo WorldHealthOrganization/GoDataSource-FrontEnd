@@ -108,7 +108,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         const actualRemoveNewFlag = (question: QuestionModel) => {
             delete question.new;
             _.each(question.answers, (answer: AnswerModel) => {
-                delete answer.new;
                 _.each(answer.additionalQuestions, (childQuestion: QuestionModel) => {
                     actualRemoveNewFlag(childQuestion);
                 });

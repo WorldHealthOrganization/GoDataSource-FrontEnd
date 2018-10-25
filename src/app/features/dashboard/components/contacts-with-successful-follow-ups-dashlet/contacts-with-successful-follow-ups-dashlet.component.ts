@@ -18,7 +18,7 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComponent implements OnInit {
 
     // contacts with successfulFollowup
-    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp;
+    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp = new MetricContactsWithSuccessfulFollowUp();
 
     // filter by day
     date: Moment = moment();
@@ -66,12 +66,4 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
             });
     }
 
-    /**
-     * Calculate percentage of successfully follow-up for specific date
-     * @returns {number}
-     */
-    calculatePercent() {
-        return this.contactsWithSuccessfulFollowup && this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount > 0 ?
-            Math.round(100 * this.contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount / this.contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount) : 0;
-    }
 }

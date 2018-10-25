@@ -132,6 +132,7 @@
                                     (optionChanged)="filterBySelectField('gender', $event)"
                                     multiple="true"
                                     [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
                                     [displayFilterIcon]="true">
                                 </app-form-select>
                             </div>
@@ -159,7 +160,8 @@
                                     (optionChanged)="filterBySelectField('riskLevel', $event)"
                                     multiple="true"
                                     app-reset-input-on-side-filter
-                                    [allowSelectionOfDisabledItems]="true">
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true">
                                 </app-form-select>
                             </div>
                         </div>
@@ -169,6 +171,36 @@
                         <app-reference-data-label
                             [category]="ReferenceDataCategory.RISK_LEVEL"
                             [value]="item.riskLevel">
+                        </app-reference-data-label>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Classification -->
+                <ng-container matColumnDef="classification">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="classificationFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="caseClassificationsList$ | async"
+                                    (optionChanged)="filterBySelectField('classification', $event)"
+                                    multiple="true"
+                                    app-reset-input-on-side-filter
+                                    [allowSelectionOfDisabledItems]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                     <mat-cell *matCellDef="let item">
+                        <app-reference-data-label
+                            [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
+                            [value]="item.classification">
                         </app-reference-data-label>
                     </mat-cell>
                 </ng-container>

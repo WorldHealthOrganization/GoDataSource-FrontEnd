@@ -91,7 +91,7 @@ export class UserListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'email', 'role', 'actions'];
+        const columns = ['lastName', 'firstName', 'email', 'role', 'actions'];
 
         return columns;
     }

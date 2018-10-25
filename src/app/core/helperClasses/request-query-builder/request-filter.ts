@@ -150,12 +150,30 @@ export class RequestFilter {
             // remove filter
             this.remove(property);
         } else {
-            // filter with 'startsWith' criteria
-            this.where({
-                [property]: {
-                    [caseInsensitive ? 'regexp' : 'eq']: caseInsensitive ? '/^' + RequestFilter.escapeStringForRegex(value) + '$/i' : value
+            // fix Loopback V3 "eq" comparator not working in some cases
+            // but we still need to use eq when comparing with null values
+            // use eq for null values
+            if (value === null) {
+                this.where({
+                    [property]: {
+                        eq: null
+                    }
+                }, replace);
+            } else {
+                // use regexp for case insensitive compare
+                if (caseInsensitive) {
+                    this.where({
+                        [property]: {
+                            regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '$/i'
+                        }
+                    }, replace);
+                } else {
+                    // case sensitive search
+                    this.where({
+                        [property]: value
+                    }, replace);
                 }
-            }, replace);
+            }
         }
 
         return this;
