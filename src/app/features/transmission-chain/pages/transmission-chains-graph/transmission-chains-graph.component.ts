@@ -26,6 +26,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     authUser: UserModel;
     // filter used for size of chains
     sizeOfChainsFilter: number = null;
+    // person Id - to filter the chain
+    personId: string = null;
 
     constructor(
         private authDataService: AuthDataService,
@@ -41,6 +43,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
             .subscribe((params: {sizeOfChainsFilter}) => {
                 if (params.sizeOfChainsFilter) {
                     this.sizeOfChainsFilter = params.sizeOfChainsFilter;
+                }
+            });
+
+        this.route.queryParams
+            .subscribe((params: {personId}) => {
+                if (params.personId) {
+                    this.personId = params.personId;
                 }
             });
     }

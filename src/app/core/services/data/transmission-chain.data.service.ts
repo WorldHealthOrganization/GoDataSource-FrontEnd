@@ -58,17 +58,20 @@ export class TransmissionChainDataService {
      * Retrieve the list of Independent Transmission Chains, nodes, edges
      * @param {string} outbreakId
      * @param {number} size
+     * @param {string} personId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<TransmissionChainModel[]>}
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
         size: number = null,
+        personId: string = null,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
 
         let filter = queryBuilder.filter.generateFirstCondition(false, false);
 
+        // add filter for size ( under where )
         if (size) {
             const rQBSize = new RequestQueryBuilder();
             rQBSize.filter.where({
@@ -76,6 +79,22 @@ export class TransmissionChainDataService {
                 });
             filter.where = rQBSize.filter.generateFirstCondition(false, false);
         }
+
+        // add filter for person ( under filter )
+        if (personId) {
+            const rQBPersonId = new RequestQueryBuilder();
+            rQBPersonId.filter.where({
+                chainIncludesPerson: {
+                    where: {
+                        id: personId
+                    }
+                }
+            });
+            const filterPerson = rQBPersonId.filter.generateFirstCondition(false, false);
+            // merge conditions from person filter with those from chainInculdesPerson
+            filter = {...filter, ...filterPerson};
+        }
+
         filter = JSON.stringify(filter);
 
         return this.http.get(

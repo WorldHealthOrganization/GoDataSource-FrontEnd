@@ -34,6 +34,7 @@ import { Router } from '@angular/router';
 export class TransmissionChainsDashletComponent implements OnInit {
 
     @Input() sizeOfChainsFilter: number = null;
+    @Input() personId: string = null;
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
@@ -271,7 +272,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, rQB).subscribe((chains) => {
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
                 } else {

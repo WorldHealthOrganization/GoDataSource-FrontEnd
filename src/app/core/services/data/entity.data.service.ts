@@ -204,6 +204,12 @@ export class EntityDataService {
                 'LINK',
                 `/cases/${entity.id}/view`
             ));
+
+            // insert link to view chain
+            lightObject.push(new LabelValuePair(
+                'LINK_CHAIN',
+                `/transmission-chains?personId=${entity.id}`
+            ));
         }
 
         // entity type = Contact

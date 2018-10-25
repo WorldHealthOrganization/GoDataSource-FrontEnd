@@ -26,6 +26,7 @@
         <!-- Chains of transmission -->
         <app-transmission-chains-dashlet
             [sizeOfChainsFilter]="sizeOfChainsFilter"
+            [personId]="personId"
             *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
         </app-transmission-chains-dashlet>
 
