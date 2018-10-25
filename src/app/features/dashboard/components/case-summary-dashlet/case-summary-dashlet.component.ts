@@ -74,11 +74,10 @@ export class CaseSummaryDashletComponent implements OnInit {
             }
         });
         // translate the classification
-        caseSummaryResults.map((result) => {
+       caseSummaryResults = caseSummaryResults.map((result) => {
             result.name = this.i18nService.instant(result.name);
             return result;
         });
-        caseSummaryResults = _.orderBy(caseSummaryResults, ['value'], ['desc']);
         return caseSummaryResults;
     }
 
