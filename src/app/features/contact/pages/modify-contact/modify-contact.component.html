@@ -112,7 +112,19 @@
                                 [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-select
+                                *ngIf="contactData.followUp?.status"
+                                name="followUpStatus"
+                                [ngModel]="contactData.followUp?.status"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
+                                [options]="finalFollowUpStatus$ | async"
+                                [disabled]="true">
+                            </app-form-select>
+                            <div
+                                *ngIf="!contactData.followUp?.status"
+                                fxFlex><!-- placeholder --></div>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
 
