@@ -22,7 +22,8 @@ export class TransmissionChainDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private i18nService: I18nService
-    ) {}
+    ) {
+    }
 
     /**
      * Map Transmission chain to Chain model
@@ -140,51 +141,41 @@ export class TransmissionChainDataService {
      */
     convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
-        let selectedNodeIds: string[] = [];
+        const selectedNodeIds: string[] = [];
         // get labels for uears / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
-            // if show contacts and show events filters are not checked then only look into chainRelations for cases / events - faster lookup
-            if (filters.filtersDefault) {
-                // loop through the list of relations from all chains
-                _.forEach(chains, (chain, chainKey) => {
-                    if (!_.isEmpty(chain.chainRelations)) {
-                        _.forEach(chain.chainRelations, (relation, key) => {
-                            selectedNodeIds.push(relation.entityIds[0]);
-                            selectedNodeIds.push(relation.entityIds[1]);
-                        });
-                    }
-                });
-                selectedNodeIds = _.uniq(selectedNodeIds);
-                // load the data for all selected nodes
-                _.forEach(selectedNodeIds, (nodeId, key) => {
-                    const node = firstChain.nodes[nodeId];
-                    if (node) {
-                        const nodeProps = node.model;
-                        // calculate dateTimeline value
-                        if (node.type === EntityType.CASE) {
-                            // set date of onset to be used in timeline
-                            if (!_.isEmpty(node.model.dateOfOnset)) {
-                                nodeProps.dateTimeline = node.model.dateOfOnset;
-                            } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (node.type === EntityType.CONTACT) {
-                            if (!_.isEmpty(node.model.dateOfLastContact)) {
-                                nodeProps.dateTimeline = node.model.dateOfLastContact;
-                            } else {
-                                graphData.contactNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (node.type === EntityType.EVENT) {
-                            if (!_.isEmpty(node.model.data)) {
-                                nodeProps.dateTimeline = node.model.date;
-                            } else {
-                                graphData.eventNodesWithoutDates.push(node.model.id);
-                            }
+            if (!_.isEmpty(firstChain.nodes)) {
+                _.forEach(firstChain.nodes, function (node, key) {
+                    let allowAdd = false;
+                    const nodeProps = node.model;
+                    // show nodes based on their type
+                    if (node.type === EntityType.CONTACT && filters.showContacts) {
+                        allowAdd = true;
+                        if (!_.isEmpty(node.model.dateOfLastContact)) {
+                            nodeProps.dateTimeline = node.model.dateOfLastContact;
+                        } else {
+                            graphData.contactNodesWithoutDates.push(node.model.id);
                         }
+                    } else if (node.type === EntityType.EVENT && filters.showEvents) {
+                        allowAdd = true;
+                        if (!_.isEmpty(node.model.data)) {
+                            nodeProps.dateTimeline = node.model.date;
+                        } else {
+                            graphData.eventNodesWithoutDates.push(node.model.id);
+                        }
+                    } else if (node.type === EntityType.CASE) {
+                        allowAdd = true;
+                        if (!_.isEmpty(node.model.dateOfOnset)) {
+                            nodeProps.dateTimeline = node.model.dateOfOnset;
+                        } else {
+                            graphData.caseNodesWithoutDates.push(node.model.id);
+                        }
+                    }
+                    if (allowAdd) {
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
                         // set node color
@@ -201,7 +192,7 @@ export class TransmissionChainDataService {
                         }
                         // set node icon
                         if (Object.keys(colorCriteria.nodeIcon).length) {
-                            if ( colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]] ) {
+                            if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                             }
                         }
@@ -245,103 +236,9 @@ export class TransmissionChainDataService {
                             }
                         }
                         graphData.nodes.push({data: nodeData});
+                        selectedNodeIds.push(nodeData.id);
                     }
                 });
-            } else {
-                // if show contacts filter is checked or show events is not checked, then look into all the nodes - don't rely on chainRelations
-                if (!_.isEmpty(firstChain.nodes)) {
-                    _.forEach(firstChain.nodes, function (node, key) {
-                        let allowAdd = false;
-                        const nodeProps = node.model;
-                        // show nodes based on their type
-                        if (node.type === EntityType.CONTACT && filters.showContacts) {
-                            allowAdd = true;
-                            if (!_.isEmpty(node.model.dateOfLastContact)) {
-                                nodeProps.dateTimeline = node.model.dateOfLastContact;
-                            } else {
-                                graphData.contactNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (node.type === EntityType.EVENT && filters.showEvents) {
-                            allowAdd = true;
-                            if (!_.isEmpty(node.model.data)) {
-                                nodeProps.dateTimeline = node.model.date;
-                            } else {
-                                graphData.eventNodesWithoutDates.push(node.model.id);
-                            }
-                        } else if (node.type === EntityType.CASE) {
-                            allowAdd = true;
-                            if (!_.isEmpty(node.model.dateOfOnset)) {
-                                nodeProps.dateTimeline = node.model.dateOfOnset;
-                            } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
-                            }
-                        }
-                        if (allowAdd) {
-                            const nodeData = new GraphNodeModel(nodeProps);
-                            nodeData.type = node.type;
-                            // set node color
-                            if (Object.keys(colorCriteria.nodeColor).length) {
-                                if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
-                                    nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
-                                }
-                            }
-                            // set node label color
-                            if (Object.keys(colorCriteria.nodeNameColor).length) {
-                                if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
-                                    nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
-                                }
-                            }
-                            // set node icon
-                            if (Object.keys(colorCriteria.nodeIcon).length) {
-                                if ( colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]] ) {
-                                    nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
-                                }
-                            }
-
-                            // determine label
-                            if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
-                                nodeData.label = nodeData.name;
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
-                                if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
-                                    if (node.model.age.months > 0) {
-                                        nodeData.label = node.model.age.months + ' ' + monthsLabel;
-                                    } else {
-                                        nodeData.label = node.model.age.years + ' ' + yearsLabel;
-                                    }
-                                } else {
-                                    nodeData.label = '';
-                                }
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
-                                if (node.type === EntityType.CASE) {
-                                    nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                } else {
-                                    nodeData.label = '';
-                                }
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
-                                if (node.type !== EntityType.EVENT) {
-                                    nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
-                                } else {
-                                    nodeData.label = '';
-                                }
-                            } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
-                                nodeData.label = '';
-                                if (node.type !== EntityType.EVENT) {
-                                    const mainAddr = node.model.mainAddress;
-                                    if (!_.isEmpty(mainAddr.locationId)) {
-                                        const location = _.find(locationsList, function (l) {
-                                            return l.id === mainAddr.locationId;
-                                        });
-                                        if (location) {
-                                            nodeData.label = location.name;
-                                        }
-                                    }
-                                }
-                            }
-                            graphData.nodes.push({data: nodeData});
-                            selectedNodeIds.push(nodeData.id);
-                        }
-                    });
-                }
             }
 
             // generate edges based on the nodes included in the graph

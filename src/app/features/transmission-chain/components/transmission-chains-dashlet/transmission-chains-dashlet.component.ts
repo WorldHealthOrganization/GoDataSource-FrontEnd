@@ -256,7 +256,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
 
             // configure
-            this.filters.filtersDefault = this.filtersDefault();
             const rQB = new RequestQueryBuilder();
             if (!requestQueryBuilder.filter.isEmpty()) {
                 rQB.filter.where({
@@ -334,25 +333,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.displayChainsOfTransmission();
         // close settings panel
         this.showSettings = false;
-    }
-
-    /**
-     * used to determine if filters are used. If not, we can load the graph faster
-     * @returns {boolean}
-     */
-    filtersDefault(): boolean {
-        return (
-            this.filters.showEvents
-            && !this.filters.showContacts
-            && _.isEmpty(this.filters.classification)
-            && _.isEmpty(this.filters.gender)
-            && _.isEmpty(this.filters.occupation)
-            && _.isEmpty(this.filters.firstName)
-            && _.isEmpty(this.filters.lastName)
-            && _.isEmpty(this.filters.date)
-            && _.isEmpty(this.filters.locationId)
-            && _.isEmpty(this.filters.age)
-        );
     }
 
     /**
