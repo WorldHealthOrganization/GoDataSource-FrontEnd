@@ -103,7 +103,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     .remove('id')
                     .where({
                     id: {
-                        'inq': this.value
+                        'inq': _.isArray(this.value) ? this.value : [this.value]
                     }
                 }, true);
                 this.refreshLocationList();
