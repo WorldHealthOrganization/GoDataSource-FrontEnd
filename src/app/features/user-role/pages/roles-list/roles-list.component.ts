@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Router } from '@angular/router';
 
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
@@ -14,7 +13,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-roles-list',
@@ -36,12 +34,10 @@ export class RolesListComponent extends ListComponent implements OnInit {
     availablePermissions$: Observable<any>;
 
     constructor(
-        private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private http: HttpClient
     ) {
         super(
             snackbarService
