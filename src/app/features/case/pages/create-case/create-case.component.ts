@@ -43,6 +43,12 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
     serverToday: Moment = null;
 
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    caseIdMaskValidator: Observable<boolean>;
+
     constructor(
         private router: Router,
         private caseDataService: CaseDataService,
@@ -79,6 +85,22 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                };
+
+                // set visual ID validator
+                this.caseIdMaskValidator = Observable.create((observer) => {
+                    this.outbreakDataService.generateVisualIDCheckValidity(
+                        this.selectedOutbreak.id,
+                        this.caseData.visualId
+                    ).subscribe((isValid: boolean) => {
+                        observer.next(isValid);
+                        observer.complete();
+                    });
+                });
             });
     }
 
