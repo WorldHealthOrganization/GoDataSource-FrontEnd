@@ -181,17 +181,18 @@ export class TransmissionChainsDashletComponent implements OnInit {
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
+                        // load person if selected
+                        if (this.personId) {
+                            this.entityDataService
+                                .getEntity(this.selectedEntityType,this.selectedOutbreak.id,this.personId)
+                                .subscribe( (entity) => {
+                                    this.personName = entity.name;
+                                });
+                        }
+                        // load chain
                         this.displayChainsOfTransmission();
                     });
             });
-
-        if (this.personId) {
-            this.entityDataService
-                .getEntity(this.selectedEntityType,this.selectedOutbreak.id,this.personId)
-                .subscribe( (entity) => {
-                    this.personName = entity.name;
-            });
-        }
     }
 
     /**
@@ -501,6 +502,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     resetChain() {
         this.sizeOfChainsFilter = null;
+        this.personId = null;
         this.refreshChain();
     }
 

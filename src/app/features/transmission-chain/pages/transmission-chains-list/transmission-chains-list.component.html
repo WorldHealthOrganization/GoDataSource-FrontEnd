@@ -53,9 +53,9 @@
                     <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE' | translate}}</div>
                 </div>
             </mat-header-cell>
-
+            `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.CASE}`
             <mat-cell *matCellDef="let item">
-                <a *ngIf="item.firstCase" [routerLink]="['/cases', item.firstCase.id, 'modify']">
+                <a *ngIf="item.firstCase" [routerLink]="['/transmission-chains']" [queryParams]="{ personId: item.firstCase.id, selectedEntityType: EntityType.CASE }">
                     {{ item.firstCase.name }}
                 </a>
             </mat-cell>
