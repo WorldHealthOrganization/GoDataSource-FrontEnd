@@ -45,7 +45,6 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      * Initialize component elements
      */
     ngOnInit() {
-        console.log(this.required);
         // init value
         this.value = new AddressModel(this.value);
 
