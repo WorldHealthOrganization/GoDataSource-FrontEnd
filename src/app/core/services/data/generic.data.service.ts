@@ -147,5 +147,21 @@ export class GenericDataService {
     getTransmissionChainNodeLabelCriteriaOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS));
     }
+
+    /**
+     * Retrieve the list of audit log actions
+     * @returns {Observable<any[]>}
+     */
+    getAuditLogActionOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.AUDIT_LOG_ACTION_OPTIONS));
+    }
+
+    /**
+     * Retrieve the list of modules
+     * @returns {Observable<any[]>}
+     */
+    getDataModuleOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.DATA_MODULES));
+    }
 }
 

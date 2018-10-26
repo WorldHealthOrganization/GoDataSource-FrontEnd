@@ -10,6 +10,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL': 'Change Password',
         'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL': 'Admin',
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
+        'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
@@ -1561,6 +1562,54 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
+
+        /**
+         * Audit Logs fields
+         */
+        'LNG_AUDIT_LOG_FIELD_LABEL_ACTION': 'Action',
+        'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME': 'Record Name',
+        'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT': 'Time',
+        'LNG_AUDIT_LOG_FIELD_LABEL_USER': 'User',
+        'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES': 'User roles',
+        'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS': 'IP Address',
+        'LNG_AUDIT_LOG_FIELD_LABEL_CHANGED_DATA_FIELD': 'Field',
+
+        /**
+         * Audit Logs List page
+         */
+        'LNG_PAGE_LIST_AUDIT_LOGS_TITLE': 'Audit Logs',
+
+        /**
+         * Modules
+         */
+        'LNG_MODULE_LABEL_USER': 'User',
+        'LNG_MODULE_LABEL_ROLE': 'Role',
+        'LNG_MODULE_LABEL_LOCATION': 'Location',
+        'LNG_MODULE_LABEL_TEAM': 'Team',
+        'LNG_MODULE_LABEL_AUDIT_LOG': 'Audit Log',
+        'LNG_MODULE_LABEL_SYSTEM_SETTINGS': 'System Settings',
+        'LNG_MODULE_LABEL_SYNC_LOG': 'Sync Log',
+        'LNG_MODULE_LABEL_DATABASE_ACTION_LOG': 'Database action log',
+        'LNG_MODULE_LABEL_DATABASE_EXPORT_LOG': 'Database export log',
+        'LNG_MODULE_LABEL_TEMPLATE': 'Template',
+        'LNG_MODULE_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_MODULE_LABEL_CASE': 'Case',
+        'LNG_MODULE_LABEL_CONTACT': 'Contact',
+        'LNG_MODULE_LABEL_REFERENCE_DATA': 'Reference data',
+        'LNG_MODULE_LABEL_FOLLOW_UP': 'Follow-up',
+        'LNG_MODULE_LABEL_CLUSTER': 'Cluster',
+        'LNG_MODULE_LABEL_HELP_CATEGORY': 'Help category',
+        'LNG_MODULE_LABEL_LAB_RESULT': 'Lab result',
+        'LNG_MODULE_LABEL_HELP_ITEM': 'Help item',
+        'LNG_MODULE_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_MODULE_LABEL_ACCESS_TOKEN': 'Access token',
+        'LNG_MODULE_LABEL_PERSON': 'Person',
+        'LNG_MODULE_LABEL_LANGUAGE': 'Language',
+        'LNG_MODULE_LABEL_LANGUAGE_TOKEN': 'Language Token',
+        'LNG_MODULE_LABEL_EVENT': 'Event',
+        'LNG_MODULE_LABEL_ICON': 'Icon',
+        'LNG_MODULE_LABEL_BACKUP': 'Backup',
+        'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
 
         /**
          * List Filters page titles

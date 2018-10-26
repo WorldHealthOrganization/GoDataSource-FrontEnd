@@ -41,6 +41,7 @@ import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
 import { LanguageResolver } from './resolvers/language.resolver';
 import { BulkAddContactsService } from './helper/bulk-add-contacts.service';
+import { AuditLogDataService } from './data/audit-log.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -76,6 +77,7 @@ export const services: any[] = [
     SystemSyncLogDataService,
     AttachmentDataService,
     TeamDataService,
+    AuditLogDataService,
 
     // guard services
     AuthGuard,

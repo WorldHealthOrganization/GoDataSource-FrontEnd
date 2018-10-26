@@ -212,6 +212,18 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
+            },
+            // Audit Logs Module routes
+            {
+                path: ModulePath.AuditLogModule,
+                loadChildren: './features/audit-log/audit-log.module#AuditLogModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
             }
         ]
     },
