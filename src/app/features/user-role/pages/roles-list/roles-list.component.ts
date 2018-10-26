@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Router } from '@angular/router';
 
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
@@ -31,9 +30,10 @@ export class RolesListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
     // list of existing roles
     rolesList$: Observable<UserRoleModel[]>;
+    // list of permission
+    availablePermissions$: Observable<any>;
 
     constructor(
-        private router: Router,
         private userRoleDataService: UserRoleDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
@@ -48,6 +48,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().share();
+
         this.needsRefreshList(true);
     }
 
