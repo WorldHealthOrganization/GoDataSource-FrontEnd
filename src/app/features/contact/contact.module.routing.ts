@@ -84,16 +84,7 @@ const routes: Routes = [
     // Follow-ups list
     {
         path: 'follow-ups',
-        component: fromPages.ContactsFollowUpsListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_FOLLOWUP]
-        }
-    },
-    // list of contacts that missed their last follow-up
-    {
-        path: 'follow-ups/missed',
-        component: fromPages.ContactsFollowUpsMissedListComponent,
+        component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_FOLLOWUP]

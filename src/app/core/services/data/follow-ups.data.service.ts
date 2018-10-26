@@ -19,18 +19,26 @@ export class FollowUpsDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private locationDataService: LocationDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate followups for contacts
-     * @param {string} outbreakId
-     * @param {number} followUpPeriod
      * @returns {Observable<ContactFollowUpsModel[]>}
      */
-    generateFollowUps(outbreakId: string, followUpPeriod: number): Observable<ContactFollowUpsModel[]> {
+    generateFollowUps(
+        outbreakId: string,
+        startDate: any,
+        endDate: any,
+        targeted: boolean
+    ): Observable<ContactFollowUpsModel[]> {
         return this.modelHelper.mapObservableListToModel(
-            this.http.post(`outbreaks/${outbreakId}/generate-followups`, {followUpPeriod: followUpPeriod}),
+            this.http.post(
+                `outbreaks/${outbreakId}/generate-followups`, {
+                    startDate: startDate,
+                    endDate: endDate,
+                    targeted: targeted
+                }
+            ),
             ContactFollowUpsModel
         );
     }
@@ -75,68 +83,6 @@ export class FollowUpsDataService {
                     });
                 });
             });
-    }
-
-    /**
-     * Retrieve the list of contacts that missed their last follow-up
-     * @param {string} outbreakId
-     * @returns {Observable<FollowUpModel[]>}
-     */
-    getLastFollowUpsMissedList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<FollowUpModel[]> {
-        // include contact in response
-        const qb = new RequestQueryBuilder();
-        qb.include('contact');
-        qb.merge(queryBuilder);
-
-        // construct query
-        const filter = qb.buildQuery();
-
-        // retrieve locations
-        return this.locationDataService
-            .getLocationsList()
-            .mergeMap((locations) => {
-                // map names to id
-                const locationsMapped = _.groupBy(locations, 'id');
-                return this.modelHelper.mapObservableListToModel(
-                    this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed?filter=${filter}`),
-                    FollowUpModel
-                ).map((followUps) => {
-                    return _.map(followUps, (followUp: FollowUpModel) => {
-                        // map location
-                        if (
-                            followUp.address &&
-                            followUp.address.locationId
-                        ) {
-                            followUp.address.location = locationsMapped[followUp.address.locationId] ?
-                                locationsMapped[followUp.address.locationId][0] :
-                                null;
-                        }
-
-                        // finished
-                        return followUp;
-                    });
-                });
-            });
-    }
-
-    /**
-     * Return the number of contacts that missed their last follow-up
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
-     */
-    getLastFollowUpsMissedCount(
-        outbreakId: string,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<any> {
-        // include contact in response
-        const qb = new RequestQueryBuilder();
-        qb.include('contact');
-        qb.merge(queryBuilder);
-
-        // construct query
-        const filter = qb.buildQuery();
-        return this.http.get(`outbreaks/${outbreakId}/follow-ups/latest-by-contacts-if-not-performed/filtered-count?filter=${filter}`);
     }
 
     /**

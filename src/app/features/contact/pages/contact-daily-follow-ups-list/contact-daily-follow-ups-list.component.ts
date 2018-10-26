@@ -12,31 +12,34 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
+import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { Moment } from 'moment';
+import { MatTable } from '@angular/material';
 
 @Component({
-    selector: 'app-follow-ups-list',
+    selector: 'app-daily-follow-ups-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './contacts-follow-ups-missed-list.component.html',
-    styleUrls: ['./contacts-follow-ups-missed-list.component.less']
+    templateUrl: './contact-daily-follow-ups-list.component.html',
+    styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
-export class ContactsFollowUpsMissedListComponent extends ListComponent implements OnInit {
+export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '.', true)
     ];
 
     // import constants into template
@@ -45,7 +48,6 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     // authenticated user
     authUser: UserModel;
-
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
 
@@ -56,8 +58,16 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
 
+    ReferenceDataCategory = ReferenceDataCategory;
+    dailyStatusTypeOptions$: Observable<any[]>;
+
     availableSideFilters: FilterModel[];
 
+    dateFilterDefaultValue: Moment;
+
+    printDailyFollowUpsUrl: string;
+    followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
+    printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
@@ -69,8 +79,8 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     anonymizeFields: LabelValuePair[] = [
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ID', 'id'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_DATE', 'date'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED', 'performed'),
-        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP', 'lostToFollowUp'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', 'targeted'),
+        new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID', 'statusId'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', 'address'),
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
@@ -93,22 +103,22 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
     ngOnInit() {
         // add page title
-        this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE') +
+        this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
+        this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
+            ' - ' +
+            this.followUpsPrintDailyFileName;
+
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
+        // set default filter rules
+        this.initializeHeaderFilters();
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-        // add missed / upcoming breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE',
-                '.',
-                true
-            )
-        );
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -119,11 +129,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
                 // export url
                 this.exportFollowUpsUrl = null;
+                this.printDailyFollowUpsUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
                 }
 
                 // initialize pagination
@@ -137,6 +149,26 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize header filters
+     */
+    initializeHeaderFilters() {
+        this.dateFilterDefaultValue = moment();
+        this.queryBuilder.filter.byDateRange(
+            'date', {
+                startDate: moment(this.dateFilterDefaultValue).startOf('day'),
+                endDate: moment(this.dateFilterDefaultValue).endOf('day')
+            }
+        );
+    }
+
+    /**
+     * Add search criteria
+     */
+    resetFiltersAddDefault() {
+        this.initializeHeaderFilters();
     }
 
     /**
@@ -172,6 +204,10 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'statusId',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED'
             }),
@@ -203,16 +239,16 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
                 type: FilterType.RANGE_DATE
             }),
             new FilterModel({
-                fieldName: 'lostToFollowUp',
-                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                fieldName: 'targeted',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                 type: FilterType.SELECT,
                 options$: this.yesNoOptionsList$
             }),
             new FilterModel({
-                fieldName: 'performed',
-                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                fieldName: 'statusId',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                 type: FilterType.SELECT,
-                options$: this.yesNoOptionsList$
+                options$: this.dailyStatusTypeOptions$
             })
         ];
         if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
@@ -282,11 +318,14 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
         }
     }
 
+    /**
+     * Refresh list
+     */
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
-                .getLastFollowUpsMissedList(this.selectedOutbreak.id, this.queryBuilder);
+                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -299,7 +338,7 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
-                .getLastFollowUpsMissedCount(this.selectedOutbreak.id, countQueryBuilder);
+                .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
@@ -366,12 +405,91 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
     }
 
     /**
+     * Generate Follow Ups
+     */
+    generateFollowUps() {
+        if (this.selectedOutbreak) {
+            this.genericDataService
+                .getFilterYesNoOptions()
+                .subscribe((yesNoOptions: LabelValuePair[]) => {
+                    const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
+                    this.dialogService.showInput(new DialogConfiguration({
+                        message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
+                        yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
+                        fieldsList: [
+                            new DialogField({
+                                name: 'dates',
+                                required: true,
+                                value: {
+                                    startDate: moment().add(1, 'days').startOf('day').format(),
+                                    endDate: moment().add(1, 'days').endOf('day').format()
+                                },
+                                fieldType: DialogFieldType.DATE_RANGE
+                            }),
+                            new DialogField({
+                                name: 'targeted',
+                                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
+                                inputOptions: yesNoOptionsFiltered,
+                                inputOptionsClearable: false,
+                                required: true,
+                                value: true
+                            })
+                        ]
+                    })).subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            this.followUpsDataService
+                                .generateFollowUps(
+                                    this.selectedOutbreak.id,
+                                    answer.inputValue.value.dates.startDate,
+                                    answer.inputValue.value.dates.endDate,
+                                    answer.inputValue.value.targeted
+                                ).catch((err) => {
+                                    this.snackbarService.showError(err.message);
+                                    return ErrorObservable.create(err);
+                                })
+                                .subscribe(() => {
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+
+                                    // reload data
+                                    this.needsRefreshList(true);
+                                });
+                        }
+                    });
+                });
+        }
+    }
+
+    /**
      * Modify selected follow-ups
      */
-    modifySelectedFollowUps() {
+    modifySelectedFollowUps(table: MatTable<any>) {
         // get list of follow-ups that we want to modify
         const selectedRecords: false | string[] = this.validateCheckedRecords();
         if (!selectedRecords) {
+            return;
+        }
+
+        // check if we have future records
+        let hasFutureFollowUps: boolean = false;
+        _.each(
+            table.dataSource,
+            (item: FollowUpModel) => {
+                if (
+                    selectedRecords.indexOf(item.id) > -1 &&
+                    this.dateInTheFuture(item.date)
+                ) {
+                    // found record that is in the future
+                    hasFutureFollowUps = true;
+
+                    // stop each
+                    return false;
+                }
+            }
+        );
+
+        // we aren't allowed to continue to modify follow-ups if in our list we have future follow-ups
+        if (hasFutureFollowUps) {
+            this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS');
             return;
         }
 
@@ -420,5 +538,13 @@ export class ContactsFollowUpsMissedListComponent extends ListComponent implemen
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Check if date is in future to know if we show "Missed to follow-up" option or not
+     */
+    dateInTheFuture(followUpDate): boolean {
+        const date = followUpDate ? moment(followUpDate) : null;
+        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 }

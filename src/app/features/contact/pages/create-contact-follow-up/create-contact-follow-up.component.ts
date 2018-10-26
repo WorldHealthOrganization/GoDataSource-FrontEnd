@@ -12,11 +12,11 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import * as moment from 'moment';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Observable } from 'rxjs/Observable';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-create-follow-up',
@@ -36,7 +36,7 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    serverToday: Moment = null;
+    dailyStatusTypeOptions$: Observable<any[]>;
 
     // provide constants to template
     EntityType = EntityType;
@@ -49,18 +49,14 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
-        private genericDataService: GenericDataService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // retrieve query params
         this.route.params
@@ -131,26 +127,5 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
                     this.router.navigate(['/contacts/follow-ups']);
                 });
         }
-    }
-
-    /**
-     * If date is in the future we need to reset performed & lost to follow-up
-     */
-    dateInTheFuture(): boolean {
-        const date = this.followUpData.date ?
-            moment(this.followUpData.date) :
-            null;
-
-        if (
-            this.serverToday &&
-            date &&
-            date.startOf('day').isAfter(this.serverToday)
-        ) {
-            this.followUpData.performed = false;
-            this.followUpData.lostToFollowUp = false;
-            return true;
-        }
-
-        return false;
     }
 }
