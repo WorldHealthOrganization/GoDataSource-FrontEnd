@@ -17,6 +17,9 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Moment } from 'moment';
+import { Observable } from 'rxjs/Observable';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -29,6 +32,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
     ];
+
+    teamsList$: Observable<TeamModel[]>;
 
     followUpData: FollowUpModel = new FollowUpModel();
 
@@ -52,7 +57,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private teamDataService: TeamDataService
     ) {
         super(route);
     }
@@ -64,6 +70,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             .subscribe((curDate) => {
                 this.serverToday = curDate;
             });
+
+        this.teamsList$ = this.teamDataService.getTeamsList();
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();

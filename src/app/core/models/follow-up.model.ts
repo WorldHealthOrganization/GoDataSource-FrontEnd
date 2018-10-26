@@ -15,6 +15,7 @@ export class FollowUpModel {
     deleted: boolean;
     questionnaireAnswers: {};
     outbreakId: string;
+    teamId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -30,6 +31,8 @@ export class FollowUpModel {
 
         this.contact = _.get(data, 'contact', {});
         this.contact = new ContactModel(this.contact);
+
+        this.teamId = _.get(data, 'teamId');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
