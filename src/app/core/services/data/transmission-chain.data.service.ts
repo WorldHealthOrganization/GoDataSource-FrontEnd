@@ -69,6 +69,7 @@ export class TransmissionChainDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
 
+        // generate filter for person fields
         let filter = queryBuilder.filter.generateFirstCondition(false, false);
 
         // add filter for size ( under where )
@@ -80,7 +81,7 @@ export class TransmissionChainDataService {
             filter.where = rQBSize.filter.generateFirstCondition(false, false);
         }
 
-        // add filter for person ( under filter )
+        // add filter for person ( under filter ) - view the chain of a person
         if (personId) {
             const rQBPersonId = new RequestQueryBuilder();
             rQBPersonId.filter.where({
