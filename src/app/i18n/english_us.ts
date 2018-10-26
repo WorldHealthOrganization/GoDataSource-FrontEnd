@@ -416,12 +416,12 @@ export const EnglishUsLang = {
         /**
          * Movement Case page
          */
-        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case movement',
 
         /**
          * Chronology Case page
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case chronology',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE': 'Hospitalisation Start Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE': 'Hospitalisation End Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE': 'Incubation Start Date',
@@ -830,12 +830,12 @@ export const EnglishUsLang = {
         /**
          * Movement Contact page
          */
-        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact movement',
 
         /**
          * Chronology Contact page
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact chronology',
 
 
         /**
