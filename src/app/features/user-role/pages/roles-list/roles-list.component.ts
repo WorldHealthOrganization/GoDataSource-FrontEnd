@@ -52,7 +52,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.availablePermissions$ = this.http.get(`roles/available-permissions`).share();
+        this.availablePermissions$ = this.userRoleDataService.getAvailablePermissions().share();
 
         this.needsRefreshList(true);
     }
