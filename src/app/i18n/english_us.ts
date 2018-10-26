@@ -1572,7 +1572,7 @@ export const EnglishUsLang = {
         'LNG_AUDIT_LOG_FIELD_LABEL_USER': 'User',
         'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES': 'User roles',
         'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS': 'IP Address',
-        'LNG_AUDIT_LOG_FIELD_LABEL_CHANGED_DATA_FIELD': 'Field',
+        'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA': 'Changes',
 
         /**
          * Audit Logs List page

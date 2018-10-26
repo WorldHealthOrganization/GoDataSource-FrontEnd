@@ -100,6 +100,22 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Changes -->
+        <ng-container matColumnDef="changedData">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA' | translate}}</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.changedData | json }}
+            </mat-cell>
+        </ng-container>
+
         <!-- User -->
         <ng-container matColumnDef="userId">
             <mat-header-cell *matHeaderCellDef>

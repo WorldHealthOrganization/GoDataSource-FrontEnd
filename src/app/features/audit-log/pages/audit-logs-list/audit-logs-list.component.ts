@@ -108,6 +108,10 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT'
             }),
             new VisibleColumnModel({
+                field: 'changedData',
+                label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
+            }),
+            new VisibleColumnModel({
                 field: 'userId',
                 label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER'
             }),
@@ -118,11 +122,6 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'userIPAddress',
                 label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS'
-            }),
-            new VisibleColumnModel({
-                field: 'actions',
-                required: true,
-                excludeFromSave: true
             })
         ];
     }
@@ -154,5 +153,3 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
     }
 }
 
-1. fix for inq issue on addresses...
-2. changes fara search si fara order..si pus tot json-ul in coloana
