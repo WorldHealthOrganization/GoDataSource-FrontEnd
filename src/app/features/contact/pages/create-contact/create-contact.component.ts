@@ -9,8 +9,7 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
+import { AddressModel, AddressTypeModel } from '../../../../core/models/address.model';
 import { Observable } from 'rxjs/Observable';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
@@ -75,6 +74,8 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
         // by default, enforce Contact having an address
         this.contactData.addresses.push(new AddressModel());
+        // pre-set the initial address as "current address"
+        this.contactData.addresses[0].typeId = AddressTypeModel.CURRENT_ADDRESS;
 
         // get today time
         this.genericDataService

@@ -9,10 +9,8 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
+import { AddressModel, AddressTypeModel } from '../../../../core/models/address.model';
 import { Observable } from 'rxjs/Observable';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -73,6 +71,8 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
         // by default, enforce Case having an address
         this.caseData.addresses.push(new AddressModel());
+        // pre-set the initial address as "current address"
+        this.caseData.addresses[0].typeId = AddressTypeModel.CURRENT_ADDRESS;
 
         // get selected outbreak
         this.outbreakDataService
