@@ -24,6 +24,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { Router } from '@angular/router';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -35,6 +36,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     @Input() sizeOfChainsFilter: number = null;
     @Input() personId: string = null;
+    @Input() selectedEntityType: EntityType = null;
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
@@ -45,6 +47,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     locationsList: LocationModel[];
+    personName: string = '';
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
@@ -181,6 +184,14 @@ export class TransmissionChainsDashletComponent implements OnInit {
                         this.displayChainsOfTransmission();
                     });
             });
+
+        if (this.personId) {
+            this.entityDataService
+                .getEntity(this.selectedEntityType,this.selectedOutbreak.id,this.personId)
+                .subscribe( (entity) => {
+                    this.personName = entity.name;
+            });
+        }
     }
 
     /**

@@ -174,3 +174,11 @@
         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS' | translate }}
     </button>
 </div>
+<div *ngIf="personId">
+    <div>
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}}: {{personName}}
+    </div>
+    <button mat-raised-button (click)="resetChain()">
+        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS' | translate }}
+    </button>
+</div>

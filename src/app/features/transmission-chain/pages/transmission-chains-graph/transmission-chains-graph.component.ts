@@ -6,6 +6,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -28,6 +29,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     sizeOfChainsFilter: number = null;
     // person Id - to filter the chain
     personId: string = null;
+    // type of the selected person . event
+    selectedEntityType: EntityType = null;
 
     constructor(
         private authDataService: AuthDataService,
@@ -47,9 +50,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
 
         this.route.queryParams
-            .subscribe((params: {personId}) => {
+            .subscribe((params: {personId: string, selectedEntityType: EntityType}) => {
                 if (params.personId) {
                     this.personId = params.personId;
+                    this.selectedEntityType = params.selectedEntityType;
                 }
             });
     }

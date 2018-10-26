@@ -208,7 +208,7 @@ export class EntityDataService {
             // insert link to view chain
             lightObject.push(new LabelValuePair(
                 'LINK_CHAIN',
-                `/transmission-chains?personId=${entity.id}`
+                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.CASE}`
             ));
         }
 
@@ -271,6 +271,12 @@ export class EntityDataService {
                 'LINK',
                 `/contacts/${entity.id}/view`
             ));
+
+            // insert link to view chain
+            lightObject.push(new LabelValuePair(
+                'LINK_CHAIN',
+                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.CONTACT}`
+            ));
         }
 
         // entity type = Event
@@ -309,6 +315,13 @@ export class EntityDataService {
                 'LINK',
                 `/events/${entity.id}/view`
             ));
+
+            // insert link to view chain
+            lightObject.push(new LabelValuePair(
+                'LINK_CHAIN',
+                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.EVENT}`
+            ));
+
         }
 
         return lightObject;
