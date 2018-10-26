@@ -55,7 +55,15 @@
                 <div class="table-header-cell column-header">
                     {{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-input
+                            name="descriptionFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('description', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
                     </div>
                 </div>
             </mat-header-cell>
@@ -70,7 +78,19 @@
                 <div class="table-header-cell column-header">
                     {{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="rolesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="availablePermissions$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('permissionIds', $event, 'id')"
+                            optionLabelKey="label"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>

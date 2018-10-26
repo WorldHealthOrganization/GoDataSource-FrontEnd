@@ -195,6 +195,7 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_BEFORE': 'before',
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
         'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED': 'At least one field must be filled',
+        'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC': 'Invalid data',
 
         /**
          * API Errors
@@ -324,6 +325,8 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID': 'Visual ID',
+        'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID_DESCRIPTION': 'ID should match: {{mask}}',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
@@ -371,6 +374,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
+        'LNG_PAGE_CREATE_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
 
         /**
          * Modify Case page
@@ -384,6 +388,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
 
         /**
          * Date onset report list page
@@ -739,6 +744,8 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_OCCUPATION': 'Occupation',
         'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS': 'Follow-up final status',
+        'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH': 'Date of birth',
         'LNG_CONTACT_FIELD_LABEL_DOCUMENTS': 'Documents',
         'LNG_CONTACT_FIELD_LABEL_AGE_BUTTON': 'Age',
@@ -1223,7 +1230,7 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Frequency of Contact Follow Up (per day)',
         'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK': 'Case Id Mask',
-        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': 'Example of mask: RX-0000. It will generate Ids in the range: RX-0001 and RX-9999',
+        'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION': '0 – Digit (0 through 9) / 9 – Digit (auto-generated sequence number) / Y – Year (Using year from the date when a case has been reported) / @ – Letter (A through Z) / & - Any character(including spaces)',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
@@ -1369,6 +1376,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE': 'Histogram - Size of Chains of Transmission',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
+        'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
+        'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
+        'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL': 'Cases Hospitalized',
+        'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL': 'Cases Isolated',
+        'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL': 'Cases Not Hospitalized',
+
 
         /**
          * Backup modules

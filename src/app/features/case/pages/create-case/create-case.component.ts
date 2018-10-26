@@ -10,9 +10,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
@@ -44,6 +42,12 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
     serverToday: Moment = null;
+
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    caseIdMaskValidator: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -79,6 +83,22 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                };
+
+                // set visual ID validator
+                this.caseIdMaskValidator = Observable.create((observer) => {
+                    this.outbreakDataService.generateVisualIDCheckValidity(
+                        this.selectedOutbreak.id,
+                        this.caseData.visualId
+                    ).subscribe((isValid: boolean) => {
+                        observer.next(isValid);
+                        observer.complete();
+                    });
+                });
             });
     }
 

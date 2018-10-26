@@ -120,6 +120,41 @@ export class ListFilterDataService {
 
     /**
      * Create the query builder for filtering the list of cases
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesIsolated(): Observable<RequestQueryBuilder> {
+        // get server current time to compare with isolation dates
+        return this.genericDataService
+            .getServerUTCCurrentDateTime()
+            .map((serverDateTime: string) => {
+                // generate a query builder for isolated cases
+                const filterQueryBuilder = new RequestQueryBuilder();
+                // compare isolation dates start and end with current date
+                filterQueryBuilder.filter.where({
+                    [RequestFilterOperator.AND]: [
+                        {
+                            'isolationDates.startDate': {
+                                lte: moment(serverDateTime).endOf('day').toISOString()
+                            }
+                        }, {
+                            [RequestFilterOperator.OR]: [{
+                                'isolationDates.endDate': {
+                                    eq: null
+                                }
+                            }, {
+                                'isolationDates.endDate': {
+                                    gte: moment(serverDateTime).startOf('day').toISOString()
+                                }
+                            }]
+                        }
+                    ]
+                }, true);
+                return filterQueryBuilder;
+            });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */

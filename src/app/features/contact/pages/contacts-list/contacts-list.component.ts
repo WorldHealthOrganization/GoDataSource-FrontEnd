@@ -72,6 +72,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
 
+    // final contact follow-up status
+    finalFollowUpStatus$: Observable<any[]>;
+
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
@@ -144,6 +147,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -252,6 +256,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
             }),
             new VisibleColumnModel({
+                field: 'finalStatus',
+                label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
             }),
@@ -321,6 +329,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
                 type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'finalStatus',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+                type: FilterType.MULTISELECT,
+                options$: this.finalFollowUpStatus$,
+                sortable: true
             })
         ];
 

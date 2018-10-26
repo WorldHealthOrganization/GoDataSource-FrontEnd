@@ -10,7 +10,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel } from '../../../../core/models/address.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { Observable } from 'rxjs/Observable';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
