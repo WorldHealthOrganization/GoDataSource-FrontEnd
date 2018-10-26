@@ -271,8 +271,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 }
             }
 
-            console.log(requestQueryBuilder);
-
             // configure
             this.filters.filtersDefault = this.filtersDefault();
             const rQB = new RequestQueryBuilder();
@@ -280,12 +278,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
             if (!requestQueryBuilder.filter.isEmpty()) {
                 rQB.filter.where({
                     person: {
-                        where: requestQueryBuilder.filter.generateFirstCondition()
+                        where: requestQueryBuilder.filter.generateCondition()
                     }
                 });
             }
-
-            console.log(rQB);
 
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB).subscribe((chains) => {
