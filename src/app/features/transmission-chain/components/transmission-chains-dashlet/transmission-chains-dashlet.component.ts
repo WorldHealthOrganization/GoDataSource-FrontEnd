@@ -184,7 +184,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
                         // load person if selected
                         if (this.personId) {
                             this.entityDataService
-                                .getEntity(this.selectedEntityType,this.selectedOutbreak.id,this.personId)
+                                .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
                                 .subscribe( (entity) => {
                                     this.personName = entity.name;
                                 });
