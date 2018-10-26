@@ -3,6 +3,12 @@ import { LocationModel } from './location.model';
 import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-query-builder';
 import * as moment from 'moment';
 
+// addresses types
+export enum AddressTypeModel {
+    OTHER = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER',
+    CURRENT_ADDRESS = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE'
+}
+
 export class AddressModel {
     typeId: string;
     city: string;

@@ -35,7 +35,6 @@
                     <app-form-datepicker
                         [name]="name + '[date]'"
                         [(ngModel)]="address.date"
-                        [required]="required"
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_DATE' | translate"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
                         [disabled]="disabled"
@@ -102,7 +101,7 @@
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_CITY' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="required"
+                            [required]="false"
                             (input)="onChange()">
                         </app-form-input>
                         <div
@@ -128,7 +127,7 @@
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="required"
+                            [required]="false"
                             (input)="onChange()">
                         </app-form-input>
                         <div
@@ -155,7 +154,7 @@
                         [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                         [disabled]="disabled"
-                        [required]="required"
+                        [required]="false"
                         (input)="onChange()">
                     </app-form-input>
                     <div
