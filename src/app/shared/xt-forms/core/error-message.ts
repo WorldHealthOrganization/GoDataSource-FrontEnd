@@ -99,6 +99,11 @@ export class ErrorMessage {
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED'
                 );
+            case 'generalAsyncValidatorDirective':
+                return new ElementBaseFailure(
+                    (this.validator[this.key] as any).err,
+                    (this.validator[this.key] as any).details
+                );
         }
 
         // Get default message if no validator matched
