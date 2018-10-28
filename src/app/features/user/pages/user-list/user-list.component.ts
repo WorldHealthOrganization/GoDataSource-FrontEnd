@@ -37,7 +37,7 @@ export class UserListComponent extends ListComponent implements OnInit {
     usersListCount$: Observable<any>;
 
     rolesList$: Observable<UserRoleModel[]>;
-    outbreaksListMap:any = {};
+    outbreaksListMap: any = {};
     outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(

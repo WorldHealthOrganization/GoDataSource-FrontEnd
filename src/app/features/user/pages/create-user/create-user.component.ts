@@ -24,7 +24,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
     templateUrl: './create-user.component.html',
     styleUrls: ['./create-user.component.less']
 })
-export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit{
+export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '..'),
