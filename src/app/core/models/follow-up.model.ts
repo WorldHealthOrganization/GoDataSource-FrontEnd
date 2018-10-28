@@ -7,6 +7,7 @@ import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-defau
 export class FollowUpModel {
     id: string;
     date: string;
+    statusId: string;
     performed: boolean;
     lostToFollowUp: boolean;
     address: AddressModel;
@@ -20,6 +21,7 @@ export class FollowUpModel {
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.date = _.get(data, 'date');
+        this.statusId = _.get(data, 'statusId');
         this.performed = _.get(data, 'performed', false);
         this.lostToFollowUp = _.get(data, 'lostToFollowUp', false);
         this.personId = _.get(data, 'personId');
