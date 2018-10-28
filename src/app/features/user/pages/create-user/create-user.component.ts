@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { NgForm } from '@angular/forms';
@@ -13,6 +13,10 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
     selector: 'app-create-user',
@@ -20,27 +24,39 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
     templateUrl: './create-user.component.html',
     styleUrls: ['./create-user.component.less']
 })
-export class CreateUserComponent extends ConfirmOnFormChanges {
+export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit{
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '..'),
         new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true)
     ];
 
+    // authenticated user
+    authUser: UserModel;
+
     newUser: UserModel = new UserModel();
     passwordConfirmModel: string;
     rolesList$: Observable<UserRoleModel[]>;
+    outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(
         private router: Router,
         private userDataService: UserDataService,
         private userRoleDataService: UserRoleDataService,
         private snackbarService: SnackbarService,
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService
     ) {
         super();
+    }
+
+    ngOnInit() {
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
     }
 
     createNewUser(form: NgForm) {
@@ -69,4 +85,13 @@ export class CreateUserComponent extends ConfirmOnFormChanges {
                 });
         }
     }
+
+    /**
+     * Check if the user has read access to outbreaks
+     * @returns {boolean}
+     */
+    hasOutbreakReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
+    }
+
 }
