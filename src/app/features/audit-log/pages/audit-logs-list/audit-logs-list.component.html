@@ -87,7 +87,7 @@
                     <div class="column-filter">
                         <app-form-daterange
                             name="createdAtFilter"
-                            ngModel
+                            [ngModel]="dateFilterDefaultValue"
                             (changed)="filterByDateRangeField('createdAt', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
@@ -112,7 +112,16 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.changedData | json }}
+                {{ trimChangeData(item) }}
+
+                <ng-container
+                    *ngIf="auditLogsTrim[item.id]?.displayButtons">
+                    (
+                    <a
+                        class="audit-log-expand-collapse"
+                        (click)="auditLogsTrim[item.id].displayAll = !auditLogsTrim[item.id].displayAll;">{{ (auditLogsTrim[item.id].displayAll ? 'LNG_PAGE_LIST_AUDIT_LOGS_COLLAPSE_CHANGED_DATA_BUTTON' : 'LNG_PAGE_LIST_AUDIT_LOGS_EXPAND_CHANGED_DATA_BUTTON') | translate }}</a>
+                    )
+                </ng-container>
             </mat-cell>
         </ng-container>
 

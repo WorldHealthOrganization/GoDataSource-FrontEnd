@@ -1562,6 +1562,9 @@ export const EnglishUsLang = {
          * Audit Logs List page
          */
         'LNG_PAGE_LIST_AUDIT_LOGS_TITLE': 'Audit Logs',
+        'LNG_PAGE_LIST_AUDIT_LOGS_EXPAND_CHANGED_DATA_BUTTON': 'Expand',
+        'LNG_PAGE_LIST_AUDIT_LOGS_COLLAPSE_CHANGED_DATA_BUTTON': 'Collapse',
+        'LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL': '...',
 
         /**
          * Modules

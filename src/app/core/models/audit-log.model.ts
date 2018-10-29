@@ -22,8 +22,10 @@ export class AuditLogModel {
     userRole: string;
     userIPAddress: string;
     createdAt: string;
+    id: string;
 
     constructor(data = null) {
+        this.id = _.get(data, 'id');
         this.action = _.get(data, 'action');
         this.modelName = _.get(data, 'modelName');
 
