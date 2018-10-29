@@ -15,6 +15,7 @@ enum ValueType {
 // filter types
 export enum FilterType {
     TEXT = 'text',
+    TEXT_LIKE = 'text_like',
     SELECT = 'select',
     MULTISELECT = 'multiselect',
     RANGE_NUMBER = 'range_number',
@@ -138,6 +139,21 @@ export class AppliedFilterModel {
             valueType: ValueType.STRING
         }],
 
+        // text like
+        [FilterType.TEXT_LIKE]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_STARTS_WITH',
+            value: FilterComparator.TEXT_STARTS_WITH,
+            valueType: ValueType.STRING
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
+            value: FilterComparator.IS,
+            valueType: ValueType.STRING
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT',
+            value: FilterComparator.CONTAINS_TEXT,
+            valueType: ValueType.STRING
+        }],
+
         // select
         [FilterType.SELECT]: [{
             value: FilterComparator.NONE,
@@ -214,6 +230,7 @@ export class AppliedFilterModel {
     // default comparators
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
+        [FilterType.TEXT_LIKE]: FilterComparator.TEXT_STARTS_WITH,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,

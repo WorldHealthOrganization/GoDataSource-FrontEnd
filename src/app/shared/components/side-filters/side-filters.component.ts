@@ -231,6 +231,21 @@ export class SideFiltersComponent {
                     }
                     break;
 
+                case FilterType.TEXT_LIKE:
+                    switch (comparator) {
+                        case FilterComparator.IS:
+                            qb.filter.byEqualityWithLike(filter.fieldName, appliedFilter.value, false);
+                            break;
+                        case FilterComparator.CONTAINS_TEXT:
+                            qb.filter.byContainingTextWithLike(filter.fieldName, appliedFilter.value, false);
+                            break;
+
+                        // FilterComparator.TEXT_STARTS_WITH
+                        default:
+                            qb.filter.byTextWithLikeOperator(filter.fieldName, appliedFilter.value, false);
+                    }
+                    break;
+
                 case FilterType.ADDRESS:
                     // contains / within
                     switch (comparator) {
