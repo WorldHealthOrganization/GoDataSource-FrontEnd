@@ -298,6 +298,15 @@ export class TransmissionChainDataService {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }
                         }
+                        // set edge style
+                        if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.LOW) {
+                            graphEdge.edgeStyle = 'dotted';
+                        } else if (relationship.certaintyLevelId === Constants.CERTAINITY_LEVEL.MEDIUM) {
+                            graphEdge.edgeStyle = 'dashed';
+                        } else {
+                            graphEdge.edgeStyle = 'solid';
+                        }
+
                         graphData.edges.push({data: graphEdge});
                     }
                 });
