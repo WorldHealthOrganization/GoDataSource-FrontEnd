@@ -43,17 +43,15 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.queryParams
-            .subscribe((params: {sizeOfChainsFilter}) => {
-                if (params.sizeOfChainsFilter) {
-                    this.sizeOfChainsFilter = params.sizeOfChainsFilter;
-                }
-            });
-
-        this.route.queryParams
-            .subscribe((params: {personId: string, selectedEntityType: EntityType}) => {
-                if (params.personId) {
+            .subscribe((params: {personId: string, selectedEntityType: EntityType, sizeOfChainsFilter: number}) => {
+                // check if person id was sent in url
+                if (params.personId && params.selectedEntityType) {
                     this.personId = params.personId;
                     this.selectedEntityType = params.selectedEntityType;
+                }
+                // check if the size of chains was sent in url
+                if (params.sizeOfChainsFilter) {
+                    this.sizeOfChainsFilter = params.sizeOfChainsFilter;
                 }
             });
     }

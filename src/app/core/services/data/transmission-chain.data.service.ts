@@ -76,8 +76,8 @@ export class TransmissionChainDataService {
         if (size) {
             const rQBSize = new RequestQueryBuilder();
             rQBSize.filter.where({
-                        size: Number(size)
-                });
+                size: Number(size)
+            });
             filter.where = rQBSize.filter.generateFirstCondition(false, false);
         }
 
