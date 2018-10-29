@@ -10,6 +10,7 @@ import { UniqueValidatorDirective } from './unique-validator.directive';
 import { DateValidatorDirective } from './date-validator.directive';
 import { RequiredOneOrOtherValidatorDirective } from './required-one-or-other-validator.directive';
 import { MinMaxValidatorDirective } from './min-max-validator.directive';
+import { GeneralAsyncValidatorDirective } from './general-async-validator.directive';
 
 export const validatorDirectives: any[] = [
     EmailValidatorDirective,
@@ -23,5 +24,6 @@ export const validatorDirectives: any[] = [
     UniqueValidatorDirective,
     DateValidatorDirective,
     RequiredOneOrOtherValidatorDirective,
-    MinMaxValidatorDirective
+    MinMaxValidatorDirective,
+    GeneralAsyncValidatorDirective
 ];

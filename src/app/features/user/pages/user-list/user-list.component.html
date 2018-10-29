@@ -95,9 +95,21 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="rolesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="rolesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('roleIds', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>

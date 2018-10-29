@@ -72,6 +72,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
 
+    // final contact follow-up status
+    finalFollowUpStatus$: Observable<any[]>;
+
     // provide constants to template
     EntityType = EntityType;
     ReferenceDataCategory = ReferenceDataCategory;
@@ -101,7 +104,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName' ),
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_GENDER', 'gender' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
+        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE', 'phoneNumber' ),
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation' ),
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob' ),
         new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_AGE', 'age' ),
@@ -144,6 +147,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
+        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
@@ -252,6 +256,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL'
             }),
             new VisibleColumnModel({
+                field: 'finalStatus',
+                label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CONTACT_FIELD_LABEL_DELETED'
             }),
@@ -268,6 +276,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     initializeSideFilters() {
         const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        const dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // case condition
         const caseCondition = new RequestQueryBuilder();
@@ -320,6 +329,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 fieldName: 'addresses',
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
                 type: FilterType.ADDRESS
+            }),
+            new FilterModel({
+                fieldName: 'finalStatus',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+                type: FilterType.MULTISELECT,
+                options$: this.finalFollowUpStatus$,
+                sortable: true
             })
         ];
 
@@ -336,18 +352,18 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     }),
                     new FilterModel({
-                        fieldName: 'performed',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED',
+                        fieldName: 'targeted',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                         type: FilterType.SELECT,
                         options$: this.yesNoOptionsList$,
                         relationshipPath: ['followUps'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     }),
                     new FilterModel({
-                        fieldName: 'lostToFollowUp',
-                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP',
+                        fieldName: 'statusId',
+                        fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                         type: FilterType.SELECT,
-                        options$: this.yesNoOptionsList$,
+                        options$: dailyStatusTypeOptions$,
                         relationshipPath: ['followUps'],
                         relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
                     })
