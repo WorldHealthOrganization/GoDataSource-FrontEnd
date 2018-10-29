@@ -17,5 +17,6 @@ export enum ModulePath {
     ImportExportDataModule = 'import-export-data',
     SystemConfigModule = 'system-config',
     TeamModule = 'teams',
-    AuditLogModule = 'audit-log'
+    AuditLogModule = 'audit-log',
+    CloudBackupModule = 'cloud-backup'
 }

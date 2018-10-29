@@ -13,6 +13,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
+        'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -66,6 +67,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_VIEW': 'View',
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_CLONE': 'Clone',
+        'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD': 'Copy to clipboard',
 
         /**
          * Common buttons
@@ -1377,6 +1379,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE': 'Histogram - Size of Chains of Transmission',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL': 'Number of chains',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE': 'Cases counts over time stratified by classification',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL': 'Date',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL': 'Number of Cases',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
+
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL': 'Cases Hospitalized',
@@ -1815,6 +1824,15 @@ export const EnglishUsLang = {
         'LNG_AGE_FIELD_LABEL_YEARS': 'Years',
         'LNG_AGE_FIELD_LABEL_MONTHS': 'Months',
         'LNG_AGE_FIELD_FILTER_LABEL_FROM': 'From years',
-        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years'
+        'LNG_AGE_FIELD_FILTER_LABEL_TO': 'To years',
+
+        /**
+         * Cloud backup page
+         */
+        'LNG_PAGE_CLOUD_BACKUP_TITLE' : 'Cloud Backup',
+        'LNG_PAGE_CLOUD_BACKUP_HEADER_TITLE' : 'If you want to sync your backups on cloud, you have to use and external tool (like Google Drive or Dropbox)',
+        'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at: ',
+        'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The back-up path is: ',
+        'LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE': 'Path copied!',
     }
 };

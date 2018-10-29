@@ -81,6 +81,12 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/audit-log'
+                ),
+                new ChildNavItem(
+                    'cloud-backup',
+                    'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/cloud-backup'
                 )
             ]
         ),
