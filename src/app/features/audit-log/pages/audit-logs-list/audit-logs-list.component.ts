@@ -121,6 +121,10 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION'
             }),
             new VisibleColumnModel({
+                field: 'recordId',
+                label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'modelName',
                 label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME'
             }),

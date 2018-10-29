@@ -1551,6 +1551,7 @@ export const EnglishUsLang = {
          * Audit Logs fields
          */
         'LNG_AUDIT_LOG_FIELD_LABEL_ACTION': 'Action',
+        'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID': 'Record ID',
         'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME': 'Record Name',
         'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT': 'Time',
         'LNG_AUDIT_LOG_FIELD_LABEL_USER': 'User',

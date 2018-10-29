@@ -14,6 +14,7 @@ export class AuditLogChangeDataModel {
 }
 
 export class AuditLogModel {
+    id: string;
     action: string;
     modelName: string;
     changedData: AuditLogChangeDataModel[];
@@ -22,10 +23,11 @@ export class AuditLogModel {
     userRole: string;
     userIPAddress: string;
     createdAt: string;
-    id: string;
+    recordId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
+        this.recordId = _.get(data, 'recordId');
         this.action = _.get(data, 'action');
         this.modelName = _.get(data, 'modelName');
 

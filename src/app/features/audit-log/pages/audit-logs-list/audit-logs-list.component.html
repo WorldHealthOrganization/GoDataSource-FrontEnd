@@ -79,6 +79,29 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Record ID -->
+        <ng-container matColumnDef="recordId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div mat-sort-header class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="recordIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('recordId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.recordId }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Time -->
         <ng-container matColumnDef="createdAt">
             <mat-header-cell *matHeaderCellDef>
