@@ -43,10 +43,19 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     private _tooltip: string;
     @Input() set tooltip(tooltip: string) {
         this._tooltipToken = tooltip;
-        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken) : this._tooltipToken;
+        this._tooltip = this._tooltipToken ? this.i18nService.instant(this._tooltipToken, this.tooltipTranslateData) : this._tooltipToken;
     }
     get tooltip(): string {
         return this._tooltip;
+    }
+
+    private _tooltipTranslateData: any;
+    @Input() set tooltipTranslateData(tooltipTranslateData: any) {
+        this._tooltipTranslateData = tooltipTranslateData;
+        this.tooltip = this._tooltipToken;
+    }
+    get tooltipTranslateData(): any {
+        return this._tooltipTranslateData;
     }
 
     @Input() displayFilterIcon: boolean = false;

@@ -18,9 +18,9 @@
                             fxLayout="row" fxLayoutGap="20px" fxFlex
                             class="follow-ups-title">
                             <div>{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT' | translate }}</div>
-                            <a [routerLink]="['/contacts', followUpData.personId, viewOnly ? 'view' : 'modify']">
+                            <div>
                                 {{ followUpData.contact.name }}
-                            </a>
+                            </div>
                         </div>
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
@@ -34,20 +34,26 @@
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
-                                name="performed"
-                                [(ngModel)]="followUpData.performed"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION"
-                                [disabled]="viewOnly || dateInTheFuture()">
+                                name="targeted"
+                                [(ngModel)]="followUpData.targeted"
+                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                                [disabled]="viewOnly">
                             </app-form-slide-toggle>
 
-                            <app-form-slide-toggle
-                                name="lostToFollowUp"
-                                [(ngModel)]="followUpData.lostToFollowUp"
-                                [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION"
-                                [disabled]="viewOnly || dateInTheFuture()">
-                            </app-form-slide-toggle>
+                            <app-form-select
+                                name="statusId"
+                                [(ngModel)]="followUpData.statusId"
+                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                                [options]="dailyStatusTypeOptions$ | async"
+                                [disabled]="viewOnly"
+                                [required]="true"
+                                optionLabelKey="label"
+                                optionValueKey="value">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>
@@ -57,7 +63,7 @@
                     <app-form-address
                         name="address"
                         [ngModel]="followUpData.address"
-                        [disabled]="viewOnly">
+                        [disabled]="true">
                     </app-form-address>
                 </mat-card>
 
@@ -105,11 +111,22 @@
 
             <button
                 type="button"
-                [routerLink]="displayOnlyMissedFollowUps ? '/contacts/follow-ups/missed' : '/contacts/follow-ups'"
+                routerLink="/contacts/follow-ups"
                 mat-raised-button>
                 {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
             </button>
         </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="hasContactReadAccess()"
+            mat-raised-button
+            type="button"
+            [routerLink]="['/contacts', contactId, 'view']">
+            {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT' | translate }}
+        </button>
+
 
     </div>
 </form>

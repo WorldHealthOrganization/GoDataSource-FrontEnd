@@ -106,7 +106,7 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${this.caseId}/lab-results`)
                                 );
-                                // add new breadcrumb: page title
+                                // add new breadcrumb : page title
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel('LNG_PAGE_CREATE_CASE_LAB_RESULT_TITLE', '.', true)
                                 );

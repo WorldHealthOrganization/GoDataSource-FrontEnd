@@ -8,14 +8,11 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -60,12 +57,6 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
 
     relationshipData: RelationshipModel = new RelationshipModel();
 
-    certaintyLevelOptions$: Observable<any[]>;
-    exposureTypeOptions$: Observable<any[]>;
-    exposureFrequencyOptions$: Observable<any[]>;
-    exposureDurationOptions$: Observable<any[]>;
-    socialRelationshipOptions$: Observable<any[]>;
-
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -75,18 +66,12 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
-        this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
-        this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
-        this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
-        this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
-        this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.params

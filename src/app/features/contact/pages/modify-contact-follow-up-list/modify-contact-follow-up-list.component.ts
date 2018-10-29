@@ -13,13 +13,12 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { NgForm, NgModel } from '@angular/forms';
 import { GroupBase } from '../../../../shared/xt-forms/core';
-import * as moment from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Moment } from 'moment';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -40,7 +39,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     followUps: FollowUpModel[] = [];
 
-    serverToday: Moment = null;
+    dailyStatusTypeOptions$: Observable<any[]>;
 
     constructor(
         private router: Router,
@@ -49,19 +48,15 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // get selected outbreak
         this.outbreakDataService
@@ -208,19 +203,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         if (form.invalid) {
             this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_INVALID_FIELDS');
         }
-    }
-
-    /**
-     * Date in the future
-     */
-    dateInTheFuture(followUpData: FollowUpModel) {
-        const date = followUpData.date ?
-            moment(followUpData.date) :
-            null;
-
-        return this.serverToday &&
-            date &&
-            date.startOf('day').isAfter(this.serverToday);
     }
 
     /**
