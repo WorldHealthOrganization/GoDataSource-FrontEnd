@@ -83,7 +83,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                     this.locationData = new LocationModel(locationData);
                     this.breadcrumbs.push(
                         new BreadcrumbItemModel(
-                            'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                             this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
                             '.',
                             true,
                             {},

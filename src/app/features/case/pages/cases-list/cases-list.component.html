@@ -275,7 +275,12 @@
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate }}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-daterange
+                            name="dateFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfOnset', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>

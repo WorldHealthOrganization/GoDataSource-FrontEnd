@@ -60,6 +60,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         longPeriod: boolean
     };
 
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    caseIdMaskValidator: Observable<boolean>;
+
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
@@ -108,7 +114,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
+                // outbreak
                 this.selectedOutbreak = selectedOutbreak;
+
+                // breadcrumbs
                 this.retrieveCaseData();
             });
     }
@@ -221,6 +230,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
+
                     // determine parent onset dates
                     const uniqueDates: {} = {};
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
@@ -237,6 +247,23 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                     // convert unique object of dates to array
                     this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
                         return moment(date);
+                    });
+
+                    // set visual ID translate data
+                    this.visualIDTranslateData = {
+                        mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                    };
+
+                    // set visual ID validator
+                    this.caseIdMaskValidator = Observable.create((observer) => {
+                        this.outbreakDataService.generateVisualIDCheckValidity(
+                            this.selectedOutbreak.id,
+                            this.caseData.visualId,
+                            this.caseData.id
+                        ).subscribe((isValid: boolean) => {
+                            observer.next(isValid);
+                            observer.complete();
+                        });
                     });
 
                     // breadcrumbs

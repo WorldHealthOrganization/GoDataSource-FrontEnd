@@ -40,15 +40,12 @@ export const JapaneseLang = {
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': '[言語] Are you sure you want to delete the outbreak {{name}}?',
         'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE': '[言語] Are you sure you want to set this outbreak active ? <br /> The other active outbreak will be deactivated',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION': '[言語] Are you sure you want to delete this question?',
-        'LNG_DIALOG_CONFIRM_DUPLICATE_QUESTION': '[言語] Are you sure you want to duplicate this question?',
         'LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER': '[言語] Are you sure you want to delete this answer?',
-        'LNG_DIALOG_CONFIRM_LINK_QUESTION_ANSWER': '[言語] Are you sure you want to link this answer?',
 
         /**
          * Login page
          */
         'LNG_PAGE_LOGIN_WELCOME_MESSAGE': '[言語] Welcome!',
-        'LNG_PAGE_LOGIN_LOGIN_LABEL': '[言語] Login',
         'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL': '[言語] Forgot Password?',
         'LNG_PAGE_LOGIN_ACTION_LOGIN_SUCCESS_MESSAGE': `Welcome, {{name}}!`,
 
@@ -56,7 +53,6 @@ export const JapaneseLang = {
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': '[言語] Something went wrong! Please contact an administrator.',
-        'LNG_API_ERROR_CODE_LOGIN_FAILED': '[言語] Login failed!',
 
         /**
          * Common Fields
