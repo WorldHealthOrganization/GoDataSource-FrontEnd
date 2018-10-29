@@ -28,7 +28,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.outbreakDataService.getSelectedOutbreak()
+        this.outbreakDataService.getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
