@@ -29,6 +29,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Moment } from 'moment';
 import { MatTable } from '@angular/material';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -65,6 +67,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     dateFilterDefaultValue: Moment;
 
+    teamsListMap: any = {};
+
     printDailyFollowUpsUrl: string;
     followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
     printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
@@ -94,7 +98,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         private genericDataService: GenericDataService,
         private router: Router,
         private i18nService: I18nService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private teamDataService: TeamDataService
     ) {
         super(
             snackbarService
@@ -115,6 +120,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // set default filter rules
         this.initializeHeaderFilters();
+
+        // load teams list
+        this.teamDataService.getTeamsList().subscribe( (teamsList) => {
+            _.forEach(teamsList, (team, key) => {
+                this.teamsListMap[team.id] = team;
+            });
+        });
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -201,6 +213,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             new VisibleColumnModel({
                 field: 'fullAddress',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'team',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
                 visible: false
             }),
             new VisibleColumnModel({

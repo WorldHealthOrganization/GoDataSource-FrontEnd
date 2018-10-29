@@ -886,6 +886,8 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION': '',
 
         /**
          * Follow-ups list page
@@ -925,6 +927,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ASSIGN': 'Assign',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT': 'View Contact',
 
         /**
