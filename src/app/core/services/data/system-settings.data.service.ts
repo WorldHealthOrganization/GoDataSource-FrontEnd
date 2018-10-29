@@ -31,5 +31,13 @@ export class SystemSettingsDataService {
     modifySystemSettings(systemSettingsData: any): Observable<any> {
         return this.http.put('system-settings', systemSettingsData);
     }
+
+    /**
+     * Get the paths of cloud backups
+     * @returns {Observable<any>}
+     */
+    getCloudBackupPaths(): Observable<any> {
+        return this.http.get(`/system-settings/backup-location`);
+    }
 }
 

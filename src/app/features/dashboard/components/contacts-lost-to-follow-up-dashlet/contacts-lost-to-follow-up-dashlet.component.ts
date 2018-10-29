@@ -4,6 +4,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { Constants } from '../../../../core/models/constants';
 import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -18,6 +19,8 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
 
     // provide constants to template
     Constants = Constants;
+    // filter by day - default - yesterday
+    date: string = moment().add(-1, 'days').format('YYYY-MM-DD');
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -32,7 +35,7 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
             .subscribe((selectedOutbreak) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.followUpsDataService
-                        .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id)
+                        .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id, this.date)
                         .subscribe((result: MetricContactsLostToFollowUpModel) => {
                             this.noContactsLostToFollowUp = result.contactsCount;
                         });

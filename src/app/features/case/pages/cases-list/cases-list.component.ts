@@ -182,12 +182,12 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 excludeFromSave: true
             }),
             new VisibleColumnModel({
-                field: 'firstName',
-                label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
-            }),
-            new VisibleColumnModel({
                 field: 'lastName',
                 label: 'LNG_CASE_FIELD_LABEL_LAST_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'firstName',
+                label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'classification',
@@ -208,6 +208,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED'
+            }),
+            new VisibleColumnModel({
+                field: 'wasContact',
+                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -374,6 +378,29 @@ export class CasesListComponent extends ListComponent implements OnInit {
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+    /**
+     * Convert a case to contact
+     * @param caseModel
+     */
+    convertCaseToContact(caseModel: CaseModel) {
+        // show confirm dialog to confirm the action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT', new CaseModel(caseModel))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.caseDataService
+                        .convertToContact(this.selectedOutbreak.id, caseModel.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

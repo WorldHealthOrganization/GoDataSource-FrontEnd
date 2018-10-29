@@ -197,8 +197,7 @@ export class DialogService {
             fieldsList.push(
                 new DialogField({
                     name: 'encryptPassword',
-                    placeholder: data.encryptPlaceholder,
-                    requiredOneOfTwo: 'anonymizeFields'
+                    placeholder: data.encryptPlaceholder
                 })
             );
         }
@@ -210,8 +209,7 @@ export class DialogService {
                     name: 'anonymizeFields',
                     placeholder: data.anonymizePlaceholder,
                     inputOptions: data.anonymizeFields,
-                    inputOptionsMultiple: true,
-                    requiredOneOfTwo: 'encryptPassword'
+                    inputOptionsMultiple: true
                 })
             );
         }

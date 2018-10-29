@@ -18,6 +18,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -100,6 +101,31 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     }
 
     /**
+     * Remove outbreak questions new flag
+     * @param outbreakData
+     */
+    cleanQuestionnaireNewFlag(outbreakData: OutbreakModel) {
+        const actualRemoveNewFlag = (question: QuestionModel) => {
+            delete question.new;
+            _.each(question.answers, (answer: AnswerModel) => {
+                _.each(answer.additionalQuestions, (childQuestion: QuestionModel) => {
+                    actualRemoveNewFlag(childQuestion);
+                });
+            });
+        };
+
+        _.each(outbreakData.labResultsTemplate, (question: QuestionModel) => {
+            actualRemoveNewFlag(question);
+        });
+        _.each(outbreakData.contactFollowUpTemplate, (question: QuestionModel) => {
+            actualRemoveNewFlag(question);
+        });
+        _.each(outbreakData.caseInvestigationTemplate, (question: QuestionModel) => {
+            actualRemoveNewFlag(question);
+        });
+    }
+
+    /**
      * Handles form submit
      * @param form
      */
@@ -111,6 +137,9 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
 
         // const dirtyFields: any = this.formHelper.getFields(form);
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // remove property "new" for every question
+        this.cleanQuestionnaireNewFlag(dirtyFields);
 
         // modify the outbreak
         this.outbreakDataService

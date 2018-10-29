@@ -45,8 +45,9 @@ export class ListFilterDataService {
      */
     filterContactsOnFollowUpLists(): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            const defaultDate = moment().add(-1, 'days').format('YYYY-MM-DD');
             return this.followUpDataService
-                .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id)
+                .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, defaultDate)
                 .map((result) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();
@@ -119,6 +120,41 @@ export class ListFilterDataService {
 
     /**
      * Create the query builder for filtering the list of cases
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesIsolated(): Observable<RequestQueryBuilder> {
+        // get server current time to compare with isolation dates
+        return this.genericDataService
+            .getServerUTCCurrentDateTime()
+            .map((serverDateTime: string) => {
+                // generate a query builder for isolated cases
+                const filterQueryBuilder = new RequestQueryBuilder();
+                // compare isolation dates start and end with current date
+                filterQueryBuilder.filter.where({
+                    [RequestFilterOperator.AND]: [
+                        {
+                            'isolationDates.startDate': {
+                                lte: moment(serverDateTime).endOf('day').toISOString()
+                            }
+                        }, {
+                            [RequestFilterOperator.OR]: [{
+                                'isolationDates.endDate': {
+                                    eq: null
+                                }
+                            }, {
+                                'isolationDates.endDate': {
+                                    gte: moment(serverDateTime).startOf('day').toISOString()
+                                }
+                            }]
+                        }
+                    ]
+                }, true);
+                return filterQueryBuilder;
+            });
+    }
+
+    /**
+     * Create the query builder for filtering the list of cases
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
@@ -145,8 +181,9 @@ export class ListFilterDataService {
      */
     filterContactsLostToFollowUp(): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            const defaultDate = moment().add(-1, 'days').format('YYYY-MM-DD');
             return this.followUpDataService
-                .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id)
+                .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id, defaultDate)
                 .map((result: MetricContactsLostToFollowUpModel) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();
@@ -211,10 +248,6 @@ export class ListFilterDataService {
     filterCasesPendingLabResult(): RequestQueryBuilder {
         // generate a query builder for cases pending lab result
         const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where({
-            classification: Constants.CASE_CLASSIFICATION.SUSPECT
-        }, true);
-
         const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
         labResultsQueryBuilder.queryBuilder.filter
             .where(
@@ -235,8 +268,6 @@ export class ListFilterDataService {
         filterQueryBuilder.filter.where({
             [RequestFilterOperator.AND]: [{
                 transferRefused: true
-            }, {
-                classification: Constants.CASE_CLASSIFICATION.SUSPECT
             }]
         }, true);
 

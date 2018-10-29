@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
+import * as moment from 'moment';
 
 export class OutbreakModel {
     id: string;
     name: string;
     description: string;
     disease: string;
+    deleted: boolean;
     startDate: string;
     endDate: string | null;
     periodOfFollowup: number;
@@ -32,6 +34,7 @@ export class OutbreakModel {
         this.name = _.get(data, 'name');
         this.description = _.get(data, 'description');
         this.disease = _.get(data, 'disease');
+        this.deleted = _.get(data, 'deleted');
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.countries = _.get(data, 'countries', []);
@@ -63,5 +66,21 @@ export class OutbreakModel {
             (lData: any) => {
                 return new QuestionModel(lData);
             });
+    }
+
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask.replace(/YYYY/g, moment().format('YYYY'));
     }
 }

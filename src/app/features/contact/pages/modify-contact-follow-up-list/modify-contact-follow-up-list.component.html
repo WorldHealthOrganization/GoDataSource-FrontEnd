@@ -61,28 +61,23 @@
                                 </div>
 
                                 <app-form-slide-toggle
-                                    [name]="'followUps[' + i + '][performed]'"
-                                    [ngModel]="followUpData.performed"
-                                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED' | translate"
-                                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_PERFORMED_DESCRIPTION"
-                                    [disabled]="dateInTheFuture(followUpData)">
+                                    [name]="'followUps[' + i + '][targeted]'"
+                                    [ngModel]="followUpData.targeted"
+                                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION">
                                 </app-form-slide-toggle>
 
-                                <app-form-slide-toggle
-                                    [name]="'followUps[' + i + '][lostToFollowUp]'"
-                                    [ngModel]="followUpData.lostToFollowUp"
-                                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP' | translate"
-                                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_LOST_TO_FOLLOW_UP_DESCRIPTION"
-                                    [disabled]="dateInTheFuture(followUpData)">
-                                </app-form-slide-toggle>
-                            </div>
-
-                            <div
-                                fxFlex fxLayout="column" fxLayoutGap="10px">
-                                <div fxFlex fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start center">
-                                    <div class="section-title">
-                                        {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS' | translate }}
-                                    </div>
+                                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                                    <app-form-select
+                                        [name]="'followUps[' + i + '][statusId]'"
+                                        [(ngModel)]="followUpData.statusId"
+                                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
+                                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
+                                        [options]="dailyStatusTypeOptions$ | async"
+                                        [required]="true"
+                                        optionLabelKey="label"
+                                        optionValueKey="value">
+                                    </app-form-select>
                                     <div
                                         fxFlex="40px"
                                         fxLayout="column"
@@ -92,18 +87,24 @@
                                             type="button"
                                             mat-icon-button
                                             [title]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
-                                            (click)="copyValueToEmptyFields('address', followUpData, followDetailsForm)">
+                                            (click)="copyValueToEmptyFields('statusId', followUpData)">
                                             <span class="xt-icon">fileCopy</span>
                                         </button>
                                     </div>
                                 </div>
 
+                                <div fxFlex><!-- placeholder --></div>
+                            </div>
+
+                            <div
+                                fxFlex fxLayout="column" fxLayoutGap="10px">
+                                <div class="section-title">
+                                    {{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS' | translate }}
+                                </div>
                                 <app-form-address
                                     [name]="'followUps[' + i + '][address]'"
                                     [ngModel]="followUpData.address"
-                                    [displayCopyField]="true"
-                                    [displayCopyFieldDescription]="'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_COPY_BUTTON_TITLE' | translate"
-                                    (copyValue)="copyValueToEmptyFields('address[' + $event + ']', followUpData, followDetailsForm)">
+                                    [disabled]="true">
                                 </app-form-address>
                             </div>
 

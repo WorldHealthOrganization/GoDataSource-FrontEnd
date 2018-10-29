@@ -25,29 +25,6 @@
 
     <mat-table #table [dataSource]="usersList$ | async" matSort (matSortChange)="sortBy($event)">
 
-        <!-- First Name -->
-        <ng-container matColumnDef="firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="firstNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.firstName }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Last Name -->
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
@@ -65,8 +42,30 @@
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
                 {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -96,15 +95,59 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef fxFlex="30">
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
-                        <!-- placeholder -->
+                        <app-form-select
+                            name="rolesFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="rolesList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('roleIds', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" fxFlex="30">
                 <mat-chip-list>
                     <mat-chip *ngFor="let role of item.roles" [matTooltip]="role.description">{{ role.name }}</mat-chip>
+                </mat-chip-list>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Available outbreaks -->
+        <ng-container matColumnDef="availableOutbreaks">
+            <mat-header-cell *matHeaderCellDef fxFlex="30">
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="availableOutbreaksFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="outbreaksList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('outbreakIds', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="30">
+                <mat-chip-list>
+                    <mat-chip
+                        *ngFor="let outbreakId of item.outbreakIds"
+                        [matTooltip]="outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].description : ''">
+                        {{ outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].name : '' }}</mat-chip>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>

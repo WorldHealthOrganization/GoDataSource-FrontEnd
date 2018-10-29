@@ -15,5 +15,7 @@ export enum ModulePath {
     DashboardModule = 'dashboard',
     TransmissionChainModule = 'transmission-chains',
     ImportExportDataModule = 'import-export-data',
-    SystemConfigModule = 'system-config'
+    SystemConfigModule = 'system-config',
+    TeamModule = 'teams',
+    CloudBackupModule = 'cloud-backup',
 }

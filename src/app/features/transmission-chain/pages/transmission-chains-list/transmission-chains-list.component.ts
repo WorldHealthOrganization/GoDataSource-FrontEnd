@@ -10,6 +10,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -31,6 +32,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
     // provide constants to template
     Constants = Constants;
+
+    EntityType = EntityType;
 
     constructor(
         private router: Router,
@@ -63,7 +66,10 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.selectedOutbreak) {
+        if (
+            this.selectedOutbreak &&
+            this.selectedOutbreak.id
+        ) {
             if (this.appliedListFilter === ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES) {
                 this.transmissionChains$ = this.transmissionChainDataService.getTransmissionChainsFromContactsWhoBecameCasesList(this.selectedOutbreak.id, this.queryBuilder);
             } else {

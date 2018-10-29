@@ -60,6 +60,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_ROLE]
                 }
             },
+            // Cloud Backup Module routes
+            {
+                path: ModulePath.CloudBackupModule,
+                loadChildren: './features/cloud-backup/cloud-backup.module#CloudBackupModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Outbreak Module routes
             {
                 path: ModulePath.OutbreakModule,
@@ -160,6 +172,18 @@ const routes: Routes = [
                 ],
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
+            // Teams Module routes
+            {
+                path: ModulePath.TeamModule,
+                loadChildren: './features/team/team.module#TeamModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_TEAM]
                 }
             },
             // Dashboard Module routes

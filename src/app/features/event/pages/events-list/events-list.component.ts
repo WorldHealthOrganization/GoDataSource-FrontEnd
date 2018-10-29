@@ -108,7 +108,8 @@ export class EventsListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'address',
-                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',

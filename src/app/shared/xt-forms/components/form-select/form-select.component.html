@@ -28,25 +28,27 @@
                 [value]="null">
                 {{ noneLabel | translate }}
             </mat-option>
-            <mat-option
-                *ngFor="let option of options"
-                [value]="option[optionValueKey]"
-                [matTooltip]="option[optionTooltipKey] | translate"
-                [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
+            <ng-container
+                *ngFor="let option of options">
+                <mat-option
+                    *ngIf="displayInvisibleItems || option[optionVisibleKey] !== false"
+                    [value]="option[optionValueKey]"
+                    [matTooltip]="option[optionTooltipKey] | translate"
+                    [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
+                    <!-- Image -->
+                    <img
+                        *ngIf="optionLabelImgKey"
+                        height="24px"
+                        [src]="option[optionLabelImgKey]"/>
 
-                <!-- Image -->
-                <img
-                    *ngIf="optionLabelImgKey"
-                    height="24px"
-                    [src]="option[optionLabelImgKey]"/>
+                    <!-- Prefix -->
+                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
 
-                <!-- Prefix -->
-                {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+                    <!-- Label -->
+                    {{option[optionLabelKey] | translate}}
 
-                <!-- Label -->
-                {{option[optionLabelKey] | translate}}
-
-            </mat-option>
+                </mat-option>
+            </ng-container>
         </mat-select>
 
         <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>

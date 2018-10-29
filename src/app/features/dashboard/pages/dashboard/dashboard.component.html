@@ -7,14 +7,70 @@
 
     <div class="page-content">
 
+        <div
+            fxFlex fxLayout="row" fxLayoutAlign="space-between">
+
+            <div fxFlex="33">
+                <mat-card class="dashboard-gauge">
+                    <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
+                    <!-- case summary pie chart -->
+                    <div fxLayoutAlign="center">
+                        <app-case-summary-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-case-summary-dashlet>
+                    </div>
+                </mat-card>
+            </div>
+
+            <div fxFlex="33">
+                <mat-card class="dashboard-gauge">
+                    <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE' | translate}}</div>
+                    <!-- case hospitalization status pie chart -->
+                    <div fxLayoutAlign="center">
+                        <app-cases-hospitalized-pie-chart-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-cases-hospitalized-pie-chart-dashlet>
+                    </div>
+                </mat-card>
+            </div>
+
+            <div fxFlex="33">
+                <!-- case summary pie chart -->
+                <mat-card class="dashboard-gauge">
+                    <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
+                    <div fxLayoutAlign="center">
+                        <app-case-summary-dashlet
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                        </app-case-summary-dashlet>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+
+        <!--</mat-card>-->
+
+        <!-- Histogram - chains of transmission -->
         <mat-card class="page-section">
 
-            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' | translate}}</div>
+            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' |
+                translate}}
+            </div>
 
             <!-- histogram - chains of transmission size -->
             <app-histogram-transmission-chains-size-dashlet
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
             </app-histogram-transmission-chains-size-dashlet>
+
+        </mat-card>
+
+        <mat-card class="page-section">
+
+            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE' | translate}}</div>
+
+            <!-- epi curve -->
+            <app-epi-curve-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-epi-curve-dashlet>
 
         </mat-card>
 

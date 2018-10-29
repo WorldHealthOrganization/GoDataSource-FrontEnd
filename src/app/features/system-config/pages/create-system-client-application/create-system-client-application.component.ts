@@ -13,6 +13,9 @@ import { SystemClientApplicationModel } from '../../../../core/models/system-cli
 import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-create-system-upstream-sync',
@@ -43,7 +46,8 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private systemSettingsDataService: SystemSettingsDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -94,6 +98,36 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
                             this.router.navigate(['/system-config/system-client-applications']);
                         });
 
+                });
+        }
+    }
+
+    /**
+     * Generate Random Key
+     * @param property
+     */
+    generateKey(property: string) {
+        // replace with generated value
+        const generateRandom = () => {
+            // generate string
+            _.set(
+                this.clientApplicationData,
+                property,
+                Constants.randomString(Constants.DEFAULT_RANDOM_KEY_LENGTH)
+            );
+        };
+
+        // ask if we should replace existing value with a new value
+        const propertyValue: string = _.get(this.clientApplicationData, property);
+        if (_.isEmpty(propertyValue)) {
+            generateRandom();
+        } else {
+            // show confirm dialog to confirm the action
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_VALUE_WITH_NEW_ONE')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        generateRandom();
+                    }
                 });
         }
     }

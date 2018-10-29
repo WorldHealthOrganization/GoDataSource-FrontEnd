@@ -5,6 +5,14 @@
         </div>
 
         <div class="topnav-actions">
+            <app-export-button
+                [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
+                [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
+                url="locations/hierarchical/export"
+                [fileName]="hierarchicalLocationsDataExportFileName"
+                [allowedExportTypes]="allowedExportTypes">
+            </app-export-button>
+
             <ng-container
                 *ngIf="hasLocationWriteAccess()">
                 <button
@@ -14,6 +22,15 @@
                     color="primary"
                     [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
                     {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
+                </button>
+
+                <button
+                    *ngIf="!parentId && !appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [routerLink]="['/import-export-data', 'location-data', 'import']">
+                    {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
                 </button>
 
                 <button
@@ -124,6 +141,7 @@
                                     (optionChanged)="filterByBooleanField('active', $event.value)"
                                     app-reset-input-on-side-filter
                                     [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
                                     [displayFilterIcon]="true">
                                 </app-form-select>
                             </div>

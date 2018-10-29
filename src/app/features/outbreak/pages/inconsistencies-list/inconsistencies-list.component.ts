@@ -16,6 +16,7 @@ import { InconsistencyModel } from '../../../../core/models/inconsistency.model'
 import * as _ from 'lodash';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -27,8 +28,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
-    // selected Outbreak
-    selectedOutbreak: OutbreakModel;
+    // Outbreak
+    outbreak: OutbreakModel;
 
     // authenticated user
     authUser: UserModel;
@@ -46,7 +47,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        protected route: ActivatedRoute
     ) {
         super(
             snackbarService
@@ -63,18 +65,21 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected outbreak
-                this.selectedOutbreak = selectedOutbreak;
+        // retrieve route params
+        this.route.params
+            .subscribe((params: { outbreakId }) => {
+                this.outbreakDataService
+                    .getOutbreak(params.outbreakId)
+                    .subscribe((outbreak: OutbreakModel) => {
+                        // outbreak
+                        this.outbreak = outbreak;
 
-                // init breadcrumbs
-                this.initBreadcrumbs();
+                        // init breadcrumbs
+                        this.initBreadcrumbs();
 
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
+                        // ...and re-load the list when the Selected Outbreak is changed
+                        this.needsRefreshList(true);
+                    });
             });
     }
 
@@ -82,8 +87,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      * Re(load) list
      */
     refreshList() {
-        if (this.selectedOutbreak) {
-            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.selectedOutbreak.id, this.queryBuilder);
+        if (this.outbreak) {
+            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.outbreak.id, this.queryBuilder);
         }
     }
 
@@ -101,18 +106,15 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         ];
 
         // add outbreak details ?
-        if (
-            this.selectedOutbreak &&
-            this.selectedOutbreak.id
-        ) {
+        if (this.outbreak) {
             // outbreak details
             const viewOrModify: string = this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK) ?
                 'modify' :
                 'view';
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.selectedOutbreak.name,
-                    `/outbreaks/${this.selectedOutbreak.id}/${viewOrModify}`,
+                    this.outbreak.name,
+                    `/outbreaks/${this.outbreak.id}/${viewOrModify}`,
                     false
                 )
             );
@@ -121,7 +123,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
                     'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
-                    `/outbreaks/${this.selectedOutbreak.id}/inconsistencies`,
+                    '.',
                     true
                 )
             );

@@ -101,29 +101,6 @@
             </mat-cell>
         </ng-container>
 
-        <!-- First Name -->
-        <ng-container matColumnDef="firstName">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}</div>
-                    <div class="column-filter">
-                        <app-form-input
-                            name="firstNameFilter"
-                            ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByTextField('firstName', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
-                {{ item.firstName }}
-            </mat-cell>
-        </ng-container>
-
         <!-- Last Name -->
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
@@ -141,8 +118,31 @@
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
                 {{ item.lastName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- First Name -->
+        <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="firstNameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('firstName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+                {{ item.firstName }}
             </mat-cell>
         </ng-container>
 
@@ -185,6 +185,7 @@
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
@@ -232,6 +233,7 @@
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
@@ -241,6 +243,35 @@
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.RISK_LEVEL"
                     [value]="item.riskLevel">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Final Follow-up Status -->
+        <ng-container matColumnDef="finalStatus">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="finalStatusFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="finalFollowUpStatus$ | async"
+                            (optionChanged)="filterBySelectField('followUp.status', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getRiskColor(item)">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS"
+                    [value]="item.followUp?.status">
                 </app-reference-data-label>
             </mat-cell>
         </ng-container>
@@ -259,6 +290,7 @@
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
                             [displayFilterIcon]="true">
                         </app-form-select>
                     </div>
@@ -267,6 +299,32 @@
             <mat-cell *matCellDef="let item">
                 <app-yes-no-label
                     [value]="item.deleted">
+                </app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!--Was Case -->
+        <ng-container matColumnDef="wasCase">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_WAS_CASE' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="wasCase"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterBySelectField('wasCase',$event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label
+                    [value]="item.wasCase">
                 </app-yes-no-label>
             </mat-cell>
         </ng-container>
@@ -320,7 +378,7 @@
                             {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
 
-                        <button *ngIf="hasContactWriteAccess()" mat-menu-item class="mat-menu-item-delete"
+                        <button *ngIf="hasContactWriteAccess() && hasCaseWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
                                 (click)="convertContactToCase(item)">
                             {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
                         </button>

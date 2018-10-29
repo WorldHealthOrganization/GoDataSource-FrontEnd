@@ -88,7 +88,8 @@
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
                                     [multiple]="filter.filter.type === FilterType.MULTISELECT"
-                                    [allowSelectionOfDisabledItems]="true">
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true">
                                 </app-form-select>
 
                                 <!-- NUMBER / AGE RANGE Filter -->

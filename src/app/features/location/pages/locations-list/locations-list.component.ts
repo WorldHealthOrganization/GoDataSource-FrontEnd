@@ -13,10 +13,12 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -45,6 +47,12 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    // export
+    hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.JSON
+    ];
+
     constructor(
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
@@ -52,7 +60,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         protected snackbarService: SnackbarService,
-        private router: Router
+        private router: Router,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -60,6 +69,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
+        // add page title
+        this.hierarchicalLocationsDataExportFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE')} - ${this.hierarchicalLocationsDataExportFileName}`;
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 

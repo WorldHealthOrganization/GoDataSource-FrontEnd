@@ -13,7 +13,9 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
     selector: 'app-user-list',
@@ -35,12 +37,15 @@ export class UserListComponent extends ListComponent implements OnInit {
     usersListCount$: Observable<any>;
 
     rolesList$: Observable<UserRoleModel[]>;
+    outbreaksListMap: any = {};
+    outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(
         private userDataService: UserDataService,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
+        private outbreakDataService: OutbreakDataService,
         private userRoleDataService: UserRoleDataService
     ) {
         super(
@@ -53,6 +58,16 @@ export class UserListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.rolesList$ = this.userRoleDataService.getRolesList();
+
+        this.outbreakDataService
+            .getOutbreaksList()
+            .subscribe( (outbreaks) => {
+              _.forEach(outbreaks, (outbreak, key) => {
+                    this.outbreaksListMap[outbreak.id] = outbreak;
+                });
+        });
+
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
 
         // initialize pagination
         this.initPaginator();
@@ -91,7 +106,7 @@ export class UserListComponent extends ListComponent implements OnInit {
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['firstName', 'lastName', 'email', 'role', 'actions'];
+        const columns = ['lastName', 'firstName', 'email', 'role', 'availableOutbreaks', 'actions'];
 
         return columns;
     }

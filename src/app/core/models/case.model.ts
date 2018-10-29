@@ -39,6 +39,10 @@ export class CaseModel {
     outbreakId: string;
     outcomeId: string;
     deleted: boolean;
+    dateBecomeContact: string;
+    wasContact: boolean;
+
+    visualId: string;
 
     relationships: {
         people: any[]
@@ -77,6 +81,7 @@ export class CaseModel {
         this.age = new AgeModel(_.get(data, 'age'));
 
         this.classification = _.get(data, 'classification');
+        this.visualId = _.get(data, 'visualId');
         this.riskLevel = _.get(data, 'riskLevel');
         this.riskReason = _.get(data, 'riskReason');
         this.dateOfInfection = _.get(data, 'dateOfInfection');
@@ -100,6 +105,8 @@ export class CaseModel {
 
         this.relationships = _.get(data, 'relationships', []);
         this.deleted = _.get(data, 'deleted');
+        this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+        this.wasContact = _.get(data, 'wasContact');
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {
@@ -121,6 +128,7 @@ export class CaseModel {
 
     /**
      * Get the main Address
+     * @returns {AddressModel}
      */
     get mainAddress(): AddressModel {
         // get main address

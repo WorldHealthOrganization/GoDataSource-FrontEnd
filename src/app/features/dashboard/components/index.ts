@@ -16,6 +16,9 @@ import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from '.
 import { ContactsSeenEachDayDashletComponent } from './contacts-seen-each-day-dashlet/contacts-seen-each-day-dashlet.component';
 import { ContactsWithSuccessfulFollowUpsDashletComponent } from './contacts-with-successful-follow-ups-dashlet/contacts-with-successful-follow-ups-dashlet.component';
 import { HistogramTransmissionChainsSizeDashletComponent } from './histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
+import { EpiCurveDashletComponent } from './epi-curve-dashlet/epi-curve-dashlet.component';
+import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary-dashlet.component';
+import { CasesHospitalizedPieChartDashletComponent } from './cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -35,6 +38,9 @@ export const components: any[] = [
     NewChainsOfTransmissionFromRegisteredContactsDashletComponent,
     ContactsSeenEachDayDashletComponent,
     ContactsWithSuccessfulFollowUpsDashletComponent,
-    HistogramTransmissionChainsSizeDashletComponent
+    HistogramTransmissionChainsSizeDashletComponent,
+    EpiCurveDashletComponent,
+    CaseSummaryDashletComponent,
+    CasesHospitalizedPieChartDashletComponent
 ];
 

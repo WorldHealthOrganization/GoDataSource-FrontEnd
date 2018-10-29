@@ -94,6 +94,16 @@ export class ContactDataService {
     }
 
     /**
+     * Add multiple Contacts for a Case
+     * @param outbreakId
+     * @param caseId
+     * @param contactsData
+     */
+    bulkAddContacts(outbreakId: string, caseId: string, contactsData: any[]): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/contacts`, contactsData);
+    }
+
+    /**
      * Retrieve the list of new Contacts grouped by Exposure Type
      * @param {string} outbreakId
      * @returns {Observable<ExposureTypeGroupModel>}

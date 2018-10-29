@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -48,6 +47,19 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Bulk Add Contacts
+    {
+        path: 'create-bulk',
+        component: fromPages.BulkCreateContactsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_CONTACT]
+        },
+        canDeactivate: [
+            // #TODO it's not working right now because we don't have a form on this page
+            PageChangeConfirmationGuard
+        ]
+    },
 
     // View Contact movement
     {
@@ -72,16 +84,7 @@ const routes: Routes = [
     // Follow-ups list
     {
         path: 'follow-ups',
-        component: fromPages.ContactsFollowUpsListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_FOLLOWUP]
-        }
-    },
-    // list of contacts that missed their last follow-up
-    {
-        path: 'follow-ups/missed',
-        component: fromPages.ContactsFollowUpsMissedListComponent,
+        component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_FOLLOWUP]

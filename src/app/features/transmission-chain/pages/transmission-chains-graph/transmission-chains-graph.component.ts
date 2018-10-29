@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -24,16 +25,35 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+    // filter used for size of chains
+    sizeOfChainsFilter: number = null;
+    // person Id - to filter the chain
+    personId: string = null;
+    // type of the selected person . event
+    selectedEntityType: EntityType = null;
 
     constructor(
-        private router: Router,
         private authDataService: AuthDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        protected route: ActivatedRoute
     ) {}
 
     ngOnInit() {
         // get authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.route.queryParams
+            .subscribe((params: {personId: string, selectedEntityType: EntityType, sizeOfChainsFilter: number}) => {
+                // check if person id was sent in url
+                if (params.personId && params.selectedEntityType) {
+                    this.personId = params.personId;
+                    this.selectedEntityType = params.selectedEntityType;
+                }
+                // check if the size of chains was sent in url
+                if (params.sizeOfChainsFilter) {
+                    this.sizeOfChainsFilter = params.sizeOfChainsFilter;
+                }
+            });
     }
 
     /**

@@ -32,7 +32,12 @@ export class Constants {
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
+    // default random configs
+    static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    static DEFAULT_RANDOM_KEY_LENGTH = 16;
+
     // default configurations
+    static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
@@ -67,19 +72,19 @@ export class Constants {
         SINGLE_SELECTION: {
             label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER',
             value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER'
+        },
+        NUMERIC: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC'
+        },
+        FILE_UPLOAD: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD'
+        },
+        DATE_TIME: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME',
+            value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME'
         }
-        // NUMERIC: {
-        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC',
-        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC'
-        // },
-        // FILE_UPLOAD: {
-        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD',
-        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FILE_UPLOAD'
-        // },
-        // DATE_TIME: {
-        //     label: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME',
-        //     value: 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME'
-        // }
     };
 
     /**
@@ -195,7 +200,17 @@ export class Constants {
      */
     static CASE_CLASSIFICATION = {
         SUSPECT: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_SUSPECT',
-        CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED'
+        CONFIRMED: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED',
+        NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED'
+    };
+
+    /**
+     * Used to match certainity level in the logic ( ex: chains of transmission )
+     */
+    static CERTAINITY_LEVEL = {
+        LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
+        MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
+        HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
     };
 
     //  transmission chain view types
@@ -214,6 +229,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS = {
         TYPE: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
@@ -233,6 +249,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
         CERTAINITY_LEVEL: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
@@ -256,6 +273,7 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS = {
         NONE: {
             label: 'LNG_COMMON_LABEL_NONE',
@@ -279,11 +297,69 @@ export class Constants {
         }
     };
 
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS = {
+        NAME: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_NAME',
+            value: 'name'
+        },
+        AGE: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE',
+            value: 'age'
+        },
+        DATE_OF_ONSET: {
+            label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            value: 'dateOfOnset'
+        },
+        GENDER: {
+            label: 'LNG_CASE_FIELD_LABEL_GENDER',
+            value: 'gender'
+        },
+        LOCATION: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION',
+            value: 'location'
+        }
+    };
+
+    static EPI_CURVE_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            value: 'week'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            value: 'month'
+        }
+
+    };
+
     /**
      * Today date
      */
     static getCurrentDate(): Moment {
         return moment().startOf('day');
+    }
+
+    /**
+     * Generate random string
+     * @param alphabet
+     */
+    static randomString(
+        length: number,
+        alphabet: string = Constants.DEFAULT_RANDOM_ALPHABET
+    ): string {
+        // generate string
+        let result: string = '';
+        while (result.length < length) {
+            result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        }
+
+        // finished
+        return result;
     }
 
 }

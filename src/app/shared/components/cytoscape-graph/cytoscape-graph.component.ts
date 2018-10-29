@@ -32,6 +32,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
 
+    showLegend: boolean = true;
+
+    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -149,7 +152,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(name)',
+                'label': 'data(label)',
                 'background-image': 'data(picture)',
                 'height': 30,
                 'width': 30,
@@ -163,7 +166,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                'line-style': 'data(edgeStyle)'
             }
         }
     ];
@@ -175,7 +179,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(label)',
+                'label': 'data(labelTimeline)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)',
                 'background-image': 'data(picture)',
@@ -191,7 +195,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                'line-style': 'data(edgeStyle)'
             }
         }
     ];
@@ -217,7 +222,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
-
     }
 
     public ngOnChanges(): any {
