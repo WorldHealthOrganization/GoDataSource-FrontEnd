@@ -3,6 +3,7 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -19,7 +20,8 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private router: Router
     ) {}
 
     ngOnInit() {
@@ -44,10 +46,10 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
         this.chainsSize = {};
         this.histogramResults = [];
         _.forEach(chains, (value, key) => {
-            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases]) {
-                this.chainsSize[value.noCases]++;
+            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.size]) {
+                this.chainsSize[value.size]++;
             } else {
-                this.chainsSize[value.noCases] = 1;
+                this.chainsSize[value.size] = 1;
             }
         });
         _.forEach(this.chainsSize, (value, key) => {
@@ -70,11 +72,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
 
     /**
      * Handle click on a bar in the chart
+     * Redirect to chains graph
      * @param event
      */
     onSelectChart(event) {
         this.selectedSizeOfChains = event.name;
-        // TODO open chains of transmission filtered by the size of the chains
+        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: this.selectedSizeOfChains } });
     }
 
 }

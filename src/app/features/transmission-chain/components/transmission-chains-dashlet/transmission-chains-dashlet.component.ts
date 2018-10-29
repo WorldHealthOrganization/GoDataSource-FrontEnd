@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -23,6 +23,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { Router } from '@angular/router';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -32,6 +34,9 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 })
 export class TransmissionChainsDashletComponent implements OnInit {
 
+    @Input() sizeOfChainsFilter: number = null;
+    @Input() personId: string = null;
+    @Input() selectedEntityType: EntityType = null;
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
@@ -42,6 +47,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
     locationsList: LocationModel[];
+    personName: string = '';
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
@@ -142,7 +148,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private genericDataService: GenericDataService,
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
-        private locationDataService: LocationDataService
+        private locationDataService: LocationDataService,
+        private router: Router
     ) {}
 
     ngOnInit() {
@@ -174,6 +181,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
+                        // load person if selected
+                        if (this.personId) {
+                            this.entityDataService
+                                .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
+                                .subscribe( (entity) => {
+                                    this.personName = entity.name;
+                                });
+                        }
+                        // load chain
                         this.displayChainsOfTransmission();
                     });
             });
@@ -258,16 +274,17 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // configure
             this.filters.filtersDefault = this.filtersDefault();
             const rQB = new RequestQueryBuilder();
+
             if (!requestQueryBuilder.filter.isEmpty()) {
                 rQB.filter.where({
                     person: {
-                        where: requestQueryBuilder.filter.generateFirstCondition()
+                        where: requestQueryBuilder.filter.generateCondition()
                     }
                 });
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, rQB).subscribe((chains) => {
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
                 } else {
@@ -474,6 +491,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
                 : null
         );
+    }
+
+    /**
+     * reset chain - navigate to chains of transmission not filtered
+     */
+    resetChain() {
+        this.sizeOfChainsFilter = null;
+        this.personId = null;
+        this.refreshChain();
     }
 
 }
