@@ -312,6 +312,22 @@ export class Constants {
         }
     };
 
+    static EPI_CURVE_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            value: 'week'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            value: 'month'
+        }
+
+    };
+
     /**
      * Today date
      */

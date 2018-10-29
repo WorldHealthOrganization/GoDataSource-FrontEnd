@@ -44,6 +44,7 @@ export class UserModel {
     email: string;
     password: string;
     passwordChange: boolean;
+    outbreakIds: string[];
     activeOutbreakId: string;
     languageId: string;
     roleIds: string[];
@@ -59,6 +60,7 @@ export class UserModel {
         this.email = _.get(data, 'email');
         this.password = _.get(data, 'password');
         this.passwordChange = _.get(data, 'passwordChange', false);
+        this.outbreakIds = _.get(data, 'outbreakIds', []);
         this.activeOutbreakId = _.get(data, 'activeOutbreakId');
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);

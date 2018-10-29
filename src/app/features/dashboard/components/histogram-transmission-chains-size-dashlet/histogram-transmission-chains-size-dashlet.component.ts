@@ -5,6 +5,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
@@ -23,12 +24,14 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
+        private referenceDataDataService: ReferenceDataDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private router: Router
     ) {}
 
     ngOnInit() {
-        this.outbreakDataService.getSelectedOutbreakSubject()
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
@@ -59,10 +62,10 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
         this.chainsSize = {};
         this.histogramResults = [];
         _.forEach(chains, (value, key) => {
-            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases]) {
-                this.chainsSize[value.noCases]++;
+            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.size]) {
+                this.chainsSize[value.size]++;
             } else {
-                this.chainsSize[value.noCases] = 1;
+                this.chainsSize[value.size] = 1;
             }
         });
         _.forEach(this.chainsSize, (value, key) => {
@@ -85,11 +88,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
 
     /**
      * Handle click on a bar in the chart
+     * Redirect to chains graph
      * @param event
      */
     onSelectChart(event) {
         this.selectedSizeOfChains = event.name;
-        // TODO open chains of transmission filtered by the size of the chains
+        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: this.selectedSizeOfChains } });
     }
 
 }

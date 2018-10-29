@@ -10,6 +10,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -31,6 +32,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
     // provide constants to template
     Constants = Constants;
+
+    EntityType = EntityType;
 
     constructor(
         private router: Router,

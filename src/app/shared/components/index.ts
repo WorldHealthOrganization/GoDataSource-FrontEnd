@@ -32,6 +32,7 @@ import { FormSubQuestionListComponent } from './form-sub-question-list/form-sub-
 import { FormQuestionListComponent } from './form-question-list/form-question-list.component';
 import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
 import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
+import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -52,6 +53,7 @@ export const components: any[] = [
     // dashboard
     DashboardCustomMetricDashletComponent,
     CytoscapeGraphComponent,
+    C3StackedBarChartComponent,
 
     // google
     GoogleMapComponent,
