@@ -189,7 +189,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         // include related locations in response
         const qb = new RequestQueryBuilder();
         qb.merge(this.queryBuilder);
-        // qb.include('locations');
+        qb.include('locations');
 
         // retrieve the list of Outbreaks
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb);

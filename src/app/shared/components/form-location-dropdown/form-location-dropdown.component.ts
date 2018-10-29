@@ -98,14 +98,28 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         // TODO investigate a solution for not specifying the timeout value.
         setTimeout(() => {
             if (this.value) {
-                this.queryBuilder.filter
-                    .remove('parentLocationId')
-                    .remove('id')
-                    .where({
-                    id: {
-                        'inq': this.value
-                    }
-                }, true);
+                if (Array.isArray(this.value)) {
+                    // multi select
+                    this.queryBuilder.filter
+                        .remove('parentLocationId')
+                        .remove('id')
+                        .where({
+                            id: {
+                                'inq': this.value
+                            }
+                        }, true);
+                } else {
+                    // single select
+                    this.queryBuilder.filter
+                        .remove('parentLocationId')
+                        .remove('id')
+                        .where({
+                            id: {
+                                'eq': this.value
+                            }
+                        }, true);
+                }
+
                 this.refreshLocationList();
             }
         }, 400);
