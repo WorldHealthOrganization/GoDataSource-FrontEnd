@@ -37,6 +37,7 @@ export class Constants {
     static DEFAULT_RANDOM_KEY_LENGTH = 16;
 
     // default configurations
+    static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
@@ -309,6 +310,22 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION',
             value: 'location'
         }
+    };
+
+    static EPI_CURVE_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            value: 'week'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            value: 'month'
+        }
+
     };
 
     /**

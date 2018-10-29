@@ -81,6 +81,12 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
                     [PERMISSION.READ_ROLE],
                     '/user-roles'
+                ),
+                new ChildNavItem(
+                    'cloud-backup',
+                    'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/cloud-backup'
                 )
             ]
         ),
@@ -133,16 +139,6 @@ export class SidenavComponent implements OnInit {
                         PERMISSION.READ_FOLLOWUP
                     ],
                     '/contacts/follow-ups',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'contact-missed-follow-ups',
-                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_MISSED_FOLLOW_UPS_LABEL',
-                    [
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_FOLLOWUP
-                    ],
-                    '/contacts/follow-ups/missed',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]

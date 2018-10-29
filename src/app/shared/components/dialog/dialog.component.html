@@ -74,7 +74,7 @@
 
                     <!-- Select -->
                     <app-form-select
-                        *ngIf="field.inputOptions"
+                        *ngIf="field.fieldType === DialogFieldType.SELECT"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -92,7 +92,7 @@
 
                     <!-- Text / Number -->
                     <app-form-input
-                        *ngIf="!field.inputOptions"
+                        *ngIf="field.fieldType === DialogFieldType.TEXT"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -103,6 +103,15 @@
                         [requiredOtherField]="field.requiredOneOfTwo"
                         [disabled]="field.disabled">
                     </app-form-input>
+
+                    <!-- Date range -->
+                    <app-form-daterange
+                        *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [required]="field.required"
+                        [disabled]="field.disabled">
+                    </app-form-daterange>
                 </div>
             </ng-container>
         </div>

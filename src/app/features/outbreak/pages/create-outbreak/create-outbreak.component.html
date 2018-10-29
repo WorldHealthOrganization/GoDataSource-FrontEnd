@@ -74,7 +74,8 @@
                                 name="caseIdMask"
                                 [(ngModel)]="newOutbreak.caseIdMask"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION">
+                                tooltip="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>

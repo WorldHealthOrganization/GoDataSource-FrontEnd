@@ -329,6 +329,28 @@ export abstract class ListComponent {
     }
 
     /**
+     * Filter the list by a date field ( startOf day => endOf day )
+     * @param {string} property
+     * @param value Date
+     */
+    filterByDateField(property: string, value: Moment) {
+        // filter by date
+        if (_.isEmpty(value)) {
+            this.queryBuilder.filter.byDateRange(property, value);
+        } else {
+            this.queryBuilder.filter.byDateRange(
+                property, {
+                    startDate: moment(value).startOf('day'),
+                    endDate: moment(value).endOf('day')
+                }
+            );
+        }
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
+    /**
      * Filter the list by a date range field ('startDate' / 'endDate')
      * @param {string} property
      * @param value Object with 'startDate' and 'endDate' properties
@@ -468,6 +490,13 @@ export abstract class ListComponent {
     }
 
     /**
+     * Callback called when resetting search filters ( can be used to add default filter criteria )
+     */
+    resetFiltersAddDefault() {
+        // NOTHING
+    }
+
+    /**
      * Clear header filters & sort
      */
     resetFiltersToSideFilters() {
@@ -479,6 +508,9 @@ export abstract class ListComponent {
 
         // reset table sort columns
         this.clearHeaderSort();
+
+        // add default filter criteria
+        this.resetFiltersAddDefault();
 
         // retrieve Side filters
         let queryBuilder;
