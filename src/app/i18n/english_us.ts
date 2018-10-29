@@ -310,6 +310,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle Name',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CASE_FIELD_LABEL_WAS_CONTACT': 'Was Contact',
         'LNG_CASE_FIELD_LABEL_TYPE': 'Type',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
@@ -664,6 +665,8 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
         'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION': '',
+        'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS': 'Available Outbreaks',
+        'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
 
@@ -740,6 +743,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CONTACT_FIELD_LABEL_WAS_CASE': 'Was Case',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
@@ -884,6 +888,8 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION': '',
 
         /**
          * Follow-ups list page
@@ -923,6 +929,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ASSIGN': 'Assign',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT': 'View Contact',
 
         /**

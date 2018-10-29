@@ -50,6 +50,9 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         private formHelper: FormHelperService
     ) {
         super(route);
+    }
+
+    ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -69,9 +72,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
-    }
 
-    ngOnInit() {
         this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_USER_TITLE' : 'LNG_PAGE_MODIFY_USER_TITLE',

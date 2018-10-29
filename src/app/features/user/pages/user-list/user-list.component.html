@@ -120,6 +120,38 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Available outbreaks -->
+        <ng-container matColumnDef="availableOutbreaks">
+            <mat-header-cell *matHeaderCellDef fxFlex="30">
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="availableOutbreaksFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="outbreaksList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('outbreakIds', $event, 'id')"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="30">
+                <mat-chip-list>
+                    <mat-chip
+                        *ngFor="let outbreakId of item.outbreakIds"
+                        [matTooltip]="outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].description : ''">
+                        {{ outbreaksListMap[outbreakId] ? outbreaksListMap[outbreakId].name : '' }}</mat-chip>
+                </mat-chip-list>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>

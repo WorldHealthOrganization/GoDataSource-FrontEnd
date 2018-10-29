@@ -9,6 +9,7 @@ export class GraphEdgeModel {
     sourceType: EntityType;
     targetType: EntityType;
     edgeColor: string;
+    edgeStyle: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -17,6 +18,7 @@ export class GraphEdgeModel {
         this.sourceType = _.get(data, 'sourceType');
         this.targetType = _.get(data, 'targetType');
         this.edgeColor = _.get(data, 'edgeColor', Constants.DEFAULT_COLOR_CHAINS);
+        this.edgeStyle = _.get(data, 'edgeStyle', 'solid');
     }
 
 }
