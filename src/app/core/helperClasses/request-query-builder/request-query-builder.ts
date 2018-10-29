@@ -18,6 +18,10 @@ export class RequestQueryBuilder {
     public limitResultsNumber: number;
     // Fields to retrieve
     public fieldsInResponse: string[] = [];
+    // other custom query full query builders
+    public childrenQueryBuilders: {
+        [qbFilterKey: string]: RequestQueryBuilder
+    } = {};
 
     /**
      * #TODO Replace usage with RequestPaginator
@@ -126,6 +130,14 @@ export class RequestQueryBuilder {
             filter.deleted = true;
         }
 
+        // add other custom filters
+        if (!_.isEmpty(this.childrenQueryBuilders)) {
+            _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder, qbKey: string) => {
+                filter[qbKey] = qb.buildQuery(false);
+            });
+        }
+
+        // serve
         return stringified ? JSON.stringify(filter) : filter;
     }
 
@@ -171,6 +183,15 @@ export class RequestQueryBuilder {
         // merge deleted
         this.deleted = queryBuilder.deleted;
 
+        // merge custom filters
+        if (!_.isEmpty(queryBuilder.childrenQueryBuilders)) {
+            this.childrenQueryBuilders = {
+                ...this.childrenQueryBuilders,
+                ...queryBuilder.childrenQueryBuilders
+            };
+        }
+
+        // serve
         return this;
     }
 
@@ -194,6 +215,7 @@ export class RequestQueryBuilder {
         this.filter.clear();
         this.includedRelations = {};
         this.sort.clear();
+        this.childrenQueryBuilders = {};
         this.deleted = false;
     }
 }
