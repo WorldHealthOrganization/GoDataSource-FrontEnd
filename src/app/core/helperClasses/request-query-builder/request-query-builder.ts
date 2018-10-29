@@ -85,6 +85,35 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove child query builder
+     * @param qbFilterKey
+     */
+    removeChildQueryBuilder(qbFilterKey: string) {
+        delete this.childrenQueryBuilders[qbFilterKey];
+    }
+
+    /**
+     * Add new child query builder
+     */
+    addChildQueryBuilder(
+        qbFilterKey: string,
+        replace: boolean = false
+    ) {
+        // replace ?
+        if (replace) {
+            this.removeChildQueryBuilder(qbFilterKey);
+        }
+
+        // add query builder
+        if (this.childrenQueryBuilders[qbFilterKey] === undefined) {
+            this.childrenQueryBuilders[qbFilterKey] = new RequestQueryBuilder();
+        }
+
+        // finished
+        return this.childrenQueryBuilders[qbFilterKey];
+    }
+
+    /**
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
@@ -133,7 +162,9 @@ export class RequestQueryBuilder {
         // add other custom filters
         if (!_.isEmpty(this.childrenQueryBuilders)) {
             _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder, qbKey: string) => {
-                filter[qbKey] = qb.buildQuery(false);
+                if (!qb.isEmpty()) {
+                    filter[qbKey] = qb.filter.generateCondition();
+                }
             });
         }
 
@@ -209,13 +240,20 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Clear children query builders
+     */
+    clearChildrenQueryBuilders() {
+        this.childrenQueryBuilders = {};
+    }
+
+    /**
      * Clear filter and sort criterias
      */
     clear() {
         this.filter.clear();
         this.includedRelations = {};
         this.sort.clear();
-        this.childrenQueryBuilders = {};
+        this.clearChildrenQueryBuilders();
         this.deleted = false;
     }
 }

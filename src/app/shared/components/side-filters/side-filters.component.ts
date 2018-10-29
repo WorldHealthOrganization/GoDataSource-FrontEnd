@@ -209,6 +209,14 @@ export class SideFiltersComponent {
                 });
             }
 
+            // children query builders
+            if (appliedFilter.filter.childQueryBuilderKey) {
+                qb = qb.addChildQueryBuilder(
+                    appliedFilter.filter.childQueryBuilderKey,
+                    false
+                );
+            }
+
             // do we need to merge extra conditions ?
             if (appliedFilter.filter.extraConditions) {
                 qb.merge(_.cloneDeep(appliedFilter.filter.extraConditions));

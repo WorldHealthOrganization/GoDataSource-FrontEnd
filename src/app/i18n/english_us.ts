@@ -909,6 +909,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
 
         /**
          * Create Follow-up page

@@ -240,10 +240,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        // filter options
         const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // set available side filters
+        // Follow-ups
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'address',
@@ -268,6 +270,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 options$: this.dailyStatusTypeOptions$
             })
         ];
+
+        // Contact
         if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
@@ -329,6 +333,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         options$: occupationsList$,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    })
+                ]
+            ];
+        }
+
+        // Case
+        if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+            this.availableSideFilters = [
+                ...this.availableSideFilters,
+                ...[
+                    new FilterModel({
+                        fieldName: 'firstName',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
                     })
                 ]
             ];
