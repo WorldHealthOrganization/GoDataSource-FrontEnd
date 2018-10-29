@@ -218,7 +218,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.teamId?.teamId }}
+                {{ teamsListMap[item.teamId] ? teamsListMap[item.teamId].name : '' }}
             </mat-cell>
         </ng-container>
 
