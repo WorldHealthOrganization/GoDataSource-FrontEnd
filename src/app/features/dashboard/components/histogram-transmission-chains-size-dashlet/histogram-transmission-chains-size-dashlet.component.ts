@@ -2,7 +2,10 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -16,10 +19,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     chainsSize: any;
     histogramResults: any = [];
     selectedSizeOfChains = 0;
+    caseRefDataColor: string = '';
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
@@ -27,6 +32,17 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
+
+                    // get case person type color
+                    this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
+                        .subscribe((personTypes) => {
+                            const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+                            if (casePersonType) {
+                                this.caseRefDataColor = casePersonType.colorCode;
+                            }
+                        });
+
                     // get chain data and convert to array of size and number
                     this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id).subscribe((chains) => {
                         this.setHistogramResults(chains);
