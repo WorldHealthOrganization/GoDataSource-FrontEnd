@@ -77,8 +77,8 @@ export class SnackbarService {
                     data: {
                         message: message
                     },
-                    verticalPosition: 'top',
-                    horizontalPosition: 'center'
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
                 });
             });
     }
