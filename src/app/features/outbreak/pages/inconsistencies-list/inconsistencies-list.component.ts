@@ -135,8 +135,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     getTableColumns(): string[] {
         return [
-            'firstName',
             'lastName',
+            'firstName',
             'inconsistencies',
             'actions'
         ];

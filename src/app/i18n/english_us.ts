@@ -392,6 +392,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
 
         /**
          * Date onset report list page
