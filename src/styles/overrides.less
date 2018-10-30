@@ -12,3 +12,29 @@
 .mat-stepper-vertical {
     background-color: transparent;
 }
+
+/* NgSelect overrides */
+.ng-select {
+    .ng-select-container {
+        min-height: 45.5px;
+
+        @angular-material-line-height: 1.125;
+        .ng-value-container {
+            line-height: @angular-material-line-height !important;
+            font-size: inherit !important;
+            overflow: visible !important;
+
+            .ng-value {
+                overflow: visible !important;
+            }
+
+            .ng-placeholder,
+            .ng-input,
+            .ng-input input {
+                line-height: 1 !important;
+                font-size: inherit !important;
+                padding: 0 !important;
+            }
+        }
+    }
+}

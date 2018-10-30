@@ -31,8 +31,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
     ];
 
     // lists used in dropdowns
-    diseasesList$: Observable<any[]>;
-    countriesList$: Observable<any[]>;
+    diseasesList$: Observable<LabelValuePair[]>;
+    countriesList$: Observable<LabelValuePair[]>;
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
