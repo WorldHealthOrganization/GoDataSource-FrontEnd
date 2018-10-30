@@ -68,6 +68,14 @@ export class LabResultDataService {
     }
 
     /**
+     * Get the list of all lab results
+     * @param {string} outbreakId
+     */
+    getAllLabResults(outbreakId: string): Observable<any> {
+        return this.http.get(`outbreaks/${outbreakId}/lab-results`, {});
+    }
+
+    /**
      * Create Lab Result
      * @param {string} outbreakId
      * @param {string} caseId

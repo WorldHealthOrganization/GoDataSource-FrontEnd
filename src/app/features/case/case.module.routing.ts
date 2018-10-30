@@ -25,6 +25,15 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // View Lab Results
+    {
+        path: 'lab-results',
+        component: fromPages.LabResultsComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_CASE]
+        }
+    },
     // View Case
     {
         path: ':caseId/view',
