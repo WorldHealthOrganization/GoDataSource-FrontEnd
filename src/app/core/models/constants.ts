@@ -40,6 +40,7 @@ export class Constants {
     static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
+    static DEFAULT_TABLE_COLUMN_TRIM_TEXT_LONGER_THAN_NO_CHARS = 150;
 
     // pagination defaults and configuration
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
@@ -321,6 +322,142 @@ export class Constants {
         }
     };
 
+    // audit log actions
+    static AUDIT_LOG_ACTION_OPTIONS = {
+        CREATED: {
+            label: 'LNG_AUDIT_LOG_ACTIONS_CREATED',
+            value: 'LNG_AUDIT_LOG_ACTIONS_CREATED'
+        },
+        MODIFIED: {
+            label: 'LNG_AUDIT_LOG_ACTIONS_MODIFIED',
+            value: 'LNG_AUDIT_LOG_ACTIONS_MODIFIED'
+        },
+        REMOVED: {
+            label: 'LNG_AUDIT_LOG_ACTIONS_REMOVED',
+            value: 'LNG_AUDIT_LOG_ACTIONS_REMOVED'
+        },
+        RESTORED: {
+            label: 'LNG_AUDIT_LOG_ACTIONS_RESTORED',
+            value: 'LNG_AUDIT_LOG_ACTIONS_RESTORED'
+        }
+    };
+
+    // possible modules
+    static DATA_MODULES = {
+        USER: {
+            label: 'LNG_MODULE_LABEL_USER',
+            value: 'user'
+        },
+        ROLE: {
+            label: 'LNG_MODULE_LABEL_ROLE',
+            value: 'role'
+        },
+        LOCATION: {
+            label: 'LNG_MODULE_LABEL_LOCATION',
+            value: 'location'
+        },
+        TEAM: {
+            label: 'LNG_MODULE_LABEL_TEAM',
+            value: 'team'
+        },
+        AUDIT_LOG: {
+            label: 'LNG_MODULE_LABEL_AUDIT_LOG',
+            value: 'auditLog'
+        },
+        SYSTEM_SETTINGS: {
+            label: 'LNG_MODULE_LABEL_SYSTEM_SETTINGS',
+            value: 'systemSettings'
+        },
+        SYNC_LOG: {
+            label: 'LNG_MODULE_LABEL_SYNC_LOG',
+            value: 'syncLog'
+        },
+        DB_ACTION_LOG: {
+            label: 'LNG_MODULE_LABEL_DATABASE_ACTION_LOG',
+            value: 'databaseActionLog'
+        },
+        DB_EXPORT_LOG: {
+            label: 'LNG_MODULE_LABEL_DATABASE_EXPORT_LOG',
+            value: 'databaseExportLog'
+        },
+        TEMPLATE: {
+            label: 'LNG_MODULE_LABEL_TEMPLATE',
+            value: 'template'
+        },
+        OUTBREAK: {
+            label: 'LNG_MODULE_LABEL_OUTBREAK',
+            value: 'outbreak'
+        },
+        CASE: {
+            label: 'LNG_MODULE_LABEL_CASE',
+            value: 'case'
+        },
+        CONTACT: {
+            label: 'LNG_MODULE_LABEL_CONTACT',
+            value: 'contact'
+        },
+        REFERENCE_DATA: {
+            label: 'LNG_MODULE_LABEL_REFERENCE_DATA',
+            value: 'referenceData'
+        },
+        FOLLOW_UP: {
+            label: 'LNG_MODULE_LABEL_FOLLOW_UP',
+            value: 'followUp'
+        },
+        CLUSTER: {
+            label: 'LNG_MODULE_LABEL_CLUSTER',
+            value: 'cluster'
+        },
+        HELP_CATEGORY: {
+            label: 'LNG_MODULE_LABEL_HELP_CATEGORY',
+            value: 'helpCategory'
+        },
+        LAB_RESULT: {
+            label: 'LNG_MODULE_LABEL_LAB_RESULT',
+            value: 'labResult'
+        },
+        HELP_ITEM: {
+            label: 'LNG_MODULE_LABEL_HELP_ITEM',
+            value: 'helpItem'
+        },
+        RELATIONSHIP: {
+            label: 'LNG_MODULE_LABEL_RELATIONSHIP',
+            value: 'relationship'
+        },
+        ACCESS_TOKEN: {
+            label: 'LNG_MODULE_LABEL_ACCESS_TOKEN',
+            value: 'accessToken'
+        },
+        PERSON: {
+            label: 'LNG_MODULE_LABEL_PERSON',
+            value: 'person'
+        },
+        LANGUAGE: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE',
+            value: 'language'
+        },
+        LANGUAGE_TOKEN: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE_TOKEN',
+            value: 'languageToken'
+        },
+        EVENT: {
+            label: 'LNG_MODULE_LABEL_EVENT',
+            value: 'event'
+        },
+        ICON: {
+            label: 'LNG_MODULE_LABEL_ICON',
+            value: 'icon'
+        },
+        BACKUP: {
+            label: 'LNG_MODULE_LABEL_BACKUP',
+            value: 'backup'
+        },
+        FILE_ATTACHMENT: {
+            label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
+            value: 'fileAttachment'
+        }
+    };
+
     static EPI_CURVE_VIEW_TYPE = {
         DAY: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
@@ -334,7 +471,6 @@ export class Constants {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
             value: 'month'
         }
-
     };
 
     /**

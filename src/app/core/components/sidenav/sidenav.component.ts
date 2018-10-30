@@ -70,17 +70,17 @@ export class SidenavComponent implements OnInit {
                     [PERMISSION.READ_USER_ACCOUNT],
                     '/users'
                 ),
-                // new ChildNavItem(
-                //     'teams',
-                //     'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL',
-                //     [PERMISSION.READ_TEAM],
-                //     '/users'
-                // ),
                 new ChildNavItem(
                     'roles',
                     'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL',
                     [PERMISSION.READ_ROLE],
                     '/user-roles'
+                ),
+                new ChildNavItem(
+                    'audit-log',
+                    'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/audit-log'
                 ),
                 new ChildNavItem(
                     'cloud-backup',
