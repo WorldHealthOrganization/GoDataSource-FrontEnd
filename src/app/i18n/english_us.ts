@@ -80,8 +80,10 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
+        'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
+        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share Exposures',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
@@ -531,6 +533,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
+
+        /**
+         * Entity Relationships list share page
+         */
+        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Assign To',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE': 'Create relationships',
+
 
         /**
          * Modify Entity Relationship page

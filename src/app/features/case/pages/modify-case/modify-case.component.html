@@ -394,6 +394,9 @@
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
+        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.CASE, caseData.id, 'share']">
+            {{ 'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS' | translate }}
+        </button>
         <button *ngIf="hasCaseWriteAccess()" mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS' | translate }}
         </button>
