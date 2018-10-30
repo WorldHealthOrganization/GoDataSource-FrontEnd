@@ -138,34 +138,41 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         // get case id
         this.route.params
             .subscribe((params: { caseId }) => {
+                // case Id arrives only from cases list, view & modify pages
+                // coming directly to daily page doesn't provide us with a case id
                 this.caseId = params.caseId;
-            });
-
-        // subscribe to the Selected Outbreak
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected outbreak
-                this.selectedOutbreak = selectedOutbreak;
-
-                // export url
-                this.exportFollowUpsUrl = null;
-                this.printDailyFollowUpsUrl = null;
-                if (
-                    this.selectedOutbreak &&
-                    this.selectedOutbreak.id
-                ) {
-                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
-                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+                if (!this.caseId) {
+                    this.initializeBreadcrumbs();
                 }
 
-                // retrieve case data if necessary
-                this.retrieveCaseData();
+                // subscribe to the Selected Outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreakSubject()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // selected outbreak
+                        this.selectedOutbreak = selectedOutbreak;
 
-                // initialize pagination
-                this.initPaginator();
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
+                        // export url
+                        this.exportFollowUpsUrl = null;
+                        this.printDailyFollowUpsUrl = null;
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                            this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+
+                            // retrieve case data
+                            if (this.caseId) {
+                                this.retrieveCaseData();
+                            }
+                        }
+
+                        // initialize pagination
+                        this.initPaginator();
+                        // ...and re-load the list when the Selected Outbreak is changed
+                        this.needsRefreshList(true);
+                    });
             });
 
         // initialize Side Table Columns
@@ -179,21 +186,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Retrieve case data
      */
     retrieveCaseData() {
-        // retrieve case information if necessary
-        if (!this.caseId) {
-            this.initializeBreadcrumbs();
-        } else if (
-            this.selectedOutbreak &&
-            this.selectedOutbreak.id
-        ) {
-            // retrieve case data
-            this.caseDataService
-                .getCase(this.selectedOutbreak.id, this.caseId)
-                .subscribe((caseData: CaseModel) => {
-                    this.caseData = caseData;
-                    this.initializeBreadcrumbs();
-                });
-        }
+        // retrieve case data
+        this.caseDataService
+            .getCase(this.selectedOutbreak.id, this.caseId)
+            .subscribe((caseData: CaseModel) => {
+                this.caseData = caseData;
+                this.initializeBreadcrumbs();
+            });
     }
 
     /**
