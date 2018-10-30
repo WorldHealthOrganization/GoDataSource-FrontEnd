@@ -1,13 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
 
 @Component({
     selector: 'app-view-chronology-contact',
@@ -21,7 +20,7 @@ export class ViewChronologyContactComponent implements OnInit {
     ];
 
     contactData: ContactModel = new ContactModel();
-    chronologyEntries: any[] = [];
+    chronologyEntries: ChronologyItem[] = [];
 
     constructor(
         protected route: ActivatedRoute,
@@ -54,17 +53,34 @@ export class ViewChronologyContactComponent implements OnInit {
                             );
 
                             // create entries array.
+                            const chronologyEntries: ChronologyItem[] = [];
+
                             // date of onset
                             if (!_.isEmpty(this.contactData.dateOfReporting)) {
-                                this.chronologyEntries.push({date: this.contactData.dateOfReporting, label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'});
-                            }
-                            // date deceased
-                            if (!_.isEmpty(this.contactData.dateDeceased)) {
-                                this.chronologyEntries.push({date: this.contactData.dateDeceased, label: 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.contactData.dateOfReporting,
+                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'
+                                }));
                             }
 
-                            // sort collection asc
-                            this.chronologyEntries = _.sortBy(this.chronologyEntries, 'date');
+                            // date deceased
+                            if (!_.isEmpty(this.contactData.dateDeceased)) {
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.contactData.dateDeceased,
+                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED'
+                                }));
+                            }
+
+                            // date become contact
+                            if (!_.isEmpty(this.contactData.dateBecomeContact)) {
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.contactData.dateBecomeContact,
+                                    label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT'
+                                }));
+                            }
+
+                            // set data
+                            this.chronologyEntries = chronologyEntries;
                         });
                 });
 
