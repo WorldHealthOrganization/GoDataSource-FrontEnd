@@ -42,30 +42,6 @@
                     </mat-cell>
                 </ng-container>
 
-                <!-- First Name -->
-                <ng-container matColumnDef="firstName">
-                    <mat-header-cell *matHeaderCellDef>
-                        <div class="table-header-cell">
-                            <div mat-sort-header class="column-header">
-                                {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
-                            </div>
-                            <div class="column-filter">
-                                <app-form-input
-                                    name="firstNameFilter"
-                                    ngModel
-                                    placeholder="Filter"
-                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                                    [displayFilterIcon]="true">
-                                </app-form-input>
-                            </div>
-                        </div>
-                    </mat-header-cell>
-
-                    <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
-                        {{item.type === EntityType.EVENT ? item.name : item.firstName}}
-                    </mat-cell>
-                </ng-container>
-
                 <!-- Last Name -->
                 <ng-container matColumnDef="lastName">
                     <mat-header-cell *matHeaderCellDef>
@@ -87,6 +63,30 @@
 
                     <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
                         {{item.lastName}}
+                    </mat-cell>
+                </ng-container>
+
+                <!-- First Name -->
+                <ng-container matColumnDef="firstName">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="firstNameFilter"
+                                    ngModel
+                                    placeholder="Filter"
+                                    (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                        {{item.type === EntityType.EVENT ? item.name : item.firstName}}
                     </mat-cell>
                 </ng-container>
 
