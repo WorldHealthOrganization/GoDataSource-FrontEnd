@@ -122,7 +122,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     getTableColumns(): string[] {
         const columns = [
-            'firstName', 'lastName', 'age', 'gender', 'riskLevel',
+            'lastName', 'firstName', 'age', 'gender', 'riskLevel',
             'place', 'address', 'actions'
         ];
         return columns;

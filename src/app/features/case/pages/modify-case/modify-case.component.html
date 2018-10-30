@@ -222,10 +222,11 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
-                                [dateSameOrBefore]="dateOnsetSameOrBeforeDates()"
-                                [dateSameOrAfter]="[
-                                    [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate]
-                                ]">
+                                [dateSameOrBefore]="[
+                                    serverToday,
+                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                ]"
+                                [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
                             </app-form-datepicker>
 
                             <app-form-slide-toggle
