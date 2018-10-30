@@ -311,6 +311,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle Name',
         'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CASE_FIELD_LABEL_WAS_CONTACT': 'Was Contact',
         'LNG_CASE_FIELD_LABEL_TYPE': 'Type',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
@@ -392,6 +393,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
 
         /**
          * Date onset report list page
@@ -665,6 +667,8 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
         'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION': '',
+        'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS': 'Available Outbreaks',
+        'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
 
@@ -741,6 +745,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk Level',
         'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CONTACT_FIELD_LABEL_WAS_CASE': 'Was Case',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
         'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
@@ -885,6 +890,8 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
         'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION': '',
 
         /**
          * Follow-ups list page
@@ -924,6 +931,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS': 'Address',
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ASSIGN': 'Assign',
         'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_VIEW_CONTACT': 'View Contact',
 
         /**
@@ -1666,6 +1674,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW': 'Timeline Network',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE': 'View Full Resource',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION': 'View Chain of Transmission',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE': 'Contact Details',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE': 'Case Details',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
@@ -1686,6 +1695,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_AGE': 'Age',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION': 'Location',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL': 'Show Legend',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS': 'Reset',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE': 'You are currently seeing the chains with size:',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON': 'You are currently seeing the chains for person:',
 
         /**
          * Side filter
