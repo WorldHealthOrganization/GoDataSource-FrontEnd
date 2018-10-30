@@ -372,17 +372,25 @@
 
                     <mat-divider></mat-divider>
 
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                    </button>
+                    <ng-container
+                        *ngIf="!item.deleted">
 
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'movement']">
-                        {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT' | translate }}
-                    </button>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
 
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'chronology']">
-                        {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY' | translate }}
-                    </button>
+                        <button mat-menu-item [routerLink]="['.', item.id, 'movement']">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT' | translate }}
+                        </button>
+
+                        <button mat-menu-item [routerLink]="['.', item.id, 'chronology']">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY' | translate }}
+                        </button>
+
+                        <button mat-menu-item [routerLink]="['/contacts', item.id, 'follow-ups']">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS' | translate }}
+                        </button>
+                    </ng-container>
 
                     <ng-container *app-selected-outbreak-is-active>
                         <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">

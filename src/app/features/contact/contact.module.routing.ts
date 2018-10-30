@@ -90,6 +90,15 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_FOLLOWUP]
         }
     },
+    // Follow-ups list from a case
+    {
+        path: ':caseId/follow-ups',
+        component: fromPages.ContactDailyFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_FOLLOWUP]
+        }
+    },
     // Create Follow Up
     {
         path: ':contactId/follow-ups/create',
