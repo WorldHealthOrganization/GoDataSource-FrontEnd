@@ -92,7 +92,7 @@ const routes: Routes = [
     },
     // Follow-ups list from a case
     {
-        path: ':caseId/follow-ups',
+        path: 'case-related-follow-ups/:caseId',
         component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {
