@@ -70,25 +70,20 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
             })
         );
 
-        this.route.params
-            .subscribe((params: {outbreakId}) => {
-                this.outbreakId = params.outbreakId;
-                // get the outbreak to modify
-                this.outbreakDataService
-                    .getOutbreak(this.outbreakId)
-                    .subscribe(outbreakData => {
-                        this.outbreak = outbreakData;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
-                                '.',
-                                true,
-                                {},
-                                this.outbreak
-                            )
-                        );
-                    });
-            });
+        // get outbreak
+        this.outbreak = this.route.snapshot.data.outbreak;
+        this.outbreakId = this.outbreak.id;
+
+        // update breadcrumbs
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                '.',
+                true,
+                {},
+                this.outbreak
+            )
+        );
     }
 
     /**

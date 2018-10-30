@@ -1,11 +1,11 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { OutbreakResolver } from './services/outbreak-resolver';
 
 const routes: Routes = [
     // Outbreaks list
@@ -29,6 +29,9 @@ const routes: Routes = [
     {
         path: ':outbreakId/view',
         component: fromPages.ModifyOutbreakComponent,
+        resolve: {
+            outbreak: OutbreakResolver
+        },
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
@@ -39,6 +42,9 @@ const routes: Routes = [
     {
         path: ':outbreakId/modify',
         component: fromPages.ModifyOutbreakComponent,
+        resolve: {
+            outbreak: OutbreakResolver
+        },
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_OUTBREAK],
