@@ -19,6 +19,7 @@ import { EventModel } from '../../models/event.model';
 import * as _ from 'lodash';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import 'rxjs/add/observable/throw';
+import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 
 @Injectable()
 export class OutbreakDataService {
@@ -120,6 +121,21 @@ export class OutbreakDataService {
                         return res;
                     });
             });
+    }
+
+    /**
+     * Retrieve the Hierarchical list of Locations
+     * @returns {Observable<HierarchicalLocationModel[]>}
+     */
+    getOutbreakLocationsHierarchicalList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<HierarchicalLocationModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/locations/hierarchical?filter=${filter}`),
+            HierarchicalLocationModel
+        );
     }
 
     /**
