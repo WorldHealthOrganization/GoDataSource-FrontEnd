@@ -37,6 +37,7 @@ export class Constants {
     static DEFAULT_RANDOM_KEY_LENGTH = 16;
 
     // default configurations
+    static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
     static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
@@ -203,6 +204,15 @@ export class Constants {
         NOT_A_CASE: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED'
     };
 
+    /**
+     * Used to match certainity level in the logic ( ex: chains of transmission )
+     */
+    static CERTAINITY_LEVEL = {
+        LOW: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_1_LOW',
+        MEDIUM: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_2_MEDIUM',
+        HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
+    };
+
     //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
@@ -309,6 +319,22 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_LOCATION',
             value: 'location'
         }
+    };
+
+    static EPI_CURVE_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            value: 'week'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            value: 'month'
+        }
+
     };
 
     /**

@@ -1,4 +1,4 @@
-import { Directive } from '@angular/core';
+import { Directive, Input } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -6,6 +6,8 @@ import { NgControl } from '@angular/forms';
 })
 export class ResetInputOnSideFilterDirective {
     private pristineValue: any = undefined;
+
+    @Input() resetToPristineValue: boolean = true;
 
     constructor(
         private control: NgControl
@@ -16,6 +18,6 @@ export class ResetInputOnSideFilterDirective {
     }
 
     public reset() {
-        this.control.reset(this.pristineValue);
+        this.control.reset(this.resetToPristineValue ? this.pristineValue : undefined);
     }
 }

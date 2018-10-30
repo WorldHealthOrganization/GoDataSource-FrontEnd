@@ -8,8 +8,7 @@ export class TransmissionChainRelation {
 
     constructor(
         public entityIds: string[]
-    ) {
-    }
+    ) {}
 }
 
 export class TransmissionChainModel {
@@ -25,9 +24,12 @@ export class TransmissionChainModel {
     active: boolean;
     // duration of the chain ( no of days )
     duration: number;
+    // size of the chain ( no of cases )
+    size: number;
 
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
+        this.size = _.get(chainData, 'size', 0);
         this.duration = _.get(chainData, 'period.duration', 0);
 
         const chainRelationsData = _.get(chainData, 'chain', []);

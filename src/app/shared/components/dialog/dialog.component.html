@@ -11,7 +11,7 @@
             <mat-list>
                 <mat-list-item *ngFor="let dataItem of confirmData?.data">
                     <!-- if the label is not LINK display the label and the value-->
-                    <div *ngIf="dataItem.label !== 'LINK'">
+                    <div *ngIf="dataItem.label !== 'LINK' && dataItem.label !== 'LINK_CHAIN'">
                         <span class="dialog-data-label">
                             {{ dataItem.label | translate }}:
                         </span>
@@ -25,6 +25,15 @@
                             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
                         </a>
                     </div>
+
+                    <!-- custom case for displaying link so the user can navigate to the chain of transmission page -->
+                    <div *ngIf="dataItem.label === 'LINK_CHAIN'">
+                        <a href="{{dataItem.value}}"
+                           target="_blank">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}
+                        </a>
+                    </div>
+
                 </mat-list-item>
             </mat-list>
         </mat-card>
@@ -65,7 +74,7 @@
 
                     <!-- Select -->
                     <app-form-select
-                        *ngIf="field.inputOptions"
+                        *ngIf="field.fieldType === DialogFieldType.SELECT"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -83,7 +92,7 @@
 
                     <!-- Text / Number -->
                     <app-form-input
-                        *ngIf="!field.inputOptions"
+                        *ngIf="field.fieldType === DialogFieldType.TEXT"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -94,6 +103,15 @@
                         [requiredOtherField]="field.requiredOneOfTwo"
                         [disabled]="field.disabled">
                     </app-form-input>
+
+                    <!-- Date range -->
+                    <app-form-daterange
+                        *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [required]="field.required"
+                        [disabled]="field.disabled">
+                    </app-form-daterange>
                 </div>
             </ng-container>
         </div>

@@ -4,19 +4,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import * as moment from 'moment';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Moment } from 'moment';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -27,95 +30,83 @@ import { Moment } from 'moment';
 export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
+
+    teamsList$: Observable<TeamModel[]>;
 
     followUpData: FollowUpModel = new FollowUpModel();
 
     selectedOutbreak: OutbreakModel = new OutbreakModel();
 
-    displayOnlyMissedFollowUps: boolean = false;
+    dailyStatusTypeOptions$: Observable<any[]>;
 
     contactId: string;
     followUpId: string;
 
     authUser: UserModel;
 
-    serverToday: Moment = null;
-
     constructor(
         private router: Router,
         protected route: ActivatedRoute,
         private contactDataService: ContactDataService,
         private outbreakDataService: OutbreakDataService,
-        private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private teamDataService: TeamDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
+        this.teamsList$ = this.teamDataService.getTeamsList();
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // daily status types
+        this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
 
         // retrieve route params
         this.route.params
             .subscribe((params: {contactId, followUpId}) => {
             this.contactId = params.contactId;
             this.followUpId = params.followUpId;
-                // retrieve query params
-                this.route.queryParams
-                    .subscribe((queryParams: {displayOnlyMissedFollowUps}) => {
-                        // display missed follow-ups or upcoming follow-ups link
-                        this.displayOnlyMissedFollowUps = queryParams.displayOnlyMissedFollowUps;
-                        if (this.displayOnlyMissedFollowUps) {
-                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_MISSED_TITLE', '/contacts/follow-ups/missed'));
-                        } else {
-                            this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups'));
-                        }
+                // get selected outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreak()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // keep selected outbreak for later user
+                        this.selectedOutbreak = selectedOutbreak;
 
-                        // get selected outbreak
-                        this.outbreakDataService
-                            .getSelectedOutbreak()
-                            .subscribe((selectedOutbreak: OutbreakModel) => {
-                                // keep selected outbreak for later user
-                                this.selectedOutbreak = selectedOutbreak;
+                        // retrieve follow-up information
+                        this.followUpsDataService
+                            .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
+                            .catch((err) => {
+                                // show error message
+                                this.snackbarService.showError(err.message);
 
-                                // retrieve follow-up information
-                                this.followUpsDataService
-                                    .getFollowUp(selectedOutbreak.id, params.contactId, params.followUpId)
-                                    .catch((err) => {
-                                        // show error message
-                                        this.snackbarService.showError(err.message);
-
-                                        // redirect
-                                        this.disableDirtyConfirm();
-                                        this.router.navigate(['/contacts/follow-ups']);
-                                        return ErrorObservable.create(err);
-                                    })
-                                    .subscribe((followUpData: FollowUpModel) => {
-                                        // initialize follow-up
-                                        this.followUpData = new FollowUpModel(followUpData);
-                                        this.breadcrumbs.push(
-                                            new BreadcrumbItemModel(
-                                                this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
-                                                '.',
-                                                true,
-                                                {},
-                                                this.followUpData
-                                            )
-                                        );
-                                    });
+                                // redirect
+                                this.disableDirtyConfirm();
+                                this.router.navigate(['/contacts/follow-ups']);
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((followUpData: FollowUpModel) => {
+                                // initialize follow-up
+                                this.followUpData = new FollowUpModel(followUpData);
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel(
+                                        this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+                                        '.',
+                                        true,
+                                        {},
+                                        this.followUpData
+                                    )
+                                );
                             });
                     });
             });
@@ -152,31 +143,18 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
     }
 
     /**
-     * If date is in the future we need to reset performed & lost to follow-up
-     */
-    dateInTheFuture(): boolean {
-        const date = this.followUpData.date ?
-            moment(this.followUpData.date) :
-            null;
-
-        if (
-            this.serverToday &&
-            date &&
-            date.startOf('day').isAfter(this.serverToday)
-        ) {
-            this.followUpData.performed = false;
-            this.followUpData.lostToFollowUp = false;
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Check if we have access to create / generate follow-ups
      * @returns {boolean}
      */
     hasFollowUpsWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
+    }
+
+    /**
+     * Check if we have access to view a contact
+     * @returns {boolean}
+     */
+    hasContactReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
     }
 }

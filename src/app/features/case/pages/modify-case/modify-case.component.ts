@@ -24,6 +24,7 @@ import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-case',
@@ -53,12 +54,18 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     serverToday: Moment = null;
 
-    parentOnsetDates: Moment[] = [];
+    parentOnsetDates: [Moment, string][] = [];
 
     queryParams: {
         onset: boolean,
         longPeriod: boolean
     };
+
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    caseIdMaskValidator: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -108,7 +115,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
+                // outbreak
                 this.selectedOutbreak = selectedOutbreak;
+
+                // breadcrumbs
                 this.retrieveCaseData();
             });
     }
@@ -221,6 +231,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set data only when we have everything
                     this.caseData = new CaseModel(cases[0]);
+
                     // determine parent onset dates
                     const uniqueDates: {} = {};
                     _.each(this.caseData.relationships, (relationship: RelationshipModel) => {
@@ -236,7 +247,31 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // convert unique object of dates to array
                     this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
-                        return moment(date);
+                        return [
+                            moment(date),
+                            this.i18nService.instant(
+                                'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET', {
+                                    date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                                }
+                            )
+                        ];
+                    });
+
+                    // set visual ID translate data
+                    this.visualIDTranslateData = {
+                        mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                    };
+
+                    // set visual ID validator
+                    this.caseIdMaskValidator = Observable.create((observer) => {
+                        this.outbreakDataService.generateVisualIDCheckValidity(
+                            this.selectedOutbreak.id,
+                            this.caseData.visualId,
+                            this.caseData.id
+                        ).subscribe((isValid: boolean) => {
+                            observer.next(isValid);
+                            observer.complete();
+                        });
                     });
 
                     // breadcrumbs
@@ -297,11 +332,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     /**
      * Used for validating date onset
      */
-    dateOnsetSameOrBeforeDates(): any[] {
+    dateOnsetSameOrAfterDates(): any[] {
         return [
             ...this.parentOnsetDates,
-            this.serverToday,
-            [this.caseData.dateDeceased, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_DECEASED')]
+            [this.caseData.dateOfInfection, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION')]
         ];
     }
 }

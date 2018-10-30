@@ -85,6 +85,7 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION"
                         [options]="exposureTypeOptions$ | async"
                         [disabled]="disabled"
+                        [required]="false"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">
@@ -115,6 +116,7 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION"
                         [options]="exposureFrequencyOptions$ | async"
                         [disabled]="disabled"
+                        [required]="false"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">
@@ -143,6 +145,7 @@
                         tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION"
                         [options]="exposureDurationOptions$ | async"
                         [disabled]="disabled"
+                        [required]="false"
                         optionLabelKey="label"
                         optionValueKey="value"
                         (optionChanged)="onChange()">

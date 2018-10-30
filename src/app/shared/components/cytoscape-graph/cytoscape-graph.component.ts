@@ -166,7 +166,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                'line-style': 'data(edgeStyle)'
             }
         }
     ];
@@ -194,7 +195,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             style: {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle'
+                'target-arrow-shape': 'triangle',
+                'line-style': 'data(edgeStyle)'
             }
         }
     ];

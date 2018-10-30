@@ -13,9 +13,7 @@ export enum UserSettings {
     RELATIONSHIP_FIELDS = 'relationshipFields',
     OUTBREAK_FIELDS = 'outbreakFields',
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
-    FOLLOW_UPS_MISSED_FIELDS = 'missedFollowUpFields',
-    FOLLOW_UPS_UPCOMING_FIELDS = 'upcomingFollowUpFields',
-    FOLLOW_UPS_PAST_FIELDS = 'pastFollowUpFields',
+    CONTACT_DAILY_FOLLOW_UP_FIELDS = 'contactDailyFollowUpFields',
     SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
     SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
     SYNC_LOGS_FIELDS = 'syncLogsFields'
@@ -32,9 +30,11 @@ abstract class UserSettingsHandlers {
     static EVENT_FIELDS = [];
     static RELATIONSHIP_FIELDS = [];
     static OUTBREAK_FIELDS = [];
-    static FOLLOW_UPS_MISSED_FIELDS = [];
-    static FOLLOW_UPS_UPCOMING_FIELDS = [];
-    static FOLLOW_UPS_PAST_FIELDS = [];
+    static OUTBREAK_TEMPLATE_FIELDS = [];
+    static CONTACT_DAILY_FOLLOW_UP_FIELDS = [];
+    static SYNC_UPSTREAM_SERVERS_FIELDS = [];
+    static SYNC_CLIENT_APPLICATIONS_FIELDS = [];
+    static SYNC_LOGS_FIELDS = [];
 }
 
 export class UserModel {
@@ -44,6 +44,7 @@ export class UserModel {
     email: string;
     password: string;
     passwordChange: boolean;
+    outbreakIds: string[];
     activeOutbreakId: string;
     languageId: string;
     roleIds: string[];
@@ -59,6 +60,7 @@ export class UserModel {
         this.email = _.get(data, 'email');
         this.password = _.get(data, 'password');
         this.passwordChange = _.get(data, 'passwordChange', false);
+        this.outbreakIds = _.get(data, 'outbreakIds', []);
         this.activeOutbreakId = _.get(data, 'activeOutbreakId');
         this.languageId = _.get(data, 'languageId');
         this.roleIds = _.get(data, 'roleIds', []);

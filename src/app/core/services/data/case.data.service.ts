@@ -6,6 +6,7 @@ import { CaseModel } from '../../models/case.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { GenericDataService } from './generic.data.service';
 import { ListFilterDataService } from './list-filter.data.service';
+import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 
 @Injectable()
 export class CaseDataService {
@@ -15,8 +16,7 @@ export class CaseDataService {
         private modelHelper: ModelHelperService,
         private genericDataService: GenericDataService,
         private listFilterDataService: ListFilterDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Cases for an Outbreak
@@ -164,6 +164,32 @@ export class CaseDataService {
         const filter = filterQueryBuilder.buildQuery();
         // call endpoint
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
+    }
+
+    /**
+     * Cases count stratified by classification over time
+     * @param {string} outbreakId
+     * @param {string} periodType
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesCountStratified[]>}
+     */
+    getCasesStratifiedByClassificationOverTime(outbreakId: string, periodType: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesCountStratified[]> {
+        queryBuilder.filter.where({periodType: periodType});
+        const filter = queryBuilder.filter.generateFirstCondition(true, true);
+
+        const obs = this.http.get(`outbreaks/${outbreakId}/contacts/classification-over-time/count?filter=${filter}`);
+
+        return obs.map(
+            (listResult) => {
+                const results = [];
+                Object.keys(listResult).forEach((key) => {
+                    // const metricResult = new MetricCasesCountStratified(listResult[key]);
+                    const metricResult = listResult[key];
+                    results.push(metricResult);
+                });
+                return results;
+            }
+        );
     }
 
     /**

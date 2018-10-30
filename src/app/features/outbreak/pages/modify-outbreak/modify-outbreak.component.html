@@ -82,7 +82,9 @@
                                 [(ngModel)]="outbreak.caseIdMask"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
-                                [disabled]="viewOnly">
+                                [disabled]="viewOnly"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
+                                required="true">
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>
