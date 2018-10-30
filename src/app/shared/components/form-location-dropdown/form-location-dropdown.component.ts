@@ -13,6 +13,7 @@ import 'rxjs/add/operator/debounceTime';
 import { Subscription } from 'rxjs/Subscription';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 
 class LocationAutoItem {
     constructor(
@@ -46,6 +47,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     @Input() loadingText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_LOADING_TEXT';
     @Input() typeToSearchText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_TYPE_TO_SEARCH_TEXT';
     @Input() notFoundText: string = 'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_NO_ITEMS_FOUND_TEXT';
+    @Input() locationsForOutbrakId: string;
+    @Input() useOutbreakLocations: boolean = false;
 
     @Output() itemChanged = new EventEmitter<LocationAutoItem | undefined | LocationAutoItem[]>();
     @Output() locationsLoaded = new EventEmitter<LocationAutoItem[]>();
@@ -67,6 +70,9 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     locationLoading: boolean = false;
     locationInput$: Subject<string> = new Subject<string>();
 
+    // selected Outbreak id
+    outbreakId: string;
+
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
     previousSubscription: Subscription;
@@ -79,7 +85,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super(controlContainer, validators, asyncValidators);
 
@@ -93,36 +100,18 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * Initialize component elements
      */
     ngOnInit() {
+        if (this.useOutbreakLocations) {
+            // get selected outbreak
+            this.outbreakDataService
+                .getSelectedOutbreak()
+                .subscribe((outbreak) => {
+                    if (outbreak && outbreak.id) {
+                        this.outbreakId = outbreak.id;
 
-        // if this.value is set, then retrieve the corresponding location names for the ids
-        // TODO investigate a solution for not specifying the timeout value.
-        setTimeout(() => {
-            if (this.value) {
-                if (Array.isArray(this.value)) {
-                    // multi select
-                    this.queryBuilder.filter
-                        .remove('parentLocationId')
-                        .remove('id')
-                        .where({
-                            id: {
-                                'inq': this.value
-                            }
-                        }, true);
-                } else {
-                    // single select
-                    this.queryBuilder.filter
-                        .remove('parentLocationId')
-                        .remove('id')
-                        .where({
-                            id: {
-                                'eq': this.value
-                            }
-                        }, true);
-                }
-
-                this.refreshLocationList();
-            }
-        }, 400);
+                        this.refreshLocationList();
+                    }
+                });
+        }
 
         // handle server side search
         this.locationInput$
@@ -156,6 +145,31 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * Add location condition
      */
     addLocationCondition() {
+        // construct the value filter
+        let whereFilter;
+        if (!this.value) {
+            // empty value; selecting only top-level locations
+            whereFilter = {
+                parentLocationId: {
+                    eq: null
+                }
+            };
+        } else if (this.multiple) {
+            // multi select
+            whereFilter = {
+                id: {
+                    inq: this.value
+                }
+            };
+        } else {
+            // single select
+            whereFilter = {
+                id: {
+                    eq: this.value
+                }
+            };
+        }
+
         this.queryBuilder.filter
             .remove('parentLocationId')
             .remove('id')
@@ -166,11 +180,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     synonyms: true
                 }]
             })
-            .where({
-                [this.value ? 'id' : 'parentLocationId']: {
-                    eq: this.value ? this.value : null
-                }}
-            ).flag(
+            .where(whereFilter)
+            .flag(
                 'includeChildren',
             this.value ? true : false
             );
@@ -180,9 +191,12 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * Refresh Location List
      */
     refreshLocationList() {
+        const locationsList$ = (this.useOutbreakLocations && this.outbreakId) ?
+            this.outbreakDataService.getOutbreakLocationsHierarchicalList(this.outbreakId, this.queryBuilder) :
+            this.locationDataService.getLocationsHierarchicalList(this.queryBuilder);
+
         // retrieve hierarchic location list
-        const request = this.locationDataService
-            .getLocationsHierarchicalList(this.queryBuilder)
+        const request = locationsList$
             .catch((err) => {
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
@@ -207,7 +221,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                         currentItem.location.parentLocationId ?
                             levels[currentItem.location.parentLocationId] + 1 :
                             0,
-                        !currentItem.location.active,
+                        !currentItem.location.active || currentItem.location.disabled,
                         currentItem.location.geoLocation
                     );
 
