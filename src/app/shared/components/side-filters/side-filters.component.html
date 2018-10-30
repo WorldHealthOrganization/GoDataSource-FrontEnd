@@ -129,6 +129,7 @@
                                     [ngModel]="filter.value"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
                                     [multiple]="true"
+                                    [useOutbreakLocations]="true"
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
 
@@ -146,6 +147,7 @@
                                         [ngModel]="filter.value"
                                         [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
                                         [multiple]="false"
+                                        [useOutbreakLocations]="true"
                                         (changed)="filter.value = $event;"
                                         (itemChanged)="filter.extraValues.location = $event;">
                                     </app-form-location-dropdown>

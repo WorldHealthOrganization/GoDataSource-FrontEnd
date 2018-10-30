@@ -28,6 +28,7 @@
             [ngModel]="locationIds"
             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate"
             [multiple]="true"
+            [useOutbreakLocations]="true"
             (changed)="onLocationChange($event)">
         </app-form-location-dropdown>
     </div>

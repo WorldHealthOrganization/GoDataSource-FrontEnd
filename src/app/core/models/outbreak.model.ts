@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
 import * as moment from 'moment';
+import { LocationModel } from './location.model';
 
 export class OutbreakModel {
     id: string;
@@ -27,6 +28,8 @@ export class OutbreakModel {
     countries: {
         id: string
     }[];
+    locationIds: string[];
+    locations: LocationModel[] = [];
     longPeriodsBetweenCaseOnset: number;
 
     constructor(data = null) {
@@ -38,6 +41,7 @@ export class OutbreakModel {
         this.startDate = _.get(data, 'startDate');
         this.endDate = _.get(data, 'endDate');
         this.countries = _.get(data, 'countries', []);
+        this.locationIds = _.get(data, 'locationIds', []);
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
         this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
         this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');

@@ -7,6 +7,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { ChronologyItem } from '../../../../shared/components/chronology/chronology.component';
+import 'rxjs/add/observable/forkJoin';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-view-chronology-case',
@@ -20,13 +23,14 @@ export class ViewChronologyCaseComponent implements OnInit {
     ];
 
     caseData: CaseModel = new CaseModel();
-    chronologyEntries: any[] = [];
+    chronologyEntries: ChronologyItem[] = [];
 
     constructor(
         protected route: ActivatedRoute,
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private labResultDataService: LabResultDataService
+        private labResultDataService: LabResultDataService,
+        private i18nService: I18nService
     ) {}
 
     ngOnInit() {
@@ -54,66 +58,143 @@ export class ViewChronologyCaseComponent implements OnInit {
                             );
 
                             // create entries array.
+                            const chronologyEntries: ChronologyItem[] = [];
+
                             // date of onset
                             if (!_.isEmpty(this.caseData.dateOfOnset)) {
-                                this.chronologyEntries.push({date: this.caseData.dateOfOnset, label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.caseData.dateOfOnset,
+                                    label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
+                                }));
                             }
+
                             // date of infection
                             if (!_.isEmpty(this.caseData.dateOfInfection)) {
-                                this.chronologyEntries.push({date: this.caseData.dateOfInfection, label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.caseData.dateOfInfection,
+                                    label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION'
+                                }));
                             }
+
                             // date of outcome
                             if (!_.isEmpty(this.caseData.dateOfOutcome)) {
-                                this.chronologyEntries.push({date: this.caseData.dateOfOutcome, label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.caseData.dateOfOutcome,
+                                    label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME'
+                                }));
                             }
+
                             // date deceased
                             if (!_.isEmpty(this.caseData.dateDeceased)) {
-                                this.chronologyEntries.push({date: this.caseData.dateDeceased, label: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.caseData.dateDeceased,
+                                    label: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED'
+                                }));
                             }
+
                             // date contact become case
                             if (!_.isEmpty(this.caseData.dateBecomeCase)) {
-                                this.chronologyEntries.push({date: this.caseData.dateBecomeCase, label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'});
+                                chronologyEntries.push(new ChronologyItem({
+                                    date: this.caseData.dateBecomeCase,
+                                    label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE'
+                                }));
                             }
+
                             // hospitalization dates
-                            _.forEach(this.caseData.hospitalizationDates, (hospitalization, key) => {
+                            _.forEach(this.caseData.hospitalizationDates, (hospitalization) => {
                                 if (!_.isEmpty(hospitalization.startDate)) {
-                                    this.chronologyEntries.push({date: hospitalization.startDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: hospitalization.startDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE'
+                                    }));
                                 }
                                 if (!_.isEmpty(hospitalization.endDate)) {
-                                    this.chronologyEntries.push({date: hospitalization.endDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: hospitalization.endDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE'
+                                    }));
                                 }
                             });
+
                             // incubation dates
-                            _.forEach(this.caseData.incubationDates, (incubation, key) => {
+                            _.forEach(this.caseData.incubationDates, (incubation) => {
                                 if (!_.isEmpty(incubation.startDate)) {
-                                    this.chronologyEntries.push({date: incubation.startDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: incubation.startDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE'
+                                    }));
                                 }
                                 if (!_.isEmpty(incubation.endDate)) {
-                                    this.chronologyEntries.push({date: incubation.endDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_END_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: incubation.endDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_END_DATE'
+                                    }));
                                 }
                             });
+
                             // isolation dates
-                            _.forEach(this.caseData.isolationDates, (isolation, key) => {
+                            _.forEach(this.caseData.isolationDates, (isolation) => {
                                 if (!_.isEmpty(isolation.startDate)) {
-                                    this.chronologyEntries.push({date: isolation.startDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: isolation.startDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE'
+                                    }));
                                 }
                                 if (!_.isEmpty(isolation.endDate)) {
-                                    this.chronologyEntries.push({date: isolation.endDate, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE'});
+                                    chronologyEntries.push(new ChronologyItem({
+                                        date: isolation.endDate,
+                                        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE'
+                                    }));
                                 }
                             });
+
+                            // classification dates
+                            if (!_.isEmpty(this.caseData.classificationHistory)) {
+                                _.forEach(
+                                    this.caseData.classificationHistory, (
+                                        classificationHistory: {
+                                            classification: string,
+                                            startDate: string,
+                                            endDate: string
+                                        }
+                                    ) => {
+                                        const translateData = {
+                                            classification: this.i18nService.instant(classificationHistory.classification)
+                                        };
+                                        if (!_.isEmpty(classificationHistory.startDate)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: classificationHistory.startDate,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_START_DATE',
+                                                translateData: translateData
+                                            }));
+                                        }
+                                        if (!_.isEmpty(classificationHistory.endDate)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: classificationHistory.endDate,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_END_DATE',
+                                                translateData: translateData
+                                            }));
+                                        }
+                                    });
+                            }
+
                             // lab sample taken and lab result dates
-                            this.labResultDataService.getCaseLabResults(selectedOutbreak.id, this.caseData.id).subscribe((labResults) => {
-                                // isolation dates
-                                _.forEach(labResults, (labResult, key) => {
-                                    if (!_.isEmpty(labResult.dateOfResult)) {
-                                        this.chronologyEntries.push({date: labResult.dateOfResult, label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE'});
-                                    }
+                            this.labResultDataService
+                                .getCaseLabResults(selectedOutbreak.id, this.caseData.id)
+                                .subscribe((labResults) => {
+                                    // isolation dates
+                                    _.forEach(labResults, (labResult) => {
+                                        if (!_.isEmpty(labResult.dateOfResult)) {
+                                            chronologyEntries.push(new ChronologyItem({
+                                                date: labResult.dateOfResult,
+                                                label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE'
+                                            }));
+                                        }
+                                    });
+
+                                    // set data
+                                    this.chronologyEntries = chronologyEntries;
                                 });
-                                // sort collection asc
-                                this.chronologyEntries = _.sortBy(this.chronologyEntries, 'date');
-                            });
-                            // sort collection asc
-                            this.chronologyEntries = _.sortBy(this.chronologyEntries, 'date');
                         });
                 });
         });

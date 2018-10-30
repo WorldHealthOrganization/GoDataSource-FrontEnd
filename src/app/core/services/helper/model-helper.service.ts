@@ -7,6 +7,7 @@ import { PermissionModel } from '../../models/permission.model';
 import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
 import { LocationModel } from '../../models/location.model';
+import { OutbreakModel } from '../../models/outbreak.model';
 
 @Injectable()
 export class ModelHelperService {
@@ -116,6 +117,18 @@ export class ModelHelperService {
                 );
 
                 return team;
+
+            case OutbreakModel:
+                // create the Outbreak instance
+                const outbreak = new OutbreakModel(data);
+
+                // set locations
+                outbreak.locations = this.mapListToModel(
+                    _.get(data, 'locations', []),
+                    LocationModel
+                );
+
+                return outbreak;
 
             default:
                 return new modelClass(data);
