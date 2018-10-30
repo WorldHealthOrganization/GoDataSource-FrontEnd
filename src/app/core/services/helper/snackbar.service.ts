@@ -31,7 +31,9 @@ export class SnackbarService {
                     data: {
                         message: message
                     },
-                    duration: duration
+                    duration: duration,
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
                 });
             });
     }
@@ -52,7 +54,9 @@ export class SnackbarService {
                     data: {
                         message: message
                     },
-                    duration: duration
+                    duration: duration,
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
                 });
             });
     }
@@ -73,8 +77,8 @@ export class SnackbarService {
                     data: {
                         message: message
                     },
-                    verticalPosition: 'top',
-                    horizontalPosition: 'start'
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
                 });
             });
     }
