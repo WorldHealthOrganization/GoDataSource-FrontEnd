@@ -155,7 +155,7 @@
                             name="lastNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextFieldWithLikeOperator('lastName', $event)"
+                            (optionChanged)="filterByTextField('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -178,7 +178,7 @@
                             name="firstNameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextFieldWithLikeOperator('firstName', $event)"
+                            (optionChanged)="filterByTextField('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>

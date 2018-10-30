@@ -275,24 +275,6 @@ export abstract class ListComponent {
      * @param {string} property
      * @param {string} value
      */
-    filterByTextFieldWithLikeOperator(
-        property: string,
-        value: string
-    ) {
-        this.queryBuilder.filter.byTextWithLikeOperator(
-            property as string,
-            value
-        );
-
-        // refresh list
-        this.needsRefreshList();
-    }
-
-    /**
-     * Filter the list by a text field
-     * @param {string} property
-     * @param {string} value
-     */
     filterByTextContainingField(
         property: string,
         value: string

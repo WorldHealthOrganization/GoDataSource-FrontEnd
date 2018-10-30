@@ -71,8 +71,7 @@
                                 <!-- TEXT Filter -->
                                 <app-form-input
                                     *ngIf="
-                                        filter.filter?.type === FilterType.TEXT ||
-                                        filter.filter?.type === FilterType.TEXT_LIKE || (
+                                        filter.filter?.type === FilterType.TEXT || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
                                         )"

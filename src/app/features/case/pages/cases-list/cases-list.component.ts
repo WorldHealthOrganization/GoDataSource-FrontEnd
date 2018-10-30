@@ -231,19 +231,19 @@ export class CasesListComponent extends ListComponent implements OnInit {
             new FilterModel({
                 fieldName: 'firstName',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-                type: FilterType.TEXT_LIKE,
+                type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'middleName',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-                type: FilterType.TEXT_LIKE,
+                type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'lastName',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-                type: FilterType.TEXT_LIKE,
+                type: FilterType.TEXT,
                 sortable: true
             }),
             new FilterModel({

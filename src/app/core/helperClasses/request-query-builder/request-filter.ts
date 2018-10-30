@@ -65,7 +65,11 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                    regexp: '/^' +
+                        RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.') +
+                        '/i'
                 }
             }, replace);
         }
@@ -91,7 +95,11 @@ export class RequestFilter {
         const condition = {
             [operator]: _.map(properties, (prop) => ({
                 [prop]: {
-                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                    regexp: '/^' +
+                        RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.') +
+                        '/i'
                 }
             }))
         };
@@ -102,37 +110,6 @@ export class RequestFilter {
         } else {
             // filter with 'startsWith' criteria
             this.where(condition, replace);
-        }
-
-        return this;
-    }
-
-    /**
-     * Filter by a text field with Like operator
-     * @param {string} property
-     * @param {string} value Replaces ? & % with regex . & .*
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
-    byTextWithLikeOperator(
-        property: string,
-        value: string,
-        replace: boolean = true
-    ) {
-        // do we need to remove condition ?
-        if (_.isEmpty(value)) {
-            this.remove(property);
-        } else {
-            // filter with 'startsWith' criteria
-            this.where({
-                [property]: {
-                    regexp: '/^' +
-                        RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.') +
-                        '/i'
-                }
-            }, replace);
         }
 
         return this;
@@ -157,32 +134,6 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    regexp: '/' + RequestFilter.escapeStringForRegex(value) + '/i'
-                }
-            }, replace);
-        }
-        return this;
-    }
-
-    /**
-     * Filter by a text field ( allows ? & % from like to be used )
-     * @param {string} property
-     * @param {string} value Replaces ? & % with regex . & .*
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
-    byContainingTextWithLike(
-        property: string,
-        value: string,
-        replace: boolean = true
-    ) {
-        // do we need to remove condition ?
-        if (_.isEmpty(value)) {
-            this.remove(property);
-        } else {
-            // filter with 'startsWith' criteria
-            this.where({
-                [property]: {
                     regexp: '/' +
                         RequestFilter.escapeStringForRegex(value)
                             .replace(/%/g, '.*')
@@ -191,7 +142,6 @@ export class RequestFilter {
                 }
             }, replace);
         }
-
         return this;
     }
 
@@ -226,47 +176,22 @@ export class RequestFilter {
                 if (caseInsensitive) {
                     this.where({
                         [property]: {
-                            regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '$/i'
+                            regexp: '/^' +
+                                RequestFilter.escapeStringForRegex(value)
+                                    .replace(/%/g, '.*')
+                                    .replace(/\\\?/g, '.') +
+                                '$/i'
                         }
                     }, replace);
                 } else {
                     // case sensitive search
+                    // we don't use "regex" ( ? and % ) special characters in this case
+                    // !!! changing this to regex breaks a few things !!!
                     this.where({
                         [property]: value
                     }, replace);
                 }
             }
-        }
-
-        return this;
-    }
-
-    /**
-     * Filter by comparing a field if it is equal to the provided value ( allows ? & % from like to be used )
-     * @param {string} property
-     * @param {string} value Replaces ? & % with regex . & .*
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
-    byEqualityWithLike(
-        property: string,
-        value: string,
-        replace: boolean = true
-    ) {
-        // do we need to remove condition ?
-        if (_.isEmpty(value)) {
-            this.remove(property);
-        } else {
-            // filter with 'startsWith' criteria
-            this.where({
-                [property]: {
-                    regexp: '/^' +
-                        RequestFilter.escapeStringForRegex(value)
-                            .replace(/%/g, '.*')
-                            .replace(/\\\?/g, '.') +
-                        '$/i'
-                }
-            }, replace);
         }
 
         return this;
