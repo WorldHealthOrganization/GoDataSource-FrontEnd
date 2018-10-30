@@ -60,6 +60,20 @@
 
                         <app-form-select
                             *ngIf="hasOutbreakReadAccess()"
+                            name="outbreakIds"
+                            [(ngModel)]="user.outbreakIds"
+                            [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
+                            tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
+                            optionLabelKey="name"
+                            optionValueKey="id"
+                            optionTooltipKey="description"
+                            [options]="outbreaksList$ | async"
+                            [multiple]="true"
+                            [disabled]="viewOnly">
+                        </app-form-select>
+
+                        <app-form-select
+                            *ngIf="hasOutbreakReadAccess()"
                             name="activeOutbreakId"
                             [(ngModel)]="user.activeOutbreakId"
                             [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"

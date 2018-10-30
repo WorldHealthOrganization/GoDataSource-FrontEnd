@@ -66,6 +66,21 @@
                         [disabled]="true">
                     </app-form-address>
                 </mat-card>
+
+                <div class="section-title">{{ 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ASSIGN' | translate }}</div>
+                <mat-card class="page-section">
+                    <app-form-select
+                        name="teamId"
+                        [ngModel]="followUpData.teamId"
+                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
+                        [options]="teamsList$ | async"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        [disabled]="viewOnly">
+                    </app-form-select>
+                </mat-card>
+
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">

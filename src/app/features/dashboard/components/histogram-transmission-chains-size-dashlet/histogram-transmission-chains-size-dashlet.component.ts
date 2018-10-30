@@ -2,7 +2,11 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
+import { Router } from '@angular/router';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -16,17 +20,32 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     chainsSize: any;
     histogramResults: any = [];
     selectedSizeOfChains = 0;
+    caseRefDataColor: string = '';
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private outbreakDataService: OutbreakDataService,
+        private router: Router
     ) {}
 
     ngOnInit() {
-        this.outbreakDataService.getSelectedOutbreak()
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
+
+                    // get case person type color
+                    this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
+                        .subscribe((personTypes) => {
+                            const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+                            if (casePersonType) {
+                                this.caseRefDataColor = casePersonType.colorCode;
+                            }
+                        });
+
                     // get chain data and convert to array of size and number
                     this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id).subscribe((chains) => {
                         this.setHistogramResults(chains);
@@ -43,10 +62,10 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
         this.chainsSize = {};
         this.histogramResults = [];
         _.forEach(chains, (value, key) => {
-            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.noCases]) {
-                this.chainsSize[value.noCases]++;
+            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.size]) {
+                this.chainsSize[value.size]++;
             } else {
-                this.chainsSize[value.noCases] = 1;
+                this.chainsSize[value.size] = 1;
             }
         });
         _.forEach(this.chainsSize, (value, key) => {
@@ -69,11 +88,12 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
 
     /**
      * Handle click on a bar in the chart
+     * Redirect to chains graph
      * @param event
      */
     onSelectChart(event) {
         this.selectedSizeOfChains = event.name;
-        // TODO open chains of transmission filtered by the size of the chains
+        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: this.selectedSizeOfChains } });
     }
 
 }

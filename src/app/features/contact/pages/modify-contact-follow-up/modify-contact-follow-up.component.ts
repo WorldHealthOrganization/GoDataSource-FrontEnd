@@ -14,6 +14,9 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { Moment } from 'moment';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
@@ -30,6 +33,8 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
     ];
+
+    teamsList$: Observable<TeamModel[]>;
 
     followUpData: FollowUpModel = new FollowUpModel();
 
@@ -51,12 +56,15 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
         private formHelper: FormHelperService,
         private followUpsDataService: FollowUpsDataService,
         private authDataService: AuthDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private teamDataService: TeamDataService
     ) {
         super(route);
     }
 
     ngOnInit() {
+        this.teamsList$ = this.teamDataService.getTeamsList();
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 

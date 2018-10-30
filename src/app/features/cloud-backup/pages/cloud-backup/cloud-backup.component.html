@@ -1,0 +1,34 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content mat-card">
+
+    <ng-container *ngIf="cloudBackup">
+        <p class="column-header">{{ 'LNG_PAGE_CLOUD_BACKUP_HEADER_TITLE' | translate}}</p>
+
+        <div class="paths-container">
+            <p>{{'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' | translate}} </p>
+            <div class="value-wrapper">
+                <p class="cloud-backup-value">{{ cloudBackup.install }}</p>
+                <button (click)="copyToClipBoard(cloudBackup.install)" class="mat-raised-button">
+                    {{'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD' | translate}}
+                </button>
+            </div>
+        </div>
+
+        <div class="paths-container">
+            <p>{{'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' | translate}} </p>
+            <div class="value-wrapper">
+                <p class="cloud-backup-value">{{ cloudBackup.backUp }}</p>
+                <button (click)="copyToClipBoard(cloudBackup.backUp)" class="mat-raised-button">
+                    {{'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD' | translate}}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+
+
+</mat-card>

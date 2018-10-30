@@ -24,6 +24,7 @@ import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-modify-case',
@@ -53,7 +54,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
     serverToday: Moment = null;
 
-    parentOnsetDates: Moment[] = [];
+    parentOnsetDates: [Moment, string][] = [];
 
     queryParams: {
         onset: boolean,
@@ -246,7 +247,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // convert unique object of dates to array
                     this.parentOnsetDates = _.map(Object.keys(uniqueDates), (date: string) => {
-                        return moment(date);
+                        return [
+                            moment(date),
+                            this.i18nService.instant(
+                                'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET', {
+                                    date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                                }
+                            )
+                        ];
                     });
 
                     // set visual ID translate data
@@ -324,11 +332,10 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
     /**
      * Used for validating date onset
      */
-    dateOnsetSameOrBeforeDates(): any[] {
+    dateOnsetSameOrAfterDates(): any[] {
         return [
             ...this.parentOnsetDates,
-            this.serverToday,
-            [this.caseData.dateDeceased, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_DECEASED')]
+            [this.caseData.dateOfInfection, this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION')]
         ];
     }
 }

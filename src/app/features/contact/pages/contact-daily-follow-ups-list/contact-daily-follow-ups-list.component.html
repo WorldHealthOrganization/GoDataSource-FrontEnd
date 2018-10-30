@@ -207,6 +207,21 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Team -->
+        <ng-container matColumnDef="team">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate }}</div>
+                    <div class="column-filter">
+                        <!-- placeholder -->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ teamsListMap[item.teamId] ? teamsListMap[item.teamId].name : '' }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Status -->
         <ng-container matColumnDef="statusId">
             <mat-header-cell *matHeaderCellDef>

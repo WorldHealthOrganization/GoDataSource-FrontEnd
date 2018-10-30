@@ -298,7 +298,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         const columns = [
-            'checkbox', 'firstName', 'lastName', 'age', 'gender', 'riskLevel', 'classification',
+            'checkbox', 'lastName', 'firstName', 'age', 'gender', 'riskLevel', 'classification',
             'place', 'address'
         ];
 
