@@ -19,6 +19,7 @@ import { HistogramTransmissionChainsSizeDashletComponent } from './histogram-tra
 import { EpiCurveDashletComponent } from './epi-curve-dashlet/epi-curve-dashlet.component';
 import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary-dashlet.component';
 import { CasesHospitalizedPieChartDashletComponent } from './cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
+import { CasesByGeographicLocationDashletComponent } from './case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -41,6 +42,7 @@ export const components: any[] = [
     HistogramTransmissionChainsSizeDashletComponent,
     EpiCurveDashletComponent,
     CaseSummaryDashletComponent,
-    CasesHospitalizedPieChartDashletComponent
+    CasesHospitalizedPieChartDashletComponent,
+    CasesByGeographicLocationDashletComponent
 ];
 
