@@ -10,6 +10,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL': 'Change Password',
         'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL': 'Admin',
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
+        'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
@@ -420,12 +421,12 @@ export const EnglishUsLang = {
         /**
          * Movement Case page
          */
-        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case "{{name}}" movement',
+        'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE': 'Case movement',
 
         /**
          * Chronology Case page
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE': 'Case chronology',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_START_DATE': 'Hospitalisation Start Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_HOSPITALISATION_END_DATE': 'Hospitalisation End Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_INCUBATION_START_DATE': 'Incubation Start Date',
@@ -433,7 +434,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_START_DATE': 'Isolation Start Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_ISOLATION_END_DATE': 'Isolation End Date',
         'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE': 'Lab Result Date',
-
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_START_DATE': 'Classification "{{classification}}" Start Date',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_CLASSIFICATION_HISTORY_END_DATE': 'Classification "{{classification}}" End Date',
 
         /**
          * Case lab results fields
@@ -778,6 +780,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
+        'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT': 'Date Become Contact',
         'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP': 'Relationship',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS': 'Persons',
@@ -842,12 +845,12 @@ export const EnglishUsLang = {
         /**
          * Movement Contact page
          */
-        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact "{{name}}" movement',
+        'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact movement',
 
         /**
          * Chronology Contact page
          */
-        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact "{{name}}" chronology',
+        'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact chronology',
 
 
         /**
@@ -1236,6 +1239,8 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_FIELD_LABEL_DISEASE_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES': 'Countries',
         'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS': 'Locations',
+        'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE': 'Start Date',
         'LNG_OUTBREAK_FIELD_LABEL_START_DATE_DESCRIPTION': 'For info only',
         'LNG_OUTBREAK_FIELD_LABEL_END_DATE': 'End Date',
@@ -1572,6 +1577,58 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
+
+        /**
+         * Audit Logs fields
+         */
+        'LNG_AUDIT_LOG_FIELD_LABEL_ACTION': 'Action',
+        'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID': 'Record ID',
+        'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME': 'Record Name',
+        'LNG_AUDIT_LOG_FIELD_LABEL_CREATED_AT': 'Time',
+        'LNG_AUDIT_LOG_FIELD_LABEL_USER': 'User',
+        'LNG_AUDIT_LOG_FIELD_LABEL_USER_ROLES': 'User roles',
+        'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS': 'IP Address',
+        'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA': 'Changes',
+
+        /**
+         * Audit Logs List page
+         */
+        'LNG_PAGE_LIST_AUDIT_LOGS_TITLE': 'Audit Logs',
+        'LNG_PAGE_LIST_AUDIT_LOGS_EXPAND_CHANGED_DATA_BUTTON': 'Expand',
+        'LNG_PAGE_LIST_AUDIT_LOGS_COLLAPSE_CHANGED_DATA_BUTTON': 'Collapse',
+        'LNG_PAGE_LIST_AUDIT_LOGS_ELLIPSIS_LABEL': '...',
+
+        /**
+         * Modules
+         */
+        'LNG_MODULE_LABEL_USER': 'User',
+        'LNG_MODULE_LABEL_ROLE': 'Role',
+        'LNG_MODULE_LABEL_LOCATION': 'Location',
+        'LNG_MODULE_LABEL_TEAM': 'Team',
+        'LNG_MODULE_LABEL_AUDIT_LOG': 'Audit Log',
+        'LNG_MODULE_LABEL_SYSTEM_SETTINGS': 'System Settings',
+        'LNG_MODULE_LABEL_SYNC_LOG': 'Sync Log',
+        'LNG_MODULE_LABEL_DATABASE_ACTION_LOG': 'Database action log',
+        'LNG_MODULE_LABEL_DATABASE_EXPORT_LOG': 'Database export log',
+        'LNG_MODULE_LABEL_TEMPLATE': 'Template',
+        'LNG_MODULE_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_MODULE_LABEL_CASE': 'Case',
+        'LNG_MODULE_LABEL_CONTACT': 'Contact',
+        'LNG_MODULE_LABEL_REFERENCE_DATA': 'Reference data',
+        'LNG_MODULE_LABEL_FOLLOW_UP': 'Follow-up',
+        'LNG_MODULE_LABEL_CLUSTER': 'Cluster',
+        'LNG_MODULE_LABEL_HELP_CATEGORY': 'Help category',
+        'LNG_MODULE_LABEL_LAB_RESULT': 'Lab result',
+        'LNG_MODULE_LABEL_HELP_ITEM': 'Help item',
+        'LNG_MODULE_LABEL_RELATIONSHIP': 'Relationship',
+        'LNG_MODULE_LABEL_ACCESS_TOKEN': 'Access token',
+        'LNG_MODULE_LABEL_PERSON': 'Person',
+        'LNG_MODULE_LABEL_LANGUAGE': 'Language',
+        'LNG_MODULE_LABEL_LANGUAGE_TOKEN': 'Language Token',
+        'LNG_MODULE_LABEL_EVENT': 'Event',
+        'LNG_MODULE_LABEL_ICON': 'Icon',
+        'LNG_MODULE_LABEL_BACKUP': 'Backup',
+        'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
 
         /**
          * List Filters page titles

@@ -65,7 +65,11 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                    regexp: '/^' +
+                        RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.') +
+                        '/i'
                 }
             }, replace);
         }
@@ -91,7 +95,11 @@ export class RequestFilter {
         const condition = {
             [operator]: _.map(properties, (prop) => ({
                 [prop]: {
-                    regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '/i'
+                    regexp: '/^' +
+                        RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.') +
+                        '/i'
                 }
             }))
         };
@@ -126,7 +134,11 @@ export class RequestFilter {
             // filter with 'startsWith' criteria
             this.where({
                 [property]: {
-                    regexp: '/' + RequestFilter.escapeStringForRegex(value) + '/i'
+                    regexp: '/' +
+                        RequestFilter.escapeStringForRegex(value)
+                            .replace(/%/g, '.*')
+                            .replace(/\\\?/g, '.') +
+                        '/i'
                 }
             }, replace);
         }
@@ -164,11 +176,17 @@ export class RequestFilter {
                 if (caseInsensitive) {
                     this.where({
                         [property]: {
-                            regexp: '/^' + RequestFilter.escapeStringForRegex(value) + '$/i'
+                            regexp: '/^' +
+                                RequestFilter.escapeStringForRegex(value)
+                                    .replace(/%/g, '.*')
+                                    .replace(/\\\?/g, '.') +
+                                '$/i'
                         }
                     }, replace);
                 } else {
                     // case sensitive search
+                    // we don't use "regex" ( ? and % ) special characters in this case
+                    // !!! changing this to regex breaks a few things !!!
                     this.where({
                         [property]: value
                     }, replace);

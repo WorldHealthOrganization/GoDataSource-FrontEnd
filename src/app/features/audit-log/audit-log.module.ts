@@ -1,13 +1,11 @@
 import { NgModule } from '@angular/core';
 
 // modules
-import { routing } from './outbreak.module.routing';
+import { routing } from './audit-log.module.routing';
 import { SharedModule } from '../../shared/shared.module';
+
 // components
 import * as fromPages from './pages';
-// services
-
-import * as fromServices from './services';
 
 @NgModule({
     imports: [
@@ -18,10 +16,7 @@ import * as fromServices from './services';
     declarations: [
         ...fromPages.pageComponents
     ],
-    providers: [
-        ...fromServices.services
-    ],
     entryComponents: []
 })
-export class OutbreakModule {
+export class AuditLogModule {
 }

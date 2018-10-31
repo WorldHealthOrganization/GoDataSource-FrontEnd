@@ -5,6 +5,7 @@ import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 
 export enum UserSettings {
+    AUDIT_LOG_FIELDS = 'auditLogFields',
     DASHBOARD = 'dashboard',
     CASE_FIELDS = 'caseFields',
     CASE_LAB_FIELDS = 'caseLabFields',
@@ -23,6 +24,7 @@ export enum UserSettings {
  * Custom handlers
  */
 abstract class UserSettingsHandlers {
+    static AUDIT_LOG_FIELDS = [];
     static DASHBOARD = UserSettingsDashboardModel;
     static CASE_FIELDS = [];
     static CASE_LAB_FIELDS = [];

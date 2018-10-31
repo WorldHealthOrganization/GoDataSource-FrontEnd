@@ -289,6 +289,11 @@
                             [dateSameOrBefore]="serverToday">
                         </app-form-datepicker>
 
+                        <div fxFlex><!-- placeholder --></div>
+                        <div fxFlex><!-- placeholder --></div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                         <app-form-slide-toggle
                             name="deceased"
                             [(ngModel)]="caseData.deceased"
@@ -302,7 +307,7 @@
                             [(ngModel)]="caseData.safeBurial"
                             [label]="'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL' | translate"
                             tooltip="LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION"
-                            [disabled]="viewOnly">
+                            [disabled]="!caseData.deceased || viewOnly">
                         </app-form-slide-toggle>
 
                         <div fxFlex>
@@ -322,6 +327,8 @@
                                     ]">
                             </app-form-datepicker>
                         </div>
+
+                        <div fxFlex><!-- placeholder --></div>
                     </div>
                 </mat-card>
 
