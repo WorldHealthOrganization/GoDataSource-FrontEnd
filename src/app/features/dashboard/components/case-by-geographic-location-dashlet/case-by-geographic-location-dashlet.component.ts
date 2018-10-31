@@ -60,6 +60,7 @@ export class CasesByGeographicLocationDashletComponent implements OnInit {
     buildChartData(casesList: CaseModel[]) {
         let caseSummaryResults: MetricChartDataModel[] = [];
         _.forEach(casesList, (casePerson, key) => {
+
             // ignore not a case classification
             if (casePerson.classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
                 const caseSummaryResult: MetricChartDataModel = _.find(caseSummaryResults, {name: casePerson.classification});
