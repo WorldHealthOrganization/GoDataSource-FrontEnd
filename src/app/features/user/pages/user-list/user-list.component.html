@@ -71,7 +71,7 @@
 
         <!-- Email -->
         <ng-container matColumnDef="email">
-            <mat-header-cell *matHeaderCellDef fxFlex="30">
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_EMAIL' | translate}}</div>
                     <div class="column-filter">
@@ -86,14 +86,14 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="30">
+            <mat-cell *matCellDef="let item">
                 {{ item.email }}
             </mat-cell>
         </ng-container>
 
         <!-- Role -->
         <ng-container matColumnDef="role">
-            <mat-header-cell *matHeaderCellDef fxFlex="30">
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
                     <div class="column-filter">
@@ -113,7 +113,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="30">
+            <mat-cell *matCellDef="let item">
                 <mat-chip-list>
                     <mat-chip *ngFor="let role of item.roles" [matTooltip]="role.description">{{ role.name }}</mat-chip>
                 </mat-chip-list>

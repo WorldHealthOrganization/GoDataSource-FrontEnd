@@ -4,32 +4,38 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <app-export-button
-                    *ngIf="!appliedListFilter"
-                    [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
-                    [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
-                    [url]="exportOutbreaksUrl"
-                    [fileName]="outbreaksDataExporFileName"
-                    [allowedExportTypes]="allowedExportTypes"
-                    [displayEncrypt]="true"
-                    [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields"
-                    [queryBuilder]="queryBuilder">
-                </app-export-button>
-
-                <button
-                    *ngIf="!appliedListFilter"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
-                    {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
-                </button>
-
                 <button *ngIf="hasOutbreakWriteAccess()" class="button-primary" mat-raised-button color="primary"
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
+
+                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+
+                    <app-export-button
+                        *ngIf="!appliedListFilter"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
+                        [url]="exportOutbreaksUrl"
+                        [fileName]="outbreaksDataExporFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
+
+                    <button
+                        mat-menu-item
+                        *ngIf="!appliedListFilter"
+                        [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
+                        {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
+                    </button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>

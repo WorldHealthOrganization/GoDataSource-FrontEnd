@@ -11,6 +11,14 @@
         <div fxLayout="column">
 
             <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-input
+                    name="value"
+                    [ngModel]="entry.value"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
+                    required="true">
+                </app-form-input>
+
                 <app-form-slide-toggle
                     name="active"
                     [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
@@ -18,10 +26,8 @@
                     [ngModel]="entry.active">
                 </app-form-slide-toggle>
 
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <div
-                        fxFlex>
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                    <div>
                         {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
                         <span
                             *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
@@ -45,11 +51,11 @@
                         (click)="$event.target.select()"/>
                 </div>
 
-                <div fxFlex>
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
                     <!-- View Icon  -->
                     <div
                         *ngIf="!changeIcon"
-                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
 
                         <!-- Label -->
                         <div>
@@ -59,7 +65,7 @@
                         <!-- Image -->
                         <img
                             *ngIf="entry.iconId"
-                            [src]="entry.iconUrl" />
+                            [src]="entry.iconUrl"/>
                         <div
                             *ngIf="!entry.iconId">
                             {{ 'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_LABEL_NO_COLOR' | translate }}
@@ -89,20 +95,10 @@
                         optionLabelImgKey="url">
                     </app-form-select>
                 </div>
-
-                <div fxFlex><!-- placeholder --></div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-input fxFlex="30"
-                    name="value"
-                    [ngModel]="entry.value"
-                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
-                    required="true">
-                </app-form-input>
-
-                <app-form-textarea fxFlex
+            <div fxLayout="row">
+                <app-form-textarea
                     name="description"
                     [ngModel]="entry.description"
                     [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION' | translate"
@@ -116,8 +112,11 @@
     </mat-card>
 
     <div class="form-actions">
-        <button mat-raised-button color="primary" class="button-primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}</button>
-        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>{{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}</button>
+        <button mat-raised-button color="primary" class="button-primary">{{ 'LNG_COMMON_BUTTON_SAVE' | translate }}
+        </button>
+        <button type="button" [routerLink]="'/reference-data/' + categoryId" mat-raised-button>{{
+            'LNG_COMMON_BUTTON_CANCEL' | translate }}
+        </button>
     </div>
 
 </form>

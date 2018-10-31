@@ -1,17 +1,13 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
-
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { RouterHelperService } from '../../../../core/services/helper/router-helper.service';
-import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
@@ -21,8 +17,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
     templateUrl: './set-security-questions.component.html',
     styleUrls: ['./set-security-questions.component.less']
 })
-export class SetSecurityQuestionsComponent {
-
+export class SetSecurityQuestionsComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_SET_SECURITY_QUESTIONS_TITLE', '.', true)
     ];
@@ -30,23 +25,32 @@ export class SetSecurityQuestionsComponent {
     authUser: UserModel;
     securityQuestionsList$: Observable<SecurityQuestionModel[]>;
     answers: any = [];
-    alreadySet: boolean = true;
+
+    // flag to display the form for changing the security questions
     viewForm: boolean = false;
 
     constructor(
-        private routerHelper: RouterHelperService,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private modelHelperService: ModelHelperService,
-        private router: Router,
         private authDataService: AuthDataService
     ) {
+    }
+
+    ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.securityQuestionsList$ = this.userDataService.getSecurityQuestionsList().share();
-        if (_.isEmpty(this.authUser.securityQuestions[0].question) || _.isEmpty(this.authUser.securityQuestions[1].question)) {
-            this.alreadySet = false;
+
+        // check if user has security questions set
+        if (
+            _.isEmpty(this.authUser.securityQuestions[0].question) ||
+            _.isEmpty(this.authUser.securityQuestions[1].question)
+        ) {
+            // security questions are not set; show form
             this.viewForm = true;
+        } else {
+            // security questions are set; show details
+            this.viewForm = false;
         }
     }
 
@@ -67,7 +71,6 @@ export class SetSecurityQuestionsComponent {
                             this.authUser = authenticatedUser.user;
                             this.snackbarService.showSuccess('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
                             this.viewForm = false;
-                            this.alreadySet = true;
                         });
                 });
         }

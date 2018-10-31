@@ -4,33 +4,44 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasFollowUpsWriteAccess()" class="button-primary" mat-raised-button color="primary" (click)="generateFollowUps()">
-                        {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
-                    </button>
-                </ng-container>
+                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
 
-                <app-export-button
-                    *ngIf="printDailyFollowUpsUrl"
-                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
-                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
-                    [url]="printDailyFollowUpsUrl"
-                    [fileName]="followUpsPrintDailyFileName"
-                    [fileType]="printDailyFollowUpsFileType">
-                </app-export-button>
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="hasFollowUpsWriteAccess()"
+                            mat-menu-item
+                            (click)="generateFollowUps()">
+                            {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON' | translate }}
+                        </button>
+                    </ng-container>
 
-                <app-export-button
-                    *ngIf="exportFollowUpsUrl"
-                    [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
-                    [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
-                    [url]="exportFollowUpsUrl"
-                    [fileName]="followUpsDataExportFileName"
-                    [allowedExportTypes]="allowedExportTypes"
-                    [displayEncrypt]="true"
-                    [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields"
-                    [queryBuilder]="queryBuilder">
-                </app-export-button>
+                    <app-export-button
+                        *ngIf="printDailyFollowUpsUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
+                        [url]="printDailyFollowUpsUrl"
+                        [fileName]="followUpsPrintDailyFileName"
+                        [fileType]="printDailyFollowUpsFileType">
+                    </app-export-button>
+
+                    <app-export-button
+                        *ngIf="exportFollowUpsUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
+                        [url]="exportFollowUpsUrl"
+                        [fileName]="followUpsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>

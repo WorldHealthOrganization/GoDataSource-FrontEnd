@@ -11,6 +11,15 @@
         <div fxLayout="column">
 
             <div fxLayout="row" fxLayoutGap="20px">
+                <app-form-input
+                    name="value"
+                    [ngModel]="entry.value | translate"
+                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
+                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
+                    required="true"
+                    [disabled]="viewOnly || entry.readonly">
+                </app-form-input>
+
                 <app-form-slide-toggle
                     name="active"
                     [label]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE' | translate"
@@ -19,10 +28,8 @@
                     [disabled]="viewOnly || entry.readonly">
                 </app-form-slide-toggle>
 
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <div
-                        fxFlex>
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+                    <div>
                         {{ 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate }}
                         <span
                             *ngIf="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION' | translate"
@@ -59,11 +66,11 @@
                         (click)="$event.target.select()"/>
                 </div>
 
-                <div fxFlex>
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
                     <!-- View Icon  -->
                     <div
                         *ngIf="!changeIcon"
-                        fxFlex fxLayout="row" fxLayoutGap="20px">
+                        fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
 
                         <!-- Label -->
                         <div>
@@ -105,21 +112,9 @@
                         [disabled]="viewOnly">
                     </app-form-select>
                 </div>
-
-                <div fxFlex><!-- placeholder --></div>
             </div>
 
-            <div fxLayout="row" fxLayoutGap="20px">
-                <app-form-input
-                    fxFlex="30"
-                    name="value"
-                    [ngModel]="entry.value | translate"
-                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION"
-                    required="true"
-                    [disabled]="viewOnly || entry.readonly">
-                </app-form-input>
-
+            <div fxLayout="row">
                 <app-form-textarea
                     fxFlex
                     name="description"

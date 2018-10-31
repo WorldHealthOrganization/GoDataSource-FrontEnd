@@ -6,7 +6,7 @@ export class OutbreakTemplateModel {
     name: string;
     disease: string;
     periodOfFollowup: number;
-    frequencyOfFollowUp: number;
+    frequencyOfFollowUpPerDay: number;
     noDaysAmongContacts: number;
     noDaysInChains: number;
     noDaysNotSeen: number;
@@ -22,12 +22,12 @@ export class OutbreakTemplateModel {
         this.name = _.get(data, 'name');
         this.disease = _.get(data, 'disease');
         this.periodOfFollowup = _.get(data, 'periodOfFollowup');
-        this.frequencyOfFollowUp = _.get(data, 'frequencyOfFollowUp');
+        this.frequencyOfFollowUpPerDay = _.get(data, 'frequencyOfFollowUpPerDay');
         this.noDaysAmongContacts = _.get(data, 'noDaysAmongContacts');
         this.noDaysInChains = _.get(data, 'noDaysInChains');
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
-        this.noDaysNewContacts = _.get(data, 'noDaysNewContacts');
+        this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
         this.caseInvestigationTemplate = _.map(
             _.get(data, 'caseInvestigationTemplate', []),

@@ -4,31 +4,35 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button
-                    *ngIf="hasReferenceDataWriteAccess()"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/reference-data', 'manage-icons', 'list']">
-                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
-                <button
-                    *ngIf="hasReferenceDataWriteAccess()"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/import-export-data', 'reference-data', 'import']">
-                    {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
-                </button>
+                <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        *ngIf="hasReferenceDataWriteAccess()"
+                        mat-menu-item
+                        [routerLink]="['/reference-data', 'manage-icons', 'list']">
+                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                    </button>
 
-                <app-export-button
-                    [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
-                    [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
-                    url="reference-data/export"
-                    [fileName]="referenceDataExporFileName">
-                </app-export-button>
+                    <mat-divider></mat-divider>
 
+                    <button
+                        *ngIf="hasReferenceDataWriteAccess()"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'reference-data', 'import']">
+                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
+                    </button>
+
+                    <app-export-button
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
+                        url="reference-data/export"
+                        [fileName]="referenceDataExporFileName">
+                    </app-export-button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>

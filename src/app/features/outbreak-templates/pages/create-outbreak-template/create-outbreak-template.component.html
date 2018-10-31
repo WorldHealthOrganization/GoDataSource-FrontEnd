@@ -15,7 +15,6 @@
 
                 <mat-card class="page-section">
                     <div fxLayout="column">
-
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="name"
@@ -30,14 +29,17 @@
                                 [(ngModel)]="newOutbreakTemplate.disease"
                                 [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION"
-                                [options]="diseasesList$ | async"
-                                required="true">
+                                [options]="diseasesList$ | async">
                             </app-form-select>
 
                             <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
+                    </div>
+                </mat-card>
 
+                <mat-card class="page-section">
+                    <div fxLayout="column">
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="periodOfFollowup"
@@ -48,10 +50,10 @@
                                 type="number">
                             </app-form-input>
                             <app-form-input
-                                name="frequencyOfFollowUp"
-                                [(ngModel)]="newOutbreakTemplate.frequencyOfFollowUp"
-                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY' | translate"
-                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_DESCRIPTION"
+                                name="frequencyOfFollowUpPerDay"
+                                [(ngModel)]="newOutbreakTemplate.frequencyOfFollowUpPerDay"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION"
                                 required="true"
                                 type="number">
                             </app-form-input>
@@ -123,8 +125,7 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreakTemplate.caseInvestigationTemplate"
-                    [minItems]="1">
+                    [ngModel]="newOutbreakTemplate.caseInvestigationTemplate">
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
@@ -138,8 +139,7 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreakTemplate.contactFollowUpTemplate"
-                    [minItems]="1">
+                    [ngModel]="newOutbreakTemplate.contactFollowUpTemplate">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
@@ -153,8 +153,7 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="labResultsTemplate"
-                    [ngModel]="newOutbreakTemplate.labResultsTemplate"
-                    [minItems]="1">
+                    [ngModel]="newOutbreakTemplate.labResultsTemplate">
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>

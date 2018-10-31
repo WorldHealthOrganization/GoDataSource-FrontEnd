@@ -174,7 +174,8 @@ html, body, ul, li, div, span {
 
     // column on the right of forms
     .form-actions {
-        width: 165px;
+        // keep extra left-right margins of 10px
+        width: @page-right-margin + 20px;
         display: flex;
         flex-direction: column;
         padding: 15px 0;

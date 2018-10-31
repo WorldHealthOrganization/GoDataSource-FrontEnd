@@ -24,7 +24,7 @@ import { Constants } from '../../../../core/models/constants';
 })
 export class TransmissionChainsGeoMapComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', '/transmission-chains'),
+        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE', '', true)
     ];
 
