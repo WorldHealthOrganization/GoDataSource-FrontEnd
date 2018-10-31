@@ -10,7 +10,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -18,13 +17,9 @@ import { EventModel } from '../../../../core/models/event.model';
 import 'rxjs/add/operator/filter';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
-import { GroupBase } from '../../../../shared/xt-forms/core';
-import { v4 as uuid } from 'uuid';
 
 @Component({
     selector: 'app-create-entity-relationship-bulk',
@@ -58,14 +53,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     entityType: EntityType;
     entityId: string;
 
-    selectedEntityIds: string[];
-    selectedEntities: (CaseModel|ContactModel|EventModel)[];
-
-    relationships: RelationshipModel[] = [];
-    relationshipsIds: string[] = [];
-
-    relationship: RelationshipModel[];
-    bulkInsert: boolean = false;
+    relationship: RelationshipModel = new RelationshipModel();
     selectedSourceIds: string[] = [];
     selectedTargetIds: string[] = [];
 
@@ -92,11 +80,8 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                     // bulk insert of relationships
                     if (!_.isEmpty(queryParams.selectedSourceIds) && !_.isEmpty(queryParams.selectedTargetIds)) {
                         // bulk insert
-                        this.bulkInsert = true;
-                        this.selectedSourceIds = queryParams.selectedSourceIds;
-                        this.selectedTargetIds = queryParams.selectedTargetIds;
-                        console.log(this.selectedSourceIds);
-                        console.log(this.selectedTargetIds);
+                        this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
+                        this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
                     } else {
 
                         this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
@@ -148,7 +133,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
+                                        `/relationships/${this.entityType}/${this.entityId}/share`
                                     )
                                 );
                                 // add new breadcrumb: page title
@@ -168,76 +153,24 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         if (!this.formHelper.validateForm(form)) {
             return;
         }
+         // bulk insert relationships
+        const relationshipsBulkData = {sources: [], targets: [], relationship: {}};
+        relationshipsBulkData.sources = this.selectedSourceIds;
+        relationshipsBulkData.targets = this.selectedTargetIds;
+        relationshipsBulkData.relationship = this.relationship;
+        this.relationshipDataService.createBulkRelationships(this.outbreakId, relationshipsBulkData)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
 
-        if (!this.bulkInsert) {
-
-
-
-            // create a separate observable for each Relationship that needs to be created
-            // and execute all observables at once
-            const createRelationships$: Observable<any>[] = [];
-
-            _.each(fields.relationships, (relationship) => {
-                const relatedEntityId = _.get(relationship, 'relatedEntityId');
-                const relationshipData = _.get(relationship, 'relationship');
-
-                // add related entity ID
-                relationshipData.persons.push({
-                    id: relatedEntityId
-                });
-
-                // create observable
-                createRelationships$.push(
-                    this.relationshipDataService
-                        .createRelationship(
-                            this.outbreakId,
-                            this.entityType,
-                            this.entityId,
-                            relationshipData
-                        )
-                );
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
+                // navigate to listing page
+                this.disableDirtyConfirm();
+                this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
             });
 
-            return Observable.forkJoin(createRelationships$)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-
-                    return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
-                    if (createRelationships$.length > 1) {
-                        // multiple relationships
-                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE');
-                    } else {
-                        // single relationship
-                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
-                    }
-
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
-                });
-        } else {
-            // bulk insert relationships
-            console.log(this.selectedSourceIds);
-            console.log(this.selectedTargetIds);
-
-        }
-    }
-
-    /**
-     * Check if an object has empty values
-     * @param object
-     */
-    private isEmptyObject(object): boolean {
-        return _.every(
-            object,
-            (value) => {
-                return _.isObject(value) ?
-                    this.isEmptyObject(value) :
-                    ( !_.isNumber(value) && _.isEmpty(value) );
-            }
-        );
     }
 
 }

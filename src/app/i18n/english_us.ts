@@ -535,12 +535,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
 
         /**
-         * Entity Relationships list share page
+         * Entity Relationships list share - assign - create pages
          */
         'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
         'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Assign To',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE': 'Create relationships',
-
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
          * Modify Entity Relationship page

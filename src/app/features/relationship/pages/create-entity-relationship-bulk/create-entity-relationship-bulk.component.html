@@ -8,7 +8,7 @@
 
     <mat-horizontal-stepper linear #stepper>
 
-        <!-- Relationships step -->
+        <!-- Relationship data step -->
         <mat-step [stepControl]="relationshipsForm">
             <form #relationshipsForm="ngForm">
                 <ng-template matStepLabel>
@@ -20,7 +20,7 @@
                         class="page-section">
 
                         <app-form-relationship
-                            [name]="relationship"
+                            [name]="'relationship'"
                             [ngModel]="relationship"
                             required="true">
                         </app-form-relationship>

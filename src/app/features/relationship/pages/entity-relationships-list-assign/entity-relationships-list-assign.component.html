@@ -231,14 +231,7 @@
                                 {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
                             </div>
                             <div class="column-filter">
-                                <!--<app-form-location-dropdown-->
-                                <!--name="locationFilter"-->
-                                <!--ngModel-->
-                                <!--[placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-                                <!--(changed)="filterBySelectField('address.locationId', $event)"-->
-                                <!--multiple="true"-->
-                                <!--app-reset-input-on-side-filter>-->
-                                <!--</app-form-location-dropdown>-->
+
                             </div>
                         </div>
                     </mat-header-cell>
@@ -288,7 +281,7 @@
             color="primary">
             {{'LNG_COMMON_BUTTON_SELECT' | translate}}
         </button>
-        <button type="button" [routerLink]="['/relationships', entityType, this.entityId]" mat-raised-button>
+        <button type="button" [routerLink]="['/relationships', entityType, this.entityId, 'share']" mat-raised-button>
             {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
         </button>
     </div>

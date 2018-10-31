@@ -2,15 +2,6 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-                <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEntityWriteAccess()" class="button-primary" mat-raised-button color="primary"
-                            [routerLink]="['/relationships', entityType, entityId, 'available-entities']">
-                        {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
-                    </button>
-                </ng-container>
-            </div>
         </div>
     </ng-container>
 </app-topnav>

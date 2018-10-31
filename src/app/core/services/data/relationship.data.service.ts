@@ -53,6 +53,16 @@ export class RelationshipDataService {
     }
 
     /**
+     * Create bulk relationships
+     * @param {string} outbreakId
+     * @param relationshipsBulkData
+     * @returns {Observable<any>}
+     */
+    createBulkRelationships(outbreakId: string, relationshipsBulkData: any): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/relationships/bulk`, relationshipsBulkData);
+    }
+
+    /**
      * Retrieve Relationships of a Case / Contact / Event
      * @param {string} outbreakId
      * @param {EntityType} entityType

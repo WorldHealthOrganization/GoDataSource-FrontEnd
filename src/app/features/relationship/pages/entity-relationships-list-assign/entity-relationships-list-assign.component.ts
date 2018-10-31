@@ -18,9 +18,9 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
-import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -114,11 +114,12 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
             .subscribe((params: {entityType, entityId}) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
+                const excludeEntityIds = [...[this.entityId], ...this.selectedTargetIds];
 
                 // exclude current Entity from the list
                 this.queryBuilder.filter.where({
                     id: {
-                        'neq': this.entityId
+                        'nin': excludeEntityIds
                     }
                 });
                 // retrieve only available entity types
@@ -161,14 +162,14 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                                     )
                                 );
                                 // add new breadcrumb: Entity Relationships list
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-                                        `/relationships/${this.entityType}/${this.entityId}`
+                                        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE',
+                                        `/relationships/${this.entityType}/${this.entityId}/share`
                                     )
                                 );
                                 // add new breadcrumb: page title

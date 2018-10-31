@@ -17,16 +17,14 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import * as _ from 'lodash';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { NgForm } from '@angular/forms';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-entity-relationships-list-share',
@@ -100,8 +98,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
         private relationshipDataService: RelationshipDataService,
         private outbreakDataService: OutbreakDataService,
         protected snackbarService: SnackbarService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private dialogService: DialogService
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -155,7 +152,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                                     )
                                 );
                                 // add new breadcrumb: page title
@@ -287,10 +284,6 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
                 }
             }
         );
-    }
-
-    hasEntityWriteAccess(): boolean {
-        return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
     }
 
 }
