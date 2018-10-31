@@ -26,6 +26,24 @@ const routes: Routes = [
             PageChangeConfirmationGuard
         ]
     },
+    // Entity Relationships list - Share
+    {
+        path: ':entityType/:entityId/share',
+        component: fromPages.EntityRelationshipsListShareComponent
+    },
+    // Entity Relationships list - Assign
+    {
+        path: ':entityType/:entityId/assign',
+        component: fromPages.EntityRelationshipsListAssignComponent
+    },
+    // Create new Entity relationship(s) - bulk
+    {
+        path: ':entityType/:entityId/createBulk',
+        component: fromPages.CreateEntityRelationshipBulkComponent,
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
     // View Entity Relationship
     {
         path: ':entityType/:entityId/:relationshipId/view',
