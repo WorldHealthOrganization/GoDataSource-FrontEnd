@@ -177,6 +177,35 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Location Geographical Level -->
+        <ng-container matColumnDef="reportingGeographicalLevelId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="geographicalLevelFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="geographicalLevelsList$ | async"
+                            multiple="true"
+                            (optionChanged)="filterBySelectField('reportingGeographicalLevelId', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true"
+                            [displayFilterIcon]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let outbreak">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL"
+                    [value]="outbreak.reportingGeographicalLevelId">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Start Date -->
         <ng-container matColumnDef="startDate">
             <mat-header-cell *matHeaderCellDef>

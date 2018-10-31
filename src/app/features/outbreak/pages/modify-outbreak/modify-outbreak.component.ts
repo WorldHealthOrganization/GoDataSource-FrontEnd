@@ -41,6 +41,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     diseasesList$: Observable<any[]>;
     // list of countries
     countriesList$: Observable<any[]>;
+    // list of geographical levels
+    geographicalLevelsList$: Observable<any[]>;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -60,6 +62,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     }
 
     ngOnInit() {
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {

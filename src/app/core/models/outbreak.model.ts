@@ -31,6 +31,7 @@ export class OutbreakModel {
     locationIds: string[];
     locations: LocationModel[] = [];
     longPeriodsBetweenCaseOnset: number;
+    reportingGeographicalLevelId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -50,6 +51,7 @@ export class OutbreakModel {
         this.noDaysNotSeen = _.get(data, 'noDaysNotSeen');
         this.noLessContacts = _.get(data, 'noLessContacts');
         this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
+        this.reportingGeographicalLevelId = _.get(data, 'reportingGeographicalLevelId', '');
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
