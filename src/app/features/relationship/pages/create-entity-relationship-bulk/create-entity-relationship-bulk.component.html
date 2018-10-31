@@ -12,7 +12,7 @@
         <mat-step [stepControl]="relationshipsForm">
             <form #relationshipsForm="ngForm">
                 <ng-template matStepLabel>
-                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_TAB_RELATIONSHIPS' | translate}}
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TAB_RELATIONSHIPS' | translate}}
                 </ng-template>
 
                     <mat-card
@@ -41,7 +41,7 @@
             <div>
                 <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-button (click)="createNewRelationship(relationshipsForm)">
-                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

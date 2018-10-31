@@ -543,6 +543,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Assign To',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE': 'Create relationships',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE': 'Relationships created!',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TAB_RELATIONSHIPS': 'Relationships',
+        'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create Relationship',
 
         /**
          * Modify Entity Relationship page

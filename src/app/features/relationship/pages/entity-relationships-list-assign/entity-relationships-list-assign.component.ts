@@ -72,7 +72,6 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
     EntityType = EntityType;
 
     selectedTargetIds: string[] = [];
-    selectedSourceIds: string[] = [];
 
     constructor(
         private router: Router,
@@ -280,8 +279,6 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
             property === 'firstName' &&
             direction
         ) {
-            // need to sort by firstName ASC, name ASC (so we sort Events aswell)
-
             // remove previous sort columns, we can sort only by one column at a time
             this.queryBuilder.sort.clear();
 
