@@ -66,8 +66,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
         private genericDataService: GenericDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService,
-        private dialogService: DialogService
+        private relationshipDataService: RelationshipDataService
     ) {
         super();
     }
@@ -75,26 +74,24 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     ngOnInit() {
 
         this.route.queryParams
-            .subscribe((queryParams: {selectedSourceIds, selectedTargetIds }) => {
+            .subscribe((queryParams: { selectedSourceIds, selectedTargetIds }) => {
+                // bulk insert of relationships
+                if (!_.isEmpty(queryParams.selectedSourceIds) && !_.isEmpty(queryParams.selectedTargetIds)) {
+                    // bulk insert
+                    this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
+                    this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
+                } else {
 
-                    // bulk insert of relationships
-                    if (!_.isEmpty(queryParams.selectedSourceIds) && !_.isEmpty(queryParams.selectedTargetIds)) {
-                        // bulk insert
-                        this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
-                        this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
-                    } else {
+                    this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
-                        this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
-
-                        // No entities selected; navigate back to Available Entities list
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['..', 'assign']);
-                    }
-
+                    // No entities selected; navigate back to Available Entities list
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['..', 'assign']);
+                }
             });
 
         this.route.params
-            .subscribe((params: {entityType, entityId}) => {
+            .subscribe((params: { entityType, entityId }) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
 
@@ -121,7 +118,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
 
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                            .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                                 // add new breadcrumb: Entity Modify page
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
@@ -145,15 +142,17 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
             });
     }
 
-    createNewRelationship(form: NgForm) {
-
-        // get forms fields
-        const fields = this.formHelper.getFields(form);
+    /**
+     * craete relationships between all the entities from sources and all entities from targets
+     * the relationships will have the same data
+     * @param {NgForm} form
+     */
+    createNewRelationships(form: NgForm) {
 
         if (!this.formHelper.validateForm(form)) {
             return;
         }
-         // bulk insert relationships
+        // bulk insert relationships
         const relationshipsBulkData = {sources: [], targets: [], relationship: {}};
         relationshipsBulkData.sources = this.selectedSourceIds;
         relationshipsBulkData.targets = this.selectedTargetIds;
@@ -165,7 +164,7 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);

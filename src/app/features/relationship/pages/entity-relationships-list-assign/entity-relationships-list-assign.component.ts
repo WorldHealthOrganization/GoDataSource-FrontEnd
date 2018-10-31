@@ -54,7 +54,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
     entityType: EntityType;
     entityId: string;
     // entities list relationships
-    entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
+    entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
     entitiesListCount$: Observable<any>;
 
     // available side filters
@@ -100,7 +100,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
         this.generateSideFilters();
 
         this.route.queryParams
-            .subscribe((queryParams: {selectedTargetIds}) => {
+            .subscribe((queryParams: { selectedTargetIds }) => {
                 if (_.isEmpty(queryParams.selectedTargetIds)) {
                     this.snackbarService.showError('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
                     this.router.navigate(['..', 'share']);
@@ -110,7 +110,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
             });
 
         this.route.params
-            .subscribe((params: {entityType, entityId}) => {
+            .subscribe((params: { entityType, entityId }) => {
                 this.entityType = params.entityType;
                 this.entityId = params.entityId;
                 const excludeEntityIds = [...[this.entityId], ...this.selectedTargetIds];
@@ -156,7 +156,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
 
                                 return ErrorObservable.create(err);
                             })
-                            .subscribe((entityData: CaseModel|ContactModel|EventModel) => {
+                            .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
                                 // add new breadcrumb: Entity Modify page
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
