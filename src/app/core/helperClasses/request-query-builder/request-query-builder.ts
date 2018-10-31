@@ -18,6 +18,10 @@ export class RequestQueryBuilder {
     public limitResultsNumber: number;
     // Fields to retrieve
     public fieldsInResponse: string[] = [];
+    // other custom query full query builders
+    public childrenQueryBuilders: {
+        [qbFilterKey: string]: RequestQueryBuilder
+    } = {};
 
     /**
      * #TODO Replace usage with RequestPaginator
@@ -81,6 +85,35 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Remove child query builder
+     * @param qbFilterKey
+     */
+    removeChildQueryBuilder(qbFilterKey: string) {
+        delete this.childrenQueryBuilders[qbFilterKey];
+    }
+
+    /**
+     * Add new child query builder
+     */
+    addChildQueryBuilder(
+        qbFilterKey: string,
+        replace: boolean = false
+    ) {
+        // replace ?
+        if (replace) {
+            this.removeChildQueryBuilder(qbFilterKey);
+        }
+
+        // add query builder
+        if (this.childrenQueryBuilders[qbFilterKey] === undefined) {
+            this.childrenQueryBuilders[qbFilterKey] = new RequestQueryBuilder();
+        }
+
+        // finished
+        return this.childrenQueryBuilders[qbFilterKey];
+    }
+
+    /**
      * Build the query to be applied on Loopback requests
      * @returns {string}
      */
@@ -126,6 +159,16 @@ export class RequestQueryBuilder {
             filter.deleted = true;
         }
 
+        // add other custom filters
+        if (!_.isEmpty(this.childrenQueryBuilders)) {
+            _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder, qbKey: string) => {
+                if (!qb.isEmpty()) {
+                    filter[qbKey] = qb.filter.generateCondition();
+                }
+            });
+        }
+
+        // serve
         return stringified ? JSON.stringify(filter) : filter;
     }
 
@@ -171,6 +214,15 @@ export class RequestQueryBuilder {
         // merge deleted
         this.deleted = queryBuilder.deleted;
 
+        // merge custom filters
+        if (!_.isEmpty(queryBuilder.childrenQueryBuilders)) {
+            this.childrenQueryBuilders = {
+                ...this.childrenQueryBuilders,
+                ...queryBuilder.childrenQueryBuilders
+            };
+        }
+
+        // serve
         return this;
     }
 
@@ -188,12 +240,20 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Clear children query builders
+     */
+    clearChildrenQueryBuilders() {
+        this.childrenQueryBuilders = {};
+    }
+
+    /**
      * Clear filter and sort criterias
      */
     clear() {
         this.filter.clear();
         this.includedRelations = {};
         this.sort.clear();
+        this.clearChildrenQueryBuilders();
         this.deleted = false;
     }
 }

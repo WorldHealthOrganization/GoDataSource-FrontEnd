@@ -88,6 +88,9 @@ export class FilterModel {
     relationshipLabel: string = null;
     extraConditions: RequestQueryBuilder = null;
 
+    // children query builders ( either main qb or relationship qb )
+    childQueryBuilderKey: string;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -100,7 +103,8 @@ export class FilterModel {
         sortable?: boolean,
         relationshipPath?: string[],
         relationshipLabel?: string,
-        extraConditions?: RequestQueryBuilder
+        extraConditions?: RequestQueryBuilder,
+        childQueryBuilderKey?: string
     }) {
         // set handler
         this.self = this;

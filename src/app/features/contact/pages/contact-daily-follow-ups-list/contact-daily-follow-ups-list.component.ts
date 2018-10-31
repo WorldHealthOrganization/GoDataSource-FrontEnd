@@ -19,7 +19,7 @@ import { DialogAnswer, DialogConfiguration } from '../../../../shared/components
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -29,8 +29,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Moment } from 'moment';
 import { MatTable } from '@angular/material';
-import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -39,10 +40,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
 export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '.', true)
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // import constants into template
     Constants = Constants;
@@ -89,6 +87,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
 
+    caseId: string;
+    caseData: CaseModel;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -99,7 +100,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         private router: Router,
         private i18nService: I18nService,
         private referenceDataDataService: ReferenceDataDataService,
-        private teamDataService: TeamDataService
+        private teamDataService: TeamDataService,
+        protected route: ActivatedRoute,
+        private caseDataService: CaseDataService
     ) {
         super(
             snackbarService
@@ -123,7 +126,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // load teams list
         this.teamDataService.getTeamsList().subscribe( (teamsList) => {
-            _.forEach(teamsList, (team, key) => {
+            _.forEach(teamsList, (team) => {
                 this.teamsListMap[team.id] = team;
             });
         });
@@ -132,28 +135,44 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
-        // subscribe to the Selected Outbreak
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                // selected outbreak
-                this.selectedOutbreak = selectedOutbreak;
-
-                // export url
-                this.exportFollowUpsUrl = null;
-                this.printDailyFollowUpsUrl = null;
-                if (
-                    this.selectedOutbreak &&
-                    this.selectedOutbreak.id
-                ) {
-                    this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
-                    this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+        // get case id
+        this.route.params
+            .subscribe((params: { caseId }) => {
+                // case Id arrives only from cases list, view & modify pages
+                // coming directly to daily page doesn't provide us with a case id
+                this.caseId = params.caseId;
+                if (!this.caseId) {
+                    this.initializeBreadcrumbs();
                 }
 
-                // initialize pagination
-                this.initPaginator();
-                // ...and re-load the list when the Selected Outbreak is changed
-                this.needsRefreshList(true);
+                // subscribe to the Selected Outbreak
+                this.outbreakDataService
+                    .getSelectedOutbreakSubject()
+                    .subscribe((selectedOutbreak: OutbreakModel) => {
+                        // selected outbreak
+                        this.selectedOutbreak = selectedOutbreak;
+
+                        // export url
+                        this.exportFollowUpsUrl = null;
+                        this.printDailyFollowUpsUrl = null;
+                        if (
+                            this.selectedOutbreak &&
+                            this.selectedOutbreak.id
+                        ) {
+                            this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                            this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
+
+                            // retrieve case data
+                            if (this.caseId) {
+                                this.retrieveCaseData();
+                            }
+                        }
+
+                        // initialize pagination
+                        this.initPaginator();
+                        // ...and re-load the list when the Selected Outbreak is changed
+                        this.needsRefreshList(true);
+                    });
             });
 
         // initialize Side Table Columns
@@ -161,6 +180,51 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Retrieve case data
+     */
+    retrieveCaseData() {
+        // retrieve case data
+        this.caseDataService
+            .getCase(this.selectedOutbreak.id, this.caseId)
+            .subscribe((caseData: CaseModel) => {
+                this.caseData = caseData;
+                this.initializeBreadcrumbs();
+            });
+    }
+
+    /**
+     * Initialize breadcrumbs
+     */
+    initializeBreadcrumbs() {
+        // init
+        this.breadcrumbs = [];
+
+        // add case / contact breadcrumbs
+        if (!this.caseId) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_CONTACTS_TITLE',
+                '/contacts'
+            ));
+        } else if (this.caseData) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_CASES_TITLE',
+                '/cases'
+            ));
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                this.caseData.name,
+                `/cases/${this.caseData.id}/view`
+            ));
+        }
+
+        // add follow-ups breadcrumbs
+        this.breadcrumbs.push(new BreadcrumbItemModel(
+            'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+            '.',
+            true
+        ));
     }
 
     /**
@@ -240,10 +304,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        // filter options
         const genderOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         const occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        const caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        const caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        const outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
         // set available side filters
+        // Follow-ups
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'address',
@@ -259,7 +329,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 fieldName: 'targeted',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
                 type: FilterType.SELECT,
-                options$: this.yesNoOptionsList$
+                options$: yesNoOptionsWithoutAllList$
             }),
             new FilterModel({
                 fieldName: 'statusId',
@@ -268,6 +338,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 options$: this.dailyStatusTypeOptions$
             })
         ];
+
+        // Contact
         if (this.authUser.hasPermissions(PERMISSION.READ_CONTACT)) {
             this.availableSideFilters = [
                 ...this.availableSideFilters,
@@ -333,6 +405,208 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 ]
             ];
         }
+
+        // Case
+        if (this.authUser.hasPermissions(PERMISSION.READ_CASE)) {
+            this.availableSideFilters = [
+                ...this.availableSideFilters,
+                ...[
+                    new FilterModel({
+                        fieldName: 'firstName',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'middleName',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'lastName',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'gender',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_GENDER',
+                        type: FilterType.MULTISELECT,
+                        options$: genderOptionsList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'phoneNumber',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'riskLevel',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+                        type: FilterType.MULTISELECT,
+                        options$: caseRiskLevelsList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'riskReason',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'classification',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                        type: FilterType.MULTISELECT,
+                        options$: caseClassificationsList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'occupation',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+                        type: FilterType.MULTISELECT,
+                        options$: occupationsList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'age',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_AGE',
+                        type: FilterType.RANGE_AGE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dob',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DOB',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'visualId',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                        type: FilterType.TEXT,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateOfInfection',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateOfOnset',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateOfOutcome',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateBecomeCase',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'deceased',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DECEASED',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateDeceased',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'safeBurial',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'isDateOfOnsetApproximate',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'dateOfReporting',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+                        type: FilterType.RANGE_DATE,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'isDateOfReportingApproximate',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'transferRefused',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'outcomeId',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+                        type: FilterType.MULTISELECT,
+                        options$: outcomeList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'wasContact',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+                        type: FilterType.SELECT,
+                        options$: yesNoOptionsWithoutAllList$,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    }),
+                    new FilterModel({
+                        fieldName: 'addresses',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+                        type: FilterType.ADDRESS,
+                        relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
+                        childQueryBuilderKey: 'whereCase'
+                    })
+                ]
+            ];
+        }
     }
 
     /**
@@ -340,6 +614,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // add case id
+            if (this.caseId) {
+                this.queryBuilder.addChildQueryBuilder('whereCase').filter.byEquality('id', this.caseId);
+            }
+
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);

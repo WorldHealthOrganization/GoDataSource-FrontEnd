@@ -361,6 +361,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE': 'Case successfully converted to contact!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
@@ -392,6 +393,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE': 'Case saved!',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
         'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
 
@@ -913,6 +915,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
 
         /**
          * Create Follow-up page

@@ -39,8 +39,8 @@ export class GenericDataService {
      * Retrieve the list of Filter Yes / No options
      * @returns {Observable<any[]>}
      */
-    getFilterYesNoOptions(): Observable<any[]> {
-        return Observable.of(Object.values(Constants.FILTER_YES_NO_OPTIONS));
+    getFilterYesNoOptions(withoutAll: boolean = false): Observable<any[]> {
+        return Observable.of(Object.values(withoutAll ? _.filter(Constants.FILTER_YES_NO_OPTIONS, (o) => o.value !== '' ) : Constants.FILTER_YES_NO_OPTIONS));
     }
 
     /**

@@ -410,7 +410,9 @@
         <button mat-raised-button type="button" [routerLink]="['/cases', caseData.id, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
-
+        <button mat-raised-button type="button" [routerLink]="['/contacts/case-related-follow-ups', caseData.id]">
+            {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
+        </button>
     </div>
 
 

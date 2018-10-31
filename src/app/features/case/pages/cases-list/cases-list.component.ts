@@ -225,6 +225,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
      * Initialize Side Filters
      */
     initializeSideFilters() {
+        const caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        const yesNoOptionsWithoutAllList$ = this.genericDataService.getFilterYesNoOptions(true);
+        const outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
         // set available side filters
         this.availableSideFilters = [
             // Case
@@ -282,10 +286,103 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 type: FilterType.MULTISELECT,
                 options$: this.occupationsList$,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'riskLevel',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+                type: FilterType.MULTISELECT,
+                options$: caseRiskLevelsList$
+            }),
+            new FilterModel({
+                fieldName: 'riskReason',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'visualId',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                type: FilterType.TEXT,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'classification',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                type: FilterType.MULTISELECT,
+                options$: this.caseClassificationsList$
+            }),
+            new FilterModel({
+                fieldName: 'dateOfInfection',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'dateOfOnset',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'dateOfOutcome',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'dateBecomeCase',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'deceased',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DECEASED',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'dateDeceased',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'safeBurial',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'isDateOfOnsetApproximate',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'dateOfReporting',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+                type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'isDateOfReportingApproximate',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'transferRefused',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'outcomeId',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+                type: FilterType.MULTISELECT,
+                options$: outcomeList$
+            }),
+            new FilterModel({
+                fieldName: 'wasContact',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+                type: FilterType.SELECT,
+                options$: yesNoOptionsWithoutAllList$
             })
-
-            // Relations
-            // #TODO
         ];
     }
 
