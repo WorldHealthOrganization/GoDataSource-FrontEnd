@@ -1,4 +1,5 @@
 <button
+    *ngIf="!menuItem"
     class="button-primary"
     mat-raised-button
     color="primary"
@@ -6,4 +7,13 @@
     type="button">
     {{ label | translate }}
 </button>
+
+<button
+    *ngIf="menuItem"
+    mat-menu-item
+    (click)="triggerExport()"
+    type="button">
+    {{ label | translate }}
+</button>
+
 <a hidden #buttonDownloadFile></a>

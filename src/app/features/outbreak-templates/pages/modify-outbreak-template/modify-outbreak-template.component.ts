@@ -14,6 +14,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -42,7 +43,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -96,7 +98,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-
+                // update language tokens to get the translation of submitted questions and answers
+                this.i18nService.loadUserLanguage().subscribe();
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 this.router.navigate(['/outbreak-templates']);

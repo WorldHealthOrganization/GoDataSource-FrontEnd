@@ -3,26 +3,25 @@
 
     <form #groupForm="ngForm">
         <div fxLayout="row" fxLayoutGap="20px">
-            <div
-                fxFlex
-                fxLayout="row"
-                class="switch-buttons">
-                <button
-                    fxFlex
-                    mat-raised-button
-                    type="button"
-                    [color]="ageSelected ? 'primary' : ''"
-                    (click)="switchAgeDob(true)">
-                    {{ ageButtonLabel | translate }}
-                </button>
-                <button
-                    fxFlex
-                    mat-raised-button
-                    type="button"
-                    [color]="!ageSelected ? 'primary' : ''"
-                    (click)="switchAgeDob(false)">
-                    {{ dobButtonLabel | translate }}
-                </button>
+            <div fxFlex fxLayout="column" fxLayoutAlign="center">
+                <div class="switch-buttons" fxLayout="row">
+                    <button
+                        fxFlex
+                        mat-raised-button
+                        type="button"
+                        [color]="ageSelected ? 'primary' : ''"
+                        (click)="switchAgeDob(true)">
+                        {{ ageButtonLabel | translate }}
+                    </button>
+                    <button
+                        fxFlex
+                        mat-raised-button
+                        type="button"
+                        [color]="!ageSelected ? 'primary' : ''"
+                        (click)="switchAgeDob(false)">
+                        {{ dobButtonLabel | translate }}
+                    </button>
+                </div>
             </div>
 
             <div

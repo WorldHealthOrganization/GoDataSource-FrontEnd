@@ -66,19 +66,21 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                 .getUser(this.userId)
                 .subscribe((user: UserModel) => {
                     this.user = user;
+
+                    // update breadcrumbs
+                    this.breadcrumbs.push(
+                        new BreadcrumbItemModel(
+                            this.user.name,
+                            null,
+                            true
+                        )
+                    );
                 });
         });
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
         this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
-
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_USER_TITLE' : 'LNG_PAGE_MODIFY_USER_TITLE',
-                '.'
-            )
-        );
     }
 
     modifyUser(form: NgForm) {

@@ -29,6 +29,7 @@ export class ExportButtonComponent {
     @Input() fileName: string;
     @Input() queryBuilder: RequestQueryBuilder;
     @Input() queryBuilderClearOthers: string[];
+    @Input() menuItem: boolean = false;
 
     /**
      * If file type is provided, allowedExportTypes will be ignored

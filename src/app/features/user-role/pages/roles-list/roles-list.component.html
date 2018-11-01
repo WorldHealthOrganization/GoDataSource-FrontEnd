@@ -28,7 +28,7 @@
 
         <!-- Name -->
         <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef fxFlex="20">
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
@@ -44,14 +44,14 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" fxFlex="20">
+            <mat-cell *matCellDef="let item">
                 {{ item.name }}
             </mat-cell>
         </ng-container>
 
         <!-- Description -->
         <ng-container matColumnDef="description">
-            <mat-header-cell *matHeaderCellDef fxFlex="30">
+            <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell column-header">
                     {{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}
                     <div class="column-filter">
@@ -67,7 +67,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" fxFlex="30">
+            <mat-cell *matCellDef="let item">
                 {{ item.description }}
             </mat-cell>
         </ng-container>

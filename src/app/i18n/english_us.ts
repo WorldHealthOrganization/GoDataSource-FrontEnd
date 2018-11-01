@@ -90,6 +90,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
         'LNG_COMMON_BUTTON_CHANGE': 'Change',
         'LNG_COMMON_BUTTON_CLONE': 'Clone',
+        'LNG_COMMON_BUTTON_QUICK_ACTIONS': 'Quick actions',
 
         /**
          * Dialogs
@@ -212,7 +213,6 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS': 'Email Address',
         'LNG_COMMON_FIELD_LABEL_PASSWORD': 'Password',
-        'LNG_COMMON_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
 
         /**
          * Address Fields
@@ -704,8 +704,6 @@ export const EnglishUsLang = {
         /**
          * Modify User page
          */
-        'LNG_PAGE_VIEW_USER_TITLE': 'View User',
-        'LNG_PAGE_MODIFY_USER_TITLE': 'Modify User',
         'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' : 'Details',
         'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE': 'User updated!',
 
@@ -1159,9 +1157,9 @@ export const EnglishUsLang = {
          * Set Security Questions Page
          */
         'LNG_PAGE_SET_SECURITY_QUESTIONS_TITLE': 'Set Security Questions',
+        'LNG_PAGE_SET_SECURITY_QUESTIONS_TAB_SECURITY_QUESTIONS_TITLE': 'Security Questions',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE': 'Security Questions were updated',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET': 'You already set your security questions.',
-        'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION': 'Select the questions below and add an answer for each of them.',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1': 'Question 1',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2': 'Question 2',
         'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1': 'Answer 1',
@@ -1192,10 +1190,13 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_RESET_PASSWORD_TITLE': 'Reset Password',
         'LNG_PAGE_RESET_PASSWORD_BUTTON': 'Change Password',
+        'LNG_PAGE_RESET_PASSWORD_TAB_CHANGE_PASSWORD_TITLE': 'Change Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD': 'New Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION': '',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD_DESCRIPTION': '',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION': 'Current Password',
 
         /**
          * Change Password Page
@@ -1319,8 +1320,8 @@ export const EnglishUsLang = {
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION' : '',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS': 'Duration for the follow-up ( days )',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION': '',
-        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY': 'Follow-up frequency',
-        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_DESCRIPTION': '',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY': 'Follow-up frequency per day',
+        'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION': '',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS': 'Days among known contacts',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION': '',
         'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS': 'Days in known transmission chains',
@@ -1375,7 +1376,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
         'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE': 'Cases KPIs',
         'LNG_PAGE_DASHBOARD_CONTACTS_KPI_TITLE': 'Contacts KPIs',
-        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE': 'Chains of transmission KPIs',
+        'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE': 'Chains of Transmission KPIs',
         'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL': 'Show all',
         'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_HIDE_LABEL': 'Hide',
         'LNG_PAGE_DASHBOARD_KPI_DASHLET_MENU_MOVE_BEFORE_LABEL': 'Move before',
@@ -1673,7 +1674,7 @@ export const EnglishUsLang = {
         /**
          * Transmission Chains List page
          */
-        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Chains of Transmission',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Details',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON': 'List',
@@ -1862,8 +1863,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CLOUD_BACKUP_TITLE' : 'Cloud Backup',
         'LNG_PAGE_CLOUD_BACKUP_HEADER_TITLE' : 'If you want to sync your backups on cloud, you have to use and external tool (like Google Drive or Dropbox)',
-        'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at: ',
-        'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The back-up path is: ',
+        'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at location:',
+        'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The backups are saved at location:',
         'LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE': 'Path copied!',
     }
 };
