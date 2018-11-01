@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
-import { CaseModel } from '../../../../core/models/case.model';
-import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
+import { MetricLocationCasesCountsModel } from '../../../../core/models/metrics/metric-location-cases-count.model';
 
 @Component({
     selector: 'app-case-by-geographic-location-dashlet',
@@ -19,9 +17,7 @@ import * as _ from 'lodash';
 export class CasesByGeographicLocationDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
-    caseClassificationsList: ReferenceDataCategoryModel;
-    caseSummaryResults: any = [];
-    customColors = [];
+    casesLocationResults: any = [];
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -31,22 +27,15 @@ export class CasesByGeographicLocationDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.referenceDataDataService
-            .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-            .subscribe((caseClassifications) => {
-                this.caseClassificationsList = caseClassifications;
-                this.setCustomColors();
-            });
-
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // get the results for hospitalised cases
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.caseDataService
-                        .getCasesList(selectedOutbreak.id)
-                        .subscribe((casesList) => {
-                            this.caseSummaryResults = this.buildChartData(casesList);
+                        .getCasesPerLocation(selectedOutbreak.id)
+                        .subscribe((locationsMetric) => {
+                            this.casesLocationResults = this.buildChartData(locationsMetric.locations);
                         });
                 }
             });
@@ -54,48 +43,20 @@ export class CasesByGeographicLocationDashletComponent implements OnInit {
 
     /**
      * Build chart data object
-     * @param {CaseModel[]} casesList
+     * @param {MetricLocationCasesCountsModel[]} locationsMetric
      * @returns {MetricChartDataModel[]}
      */
-    buildChartData(casesList: CaseModel[]) {
-        let caseSummaryResults: MetricChartDataModel[] = [];
-        _.forEach(casesList, (casePerson, key) => {
-
-            // ignore not a case classification
-            if (casePerson.classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
-                const caseSummaryResult: MetricChartDataModel = _.find(caseSummaryResults, {name: casePerson.classification});
-                if (caseSummaryResult) {
-                    caseSummaryResult.value++;
-                } else {
-                    const caseSummaryResultNew: MetricChartDataModel = new MetricChartDataModel();
-                    caseSummaryResultNew.name = casePerson.classification;
-                    caseSummaryResultNew.value = 1;
-                    caseSummaryResults.push(caseSummaryResultNew);
-                }
+    buildChartData(locationsMetric: MetricLocationCasesCountsModel[]) {
+        const caseLocationSummaryResults: MetricChartDataModel[] = [];
+        _.forEach(locationsMetric, (locationMetric, key) => {
+            if (locationMetric.casesCount > 0) {
+                const caseLocationSummaryResult: MetricChartDataModel = new MetricChartDataModel();
+                caseLocationSummaryResult.name = locationMetric.location.name;
+                caseLocationSummaryResult.value = locationMetric.casesCount;
+                caseLocationSummaryResults.push(caseLocationSummaryResult);
             }
         });
-        // translate the classification
-        caseSummaryResults = caseSummaryResults.map((result) => {
-            result.name = this.i18nService.instant(result.name);
-            return result;
-        });
-        return caseSummaryResults;
-    }
-
-    /**
-     * Set custom colors of the chart - based on those chosen in ref data
-     */
-    setCustomColors() {
-        const customColors = [];
-        if (!_.isEmpty(this.caseClassificationsList)) {
-            _.forEach(this.caseClassificationsList.entries, (entry, key) => {
-                const customColor: MetricChartDataModel = new MetricChartDataModel();
-                customColor.name = this.i18nService.instant(entry.value);
-                customColor.value = entry.colorCode;
-                customColors.push(customColor);
-            });
-            this.customColors = customColors;
-        }
+        return caseLocationSummaryResults;
     }
 
 }
