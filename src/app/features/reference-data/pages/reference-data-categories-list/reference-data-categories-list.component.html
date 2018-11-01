@@ -9,21 +9,21 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        *ngIf="hasReferenceDataWriteAccess()"
-                        mat-menu-item
-                        [routerLink]="['/reference-data', 'manage-icons', 'list']">
-                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
-                    </button>
+                    <ng-container *ngIf="hasReferenceDataWriteAccess()">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/reference-data', 'manage-icons', 'list']">
+                            {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
+                        </button>
 
-                    <mat-divider></mat-divider>
+                        <mat-divider></mat-divider>
 
-                    <button
-                        *ngIf="hasReferenceDataWriteAccess()"
-                        mat-menu-item
-                        [routerLink]="['/import-export-data', 'reference-data', 'import']">
-                        {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
-                    </button>
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'reference-data', 'import']">
+                            {{'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON' | translate}}
+                        </button>
+                    </ng-container>
 
                     <app-export-button
                         [menuItem]="true"

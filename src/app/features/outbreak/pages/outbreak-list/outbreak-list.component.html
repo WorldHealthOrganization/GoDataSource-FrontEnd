@@ -14,27 +14,26 @@
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container *ngIf="!appliedListFilter">
+                        <app-export-button
+                            [menuItem]="true"
+                            [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
+                            [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
+                            [url]="exportOutbreaksUrl"
+                            [fileName]="outbreaksDataExporFileName"
+                            [allowedExportTypes]="allowedExportTypes"
+                            [displayEncrypt]="true"
+                            [displayAnonymize]="true"
+                            [anonymizeFields]="anonymizeFields"
+                            [queryBuilder]="queryBuilder">
+                        </app-export-button>
 
-                    <app-export-button
-                        *ngIf="!appliedListFilter"
-                        [menuItem]="true"
-                        [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
-                        [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
-                        [url]="exportOutbreaksUrl"
-                        [fileName]="outbreaksDataExporFileName"
-                        [allowedExportTypes]="allowedExportTypes"
-                        [displayEncrypt]="true"
-                        [displayAnonymize]="true"
-                        [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
-                    </app-export-button>
-
-                    <button
-                        mat-menu-item
-                        *ngIf="!appliedListFilter"
-                        [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
-                        {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
-                    </button>
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
+                            {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
+                        </button>
+                    </ng-container>
                 </mat-menu>
             </div>
         </div>

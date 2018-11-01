@@ -28,17 +28,14 @@
                     [allowedExportTypes]="allowedExportTypes">
                 </app-export-button>
 
-                <ng-container
-                    *ngIf="hasLocationWriteAccess()">
+                <ng-container *ngIf="!parentId && !appliedListFilter && hasLocationWriteAccess()">
                     <button
-                        *ngIf="!parentId && !appliedListFilter"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
                         {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
                     </button>
 
                     <button
-                        *ngIf="!parentId && !appliedListFilter"
                         mat-menu-item
                         [routerLink]="['/import-export-data', 'location-data', 'import']">
                         {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}

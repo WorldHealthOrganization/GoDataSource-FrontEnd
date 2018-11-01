@@ -211,7 +211,6 @@ export const EnglishUsLang = {
          */
         'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS': 'Email Address',
         'LNG_COMMON_FIELD_LABEL_PASSWORD': 'Password',
-        'LNG_COMMON_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
 
         /**
          * Address Fields
@@ -1184,6 +1183,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION': '',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD': 'Confirm New Password',
         'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CONFIRM_NEW_PASSWORD_DESCRIPTION': '',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD': 'Current Password',
+        'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION': 'Current Password',
 
         /**
          * Change Password Page

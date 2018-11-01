@@ -59,16 +59,14 @@
                     </app-export-button>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="hasCaseWriteAccess()">
+                        <ng-container *ngIf="!appliedListFilter && hasCaseWriteAccess()">
                             <button
-                                *ngIf="!appliedListFilter"
                                 mat-menu-item
                                 [routerLink]="['/import-export-data', 'case-data', 'import']">
                                 {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
                             </button>
 
                             <button
-                                *ngIf="!appliedListFilter"
                                 mat-menu-item
                                 [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
                                 {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}

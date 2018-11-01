@@ -58,9 +58,11 @@
                             </app-form-select>
                         </div>
 
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                        <div
+                            *ngIf="hasOutbreakReadAccess()"
+                            fxLayout="row" fxLayoutGap="20px" fxFlex
+                        >
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
                                 name="outbreakIds"
                                 [(ngModel)]="user.outbreakIds"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
@@ -74,7 +76,6 @@
                             </app-form-select>
 
                             <app-form-select
-                                *ngIf="hasOutbreakReadAccess()"
                                 name="activeOutbreakId"
                                 [(ngModel)]="user.activeOutbreakId"
                                 [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
