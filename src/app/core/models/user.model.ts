@@ -10,6 +10,7 @@ export enum UserSettings {
     CASE_LAB_FIELDS = 'caseLabFields',
     CONTACT_FIELDS = 'contactFields',
     EVENT_FIELDS = 'eventFields',
+    LAB_RESULTS = 'labResults',
     RELATIONSHIP_FIELDS = 'relationshipFields',
     OUTBREAK_FIELDS = 'outbreakFields',
     OUTBREAK_TEMPLATE_FIELDS = 'outbreakTemplateFields',
@@ -28,6 +29,7 @@ abstract class UserSettingsHandlers {
     static CASE_LAB_FIELDS = [];
     static CONTACT_FIELDS = [];
     static EVENT_FIELDS = [];
+    static LAB_RESULTS = [];
     static RELATIONSHIP_FIELDS = [];
     static OUTBREAK_FIELDS = [];
     static OUTBREAK_TEMPLATE_FIELDS = [];

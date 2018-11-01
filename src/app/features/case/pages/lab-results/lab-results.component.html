@@ -8,10 +8,15 @@
 
 <!-- Side columns -->
 <app-side-columns
-    [tableColumnsUserSettingsKey]="UserSettings.EVENT_FIELDS"
+    [tableColumnsUserSettingsKey]="UserSettings.LAB_RESULTS"
     [tableColumns]="tableColumns"
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
+
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
@@ -26,17 +31,17 @@
 
     <mat-table #table [dataSource]="labResultsList$ | async" matSort (matSortChange)="sortBy($event)">
 
-        <!-- Name -->
-        <ng-container matColumnDef="name">
+        <!-- Case Last Name -->
+        <ng-container matColumnDef="caseLastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_LAB_RESULTS_FIELD_CASE_LAST_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="nameFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('name', $event)"
+                            (optionChanged)="filterByTextField('labName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -45,87 +50,231 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.name }}
+                {{ item.case.lastName | translate}}
             </mat-cell>
         </ng-container>
 
-        <!-- Date -->
-        <ng-container matColumnDef="date">
+        <!-- Case First Name -->
+        <ng-container matColumnDef="caseFirstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DATE' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_LAB_RESULTS_FIELD_CASE_FIRST_NAME' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="nameFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
+                            (optionChanged)="filterByTextField('labName', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.case.firstName | translate}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sample Lab Identifier -->
+        <ng-container matColumnDef="sampleIdentifier">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="sampleIdentifierFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByTextField('sampleIdentifier', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.sampleIdentifier }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Date sample taken -->
+        <ng-container matColumnDef="dateSampleTaken">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN' | translate }}</div>
                     <div class="column-filter">
                         <app-form-daterange
-                            name="dateFilter"
+                            name="dateSampleTakenFilter"
                             ngModel
-                            (changed)="filterByDateRangeField('date', $event)"
+                            (changed)="filterByDateRangeField('dateSampleTaken', $event)"
                             app-reset-input-on-side-filter>
                         </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
-                {{ item.date | dateDefault }}
+                {{ item.dateSampleTaken | dateDefault }}
             </mat-cell>
         </ng-container>
 
-        <!-- Description -->
-        <ng-container matColumnDef="description">
+        <!-- Date sample delivered to lab -->
+        <ng-container matColumnDef="dateSampleDelivered">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED' | translate}}</div>
                     <div class="column-filter">
-                        <app-form-input
-                            name="descriptionFilter"
+                        <app-form-daterange
+                            name="dateSampleDeliveredFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'| translate"
-                            (optionChanged)="filterByTextField('description', $event)"
-                            app-reset-input-on-side-filter
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            (changed)="filterByDateRangeField('dateSampleDelivered', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
-                {{ item.description }}
+                {{ item.dateSampleDelivered | dateDefault }}
             </mat-cell>
         </ng-container>
 
-        <!-- Address -->
-        <ng-container matColumnDef="address">
+        <!-- Date of the result -->
+        <ng-container matColumnDef="dateOfResult">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{ 'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate }}</div>
-                    <div class="column-filter"></div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-daterange
+                            name="dateOfResultFilter"
+                            ngModel
+                            (changed)="filterByDateRangeField('dateOfResult', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
+                    </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
-                {{ item.address.fullAddress }}
+                {{ item.dateOfResult | dateDefault}}
             </mat-cell>
         </ng-container>
 
-        <!--Deleted-->
-        <ng-container matColumnDef="deleted">
+        <!-- Lab Name -->
+        <ng-container matColumnDef="labName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_EVENT_FIELD_LABEL_DELETED' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="deletedFilter"
+                            name="labNameFilter"
                             ngModel
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="yesNoOptionsList$ | async"
-                            (optionChanged)="filterByDeletedField($event.value)"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="labNamesList$ | async"
+                            (optionChanged)="filterBySelectField('labName', $event)"
+                            multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true"
-                        ></app-form-select>
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
-                <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LAB_NAME"
+                    [value]="item.labName">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Sample type -->
+        <ng-container matColumnDef="sampleType">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="sampleTypeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="sampleTypesList$ | async"
+                            (optionChanged)="filterBySelectField('sampleType', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.TYPE_OF_SAMPLE"
+                    [value]="item.sampleType">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Test type -->
+        <ng-container matColumnDef="testType">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="testTypeFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="testTypesList$ | async"
+                            (optionChanged)="filterBySelectField('testType', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.TYPE_OF_LAB_TEST"
+                    [value]="item.testType">
+                </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Result -->
+        <ng-container matColumnDef="result">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_LAB_RESULTS_FIELD_LABEL_RESULT' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="resultFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            [options]="labTestResultsList$ | async"
+                            (optionChanged)="filterBySelectField('result', $event)"
+                            multiple="true"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayInvisibleItems]="true">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-reference-data-label
+                    [category]="ReferenceDataCategory.LAB_TEST_RESULT"
+                    [value]="item.result">
+                </app-reference-data-label>
             </mat-cell>
         </ng-container>
 
@@ -139,40 +288,25 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
-                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
-                                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                            </button>
-
-                            <mat-divider></mat-divider>
-                        </ng-container>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
-                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
+                        <button *ngIf="!item.deleted" mat-menu-item
+                                [routerLink]="['.', item.id, 'view']"
+                                [queryParams]="{caseId: item.case.id}">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEventWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                            <button *ngIf="hasLabResultWriteAccess() && !item.deleted"
+                                    mat-menu-item
+                                    [routerLink]="['.', item.id, 'modify']"
+                                    [queryParams]="{caseId: item.case.id}">
                                 {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                             </button>
 
                             <button
-                                *ngIf="hasEventWriteAccess() && !item.deleted"
+                                *ngIf="hasLabResultWriteAccess() && !item.deleted"
                                 mat-menu-item class="mat-menu-item-delete"
-                                (click)="deleteEvent(item)">
+                                (click)="deleteLabResult(item)">
                                 {{'LNG_PAGE_ACTION_DELETE' | translate}}
-                            </button>
-
-                            <button *ngIf="item.deleted && hasEventWriteAccess()" mat-menu-item class="mat-menu-item-restore"
-                                    (click)="restoreEvent(item)">
-                                {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                             </button>
                         </ng-container>
 

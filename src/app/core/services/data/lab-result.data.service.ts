@@ -73,9 +73,16 @@ export class LabResultDataService {
      * @returns {Observable<any[]>}
      */
     getAllLabResults(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
-        const filter  = queryBuilder.buildQuery();
 
-        return this.http.get(`outbreaks/${outbreakId}/lab-results?=filter=${filter}`);
+        const qb = new RequestQueryBuilder();
+        // include case data
+        qb.include('case');
+
+        qb.merge(queryBuilder);
+
+        const filter  = qb.buildQuery();
+
+        return this.http.get(`outbreaks/${outbreakId}/lab-results?filter=${filter}`);
     }
 
     /**

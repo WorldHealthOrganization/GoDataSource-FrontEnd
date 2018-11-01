@@ -12,12 +12,15 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import * as _ from 'lodash';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { EventModel } from '../../../../core/models/event.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-lab-results',
@@ -32,6 +35,11 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     ];
     // lab results list
     labResultsList$: Observable<any>;
+    labNamesList$: Observable<any[]>;
+    sampleTypesList$: Observable<any[]>;
+    testTypesList$: Observable<any[]>;
+    labTestResultsList$: Observable<any[]>;
+
     // lab results count
     labResultsListCount$: Observable<any>;
     // authenticated user
@@ -39,18 +47,22 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     // selected outbreak
     selectedOutbreak: OutbreakModel;
 
+    // available side filters
+    availableSideFilters: FilterModel[];
+
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
     UserSettings = UserSettings;
-
+    ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(protected snackbarService: SnackbarService,
                 private authDataService: AuthDataService,
                 private outbreakDataService: OutbreakDataService,
                 private labResultDataService: LabResultDataService,
                 private dialogService: DialogService,
-                private eventDataService: EventDataService
+                private eventDataService: EventDataService,
+                private referenceDataDataService: ReferenceDataDataService
     ) {
         super(snackbarService);
     }
@@ -73,6 +85,14 @@ export class LabResultsComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+
+        // initialize side filters
+        this.initializeSideFilters();
+
+        this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).share();
+        this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
+        this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
+        this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
     }
 
     /**
@@ -82,25 +102,44 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
-                field: 'name',
-                label: 'LNG_EVENT_FIELD_LABEL_NAME'
+                field: 'caseLastName',
+                label: 'LNG_LAB_RESULTS_FIELD_CASE_LAST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'date',
-                label: 'LNG_EVENT_FIELD_LABEL_DATE'
+                field: 'caseFirstName',
+                label: 'LNG_LAB_RESULTS_FIELD_CASE_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'description',
-                label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION'
+                field: 'sampleIdentifier',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
             }),
             new VisibleColumnModel({
-                field: 'address',
-                label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-                visible: false
+                field: 'dateSampleTaken',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
             }),
             new VisibleColumnModel({
-                field: 'deleted',
-                label: 'LNG_EVENT_FIELD_LABEL_DELETED'
+                field: 'dateSampleDelivered',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfResult',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'labName',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'sampleType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'testType',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+            }),
+            new VisibleColumnModel({
+                field: 'result',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -109,9 +148,85 @@ export class LabResultsComponent extends ListComponent implements OnInit {
             })
         ];
     }
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'sampleIdentifier',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+                type: FilterType.TEXT,
+                sortable: true,
+            }),
+            new FilterModel({
+                fieldName: 'dateSampleTaken',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'dateSampleDelivered',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'dateOfResult',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+                type: FilterType.RANGE_DATE,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'labName',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+                type: FilterType.SELECT,
+                options$: this.labNamesList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'sampleType',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+                type: FilterType.SELECT,
+                options$: this.sampleTypesList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'testType',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+                type: FilterType.SELECT,
+                options$: this.testTypesList$,
+                sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'result',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
+                type: FilterType.SELECT,
+                options$: this.labTestResultsList$,
+            }),
+            new FilterModel({
+                fieldName: 'dateTesting',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+                type: FilterType.RANGE_DATE,
+                sortable: true,
+            }),
+            new FilterModel({
+                fieldName: 'notes',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES',
+                type: FilterType.TEXT,
+                sortable: true,
+            }),
+            new FilterModel({
+                fieldName: 'status',
+                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
+                type: FilterType.TEXT,
+                sortable: true,
+            })
+        ];
+    }
 
     /**
-     * Re(load) the Events list
+     * Re(load) the Lab Results list
      */
     refreshList() {
         if (this.selectedOutbreak) {
@@ -133,33 +248,24 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Check if we have write access to events
+     * Check if we have write access to lab results
      * @returns {boolean}
      */
-    hasEventWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    hasLabResultWriteAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
     /**
-     * Check if we have access to create a contact
-     * @returns {boolean}
+     * Delete specific lab result
+     * @param {LabResultModel} labResult
      */
-    hasContactWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-    }
-
-    /**
-     * Delete specific event from outbreak
-     * @param {EventModel} event
-     */
-    deleteEvent(event: EventModel) {
+    deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_EVENT', event)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT', event)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete contact
-                    this.eventDataService
-                        .deleteEvent(this.selectedOutbreak.id, event.id)
+                    this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
@@ -168,30 +274,6 @@ export class LabResultsComponent extends ListComponent implements OnInit {
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
-    }
-
-    /**
-     * Restore an deleted event
-     * @param eventModel
-     */
-    restoreEvent(eventModel: EventModel) {
-        // show confirm dialog to confirm the action
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_EVENT', new EventModel(eventModel))
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.eventDataService
-                        .restoreEvent(this.selectedOutbreak.id, eventModel.id)
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
                             // reload data
                             this.needsRefreshList(true);
                         });

@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
+import { CaseModel } from './case.model';
 
 export class LabResultModel {
+    case: CaseModel;
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;

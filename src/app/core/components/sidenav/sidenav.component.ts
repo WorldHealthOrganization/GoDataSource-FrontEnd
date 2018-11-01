@@ -144,11 +144,17 @@ export class SidenavComponent implements OnInit {
             ]
         ),
         new NavItem(
-            'cases',
+            'cases-group',
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
             [PERMISSION.READ_CASE],
-            [
+            [   new ChildNavItem(
+                'cases',
+                'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
+                [PERMISSION.READ_CASE],
+                '/cases',
+                () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+            ),
                 new ChildNavItem(
                     'lab-results',
                     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',

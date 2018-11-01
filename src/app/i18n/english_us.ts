@@ -398,7 +398,7 @@ export const EnglishUsLang = {
         /**
          * Cases list page
          */
-        'LNG_PAGE_LIST_LAB_RESULTS_TITLE' : 'Lab Results',
+        // 'LNG_PAGE_LIST_LAB_RESULTS_TITLE' : 'Lab Results',
 
         /**
          * Date onset report list page
@@ -467,6 +467,22 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+
+        /**
+         * Lab results list page
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
+        'LNG_LAB_RESULTS_FIELD_CASE_LAST_NAME': 'Case last name',
+        'LNG_LAB_RESULTS_FIELD_CASE_FIRST_NAME': 'Case first name',
+        'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
+        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
+        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED': 'Sample delivered to lab',
+        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT': 'Date of the result',
+        'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME': 'Lab name',
+        'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
+        'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE': 'Test type',
+        'LNG_LAB_RESULTS_FIELD_LABEL_RESULT': 'Result',
+        // '': '',
 
         /**
          * Case Lab results list page
