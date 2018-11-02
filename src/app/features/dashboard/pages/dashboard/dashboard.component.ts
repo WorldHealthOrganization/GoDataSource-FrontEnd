@@ -12,6 +12,7 @@ import { ExportDataExtension } from '../../../../core/services/helper/dialog.ser
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -86,7 +87,8 @@ export class DashboardComponent implements OnInit {
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
         private outbreakDataService: OutbreakDataService,
-        private domService: DomService
+        private domService: DomService,
+        private importExportDataService: ImportExportDataService
     ) {}
 
     ngOnInit() {
@@ -239,7 +241,22 @@ export class DashboardComponent implements OnInit {
         this.domService.getPNGBase64('app-epi-curve-dashlet svg', 3, '#tempCanvas')
             .subscribe( (pngBase64) => {
             const epiCurvePngBase64 = pngBase64;
-            console.log(epiCurvePngBase64);
+            this.importExportDataService.exportImageToPdf({image: epiCurvePngBase64, responseType: 'blob'})
+                .subscribe( (blob) => {
+                    console.log(JSON.parse(blob));
+                    const urlT = window.URL.createObjectURL(blob);
+                    console.log(urlT);
+                    window.open(urlT);
+
+
+                    // const link = data.buttonDownloadFile.nativeElement;
+                    // link.href = urlT;
+                    // link.download = `${data.fileName}.${answer.inputValue.value.fileType}`;
+                    // link.click();
+                    //
+                    // window.URL.revokeObjectURL(urlT);
+                });
+
         });
 
     }

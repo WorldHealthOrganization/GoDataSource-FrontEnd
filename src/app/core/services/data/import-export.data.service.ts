@@ -64,5 +64,11 @@ export class ImportExportDataService {
             }
         );
     }
+
+    exportImageToPdf( imageData: {image: string, responseType: string}): Observable<any> {
+        console.log(imageData);
+        return this.http.post(`/system-settings/image-to-pdf/`, imageData);
+
+    }
 }
 
