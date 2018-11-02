@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
-import { AddressModel } from '../../../core/models/address.model';
+import { AddressModel, AddressType } from '../../../core/models/address.model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { } from '@types/googlemaps';
@@ -34,6 +34,7 @@ export class GoogleMapMovementComponent {
         };
 
         // sort addresses
+        let currentAddressIndex = 0;
         let previousAddress: AddressModel;
         this._addresses = _.chain(items).filter((item: AddressModel) => {
             return item.geoLocation &&
@@ -51,26 +52,35 @@ export class GoogleMapMovementComponent {
                 label: (index + 1).toString()
             }));
 
-            // add arrow line
+            // display lines only between usual place addresses ( current & history )
             const currentAddress = new AddressModel(item);
-            if (index > 0) {
-                this.arrowLines.push(new google.maps.Polyline({
-                    path: [{
-                        lat: previousAddress.geoLocation.lat,
-                        lng: previousAddress.geoLocation.lng
-                    }, {
-                        lat: currentAddress.geoLocation.lat,
-                        lng: currentAddress.geoLocation.lng
-                    }],
-                    icons: [{
-                        icon: lineSymbol,
-                        offset: '100%'
-                    }]
-                } as google.maps.PolylineOptions));
+            if (
+                currentAddress.typeId === AddressType.CURRENT_ADDRESS ||
+                currentAddress.typeId === AddressType.PREVIOUS_ADDRESS
+            ) {
+                // add arrow line
+                if (currentAddressIndex > 0) {
+                    this.arrowLines.push(new google.maps.Polyline({
+                        path: [{
+                            lat: previousAddress.geoLocation.lat,
+                            lng: previousAddress.geoLocation.lng
+                        }, {
+                            lat: currentAddress.geoLocation.lat,
+                            lng: currentAddress.geoLocation.lng
+                        }],
+                        icons: [{
+                            icon: lineSymbol,
+                            offset: '100%'
+                        }]
+                    } as google.maps.PolylineOptions));
+                }
+
+                // return address item
+                currentAddressIndex++;
+                previousAddress = currentAddress;
             }
 
-            // return address item
-            previousAddress = currentAddress;
+            // finished
             return currentAddress;
         }).value();
     }

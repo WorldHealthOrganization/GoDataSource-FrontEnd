@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
-import { AddressModel } from './address.model';
+import { AddressModel, AddressType } from './address.model';
 import { DocumentModel } from './document.model';
 import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
-import { Constants } from './constants';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 
@@ -132,7 +131,7 @@ export class CaseModel {
      */
     get mainAddress(): AddressModel {
         // get main address
-        const mainAddress = _.find(this.addresses, {'typeId': Constants.ADDRESS_USUAL_PLACE_OF_RESIDENCE});
+        const mainAddress = _.find(this.addresses, {'typeId': AddressType.CURRENT_ADDRESS});
         // do we have main address? Otherwise use any address
         const address = mainAddress ? mainAddress : this.addresses[0];
 

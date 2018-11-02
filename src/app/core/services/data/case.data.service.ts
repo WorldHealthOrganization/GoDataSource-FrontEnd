@@ -7,6 +7,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { GenericDataService } from './generic.data.service';
 import { ListFilterDataService } from './list-filter.data.service';
 import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
+import { AddressModel } from '../../models/address.model';
 
 @Injectable()
 export class CaseDataService {
@@ -43,6 +44,19 @@ export class CaseDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/${caseId}`),
             CaseModel
+        );
+    }
+
+    /**
+     * Retrieve a Case of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @returns {Observable<AddressModel[]>}
+     */
+    getCaseMovement(outbreakId: string, caseId: string): Observable<AddressModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/movement`),
+            AddressModel
         );
     }
 

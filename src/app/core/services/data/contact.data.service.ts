@@ -6,6 +6,7 @@ import { ContactModel } from '../../models/contact.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ExposureTypeGroupModel } from '../../models/exposure-type-group';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
+import { AddressModel } from '../../models/address.model';
 
 @Injectable()
 export class ContactDataService {
@@ -79,6 +80,19 @@ export class ContactDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}`),
             ContactModel
+        );
+    }
+
+    /**
+     * Retrieve a Contact of an Outbreak
+     * @param {string} outbreakId
+     * @param {string} contactId
+     * @returns {Observable<AddressModel[]>}
+     */
+    getContactMovement(outbreakId: string, contactId: string): Observable<AddressModel[]> {
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/movement`),
+            AddressModel
         );
     }
 
