@@ -41,9 +41,6 @@ export class TopnavComponent implements OnInit {
         private i18nService: I18nService,
         private snackbarService: SnackbarService
     ) {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
         // get the outbreaks list
         this.refreshOutbreaksList();
 
@@ -73,6 +70,10 @@ export class TopnavComponent implements OnInit {
      * Refresh outbreak list
      */
     refreshOutbreaksList() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // outbreak data
         this.outbreakDataService
             .getOutbreaksList()
             .map((outbreaksList) => {
