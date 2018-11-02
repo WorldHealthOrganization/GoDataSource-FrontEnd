@@ -320,7 +320,7 @@
     </mat-table>
 
     <mat-paginator
-        [length]="(eventsListCount$ | async)?.count"
+        [length]="(labResultsListCount$ | async)?.count"
         [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions"
         (page)="changePage($event)">

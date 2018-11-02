@@ -202,7 +202,11 @@
             <button mat-raised-button color="primary" class="button-primary">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
-            <button type="button" [routerLink]="['/cases', caseData.id, 'lab-results']" mat-raised-button>
+            <button type="button"
+                    mat-raised-button
+                    [routerLink]="!fromLabResultsPage ?
+                    ['/cases', caseData.id, 'lab-results'] :
+                    ['/cases/lab-results']">
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>

@@ -55,7 +55,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_CASE],
-            action: ViewModifyComponentAction.VIEW
+            action: ViewModifyComponentAction.MODIFY
         }
     },
     // View Case

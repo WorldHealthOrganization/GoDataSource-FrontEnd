@@ -31,17 +31,20 @@ import { FilterModel, FilterType } from '../../../../shared/components/side-filt
 export class LabResultsComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', ''),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
     ];
     // lab results list
     labResultsList$: Observable<any>;
+    // lab results count
+    labResultsListCount$: Observable<any>;
+
     labNamesList$: Observable<any[]>;
     sampleTypesList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
 
-    // lab results count
-    labResultsListCount$: Observable<any>;
+
     // authenticated user
     authUser: UserModel;
     // selected outbreak
@@ -243,7 +246,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.labResultsListCount$= this.labResultDataService.getAllLabResultsCount(this.selectedOutbreak.id, countQueryBuilder);
+            this.labResultsListCount$ = this.labResultDataService.getAllLabResultsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 

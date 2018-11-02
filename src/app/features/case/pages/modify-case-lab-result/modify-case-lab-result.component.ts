@@ -104,7 +104,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                             .subscribe((labResultData) => {
                                                 this.labResultData = new LabResultModel(labResultData);
                                                 this.breadcrumbs.push(
-                                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${params.caseId}/lab-results`)
+                                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/lab-results`)
                                                 );
                                                 // add new breadcrumb: page title
                                                 this.breadcrumbs.push(
