@@ -5,6 +5,9 @@ import { ActivatedRoute } from '@angular/router';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { AddressModel } from '../../../../core/models/address.model';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-view-movement-case',
@@ -18,6 +21,7 @@ export class ViewMovementCaseComponent implements OnInit {
     ];
 
     caseData: CaseModel = new CaseModel();
+    movementAddresses: AddressModel[] = [];
 
     constructor(
         protected route: ActivatedRoute,
@@ -27,31 +31,34 @@ export class ViewMovementCaseComponent implements OnInit {
 
     ngOnInit() {
         this.route.params.subscribe((params: { caseId }) => {
-            // get current outbreak
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // get case
-                    this.caseDataService
-                        .getCase(selectedOutbreak.id, params.caseId)
-                        .subscribe((caseDataReturned) => {
-                            this.caseData = caseDataReturned;
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    caseDataReturned.name,
-                                    `/cases/${caseDataReturned.id}/view`),
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.caseData
-                                )
-                            );
-                        });
+                    Observable.forkJoin([
+                        this.caseDataService.getCase(selectedOutbreak.id, params.caseId),
+                        this.caseDataService.getCaseMovement(selectedOutbreak.id, params.caseId)
+                    ]).subscribe((
+                        [caseData, movementData]: [CaseModel, AddressModel[]]
+                    ) => {
+                        // case data
+                        this.caseData = caseData;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                this.caseData.name,
+                                `/cases/${this.caseData.id}/view`),
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+                                '.',
+                                true,
+                                {},
+                                this.caseData
+                            )
+                        );
+
+                        // movement data
+                        this.movementAddresses = movementData;
+                    });
                 });
-
-
         });
     }
 }

@@ -15,7 +15,7 @@ export class SystemSettingsDataService {
     ) {}
 
     /**
-     * Retrieve a Case of an Outbreak
+     * Retrieve System settings
      * @returns {Observable<SystemSettingsModel>}
      */
     getSystemSettings(): Observable<SystemSettingsModel> {
