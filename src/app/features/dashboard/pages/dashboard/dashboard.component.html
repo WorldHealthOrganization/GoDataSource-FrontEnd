@@ -1,7 +1,28 @@
 <div>
     <app-topnav>
         <ng-container dynamic-section>
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+            <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+                <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+                <div class="topnav-actions">
+
+                    <button class="button-primary" mat-raised-button color="primary"
+                            [matMenuTriggerFor]="quickActionsMenu">
+                        {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                    </button>
+
+                    <mat-menu #quickActionsMenu="matMenu">
+                        <ng-container>
+
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
+                                {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </div>
+            </div>
         </ng-container>
     </app-topnav>
 
