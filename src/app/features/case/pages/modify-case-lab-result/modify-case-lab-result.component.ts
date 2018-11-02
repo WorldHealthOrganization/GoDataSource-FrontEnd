@@ -20,6 +20,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Moment } from 'moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-modify-case-relationship',
@@ -88,7 +89,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
         this.route.queryParams.
             subscribe((queryParams: {fromLabResultsList}) => {
+            if (!_.isEmpty(queryParams)) {
                 this.fromLabResultsList = JSON.parse(queryParams.fromLabResultsList);
+            }
         });
 
         this.route.params
@@ -114,16 +117,19 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                             })
                             .subscribe((caseData: CaseModel) => {
                                 this.caseData = caseData;
+                                // If we're not coming from lab results list push a new breadcrumb
                                 if (!this.fromLabResultsList) {
-                                        this.breadcrumbs.push(
+                                    this.breadcrumbs.push(
                                         new BreadcrumbItemModel(caseData.name, `/cases/${params.caseId}/modify`),
                                     );
                                 }
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
+                                    new BreadcrumbItemModel(
+                                        'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
                                         !this.fromLabResultsList ?
                                             `/cases/${params.caseId}/lab-results` :
-                                            '/cases/lab-results')
+                                            '/cases/lab-results'
+                                    )
                                 );
 
                                 // get relationship data

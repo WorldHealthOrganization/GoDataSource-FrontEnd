@@ -192,10 +192,8 @@
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
                 mat-raised-button color="primary" class="button-primary"
-                [routerLink]="!fromLabResultsPage ?
-                    ['/cases', caseData.id, 'lab-results', labResultId, 'modify' ] :
-                    ['/cases/lab-results', labResultId, 'modify']"
-                [queryParams]="{fromLabResultsList: true}">
+                [routerLink]=" ['/cases', caseData.id, 'lab-results', labResultId, 'modify' ]"
+                [queryParams]="{fromLabResultsList: fromLabResultsList}">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
@@ -204,7 +202,7 @@
             </button>
             <button type="button"
                     mat-raised-button
-                    [routerLink]="!fromLabResultsPage ?
+                    [routerLink]="!fromLabResultsList ?
                         ['/cases', caseData.id, 'lab-results'] :
                         ['/cases/lab-results']">
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
