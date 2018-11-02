@@ -93,19 +93,7 @@
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
                                 required="true">
                             </app-form-input>
-                            <app-form-select
-                                name="reportingGeographicalLevelId"
-                                [(ngModel)]="outbreak.reportingGeographicalLevelId"
-                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate"
-                                tooltip="LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL_DESCRIPTION"
-                                [options]="geographicalLevelsList$ | async"
-                                optionLabelKey="label"
-                                optionValueKey="value"
-                                multiple="false"
-                                required="true"
-                                [disabled]="viewOnly">
-                            </app-form-select>
-
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>
@@ -188,6 +176,26 @@
                                 [disabled]="viewOnly">
                             </app-form-input>
 
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+                            <app-form-select
+                                name="reportingGeographicalLevelId"
+                                [(ngModel)]="outbreak.reportingGeographicalLevelId"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL_DESCRIPTION"
+                                [options]="geographicalLevelsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                multiple="false"
+                                required="true"
+                                [disabled]="viewOnly">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>

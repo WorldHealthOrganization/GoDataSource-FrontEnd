@@ -162,7 +162,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'reportingGeographicalLevelId',
-                label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL'
+                label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'startDate',
