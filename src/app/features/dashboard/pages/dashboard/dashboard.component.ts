@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -8,6 +8,12 @@ import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/Observable';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { DomService } from '../../../../core/services/helper/dom.service';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -69,15 +75,41 @@ export class DashboardComponent implements OnInit {
     // provide constants to template
     DashboardDashlet = DashboardDashlet;
 
+    selectedOutbreak: OutbreakModel;
+
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.PDF
+    ];
+
+    casesByClassificationAndLocationReportUrl: string = '';
+    contactsFollowupSuccessRateReportUrl: string = '';
+
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
     constructor(
         private authDataService: AuthDataService,
-        private userDataService: UserDataService
-    ) {}
+        private userDataService: UserDataService,
+        private outbreakDataService: OutbreakDataService,
+        private domService: DomService,
+        private importExportDataService: ImportExportDataService,
+        private i18nService: I18nService
+    ) {
+    }
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.initializeDashlets();
+
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                if (selectedOutbreak && selectedOutbreak.id) {
+                    this.selectedOutbreak = selectedOutbreak;
+                    this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
+                    this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                }
+            });
     }
 
     private initializeDashlets() {
@@ -200,12 +232,38 @@ export class DashboardComponent implements OnInit {
     hasReadReportPermissions(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
+
     /**
      * Check if the user has read team permission
      * @returns {boolean}
      */
     hasReadUserPermissions(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_TEAM);
+    }
+
+    /**
+     * generate EPI curve report - image will be exported as pdf
+     */
+    generateEpiCurveReport() {
+        this.domService
+            .getPNGBase64('app-epi-curve-dashlet svg', 3, '#tempCanvas')
+            .subscribe((pngBase64) => {
+                const epiCurvePngBase64 = pngBase64;
+                this.importExportDataService.exportImageToPdf({image: epiCurvePngBase64, responseType: 'blob'})
+                    .subscribe((blob) => {
+                        const urlT = window.URL.createObjectURL(blob);
+                        window.open(urlT);
+                        const link = this.buttonDownloadFile.nativeElement;
+
+                        const fileName = this.i18nService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+
+                        link.href = urlT;
+                        link.download = `${fileName}.pdf`;
+                        link.click();
+
+                        window.URL.revokeObjectURL(urlT);
+                });
+            });
     }
 
 }

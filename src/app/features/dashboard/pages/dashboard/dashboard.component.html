@@ -1,7 +1,46 @@
 <div>
     <app-topnav>
         <ng-container dynamic-section>
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+            <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+                <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+                <div class="topnav-actions">
+
+                    <button class="button-primary" mat-raised-button color="primary"
+                            [matMenuTriggerFor]="quickActionsMenu">
+                        {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
+                    </button>
+
+                    <mat-menu #quickActionsMenu="matMenu">
+                        <ng-container>
+
+                            <app-export-button
+                                [menuItem]="true"
+                                [allowedExportTypes]="allowedExportTypes"
+                                [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                                [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                                [url]="casesByClassificationAndLocationReportUrl"
+                                [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate">
+                            </app-export-button>
+
+                            <app-export-button
+                                [menuItem]="true"
+                                [allowedExportTypes]="allowedExportTypes"
+                                [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                                [message]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                                [url]="contactsFollowupSuccessRateReportUrl"
+                                [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate">
+                            </app-export-button>
+
+                            <button
+                                mat-menu-item
+                                (click)="generateEpiCurveReport()">
+                                {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </div>
+            </div>
         </ng-container>
     </app-topnav>
 
@@ -319,6 +358,9 @@
                 </ng-container>
             </div>
         </mat-card>
+
+        <canvas id="tempCanvas"></canvas>
+        <a hidden #buttonDownloadFile></a>
 
     </div>
 </div>
