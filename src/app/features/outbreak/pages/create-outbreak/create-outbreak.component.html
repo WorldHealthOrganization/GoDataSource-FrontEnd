@@ -85,6 +85,7 @@
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>
+
                         </div>
                     </div>
                 </mat-card>
@@ -159,6 +160,26 @@
                                 type="number">
                             </app-form-input>
                         </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+                            <app-form-select
+                                name="reportingGeographicalLevelId"
+                                [(ngModel)]="newOutbreak.reportingGeographicalLevelId"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL_DESCRIPTION"
+                                [options]="geographicalLevelsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                required="true"
+                                multiple="false">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                        </div>
+
                     </div>
                 </mat-card>
 

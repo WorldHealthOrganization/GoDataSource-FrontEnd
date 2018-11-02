@@ -35,13 +35,13 @@
             </div>
 
             <div fxFlex="33">
-                <!-- case summary pie chart -->
+                <!-- cases by geographic location - pie chart -->
                 <mat-card class="dashboard-gauge">
-                    <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE' | translate}}</div>
+                    <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}</div>
                     <div fxLayoutAlign="center">
-                        <app-case-summary-dashlet
+                        <app-case-by-geographic-location-dashlet
                             *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
-                        </app-case-summary-dashlet>
+                        </app-case-by-geographic-location-dashlet>
                     </div>
                 </mat-card>
             </div>

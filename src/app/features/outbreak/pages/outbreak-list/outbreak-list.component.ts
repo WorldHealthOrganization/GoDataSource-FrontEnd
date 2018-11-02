@@ -53,6 +53,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    geographicalLevelsList$: Observable<any[]>;
+
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
     UserSettings = UserSettings;
@@ -112,6 +114,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
         this.activeOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
@@ -156,6 +159,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'country',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES'
+            }),
+            new VisibleColumnModel({
+                field: 'reportingGeographicalLevelId',
+                label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'startDate',

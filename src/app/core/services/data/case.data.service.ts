@@ -7,6 +7,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { GenericDataService } from './generic.data.service';
 import { ListFilterDataService } from './list-filter.data.service';
 import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
+import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 
 @Injectable()
@@ -203,6 +204,21 @@ export class CaseDataService {
                 });
                 return results;
             }
+        );
+    }
+
+    /**
+     * Retrieve cases per location metrics
+     * @param {string} outbreakId
+     * @returns {Observable<MetricCasesPerLocationCountsModel>}
+     */
+    getCasesPerLocation(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesPerLocationCountsModel> {
+
+        const filter = queryBuilder.buildQuery();
+
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/per-location-level/count?filter=${filter}`),
+            MetricCasesPerLocationCountsModel
         );
     }
 

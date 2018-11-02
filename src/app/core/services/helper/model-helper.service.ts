@@ -8,6 +8,8 @@ import * as _ from 'lodash';
 import { TeamModel } from '../../models/team.model';
 import { LocationModel } from '../../models/location.model';
 import { OutbreakModel } from '../../models/outbreak.model';
+import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
+import { MetricLocationCasesCountsModel } from '../../models/metrics/metric-location-cases-count.model';
 
 @Injectable()
 export class ModelHelperService {
@@ -20,7 +22,7 @@ export class ModelHelperService {
      */
     mapObservableListToModel(obs: Observable<any>, modelClass): Observable<any> {
         return obs.map(
-            (listResult) => {
+         (listResult) => {
                 return listResult.map((item) => {
                     return this.getModelInstance(modelClass, item);
                 });
@@ -129,6 +131,18 @@ export class ModelHelperService {
                 );
 
                 return outbreak;
+
+            case MetricCasesPerLocationCountsModel:
+                // create the Outbreak instance
+                const metricCasesPerLocationCounts = new MetricCasesPerLocationCountsModel(data);
+
+                // set locations
+                metricCasesPerLocationCounts.locations = this.mapListToModel(
+                    _.get(data, 'locations', []),
+                    MetricLocationCasesCountsModel
+                );
+
+                return metricCasesPerLocationCounts;
 
             default:
                 return new modelClass(data);

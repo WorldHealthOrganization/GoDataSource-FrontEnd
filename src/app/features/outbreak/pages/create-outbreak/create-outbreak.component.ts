@@ -33,6 +33,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
     // lists used in dropdowns
     diseasesList$: Observable<LabelValuePair[]>;
     countriesList$: Observable<LabelValuePair[]>;
+    geographicalLevelsList$: Observable<any[]>;
 
     newOutbreak: OutbreakModel = new OutbreakModel();
 
@@ -50,6 +51,7 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
     }
 
     ngOnInit() {
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
