@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { ViewModifyComponent, ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
@@ -24,6 +24,11 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
+    },
+    // View Lab Results
+    {
+        path: 'lab-results',
+        component: fromPages.LabResultsComponent
     },
     // View Case
     {

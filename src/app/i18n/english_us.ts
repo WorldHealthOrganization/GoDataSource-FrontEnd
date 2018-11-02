@@ -21,6 +21,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
+        'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': 'Lab Results',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
         'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL': 'Duplicated Records',
         'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL': 'Reference Data',
@@ -443,6 +444,10 @@ export const EnglishUsLang = {
         /**
          * Case lab results fields
          */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME': 'Case last name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME': 'Case first name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
@@ -468,6 +473,12 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': 'Quantitative Result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+
+        /**
+         * Lab results list page
+         */
+        'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
 
         /**
          * Case Lab results list page

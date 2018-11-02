@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
+import { CaseModel } from './case.model';
 
 export class LabResultModel {
+    case: CaseModel;
     id: string;
     sampleIdentifier: string;
     dateSampleTaken: string;
@@ -19,6 +21,7 @@ export class LabResultModel {
     personId: string;
 
     constructor(data = null) {
+        this.case = new CaseModel(_.get(data, 'case'));
         this.id = _.get(data, 'id');
         this.sampleIdentifier = _.get(data, 'sampleIdentifier', '');
         this.dateSampleTaken = _.get(data, 'dateSampleTaken');
