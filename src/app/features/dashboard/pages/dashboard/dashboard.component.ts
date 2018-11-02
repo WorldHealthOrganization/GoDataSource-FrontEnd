@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -13,6 +13,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -83,13 +84,17 @@ export class DashboardComponent implements OnInit {
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
     constructor(
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
         private outbreakDataService: OutbreakDataService,
         private domService: DomService,
-        private importExportDataService: ImportExportDataService
-    ) {}
+        private importExportDataService: ImportExportDataService,
+        private i18nService: I18nService
+    ) {
+    }
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -100,9 +105,9 @@ export class DashboardComponent implements OnInit {
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
-                  this.selectedOutbreak = selectedOutbreak;
-                  this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
-                  this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                    this.selectedOutbreak = selectedOutbreak;
+                    this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
+                    this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
     }
@@ -227,6 +232,7 @@ export class DashboardComponent implements OnInit {
     hasReadReportPermissions(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
+
     /**
      * Check if the user has read team permission
      * @returns {boolean}
@@ -235,29 +241,29 @@ export class DashboardComponent implements OnInit {
         return this.authUser.hasPermissions(PERMISSION.READ_TEAM);
     }
 
+    /**
+     * generate EPI curve report - image will be exported as pdf
+     */
     generateEpiCurveReport() {
-        console.log('start');
-  //      this.domService.generatePngFromSvg('app-epi-curve-dashlet svg', '#tempCanvas');
         this.domService.getPNGBase64('app-epi-curve-dashlet svg', 3, '#tempCanvas')
-            .subscribe( (pngBase64) => {
-            const epiCurvePngBase64 = pngBase64;
-            this.importExportDataService.exportImageToPdf({image: epiCurvePngBase64, responseType: 'blob'})
-                .subscribe( (blob) => {
-                    console.log(JSON.parse(blob));
-                    const urlT = window.URL.createObjectURL(blob);
-                    console.log(urlT);
-                    window.open(urlT);
+            .subscribe((pngBase64) => {
+                const epiCurvePngBase64 = pngBase64;
+                this.importExportDataService.exportImageToPdf({image: epiCurvePngBase64, responseType: 'blob'})
+                    .subscribe((blob) => {
+                        const urlT = window.URL.createObjectURL(blob);
+                        window.open(urlT);
+                        const link = this.buttonDownloadFile.nativeElement;
 
+                        const fileName = this.i18nService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
 
-                    // const link = data.buttonDownloadFile.nativeElement;
-                    // link.href = urlT;
-                    // link.download = `${data.fileName}.${answer.inputValue.value.fileType}`;
-                    // link.click();
-                    //
-                    // window.URL.revokeObjectURL(urlT);
+                        link.href = urlT;
+                        link.download = `epi-curve.pdf`;
+                        link.click();
+
+                        window.URL.revokeObjectURL(urlT);
                 });
 
-        });
+            });
 
     }
 

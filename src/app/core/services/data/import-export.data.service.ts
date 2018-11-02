@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -66,8 +66,8 @@ export class ImportExportDataService {
     }
 
     exportImageToPdf( imageData: {image: string, responseType: string}): Observable<any> {
-        console.log(imageData);
-        return this.http.post(`/system-settings/image-to-pdf/`, imageData);
+        const headers = new HttpHeaders({ 'Content-Type': 'application/pdf'});
+        return this.http.post(`/system-settings/image-to-pdf/`, imageData,  { headers, responseType: 'blob' });
 
     }
 }
