@@ -53,7 +53,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
-    geographicalLevelsList$: Observable<any[]>
+    geographicalLevelsList$: Observable<any[]>;
 
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
