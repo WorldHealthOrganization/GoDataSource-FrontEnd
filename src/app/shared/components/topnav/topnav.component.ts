@@ -9,6 +9,7 @@ import { LanguageDataService } from '../../../core/services/data/language.data.s
 import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-topnav',
@@ -72,9 +73,22 @@ export class TopnavComponent implements OnInit {
      * Refresh outbreak list
      */
     refreshOutbreaksList() {
-        this.outbreakDataService.getOutbreaksList().subscribe((outbreaksList) => {
-            this.outbreaksList = outbreaksList;
-        });
+        this.outbreakDataService
+            .getOutbreaksList()
+            .map((outbreaksList) => {
+                return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                    // do we need to update name of the outbreak ?
+                    if (outbreak.id === this.authUser.activeOutbreakId) {
+                        outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
+                    }
+
+                    // finished
+                    return outbreak;
+                });
+            })
+            .subscribe((outbreaksList) => {
+                this.outbreaksList = outbreaksList;
+            });
     }
 
     /**
