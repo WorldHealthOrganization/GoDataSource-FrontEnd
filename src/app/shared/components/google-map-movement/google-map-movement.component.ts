@@ -34,7 +34,6 @@ export class GoogleMapMovementComponent {
         };
 
         // sort addresses
-        let currentAddressIndex = 0;
         let previousAddress: AddressModel;
         this._addresses = _.chain(items).filter((item: AddressModel) => {
             return item.geoLocation &&
@@ -59,7 +58,7 @@ export class GoogleMapMovementComponent {
                 currentAddress.typeId === AddressType.PREVIOUS_ADDRESS
             ) {
                 // add arrow line
-                if (currentAddressIndex > 0) {
+                if (previousAddress) {
                     this.arrowLines.push(new google.maps.Polyline({
                         path: [{
                             lat: previousAddress.geoLocation.lat,
@@ -76,7 +75,6 @@ export class GoogleMapMovementComponent {
                 }
 
                 // return address item
-                currentAddressIndex++;
                 previousAddress = currentAddress;
             }
 
