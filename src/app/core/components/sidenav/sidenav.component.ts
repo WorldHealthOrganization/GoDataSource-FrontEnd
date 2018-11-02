@@ -148,7 +148,8 @@ export class SidenavComponent implements OnInit {
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
             [PERMISSION.READ_CASE],
-            [   new ChildNavItem(
+            [
+                new ChildNavItem(
                 'cases',
                 'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
                 [PERMISSION.READ_CASE],

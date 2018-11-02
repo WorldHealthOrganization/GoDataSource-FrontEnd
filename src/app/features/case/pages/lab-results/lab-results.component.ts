@@ -215,7 +215,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getAllLabResults(this.selectedOutbreak.id, this.queryBuilder);
+            this.labResultsList$ = this.labResultDataService.getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -227,7 +227,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.labResultsListCount$ = this.labResultDataService.getAllLabResultsCount(this.selectedOutbreak.id, countQueryBuilder);
+            this.labResultsListCount$ = this.labResultDataService.getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 
@@ -245,7 +245,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
      */
     deleteLabResult(labResult: LabResultModel) {
         // show confirm dialog
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT', event)
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT', labResult)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     // delete lab result
@@ -256,7 +256,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);

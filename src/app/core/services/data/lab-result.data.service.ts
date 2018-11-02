@@ -72,7 +72,7 @@ export class LabResultDataService {
      * @param {string} outbreakId
      * @returns {Observable<any[]>}
      */
-    getAllLabResults(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getOutbreakLabResults(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
 
         const qb = new RequestQueryBuilder();
         // include case data
@@ -91,7 +91,7 @@ export class LabResultDataService {
      * @param {RequestQueryBuilder}queryBuilder
      * @returns {Observable<any>}
      */
-    getAllLabResultsCount(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+    getOutbreakLabResultsCount(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter  = queryBuilder.buildQuery();
 
         return this.http.get(`/outbreaks/${outbreakId}/lab-results/count?filter=${filter}`);

@@ -44,7 +44,9 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
     // lab results
     labResultData: LabResultModel = new LabResultModel();
     labResultId: string;
-    fromLabResultsPage: boolean = false;
+
+    // variable for breadcrumbs manipulation if we're coming from lab result list
+    fromLabResultsList: boolean = false;
 
     sampleTypesList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;
@@ -84,6 +86,11 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 this.serverToday = curDate;
             });
 
+        this.route.queryParams.
+            subscribe((queryParams: {fromLabResultsList}) => {
+                this.fromLabResultsList = JSON.parse(queryParams.fromLabResultsList);
+        });
+
         this.route.params
             .subscribe((params: {caseId, labResultId}) => {
                 this.labResultId = params.labResultId;
@@ -92,104 +99,61 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                     .getSelectedOutbreak()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
-                        // handle the route when we're coming from LabResults page
-                        if (!params.caseId) {
-                            // if there's no caseID from params, it means we're coming from lab results page list
-                            this.route.queryParams.subscribe((queryParams: { caseId }) => {
-                                this.fromLabResultsPage = true;
-                                this.getCaseData(this.selectedOutbreak.id, queryParams.caseId)
-                                    .subscribe((caseData: CaseModel) => {
-                                        this.caseData = caseData;
-                                        // get lab result data
-                                        this.getLabResultData(this.selectedOutbreak.id, this.caseData.id, params.labResultId)
-                                            .subscribe((labResultData) => {
-                                                this.labResultData = new LabResultModel(labResultData);
-                                                this.breadcrumbs.push(
-                                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/lab-results`)
-                                                );
-                                                // add new breadcrumb: page title
-                                                this.breadcrumbs.push(
-                                                    new BreadcrumbItemModel(
-                                                        this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
-                                                        null,
-                                                        true,
-                                                        {},
-                                                        this.labResultData
-                                                    )
-                                                );
-                                            });
 
-                                    });
-                            });
-                        } else {
-                            // get case data
-                            this.getCaseData(this.selectedOutbreak.id, params.caseId)
-                                .subscribe((caseData: CaseModel) => {
-                                    this.caseData = caseData;
-                                    this.breadcrumbs.push(
+                        // get case data
+                        this.caseDataService
+                            .getCase(this.selectedOutbreak.id, params.caseId)
+                            .catch((err) => {
+                                this.snackbarService.showError(err.message);
+
+                                // Case not found; navigate back to Cases list
+                                this.disableDirtyConfirm();
+                                this.router.navigate(['/cases']);
+
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((caseData: CaseModel) => {
+                                this.caseData = caseData;
+                                if (!this.fromLabResultsList) {
+                                        this.breadcrumbs.push(
                                         new BreadcrumbItemModel(caseData.name, `/cases/${params.caseId}/modify`),
                                     );
-                                    this.breadcrumbs.push(
-                                        new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE', `/cases/${params.caseId}/lab-results`)
-                                    );
+                                }
+                                this.breadcrumbs.push(
+                                    new BreadcrumbItemModel('LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
+                                        !this.fromLabResultsList ?
+                                            `/cases/${params.caseId}/lab-results` :
+                                            '/cases/lab-results')
+                                );
 
-                                    // get relationship data
-                                    this.getLabResultData(this.selectedOutbreak.id, params.caseId, params.labResultId)
-                                        .subscribe((labResultData) => {
-                                            this.labResultData = new LabResultModel(labResultData);
+                                // get relationship data
+                                this.labResultDataService
+                                    .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                                            // add new breadcrumb: page title
-                                            this.breadcrumbs.push(
-                                                new BreadcrumbItemModel(
-                                                    this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
-                                                    null,
-                                                    true,
-                                                    {},
-                                                    this.labResultData
-                                                )
-                                            );
-                                        });
-                                });
-                        }
+                                        this.disableDirtyConfirm();
+                                        this.router.navigate([`/cases/${params.caseId}/lab-results`]);
+
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe((labResultData) => {
+                                        this.labResultData = new LabResultModel(labResultData);
+
+                                        // add new breadcrumb: page title
+                                        this.breadcrumbs.push(
+                                            new BreadcrumbItemModel(
+                                                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                                                null,
+                                                true,
+                                                {},
+                                                this.labResultData
+                                            )
+                                        );
+                                    });
+
+                            });
                     });
-            });
-    }
-
-    /**
-     * Get case data
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<CaseModel>}
-     */
-    getCaseData(outbreakId: string, caseId: string): Observable<CaseModel> {
-        return this.caseDataService.getCase(outbreakId, caseId)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-
-                // Case not found; navigate back to Cases list
-                this.disableDirtyConfirm();
-                this.router.navigate(['/cases']);
-
-                return ErrorObservable.create(err);
-            });
-    }
-
-    /**
-     * Get Lab result data
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @param {string} labResultId
-     * @returns {Observable<LabResultModel>}
-     */
-    getLabResultData(outbreakId: string, caseId: string, labResultId: string): Observable<LabResultModel> {
-        return this.labResultDataService.getLabResult(outbreakId, caseId, labResultId)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-
-                this.disableDirtyConfirm();
-                this.router.navigate([`/cases/${caseId}/lab-results`]);
-
-                return ErrorObservable.create(err);
             });
     }
 

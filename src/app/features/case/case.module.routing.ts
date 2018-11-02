@@ -28,35 +28,7 @@ const routes: Routes = [
     // View Lab Results
     {
         path: 'lab-results',
-        component: fromPages.LabResultsComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_CASE]
-        }
-    },
-    // View lab results
-    {
-        path: 'lab-results/:labResultId/view',
-        component: fromPages.ModifyCaseLabResultComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_CASE],
-            action: ViewModifyComponentAction.VIEW
-        }
-    },
-    // Modify lab results
-    {
-
-        path: 'lab-results/:labResultId/modify',
-        component: fromPages.ModifyCaseLabResultComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_CASE],
-            action: ViewModifyComponentAction.MODIFY
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
+        component: fromPages.LabResultsComponent
     },
     // View Case
     {

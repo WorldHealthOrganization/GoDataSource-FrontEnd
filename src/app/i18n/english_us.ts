@@ -437,6 +437,10 @@ export const EnglishUsLang = {
         /**
          * Case lab results fields
          */
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME': 'Case last name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME': 'Case first name',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
@@ -467,16 +471,7 @@ export const EnglishUsLang = {
          * Lab results list page
          */
         'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
-        'LNG_LAB_RESULTS_FIELD_CASE_LAST_NAME': 'Case last name',
-        'LNG_LAB_RESULTS_FIELD_CASE_FIRST_NAME': 'Case first name',
-        'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID': 'Sample Lab Id',
-        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN': 'Sample taken',
-        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED': 'Sample delivered to lab',
-        'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT': 'Date of the result',
-        'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME': 'Lab name',
-        'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
-        'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE': 'Test type',
-        'LNG_LAB_RESULTS_FIELD_LABEL_RESULT': 'Result',
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
 
         /**
          * Case Lab results list page
