@@ -257,7 +257,7 @@ export class DashboardComponent implements OnInit {
                         const fileName = this.i18nService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
 
                         link.href = urlT;
-                        link.download = `epi-curve.pdf`;
+                        link.download = `${fileName}.pdf`;
                         link.click();
 
                         window.URL.revokeObjectURL(urlT);
