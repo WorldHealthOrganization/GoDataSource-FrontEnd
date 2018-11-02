@@ -24,6 +24,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
+import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -58,6 +59,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     // provide constants to template
     ReferenceDataCategory = ReferenceDataCategory;
     UserSettings = UserSettings;
+
+    @ViewChild('topNav') topNav: TopnavComponent;
 
     exportOutbreaksUrl: string = 'outbreaks/export';
     outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
@@ -280,6 +283,11 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
                                     this.outbreakDataService.checkActiveSelectedOutbreak();
                                     this.needsRefreshList(true);
+
+                                    // refresh list of top nav outbreak
+                                    if (this.topNav) {
+                                        this.topNav.refreshOutbreaksList();
+                                    }
                                 });
                         });
                 }
