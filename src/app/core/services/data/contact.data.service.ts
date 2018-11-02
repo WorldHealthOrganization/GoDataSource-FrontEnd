@@ -84,7 +84,7 @@ export class ContactDataService {
     }
 
     /**
-     * Retrieve a Contact of an Outbreak
+     * Retrieve Contact movement information
      * @param {string} outbreakId
      * @param {string} contactId
      * @returns {Observable<AddressModel[]>}

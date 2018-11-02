@@ -48,7 +48,7 @@ export class CaseDataService {
     }
 
     /**
-     * Retrieve a Case of an Outbreak
+     * Retrieve Case movement information
      * @param {string} outbreakId
      * @param {string} caseId
      * @returns {Observable<AddressModel[]>}
