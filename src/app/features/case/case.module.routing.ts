@@ -32,10 +32,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_CASE]
-        },
-        children: [
-
-        ]
+        }
     },
     // View lab results
     {
@@ -56,7 +53,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_CASE],
             action: ViewModifyComponentAction.MODIFY
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
     // View Case
     {

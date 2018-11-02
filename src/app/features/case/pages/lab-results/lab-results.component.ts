@@ -14,7 +14,6 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -59,13 +58,13 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     UserSettings = UserSettings;
     ReferenceDataCategory = ReferenceDataCategory;
 
-    constructor(protected snackbarService: SnackbarService,
-                private authDataService: AuthDataService,
-                private outbreakDataService: OutbreakDataService,
-                private labResultDataService: LabResultDataService,
-                private dialogService: DialogService,
-                private eventDataService: EventDataService,
-                private referenceDataDataService: ReferenceDataDataService
+    constructor(
+        protected snackbarService: SnackbarService,
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService,
+        private labResultDataService: LabResultDataService,
+        private dialogService: DialogService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(snackbarService);
     }
@@ -114,35 +113,35 @@ export class LabResultsComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'sampleIdentifier',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleTaken',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleDelivered',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
             }),
             new VisibleColumnModel({
                 field: 'dateOfResult',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'labName',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME'
             }),
             new VisibleColumnModel({
                 field: 'sampleType',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'testType',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'result',
-                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+                label: 'LNG_LAB_RESULTS_FIELD_LABEL_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -158,72 +157,54 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'sampleIdentifier',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID',
                 type: FilterType.TEXT,
                 sortable: true,
             }),
             new FilterModel({
                 fieldName: 'dateSampleTaken',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateSampleDelivered',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'dateOfResult',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT',
                 type: FilterType.RANGE_DATE,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'labName',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME',
                 type: FilterType.SELECT,
                 options$: this.labNamesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'sampleType',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE',
                 type: FilterType.SELECT,
                 options$: this.sampleTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'testType',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE',
                 type: FilterType.SELECT,
                 options$: this.testTypesList$,
                 sortable: true
             }),
             new FilterModel({
                 fieldName: 'result',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT',
+                fieldLabel: 'LNG_LAB_RESULTS_FIELD_LABEL_RESULT',
                 type: FilterType.SELECT,
                 options$: this.labTestResultsList$,
-            }),
-            new FilterModel({
-                fieldName: 'dateTesting',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-                type: FilterType.RANGE_DATE,
-                sortable: true,
-            }),
-            new FilterModel({
-                fieldName: 'notes',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES',
-                type: FilterType.TEXT,
-                sortable: true,
-            }),
-            new FilterModel({
-                fieldName: 'status',
-                fieldLabel: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS',
-                type: FilterType.TEXT,
-                sortable: true,
             })
         ];
     }
@@ -233,7 +214,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            // retrieve the list of Events
+            // retrieve the list of lab results
             this.labResultsList$ = this.labResultDataService.getAllLabResults(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
@@ -267,7 +248,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT', event)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    // delete contact
+                    // delete lab result
                     this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);

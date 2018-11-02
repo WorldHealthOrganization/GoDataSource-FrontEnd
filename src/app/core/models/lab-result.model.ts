@@ -21,6 +21,7 @@ export class LabResultModel {
     personId: string;
 
     constructor(data = null) {
+        this.case = _.get(data, 'case');
         this.id = _.get(data, 'id');
         this.sampleIdentifier = _.get(data, 'sampleIdentifier', '');
         this.dateSampleTaken = _.get(data, 'dateSampleTaken');

@@ -94,6 +94,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                         this.selectedOutbreak = selectedOutbreak;
                         // handle the route when we're coming from LabResults page
                         if (!params.caseId) {
+                            // if there's no caseID from params, it means we're coming from lab results page list
                             this.route.queryParams.subscribe((queryParams: { caseId }) => {
                                 this.fromLabResultsPage = true;
                                 this.getCaseData(this.selectedOutbreak.id, queryParams.caseId)

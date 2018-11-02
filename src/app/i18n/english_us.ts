@@ -396,11 +396,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
 
         /**
-         * Cases list page
-         */
-        // 'LNG_PAGE_LIST_LAB_RESULTS_TITLE' : 'Lab Results',
-
-        /**
          * Date onset report list page
          */
         'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE': 'Cases with onset date before parent onset case',
@@ -482,7 +477,6 @@ export const EnglishUsLang = {
         'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE': 'Sample type',
         'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE': 'Test type',
         'LNG_LAB_RESULTS_FIELD_LABEL_RESULT': 'Result',
-        // '': '',
 
         /**
          * Case Lab results list page
