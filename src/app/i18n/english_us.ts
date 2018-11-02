@@ -1420,6 +1420,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL': 'Cases Isolated',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL': 'Cases Not Hospitalized',
 
+        'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL': 'Cases by classification and location',
+        'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL': 'Contacts follow up success rate',
+        'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
+
 
         /**
          * Backup modules

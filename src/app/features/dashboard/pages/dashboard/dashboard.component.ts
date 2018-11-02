@@ -8,6 +8,10 @@ import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/Observable';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { DomService } from '../../../../core/services/helper/dom.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -69,15 +73,36 @@ export class DashboardComponent implements OnInit {
     // provide constants to template
     DashboardDashlet = DashboardDashlet;
 
+    selectedOutbreak: OutbreakModel;
+
+    allowedExportTypes: ExportDataExtension[] = [
+        ExportDataExtension.PDF
+    ];
+
+    casesByClassificationAndLocationReportUrl: string = '';
+    contactsFollowupSuccessRateReportUrl: string = '';
+
     constructor(
         private authDataService: AuthDataService,
-        private userDataService: UserDataService
+        private userDataService: UserDataService,
+        private outbreakDataService: OutbreakDataService,
+        private domService: DomService
     ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.initializeDashlets();
+
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                if (selectedOutbreak && selectedOutbreak.id) {
+                  this.selectedOutbreak = selectedOutbreak;
+                  this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
+                  this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+                }
+            });
     }
 
     private initializeDashlets() {
@@ -206,6 +231,17 @@ export class DashboardComponent implements OnInit {
      */
     hasReadUserPermissions(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_TEAM);
+    }
+
+    generateEpiCurveReport() {
+        console.log('start');
+  //      this.domService.generatePngFromSvg('app-epi-curve-dashlet svg', '#tempCanvas');
+        this.domService.getPNGBase64('app-epi-curve-dashlet svg', 3, '#tempCanvas')
+            .subscribe( (pngBase64) => {
+            const epiCurvePngBase64 = pngBase64;
+            console.log(epiCurvePngBase64);
+        });
+
     }
 
 }

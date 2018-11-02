@@ -14,10 +14,28 @@
                     <mat-menu #quickActionsMenu="matMenu">
                         <ng-container>
 
+                            <app-export-button
+                                [menuItem]="true"
+                                [allowedExportTypes]="allowedExportTypes"
+                                [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                                [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                                [url]="casesByClassificationAndLocationReportUrl"
+                                [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate">
+                            </app-export-button>
+
+                            <app-export-button
+                                [menuItem]="true"
+                                [allowedExportTypes]="allowedExportTypes"
+                                [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                                [message]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                                [url]="contactsFollowupSuccessRateReportUrl"
+                                [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate">
+                            </app-export-button>
+
                             <button
                                 mat-menu-item
-                                [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
-                                {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
+                                (click)="generateEpiCurveReport()">
+                                {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
                             </button>
                         </ng-container>
                     </mat-menu>
@@ -340,6 +358,8 @@
                 </ng-container>
             </div>
         </mat-card>
+
+        <canvas id="tempCanvas"></canvas>
 
     </div>
 </div>
