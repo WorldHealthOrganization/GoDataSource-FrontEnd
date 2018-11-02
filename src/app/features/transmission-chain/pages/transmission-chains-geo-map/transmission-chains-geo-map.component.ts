@@ -13,8 +13,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { AddressModel } from '../../../../core/models/address.model';
-import { Constants } from '../../../../core/models/constants';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -24,7 +23,7 @@ import { Constants } from '../../../../core/models/constants';
 })
 export class TransmissionChainsGeoMapComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', '/transmission-chains'),
+        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE', '', true)
     ];
 
@@ -128,7 +127,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                                         _.find(
                                             (node.model as ContactModel).addresses,
                                             {
-                                                typeId: Constants.ADDRESS_USUAL_PLACE_OF_RESIDENCE
+                                                typeId: AddressType.CURRENT_ADDRESS
                                             }
                                         ),
                                         chainIndex,
@@ -142,7 +141,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                                         _.find(
                                             (node.model as CaseModel).addresses,
                                             {
-                                                typeId: Constants.ADDRESS_USUAL_PLACE_OF_RESIDENCE
+                                                typeId: AddressType.CURRENT_ADDRESS
                                             }
                                         ),
                                         chainIndex,

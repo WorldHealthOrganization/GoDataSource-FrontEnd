@@ -1,0 +1,50 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+
+    <mat-horizontal-stepper linear #stepper>
+
+        <!-- Relationship data step -->
+        <mat-step [stepControl]="relationshipsForm">
+            <form #relationshipsForm="ngForm">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TAB_RELATIONSHIPS' | translate}}
+                </ng-template>
+
+                    <mat-card
+                        fxFlex
+                        class="page-section">
+
+                        <app-form-relationship
+                            [name]="'relationship'"
+                            [ngModel]="relationship"
+                            required="true">
+                        </app-form-relationship>
+                    </mat-card>
+
+                <div>
+                    <button mat-button matStepperNext>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                    </button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+            <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}</ng-template>
+            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+            <div>
+                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button type="button" mat-button (click)="createNewRelationships(relationshipsForm)">
+                    {{'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                </button>
+            </div>
+        </mat-step>
+    </mat-horizontal-stepper>
+
+</div>

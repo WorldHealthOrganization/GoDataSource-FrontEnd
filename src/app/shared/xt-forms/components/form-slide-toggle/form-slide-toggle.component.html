@@ -1,8 +1,7 @@
 <div class="form-slide-toggle-container form-element {{ tooltip ? 'form-slide-tooltip' : '' }}"
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <div
-        fxFlex>
+    <div fxFlex fxLayout="row" fxLayoutAlign="start end">
         <div
             class="slide-with-icon">
             <mat-slide-toggle

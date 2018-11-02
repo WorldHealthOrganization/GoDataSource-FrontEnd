@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { AddressTypeModel } from '../../../../core/models/address.model';
+import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-create-event',
@@ -61,7 +61,7 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
                 this.outbreakId = selectedOutbreak.id;
             });
         // pre-set the initial address as "current address"
-        this.eventData.address.typeId = AddressTypeModel.CURRENT_ADDRESS;
+        this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
     }
 
     /**

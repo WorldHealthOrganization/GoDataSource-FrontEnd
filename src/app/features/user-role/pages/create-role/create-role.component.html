@@ -7,15 +7,13 @@
 <div class="page-content">
 
     <mat-horizontal-stepper linear #stepper>
-
-        <mat-step>
+        <!-- Details step -->
+        <mat-step [stepControl]="form">
             <form #form="ngForm">
                 <ng-template matStepLabel>{{'LNG_PAGE_CREATE_USER_ROLE_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
                 <div fxLayout="column">
                     <mat-card class="page-section">
-
-
                         <app-form-input
                             name="name"
                             [(ngModel)]="newUserRole.name"

@@ -16,7 +16,8 @@ export class RouterHelperService {
      * @returns {Promise<void>}
      */
     navigateForce(targetUrl: string[]) {
-        return this.router.navigate(['..'], {skipLocationChange: true})
+        // we are using the Dashboard page as an intermediate route so we can be able to reload current route
+        return this.router.navigate(['/dashboard'], {skipLocationChange: true})
             .then(() => {
                 this.router.navigate(targetUrl);
             });

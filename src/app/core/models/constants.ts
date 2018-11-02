@@ -56,9 +56,6 @@ export class Constants {
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
-    // address constants - mapped to reference tokens
-    static ADDRESS_USUAL_PLACE_OF_RESIDENCE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE';
-
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {

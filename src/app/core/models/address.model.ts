@@ -4,8 +4,8 @@ import { RequestFilter, RequestQueryBuilder } from '../helperClasses/request-que
 import * as moment from 'moment';
 
 // addresses types
-export enum AddressTypeModel {
-    OTHER = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER',
+export enum AddressType {
+    PREVIOUS_ADDRESS = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_PREVIOUS_USUAL_PLACE_OF_RESIDENCE',
     CURRENT_ADDRESS = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE'
 }
 

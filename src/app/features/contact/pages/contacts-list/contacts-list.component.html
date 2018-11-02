@@ -4,27 +4,32 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <app-export-button
-                    *ngIf="!appliedListFilter && exportContactsUrl"
-                    [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
-                    [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
-                    [url]="exportContactsUrl"
-                    [fileName]="contactsDataExportFileName"
-                    [allowedExportTypes]="allowedExportTypes"
-                    [displayEncrypt]="true"
-                    [displayAnonymize]="true"
-                    [anonymizeFields]="anonymizeFields"
-                    [queryBuilder]="queryBuilder">
-                </app-export-button>
-
-                <button
-                    *ngIf="!appliedListFilter"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/import-export-data', 'contact-data', 'import']">
-                    {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="!appliedListFilter && exportContactsUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE' | translate"
+                        [url]="exportContactsUrl"
+                        [fileName]="contactsDataExportFileName"
+                        [allowedExportTypes]="allowedExportTypes"
+                        [displayEncrypt]="true"
+                        [displayAnonymize]="true"
+                        [anonymizeFields]="anonymizeFields"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
+
+                    <button
+                        *ngIf="!appliedListFilter"
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'contact-data', 'import']">
+                        {{'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON' | translate}}
+                    </button>
+                </mat-menu>
             </div>
         </div>
     </ng-container>

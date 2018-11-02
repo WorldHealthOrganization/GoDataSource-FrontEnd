@@ -1,62 +1,129 @@
-<app-topnav>
+<app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
 
-    <mat-card class="page-section page-content">
-        <form #form="ngForm" (submit)="save(form)">
+<form class="page-content form-section" #form="ngForm" (submit)="save(form)">
 
-            <div fxLayout="column">
-                <div *ngIf="alreadySet && !viewForm" class="questions-display"> {{ 'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET' | translate }}
-                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate}}: {{authUser.securityQuestions[0].question | translate}}</div>
-                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate}}: ***</div>
-                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate}}: {{authUser.securityQuestions[1].question | translate}}</div>
-                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate}}: ***</div>
-                    <button *ngIf="!viewForm" mat-raised-button color="primary" (click)="allowEdit()" class="edit-questions-btn"> {{'LNG_COMMON_BUTTON_EDIT' | translate}}
-                    </button>
-                </div>
+    <div class="form-content">
 
-                <div *ngIf="viewForm">
-                    <div>{{'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION' | translate}}</div>
+        <mat-tab-group class="page-tabs-navbar">
 
-                   <app-form-select
-                        name="securityQuestions[0][question]"
-                        [(ngModel)]="authUser.securityQuestions[0].question"
-                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate"
-                        [options]="securityQuestionsList$ | async"
-                        optionLabelKey="question"
-                        optionValueKey="question"
-                        required="true"
-                        app-trigger-validation-for="securityQuestions[1][question]"
-                    >
-                    </app-form-select>
-                    <app-form-input
-                        name="securityQuestions[0][answer]"
-                        [(ngModel)]="answers[0]"
-                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate"
-                        required="true">
-                    </app-form-input>
-                    <app-form-select
-                        name="securityQuestions[1][question]"
-                        [(ngModel)]="authUser.securityQuestions[1].question"
-                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate"
-                        [options]="securityQuestionsList$ | async"
-                        optionLabelKey="question"
-                        optionValueKey="question"
-                        app-notEqualValidator="securityQuestions[0][question]"
-                        required="true">
-                    </app-form-select>
-                    <app-form-input
-                        name="securityQuestions[1][answer]"
-                        [(ngModel)]="answers[1]"
-                        [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate"
-                        required="true">
-                    </app-form-input>
+            <mat-tab [label]="'LNG_PAGE_SET_SECURITY_QUESTIONS_TAB_SECURITY_QUESTIONS_TITLE'| translate">
 
-                    <button mat-raised-button color="primary">{{'LNG_COMMON_BUTTON_SAVE' | translate}}</button>
-                </div>
-            </div>
-        </form>
-    </mat-card>
+                <!-- Security Questions section -->
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div
+                            *ngIf="!viewForm"
+                            fxLayout="column" fxLayoutGap="20px"
+                        >
+                            <span>
+                                {{ 'LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET' | translate }}
+                            </span>
 
+                            <div
+                                class="questions-display"
+                                fxLayout="column" fxLayoutGap="15px"
+                            >
+                                <div fxLayout="row">
+                                    <span fxFlex="120px">
+                                        {{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate}}:
+                                    </span>
+                                    <span>
+                                        {{authUser.securityQuestions[0].question | translate}}
+                                    </span>
+                                </div>
+
+                                <div fxLayout="row">
+                                    <span fxFlex="120px">
+                                        {{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate}}:
+                                    </span>
+                                    <span>
+                                        ***
+                                    </span>
+                                </div>
+
+                                <div fxLayout="row">
+                                    <span fxFlex="120px">
+                                        {{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate}}:
+                                    </span>
+                                    <span>
+                                        {{authUser.securityQuestions[1].question | translate}}
+                                    </span>
+                                </div>
+
+                                <div fxLayout="row">
+                                    <span fxFlex="120px">
+                                        {{'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate}}:
+                                    </span>
+                                    <span>
+                                        ***
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="viewForm">
+                            <app-form-select
+                                name="securityQuestions[0][question]"
+                                [(ngModel)]="authUser.securityQuestions[0].question"
+                                [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_1' | translate"
+                                [options]="securityQuestionsList$ | async"
+                                optionLabelKey="question"
+                                optionValueKey="question"
+                                required="true"
+                                app-trigger-validation-for="securityQuestions[1][question]"
+                            >
+                            </app-form-select>
+                            <app-form-input
+                                name="securityQuestions[0][answer]"
+                                [(ngModel)]="answers[0]"
+                                [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_1' | translate"
+                                required="true">
+                            </app-form-input>
+                            <app-form-select
+                                name="securityQuestions[1][question]"
+                                [(ngModel)]="authUser.securityQuestions[1].question"
+                                [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_QUESTION_2' | translate"
+                                [options]="securityQuestionsList$ | async"
+                                optionLabelKey="question"
+                                optionValueKey="question"
+                                app-notEqualValidator="securityQuestions[0][question]"
+                                required="true">
+                            </app-form-select>
+                            <app-form-input
+                                name="securityQuestions[1][answer]"
+                                [(ngModel)]="answers[1]"
+                                [placeholder]="'LNG_PAGE_SET_SECURITY_QUESTIONS_FIELD_LABEL_ANSWER_2' | translate"
+                                required="true">
+                            </app-form-input>
+                        </div>
+                    </div>
+                </mat-card>
+
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            *ngIf="!viewForm"
+            mat-raised-button color="primary" class="button-primary"
+            (click)="allowEdit()"
+        >
+            {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+        </button>
+
+        <button
+            *ngIf="viewForm"
+            mat-raised-button color="primary" class="button-primary"
+        >
+            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+        </button>
+    </div>
+</form>

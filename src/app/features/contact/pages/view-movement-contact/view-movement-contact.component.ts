@@ -5,6 +5,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-view-movement-contact',
@@ -18,6 +21,7 @@ export class ViewMovementContactComponent implements OnInit {
     ];
 
     contactData: ContactModel = new ContactModel();
+    movementAddresses: AddressModel[] = [];
 
     constructor(
         protected route: ActivatedRoute,
@@ -27,31 +31,35 @@ export class ViewMovementContactComponent implements OnInit {
 
     ngOnInit() {
         this.route.params.subscribe((params: { contactId }) => {
-            // get current outbreak
             this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((selectedOutbreak: OutbreakModel) => {
-                    // get contact
-                    this.contactDataService
-                        .getContact(selectedOutbreak.id, params.contactId)
-                        .subscribe((contactDataReturned) => {
-                            this.contactData = contactDataReturned;
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    contactDataReturned.name,
-                                    `/contacts/${contactDataReturned.id}/view`),
-                                new BreadcrumbItemModel(
-                                    'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
-                                    '.',
-                                    true,
-                                    {},
-                                    this.contactData
-                                )
-                            );
-                        });
+                    Observable.forkJoin([
+                        this.contactDataService.getContact(selectedOutbreak.id, params.contactId),
+                        this.contactDataService.getContactMovement(selectedOutbreak.id, params.contactId)
+                    ]).subscribe((
+                        [contactData, movementData]: [ContactModel, AddressModel[]]
+                    ) => {
+                        // contact data
+                        this.contactData = contactData;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                this.contactData.name,
+                                `/contacts/${this.contactData.id}/view`
+                            ),
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
+                                '.',
+                                true,
+                                {},
+                                this.contactData
+                            )
+                        );
+
+                        // movement data
+                        this.movementAddresses = movementData;
+                    });
                 });
-
-
         });
     }
 }

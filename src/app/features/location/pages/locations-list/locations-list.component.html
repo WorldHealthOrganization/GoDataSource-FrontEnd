@@ -5,42 +5,43 @@
         </div>
 
         <div class="topnav-actions">
-            <app-export-button
-                [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
-                [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
-                url="locations/hierarchical/export"
-                [fileName]="hierarchicalLocationsDataExportFileName"
-                [allowedExportTypes]="allowedExportTypes">
-            </app-export-button>
+            <button
+                *ngIf="hasLocationWriteAccess()"
+                class="button-primary"
+                mat-raised-button
+                color="primary"
+                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
+                {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
+            </button>
 
-            <ng-container
-                *ngIf="hasLocationWriteAccess()">
-                <button
-                    *ngIf="!parentId && !appliedListFilter"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
-                    {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
-                </button>
+            <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+            </button>
 
-                <button
-                    *ngIf="!parentId && !appliedListFilter"
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="['/import-export-data', 'location-data', 'import']">
-                    {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
-                </button>
+            <mat-menu #quickActionsMenu="matMenu">
+                <app-export-button
+                    [menuItem]="true"
+                    [label]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON' | translate"
+                    [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
+                    url="locations/hierarchical/export"
+                    [fileName]="hierarchicalLocationsDataExportFileName"
+                    [allowedExportTypes]="allowedExportTypes">
+                </app-export-button>
 
-                <button
-                    class="button-primary"
-                    mat-raised-button
-                    color="primary"
-                    [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
-                    {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
-                </button>
-            </ng-container>
+                <ng-container *ngIf="!parentId && !appliedListFilter && hasLocationWriteAccess()">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'hierarchical-locations', 'import']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON' | translate}}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/import-export-data', 'location-data', 'import']">
+                        {{'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON' | translate}}
+                    </button>
+                </ng-container>
+            </mat-menu>
         </div>
     </ng-container>
 </app-topnav>

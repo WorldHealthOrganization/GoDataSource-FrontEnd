@@ -21,6 +21,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class TransmissionChainsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
     ];
 

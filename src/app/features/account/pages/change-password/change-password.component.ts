@@ -1,6 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgForm } from '@angular/forms';
-
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
@@ -61,6 +60,9 @@ export class ChangePasswordComponent {
                             .subscribe((authenticatedUser) => {
                                 this.authUser = authenticatedUser.user;
                                 this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+
+                                // refresh page
+                                this.routerHelper.navigateForce(['/account/change-password']);
                             });
                     };
 

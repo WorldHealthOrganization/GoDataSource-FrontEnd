@@ -51,10 +51,10 @@
                                 type="number">
                             </app-form-input>
                             <app-form-input
-                                name="frequencyOfFollowUp"
-                                [(ngModel)]="outbreakTemplate.frequencyOfFollowUp"
-                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY' | translate"
-                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_DESCRIPTION"
+                                name="frequencyOfFollowUpPerDay"
+                                [(ngModel)]="outbreakTemplate.frequencyOfFollowUpPerDay"
+                                [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY' | translate"
+                                tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY_DESCRIPTION"
                                 required="true"
                                 [disabled]="viewOnly"
                                 type="number">
@@ -130,7 +130,6 @@
                     name="caseInvestigationTemplate"
                     [ngModel]="outbreakTemplate.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1"
                     [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
@@ -143,7 +142,6 @@
                     name="contactFollowUpTemplate"
                     [ngModel]="outbreakTemplate.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1"
                     [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
@@ -157,7 +155,6 @@
                     name="labResultsTemplate"
                     [ngModel]="outbreakTemplate.labResultsTemplate"
                     [viewOnly]="viewOnly"
-                    [minItems]="1"
                     [variableReadOnly]="true">
                 </app-form-question-list>
             </mat-tab>
