@@ -111,12 +111,12 @@
         <ng-container matColumnDef="readonly">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_READONLY' | translate}}</div>
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ (item.active ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                <app-yes-no-label [value]="item.readonly"></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
@@ -139,7 +139,6 @@
                     </button>
 
                     <button
-                        *ngIf="!item.readonly"
                         mat-menu-item
                         [routerLink]="['.', item.id, 'modify']">
                         {{'LNG_PAGE_ACTION_MODIFY' | translate}}

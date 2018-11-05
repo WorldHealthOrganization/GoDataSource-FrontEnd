@@ -144,7 +144,7 @@
             {{'LNG_COMMON_BUTTON_SAVE' | translate}}
         </button>
         <button
-            *ngIf="viewOnly && !entry.readonly && hasReferenceDataWriteAccess() "
+            *ngIf="viewOnly && hasReferenceDataWriteAccess() "
             type="button"
             [routerLink]="'/reference-data/' + categoryId + '/' + entryId + '/modify'"
             mat-raised-button>
