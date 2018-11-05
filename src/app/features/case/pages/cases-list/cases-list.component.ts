@@ -557,16 +557,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         if (this.selectedOutbreak) {
             // display export dialog
             this.dialogService.showExportDialog({
-                // required
                 message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
                 url: `/outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
                 buttonDownloadFile: this.buttonDownloadFile,
-
-                // optional
-                fileType: ExportDataExtension.ZIP,
-                displayEncrypt: false,
-                displayAnonymize: false
+                fileType: ExportDataExtension.ZIP
             });
         }
     }
