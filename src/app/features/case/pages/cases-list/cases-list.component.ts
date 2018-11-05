@@ -417,6 +417,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have access view a contact
+     * @returns {boolean}
+     */
+    hasContactReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
+
+    /**
      * Check if we have access to create a contact
      * @returns {boolean}
      */
@@ -539,5 +547,27 @@ export class CasesListComponent extends ListComponent implements OnInit {
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Export empty case investigation
+     */
+    exportEmptyCaseInvestigation(caseModel: CaseModel) {
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // display export dialog
+            this.dialogService.showExportDialog({
+                // required
+                message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
+                url: `/outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
+                fileName: this.casesDataExportFileName,
+                buttonDownloadFile: this.buttonDownloadFile,
+
+                // optional
+                fileType: ExportDataExtension.ZIP,
+                displayEncrypt: false,
+                displayAnonymize: false
+            });
+        }
     }
 }
