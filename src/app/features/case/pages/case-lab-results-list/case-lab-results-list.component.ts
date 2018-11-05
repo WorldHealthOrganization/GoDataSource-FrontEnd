@@ -19,6 +19,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -46,6 +47,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
     testTypesList$: Observable<any[]>;
     sampleTypesList$: Observable<any[]>;
     labNamesList$: Observable<any[]>;
+    yesNoOptionsList$: Observable<any[]>;
 
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
@@ -61,7 +63,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         private labResultDataService: LabResultDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
@@ -101,6 +104,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
         this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).share();
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
@@ -146,6 +150,11 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             new VisibleColumnModel({
                 field: 'result',
                 label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -275,6 +284,33 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore a deleted lab result
+     * @param {string} labResultId
+     */
+    restoreLabResult(labResult: LabResultModel) {
+        // show confirm dialog to confirm de action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT', new LabResultModel(labResult))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // restore lab result
+                    this.labResultDataService
+                        .restoreLabResult(this.selectedOutbreak.id, labResult.personId, labResult.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);

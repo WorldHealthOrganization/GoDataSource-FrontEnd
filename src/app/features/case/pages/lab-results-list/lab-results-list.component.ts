@@ -20,12 +20,13 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-lab-results',
-    templateUrl: './lab-results.component.html',
+    templateUrl: './lab-results-list.component.html',
     encapsulation: ViewEncapsulation.None,
-    styleUrls: ['./lab-results.component.less']
+    styleUrls: ['./lab-results-list.component.less']
 })
 export class LabResultsComponent extends ListComponent implements OnInit {
 
@@ -42,7 +43,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
     sampleTypesList$: Observable<any[]>;
     testTypesList$: Observable<any[]>;
     labTestResultsList$: Observable<any[]>;
-
+    yesNoOptionsList$: Observable<any>;
 
     // authenticated user
     authUser: UserModel;
@@ -64,7 +65,8 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private labResultDataService: LabResultDataService,
         private dialogService: DialogService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private genericDataService: GenericDataService
     ) {
         super(snackbarService);
     }
@@ -95,6 +97,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).share();
         this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).share();
         this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).share();
+        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
     }
 
     /**
@@ -105,43 +108,48 @@ export class LabResultsComponent extends ListComponent implements OnInit {
         this.tableColumns = [
             new VisibleColumnModel({
                 field: 'caseLastName',
-                label: 'LNG_LAB_RESULTS_FIELD_CASE_LAST_NAME'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_LAST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'caseFirstName',
-                label: 'LNG_LAB_RESULTS_FIELD_CASE_FIRST_NAME'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_CASE_FIRST_NAME'
             }),
             new VisibleColumnModel({
                 field: 'sampleIdentifier',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_LAB_ID'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleTaken',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
             }),
             new VisibleColumnModel({
                 field: 'dateSampleDelivered',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
             }),
             new VisibleColumnModel({
                 field: 'dateOfResult',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_DATE_OF_RESULT'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
             }),
             new VisibleColumnModel({
                 field: 'labName',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_LAB_NAME'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_LAB_NAME'
             }),
             new VisibleColumnModel({
                 field: 'sampleType',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_SAMPLE_TYPE'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'testType',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_TEST_TYPE'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'result',
-                label: 'LNG_LAB_RESULTS_FIELD_LABEL_RESULT'
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT'
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -257,6 +265,33 @@ export class LabResultsComponent extends ListComponent implements OnInit {
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Restore a deleted lab result
+     * @param {string} labResultId
+     */
+    restoreLabResult(labResult: LabResultModel) {
+        // show confirm dialog to confirm de action
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT', new LabResultModel(labResult))
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // restore lab result
+                    this.labResultDataService
+                        .restoreLabResult(this.selectedOutbreak.id, labResult.personId, labResult.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);

@@ -136,6 +136,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK': 'Are you sure you want to restore this outbreak: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT': 'Are you sure you want to restore this lab result?',
         'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
         'LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT': 'Are you sure you want to remove this attachment?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
@@ -466,6 +467,8 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT': 'Result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
@@ -479,6 +482,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result restored',
 
         /**
          * Case Lab results list page
