@@ -63,6 +63,16 @@
         </div>
 
         <div
+            fxFlex fxLayout="row">
+            <app-form-input
+                name="decryptPassword"
+                [(ngModel)]="decryptPassword"
+                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
+                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION">
+            </app-form-input>
+        </div>
+
+        <div
             fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button

@@ -1824,6 +1824,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
         'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD': 'Decrypt password',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION': 'Required if uploaded file is encrypted',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL': 'Select Level',

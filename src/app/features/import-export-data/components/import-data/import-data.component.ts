@@ -261,6 +261,11 @@ export class ImportDataComponent implements OnInit {
     formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
 
     /**
+     * Decrypt password
+     */
+    decryptPassword: string;
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -354,6 +359,15 @@ export class ImportDataComponent implements OnInit {
                 'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
                 true
             );
+        };
+
+        // handle before upload preparation
+        this.uploader.onBeforeUploadItem = () => {
+            if (this.decryptPassword) {
+                this.uploader.options.additionalParameter.decryptPassword = this.decryptPassword;
+            } else {
+                delete this.uploader.options.additionalParameter.decryptPassword;
+            }
         };
 
         // handle file upload progress
@@ -935,5 +949,6 @@ export class ImportDataComponent implements OnInit {
         this.errMsgDetails = null;
         this.uploader.clearQueue();
         this.mappedFields = [];
+        this.decryptPassword = null;
     }
 }
