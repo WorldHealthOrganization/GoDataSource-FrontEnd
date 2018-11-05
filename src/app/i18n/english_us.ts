@@ -589,6 +589,8 @@ export const EnglishUsLang = {
         'LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL': 'Geographical Level',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION': '',
 
         /**
          * Locations list page
