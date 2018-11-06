@@ -558,10 +558,40 @@ export class CasesListComponent extends ListComponent implements OnInit {
             // display export dialog
             this.dialogService.showExportDialog({
                 message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
-                url: `/outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
                 buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP
+            });
+        }
+    }
+
+    /**
+     * Export cases dossier
+     */
+    exportSelectedCasesDossier() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // display export dialog
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                fileName: this.casesDataExportFileName,
+                buttonDownloadFile: this.buttonDownloadFile,
+                fileType: ExportDataExtension.ZIP,
+                displayAnonymize: true,
+                anonymizeFields: this.anonymizeFields,
+                anonymizeFieldsKey: 'data',
+                extraAPIData: {
+                    cases: selectedRecords
+                },
+                isPOST: true
             });
         }
     }

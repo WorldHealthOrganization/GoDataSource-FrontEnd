@@ -585,4 +585,35 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             anonymizeFields: this.anonymizeFields
         });
     }
+
+
+    /**
+     * Export contacts dossier
+     */
+    exportSelectedContactsDossier() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // display export dialog
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                fileName: this.contactsDataExportFileName,
+                buttonDownloadFile: this.buttonDownloadFile,
+                fileType: ExportDataExtension.ZIP,
+                displayAnonymize: true,
+                anonymizeFields: this.anonymizeFields,
+                anonymizeFieldsKey: 'data',
+                extraAPIData: {
+                    cases: selectedRecords
+                },
+                isPOST: true
+            });
+        }
+    }
 }
