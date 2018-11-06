@@ -13,6 +13,7 @@ export enum DashboardDashlet {
     NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS = 'new-cases-in-the-previous-x-days-among-known-contacts',
     NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS = 'new-cases-in-the-previous-x-days-in-known-transmission-chains',
     SUSPECT_CASES_WITH_PENDING_LAB_RESULT = 'suspect-cases-with-pending-lab-result',
+    CASES_NOT_IDENTIFIED_THROUGH_CONTACTS = 'cases-not-identified-through-contacts',
 
     // contacts
     CONTACTS_PER_CASE_MEAN = 'contacts-per-case-mean',
