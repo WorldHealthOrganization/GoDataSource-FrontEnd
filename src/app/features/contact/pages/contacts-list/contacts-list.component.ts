@@ -599,6 +599,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
         // display export only if we have a selected outbreak
         if (this.selectedOutbreak) {
+            // remove id from list
+            const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
+                return value.value !== 'id';
+            });
+
             // display export dialog
             this.dialogService.showExportDialog({
                 message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
@@ -607,7 +612,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
-                anonymizeFields: this.anonymizeFields,
+                anonymizeFields: anonymizeFields,
                 anonymizeFieldsKey: 'data',
                 extraAPIData: {
                     cases: selectedRecords
