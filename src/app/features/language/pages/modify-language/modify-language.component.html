@@ -4,12 +4,12 @@
     </ng-container>
 </app-topnav>
 
-<form class="page-content form-section" #form="ngForm" (submit)="modifyContact(form)">
+<form class="page-content form-section" #form="ngForm" (submit)="modifyLanguage(form)">
 
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE' | translate">
+            <mat-tab [label]="'LNG_PAGE_MODIFY_LANGUAGE_TAB_DETAILS_TITLE' | translate">
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -17,99 +17,51 @@
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
                                 name="name"
-                                [(ngModel)]="eventData.name"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
+                                [(ngModel)]="languageData.name"
+                                [placeholder]="'LNG_LANGUAGE_FIELD_LABEL_NAME' | translate"
+                                tooltip="LNG_LANGUAGE_FIELD_LABEL_NAME_DESCRIPTION"
                                 required="true"
-                                maxlength="100"
                                 [disabled]="viewOnly">
                             </app-form-input>
 
-                            <app-form-datepicker
-                                name="date"
-                                [(ngModel)]="eventData.date"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
-                                required="true"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
-
-                            <app-form-datepicker
-                                name="dateOfReporting"
-                                [(ngModel)]="eventData.dateOfReporting"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                required="true"
-                                [disabled]="viewOnly"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
-
-                            <app-form-slide-toggle
-                                name="isDateOfReportingApproximate"
-                                [(ngModel)]="eventData.isDateOfReportingApproximate"
-                                [label]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
-                                [disabled]="viewOnly">
-                            </app-form-slide-toggle>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-textarea
-                                name="description"
-                                [(ngModel)]="eventData.description"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                                maxlength="500"
-                                [disabled]="viewOnly">
-                            </app-form-textarea>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>
                 </mat-card>
 
             </mat-tab>
-
-            <mat-tab [label]="'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE' | translate">
-                <mat-card class="page-section">
-                    <app-form-address
-                        name="address"
-                        [(ngModel)]="eventData.address"
-                        [disabled]="viewOnly">
-                    </app-form-address>
-                </mat-card>
-            </mat-tab>
-
         </mat-tab-group>
     </div>
 
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="hasEventWriteAccess() && viewOnly"
-                mat-raised-button color="primary" class="button-primary"
-                [routerLink]="['/events', eventId, 'modify']">
+        <button
+            *ngIf="viewOnly && hasSysConfigWriteAccess()"
+            mat-raised-button
+            color="primary"
+            class="button-primary"
+            [routerLink]="['/languages', languageId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
 
-        <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+        <ng-container
+            *ngIf="!viewOnly">
+            <button
+                mat-raised-button
+                color="primary"
+                class="button-primary">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
-            <button type="button" [routerLink]="'/events'" mat-raised-button>
+            <button
+                type="button"
+                routerLink="/languages"
+                mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
-            <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
-
-        <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id]">
-            {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
-        </button>
     </div>
-
-
 </form>
