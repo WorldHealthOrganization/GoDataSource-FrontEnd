@@ -182,7 +182,7 @@ export class TransmissionChainDataService {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, function (node, key) {
+                _.forEach(firstChain.nodes, (node, key) => {
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
@@ -276,7 +276,7 @@ export class TransmissionChainDataService {
 
             // generate edges based on the nodes included in the graph
             if (!_.isEmpty(firstChain.relationships)) {
-                _.forEach(firstChain.relationships, function (relationship, key) {
+                _.forEach(firstChain.relationships, (relationship, key) => {
                     // add relation only if the nodes are in the selectedNodes array
                     if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
                         const graphEdge = new GraphEdgeModel();
@@ -305,6 +305,19 @@ export class TransmissionChainDataService {
                             graphEdge.edgeStyle = 'dashed';
                         } else {
                             graphEdge.edgeStyle = 'solid';
+                        }
+                        // set edge label
+                        if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+                            graphEdge.label = '';
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                            // translate values
+                            graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
+                            graphEdge.label = relationship.socialRelationshipDetail;
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
+                            graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
+
                         }
 
                         graphData.edges.push({data: graphEdge});

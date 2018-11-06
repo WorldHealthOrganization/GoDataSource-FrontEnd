@@ -124,6 +124,26 @@
             [tooltip]="tooltipViewTimeline() | translate">
         </app-form-radio>
 
+       <!-- node icon -->
+        <div>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeIconCriteria"
+            [(ngModel)]="colorCriteria.nodeIconCriteria"
+            [options]="nodeIconCriteriaOptions$ | async">
+        </app-form-radio>
+
+        <!-- node label -->
+        <div>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="nodeLabelCriteria"
+            [(ngModel)]="colorCriteria.nodeLabelCriteria"
+            [options]="nodeLabelCriteriaOptions$ | async">
+        </app-form-radio>
+
         <!-- Edge Color -->
         <div>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
@@ -141,26 +161,7 @@
         <app-form-radio
             name="edgeLabelCriteria"
             [(ngModel)]="colorCriteria.edgeLabelCriteria"
-            [options]="edgeColorCriteriaOptions$ | async">
-        </app-form-radio>
-
-        <!-- node icon -->
-        <div>
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
-        </div>
-        <app-form-radio
-            name="nodeIconCriteria"
-            [(ngModel)]="colorCriteria.nodeIconCriteria"
-            [options]="nodeIconCriteriaOptions$ | async">
-        </app-form-radio>
-
-        <div>
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate}}
-        </div>
-        <app-form-radio
-            name="nodeLabelCriteria"
-            [(ngModel)]="colorCriteria.nodeLabelCriteria"
-            [options]="nodeLabelCriteriaOptions$ | async">
+            [options]="edgeLabelCriteriaOptions$ | async">
         </app-form-radio>
 
         <div>

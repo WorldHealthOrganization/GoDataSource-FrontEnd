@@ -273,7 +273,11 @@ export class Constants {
 
     // used for the criteria radio buttons in the chains of transmission settings
     static TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS = {
-        CERTAINITY_LEVEL: {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        DAYS_DAYE_ONSET_LAST_CONTACT: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_EDGE_LABEL_FILTER_DAYS_BETWEEN_ONSET_LAST_CONTACT',
             value: 'dateOnsetlastContact'
         },
@@ -281,17 +285,13 @@ export class Constants {
             label: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
             value: 'socialRelationshipTypeId'
         },
-        EXPOSURE_TYPE: {
-            label: '',
-            value: 'exposureTypeId'
+        SOCIAL_RELATIONSHIP_LEVEL: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            value: 'socialRelationshipDetail'
         },
-        EXPOSURE_FREQUENCY: {
-            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-            value: 'exposureFrequencyId'
-        },
-        EXPOSURE_DURATION: {
-            label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-            value: 'exposureDurationId'
+        CLUSTER_NAME: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            value: 'clusterId'
         }
     };
 
