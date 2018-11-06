@@ -34,7 +34,7 @@
                     *ngIf="displayInvisibleItems || option[optionVisibleKey] !== false"
                     [value]="option[optionValueKey]"
                     [matTooltip]="option[optionTooltipKey] | translate"
-                    [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey]">
+                    [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey] || optionReadOnly">
                     <!-- Image -->
                     <img
                         *ngIf="optionLabelImgKey"

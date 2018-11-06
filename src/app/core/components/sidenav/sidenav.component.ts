@@ -30,10 +30,10 @@ export class SidenavComponent implements OnInit {
         [],
         [
             new ChildNavItem(
-                'logout',
-                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+                'my-profile',
+                'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL',
                 [],
-                '/auth/logout'
+                '/account/my-profile'
             ),
             new ChildNavItem(
                 'change-password',
@@ -46,6 +46,12 @@ export class SidenavComponent implements OnInit {
                 'Set Security Questions',
                 [],
                 '/account/set-security-questions'
+            ),
+            new ChildNavItem(
+                'logout',
+                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+                [],
+                '/auth/logout'
             )
         ]
     );
