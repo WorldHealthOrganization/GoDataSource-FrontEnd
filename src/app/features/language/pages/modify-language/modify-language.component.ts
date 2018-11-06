@@ -20,13 +20,13 @@ import { Moment } from 'moment';
 @Component({
     selector: 'app-modify-event',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-event.component.html',
-    styleUrls: ['./modify-event.component.less']
+    templateUrl: './modify-language.component.html',
+    styleUrls: ['./modify-language.component.less']
 })
-export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
+export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
+        new BreadcrumbItemModel('Events', '/events')
     ];
 
     // authenticated user

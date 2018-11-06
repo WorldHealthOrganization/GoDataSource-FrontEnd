@@ -236,6 +236,18 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
+            },
+            // Language Module routes
+            {
+                path: ModulePath.LanguageModule,
+                loadChildren: './features/language/language.module#LanguageModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
             }
         ]
     },

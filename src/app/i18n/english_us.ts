@@ -14,6 +14,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
+        'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -116,6 +117,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: "{{name}}"',
+        'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE': 'Are you sure you want to delete this language: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: "{{firstName}} {{lastName}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak "{{name}}"?',
@@ -1001,6 +1003,7 @@ export const EnglishUsLang = {
         /**
          * Create Event page
          */
+        'LNG_PAGE_CREATE_EVENT_TITLE': 'Create New Event',
         'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON': 'Create event',
@@ -1014,6 +1017,34 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE': 'Event saved!',
         'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
+         * Language fields
+         */
+        'LNG_LANGUAGE_FIELD_LABEL_NAME': 'Name',
+        'LNG_LANGUAGE_FIELD_LABEL_NAME_DESCRIPTION': '',
+
+        /**
+         * Languages list page
+         */
+        'LNG_PAGE_LIST_LANGUAGES_TITLE': 'Languages',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE': 'Language deleted!',
+
+        /**
+         * Create Language page
+         */
+        'LNG_PAGE_CREATE_LANGUAGE_TITLE': 'Create New Language',
+        'LNG_PAGE_CREATE_LANGUAGE_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON': 'Create Language',
+        'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE': 'Language created!',
+
+        /**
+         * Modify Language page
+         */
+        'LNG_PAGE_VIEW_LANGUAGE_TITLE': 'View {{name}}',
+        'LNG_PAGE_MODIFY_LANGUAGE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE': 'Language saved!',
+        'LNG_PAGE_MODIFY_LANGUAGE_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * Permissions
