@@ -6,7 +6,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-cases-not-identified-through-contacts-dashlet',
@@ -31,7 +31,8 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
 
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private listFilterDataService: ListFilterDataService
     ) {
         super();
     }
@@ -56,17 +57,8 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
             this.selectedOutbreak &&
             this.selectedOutbreak.id
         ) {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-                wasContact: {
-                    neq: true
-                }
-            });
-
-            // filter
             this.caseDataService
-                .getCasesCount(this.selectedOutbreak.id, qb)
+                .getCasesCount(this.selectedOutbreak.id, this.listFilterDataService.filterCasesNotIdentifiedThroughContacts())
                 .subscribe((result) => {
                     this.count = result.count;
                 });
