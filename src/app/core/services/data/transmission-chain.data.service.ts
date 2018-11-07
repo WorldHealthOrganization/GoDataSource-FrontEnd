@@ -61,13 +61,15 @@ export class TransmissionChainDataService {
      * @param {number} size
      * @param {string} personId
      * @param {RequestQueryBuilder} queryBuilder
+     * @param {string} dateGlobalFilter
      * @returns {Observable<TransmissionChainModel[]>}
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
         size: number = null,
         personId: string = null,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        dateGlobalFilter: string = null
     ): Observable<TransmissionChainModel[]> {
 
         // generate filter for person fields
@@ -95,6 +97,18 @@ export class TransmissionChainDataService {
             const filterPerson = rQBPersonId.filter.generateFirstCondition(false, false);
             // merge conditions from person filter with those from chainInculdesPerson
             filter = {...filter, ...filterPerson};
+        }
+
+        // global date - see state in time
+        if (dateGlobalFilter) {
+            const rQBGlobalDate = new RequestQueryBuilder();
+            rQBGlobalDate.filter.where({
+                    where: {
+                        endDate: dateGlobalFilter
+                    }
+            });
+            const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
+            filter.where = {...filter.where, ...filterDate.where};
         }
 
         filter = JSON.stringify(filter);

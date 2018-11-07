@@ -1737,6 +1737,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS': 'Reset',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE': 'You are currently seeing the chains with size:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON': 'You are currently seeing the chains for person:',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Date',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION': '',
 
         /**
          * Side filter

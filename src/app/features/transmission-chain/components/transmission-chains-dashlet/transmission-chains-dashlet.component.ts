@@ -23,8 +23,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -48,6 +48,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     occupationsList$: Observable<any[]>;
     locationsList: LocationModel[];
     personName: string = '';
+    dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
     nodeColorCriteriaOptions$: Observable<any[]>;
     edgeColorCriteriaOptions$: Observable<any[]>;
@@ -148,11 +149,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private genericDataService: GenericDataService,
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
-        private locationDataService: LocationDataService,
-        private router: Router
+        private locationDataService: LocationDataService
     ) {}
 
     ngOnInit() {
+        console.log(this.dateGlobalFilter);
         // init filters - only show cases and events first
         this.filters.showContacts = false;
         this.filters.showEvents = true;
@@ -185,7 +186,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
                         if (this.personId) {
                             this.entityDataService
                                 .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
-                                .subscribe( (entity) => {
+                                .subscribe((entity) => {
                                     this.personName = entity.name;
                                 });
                         }
@@ -283,7 +284,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB).subscribe((chains) => {
+            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
                 } else {
@@ -480,6 +481,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.sizeOfChainsFilter = null;
         this.personId = null;
         this.refreshChain();
+    }
+
+    /**
+     * Reload COT when global date changes
+     */
+    onChangeGlobalDate() {
+        this.displayChainsOfTransmission();
     }
 
 }
