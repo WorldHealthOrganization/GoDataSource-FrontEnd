@@ -35,23 +35,40 @@ export class DomService {
      * @param tempCanvasSelector
      * @returns {Observable<string>}
      */
-    getPNGBase64(selector, splitFactor, tempCanvasSelector): Observable<string> {
-        if (!splitFactor) {
-            splitFactor = 1;
-        }
+    getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1): Observable<string> {
         return Observable.create((observer) => {
             // server page size
-            const page = {
-                width: 1090,
-                height: 740
+            const pageSize = {
+                width: 1190,
+                height: 840
             };
             // compute render size based on server page size and split factor
+            // compute page and image aspect ratio
+            const pageAspectRatio = pageSize.width / pageSize.height;
+            // get graph svg container
+            const graphContainer: any = document.querySelector(selector);
+            // get graph container dimensions
+            const graphContainerSVGWidth = graphContainer.width.baseVal.value;
+            const graphContainerSVGHeight = graphContainer.height.baseVal.value;
+            // get image ratio
+            const imageAspectRatio = graphContainerSVGWidth / graphContainerSVGHeight;
+            // initialize canvas dimensions with page dimensions on the server
             const render = {
-                width: page.width * splitFactor,
-                height: page.height * splitFactor
+                width: pageSize.width * splitFactor,
+                height: pageSize.height * splitFactor
             };
-            // get SVG
-            const svgString = new XMLSerializer().serializeToString(document.querySelector(selector));
+            // if the image is wider than page (proportionally)
+            if (imageAspectRatio > pageAspectRatio) {
+                // resize its width according to the split factor
+                render.width = pageSize.width * splitFactor;
+                render.height = pageSize.width * splitFactor * 1 / imageAspectRatio;
+            } else {
+                // otherwise resize its height according to the split factor
+                render.width = pageSize.height * splitFactor * imageAspectRatio;
+                render.height = pageSize.height * splitFactor;
+            }
+            // get SVG as string
+            const svgString = new XMLSerializer().serializeToString(graphContainer);
             // get canvas container
             const canvas: any = document.querySelector(tempCanvasSelector);
             // resize canvas to correct dimensions

@@ -246,10 +246,9 @@ export class DashboardComponent implements OnInit {
      */
     generateEpiCurveReport() {
         this.domService
-            .getPNGBase64('app-epi-curve-dashlet svg', 3, '#tempCanvas')
+            .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
-                const epiCurvePngBase64 = pngBase64;
-                this.importExportDataService.exportImageToPdf({image: epiCurvePngBase64, responseType: 'blob'})
+                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob'})
                     .subscribe((blob) => {
                         const urlT = window.URL.createObjectURL(blob);
                         window.open(urlT);
