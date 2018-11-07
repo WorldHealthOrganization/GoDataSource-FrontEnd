@@ -372,9 +372,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob'})
             .subscribe((blob) => {
                 const urlT = window.URL.createObjectURL(blob);
-                window.open(urlT);
                 const link = this.buttonDownloadFile.nativeElement;
-
                 const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
 
                 link.href = urlT;
