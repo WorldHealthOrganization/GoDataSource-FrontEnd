@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
@@ -33,6 +33,7 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
     languagesList$: Observable<LanguageModel[]>;
 
     @ViewChild('topNav') topNav: TopnavComponent;
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     constructor(
         private languageDataService: LanguageDataService,
@@ -108,5 +109,20 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    /**
+     * Download Language
+     * @param language
+     */
+    downloadLanguage(language: LanguageModel) {
+        // display export dialog
+        this.dialogService.showExportDialog({
+            message: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE',
+            url: `languages/${language.id}/language-tokens/export`,
+            fileName: language.name,
+            buttonDownloadFile: this.buttonDownloadFile,
+            fileType: ExportDataExtension.XLSX
+        });
     }
 }

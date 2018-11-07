@@ -17,6 +17,7 @@
     </ng-container>
 </app-topnav>
 
+<a hidden #buttonDownloadFile></a>
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
@@ -62,6 +63,21 @@
                     </button>
 
                     <mat-menu #actionsMenu="matMenu">
+                        <button
+                            mat-menu-item
+                            (click)="downloadLanguage(item)">
+                            {{ 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS' | translate }}
+                        </button>
+
+                        <button
+                            *ngIf="hasSysConfigWriteAccess()"
+                            mat-menu-item
+                            [routerLink]="['/import-export-data', 'language-data', item.id, 'import-tokens']">
+                            {{'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS' | translate}}
+                        </button>
+
+                        <mat-divider></mat-divider>
+
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'view']">

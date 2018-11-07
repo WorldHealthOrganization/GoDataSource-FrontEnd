@@ -1029,6 +1029,9 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LANGUAGES_TITLE': 'Languages',
         'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE': 'Language deleted!',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS': 'Download language file',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE': 'Export language template',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS': 'Import language file',
 
         /**
          * Create Language page
@@ -1873,6 +1876,11 @@ export const EnglishUsLang = {
          * Import location data
          */
         'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
+
+        /**
+         * Import language tokens
+         */
+        'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE': 'Import Language Tokens',
 
         /**
          * Import reference data
