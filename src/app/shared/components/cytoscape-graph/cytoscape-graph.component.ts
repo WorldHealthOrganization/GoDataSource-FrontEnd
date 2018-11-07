@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
@@ -6,6 +6,8 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
+import { ImportExportDataService } from '../../../core/services/data/import-export.data.service';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -205,9 +207,14 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDates: any = {};
 
+    // used for export
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
     constructor(
         private genericDataService: GenericDataService,
-        private el: ElementRef
+        private el: ElementRef,
+        private importExportDataService: ImportExportDataService,
+        private i18nService: I18nService
     ) {}
 
     ngOnInit() {
@@ -358,6 +365,24 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     switchTimelineView(timelineViewType) {
         this.timelineViewType = timelineViewType;
         this.render();
+    }
+
+    exportGraph() {
+        const pngBase64 = this.cy.png().replace('data:image/png;base64,', '');
+        this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob'})
+            .subscribe((blob) => {
+                const urlT = window.URL.createObjectURL(blob);
+                window.open(urlT);
+                const link = this.buttonDownloadFile.nativeElement;
+
+                const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
+
+                link.href = urlT;
+                link.download = `${fileName}.pdf`;
+                link.click();
+
+                window.URL.revokeObjectURL(urlT);
+            });
     }
 
 }

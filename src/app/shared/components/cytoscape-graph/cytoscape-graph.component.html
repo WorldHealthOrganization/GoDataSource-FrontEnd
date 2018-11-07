@@ -147,3 +147,16 @@
         [(ngModel)]="showLegend">
     </app-form-slide-toggle>
 </div>
+
+<div class="export-graph">
+    <button
+        mat-raised-button
+        (click)="exportGraph()">
+        <span class="xt-icon">arrowDown</span>
+        {{ 'LNG_COMMON_LABEL_EXPORT' | translate }}
+    </button>
+</div>
+
+
+
+<a hidden #buttonDownloadFile></a>
