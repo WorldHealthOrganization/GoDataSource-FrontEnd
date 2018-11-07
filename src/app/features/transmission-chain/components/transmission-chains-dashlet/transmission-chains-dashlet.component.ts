@@ -153,7 +153,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        console.log(this.dateGlobalFilter);
         // init filters - only show cases and events first
         this.filters.showContacts = false;
         this.filters.showEvents = true;
