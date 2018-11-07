@@ -317,9 +317,47 @@ export class TransmissionChainDataService {
                         } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
                             graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
                         } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
+                            // calculate difference in dates between the dates of onset or dates of onset and last contact.
+                            const sourceNode = firstChain.nodes[graphEdge.source];
+                            const targetNode = firstChain.nodes[graphEdge.target];
+                            let noDays = 0;
+                            let sourceDate = '';
+                            let targetDate = '';
+                            if (sourceNode.type === EntityType.CASE) {
+                                if (!_.isEmpty(sourceNode.model.dateOfOnset)) {
+                                    sourceDate = sourceNode.model.dateOfOnset;
+                                }
+                            } else if (sourceNode.type === EntityType.CONTACT) {
+                                if (!_.isEmpty(relationship.contactDate)) {
+                                    sourceDate = relationship.contactDate;
+                                }
+                            } else if (sourceNode.type === EntityType.EVENT) {
+                                if (!_.isEmpty(sourceNode.model.date)) {
+                                    sourceDate = sourceNode.model.date;
+                                }
+                            }
 
+                            if (targetNode.type === EntityType.CASE) {
+                                if (!_.isEmpty(targetNode.model.dateOfOnset)) {
+                                    targetDate = targetNode.model.dateOfOnset;
+                                }
+                            } else if (targetNode.type === EntityType.CONTACT) {
+                                if (!_.isEmpty(relationship.contactDate)) {
+                                    targetDate = relationship.contactDate;
+                                }
+                            } else if (targetNode.type === EntityType.EVENT) {
+                                if (!_.isEmpty(targetNode.model.date)) {
+                                    targetDate = targetNode.model.date;
+                                }
+                            }
+
+                            if (!_.isEmpty(sourceDate) && !_.isEmpty(targetDate)) {
+                                const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+                                graphEdge.label = String(noDays);
+                            }
                         }
-
                         graphData.edges.push({data: graphEdge});
                     }
                 });

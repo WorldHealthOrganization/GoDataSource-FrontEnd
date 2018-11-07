@@ -20,7 +20,7 @@ export class GraphEdgeModel {
         this.targetType = _.get(data, 'targetType');
         this.edgeColor = _.get(data, 'edgeColor', Constants.DEFAULT_COLOR_CHAINS);
         this.edgeStyle = _.get(data, 'edgeStyle', 'solid');
-        this.label = _.get(data, 'label', 'aaaa');
+        this.label = _.get(data, 'label', '');
     }
 
 }
