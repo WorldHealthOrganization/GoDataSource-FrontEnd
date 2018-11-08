@@ -209,6 +209,9 @@ export const EnglishUsLang = {
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': 'Something went wrong! Please contact an administrator.',
+        'LNG_API_ERROR_CODE_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'One of the addresses must be set as Current Address',
+        'LNG_API_ERROR_CODE_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Multiple addresses set as Usual Place of Residence. Only one address should be set as Usual Place of Residence',
+        'LNG_API_ERROR_CODE_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Addresses set as Previous Usual Place of Residence must have a date set',
 
         /**
          * Common Fields
@@ -366,8 +369,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
         'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
@@ -601,6 +606,8 @@ export const EnglishUsLang = {
         'LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL': 'Geographical Level',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION': '',
 
         /**
          * Locations list page
@@ -1414,6 +1421,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE': ' DAYS AMONG KNOWN CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'CASES WITH PENDING LAB RESULT',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS': 'CASES NOT IDENTIFIED THROUGH CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
@@ -1668,6 +1676,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP': 'Contacts with successful follow-up',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in the previous {{x}} days among known contacts',
+        'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS': 'Cases not identified through contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Cases refusing to be transferred to a treatment unit',
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
@@ -1721,6 +1730,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE': 'Edge Label',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
@@ -1739,6 +1749,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON': 'You are currently seeing the chains for person:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Date',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION': '',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_EDGE_LABEL_FILTER_DAYS_BETWEEN_ONSET_LAST_CONTACT': 'Days',
 
         /**
          * Side filter
@@ -1813,6 +1824,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK': 'Failed to import record {{recordNo}} because of outbreak invalid case id mask',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because address must have a place of residence',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because there are multiple usual place of addresses',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Failed to import record {{recordNo}} because previous address should have date',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
@@ -1822,6 +1837,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
         'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD': 'Decrypt password',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION': 'Required if uploaded file is encrypted',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL': 'Select Level',

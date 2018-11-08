@@ -113,6 +113,7 @@
         </div>
 
         <!-- color coding -->
+        <!-- Node Color -->
         <div>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
         </div>
@@ -122,6 +123,7 @@
             [options]="nodeColorCriteriaOptions$ | async">
         </app-form-radio>
 
+        <!-- Node Label Color -->
         <div>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
         </div>
@@ -133,16 +135,7 @@
             [tooltip]="tooltipViewTimeline() | translate">
         </app-form-radio>
 
-        <div>
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
-        </div>
-        <app-form-radio
-            name="edgeColorCriteria"
-            [(ngModel)]="colorCriteria.edgeColorCriteria"
-            [options]="edgeColorCriteriaOptions$ | async">
-        </app-form-radio>
-
-        <!-- node icon -->
+       <!-- node icon -->
         <div>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
         </div>
@@ -152,6 +145,7 @@
             [options]="nodeIconCriteriaOptions$ | async">
         </app-form-radio>
 
+        <!-- node label -->
         <div>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate}}
         </div>
@@ -159,6 +153,26 @@
             name="nodeLabelCriteria"
             [(ngModel)]="colorCriteria.nodeLabelCriteria"
             [options]="nodeLabelCriteriaOptions$ | async">
+        </app-form-radio>
+
+        <!-- Edge Color -->
+        <div>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="edgeColorCriteria"
+            [(ngModel)]="colorCriteria.edgeColorCriteria"
+            [options]="edgeColorCriteriaOptions$ | async">
+        </app-form-radio>
+
+        <!-- Edge Label -->
+        <div>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate}}
+        </div>
+        <app-form-radio
+            name="edgeLabelCriteria"
+            [(ngModel)]="colorCriteria.edgeLabelCriteria"
+            [options]="edgeLabelCriteriaOptions$ | async">
         </app-form-radio>
 
         <div>

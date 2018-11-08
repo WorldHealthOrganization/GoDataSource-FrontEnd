@@ -25,6 +25,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as moment from 'moment';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -51,9 +52,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
     nodeColorCriteriaOptions$: Observable<any[]>;
-    edgeColorCriteriaOptions$: Observable<any[]>;
     nodeIconCriteriaOptions$: Observable<any[]>;
     nodeLabelCriteriaOptions$: Observable<any[]>;
+    edgeColorCriteriaOptions$: Observable<any[]>;
+    edgeLabelCriteriaOptions$: Observable<any[]>;
 
     // reference data categories needed for filters
     referenceDataCategories: any = [
@@ -115,6 +117,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
         nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
         edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
+        edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
         nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value
     };
     // default legend
@@ -149,7 +152,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private genericDataService: GenericDataService,
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
-        private locationDataService: LocationDataService
+        private locationDataService: LocationDataService,
+        private clusterDataService: ClusterDataService
     ) {}
 
     ngOnInit() {
@@ -168,6 +172,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
         this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
         this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
+        this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
@@ -189,6 +194,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
                                     this.personName = entity.name;
                                 });
                         }
+                        // load clusters list
+                        this.clusterDataService
+                            .getClusterList(this.selectedOutbreak.id)
+                            .subscribe( (clusters) => {
+                                this.legend.clustersList = [];
+                                _.forEach(clusters, (cluster) => {
+                                    this.legend.clustersList[cluster.id] = cluster.name;
+                                });
+                            });
                         // load chain
                         this.displayChainsOfTransmission();
                     });
@@ -377,6 +391,14 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
         this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
         this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+        this.legend.edgeLabelField = this.colorCriteria.edgeLabelCriteria;
+        if (this.legend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value ) {
+            this.legend.edgeLabelContextTransmissionEntries = {};
+            const refDataEntries = this.referenceDataEntries[this.referenceDataLabelMap[Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value].refDataCateg];
+            _.forEach(refDataEntries.entries, (entry) => {
+               this.legend.edgeLabelContextTransmissionEntries[entry.value] = this.i18nService.instant(entry.value);
+            });
+        }
         this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
         // set legend labels
         this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
