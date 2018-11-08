@@ -106,15 +106,6 @@
         </app-form-slide-toggle>
     </div>
 
-    <div class="export-graph">
-        <button
-            mat-raised-button
-            (click)="exportGraph()">
-            <span class="xt-icon">arrowDown</span>
-            {{ 'LNG_COMMON_LABEL_EXPORT' | translate }}
-        </button>
-    </div>
-
 </div>
 
 <div *ngIf="showCaseNodesWithoutDates()"
@@ -156,6 +147,3 @@
     (click)="switchTimelineView('horizontal')">
     {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
 </button>
-
-
-<a hidden #buttonDownloadFile></a>

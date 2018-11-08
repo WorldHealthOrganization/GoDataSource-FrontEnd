@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -25,6 +25,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
+import { CytoscapeGraphComponent } from '../../../../shared/components/cytoscape-graph/cytoscape-graph.component';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -33,6 +34,8 @@ import { EntityType } from '../../../../core/models/entity-type';
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
 export class TransmissionChainsDashletComponent implements OnInit {
+
+    @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
     @Input() sizeOfChainsFilter: number = null;
     @Input() personId: string = null;
@@ -481,6 +484,12 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.personId = null;
         this.refreshChain();
     }
+
+    getPng64() {
+        return this.cytoscapeChild.getPng64();
+    }
+
+
 
 }
 

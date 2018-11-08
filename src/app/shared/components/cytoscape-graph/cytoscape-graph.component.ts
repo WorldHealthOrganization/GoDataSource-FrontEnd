@@ -207,8 +207,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDates: any = {};
 
-    // used for export
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     constructor(
         private genericDataService: GenericDataService,
@@ -269,6 +267,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             const edge = evt.target;
             this.edgeTapped.emit(edge.json().data);
         });
+
     }
 
     /**
@@ -367,20 +366,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         this.render();
     }
 
-    exportGraph() {
-        const pngBase64 = this.cy.png().replace('data:image/png;base64,', '');
-        this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob'})
-            .subscribe((blob) => {
-                const urlT = window.URL.createObjectURL(blob);
-                const link = this.buttonDownloadFile.nativeElement;
-                const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
-
-                link.href = urlT;
-                link.download = `${fileName}.pdf`;
-                link.click();
-
-                window.URL.revokeObjectURL(urlT);
-            });
+    getPng64() {
+        if (this.cy) {
+            return this.cy.png({full: true});
+        }
+        return;
     }
 
 }

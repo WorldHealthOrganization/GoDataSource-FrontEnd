@@ -16,6 +16,22 @@
                     [routerLink]="['/transmission-chains', 'map']">
                     {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
                 </button>
+
+                <button class="button-primary" mat-raised-button color="primary"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+                        <button
+                            mat-menu-item
+                            (click)="exportChainsOfTransmission()">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+
             </div>
         </div>
     </ng-container>
@@ -33,3 +49,4 @@
 
 </mat-card>
 
+<a hidden #buttonDownloadFile></a>
