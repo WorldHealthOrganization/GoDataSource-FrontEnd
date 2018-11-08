@@ -7,6 +7,14 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
+import { GraphNodeModel } from '../../../../core/models/graph-node.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -25,6 +33,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // filter used for size of chains
     sizeOfChainsFilter: number = null;
     // person Id - to filter the chain
@@ -32,10 +42,15 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // type of the selected person . event
     selectedEntityType: EntityType = null;
 
+    // nodes selected from graph
+    selectedNodes: (CaseModel|ContactModel|EventModel)[] = [];
+
     constructor(
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
-        protected route: ActivatedRoute
+        protected route: ActivatedRoute,
+        private entityDataService: EntityDataService,
+        private outbreakDataService: OutbreakDataService
     ) {}
 
     ngOnInit() {
@@ -54,6 +69,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     this.sizeOfChainsFilter = params.sizeOfChainsFilter;
                 }
             });
+
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+            });
     }
 
     /**
@@ -70,6 +92,27 @@ export class TransmissionChainsGraphComponent implements OnInit {
      */
     hasReadReportPermissions(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
+    }
+
+    onNodeTap(entity: GraphNodeModel) {
+        // retrieve entity info
+        this.entityDataService
+            .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+            .catch((err) => {
+                // show error message
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                // add node to selected persons list
+                if (this.selectedNodes.length === 2) {
+                    // replace the second node
+                    this.selectedNodes[1] = entityData;
+                } else {
+                    // add node to the list
+                    this.selectedNodes.push(entityData);
+                }
+            });
     }
 
 }
