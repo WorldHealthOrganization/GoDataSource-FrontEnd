@@ -107,6 +107,19 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Readonly-->
+        <ng-container matColumnDef="readonly">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE' | translate}}</div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.readonly"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
