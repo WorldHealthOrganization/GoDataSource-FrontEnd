@@ -1,7 +1,7 @@
 // import each component
 import { SnackbarComponent } from './snackbar/snackbar.component';
 import { TopnavComponent } from './topnav/topnav.component';
-import { BreadcrumbsComponent} from './breadcrumbs/breadcrumbs.component';
+import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { FormAddressComponent } from './form-address/form-address.component';
 import { FormAddressListComponent } from './form-address-list/form-address-list.component';
 import { FormDocumentComponent } from './form-document/form-document.component';
@@ -33,6 +33,7 @@ import { FormQuestionListComponent } from './form-question-list/form-question-li
 import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
 import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
+import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -74,6 +75,7 @@ export const components: any[] = [
     FormFillQuestionnaireComponent,
     FormAgeComponent,
     FormAgeDobComponent,
+    FormRelationshipQuickComponent,
 
     // answers/questions
     FormAnswerListComponent,

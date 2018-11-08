@@ -15,6 +15,12 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { NgForm } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { RelationshipModel } from '../../../../core/models/relationship.model';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -27,9 +33,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
     ];
-
-    // provide constants to template
-    Constants = Constants;
 
     // authenticated user
     authUser: UserModel;
@@ -45,12 +48,21 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // nodes selected from graph
     selectedNodes: (CaseModel|ContactModel|EventModel)[] = [];
 
+    // new relationship model
+    newRelationship = new RelationshipModel();
+
+    // provide constants to template
+    Constants = Constants;
+    EntityType = EntityType;
+
     constructor(
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         protected route: ActivatedRoute,
         private entityDataService: EntityDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private formHelper: FormHelperService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -115,4 +127,42 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
+    removeSelectedNode(index) {
+        this.selectedNodes.splice(index, 1);
+    }
+
+    createRelationship(form: NgForm) {
+        // get forms fields
+        const fields = this.formHelper.getFields(form);
+
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get source and target persons
+        const sourcePerson = this.selectedNodes[0];
+        const targetPerson = this.selectedNodes[1];
+
+        // prepare relationship data
+        const relationshipData = fields['relationship'];
+        relationshipData.persons.push({
+            id: targetPerson.id
+        });
+
+        this.relationshipDataService
+            .createRelationship(
+                this.selectedOutbreak.id,
+                this.selectedNodes[0].type,
+                this.selectedNodes[0].id,
+                relationshipData
+            )
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+            });
+    }
 }

@@ -38,16 +38,26 @@
     <mat-card
         *ngFor="let person of selectedNodes; let index = index"
         class="page-section"
-        fxFlex="350px"
+        fxFlex="400px"
     >
-        {{person.name}}
+        <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
     </mat-card>
 
     <mat-card
-        *ngIf="selectedNodes.length === 2"
+        *ngIf="selectedNodes.length === 2 && (selectedNodes[0].type !== EntityType.CONTACT || selectedNodes[1].type !== EntityType.CONTACT)"
         class="page-section"
         fxFlex
     >
-        Create Relationship Form
+        <form #form="ngForm" (submit)="createRelationship(form)">
+            <app-form-relationship-quick
+                name="relationship"
+                [ngModel]="newRelationship"
+                required="true"
+            ></app-form-relationship-quick>
+
+            <button mat-raised-button color="primary" class="button-primary" type="submit">
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+            </button>
+        </form>
     </mat-card>
 </div>
