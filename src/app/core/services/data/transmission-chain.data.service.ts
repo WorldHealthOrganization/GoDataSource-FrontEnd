@@ -182,7 +182,7 @@ export class TransmissionChainDataService {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, function (node, key) {
+                _.forEach(firstChain.nodes, (node, key) => {
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
@@ -276,7 +276,7 @@ export class TransmissionChainDataService {
 
             // generate edges based on the nodes included in the graph
             if (!_.isEmpty(firstChain.relationships)) {
-                _.forEach(firstChain.relationships, function (relationship, key) {
+                _.forEach(firstChain.relationships, (relationship, key) => {
                     // add relation only if the nodes are in the selectedNodes array
                     if (_.includes(selectedNodeIds, relationship.persons[0].id) && _.includes(selectedNodeIds, relationship.persons[1].id)) {
                         const graphEdge = new GraphEdgeModel();
@@ -306,7 +306,58 @@ export class TransmissionChainDataService {
                         } else {
                             graphEdge.edgeStyle = 'solid';
                         }
+                        // set edge label
+                        if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+                            graphEdge.label = '';
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+                            // translate values
+                            graphEdge.label = colorCriteria.edgeLabelContextTransmissionEntries[relationship.socialRelationshipTypeId];
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_LEVEL.value) {
+                            graphEdge.label = relationship.socialRelationshipDetail;
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.CLUSTER_NAME.value) {
+                            graphEdge.label = colorCriteria.clustersList[relationship.clusterId];
+                        } else if (colorCriteria.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.DAYS_DAYE_ONSET_LAST_CONTACT.value) {
+                            // calculate difference in dates between the dates of onset or dates of onset and last contact.
+                            const sourceNode = firstChain.nodes[graphEdge.source];
+                            const targetNode = firstChain.nodes[graphEdge.target];
+                            let noDays = 0;
+                            let sourceDate = '';
+                            let targetDate = '';
+                            if (sourceNode.type === EntityType.CASE) {
+                                if (!_.isEmpty(sourceNode.model.dateOfOnset)) {
+                                    sourceDate = sourceNode.model.dateOfOnset;
+                                }
+                            } else if (sourceNode.type === EntityType.CONTACT) {
+                                if (!_.isEmpty(relationship.contactDate)) {
+                                    sourceDate = relationship.contactDate;
+                                }
+                            } else if (sourceNode.type === EntityType.EVENT) {
+                                if (!_.isEmpty(sourceNode.model.date)) {
+                                    sourceDate = sourceNode.model.date;
+                                }
+                            }
 
+                            if (targetNode.type === EntityType.CASE) {
+                                if (!_.isEmpty(targetNode.model.dateOfOnset)) {
+                                    targetDate = targetNode.model.dateOfOnset;
+                                }
+                            } else if (targetNode.type === EntityType.CONTACT) {
+                                if (!_.isEmpty(relationship.contactDate)) {
+                                    targetDate = relationship.contactDate;
+                                }
+                            } else if (targetNode.type === EntityType.EVENT) {
+                                if (!_.isEmpty(targetNode.model.date)) {
+                                    targetDate = targetNode.model.date;
+                                }
+                            }
+
+                            if (!_.isEmpty(sourceDate) && !_.isEmpty(targetDate)) {
+                                const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+                                graphEdge.label = String(noDays);
+                            }
+                        }
                         graphData.edges.push({data: graphEdge});
                     }
                 });
