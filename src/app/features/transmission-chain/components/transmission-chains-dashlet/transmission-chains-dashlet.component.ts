@@ -485,6 +485,10 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.refreshChain();
     }
 
+    /**
+     * return the png representation of the graph
+     * @returns {any}
+     */
     getPng64() {
         return this.cytoscapeChild.getPng64();
     }

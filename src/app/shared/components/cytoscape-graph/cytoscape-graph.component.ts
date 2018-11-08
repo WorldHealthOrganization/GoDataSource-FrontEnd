@@ -6,8 +6,6 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
-import { ImportExportDataService } from '../../../core/services/data/import-export.data.service';
-import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -210,9 +208,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     constructor(
         private genericDataService: GenericDataService,
-        private el: ElementRef,
-        private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService
+        private el: ElementRef
     ) {}
 
     ngOnInit() {
@@ -366,9 +362,26 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         this.render();
     }
 
+    /**
+     * return the png representation of the graph
+     * @returns {any}
+     */
     getPng64() {
         if (this.cy) {
-            return this.cy.png({full: true});
+
+            // const originalHeight = document.getElementById('cy').clientHeight;
+            // const originalWidth = document.getElementById('cy').clientWidth;
+            // document.getElementById('cy').style.height = '4000px';
+            // document.getElementById('cy').style.width = '4000px';
+            // this.cy.resize();
+            // this.cy.fit();
+            const png64 = this.cy.png();
+            // document.getElementById('cy').style.height = String(originalHeight) + 'px';
+            // document.getElementById('cy').style.width = String(originalWidth) + 'px';
+            // this.cy.resize();
+            // this.cy.fit();
+
+            return png64;
         }
         return;
     }

@@ -88,8 +88,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
         const pngBase64 = this.cotDashletChild.getPng64().replace('data:image/png;base64,', '');
 
-        console.log(pngBase64);
-
         this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
             .subscribe((blob) => {
                 const urlT = window.URL.createObjectURL(blob);
