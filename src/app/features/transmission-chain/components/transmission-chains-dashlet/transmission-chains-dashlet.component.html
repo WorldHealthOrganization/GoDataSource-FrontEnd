@@ -1,4 +1,15 @@
 <div class="chain-settings">
+
+    <!-- Date - moment in time -->
+    <div>
+    <app-form-datepicker
+        class="global-date-filter"
+        [(ngModel)]="dateGlobalFilter"
+        [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE' | translate"
+        [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION' | translate"
+        (optionChanged)="onChangeGlobalDate()">
+    </app-form-datepicker>
+    </div>
     <!-- settings toggle -->
     <button
         mat-raised-button
