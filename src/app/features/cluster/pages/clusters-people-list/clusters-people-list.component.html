@@ -8,25 +8,26 @@
 
 
 <mat-card class="page-section page-content">
-    <div class="reset-filters">
+    <div class="top-section-wrapper">
         <!--Color Legend-->
         <div>
             <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
             </app-color-list-legend>
         </div>
-        <!--Reset Filters-->
-        <div>
-            <button mat-raised-button (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
 
-            <button mat-raised-button (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
+        <div class="reset-filters">
+            <!--Reset Filters-->
+            <div>
+                <button mat-raised-button (click)="resetFiltersToSideFilters()">
+                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+                </button>
+
+                <button mat-raised-button (click)="needsRefreshList(true)">
+                    {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                </button>
+            </div>
         </div>
-
     </div>
-
 
     <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
 

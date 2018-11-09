@@ -25,36 +25,19 @@ export class ColorListLegendComponent implements OnInit {
     }
 
     ngOnInit() {
-        switch (this.referenceDataCategory) {
-            case ReferenceDataCategory.RISK_LEVEL :
-                this.getRiskLevelDots();
-                break;
-            case ReferenceDataCategory.PERSON_TYPE :
-                this.getPersonTypeDots();
-                break;
-        }
+        this.getDots();
     }
 
     /**
-     * Get risk level dots
+     * Get dots based on what reference category we have
      */
-    getRiskLevelDots() {
-        this.optionsList$ = this.referenceDataDataService.getReferenceDataByCategory(this.referenceDataCategory).map((response) => {
-            return _.map(response.entries, (riskLevel: ReferenceDataEntryModel) => {
-                return new LegendDot(riskLevel.id, riskLevel.value, riskLevel.colorCode);
+    getDots() {
+        this.optionsList$ = this.referenceDataDataService.getReferenceDataByCategory(this.referenceDataCategory)
+            .map((response) => {
+                return _.map(response.entries, (entry: ReferenceDataEntryModel) => {
+                    return new LegendDot(entry.id, entry.value, entry.colorCode);
+                });
             });
-        });
-    }
-
-    /**
-     * Get person type dots
-     */
-    getPersonTypeDots() {
-        this.optionsList$ = this.referenceDataDataService.getReferenceDataByCategory(this.referenceDataCategory).map((response) => {
-            return _.map(response.entries, (personType: ReferenceDataEntryModel) => {
-                return new LegendDot(personType.id, personType.value, personType.colorCode);
-            });
-        });
     }
 
     getDotColor(item: LegendDot) {
