@@ -146,6 +146,16 @@ export class SidenavComponent implements OnInit {
                     ],
                     '/contacts/follow-ups',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'contact-range-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/range-follow-ups',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]
         ),

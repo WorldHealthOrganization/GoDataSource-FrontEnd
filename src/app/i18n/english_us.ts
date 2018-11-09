@@ -21,6 +21,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Range Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': 'Lab Results',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
@@ -986,6 +987,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_UPDATE_FOLLOW_UPS_BUTTON': 'Update follow-ups',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE': 'Relationship created!',
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
+
+        /**
+         * Range Follow-ups list page
+         */
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
 
         /**
          * Event fields
