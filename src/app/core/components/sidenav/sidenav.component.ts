@@ -87,6 +87,12 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/cloud-backup'
+                ),
+                new ChildNavItem(
+                    'languages',
+                    'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/languages'
                 )
             ]
         ),

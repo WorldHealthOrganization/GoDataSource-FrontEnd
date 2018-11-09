@@ -1,0 +1,15 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE' | translate"
+    [isOneStep]="true"
+    (finished)="finished()"
+    [importFileUrl]="importFileUrl"
+    model="language"
+    fileUploadAlias="languageFile">
+</app-import-data>

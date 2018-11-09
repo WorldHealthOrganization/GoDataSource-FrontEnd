@@ -25,6 +25,16 @@ const routes: Routes = [
         }
     },
 
+    // Import Language Tokens
+    {
+        path: 'language-data/:languageId/import-tokens',
+        component: fromPages.ImportLanguageTokensComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        }
+    },
+
     // Import reference data
     {
         path: 'reference-data/import',

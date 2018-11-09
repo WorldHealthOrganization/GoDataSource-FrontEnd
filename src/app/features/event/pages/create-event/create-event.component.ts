@@ -24,8 +24,8 @@ import { AddressType } from '../../../../core/models/address.model';
 export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Events', '/events'),
-        new BreadcrumbItemModel('Create New Event', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_EVENT_TITLE', '.', true)
     ];
 
     // selected outbreak ID

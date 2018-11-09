@@ -26,7 +26,7 @@ import { Moment } from 'moment';
 export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Events', '/events')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
     ];
 
     // authenticated user
