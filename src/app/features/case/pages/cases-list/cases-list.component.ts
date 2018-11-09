@@ -29,7 +29,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import { ClusterModel } from '../../../../core/models/cluster.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -55,7 +54,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     genderList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
-    clustersList$: Observable<ClusterModel[]>;
+    clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
 
     // available side filters
     availableSideFilters: FilterModel[] = [];
@@ -160,11 +159,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 ) {
                     this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
 
-                    this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id).map((clusters) => {
-                        return _.map(clusters, (cluster: ClusterModel) => {
-                            return new LabelValuePair(cluster.name, cluster.id);
-                        });
-                    });
+                    this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
                     // initialize side filters
                     this.initializeSideFilters();
@@ -397,7 +392,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 fieldName: 'clusterId',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
                 type: FilterType.MULTISELECT,
-                options$: this.clustersList$,
+                options$: this.clustersListAsLabelValuePair$,
                 relationshipPath: ['relationships'],
                 relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
             })

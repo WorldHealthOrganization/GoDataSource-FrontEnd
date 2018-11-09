@@ -56,6 +56,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     authUser: UserModel;
 
     // list of existing contacts
+    // list of existing contacts
     contactsList$: Observable<ContactModel[]>;
     contactsListCount$: Observable<any>;
 
