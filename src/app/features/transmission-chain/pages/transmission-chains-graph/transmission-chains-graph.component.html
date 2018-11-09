@@ -69,15 +69,30 @@
         fxFlex
     >
         <form #form="ngForm" (submit)="createRelationship(form)">
-            <app-form-relationship-quick
-                name="relationship"
-                [ngModel]="newRelationship"
-                required="true"
-            ></app-form-relationship-quick>
 
-            <button mat-raised-button color="primary" class="button-primary" type="submit">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
-            </button>
+            <div fxLayout="column">
+                <div fxLayout="row" fxLayoutGap="10px">
+                    <span>Source:</span>
+                    <span>{{selectedNodes[0].name}}</span>
+                </div>
+                <div fxLayout="row" fxLayoutGap="10px">
+                    <span>Target:</span>
+                    <span>{{selectedNodes[1].name}}</span>
+                </div>
+
+                <hr/>
+
+                <app-form-relationship-quick
+                    name="relationship"
+                    [ngModel]="newRelationship"
+                    required="true"
+                ></app-form-relationship-quick>
+
+                <button mat-raised-button color="primary" class="button-primary" type="submit">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                </button>
+            </div>
+
         </form>
     </mat-card>
 </div>

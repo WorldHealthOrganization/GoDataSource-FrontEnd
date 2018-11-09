@@ -215,6 +215,12 @@ export class TransmissionChainsGraphComponent implements OnInit {
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset selected nodes
+                this.selectedNodes = [];
             });
     }
 }
