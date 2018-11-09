@@ -215,8 +215,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     constructor(
         private genericDataService: GenericDataService,
         private el: ElementRef
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         // initialize style

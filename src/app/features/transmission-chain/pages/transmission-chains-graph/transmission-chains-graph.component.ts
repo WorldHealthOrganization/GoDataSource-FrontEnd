@@ -12,9 +12,7 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -53,8 +51,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
         private dialogService: DialogService = null
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         // get authenticated user
