@@ -14,7 +14,7 @@ export class WorldMapMovementComponent {
     @Input() width: string = '100%';
     @Input() height: string = '400px';
 
-    @ViewChild(WorldMapComponent) googleMapComponent: WorldMapComponent;
+    @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
 
     markers: WorldMapMarker[] = [];
     arrowLines: WorldMapPath[] = [];
@@ -86,8 +86,8 @@ export class WorldMapMovementComponent {
      * Zoom in / out & center to view all markers
      */
     public fitMarkerBounds() {
-        if (this.googleMapComponent) {
-            this.googleMapComponent.fitMarkerBounds();
+        if (this.worldMapComponent) {
+            this.worldMapComponent.fitMarkerBounds();
         }
     }
 }

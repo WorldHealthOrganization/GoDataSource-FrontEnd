@@ -55,7 +55,7 @@ export const components: any[] = [
     CytoscapeGraphComponent,
     C3StackedBarChartComponent,
 
-    // google
+    // world map
     WorldMapComponent,
     WorldMapMovementComponent,
 
