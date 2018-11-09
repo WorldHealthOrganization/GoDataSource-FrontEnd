@@ -249,7 +249,7 @@ export class DashboardComponent implements OnInit {
         this.domService
             .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob'})
+                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         const urlT = window.URL.createObjectURL(blob);
                         const link = this.buttonDownloadFile.nativeElement;
