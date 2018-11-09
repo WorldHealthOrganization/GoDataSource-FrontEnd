@@ -487,10 +487,11 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
     /**
      * return the png representation of the graph
+     * @param {number} splitFactor
      * @returns {any}
      */
-    getPng64() {
-        return this.cytoscapeChild.getPng64();
+    getPng64(splitFactor: number) {
+          return this.cytoscapeChild.getPng64(splitFactor);
     }
 
 

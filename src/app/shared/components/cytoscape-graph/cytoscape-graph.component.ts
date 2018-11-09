@@ -209,7 +209,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     constructor(
         private genericDataService: GenericDataService,
         private el: ElementRef
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         // initialize style
@@ -263,6 +264,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             const edge = evt.target;
             this.edgeTapped.emit(edge.json().data);
         });
+
+        // document.getElementById('cy').style.height = String(5000) + 'px';
+        // document.getElementById('cy').style.width = String(5000) + 'px';
+        // this.cy.resize();
+        // this.cy.fit();
 
     }
 
@@ -323,11 +329,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
      * @returns {boolean}
      */
     showCaseNodesWithoutDates() {
-       return (
-           this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-           && this.elements
-           && this.elements.caseNodesWithoutDates.length
-       );
+        return (
+            this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            && this.elements
+            && this.elements.caseNodesWithoutDates.length
+        );
     }
 
     /**
@@ -353,6 +359,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             && this.elements.eventNodesWithoutDates.length
         );
     }
+
     /**
      * switch timeline view type: vertical / horizontal
      * @param timelineViewType
@@ -364,26 +371,30 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     /**
      * return the png representation of the graph
+     * @param {number} splitFactor
      * @returns {any}
      */
-    getPng64() {
-        if (this.cy) {
+    getPng64(splitFactor: number) {
+        // page dimensions on the server
+        const pageSize = {
+            width: 1190,
+            height: 840
+        };
+        // canvas dimensions
+        const originalHeight = document.getElementById('cy').clientHeight;
+        const originalWidth = document.getElementById('cy').clientWidth;
 
-            // const originalHeight = document.getElementById('cy').clientHeight;
-            // const originalWidth = document.getElementById('cy').clientWidth;
-            // document.getElementById('cy').style.height = '4000px';
-            // document.getElementById('cy').style.width = '4000px';
-            // this.cy.resize();
-            // this.cy.fit();
-            const png64 = this.cy.png();
-            // document.getElementById('cy').style.height = String(originalHeight) + 'px';
-            // document.getElementById('cy').style.width = String(originalWidth) + 'px';
-            // this.cy.resize();
-            // this.cy.fit();
-
-            return png64;
+        // calculate scale between server and original width
+        const scaleFactor = Math.round(pageSize.width / originalWidth);
+        // calculate scale factor based on split factor.
+        let scale = scaleFactor * splitFactor;
+        // if scale is calculated as 1, default it to 4 for a better quality of the image
+        if (scale === 1) {
+            scale = 4;
         }
-        return;
+
+        const png64 = this.cy.png({bg: 'white', scale: scale});
+        return png64;
     }
 
 }
