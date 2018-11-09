@@ -57,6 +57,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
         'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
         'LNG_COMMON_LABEL_NO_RECORDS_SELECTED': 'No records selected',
+        'LNG_COMMON_LABEL_COLOR_LEGEND': 'Color Legend',
 
         /**
          * General Actions

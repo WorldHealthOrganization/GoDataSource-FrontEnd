@@ -1,0 +1,10 @@
+<div class="colors-legend-container">
+    <div class="color-legend-title">{{'LNG_COMMON_LABEL_COLOR_LEGEND' | translate}}</div>
+    <div *ngFor="let legendDot of optionsList$ | async" class="color-container">
+        <span *ngIf="legendDot.colorCode"
+              [style.color]="getDotColor(legendDot)">
+            &#9679;
+        </span>
+        {{ legendDot.colorCode ? [legendDot.label | translate] : '' }}
+    </div>
+</div>

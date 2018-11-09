@@ -18,6 +18,15 @@
 
         <mat-card class="page-section">
 
+            <div class="reset-filters">
+                <!--List Color Legend-->
+                <div>
+                    <app-color-list-legend
+                        [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+                    </app-color-list-legend>
+                </div>
+            </div>
+
             <mat-table #table [dataSource]="entitiesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
 
                 <!-- Checkbox -->

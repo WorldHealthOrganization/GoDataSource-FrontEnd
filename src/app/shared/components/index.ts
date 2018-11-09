@@ -33,6 +33,7 @@ import { FormQuestionListComponent } from './form-question-list/form-question-li
 import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
 import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
+import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -88,6 +89,7 @@ export const components: any[] = [
     LocationBreadcrumbsComponent,
     ChronologyComponent,
     AgeLabelComponent,
+    ColorListLegendComponent,
 
     // dialogs
     DialogComponent,
