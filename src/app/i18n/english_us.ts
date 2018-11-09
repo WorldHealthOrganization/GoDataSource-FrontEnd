@@ -1782,11 +1782,11 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time',
 
         /**
-         * Google maps movement
+         * World map movement
          */
-        'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
-        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
-        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+        'LNG_WORLD_MAP_MOVEMENT_TITLE': 'Timeline',
+        'LNG_WORLD_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
+        'LNG_WORLD_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
 
         /**
          * Inconsistency labels

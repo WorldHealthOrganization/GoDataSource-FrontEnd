@@ -19,8 +19,6 @@ import { FormInputListComponent } from './form-input-list/form-input-list.compon
 import { FormLocationDropdownComponent } from './form-location-dropdown/form-location-dropdown.component';
 import { CytoscapeGraphComponent } from './cytoscape-graph/cytoscape-graph.component';
 import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
-import { GoogleMapComponent } from './google-map/google-map.component';
-import { GoogleMapMovementComponent } from './google-map-movement/google-map-movement.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
@@ -33,6 +31,8 @@ import { FormQuestionListComponent } from './form-question-list/form-question-li
 import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
 import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
+import { WorldMapComponent } from './world-map/world-map.component';
+import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -56,8 +56,8 @@ export const components: any[] = [
     C3StackedBarChartComponent,
 
     // google
-    GoogleMapComponent,
-    GoogleMapMovementComponent,
+    WorldMapComponent,
+    WorldMapMovementComponent,
 
     // authentication - #TODO - this needs to be refactored & removed
     NotAuthTemplateComponent,
