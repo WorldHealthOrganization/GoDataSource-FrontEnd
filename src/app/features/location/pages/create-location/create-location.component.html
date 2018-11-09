@@ -66,7 +66,18 @@
                                 type="number">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-select
+                                name="geographicalLevelId"
+                                [(ngModel)]="locationData.geographicalLevelId"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION"
+                                [options]="geographicalLevelsList$ | async"
+                                optionLabelKey="label"
+                                optionValueKey="value"
+                                required="false"
+                                multiple="false">
+                            </app-form-select>
+
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

@@ -25,6 +25,5 @@ export const pageComponents: any[] = [
    CasesLessContactsDashletComponent,
    NewCasesPreviousDaysContactsDashletComponent,
    ContactsSeenEachDayDashletComponent
-
 ];
 

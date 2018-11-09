@@ -103,7 +103,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        const columns = ['label', 'description', 'icon', 'color', 'active', 'actions'];
+        const columns = ['label', 'description', 'icon', 'color', 'active', 'readonly', 'actions'];
 
         return columns;
     }

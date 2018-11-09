@@ -167,7 +167,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
                 'target-arrow-shape': 'triangle',
-                'line-style': 'data(edgeStyle)'
+                'line-style': 'data(edgeStyle)',
+                'label': 'data(label)',
+                'text-rotation': 'autorotate',
+                'text-margin-y': '14px'
             }
         }
     ];
@@ -196,7 +199,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'line-color': 'data(edgeColor)',
                 'target-arrow-color': 'data(edgeColor)',
                 'target-arrow-shape': 'triangle',
-                'line-style': 'data(edgeStyle)'
+                'line-style': 'data(edgeStyle)',
+                'label': 'data(label)',
+                'text-rotation': 'autorotate',
+                'text-margin-y': '14px'
             }
         }
     ];

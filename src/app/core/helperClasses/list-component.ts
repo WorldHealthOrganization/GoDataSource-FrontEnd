@@ -928,6 +928,14 @@ export abstract class ListComponent {
                 this.needsRefreshList(true);
                 break;
 
+            // Filter cases who are not identified though known contact list
+            case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
+                break;
         }
     }
 
