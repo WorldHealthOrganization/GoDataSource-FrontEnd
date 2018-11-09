@@ -13,7 +13,12 @@
                     </button>
                 </ng-container>
 
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="!appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
