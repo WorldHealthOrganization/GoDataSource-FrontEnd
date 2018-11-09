@@ -66,10 +66,12 @@ export class CaseSummaryDashletComponent implements OnInit {
                 if (caseSummaryResult) {
                     caseSummaryResult.value++;
                 } else {
-                    const caseSummaryResultNew: MetricChartDataModel = new MetricChartDataModel();
-                    caseSummaryResultNew.name = casePerson.classification;
-                    caseSummaryResultNew.value = 1;
-                    caseSummaryResults.push(caseSummaryResultNew);
+                    if (!_.isEmpty(casePerson.classification)) {
+                        const caseSummaryResultNew: MetricChartDataModel = new MetricChartDataModel();
+                        caseSummaryResultNew.name = casePerson.classification;
+                        caseSummaryResultNew.value = 1;
+                        caseSummaryResults.push(caseSummaryResultNew);
+                    }
                 }
             }
         });

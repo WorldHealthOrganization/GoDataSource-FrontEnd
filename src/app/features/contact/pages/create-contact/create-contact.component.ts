@@ -197,7 +197,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         )
                         .catch((err) => {
                             // display error message
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             // remove contact
                             this.contactDataService

@@ -316,7 +316,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         this.caseDataService
             .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })
