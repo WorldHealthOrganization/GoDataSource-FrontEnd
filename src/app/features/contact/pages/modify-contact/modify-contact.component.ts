@@ -138,7 +138,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         this.contactDataService
             .modifyContact(this.outbreakId, this.contactId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })

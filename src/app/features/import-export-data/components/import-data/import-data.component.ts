@@ -34,7 +34,11 @@ export enum ImportServerModelNames {
 }
 
 enum ImportServerErrorCodes {
-    DUPLICATE_RECORD = 11000
+    DUPLICATE_RECORD = 11000,
+    INVALID_VISUAL_ID_MASK = 'INVALID_VISUAL_ID_MASK',
+    ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE',
+    ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE',
+    ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
 }
 
 @Component({
@@ -262,6 +266,11 @@ export class ImportDataComponent implements OnInit {
     formatSourceValueForDuplicatesCallback: (controlName: string, value: string) => string;
 
     /**
+     * Decrypt password
+     */
+    decryptPassword: string;
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -356,6 +365,15 @@ export class ImportDataComponent implements OnInit {
                 'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
                 true
             );
+        };
+
+        // handle before upload preparation
+        this.uploader.onBeforeUploadItem = () => {
+            if (this.decryptPassword) {
+                this.uploader.options.additionalParameter.decryptPassword = this.decryptPassword;
+            } else {
+                delete this.uploader.options.additionalParameter.decryptPassword;
+            }
         };
 
         // handle file upload progress
@@ -937,5 +955,6 @@ export class ImportDataComponent implements OnInit {
         this.errMsgDetails = null;
         this.uploader.clearQueue();
         this.mappedFields = [];
+        this.decryptPassword = null;
     }
 }

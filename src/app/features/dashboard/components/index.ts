@@ -20,6 +20,7 @@ import { EpiCurveDashletComponent } from './epi-curve-dashlet/epi-curve-dashlet.
 import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary-dashlet.component';
 import { CasesHospitalizedPieChartDashletComponent } from './cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
 import { CasesByGeographicLocationDashletComponent } from './case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
+import { CasesNotIdentifiedThroughContactsDashletComponent } from './cases-not-identified-through-contacts-dashlet/cases-not-identified-through-contacts-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -43,6 +44,7 @@ export const components: any[] = [
     EpiCurveDashletComponent,
     CaseSummaryDashletComponent,
     CasesHospitalizedPieChartDashletComponent,
-    CasesByGeographicLocationDashletComponent
+    CasesByGeographicLocationDashletComponent,
+    CasesNotIdentifiedThroughContactsDashletComponent
 ];
 

@@ -9,6 +9,7 @@ export class LocationModel {
     populationDensity: number;
     parentLocationId: string;
     geoLocation: { lat: number, lng: number } | null;
+    geographicalLevelId: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -19,6 +20,7 @@ export class LocationModel {
         this.populationDensity = _.get(data, 'populationDensity', 0);
         this.parentLocationId = _.get(data, 'parentLocationId');
         this.geoLocation = _.get(data, 'geoLocation', {});
+        this.geographicalLevelId = _.get(data, 'geographicalLevelId');
     }
 
     get synonymsAsString(): string {

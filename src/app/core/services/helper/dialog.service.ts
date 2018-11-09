@@ -20,7 +20,8 @@ export enum ExportDataExtension {
     XML = 'xml',
     ODS = 'ods',
     JSON = 'json',
-    PDF = 'pdf'
+    PDF = 'pdf',
+    ZIP = 'zip'
 }
 
 @Injectable()
