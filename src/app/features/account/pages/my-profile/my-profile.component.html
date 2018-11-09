@@ -43,11 +43,6 @@
                                 [readonly]="true">
                             </app-form-input>
 
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-
-                            <!--Roles-->
                             <app-form-select
                                 name="roleIds"
                                 [(ngModel)]="user.roleIds"
@@ -59,6 +54,36 @@
                                 optionValueKey="id"
                                 optionTooltipKey="description"
                                 multiple="true"
+                                [optionReadOnly]="true">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+                            <app-form-select
+                                name="outbreakIds"
+                                [(ngModel)]="user.outbreakIds"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [multiple]="true"
+                                [disabled]="viewOnly"
+                                [optionReadOnly]="true">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="activeOutbreakId"
+                                [(ngModel)]="user.activeOutbreakId"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [disabled]="viewOnly"
                                 [optionReadOnly]="true">
                             </app-form-select>
 

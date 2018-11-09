@@ -20,7 +20,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 export class MyProfileComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
+        new BreadcrumbItemModel('LNG_PAGE_MY_PROFILE_TITLE'),
     ];
 
     // authenticated user
@@ -30,12 +30,14 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
     user: UserModel = new UserModel();
 
     rolesList$: Observable<UserRoleModel[]>;
+    outbreaksList$: Observable<OutbreakModel[]>;
 
     constructor(
         protected route: ActivatedRoute,
         private userRoleDataService: UserRoleDataService,
         private userDataService: UserDataService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super(route);
     }
@@ -47,19 +49,11 @@ export class MyProfileComponent extends ViewModifyComponent implements OnInit {
             .getUser(this.authUser.id)
             .subscribe((user: UserModel) => {
                 this.user = user;
-
-                // update breadcrumbs
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.user.name,
-                        null,
-                        true
-                    )
-                );
             });
 
         // get the list of roles to populate the dropdown in UI
         this.rolesList$ = this.userRoleDataService.getRolesList();
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList();
     }
 
 }

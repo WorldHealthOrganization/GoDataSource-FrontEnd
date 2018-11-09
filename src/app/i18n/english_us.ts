@@ -695,12 +695,15 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ROLES': 'Roles',
         'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION': '',
-        'LNG_USER_FIELD_LABEL_PERMISSIONS': 'Permissions',
-        'LNG_USER_FIELD_LABEL_PERMISSIONS_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS': 'Available Outbreaks',
         'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
+
+        /**
+         * My Profile Page
+         */
+        'LNG_PAGE_MY_PROFILE_TITLE': 'My Profile',
 
         /**
          * List Users page
