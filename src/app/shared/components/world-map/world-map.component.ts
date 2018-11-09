@@ -79,7 +79,7 @@ export class WorldMapComponent implements OnInit {
         // }),
         // new TileLayer({
         //     source: new TileArcGISRest({
-        //         url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_Reference_layer/MapServer'
+        //         url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_West_Africa_reference_7/MapServer'
         //     })
         // }),
         new TileLayer({
@@ -89,7 +89,7 @@ export class WorldMapComponent implements OnInit {
         }),
         new TileLayer({
             source: new TileArcGISRest({
-                url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_West_Africa_reference_7/MapServer'
+                url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_Reference_layer/MapServer'
             })
         })
     ];
