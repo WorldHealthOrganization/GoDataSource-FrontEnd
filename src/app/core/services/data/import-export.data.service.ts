@@ -67,7 +67,7 @@ export class ImportExportDataService {
 
     /**
      * export images as  pdf
-     * @param {{image: string; responseType: string}} imageData
+     * @param {{image: string; responseType: string; splitFactor: number}} imageData
      * @returns {Observable<any>}
      */
     exportImageToPdf( imageData: {image: string, responseType: string, splitFactor: number}): Observable<any> {
