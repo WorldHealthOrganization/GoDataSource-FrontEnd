@@ -93,8 +93,17 @@
     </div>
 
     <!-- cytoscape element -->
-    <div class="cy"
+    <div class="cy" id="cy"
          [fxShow]="!showLoading">
+    </div>
+
+    <!--  show / hide legend -->
+    <div class="toggle-legend">
+        <app-form-slide-toggle
+            name="showLegend"
+            [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
+            [(ngModel)]="showLegend">
+        </app-form-slide-toggle>
     </div>
 
 </div>
@@ -138,12 +147,3 @@
     (click)="switchTimelineView('horizontal')">
     {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
 </button>
-
-<!--  show / hide legend -->
-<div class="toggle-legend">
-    <app-form-slide-toggle
-        name="showLegend"
-        [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
-        [(ngModel)]="showLegend">
-    </app-form-slide-toggle>
-</div>

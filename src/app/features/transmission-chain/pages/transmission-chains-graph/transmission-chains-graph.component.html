@@ -4,18 +4,36 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button
-                    class="button-primary"
-                    mat-raised-button color="primary"
-                    [routerLink]="['/transmission-chains', 'list']">
-                    {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON' | translate}}
+
+                <button class="button-primary" mat-raised-button color="primary"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
-                <button
-                    class="button-primary"
-                    mat-raised-button color="primary"
-                    [routerLink]="['/transmission-chains', 'map']">
-                    {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
-                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'list']">
+                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'map']">
+                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            (click)="exportChainsOfTransmission()">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
+                        </button>
+
+                    </ng-container>
+                </mat-menu>
+
             </div>
         </div>
     </ng-container>
@@ -23,16 +41,18 @@
 
 <mat-card class="page-section page-content">
 
-        <!-- Chains of transmission -->
-        <app-transmission-chains-dashlet
-            [sizeOfChainsFilter]="sizeOfChainsFilter"
-            [personId]="personId"
-            [selectedEntityType]="selectedEntityType"
-            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
-            (nodeTapped)="onNodeTap($event)"
-        ></app-transmission-chains-dashlet>
+    <!-- Chains of transmission -->
+    <app-transmission-chains-dashlet
+        [sizeOfChainsFilter]="sizeOfChainsFilter"
+        [personId]="personId"
+        [selectedEntityType]="selectedEntityType"
+        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+        (nodeTapped)="onNodeTap($event)"
+    ></app-transmission-chains-dashlet>
 
 </mat-card>
+
+<a hidden #buttonDownloadFile></a>
 
 <div class="page-content" fxLayout="row wrap" fxLayoutGap="20px">
     <mat-card

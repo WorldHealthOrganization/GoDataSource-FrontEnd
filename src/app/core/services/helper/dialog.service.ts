@@ -133,11 +133,16 @@ export class DialogService {
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
         displayAnonymize?: boolean,
+        anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
-        queryBuilderClearOthers?: string[]
+        queryBuilderClearOthers?: string[],
+        extraAPIData?: {
+            [key: string]: any
+        },
+        isPOST?: boolean
     }) {
         // default values
         if (!data.extensionPlaceholder) {
@@ -175,6 +180,11 @@ export class DialogService {
             ];
         }
 
+        // default extra api data
+        if (!data.extraAPIData) {
+            data.extraAPIData = {};
+        }
+
         // construct list of inputs that we need in the dialog
         const fieldsList: DialogField[] = [
             new DialogField({
@@ -203,11 +213,16 @@ export class DialogService {
             );
         }
 
+        // check if we have a different anonymize key
+        if (!data.anonymizeFieldsKey) {
+            data.anonymizeFieldsKey = 'anonymizeFields';
+        }
+
         // add encrypt anonymize fields
         if (data.displayAnonymize) {
             fieldsList.push(
                 new DialogField({
-                    name: 'anonymizeFields',
+                    name: data.anonymizeFieldsKey,
                     placeholder: data.anonymizePlaceholder,
                     inputOptions: data.anonymizeFields,
                     inputOptionsMultiple: true
@@ -239,12 +254,23 @@ export class DialogService {
             }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.importExportDataService
-                        .exportData(
+                    (data.isPOST ?
+                        this.importExportDataService.exportPOSTData(
                             data.url,
-                            answer.inputValue.value,
+                            {
+                                ...answer.inputValue.value,
+                                ...data.extraAPIData
+                            }
+                        ) :
+                        this.importExportDataService.exportData(
+                            data.url,
+                            {
+                                ...answer.inputValue.value,
+                                ...data.extraAPIData
+                            },
                             qb
-                        ).catch((err) => {
+                        )
+                    ).catch((err) => {
                         this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
                         return ErrorObservable.create(err);
                     }).subscribe((blob) => {

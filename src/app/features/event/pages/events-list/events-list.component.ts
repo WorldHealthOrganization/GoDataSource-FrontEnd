@@ -31,7 +31,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 export class EventsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('Events', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '.', true)
     ];
 
     // authenticated user

@@ -44,11 +44,8 @@ export class TopnavComponent implements OnInit {
         // get the outbreaks list
         this.refreshOutbreaksList();
 
-        // get the list of languages
-        this.languagesList$ = this.languageDataService.getLanguagesList();
-
-        // get the selected language ID
-        this.selectedLanguageId = this.i18nService.getSelectedLanguageId();
+        // refresh language list
+        this.refreshLanguageList();
     }
 
     ngOnInit() {
@@ -64,6 +61,17 @@ export class TopnavComponent implements OnInit {
                     this.selectedOutbreak = outbreak;
                 }
             });
+    }
+
+    /**
+     * Refresh language list
+     */
+    refreshLanguageList() {
+        // get the list of languages
+        this.languagesList$ = this.languageDataService.getLanguagesList();
+
+        // get the selected language ID
+        this.selectedLanguageId = this.i18nService.getSelectedLanguageId();
     }
 
     /**

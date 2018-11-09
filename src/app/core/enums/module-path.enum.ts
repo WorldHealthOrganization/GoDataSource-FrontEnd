@@ -18,5 +18,6 @@ export enum ModulePath {
     SystemConfigModule = 'system-config',
     TeamModule = 'teams',
     AuditLogModule = 'audit-log',
-    CloudBackupModule = 'cloud-backup'
+    CloudBackupModule = 'cloud-backup',
+    LanguageModule = 'languages'
 }
