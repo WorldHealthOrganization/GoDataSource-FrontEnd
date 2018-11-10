@@ -208,6 +208,11 @@ export class ImportDataComponent implements OnInit {
     }
 
     /**
+     * Alis under which we upload the file
+     */
+    @Input() fileUploadAlias: string;
+
+    /**
      * Keep all file data ( header columns, module information, drop-down options etc )
      */
     importableObject: ImportableFileModel;
@@ -314,7 +319,8 @@ export class ImportDataComponent implements OnInit {
             url: `${environment.apiUrl}/${this.importFileUrl}`,
             additionalParameter: {
                 model: this._model
-            }
+            },
+            itemAlias: this.fileUploadAlias
         });
 
         // don't allow multiple files to be added
