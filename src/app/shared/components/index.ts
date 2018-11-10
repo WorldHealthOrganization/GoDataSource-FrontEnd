@@ -33,6 +33,7 @@ import { FormAnswerListComponent } from './form-answer-list/form-answer-list.com
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
 import { WorldMapComponent } from './world-map/world-map.component';
 import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
+import { FormNameUrlListComponent } from './form-name-url-list/form-name-url-list.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -70,6 +71,7 @@ export const components: any[] = [
     FormRangeComponent,
     FormRelationshipComponent,
     FormInputListComponent,
+    FormNameUrlListComponent,
     FormLocationDropdownComponent,
     FormFillQuestionnaireComponent,
     FormAgeComponent,

@@ -115,6 +115,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
+        'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE': 'Are you sure you want to delete this language: "{{name}}"',
@@ -254,6 +255,11 @@ export const EnglishUsLang = {
          * Input Fields
          */
         'LNG_INPUT_LABEL_ADD_INPUT': 'Add Input',
+
+        /**
+         * Name & Url Fields
+         */
+        'LNG_INPUT_LABEL_ADD_ITEM': 'Add Item',
 
         /**
          * Questionnaire
@@ -1297,6 +1303,10 @@ export const EnglishUsLang = {
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME': 'Map name',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL': 'Map url',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Outbreak Name',
@@ -1356,6 +1366,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1369,6 +1380,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',

@@ -8,6 +8,9 @@ import { transform } from 'ol/proj';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Icon, Style, Text, Fill, Stroke } from 'ol/style';
+import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../core/models/outbreak.model';
+import { MapServerModel } from '../../../core/models/map-server.model';
 
 export class WorldMapPoint {
     constructor(
@@ -71,28 +74,7 @@ export class WorldMapComponent implements OnInit {
     /**
      * Map Tiles / Layers
      */
-    private layers: TileLayer[] = [
-        // new TileLayer({
-        //     source: new TileArcGISRest({
-        //         url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHOBasemap/MapServer'
-        //     })
-        // }),
-        // new TileLayer({
-        //     source: new TileArcGISRest({
-        //         url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_West_Africa_reference_7/MapServer'
-        //     })
-        // }),
-        new TileLayer({
-            source: new TileArcGISRest({
-                url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_West_Africa_background_7/MapServer'
-            })
-        }),
-        new TileLayer({
-            source: new TileArcGISRest({
-                url: 'http://maps.who.int/arcgis/rest/services/Basemap/WHO_Reference_layer/MapServer'
-            })
-        })
-    ];
+    layers: TileLayer[] = [];
 
     /**
      * Map handler
@@ -195,13 +177,36 @@ export class WorldMapComponent implements OnInit {
     @Input() centerLocationZoom: number = 10;
 
     /**
+     * Constructor
+     */
+    constructor(
+        private outbreakDataService: OutbreakDataService
+    ) {}
+
+    /**
      * Init map
      */
     ngOnInit() {
-        // wait for binding to take effect => ngIf
-        setTimeout(() => {
-            this.initializeMap();
-        });
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                // set map layers
+                this.layers = _.map(
+                    _.filter(selectedOutbreak.arcGisServers, 'url'),
+                    (mapServer: MapServerModel) => {
+                        return new TileLayer({
+                            source: new TileArcGISRest({
+                                url: mapServer.url
+                            })
+                        });
+                    });
+
+                // wait for binding to take effect => ngIf
+                setTimeout(() => {
+                    this.initializeMap();
+                });
+            });
     }
 
     /**
@@ -374,6 +379,7 @@ export class WorldMapComponent implements OnInit {
         // or map already initialized
         if (
             this.displayLoading ||
+            this.layers.length < 1 ||
             !_.isEmpty(this.map)
         ) {
             return;

@@ -1,6 +1,6 @@
 <!-- Draw map -->
 <div
-    *ngIf="!displayLoading"
+    *ngIf="!displayLoading && layers.length > 0"
     id="worldMap"
     [style.width]="width"
     [style.height]="height">
@@ -8,7 +8,7 @@
 
 <!-- Still loading map -->
 <div
-    *ngIf="displayLoading"
+    *ngIf="displayLoading || layers.length < 1"
     class="world-map-loading"
     [style.width]="width"
     [style.height]="height">
