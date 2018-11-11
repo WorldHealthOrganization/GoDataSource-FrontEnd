@@ -34,6 +34,11 @@ app-contact-range-follow-ups-list {
             .follow-up-range-date-header-text {
                 transform: rotate(-60deg);
             }
+
+            .follow-up-range-date-column-header {
+                border-right: 1px transparent;
+                padding-right: 2px;
+            }
         }
 
         .follow-up-range-records {
@@ -42,8 +47,17 @@ app-contact-range-follow-ups-list {
                 padding-top: 5px;
                 padding-bottom: 5px;
 
-                .follow-up-range-date-header-name {
+                .follow-up-range-name-column-data {
                     overflow-wrap: break-word;
+                }
+
+                .follow-up-range-date-column-data {
+                    border-right: 1px dashed #CCC;
+                    padding-right: 2px;
+
+                    .follow-up-range-date-column-data-status {
+                        cursor: pointer;
+                    }
                 }
             }
         }

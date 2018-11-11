@@ -994,6 +994,7 @@ export const EnglishUsLang = {
          * Range Follow-ups list page
          */
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
 
         /**
          * Event fields

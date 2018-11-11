@@ -165,12 +165,14 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
                                         // determine min & max dates
                                         const date = moment(followUp.date).startOf('day');
-                                        minDate = minDate ?
-                                            ( date.isBefore(minDate) ? date : minDate ) :
-                                            date;
-                                        maxDate = maxDate ?
-                                            ( date.isAfter(maxDate) ? moment(date) : maxDate ) :
-                                            moment(date);
+                                        if (followUp.statusId) {
+                                            minDate = minDate ?
+                                                (date.isBefore(minDate) ? date : minDate) :
+                                                date;
+                                            maxDate = maxDate ?
+                                                (date.isAfter(maxDate) ? moment(date) : maxDate) :
+                                                moment(date);
+                                        }
 
                                         // sort by date ascending
                                         return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
