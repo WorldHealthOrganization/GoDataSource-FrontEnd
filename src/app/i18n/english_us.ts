@@ -769,6 +769,7 @@ export const EnglishUsLang = {
          */
         'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_CONTACT_FIELD_LABEL_NAME': 'Name',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',

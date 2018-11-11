@@ -50,10 +50,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         }
     }[] = [];
     daysToDisplay: string[] = [];
-    dailyStatusColors: {
+    dailyStatuses: {
         // status ID => Status
         [statusId: string]: ReferenceDataEntryModel
     } = {};
+
+    displayLoading: boolean = false;
 
     // side filters
     availableSideFilters: FilterModel[];
@@ -89,9 +91,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 this.referenceDataDataService
                     .getReferenceDataByCategory(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS)
                     .subscribe((data: ReferenceDataCategoryModel) => {
-                        this.dailyStatusColors = {};
+                        this.dailyStatuses = {};
                         _.each(data.entries, (entry: ReferenceDataEntryModel) => {
-                            this.dailyStatusColors[entry.id] = entry;
+                            this.dailyStatuses[entry.id] = entry;
                         });
                     });
 
@@ -140,16 +142,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Follow Ups
+            this.displayLoading = true;
+            this.followUpsGroupedByContact = [];
             this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .subscribe((followUps: FollowUpModel[]) => {
                     // group contact information
                     let minDate: Moment;
                     let maxDate: Moment;
-                    const mappedContactFollowUpData: {
-                        contact: ContactModel,
-                        followUps: FollowUpModel[]
-                    }[] = _.chain(followUps)
+                    this.followUpsGroupedByContact = _.chain(followUps)
                         .groupBy('personId')
                         .sortBy((data: FollowUpModel[]) => {
                             return data[0].contact.name.toLowerCase();
@@ -187,19 +188,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         })
                         .value();
 
-                    // split same day follow-ups into two records
-                    // this.followUpsGroupedByContact = [];
-                    // _.each(
-                    //     mappedContactFollowUpData, (
-                    //         data: {
-                    //             contact: ContactModel,
-                    //             followUps: FollowUpModel[]
-                    //         }
-                    //     ) => {
-                    //         data.followUps
-                    //     }
-                    // );
-
                     // create dates array
                     this.daysToDisplay = [];
                     if (
@@ -215,10 +203,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         }
                     }
 
-                    // ...nu este in regula in aceasi zi..pt ca daca afisam pe doua randuri..tb sa afisam si pe celelalte zile unde nu avem dowa follow-upuri in aceasi zi ?
-                    console.log(this.followUpsGroupedByContact);
-                    console.log(this.daysToDisplay);
-                    console.log(mappedContactFollowUpData);
+                    // display data
+                    this.displayLoading = false;
                 });
         }
     }
