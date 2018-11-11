@@ -14,8 +14,21 @@
 </app-side-filters>
 
 <mat-card class="page-section page-content">
-    <div>
-        {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <div
+            fxFlex>
+            {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
+        </div>
+        <div
+            fxFlex fxLayout="row" fxLayoutGap="10px">
+            <div
+                *ngFor="let status of dailyStatusesArray"
+                [style.background-color]="status.colorCode"
+                class="follow-up-range-status-legend">
+                {{ status.value | translate }}
+            </div>
+        </div>
     </div>
 
     <!-- Loading data data -->
@@ -38,12 +51,12 @@
             class="follow-up-range-table-content">
             <!-- Table headers -->
             <div
-                fxFlex fxLayout="row" fxLayoutGap="2px"
-                class="follow-up-range-date-header">
+                fxFlex fxLayout="row">
 
                 <!-- Contact Name -->
                 <div
-                    fxFlex="240px">
+                    fxFlex="240px"
+                    class="follow-up-range-date-header">
                     {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
                 </div>
 
@@ -51,7 +64,7 @@
                 <div
                     *ngFor="let date of daysToDisplay"
                     fxFlex="36px"
-                    class="follow-up-range-date-column-header">
+                    class="follow-up-range-date-header follow-up-range-date-column-header">
                     <div
                         class="follow-up-range-date-header-text">
                         {{ date | dateShort }}
@@ -60,7 +73,8 @@
 
                 <!-- Fill empty space -->
                 <div
-                    fxFlex>
+                    fxFlex
+                    class="follow-up-range-date-header">
                     <!-- placeholder -->
                 </div>
             </div>
@@ -71,13 +85,13 @@
                 class="follow-up-range-records">
                 <div
                     *ngFor="let contactFollowUpData of followUpsGroupedByContact"
-                    fxFlex fxLayout="row" fxLayoutGap="2px"
+                    fxFlex fxLayout="row"
                     class="follow-up-range-records-row">
 
                     <!-- Contact Name -->
                     <div
                         fxFlex="240px"
-                        class="follow-up-range-name-column-data">
+                        class="follow-up-range-column-data follow-up-range-name-column-data">
                         <a
                             [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
                             {{ contactFollowUpData.contact.name }}
@@ -88,7 +102,7 @@
                     <div
                         *ngFor="let date of daysToDisplay"
                         fxFlex="36px" fxLayout="row" fxLayoutGap="1px"
-                        class="follow-up-range-date-column-data">
+                        class="follow-up-range-column-data follow-up-range-date-column-data">
                         <ng-container
                             *ngIf="contactFollowUpData.followUps[date]">
                             <div
@@ -105,7 +119,8 @@
 
                     <!-- Fill empty space -->
                     <div
-                        fxFlex>
+                        fxFlex
+                        class="follow-up-range-column-data">
                         <!-- placeholder -->
                     </div>
 
