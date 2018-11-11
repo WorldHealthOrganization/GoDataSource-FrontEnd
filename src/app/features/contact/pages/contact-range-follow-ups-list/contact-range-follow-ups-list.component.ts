@@ -13,6 +13,9 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
+import { Moment } from 'moment';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -42,8 +45,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     // follow ups list
     followUpsGroupedByContact: {
         contact: ContactModel,
-        followUps: FollowUpModel[]
-    }[];
+        followUps: {
+            [date: string]: FollowUpModel[]
+        }
+    }[] = [];
+    daysToDisplay: string[] = [];
+    dailyStatusColors: {
+        // status ID => Status
+        [statusId: string]: ReferenceDataEntryModel
+    } = {};
 
     // side filters
     availableSideFilters: FilterModel[];
@@ -53,7 +63,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
-        protected snackbarService: SnackbarService
+        protected snackbarService: SnackbarService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -64,6 +75,9 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // side filters
+        this.initializeSideFilters();
+
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -71,12 +85,20 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
 
+                // daily status colors
+                this.referenceDataDataService
+                    .getReferenceDataByCategory(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS)
+                    .subscribe((data: ReferenceDataCategoryModel) => {
+                        this.dailyStatusColors = {};
+                        _.each(data.entries, (entry: ReferenceDataEntryModel) => {
+                            this.dailyStatusColors[entry.id] = entry;
+                        });
+                    });
+
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
 
-        // side filters
-        this.initializeSideFilters();
     }
 
     /**
@@ -121,7 +143,13 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .subscribe((followUps: FollowUpModel[]) => {
-                    this.followUpsGroupedByContact = _.chain(followUps)
+                    // group contact information
+                    let minDate: Moment;
+                    let maxDate: Moment;
+                    const mappedContactFollowUpData: {
+                        contact: ContactModel,
+                        followUps: FollowUpModel[]
+                    }[] = _.chain(followUps)
                         .groupBy('personId')
                         .sortBy((data: FollowUpModel[]) => {
                             return data[0].contact.name.toLowerCase();
@@ -129,19 +157,68 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         .map((data: FollowUpModel[]) => {
                             return {
                                 contact: data[0].contact,
-                                followUps: _.groupBy(data, (followUp: FollowUpModel) => {
-                                    // contact information not needed anymore
-                                    delete followUp.contact;
+                                followUps: _.chain(data)
+                                    .groupBy((followUp: FollowUpModel) => {
+                                        // contact information not needed anymore
+                                        delete followUp.contact;
 
-                                    // sort by date ascending
-                                    return moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                                })
+                                        // determine min & max dates
+                                        const date = moment(followUp.date).startOf('day');
+                                        minDate = minDate ?
+                                            ( date.isBefore(minDate) ? date : minDate ) :
+                                            date;
+                                        maxDate = maxDate ?
+                                            ( date.isAfter(maxDate) ? moment(date) : maxDate ) :
+                                            moment(date);
+
+                                        // sort by date ascending
+                                        return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                                    })
+                                    .mapValues((followUpData: FollowUpModel[]) => {
+                                        return _.sortBy(
+                                            followUpData,
+                                            (followUp: FollowUpModel) => {
+                                                return moment(followUp.date);
+                                            }
+                                        );
+                                    })
+                                    .value()
                             };
                         })
                         .value();
 
+                    // split same day follow-ups into two records
+                    // this.followUpsGroupedByContact = [];
+                    // _.each(
+                    //     mappedContactFollowUpData, (
+                    //         data: {
+                    //             contact: ContactModel,
+                    //             followUps: FollowUpModel[]
+                    //         }
+                    //     ) => {
+                    //         data.followUps
+                    //     }
+                    // );
 
+                    // create dates array
+                    this.daysToDisplay = [];
+                    if (
+                        minDate &&
+                        maxDate
+                    ) {
+                        while (minDate.isSameOrBefore(maxDate)) {
+                            // add day to list
+                            this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+
+                            // next day
+                            minDate.add('1', 'days');
+                        }
+                    }
+
+                    // ...nu este in regula in aceasi zi..pt ca daca afisam pe doua randuri..tb sa afisam si pe celelalte zile unde nu avem dowa follow-upuri in aceasi zi ?
                     console.log(this.followUpsGroupedByContact);
+                    console.log(this.daysToDisplay);
+                    console.log(mappedContactFollowUpData);
                 });
         }
     }

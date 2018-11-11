@@ -21,5 +21,12 @@
         </button>
     </div>
 
-
+    <div
+        fxFlex fxLayout="column">
+        <div
+            *ngFor="let contactAndFollowUpData of followUpsGroupedByContact"
+            fxFlex fxLayout="row">
+            {{ contactAndFollowUpData.contact.name }}
+        </div>
+    </div>
 </mat-card>
