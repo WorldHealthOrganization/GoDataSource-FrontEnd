@@ -26,6 +26,10 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
+<app-total-number-of-records
+    [totalNumberOfRecords]="(labResultsListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">
