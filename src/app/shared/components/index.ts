@@ -36,6 +36,7 @@ import { WorldMapMovementComponent } from './world-map-movement/world-map-moveme
 import { FormNameUrlListComponent } from './form-name-url-list/form-name-url-list.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
+import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -94,6 +95,7 @@ export const components: any[] = [
     LocationBreadcrumbsComponent,
     ChronologyComponent,
     AgeLabelComponent,
+    ColorListLegendComponent,
 
     // dialogs
     DialogComponent,
