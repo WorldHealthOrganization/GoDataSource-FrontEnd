@@ -1,0 +1,112 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <ng-container *app-selected-outbreak-is-active>
+                    <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                            [routerLink]="'/help/create-category'">
+                        {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
+
+                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        *ngIf="!appliedListFilter"
+                        mat-menu-item
+                        [routerLink]="['/help']">
+                        {{'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON' | translate}}
+                    </button>
+                </mat-menu>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="helpCategoriesList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate}}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.name | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.description | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Address -->
+        <ng-container matColumnDef="order">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER' | translate }}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.order }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <div>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
+                    </button>
+
+                    <mat-menu #actionsMenu="matMenu">
+
+                        <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['/help', item.id, 'modify-category']">
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        </button>
+
+                        <button
+                            *ngIf="hasHelpWriteAccess() && !item.deleted"
+                            mat-menu-item class="mat-menu-item-delete"
+                            (click)="deleteHelpCategory(item)">
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                        </button>
+
+                    </mat-menu>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+
+</mat-card>

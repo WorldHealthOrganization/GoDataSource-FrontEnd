@@ -248,6 +248,18 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
+            },
+            // Help Module routes
+            {
+                path: ModulePath.HelpModule,
+                loadChildren: './features/help/help.module#HelpModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.WRITE_HELP]
+                }
             }
         ]
     },
