@@ -26,6 +26,8 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { SelectedNodes } from '../../classes/selected-nodes';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -59,6 +61,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // new relationship model
     newRelationship = new RelationshipModel();
+    // new contact model
+    newContact = new ContactModel();
 
     // provide constants to template
     Constants = Constants;
@@ -74,7 +78,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService
+        private relationshipDataService: RelationshipDataService,
+        private contactDataService: ContactDataService
     ) {}
 
     ngOnInit() {
@@ -184,6 +189,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.selectedNodes = new SelectedNodes();
     }
 
+    /**
+     * Create a new Relationship between 2 selected nodes
+     * @param form
+     */
     createRelationship(form: NgForm) {
         // get forms fields
         const fields = this.formHelper.getFields(form);
@@ -197,10 +206,10 @@ export class TransmissionChainsGraphComponent implements OnInit {
         const targetPerson = this.selectedNodes.targetNode;
 
         // prepare relationship data
-        const relationshipData = fields['relationship'];
-        relationshipData.persons.push({
+        const relationshipData = fields.relationship;
+        relationshipData.persons = [{
             id: targetPerson.id
-        });
+        }];
 
         this.relationshipDataService
             .createRelationship(
@@ -222,6 +231,75 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
                 // reset Relationship model
                 this.newRelationship = new RelationshipModel();
+
+                // reset selected nodes
+                this.resetNodes();
+            });
+    }
+
+    /**
+     * Create a new Contact for a selected node (Case or Event)
+     * @param form
+     */
+    createContact(form: NgForm) {
+        // get forms fields
+        const fields = this.formHelper.getFields(form);
+
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // contact fields
+        const contactFields = fields.contact;
+        // relationship fields
+        const relationshipFields = fields.relationship;
+        // get source person
+        const sourcePerson = this.selectedNodes.sourceNode;
+
+        // add the new Contact
+        this.contactDataService
+            .createContact(this.selectedOutbreak.id, contactFields)
+            .switchMap((contactData: ContactModel) => {
+                relationshipFields.persons = [{
+                    id: contactData.id
+                }];
+
+                // create the relationship between the source person and the new contact
+                return this.relationshipDataService
+                    .createRelationship(
+                        this.selectedOutbreak.id,
+                        sourcePerson.type,
+                        sourcePerson.id,
+                        relationshipFields
+                    )
+                    .catch((err) => {
+                        // display error message
+                        this.snackbarService.showApiError(err);
+
+                        // rollback - remove contact
+                        this.contactDataService
+                            .deleteContact(this.selectedOutbreak.id, contactData.id)
+                            .subscribe();
+
+                        // finished
+                        return ErrorObservable.create(err);
+                    });
+            })
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset Relationship model
+                this.newRelationship = new RelationshipModel();
+                // reset Contact model
+                this.newContact = new ContactModel();
 
                 // reset selected nodes
                 this.resetNodes();

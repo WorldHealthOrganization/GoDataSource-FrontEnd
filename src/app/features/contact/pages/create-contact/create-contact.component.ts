@@ -183,7 +183,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
             this.contactDataService
                 .createContact(this.outbreakId, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err);
 
                     return ErrorObservable.create(err);
                 })
