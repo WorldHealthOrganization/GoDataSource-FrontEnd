@@ -4,7 +4,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { EntityType } from '../../../../core/models/entity-type';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-person-summary',
@@ -33,18 +33,7 @@ export class PersonSummaryComponent implements OnInit {
     }
 
     private getPersonLink() {
-        let entityTypeLink = '';
-        switch (this.person.type) {
-            case EntityType.CASE:
-                entityTypeLink = 'cases';
-                break;
-            case EntityType.CONTACT:
-                entityTypeLink = 'contacts';
-                break;
-            case EntityType.EVENT:
-                entityTypeLink = 'events';
-                break;
-        }
+        const entityTypeLink = EntityModel.getLinkForEntityType(this.person.type);
 
         return `/${entityTypeLink}/${this.person.id}/view`;
     }

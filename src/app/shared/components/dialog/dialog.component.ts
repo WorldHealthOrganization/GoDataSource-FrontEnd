@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { NgForm } from '@angular/forms';
+import { Constants } from '../../../core/models/constants';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -176,6 +177,7 @@ export class DialogComponent {
 
     // constants
     DialogFieldType = DialogFieldType;
+    Constants = Constants;
 
     /**
      * Default configs with provided data
