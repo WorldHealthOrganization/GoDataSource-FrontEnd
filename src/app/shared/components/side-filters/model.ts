@@ -119,6 +119,9 @@ export class FilterModel {
 
 // Model for Applied Filter
 export class AppliedFilterModel {
+    // can't remove filter
+    public readonly: boolean = false;
+
     // allowed comparators accordingly with filter type
     public allowedComparators: {
         [key: string]: {

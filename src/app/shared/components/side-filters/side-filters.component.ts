@@ -43,7 +43,7 @@ export class SideFiltersComponent {
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
 
     // applied filters
-    appliedFilters: AppliedFilterModel[];
+    @Input() appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
     appliedFilterOperator: RequestFilterOperator;
     // applied sorting criteria
