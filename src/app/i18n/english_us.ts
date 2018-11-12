@@ -332,6 +332,8 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_CASE_FIELD_LABEL_WAS_CONTACT': 'Was Contact',
         'LNG_CASE_FIELD_LABEL_TYPE': 'Type',
+        'LNG_CASE_FIELD_LABEL_CLUSTER': 'Cluster',
+        'LNG_CASE_FIELD_LABEL_CLUSTER_NAME': 'Name',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_GENDER': 'Gender',
