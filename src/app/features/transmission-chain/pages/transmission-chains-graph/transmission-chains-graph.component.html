@@ -122,47 +122,10 @@
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
                 </span>
 
-                <div fxLayout="column">
-                    <div fxLayout="row" fxLayoutGap="20px">
-                        <app-form-input
-                            name="firstName"
-                            [(ngModel)]="newContact.firstName"
-                            [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
-                            tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
-                            required="true"
-                            maxlength="200">
-                        </app-form-input>
-
-                        <app-form-input
-                            name="lastName"
-                            [(ngModel)]="newContact.lastName"
-                            [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
-                            tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
-                            maxlength="200">
-                        </app-form-input>
-                    </div>
-
-                    <div fxLayout="row" fxLayoutGap="20px">
-                        <app-form-datepicker
-                            name="dateOfReporting"
-                            [(ngModel)]="newContact.dateOfReporting"
-                            [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                            tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                            required="true"
-                            [maxDate]="serverToday"
-                            app-date-validator
-                            [dateSameOrBefore]="serverToday">
-                        </app-form-datepicker>
-
-                        <app-form-select
-                            name="gender"
-                            [(ngModel)]="newContact.gender"
-                            [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
-                            tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
-                            [options]="genderList$ | async">
-                        </app-form-select>
-                    </div>
-                </div>
+                <app-form-contact-quick
+                    name="contact"
+                    [ngModel]="newContact"
+                ></app-form-contact-quick>
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
