@@ -311,7 +311,7 @@ export class DialogService {
      */
     showCustomDialog(
         componentOrTemplateRef: any,
-        config?: any
+        config: any
     ): Observable<any> {
         // open dialog
         return this.dialog.open(

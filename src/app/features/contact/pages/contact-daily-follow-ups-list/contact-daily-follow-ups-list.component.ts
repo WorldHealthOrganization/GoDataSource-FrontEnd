@@ -12,7 +12,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
@@ -32,7 +32,6 @@ import { MatTable } from '@angular/material';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ModifyContactFollowUpQuestionnaireComponent } from '../../components/modify-contact-follow-up-questionnaire/modify-contact-follow-up-questionnaire.component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -851,10 +850,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     modifyQuestionnaire(followUp: FollowUpModel) {
         this.dialogService.showCustomDialog(
-            ModifyContactFollowUpQuestionnaireComponent,
-            ModifyContactFollowUpQuestionnaireComponent.DEFAULT_CONFIG
+            ModifyContactFollowUpQuestionnaireDialogComponent, {
+                ...ModifyContactFollowUpQuestionnaireDialogComponent.DEFAULT_CONFIG,
+                ...{
+                    data: new ModifyContactFollowUpQuestionnaireData(
+                        followUp,
+                        this.selectedOutbreak
+                    )
+                }
+            }
         ).subscribe(() => {
-            // TODO
+            // NOTHING TO DO HERE
+            // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
         });
     }
 }

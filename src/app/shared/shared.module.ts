@@ -53,7 +53,7 @@ import { FileUploadModule } from 'ng2-file-upload';
     entryComponents: [
         fromSharedComponents.SnackbarComponent,
         fromSharedComponents.DialogComponent,
-        fromSharedComponents.ModifyContactFollowUpQuestionnaireComponent
+        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent
     ]
 })
 export class SharedModule {
