@@ -1,0 +1,109 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<form #form="ngForm" class="page-content form-section">
+
+    <div class="form-content">
+
+        <mat-tab-group class="page-tabs-navbar">
+
+            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE'| translate">
+
+                <mat-card class="page-section">
+                    <div fxLayout="column">
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                name="firstName"
+                                [(ngModel)]="user.firstName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                required="true"
+                                [readonly]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="lastName"
+                                [(ngModel)]="user.lastName"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                required="true"
+                                [readonly]="true">
+                            </app-form-input>
+
+                            <app-form-input
+                                name="email"
+                                [(ngModel)]="user.email"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION"
+                                required="true"
+                                app-email-validator
+                                [readonly]="true">
+                            </app-form-input>
+
+                            <app-form-select
+                                name="roleIds"
+                                [(ngModel)]="user.roleIds"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION"
+                                required="true"
+                                [options]="rolesList$ | async"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                multiple="true"
+                                [optionReadOnly]="true">
+                            </app-form-select>
+                        </div>
+
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+
+                            <app-form-select
+                                name="outbreakIds"
+                                [(ngModel)]="user.outbreakIds"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [multiple]="true"
+                                [disabled]="viewOnly"
+                                [optionReadOnly]="true">
+                            </app-form-select>
+
+                            <app-form-select
+                                name="activeOutbreakId"
+                                [(ngModel)]="user.activeOutbreakId"
+                                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
+                                tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                optionTooltipKey="description"
+                                [options]="outbreaksList$ | async"
+                                [disabled]="viewOnly"
+                                [optionReadOnly]="true">
+                            </app-form-select>
+
+                            <div fxFlex><!-- placeholder --></div>
+                            <div fxFlex><!-- placeholder --></div>
+
+                        </div>
+                    </div>
+                </mat-card>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+
+    <div class="form-actions">
+        <div class="page-tabs-navbar-placeholder"></div>
+        <button type="button"
+                [routerLink]="'/users'"
+                mat-raised-button>
+            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+        </button>
+    </div>
+
+</form>

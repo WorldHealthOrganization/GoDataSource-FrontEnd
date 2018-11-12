@@ -34,6 +34,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
     @Input() optionVisibleKey: string = 'visible';
+    @Input() optionReadOnly: boolean = false;
     @Input() clearable: boolean = true;
     @Input() compareWith: (o1: any, o2: any) => boolean = FormSelectComponent.compareWithDefault;
     @Input() allowSelectionOfDisabledItems: boolean = false;

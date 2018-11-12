@@ -9,6 +9,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL': 'Log Out',
         'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL': 'Change Password',
         'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL': 'Admin',
+        'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL': 'My profile',
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
         'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
@@ -720,6 +721,11 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION': '',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK': 'Active Outbreak',
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
+
+        /**
+         * My Profile Page
+         */
+        'LNG_PAGE_MY_PROFILE_TITLE': 'My Profile',
 
         /**
          * List Users page
