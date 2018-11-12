@@ -255,6 +255,15 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
      * @param clientApplication
      */
     downloadConfFile(clientApplication: SystemClientApplicationModel) {
+        // construct api url if necessary
+        let apiUrl: string = environment.apiUrl;
+        apiUrl = apiUrl.indexOf('http://') === 0 || apiUrl.indexOf('https://') === 0 ?
+            apiUrl : (
+                ( apiUrl.indexOf('/') === 0 ? '' : '/') +
+                window.location.origin +
+                apiUrl
+            );
+
         // display export dialog
         this.dialogService.showExportDialog({
             message: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE',
@@ -280,7 +289,7 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                     name: 'data[url]',
                     placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
                     required: true,
-                    value: environment.apiUrl,
+                    value: apiUrl,
                     fieldType: DialogFieldType.TEXT
                 })
             ],
