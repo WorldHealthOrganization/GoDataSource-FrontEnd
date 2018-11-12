@@ -28,7 +28,7 @@ const routes: Routes = [
     // View Lab Results
     {
         path: 'lab-results',
-        component: fromPages.LabResultsComponent
+        component: fromPages.LabResultsListComponent
     },
     // View Case
     {
