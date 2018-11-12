@@ -72,6 +72,7 @@
         </div>
     </div>
 
+    <a hidden #buttonDownloadFile></a>
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -92,12 +93,17 @@
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <a hidden #buttonDownloadFile></a>
                             <button
                                 *ngIf="exportContactsUrl"
                                 mat-menu-item
                                 (click)="exportSelectedContacts()">
                                 {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS' | translate }}
+                            </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedContactsDossier()">
+                                {{ 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER' | translate }}
                             </button>
                         </mat-menu>
                     </div>
@@ -352,51 +358,83 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
-                    <ng-container *app-selected-outbreak-is-active>
-                        <button mat-menu-item *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess() && !item.deleted"
-                                [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
-                            {{'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP' | translate}}
+                    <ng-container
+                        *ngIf="!item.deleted">
+
+                        <ng-container
+                            *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()">
+                            <ng-container *app-selected-outbreak-is-active>
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
+                                    {{'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP' | translate}}
+                                </button>
+
+                                <mat-divider></mat-divider>
+                            </ng-container>
+                        </ng-container>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
+                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
-                        <mat-divider *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()"></mat-divider>
+
+                        <mat-divider></mat-divider>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'view']">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'movement']">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT' | translate }}
+                        </button>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'chronology']">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
+                        </button>
+
+                        <ng-container
+                            *ngIf="hasContactWriteAccess()">
+                            <ng-container *app-selected-outbreak-is-active>
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['.', item.id, 'modify']">
+                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                </button>
+
+                                <button
+                                    *ngIf="hasCaseWriteAccess()"
+                                    mat-menu-item
+                                    (click)="convertContactToCase(item)">
+                                    {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item
+                                    class="mat-menu-item-delete"
+                                    (click)="deleteContact(item)">
+                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                </button>
+                            </ng-container>
+                        </ng-container>
                     </ng-container>
 
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.CONTACT, item.id]">
-                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                    </button>
-
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'movement']">
-                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT' | translate }}
-                    </button>
-
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'chronology']">
-                        {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
-                    </button>
-
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
-                        </button>
-
-                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="deleteContact(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
-
-                        <button *ngIf="item.deleted && hasContactWriteAccess()" mat-menu-item class="mat-menu-item-restore"
-                                (click)="restoreContact(item)">
+                        <button
+                            *ngIf="item.deleted && hasContactWriteAccess()"
+                            mat-menu-item class="mat-menu-item-restore"
+                            (click)="restoreContact(item)">
                             {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
-
-                        <button *ngIf="hasContactWriteAccess() && hasCaseWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
-                                (click)="convertContactToCase(item)">
-                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
-                        </button>
                     </ng-container>
+
                 </mat-menu>
             </mat-cell>
         </ng-container>

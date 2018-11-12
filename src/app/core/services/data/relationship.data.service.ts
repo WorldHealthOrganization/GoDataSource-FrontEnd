@@ -14,6 +14,7 @@ import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.
 import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
+import { EntityModel } from '../../models/entity.model';
 
 @Injectable()
 export class RelationshipDataService {
@@ -30,14 +31,7 @@ export class RelationshipDataService {
      * @returns {string}
      */
     private getLinkPathFromEntityType(entityType: EntityType) {
-        switch (entityType) {
-            case EntityType.CASE:
-                return 'cases';
-            case EntityType.CONTACT:
-                return 'contacts';
-            case EntityType.EVENT:
-                return 'events';
-        }
+        return EntityModel.getLinkForEntityType(entityType);
     }
 
     /**
@@ -331,7 +325,7 @@ export class RelationshipDataService {
         ));
         // insert link to full resource
         lightObject.push(new LabelValuePair(
-            'LINK',
+            Constants.DIALOG.DATA_ITEM_TYPE.LINK,
             `/relationships/${relationship.sourceType}/${relationship.source}/${relationship.id}/view`
         ));
 

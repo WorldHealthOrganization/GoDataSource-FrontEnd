@@ -55,7 +55,8 @@
                                     optionLabelKey="fieldLabel"
                                     optionLabelPrefixKey="relationshipLabel"
                                     optionValueKey="self"
-                                    [clearable]="false">
+                                    [clearable]="false"
+                                    [disabled]="filter.readonly">
                                 </app-form-select>
 
                                 <!-- Filter Comparator -->
@@ -161,6 +162,7 @@
 
                             <!-- Delete filter item -->
                             <button
+                                *ngIf="!filter.readonly"
                                 class="filter-details-delete-button"
                                 type="button" mat-icon-button
                                 (click)="deleteFilter(i)">

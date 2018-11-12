@@ -28,6 +28,7 @@ import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -53,9 +54,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
     genderList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
 
     // available side filters
-    availableSideFilters: FilterModel[];
+    availableSideFilters: FilterModel[] = [];
 
     // provide constants to template
     Constants = Constants;
@@ -118,7 +120,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private clusterDataService: ClusterDataService
     ) {
         super(
             snackbarService,
@@ -155,6 +158,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
                     this.selectedOutbreak.id
                 ) {
                     this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
+
+                    this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+
+                    // initialize side filters
+                    this.initializeSideFilters();
                 }
 
                 // initialize pagination
@@ -165,9 +173,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     /**
@@ -382,6 +387,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 type: FilterType.SELECT,
                 options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'clusterId',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+                type: FilterType.MULTISELECT,
+                options$: this.clustersListAsLabelValuePair$,
+                relationshipPath: ['relationships'],
+                relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
             })
         ];
     }
@@ -414,6 +427,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
      */
     hasCaseWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+    }
+
+    /**
+     * Check if we have access view a contact
+     * @returns {boolean}
+     */
+    hasContactReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
     }
 
     /**
@@ -539,5 +560,57 @@ export class CasesListComponent extends ListComponent implements OnInit {
             displayAnonymize: true,
             anonymizeFields: this.anonymizeFields
         });
+    }
+
+    /**
+     * Export empty case investigation
+     */
+    exportEmptyCaseInvestigation(caseModel: CaseModel) {
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // display export dialog
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
+                fileName: this.casesDataExportFileName,
+                buttonDownloadFile: this.buttonDownloadFile,
+                fileType: ExportDataExtension.ZIP
+            });
+        }
+    }
+
+    /**
+     * Export cases dossier
+     */
+    exportSelectedCasesDossier() {
+        // get list of follow-ups that we want to modify
+        const selectedRecords: false | string[] = this.validateCheckedRecords();
+        if (!selectedRecords) {
+            return;
+        }
+
+        // display export only if we have a selected outbreak
+        if (this.selectedOutbreak) {
+            // remove id from list
+            const anonymizeFields = _.filter(this.anonymizeFields, (value: LabelValuePair) => {
+                return value.value !== 'id';
+            });
+
+            // display export dialog
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                fileName: this.casesDataExportFileName,
+                buttonDownloadFile: this.buttonDownloadFile,
+                fileType: ExportDataExtension.ZIP,
+                displayAnonymize: true,
+                anonymizeFields: anonymizeFields,
+                anonymizeFieldsKey: 'data',
+                extraAPIData: {
+                    cases: selectedRecords
+                },
+                isPOST: true
+            });
+        }
     }
 }

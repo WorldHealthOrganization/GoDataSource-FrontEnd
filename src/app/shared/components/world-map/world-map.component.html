@@ -1,0 +1,16 @@
+<!-- Draw map -->
+<div
+    *ngIf="!displayLoading && layers.length > 0"
+    id="worldMap"
+    [style.width]="width"
+    [style.height]="height">
+</div>
+
+<!-- Still loading map -->
+<div
+    *ngIf="displayLoading || layers.length < 1"
+    class="world-map-loading"
+    [style.width]="width"
+    [style.height]="height">
+    <mat-spinner></mat-spinner>
+</div>

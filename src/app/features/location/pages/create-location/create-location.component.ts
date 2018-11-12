@@ -9,6 +9,9 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-create-location',
@@ -26,6 +29,8 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
     ];
     locationData: LocationModel = new LocationModel();
 
+    geographicalLevelsList$: Observable<any>;
+
     parentId: string;
 
     constructor(
@@ -33,12 +38,16 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
         private locationDataService: LocationDataService,
         private snackbarService: SnackbarService,
         private route: ActivatedRoute,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super();
     }
 
     ngOnInit() {
+
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
+
         // reload data
         this.route.params
             .subscribe((params: { parentId }) => {

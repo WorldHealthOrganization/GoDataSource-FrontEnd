@@ -13,64 +13,72 @@
                     </button>
                 </ng-container>
 
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button
+                    *ngIf="!appliedListFilter"
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
                 <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        *ngIf="!appliedListFilter"
-                        mat-menu-item
-                        [routerLink]="['/cases']"
-                        [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
-                        {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
-                    </button>
+                    <ng-container
+                        *ngIf="!appliedListFilter">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/cases']"
+                            [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS }">
+                            {{'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON' | translate}}
+                        </button>
 
-                    <mat-divider></mat-divider>
+                        <mat-divider></mat-divider>
 
-                    <button
-                        *ngIf="!appliedListFilter && hasReportAccess()"
-                        mat-menu-item
-                        [routerLink]="['/relationships/date-onset']">
-                        {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
-                    </button>
-
-                    <button
-                        *ngIf="!appliedListFilter && hasReportAccess()"
-                        mat-menu-item
-                        [routerLink]="['/relationships/long-period']">
-                        {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
-                    </button>
-
-                    <mat-divider></mat-divider>
-
-                    <app-export-button
-                        *ngIf="!appliedListFilter && exportCasesUrl"
-                        [menuItem]="true"
-                        [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
-                        [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
-                        [url]="exportCasesUrl"
-                        [fileName]="casesDataExportFileName"
-                        [allowedExportTypes]="allowedExportTypes"
-                        [displayEncrypt]="true"
-                        [displayAnonymize]="true"
-                        [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
-                    </app-export-button>
-
-                    <ng-container *app-selected-outbreak-is-active>
-                        <ng-container *ngIf="!appliedListFilter && hasCaseWriteAccess()">
+                        <ng-container
+                            *ngIf="hasReportAccess()">
                             <button
                                 mat-menu-item
-                                [routerLink]="['/import-export-data', 'case-data', 'import']">
-                                {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                                [routerLink]="['/relationships/date-onset']">
+                                {{'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON' | translate}}
                             </button>
 
                             <button
                                 mat-menu-item
-                                [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
-                                {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
+                                [routerLink]="['/relationships/long-period']">
+                                {{'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON' | translate}}
                             </button>
+
+                            <mat-divider></mat-divider>
+                        </ng-container>
+
+                        <app-export-button
+                            *ngIf="exportCasesUrl"
+                            [menuItem]="true"
+                            [label]="'LNG_PAGE_LIST_CASES_EXPORT_BUTTON' | translate"
+                            [message]="'LNG_PAGE_LIST_CASES_EXPORT_TITLE' | translate"
+                            [url]="exportCasesUrl"
+                            [fileName]="casesDataExportFileName"
+                            [allowedExportTypes]="allowedExportTypes"
+                            [displayEncrypt]="true"
+                            [displayAnonymize]="true"
+                            [anonymizeFields]="anonymizeFields"
+                            [queryBuilder]="queryBuilder">
+                        </app-export-button>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <ng-container *ngIf="hasCaseWriteAccess()">
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['/import-export-data', 'case-data', 'import']">
+                                    {{'LNG_PAGE_LIST_CASES_IMPORT_BUTTON' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
+                                    {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
+                                </button>
+                            </ng-container>
                         </ng-container>
                     </ng-container>
                 </mat-menu>
@@ -103,6 +111,7 @@
         </button>
     </div>
 
+    <a hidden #buttonDownloadFile></a>
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -123,12 +132,17 @@
                         </button>
 
                         <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <a hidden #buttonDownloadFile></a>
                             <button
                                 *ngIf="exportCasesUrl"
                                 mat-menu-item
                                 (click)="exportSelectedCases()">
                                 {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES' | translate }}
+                            </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="exportSelectedCasesDossier()">
+                                {{ 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER' | translate }}
                             </button>
                         </mat-menu>
                     </div>
@@ -350,31 +364,42 @@
 
                 <mat-menu #actionsMenu="matMenu">
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
+                        <ng-container
+                            *ngIf="hasContactWriteAccess() && !item.deleted">
+                            <button
+                                mat-menu-item
+                                routerLink="/contacts/create"
                                 [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
-                            {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                        </button>
+                                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                            </button>
 
-                        <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create-bulk"
+                            <button
+                                mat-menu-item
+                                routerLink="/contacts/create-bulk"
                                 [queryParams]="{ entityType: EntityType.CASE, entityId: item.id }">
-                            {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
-                        </button>
+                                {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                            </button>
 
-                        <mat-divider *ngIf="hasCaseWriteAccess() || hasContactWriteAccess()"></mat-divider>
+                            <mat-divider></mat-divider>
+                        </ng-container>
                     </ng-container>
-
-                    <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.CASE, item.id]">
-                        {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                    </button>
-
-                    <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'lab-results']">
-                        {{ 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS' | translate }}
-                    </button>
-
-                    <mat-divider></mat-divider>
 
                     <ng-container
                         *ngIf="!item.deleted">
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships', EntityType.CASE, item.id]">
+                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                        </button>
+
+                        <button
+                            *ngIf="hasCaseWriteAccess()"
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'lab-results']">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS' | translate }}
+                        </button>
+
+                        <mat-divider></mat-divider>
 
                         <button mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
@@ -391,22 +416,37 @@
                         <button mat-menu-item [routerLink]="['/contacts/case-related-follow-ups', item.id]">
                             {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS' | translate }}
                         </button>
+
+                        <button
+                            *ngIf="hasReportAccess() && hasContactReadAccess()"
+                            mat-menu-item
+                            (click)="exportEmptyCaseInvestigation(item)">
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION' | translate }}
+                        </button>
                     </ng-container>
 
                     <ng-container *app-selected-outbreak-is-active>
-                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                        </button>
+                        <ng-container
+                            *ngIf="hasCaseWriteAccess() && !item.deleted">
+                            <button
+                                mat-menu-item
+                                [routerLink]="['.', item.id, 'modify']">
+                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            </button>
 
-                        <button *ngIf="hasCaseWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
+                            <button
+                                mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCase(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
+                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            </button>
 
-                        <button *ngIf="hasCaseWriteAccess() && hasContactWriteAccess() && !item.deleted" mat-menu-item class="mat-menu-item-delete"
+                            <button
+                                *ngIf="hasContactWriteAccess()"
+                                mat-menu-item class="mat-menu-item-delete"
                                 (click)="convertCaseToContact(item)">
-                        {{'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT' | translate}}
-                        </button>
+                                {{'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT' | translate}}
+                            </button>
+                        </ng-container>
 
                         <button *ngIf="item.deleted && hasCaseWriteAccess()" mat-menu-item class="mat-menu-item-restore"
                                 (click)="restoreCase(item)">

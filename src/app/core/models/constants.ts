@@ -15,6 +15,7 @@ export enum ApplyListFilter {
     CASES_LESS_CONTACTS = 'cases_less_contacts',
     CASES_IN_KNOWN_TRANSMISSION_CHAINS = 'cases_in_known_transmission_chains',
     CASES_PREVIOUS_DAYS_CONTACTS = 'cases_previous_days_contacts',
+    CASES_NOT_IDENTIFIED_THROUGH_CONTACTS = 'cases-not-identified-through-contacts',
     CASES_PENDING_LAB_RESULT = 'cases_pending_lab_result',
     CASES_REFUSING_TREATMENT = 'cases_refusing_treatment',
     CONTACTS_BECOME_CASES = 'contacts_become_cases',
@@ -31,6 +32,7 @@ export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
+    static DEFAULT_DATE_SHORT_DISPLAY_FORMAT = 'MM/DD';
 
     // default random configs
     static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -46,6 +48,13 @@ export class Constants {
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // dialog constants
+    static DIALOG = {
+        DATA_ITEM_TYPE: {
+            LINK: 'LINK'
+        }
+    };
 
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
@@ -154,6 +163,7 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP',
         [Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS',
         [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
+        [Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS',
         [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',
         [Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT]: 'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT',
         [Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE',
@@ -268,6 +278,30 @@ export class Constants {
         EXPOSURE_DURATION: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             value: 'exposureDurationId'
+        }
+    };
+
+    // used for the criteria radio buttons in the chains of transmission settings
+    static TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS = {
+        NONE: {
+            label: 'LNG_COMMON_LABEL_NONE',
+            value: 'none'
+        },
+        DAYS_DAYE_ONSET_LAST_CONTACT: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_EDGE_LABEL_FILTER_DAYS_BETWEEN_ONSET_LAST_CONTACT',
+            value: 'dateOnsetlastContact'
+        },
+        SOCIAL_RELATIONSHIP_TYPE: {
+            label: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
+            value: 'socialRelationshipTypeId'
+        },
+        SOCIAL_RELATIONSHIP_LEVEL: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            value: 'socialRelationshipDetail'
+        },
+        CLUSTER_NAME: {
+            label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            value: 'clusterId'
         }
     };
 

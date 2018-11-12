@@ -9,17 +9,20 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL': 'Log Out',
         'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL': 'Change Password',
         'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL': 'Admin',
+        'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL': 'My profile',
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
         'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
+        'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
         'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Range Follow-ups',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': 'Lab Results',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
@@ -115,8 +118,10 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
+        'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: "{{name}}"',
+        'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE': 'Are you sure you want to delete this language: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_USER': 'Are you sure you want to delete this user: "{{firstName}} {{lastName}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE': 'Are you sure you want to delete this role: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK': 'Are you sure you want to delete the outbreak "{{name}}"?',
@@ -137,6 +142,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_RESTORE_EVENT': 'Are you sure you want to restore this event: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK': 'Are you sure you want to restore this outbreak: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_RESTORE_CONTACT': 'Are you sure you want to restore this contact: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT': 'Are you sure you want to restore this lab result?',
         'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT': 'Are you sure you want to convert this case: "{{name}}" to contact?',
         'LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT': 'Are you sure you want to remove this attachment?',
         'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP': 'Are you sure you want to delete this relationship: "{{name}}"?',
@@ -150,6 +156,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_TEAM': 'Are you sure you want to delete this team: "{{name}}" ?',
         'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
         'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
+        'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
 
         /**
          * Dialogs fields placeholders
@@ -210,6 +217,9 @@ export const EnglishUsLang = {
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': 'Something went wrong! Please contact an administrator.',
+        'LNG_API_ERROR_CODE_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'One of the addresses must be set as Current Address',
+        'LNG_API_ERROR_CODE_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Multiple addresses set as Usual Place of Residence. Only one address should be set as Usual Place of Residence',
+        'LNG_API_ERROR_CODE_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Addresses set as Previous Usual Place of Residence must have a date set',
 
         /**
          * Common Fields
@@ -249,6 +259,11 @@ export const EnglishUsLang = {
          * Input Fields
          */
         'LNG_INPUT_LABEL_ADD_INPUT': 'Add Input',
+
+        /**
+         * Name & Url Fields
+         */
+        'LNG_INPUT_LABEL_ADD_ITEM': 'Add Item',
 
         /**
          * Questionnaire
@@ -318,6 +333,8 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_DELETED': 'Deleted',
         'LNG_CASE_FIELD_LABEL_WAS_CONTACT': 'Was Contact',
         'LNG_CASE_FIELD_LABEL_TYPE': 'Type',
+        'LNG_CASE_FIELD_LABEL_CLUSTER': 'Cluster',
+        'LNG_CASE_FIELD_LABEL_CLUSTER_NAME': 'Name',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER': 'Phone Number',
         'LNG_CASE_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_GENDER': 'Gender',
@@ -367,9 +384,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
+        'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES': 'Export the selected cases',
+        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER': 'Export dossier for selected cases',
+        'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE': 'Cases dossier',
         'LNG_PAGE_LIST_CASES_IMPORT_BUTTON': 'Import Case Data',
         'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON': 'Onset report',
         'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON': 'Onset long period',
@@ -467,6 +488,8 @@ export const EnglishUsLang = {
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT': 'Result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION': '',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED': 'Deleted',
+        'LNG_CASE_LAB_RESULT_FIELD_LABEL_DELETED_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES': 'Notes result',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION': '',
         'LNG_CASE_LAB_RESULT_FIELD_LABEL_STATUS': 'Status',
@@ -480,6 +503,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
+        'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result restored',
 
         /**
          * Case Lab results list page
@@ -602,6 +626,8 @@ export const EnglishUsLang = {
         'LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY': 'Population Density',
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL': 'Geographical Level',
+        'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION': '',
 
         /**
          * Locations list page
@@ -701,6 +727,11 @@ export const EnglishUsLang = {
         'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION': '',
 
         /**
+         * My Profile Page
+         */
+        'LNG_PAGE_MY_PROFILE_TITLE': 'My Profile',
+
+        /**
          * List Users page
          */
         'LNG_PAGE_LIST_USERS_TITLE': 'Users',
@@ -757,6 +788,7 @@ export const EnglishUsLang = {
          */
         'LNG_CONTACT_FIELD_LABEL_ID': 'ID',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
+        'LNG_CONTACT_FIELD_LABEL_NAME': 'Name',
         'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
@@ -812,6 +844,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER': 'Export dossier for selected contacts',
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE': 'Contacts dossier',
         'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE': 'Convert to case',
         'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Contact restored!',
@@ -976,6 +1010,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
+         * Range Follow-ups list page
+         */
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+
+        /**
          * Event fields
          */
         'LNG_EVENT_FIELD_LABEL_NAME': 'Name',
@@ -1002,6 +1042,7 @@ export const EnglishUsLang = {
         /**
          * Create Event page
          */
+        'LNG_PAGE_CREATE_EVENT_TITLE': 'Create New Event',
         'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE': 'Address',
         'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON': 'Create event',
@@ -1015,6 +1056,37 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE': 'Event saved!',
         'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
         'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
+         * Language fields
+         */
+        'LNG_LANGUAGE_FIELD_LABEL_NAME': 'Name',
+        'LNG_LANGUAGE_FIELD_LABEL_NAME_DESCRIPTION': '',
+
+        /**
+         * Languages list page
+         */
+        'LNG_PAGE_LIST_LANGUAGES_TITLE': 'Languages',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE': 'Language deleted!',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS': 'Download language file',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE': 'Export language template',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS': 'Import language file',
+
+        /**
+         * Create Language page
+         */
+        'LNG_PAGE_CREATE_LANGUAGE_TITLE': 'Create New Language',
+        'LNG_PAGE_CREATE_LANGUAGE_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON': 'Create Language',
+        'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE': 'Language created!',
+
+        /**
+         * Modify Language page
+         */
+        'LNG_PAGE_VIEW_LANGUAGE_TITLE': 'View {{name}}',
+        'LNG_PAGE_MODIFY_LANGUAGE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE': 'Language saved!',
+        'LNG_PAGE_MODIFY_LANGUAGE_TAB_DETAILS_TITLE': 'Details',
 
         /**
          * Permissions
@@ -1095,6 +1167,8 @@ export const EnglishUsLang = {
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR_DESCRIPTION': '',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE': 'Active',
         'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE': 'System Value',
+        'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_READONLY_DESCRIPTION': '',
 
         /**
          * Reference Data - Categories List page
@@ -1250,6 +1324,10 @@ export const EnglishUsLang = {
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME': 'Map name',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL': 'Map url',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Outbreak Name',
@@ -1309,6 +1387,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1322,6 +1401,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1415,6 +1495,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE': ' DAYS AMONG KNOWN CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS': 'INDEPENDENT CHAINS OF TRANSMISSION',
         'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'CASES WITH PENDING LAB RESULT',
+        'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS': 'CASES NOT IDENTIFIED THROUGH CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
@@ -1592,8 +1673,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Client application deleted!',
         'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable',
         'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE': 'Download Configuration File',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE': 'Download Configuration File',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME': 'Config file',
         'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE': 'Active flag changed',
         'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL': 'Url',
 
         /**
          * Create Client Application Page
@@ -1669,6 +1754,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP': 'Contacts with successful follow-up',
         'LNG_PAGE_LIST_FILTER_CASES_KNOWN_TRANSMISSION_CHAINS': 'Cases in the previous {{x}} days in known transmission chains',
         'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS': 'Cases in the previous {{x}} days among known contacts',
+        'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS': 'Cases not identified through contacts',
         'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT': 'Cases with pending lab result',
         'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT': 'Cases refusing to be transferred to a treatment unit',
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
@@ -1714,14 +1800,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUBBLE_NETWORK_VIEW': 'Bubble Network',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW': 'Timeline Network',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE': 'View Full Resource',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION': 'View Chain of Transmission',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE': 'Contact Details',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE': 'Case Details',
-        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE': 'Event Details',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON': 'View Resource',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON_CHAIN': 'View Chain',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE': 'Relationship Details',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE': 'Node Color',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE': 'Node Label Color',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE': 'Edge Color',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE': 'Edge Label',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL': 'Entity Type',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP': 'Read-only in Timeline View',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
@@ -1738,6 +1823,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RESET_CHAINS': 'Reset',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE': 'You are currently seeing the chains with size:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON': 'You are currently seeing the chains for person:',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT': 'Export Chains of Transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR': 'Scale',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Date',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION': '',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_EDGE_LABEL_FILTER_DAYS_BETWEEN_ONSET_LAST_CONTACT': 'Days',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_EXPOSURE': 'Exposure',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_CONTACT': 'Contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON': 'Create Relationship',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship created!',
 
         /**
          * Side filter
@@ -1783,11 +1877,11 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time',
 
         /**
-         * Google maps movement
+         * World map movement
          */
-        'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
-        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
-        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+        'LNG_WORLD_MAP_MOVEMENT_TITLE': 'Timeline',
+        'LNG_WORLD_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
+        'LNG_WORLD_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
 
         /**
          * Inconsistency labels
@@ -1812,6 +1906,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK': 'Failed to import record {{recordNo}} because of outbreak invalid case id mask',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because address must have a place of residence',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because there are multiple usual place of addresses',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Failed to import record {{recordNo}} because previous address should have date',
         'LNG_PAGE_IMPORT_DATA_LABEL_OR': 'OR, click',
         'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE': 'Browse',
         'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE': 'Upload file',
@@ -1821,6 +1919,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_SUCCESS_MESSAGE': 'Data imported',
         'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_INFORMATION': 'Model Information',
         'LNG_PAGE_IMPORT_DATA_LABEL_SOURCE_FILE_INFORMATION': 'Source File Information',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD': 'Decrypt password',
+        'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION': 'Required if uploaded file is encrypted',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE': 'Select Source',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION': 'Select Destination',
         'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL': 'Select Level',
@@ -1843,6 +1943,11 @@ export const EnglishUsLang = {
          * Import location data
          */
         'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
+
+        /**
+         * Import language tokens
+         */
+        'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE': 'Import Language Tokens',
 
         /**
          * Import reference data

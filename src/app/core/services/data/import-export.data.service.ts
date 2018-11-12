@@ -31,22 +31,34 @@ export class ImportExportDataService {
         data: {
             fileType: string,
             encryptPassword?: string,
-            anonymizeFields?: string[]
+            anonymizeFields?: string[],
+            [otherData: string]: any
         },
         queryBuilder?: RequestQueryBuilder
     ): Observable<Blob>  {
+        // clone data object
+        data = _.cloneDeep(data);
+
         // url + export type ( json, csv ... )
         let completeURL = `${url}?type=${data.fileType}`;
+        delete data.fileType;
 
         // encryption password
         if (!_.isEmpty(data.encryptPassword)) {
             completeURL += `&encryptPassword=${data.encryptPassword}`;
+            delete data.encryptPassword;
         }
 
         // anonymize fields
         if (!_.isEmpty(data.anonymizeFields)) {
             completeURL += '&anonymizeFields=' + JSON.stringify(data.anonymizeFields);
+            delete data.anonymizeFields;
         }
+
+        // add other custom fields caused by API inconsistencies...
+        _.each(data, (value: any, key: string) => {
+            completeURL += `&${key}=` + JSON.stringify(value);
+        });
 
         // filter ?
         if (
@@ -66,14 +78,31 @@ export class ImportExportDataService {
     }
 
     /**
+     * Export Data
+     * @param url
+     * @param data
+     */
+    exportPOSTData(
+        url: string,
+        data: any
+    ): Observable<Blob>  {
+        // execute export
+        return this.http.post(
+            url,
+            data, {
+                responseType: 'blob'
+            }
+        );
+    }
+
+    /**
      * export images as  pdf
-     * @param {{image: string; responseType: string}} imageData
+     * @param {{image: string; responseType: string; splitFactor: number}} imageData
      * @returns {Observable<any>}
      */
-    exportImageToPdf( imageData: {image: string, responseType: string}): Observable<any> {
+    exportImageToPdf( imageData: {image: string, responseType: string, splitFactor: number}): Observable<any> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/pdf'});
         return this.http.post(`/system-settings/image-to-pdf/`, imageData,  { headers, responseType: 'blob' });
-
     }
 }
 

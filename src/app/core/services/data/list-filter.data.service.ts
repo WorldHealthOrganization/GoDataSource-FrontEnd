@@ -404,4 +404,19 @@ export class ListFilterDataService {
             return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
         });
     }
+
+    /**
+     * Create the query builder for filtering the list of cases who are not identified though known contact list
+     * @returns {RequestQueryBuilder}
+     */
+    filterCasesNotIdentifiedThroughContacts(): RequestQueryBuilder {
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+        qb.filter.where({
+            wasContact: {
+                neq: true
+            }
+        });
+        return qb;
+    }
 }

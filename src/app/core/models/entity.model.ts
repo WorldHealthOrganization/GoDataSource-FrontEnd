@@ -29,4 +29,20 @@ export class EntityModel {
         }
     }
 
+    static getLinkForEntityType(entityType: EntityType): string {
+        let entityTypeLink = '';
+        switch (entityType) {
+            case EntityType.CASE:
+                entityTypeLink = 'cases';
+                break;
+            case EntityType.CONTACT:
+                entityTypeLink = 'contacts';
+                break;
+            case EntityType.EVENT:
+                entityTypeLink = 'events';
+                break;
+        }
+
+        return entityTypeLink;
+    }
 }

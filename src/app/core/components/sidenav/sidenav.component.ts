@@ -30,10 +30,10 @@ export class SidenavComponent implements OnInit {
         [],
         [
             new ChildNavItem(
-                'logout',
-                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+                'my-profile',
+                'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL',
                 [],
-                '/auth/logout'
+                '/account/my-profile'
             ),
             new ChildNavItem(
                 'change-password',
@@ -46,6 +46,12 @@ export class SidenavComponent implements OnInit {
                 'Set Security Questions',
                 [],
                 '/account/set-security-questions'
+            ),
+            new ChildNavItem(
+                'logout',
+                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+                [],
+                '/auth/logout'
             )
         ]
     );
@@ -87,6 +93,12 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/cloud-backup'
+                ),
+                new ChildNavItem(
+                    'languages',
+                    'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/languages'
                 )
             ]
         ),
@@ -139,6 +151,16 @@ export class SidenavComponent implements OnInit {
                         PERMISSION.READ_FOLLOWUP
                     ],
                     '/contacts/follow-ups',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'contact-range-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/range-follow-ups',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]

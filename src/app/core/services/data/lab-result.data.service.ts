@@ -130,5 +130,16 @@ export class LabResultDataService {
     deleteLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<any> {
         return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`);
     }
+
+    /**
+     * Restore a deleted Lab Result
+     * @param {string} outbreakId
+     * @param {string} caseId
+     * @param {string} labResultId
+     * @returns {Observable<any>}
+     */
+    restoreLabResult(outbreakId: string, caseId: string, labResultId: string): Observable<any> {
+        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}/restore`, {});
+    }
 }
 

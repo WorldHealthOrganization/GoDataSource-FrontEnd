@@ -11,6 +11,9 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-modify-location',
@@ -33,6 +36,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     locationData: LocationModel = new LocationModel();
     authUser: UserModel;
 
+    geographicalLevelsList$: Observable<any>;
+
     backToCurrent: boolean = false;
 
     constructor(
@@ -41,7 +46,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         protected route: ActivatedRoute,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(route);
     }
@@ -49,6 +55,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
 
         this.route.queryParams
             .subscribe((params: { backToCurrent }) => {

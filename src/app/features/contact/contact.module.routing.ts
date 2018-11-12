@@ -99,6 +99,18 @@ const routes: Routes = [
             permissions: [PERMISSION.READ_FOLLOWUP]
         }
     },
+    // Range Follow-ups list
+    {
+        path: 'range-follow-ups',
+        component: fromPages.ContactRangeFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.READ_CONTACT,
+                PERMISSION.READ_FOLLOWUP
+            ]
+        }
+    },
     // Create Follow Up
     {
         path: ':contactId/follow-ups/create',

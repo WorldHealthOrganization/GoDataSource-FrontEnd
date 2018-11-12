@@ -7,6 +7,7 @@ import { CacheKey, CacheService } from '../helper/cache.service';
 import 'rxjs/add/operator/share';
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 
 @Injectable()
 export class LanguageDataService {
@@ -18,14 +19,25 @@ export class LanguageDataService {
         private modelHelper: ModelHelperService,
         private cacheService: CacheService
     ) {
-        this.languageList$ = this.http.get(`languages`).share();
+        this.languageList$ = this.http.get('languages').share();
     }
 
     /**
      * Retrieve the list of Languages
      * @returns {Observable<LanguageModel[]>}
      */
-    getLanguagesList(): Observable<LanguageModel[]> {
+    getLanguagesList(qb: RequestQueryBuilder = null): Observable<LanguageModel[]> {
+        // retrieve languages
+        if (qb) {
+            // get languages list from API
+            const filter = qb.buildQuery();
+            return this.modelHelper
+                .mapObservableListToModel(
+                    this.http.get(`languages?filter=${filter}`),
+                    LanguageModel
+                );
+        }
+
         // get languages list from cache
         const languagesList = this.cacheService.get(CacheKey.LANGUAGES);
         if (languagesList) {
@@ -88,6 +100,34 @@ export class LanguageDataService {
 
             return tokens;
         });
+    }
+
+    /**
+     * Delete language
+     * @param {string} languageId
+     * @returns {Observable<any>}
+     */
+    deleteLanguage(languageId: string): Observable<any> {
+        return this.http.delete(`languages/${languageId}`);
+    }
+
+    /**
+     * Add a new Language
+     * @param languageData
+     * @returns {Observable<any>}
+     */
+    createLanguage(languageData): Observable<any> {
+        return this.http.post('languages', languageData);
+    }
+
+    /**
+     * Modify Language
+     * @param {string} languageId
+     * @param languageData
+     * @returns {Observable<any>}
+     */
+    modifyLanguage(languageId: string, languageData): Observable<any> {
+        return this.http.put(`languages/${languageId}`, languageData);
     }
 }
 

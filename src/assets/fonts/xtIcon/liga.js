@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'swapVertical': '&#xe91c;',
+            'close': '&#xe91b;',
             'person_pin': '&#xe91a;',
             'columns': '&#xe919;',
             'groupWork': '&#xe918;',

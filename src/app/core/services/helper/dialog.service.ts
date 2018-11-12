@@ -20,7 +20,9 @@ export enum ExportDataExtension {
     XML = 'xml',
     ODS = 'ods',
     JSON = 'json',
-    PDF = 'pdf'
+    PDF = 'pdf',
+    ZIP = 'zip',
+    QR = 'qr'
 }
 
 @Injectable()
@@ -129,14 +131,22 @@ export class DialogService {
         extensionPlaceholder?: string,
         fileType?: ExportDataExtension,
         allowedExportTypes?: ExportDataExtension[],
+        allowedExportTypesKey?: string,
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
         displayAnonymize?: boolean,
+        anonymizeFieldsKey?: string,
         anonymizePlaceholder?: string,
         anonymizeFields?: LabelValuePair[],
         yesLabel?: string,
         queryBuilder?: RequestQueryBuilder,
-        queryBuilderClearOthers?: string[]
+        queryBuilderClearOthers?: string[],
+        extraAPIData?: {
+            [key: string]: any
+        },
+        isPOST?: boolean,
+        extraDialogFields?: DialogField[],
+        fileExtension?: string
     }) {
         // default values
         if (!data.extensionPlaceholder) {
@@ -174,10 +184,20 @@ export class DialogService {
             ];
         }
 
+        // default extra api data
+        if (!data.extraAPIData) {
+            data.extraAPIData = {};
+        }
+
+        // check if we have a different export type key
+        if (!data.allowedExportTypesKey) {
+            data.allowedExportTypesKey = 'fileType';
+        }
+
         // construct list of inputs that we need in the dialog
-        const fieldsList: DialogField[] = [
+        let fieldsList: DialogField[] = [
             new DialogField({
-                name: 'fileType',
+                name: data.allowedExportTypesKey,
                 placeholder: data.extensionPlaceholder,
                 inputOptions: _.map(data.allowedExportTypes, (item: ExportDataExtension) => {
                     return new LabelValuePair(
@@ -202,16 +222,29 @@ export class DialogService {
             );
         }
 
+        // check if we have a different anonymize key
+        if (!data.anonymizeFieldsKey) {
+            data.anonymizeFieldsKey = 'anonymizeFields';
+        }
+
         // add encrypt anonymize fields
         if (data.displayAnonymize) {
             fieldsList.push(
                 new DialogField({
-                    name: 'anonymizeFields',
+                    name: data.anonymizeFieldsKey,
                     placeholder: data.anonymizePlaceholder,
                     inputOptions: data.anonymizeFields,
                     inputOptionsMultiple: true
                 })
             );
+        }
+
+        // add custom fields to dialog
+        if (data.extraDialogFields) {
+            fieldsList = [
+                ...fieldsList,
+                ...data.extraDialogFields
+            ];
         }
 
         // construct query builder
@@ -238,12 +271,23 @@ export class DialogService {
             }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
-                    this.importExportDataService
-                        .exportData(
+                    (data.isPOST ?
+                        this.importExportDataService.exportPOSTData(
                             data.url,
-                            answer.inputValue.value,
+                            _.merge(
+                                answer.inputValue.value,
+                                data.extraAPIData
+                            )
+                        ) :
+                        this.importExportDataService.exportData(
+                            data.url,
+                            _.merge(
+                                answer.inputValue.value,
+                                data.extraAPIData
+                            ),
                             qb
-                        ).catch((err) => {
+                        )
+                    ).catch((err) => {
                         this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
                         return ErrorObservable.create(err);
                     }).subscribe((blob) => {
@@ -251,7 +295,7 @@ export class DialogService {
 
                         const link = data.buttonDownloadFile.nativeElement;
                         link.href = urlT;
-                        link.download = `${data.fileName}.${answer.inputValue.value.fileType}`;
+                        link.download = `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`;
                         link.click();
 
                         window.URL.revokeObjectURL(urlT);

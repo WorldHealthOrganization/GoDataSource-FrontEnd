@@ -4,20 +4,28 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <div class="topnav-actions">
-                    <button
-                        class="button-primary"
-                        mat-raised-button color="primary"
-                        [routerLink]="['/transmission-chains']">
-                        {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
-                    </button>
-                    <button
-                        class="button-primary"
-                        mat-raised-button color="primary"
-                        [routerLink]="['/transmission-chains', 'map']">
-                        {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
-                    </button>
-                </div>
+
+                <button class="button-primary" mat-raised-button color="primary"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains']">
+                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
+                        </button>
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'map']">
+                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
+
             </div>
         </div>
     </ng-container>
