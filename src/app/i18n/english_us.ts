@@ -1009,10 +1009,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
+         * Range Follow-up export fields
+         */
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE': 'Place',
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE': 'Case',
+
+        /**
          * Range Follow-ups list page
          */
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON': 'Export Data',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE': 'Export Data',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON': 'Group by',
 
         /**
          * Event fields
