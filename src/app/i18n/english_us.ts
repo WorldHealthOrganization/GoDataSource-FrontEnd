@@ -115,6 +115,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_LOCATION': 'Are you sure you want to delete this location: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_ADDRESS': 'Are you sure you want to delete this address?',
         'LNG_DIALOG_CONFIRM_DELETE_INPUT': 'Are you sure you want to delete this item?',
+        'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
         'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT': 'Are you sure you want to delete this document?',
         'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE': 'Are you sure you want to delete this language: "{{name}}"',
@@ -254,6 +255,11 @@ export const EnglishUsLang = {
          * Input Fields
          */
         'LNG_INPUT_LABEL_ADD_INPUT': 'Add Input',
+
+        /**
+         * Name & Url Fields
+         */
+        'LNG_INPUT_LABEL_ADD_ITEM': 'Add Item',
 
         /**
          * Questionnaire
@@ -1297,6 +1303,10 @@ export const EnglishUsLang = {
          * Outbreak Fields
          */
         'LNG_OUTBREAK_FIELD_LABEL_ID': 'ID',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME': 'Map name',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION': '',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL': 'Map url',
+        'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT': 'Number of days new contact',
         'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION': '',
         'LNG_OUTBREAK_FIELD_LABEL_NAME': 'Outbreak Name',
@@ -1356,6 +1366,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1369,6 +1380,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS': 'Details',
+        'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1842,11 +1854,11 @@ export const EnglishUsLang = {
         'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP': 'If you see only the list of parents, you need to select a top level location followed by pressing the down key to see the list again which will include children location this time',
 
         /**
-         * Google maps movement
+         * World map movement
          */
-        'LNG_GOOGLE_MAP_MOVEMENT_TITLE': 'Timeline',
-        'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
-        'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
+        'LNG_WORLD_MAP_MOVEMENT_TITLE': 'Timeline',
+        'LNG_WORLD_MAP_MOVEMENT_NO_DATA': 'No addresses with geo location provided',
+        'LNG_WORLD_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON': 'View all addresses',
 
         /**
          * Inconsistency labels

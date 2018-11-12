@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
 import * as moment from 'moment';
 import { LocationModel } from './location.model';
+import { MapServerModel } from './map-server.model';
 
 export class OutbreakModel {
     id: string;
@@ -32,6 +33,7 @@ export class OutbreakModel {
     locations: LocationModel[] = [];
     longPeriodsBetweenCaseOnset: number;
     reportingGeographicalLevelId: string;
+    arcGisServers: MapServerModel[];
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -71,6 +73,13 @@ export class OutbreakModel {
             _.get(data, 'labResultsTemplate', []),
             (lData: any) => {
                 return new QuestionModel(lData);
+            });
+
+        // map servers
+        this.arcGisServers = _.map(
+            _.get(data, 'arcGisServers', []),
+            (lData: any) => {
+                return new MapServerModel(lData);
             });
     }
 
