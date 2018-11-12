@@ -46,9 +46,65 @@
         [sizeOfChainsFilter]="sizeOfChainsFilter"
         [personId]="personId"
         [selectedEntityType]="selectedEntityType"
-        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
-    </app-transmission-chains-dashlet>
+        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+        (nodeTapped)="onNodeTap($event)"
+    ></app-transmission-chains-dashlet>
 
 </mat-card>
 
 <a hidden #buttonDownloadFile></a>
+
+<div class="page-content" fxLayout="row wrap" fxLayoutGap="20px">
+    <div
+        *ngFor="let person of selectedNodes.nodes; let index = index"
+        fxFlex="400px"
+        fxLayout="column"
+    >
+        <mat-card class="page-section">
+            <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
+        </mat-card>
+    </div>
+
+
+    <mat-card
+        *ngIf="selectedNodes.canCreateRelationship"
+        class="page-section create-relationship"
+        fxFlex
+    >
+        <form #form="ngForm" (submit)="createRelationship(form)">
+
+            <div fxLayout="column" fxLayoutGap="10px">
+
+                <div fxLayout="row" fxLayoutGap="30px" fxLayoutAlign="start center">
+                    <div fxLayout="column" fxLayoutGap="10px">
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <span class="person-role">{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_EXPOSURE' | translate}}:</span>
+                            <span>{{selectedNodes.sourceNode.name}}</span>
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <span class="person-role">{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_CONTACT' | translate}}:</span>
+                            <span>{{selectedNodes.targetNode.name}}</span>
+                        </div>
+                    </div>
+
+                    <button mat-raised-button color="primary" type="button" (click)="swapSelectedNodes()">
+                        <span class="xt-icon">swapVertical</span>
+                    </button>
+                </div>
+
+                <app-form-relationship-quick
+                    name="relationship"
+                    [ngModel]="newRelationship"
+                    required="true"
+                ></app-form-relationship-quick>
+
+                <div fxLayout="row">
+                    <button mat-raised-button color="primary" class="button-primary" type="submit">
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </mat-card>
+</div>

@@ -49,6 +49,13 @@ export class Constants {
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
 
+    // dialog constants
+    static DIALOG = {
+        DATA_ITEM_TYPE: {
+            LINK: 'LINK'
+        }
+    };
+
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;
 

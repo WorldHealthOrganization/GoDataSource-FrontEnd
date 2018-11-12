@@ -11,7 +11,7 @@
             <mat-list>
                 <mat-list-item *ngFor="let dataItem of confirmData?.data">
                     <!-- if the label is not LINK display the label and the value-->
-                    <div *ngIf="dataItem.label !== 'LINK' && dataItem.label !== 'LINK_CHAIN'">
+                    <div *ngIf="dataItem.label !== Constants.DIALOG.DATA_ITEM_TYPE.LINK">
                         <span class="dialog-data-label">
                             {{ dataItem.label | translate }}:
                         </span>
@@ -19,18 +19,10 @@
                     </div>
 
                     <!-- custom case for displaying link so the user can navigate to the full resource page -->
-                    <div *ngIf="dataItem.label === 'LINK'">
+                    <div *ngIf="dataItem.label === Constants.DIALOG.DATA_ITEM_TYPE.LINK">
                         <a href="{{dataItem.value}}"
                            target="_blank">
                             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
-                        </a>
-                    </div>
-
-                    <!-- custom case for displaying link so the user can navigate to the chain of transmission page -->
-                    <div *ngIf="dataItem.label === 'LINK_CHAIN'">
-                        <a href="{{dataItem.value}}"
-                           target="_blank">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}
                         </a>
                     </div>
 

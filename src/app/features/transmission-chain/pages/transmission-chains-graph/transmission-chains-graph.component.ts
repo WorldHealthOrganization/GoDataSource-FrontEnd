@@ -13,6 +13,19 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
+import { GraphNodeModel } from '../../../../core/models/graph-node.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { NgForm } from '@angular/forms';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { RelationshipModel } from '../../../../core/models/relationship.model';
+import { SelectedNodes } from '../../classes/selected-nodes';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -27,16 +40,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
     ];
 
     @ViewChild(TransmissionChainsDashletComponent) cotDashletChild;
-
     // used for export
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
-
-    // provide constants to template
-    Constants = Constants;
-
     // authenticated user
     authUser: UserModel;
+    // selected outbreak
+    selectedOutbreak: OutbreakModel;
     // filter used for size of chains
     sizeOfChainsFilter: number = null;
     // person Id - to filter the chain
@@ -44,13 +54,27 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // type of the selected person . event
     selectedEntityType: EntityType = null;
 
+    // nodes selected from graph
+    selectedNodes: SelectedNodes = new SelectedNodes();
+
+    // new relationship model
+    newRelationship = new RelationshipModel();
+
+    // provide constants to template
+    Constants = Constants;
+    EntityType = EntityType;
+
     constructor(
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         protected route: ActivatedRoute,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService = null
+        private dialogService: DialogService = null,
+        private entityDataService: EntityDataService,
+        private outbreakDataService: OutbreakDataService,
+        private formHelper: FormHelperService,
+        private relationshipDataService: RelationshipDataService
     ) {}
 
     ngOnInit() {
@@ -68,6 +92,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 if (params.sizeOfChainsFilter) {
                     this.sizeOfChainsFilter = params.sizeOfChainsFilter;
                 }
+            });
+
+        // subscribe to the Selected Outbreak Subject stream
+        this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
             });
     }
 
@@ -123,6 +154,77 @@ export class TransmissionChainsGraphComponent implements OnInit {
                             window.URL.revokeObjectURL(urlT);
                         });
                 }
+            });
+    }
+
+    onNodeTap(entity: GraphNodeModel) {
+        // retrieve entity info
+        this.entityDataService
+            .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+            .catch((err) => {
+                // show error message
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                // add node to selected persons list
+                this.selectedNodes.addNode(entityData);
+            });
+    }
+
+    removeSelectedNode(index) {
+        this.selectedNodes.removeNode(index);
+    }
+
+    swapSelectedNodes() {
+        this.selectedNodes.swapNodes();
+    }
+
+    resetNodes() {
+        this.selectedNodes = new SelectedNodes();
+    }
+
+    createRelationship(form: NgForm) {
+        // get forms fields
+        const fields = this.formHelper.getFields(form);
+
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get source and target persons
+        const sourcePerson = this.selectedNodes.sourceNode;
+        const targetPerson = this.selectedNodes.targetNode;
+
+        // prepare relationship data
+        const relationshipData = fields['relationship'];
+        relationshipData.persons.push({
+            id: targetPerson.id
+        });
+
+        this.relationshipDataService
+            .createRelationship(
+                this.selectedOutbreak.id,
+                sourcePerson.type,
+                sourcePerson.id,
+                relationshipData
+            )
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset Relationship model
+                this.newRelationship = new RelationshipModel();
+
+                // reset selected nodes
+                this.resetNodes();
             });
     }
 }
