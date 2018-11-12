@@ -55,32 +55,42 @@
 <a hidden #buttonDownloadFile></a>
 
 <div class="page-content" fxLayout="row wrap" fxLayoutGap="20px">
-    <mat-card
-        *ngFor="let person of selectedNodes; let index = index"
-        class="page-section"
+    <div
+        *ngFor="let person of selectedNodes.nodes; let index = index"
         fxFlex="400px"
+        fxLayout="column"
     >
-        <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
-    </mat-card>
+        <mat-card class="page-section">
+            <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
+        </mat-card>
+    </div>
+
 
     <mat-card
-        *ngIf="selectedNodes.length === 2 && (selectedNodes[0].type !== EntityType.CONTACT || selectedNodes[1].type !== EntityType.CONTACT)"
-        class="page-section"
+        *ngIf="selectedNodes.canCreateRelationship"
+        class="page-section create-relationship"
         fxFlex
     >
         <form #form="ngForm" (submit)="createRelationship(form)">
 
-            <div fxLayout="column">
-                <div fxLayout="row" fxLayoutGap="10px">
-                    <span>Source:</span>
-                    <span>{{selectedNodes[0].name}}</span>
-                </div>
-                <div fxLayout="row" fxLayoutGap="10px">
-                    <span>Target:</span>
-                    <span>{{selectedNodes[1].name}}</span>
-                </div>
+            <div fxLayout="column" fxLayoutGap="10px">
 
-                <hr/>
+                <div fxLayout="row" fxLayoutGap="30px" fxLayoutAlign="start center">
+                    <div fxLayout="column" fxLayoutGap="10px">
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <span class="person-role">{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_EXPOSURE' | translate}}:</span>
+                            <span>{{selectedNodes.sourceNode.name}}</span>
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <span class="person-role">{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_LABEL_CONTACT' | translate}}:</span>
+                            <span>{{selectedNodes.targetNode.name}}</span>
+                        </div>
+                    </div>
+
+                    <button mat-raised-button color="primary" type="button" (click)="swapSelectedNodes()">
+                        <span class="xt-icon">swapVertical</span>
+                    </button>
+                </div>
 
                 <app-form-relationship-quick
                     name="relationship"
@@ -88,9 +98,11 @@
                     required="true"
                 ></app-form-relationship-quick>
 
-                <button mat-raised-button color="primary" class="button-primary" type="submit">
-                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
-                </button>
+                <div fxLayout="row">
+                    <button mat-raised-button color="primary" class="button-primary" type="submit">
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                    </button>
+                </div>
             </div>
 
         </form>

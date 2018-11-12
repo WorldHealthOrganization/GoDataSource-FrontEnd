@@ -22,11 +22,10 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { NgForm } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
+import { SelectedNodes } from '../../classes/selected-nodes';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -56,7 +55,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     selectedEntityType: EntityType = null;
 
     // nodes selected from graph
-    selectedNodes: (CaseModel|ContactModel|EventModel)[] = [];
+    selectedNodes: SelectedNodes = new SelectedNodes();
 
     // new relationship model
     newRelationship = new RelationshipModel();
@@ -169,18 +168,20 @@ export class TransmissionChainsGraphComponent implements OnInit {
             })
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                 // add node to selected persons list
-                if (this.selectedNodes.length === 2) {
-                    // replace the second node
-                    this.selectedNodes[1] = entityData;
-                } else {
-                    // add node to the list
-                    this.selectedNodes.push(entityData);
-                }
+                this.selectedNodes.addNode(entityData);
             });
     }
 
     removeSelectedNode(index) {
-        this.selectedNodes.splice(index, 1);
+        this.selectedNodes.removeNode(index);
+    }
+
+    swapSelectedNodes() {
+        this.selectedNodes.swapNodes();
+    }
+
+    resetNodes() {
+        this.selectedNodes = new SelectedNodes();
     }
 
     createRelationship(form: NgForm) {
@@ -192,8 +193,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         }
 
         // get source and target persons
-        const sourcePerson = this.selectedNodes[0];
-        const targetPerson = this.selectedNodes[1];
+        const sourcePerson = this.selectedNodes.sourceNode;
+        const targetPerson = this.selectedNodes.targetNode;
 
         // prepare relationship data
         const relationshipData = fields['relationship'];
@@ -204,8 +205,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.relationshipDataService
             .createRelationship(
                 this.selectedOutbreak.id,
-                this.selectedNodes[0].type,
-                this.selectedNodes[0].id,
+                sourcePerson.type,
+                sourcePerson.id,
                 relationshipData
             )
             .catch((err) => {
@@ -219,8 +220,11 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // refresh graph
                 this.cotDashletChild.refreshChain();
 
+                // reset Relationship model
+                this.newRelationship = new RelationshipModel();
+
                 // reset selected nodes
-                this.selectedNodes = [];
+                this.resetNodes();
             });
     }
 }
