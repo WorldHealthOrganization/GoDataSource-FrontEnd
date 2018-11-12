@@ -303,4 +303,20 @@ export class DialogService {
                 }
             });
     }
+
+    /**
+     * Display custom dialog
+     * @param componentOrTemplateRef
+     * @param config
+     */
+    showCustomDialog(
+        componentOrTemplateRef: any,
+        config?: any
+    ): Observable<any> {
+        // open dialog
+        return this.dialog.open(
+            componentOrTemplateRef,
+            config
+        ).afterClosed();
+    }
 }

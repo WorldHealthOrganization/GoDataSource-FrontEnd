@@ -32,7 +32,7 @@ import { FileUploadModule } from 'ng2-file-upload';
     declarations: [
         ...fromSharedComponents.components,
         ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes,
+        ...fromSharedPipes.pipes
     ],
     providers: [],
     exports: [
@@ -48,11 +48,12 @@ import { FileUploadModule } from 'ng2-file-upload';
         NgxChartsModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
-        ...fromSharedComponents.components,
+        ...fromSharedComponents.components
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent,
-        fromSharedComponents.DialogComponent
+        fromSharedComponents.DialogComponent,
+        fromSharedComponents.ModifyContactFollowUpQuestionnaireComponent
     ]
 })
 export class SharedModule {

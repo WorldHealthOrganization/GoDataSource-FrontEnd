@@ -35,10 +35,12 @@ import { WorldMapComponent } from './world-map/world-map.component';
 import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
 import { FormNameUrlListComponent } from './form-name-url-list/form-name-url-list.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
+import { ModifyContactFollowUpQuestionnaireComponent } from './modify-contact-follow-up-questionnaire/modify-contact-follow-up-questionnaire.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
 export * from './dialog/dialog.component';
+export * from './modify-contact-follow-up-questionnaire/modify-contact-follow-up-questionnaire.component';
 export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
@@ -95,6 +97,7 @@ export const components: any[] = [
 
     // dialogs
     DialogComponent,
+    ModifyContactFollowUpQuestionnaireComponent,
 
     // general
     ExportButtonComponent

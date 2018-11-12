@@ -32,6 +32,7 @@ import { MatTable } from '@angular/material';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ModifyContactFollowUpQuestionnaireComponent } from '../../components/modify-contact-follow-up-questionnaire/modify-contact-follow-up-questionnaire.component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -842,5 +843,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     dateInTheFuture(followUpDate): boolean {
         const date = followUpDate ? moment(followUpDate) : null;
         return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
+    }
+
+    /**
+     * Modify follow-up questionnaire
+     * @param followUp
+     */
+    modifyQuestionnaire(followUp: FollowUpModel) {
+        this.dialogService.showCustomDialog(
+            ModifyContactFollowUpQuestionnaireComponent,
+            ModifyContactFollowUpQuestionnaireComponent.DEFAULT_CONFIG
+        ).subscribe(() => {
+            // TODO
+        });
     }
 }
