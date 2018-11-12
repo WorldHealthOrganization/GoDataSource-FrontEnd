@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
-import { environment } from '../environments/environment';
 
 @Component({
     selector: 'app-root',
@@ -18,12 +17,19 @@ export class AppComponent implements OnInit {
         // load the default language
         this.i18nService.loadUserLanguage().subscribe();
 
-        // setup google api with key retrieved from env
+        // used by OpenLayers
+        // The script below is only needed for old environments like Internet Explorer and Android 4.x
         const script = document.createElement('script');
         script.type = 'text/javascript';
-        script.defer = true;
-        script.async = true;
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleApiKey}`;
+        script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL';
         document.head.appendChild(script);
+
+        // used by OpenLayers
+        // css
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.type = 'text/css';
+        style.href = 'https://openlayers.org/en/v5.3.0/css/ol.css';
+        document.head.appendChild(style);
     }
 }

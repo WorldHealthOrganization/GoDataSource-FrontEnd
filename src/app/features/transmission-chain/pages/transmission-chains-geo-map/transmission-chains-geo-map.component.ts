@@ -4,16 +4,16 @@ import { TransmissionChainModel, TransmissionChainRelation } from '../../../../c
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { } from '@types/googlemaps';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { WorldMapMarker, WorldMapPath, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { AddressModel, AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -27,10 +27,10 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE', '', true)
     ];
 
-    markers: google.maps.Marker[] = [];
-    lines: google.maps.Polyline[] = [];
+    markers: WorldMapMarker[] = [];
+    lines: WorldMapPath[] = [];
 
-    selectedGeoPoint: google.maps.LatLng;
+    selectedGeoPoint: WorldMapPoint;
 
     displayLoading: boolean = true;
 
@@ -96,12 +96,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                         }
 
                         // add marker
-                        this.markers.push(new google.maps.Marker({
-                            position: new google.maps.LatLng(
-                                address.geoLocation.lat as number,
-                                address.geoLocation.lng as number
+                        this.markers.push(new WorldMapMarker(
+                            new WorldMapPoint(
+                                address.geoLocation.lat,
+                                address.geoLocation.lng
                             )
-                        }));
+                        ));
 
                         // add marker to map list
                         _.set(markersMap, `[${chainIndex}][${markerId}]`, this.markers.length - 1);
@@ -158,12 +158,11 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                                 markersMap[chainIndex][rel.entityIds[0]] !== undefined &&
                                 markersMap[chainIndex][rel.entityIds[1]] !== undefined
                             ) {
-                                this.lines.push(new google.maps.Polyline({
-                                    path: [
-                                        this.markers[markersMap[chainIndex][rel.entityIds[0]]].getPosition(),
-                                        this.markers[markersMap[chainIndex][rel.entityIds[1]]].getPosition()
-                                    ]
-                                } as google.maps.PolylineOptions));
+                                this.lines.push(new WorldMapPath(
+                                    false,
+                                    this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
+                                    this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
+                                ));
                             }
                         });
                     });

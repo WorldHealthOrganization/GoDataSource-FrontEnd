@@ -11,6 +11,10 @@ const routes: Routes = [
     {
         path: 'set-security-questions',
         component: fromPages.SetSecurityQuestionsComponent
+    },
+    {
+        path: 'my-profile',
+        component: fromPages.MyProfileComponent
     }
 ];
 

@@ -32,6 +32,7 @@
         </button>
     </div>
 
+    <a hidden #buttonDownloadFile></a>
     <mat-table #table [dataSource]="clientApplicationsServerList">
         <!-- Name -->
         <ng-container matColumnDef="name">
@@ -103,6 +104,12 @@
                 </button>
 
                 <mat-menu #actionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        (click)="downloadConfFile(item)">
+                        {{ 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE' | translate }}
+                    </button>
+
                     <ng-container
                         *ngIf="hasSysConfigWriteAccess()">
                         <button

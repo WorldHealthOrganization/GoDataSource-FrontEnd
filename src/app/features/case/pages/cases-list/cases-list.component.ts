@@ -28,6 +28,7 @@ import * as _ from 'lodash';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
     selector: 'app-cases-list',
@@ -53,9 +54,10 @@ export class CasesListComponent extends ListComponent implements OnInit {
     genderList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    clustersListAsLabelValuePair$: Observable<LabelValuePair[]>;
 
     // available side filters
-    availableSideFilters: FilterModel[];
+    availableSideFilters: FilterModel[] = [];
 
     // provide constants to template
     Constants = Constants;
@@ -118,7 +120,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
         protected route: ActivatedRoute,
         protected listFilterDataService: ListFilterDataService,
         private i18nService: I18nService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private clusterDataService: ClusterDataService
     ) {
         super(
             snackbarService,
@@ -155,6 +158,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
                     this.selectedOutbreak.id
                 ) {
                     this.exportCasesUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/export`;
+
+                    this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
+
+                    // initialize side filters
+                    this.initializeSideFilters();
                 }
 
                 // initialize pagination
@@ -165,9 +173,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
-        // initialize side filters
-        this.initializeSideFilters();
     }
 
     /**
@@ -382,6 +387,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
                 type: FilterType.SELECT,
                 options$: yesNoOptionsWithoutAllList$
+            }),
+            new FilterModel({
+                fieldName: 'clusterId',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+                type: FilterType.MULTISELECT,
+                options$: this.clustersListAsLabelValuePair$,
+                relationshipPath: ['relationships'],
+                relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER'
             })
         ];
     }
