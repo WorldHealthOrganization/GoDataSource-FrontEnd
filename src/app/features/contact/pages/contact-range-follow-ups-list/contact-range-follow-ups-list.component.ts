@@ -113,7 +113,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
                         inputOptions: options,
                         inputOptionsMultiple: true,
-                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
                         required: true
                     })
                 ];
