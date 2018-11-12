@@ -28,7 +28,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./lab-results-list.component.less']
 })
-export class LabResultsComponent extends ListComponent implements OnInit {
+export class LabResultsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
@@ -259,7 +259,7 @@ export class LabResultsComponent extends ListComponent implements OnInit {
                     // delete lab result
                     this.labResultDataService.deleteLabResult(this.selectedOutbreak.id, labResult.case.id, labResult.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })

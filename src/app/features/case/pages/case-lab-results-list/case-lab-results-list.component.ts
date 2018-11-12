@@ -305,7 +305,7 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
                     this.labResultDataService
                         .restoreLabResult(this.selectedOutbreak.id, labResult.personId, labResult.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })
