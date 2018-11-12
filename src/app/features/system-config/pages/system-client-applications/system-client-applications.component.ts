@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -9,14 +9,17 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import * as moment from 'moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-system-upstream-sync-list',
@@ -44,6 +47,9 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
     // constants
     UserSettings = UserSettings;
 
+    // handle downloads
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
     /**
      * Constructor
      */
@@ -52,7 +58,8 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService
@@ -241,5 +248,43 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                     this.needsRefreshList(true);
                 }
             });
+    }
+
+    /**
+     * Download Configuration File
+     * @param clientApplication
+     */
+    downloadConfFile(clientApplication: SystemClientApplicationModel) {
+        // display export dialog
+        this.dialogService.showExportDialog({
+            message: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE',
+            url: 'system-settings/generate-file',
+            fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
+                ' - ' +
+                moment().format('YYYY-MM-DD'),
+            buttonDownloadFile: this.buttonDownloadFile,
+            allowedExportTypes: [
+                ExportDataExtension.JSON,
+                ExportDataExtension.QR
+            ],
+            allowedExportTypesKey: 'type',
+            extraAPIData: {
+                data: {
+                    clientId: clientApplication.credentials.clientId,
+                    clientSecret: clientApplication.credentials.clientSecret
+                }
+            },
+            isPOST: true,
+            extraDialogFields: [
+                new DialogField({
+                    name: 'data[url]',
+                    placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
+                    required: true,
+                    value: environment.apiUrl,
+                    fieldType: DialogFieldType.TEXT
+                })
+            ],
+            fileExtension: 'png'
+        });
     }
 }
