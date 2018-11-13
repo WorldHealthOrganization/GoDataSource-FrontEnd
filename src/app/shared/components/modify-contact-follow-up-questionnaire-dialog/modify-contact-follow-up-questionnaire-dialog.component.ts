@@ -31,7 +31,8 @@ export class ModifyContactFollowUpQuestionnaireDialogComponent implements OnInit
         hasBackdrop: true,
         width: '90%',
         maxWidth: '90%',
-        data: undefined
+        data: undefined,
+        panelClass: 'dialog-modify-contact-follow-up-questionnaire'
     };
 
     loading: boolean = true;
