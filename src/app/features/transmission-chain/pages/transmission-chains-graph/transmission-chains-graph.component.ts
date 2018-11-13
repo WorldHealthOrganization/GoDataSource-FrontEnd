@@ -2,8 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@an
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -26,6 +24,9 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { SelectedNodes } from '../../classes/selected-nodes';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -78,7 +79,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // get authenticated user
+        // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.queryParams
@@ -102,20 +103,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
-    /**
-     * Check if the user has read access to cases
-     * @returns {boolean}
-     */
-    hasReadCasePermissions(): boolean {
+    hasCaseReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Check if the user has read report permission
-     * @returns {boolean}
-     */
-    hasReadReportPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
 
     /**

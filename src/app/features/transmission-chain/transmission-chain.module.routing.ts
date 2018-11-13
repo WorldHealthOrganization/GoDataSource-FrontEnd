@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -9,26 +9,12 @@ const routes: Routes = [
     // Transmission Chains Graph
     {
         path: '',
-        component: fromPages.TransmissionChainsGraphComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT
-            ]
-        }
+        component: fromPages.TransmissionChainsGraphComponent
     },
     // Transmission Chains List
     {
         path: 'list',
-        component: fromPages.TransmissionChainsListComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT
-            ]
-        }
+        component: fromPages.TransmissionChainsListComponent
     },
     // Transmission Chains Geospacially map
     {
@@ -37,8 +23,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT
+                PERMISSION.READ_CASE
             ]
         }
     }
