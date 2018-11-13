@@ -52,6 +52,14 @@ export class OutbreakDataService {
     }
 
     /**
+     * Retrieve the number of total outbreaks
+     * @returns {Observable<any>}
+     */
+    getOutbreaksListCount(): Observable<any> {
+        return this.http.get(`outbreaks/count`);
+    }
+
+    /**
      * Delete an existing Outbreak
      * @param {string} outbreakId
      * @returns {Observable<any>}

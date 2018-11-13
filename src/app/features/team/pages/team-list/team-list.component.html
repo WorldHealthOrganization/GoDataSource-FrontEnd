@@ -19,6 +19,11 @@
     </ng-container>
 </app-topnav>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [totalNumberOfRecords]="( teamsListCount$| async)?.count">
+</app-total-number-of-records>
+
     <div class="form-content">
         <mat-card class="page-section page-content">
 

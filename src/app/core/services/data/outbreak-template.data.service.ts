@@ -30,6 +30,14 @@ export class OutbreakTemplateDataService {
     }
 
     /**
+     * Retrieve the number of total records of templates
+     * @returns {Observable<any>}
+     */
+    getOutbreakTemplatesListCount(): Observable<any> {
+        return this.http.get(`templates/count`);
+    }
+
+    /**
      * Delete an existing outbreak template
      * @param {string} outbreakTemplateId
      * @returns {Observable<any>}

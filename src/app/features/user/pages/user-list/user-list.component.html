@@ -12,6 +12,11 @@
     </ng-container>
 </app-topnav>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [totalNumberOfRecords]="( usersListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">

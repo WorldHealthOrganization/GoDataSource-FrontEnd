@@ -14,7 +14,6 @@ export class TotalNumberOfRecordsComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log(this.totalNumberOfRecords);
     }
 
 }

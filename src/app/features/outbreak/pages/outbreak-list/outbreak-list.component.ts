@@ -43,6 +43,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     // list of existing outbreaks
     outbreaksList$: Observable<OutbreakModel[]>;
+    outbreaksListCount$: Observable<any>;
     // list of options from the Active dropdown
     activeOptionsList$: Observable<any[]>;
     // list of diseases
@@ -119,6 +120,7 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
         this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+        this.outbreaksListCount$ = this.outbreakDataService.getOutbreaksListCount();
         this.countriesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.COUNTRY).map(
             (countries) => _.map(countries, (country: LabelValuePair) => {
                 country.value = {
