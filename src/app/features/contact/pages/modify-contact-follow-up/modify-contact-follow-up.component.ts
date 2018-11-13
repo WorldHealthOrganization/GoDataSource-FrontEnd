@@ -14,7 +14,6 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Moment } from 'moment';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
