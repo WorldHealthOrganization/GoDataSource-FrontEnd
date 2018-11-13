@@ -10,7 +10,6 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
-import { EntityType } from '../../../core/models/entity-type';
 import { Constants } from '../../../core/models/constants';
 
 @Component({
@@ -39,9 +38,6 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
 
     // selected outbreak
     selectedOutbreak: OutbreakModel;
-
-    // provide constants to template
-    EntityType = EntityType;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
