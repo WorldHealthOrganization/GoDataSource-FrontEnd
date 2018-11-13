@@ -52,8 +52,9 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
+<!--Total number of records from the list-->
 <app-total-number-of-records
-    [totalNumberOfRecords]="(contactsListCount$ | async)?.count">
+    [totalNumberOfRecords]="( contactsListCount$ | async)?.count">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

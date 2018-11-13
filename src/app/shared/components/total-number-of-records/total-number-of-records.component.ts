@@ -15,5 +15,4 @@ export class TotalNumberOfRecordsComponent implements OnInit {
 
     ngOnInit() {
     }
-
 }

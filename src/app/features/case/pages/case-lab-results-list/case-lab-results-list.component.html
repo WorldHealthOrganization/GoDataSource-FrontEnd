@@ -26,8 +26,9 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
+<!--Total number of records from the list-->
 <app-total-number-of-records
-    [totalNumberOfRecords]="(labResultsListCount$ | async)?.count">
+    [totalNumberOfRecords]="( labResultsListCount$ | async)?.count">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
