@@ -891,6 +891,11 @@ export const EnglishUsLang = {
         'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy',
 
         /**
+         * Duplicate records list page
+         */
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE': 'Duplicate records',
+
+        /**
          * Movement Contact page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact movement',
@@ -899,7 +904,6 @@ export const EnglishUsLang = {
          * Chronology Contact page
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact chronology',
-
 
         /**
          * Relationship Fields
