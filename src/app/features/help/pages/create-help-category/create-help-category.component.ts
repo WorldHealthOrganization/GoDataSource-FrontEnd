@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-help-category',
@@ -50,7 +50,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
         ) {
             // add the new category
             this.helpDataService
-                .createHelpCategoryt(dirtyFields)
+                .createHelpCategory(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 

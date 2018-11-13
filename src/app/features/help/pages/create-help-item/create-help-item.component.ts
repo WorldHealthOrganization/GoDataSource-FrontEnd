@@ -1,15 +1,17 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { HelpItemModel } from '../../../../core/models/help-item.model';
+import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-create-help-item',
@@ -17,14 +19,15 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     templateUrl: './create-help-item.component.html',
     styleUrls: ['./create-help-item.component.less']
 })
-export class CreateHelpItemComponent extends ConfirmOnFormChanges {
+export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_CATEGORY_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_ITEMS_TITLE', '/help'),
+        new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_ITEM_TITLE', '.', true)
     ];
 
-    helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
+    helpItemData: HelpItemModel = new HelpItemModel();
+    helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
     constructor(
         private router: Router,
@@ -34,6 +37,10 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges {
         private i18nService: I18nService
     ) {
         super();
+    }
+
+    ngOnInit() {
+        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
     }
 
     /**
@@ -50,14 +57,14 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges {
         ) {
             // add the new category
             this.helpDataService
-                .createHelpCategoryt(dirtyFields)
+                .createHelpItem(this.helpItemData.categoryId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();

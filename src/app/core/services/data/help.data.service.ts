@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
+import { FollowUpModel } from '../../models/follow-up.model';
 
 @Injectable()
 export class HelpDataService {
@@ -34,7 +35,7 @@ export class HelpDataService {
      * @param helpCategoryData
      * @returns {Observable<any>}
      */
-    createHelpCategoryt(helpCategoryData): Observable<any> {
+    createHelpCategory(helpCategoryData): Observable<any> {
         return this.http.post(`help-categories`, helpCategoryData);
     }
 
@@ -71,11 +72,24 @@ export class HelpDataService {
 
     /**
      * Get the list of help items
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<HelpItemModel[]>}
+     */
+    getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`help-items?filter=${filter}`),
+            HelpItemModel
+        );
+    }
+
+    /**
+     * Get the list of help items
      * @param {string} categoryId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<HelpItemModel[]>}
      */
-    getHelpItemsList(categoryId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+    getHelpItemsCategoryList(categoryId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
 
         const filter = queryBuilder.buildQuery();
 

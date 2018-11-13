@@ -16,6 +16,9 @@ import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
+import { HelpItemModel } from '../../../../core/models/help-item.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-help-items-list',
@@ -32,10 +35,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
-    helpItemsList$: Observable<HelpCategoryModel[]>;
+    helpItemsList$: Observable<HelpItemModel[]>;
 
     // list of categories
-    helpCategoriesList$: Observable<HelpCategoryModel[]>;
+    helpCategoriesList: HelpCategoryModel[];
+    helpCategoriesMap: any = {};
 
     // provide constants to template
     Constants = Constants;
@@ -46,7 +50,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService,
@@ -59,11 +64,18 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
+        this.helpDataService
+            .getHelpCategoryList()
+            .subscribe((categories) => {
+                this.helpCategoriesList = categories;
+                _.forEach(this.helpCategoriesList, (category) => {
+                    this.helpCategoriesMap[category.id] = category;
+                });
+                // ...and re-load the list
+                this.needsRefreshList(true);
+                // initialize Side Table Columns
+                this.initializeSideTableColumns();
+            });
     }
 
     /**
@@ -73,16 +85,24 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
-                field: 'name',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_NAME'
+                field: 'title',
+                label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
             }),
             new VisibleColumnModel({
-                field: 'description',
+                field: 'categoryId',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
             }),
             new VisibleColumnModel({
-                field: 'order',
+                field: 'approved',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED'
+            }),
+            new VisibleColumnModel({
+                field: 'approved_by',
+                label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY'
+            }),
+            new VisibleColumnModel({
+                field: 'approved_date',
+                label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE'
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -93,11 +113,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Re(load) the categories list
+     * Re(load) the items list
      */
     refreshList() {
-        // retrieve the list of Categories
-        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList(this.queryBuilder);
+        // retrieve the list of items
+        this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
     }
 
     /**
@@ -116,23 +136,24 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Delete specific category
-     * @param {HelpCategoryModel} category
+     * Delete specific item
+     * @param {HelpItemModel} item
      */
-    deleteHelpItem(category: HelpCategoryModel) {
+    deleteHelpItem(item: HelpItemModel) {
         // show confirm dialog
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY', event)
+        const translatedData = {title: this.i18nService.instant(item.title)};
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM', translatedData)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.helpDataService
-                        .deleteHelpCategory(category.id)
+                        .deleteHelpItem(item.categoryId, item.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
 
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);

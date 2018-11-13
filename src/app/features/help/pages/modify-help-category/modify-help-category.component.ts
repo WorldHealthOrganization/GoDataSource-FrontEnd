@@ -48,11 +48,11 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.route.params
-            .subscribe((params: {categoryId}) => {
+            .subscribe((params: { categoryId }) => {
                 this.categoryId = params.categoryId;
                 // get category
                 this.helpDataService
-                    .getHelpCategory( this.categoryId)
+                    .getHelpCategory(this.categoryId)
                     .subscribe(helpCategoryData => {
                         this.helpCategoryData = new HelpCategoryModel(helpCategoryData);
                         this.breadcrumbs.push(
@@ -75,7 +75,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
             return;
         }
 
-        // modify the event
+        // modify the category
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {

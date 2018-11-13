@@ -12,6 +12,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { HelpItemModel } from '../../../../core/models/help-item.model';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -22,11 +24,14 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_ITEMS_TITLE', '/help')
     ];
 
-    helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
+    helpItemData: HelpItemModel = new HelpItemModel();
     categoryId: string;
+    itemId: string;
+
+    helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
     // authenticated user
     authUser: UserModel;
@@ -46,18 +51,20 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
         this.route.params
-            .subscribe((params: {categoryId}) => {
+            .subscribe((params: { categoryId, itemId }) => {
                 this.categoryId = params.categoryId;
+                this.itemId = params.itemId;
                 // get category
                 this.helpDataService
-                    .getHelpCategory( this.categoryId)
-                    .subscribe(helpCategoryData => {
-                        this.helpCategoryData = new HelpCategoryModel(helpCategoryData);
+                    .getHelpItem(this.categoryId, this.itemId)
+                    .subscribe(helpItemData => {
+                        this.helpItemData = new HelpItemModel(helpItemData);
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
+                                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
                                 '.',
                                 true,
                                 {},
@@ -75,16 +82,16 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
-        // modify the event
+        // modify the help item
         this.helpDataService
-            .modifyHelpCategory(this.categoryId, dirtyFields)
+            .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
 
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();

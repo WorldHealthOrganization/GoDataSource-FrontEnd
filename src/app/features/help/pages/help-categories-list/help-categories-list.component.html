@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <ng-container *app-selected-outbreak-is-active>
+                <ng-container>
                     <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
                             [routerLink]="'/help/create-category'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
@@ -42,7 +42,8 @@
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_NAME' | translate}}
+                    </div>
                     <div class="column-filter"></div>
                 </div>
             </mat-header-cell>
@@ -56,7 +57,9 @@
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION' |
+                        translate}}
+                    </div>
                     <div class="column-filter"></div>
                 </div>
             </mat-header-cell>
@@ -65,7 +68,7 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Address -->
+        <!-- Order -->
         <ng-container matColumnDef="order">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
@@ -89,7 +92,12 @@
 
                     <mat-menu #actionsMenu="matMenu">
 
-                        <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['/help', item.id, 'modify-category']">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/help', item.id, 'view-category']">
+                            {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        </button>
+
+                        <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
+                                [routerLink]="['/help', item.id, 'modify-category']">
                             {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>
 

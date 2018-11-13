@@ -16,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-help-categories-list',
@@ -44,7 +45,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private i18nService: I18nService
     ) {
         super(
             snackbarService,
@@ -57,7 +59,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // ...and re-load the list when the Selected Outbreak is changed
+        // ...and re-load the list
         this.needsRefreshList(true);
 
         // initialize Side Table Columns
@@ -119,7 +121,8 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
      */
     deleteHelpCategory(category: HelpCategoryModel) {
         // show confirm dialog
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY', event)
+        const translatedData = {name: this.i18nService.instant(category.name)};
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY', translatedData)
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
                     this.helpDataService

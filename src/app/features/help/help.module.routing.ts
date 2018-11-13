@@ -27,7 +27,7 @@ const routes: Routes = [
     },
     // View Help Item
     {
-        path: ':itemId/view',
+        path: ':categoryId/:itemId/view',
         component: fromPages.ModifyHelpItemComponent,
         canActivate: [AuthGuard],
         data: {
@@ -37,7 +37,7 @@ const routes: Routes = [
     },
     // Modify Help Item
     {
-        path: ':itemId/modify',
+        path: ':categoryId/:itemId/modify',
         component: fromPages.ModifyHelpItemComponent,
         canActivate: [AuthGuard],
         data: {
