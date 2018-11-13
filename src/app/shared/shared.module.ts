@@ -34,7 +34,7 @@ import { NgxWigModule } from 'ngx-wig';
     declarations: [
         ...fromSharedComponents.components,
         ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes,
+        ...fromSharedPipes.pipes
     ],
     providers: [],
     exports: [
@@ -51,11 +51,12 @@ import { NgxWigModule } from 'ngx-wig';
         NgxWigModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
-        ...fromSharedComponents.components,
+        ...fromSharedComponents.components
     ],
     entryComponents: [
         fromSharedComponents.SnackbarComponent,
-        fromSharedComponents.DialogComponent
+        fromSharedComponents.DialogComponent,
+        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent
     ]
 })
 export class SharedModule {

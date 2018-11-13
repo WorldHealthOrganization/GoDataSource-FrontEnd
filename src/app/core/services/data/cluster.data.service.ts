@@ -9,6 +9,7 @@ import { EventModel } from '../../models/event.model';
 import { ContactModel } from '../../models/contact.model';
 import { EntityModel } from '../../models/entity.model';
 import * as _ from 'lodash';
+import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class ClusterDataService {
@@ -36,6 +37,20 @@ export class ClusterDataService {
             this.http.get(`outbreaks/${outbreakId}/clusters?filter=${filter}`),
             ClusterModel
         );
+    }
+
+    /**
+     * Get the clusters as labelValue pairs for side filters
+     * @param {string} outbreakId
+     * @returns {LabelValuePair[]}
+     */
+    getClusterListAsLabelValue(outbreakId: string): Observable<LabelValuePair[]> {
+        return this.getClusterList(outbreakId)
+                .map((clusters) => {
+                    return _.map(clusters, (cluster: ClusterModel) => {
+                        return new LabelValuePair(cluster.name, cluster.id);
+                    });
+                });
     }
 
     /**

@@ -1,17 +1,14 @@
 import * as _ from 'lodash';
-import { Component, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
-import { EventModel } from '../../../../core/models/event.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -41,6 +38,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
     @Input() sizeOfChainsFilter: number = null;
     @Input() personId: string = null;
     @Input() selectedEntityType: EntityType = null;
+
+    @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
+
     selectedOutbreak: OutbreakModel;
     graphElements: any;
     selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
@@ -316,19 +316,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
      * @returns {IterableIterator<any>}
      */
     onNodeTap(entity: GraphNodeModel) {
-        // retrieve Case/Event/Contact information
-        this.entityDataService
-            .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
-            .catch((err) => {
-                // show error message
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                // show dialog with data
-                const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
-                this.dialogService.showDataDialog(dialogData);
-            });
+        this.nodeTapped.emit(entity);
     }
 
     /**

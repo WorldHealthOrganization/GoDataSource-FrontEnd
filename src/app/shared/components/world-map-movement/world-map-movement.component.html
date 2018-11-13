@@ -6,7 +6,7 @@
         class="location-timeline">
         <div
             class="movement-timeline-title">
-            {{ 'LNG_GOOGLE_MAP_MOVEMENT_TITLE' | translate }}
+            {{ 'LNG_WORLD_MAP_MOVEMENT_TITLE' | translate }}
         </div>
         <div
             class="movement-timeline-locations">
@@ -26,14 +26,14 @@
                 <button
                     mat-raised-button color="primary" class="button-primary"
                     (click)="fitMarkerBounds()">
-                    {{'LNG_GOOGLE_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON' | translate}}
+                    {{ 'LNG_WORLD_MAP_MOVEMENT_FIT_MARKER_BOUNDS_BUTTON' | translate }}
                 </button>
             </div>
         </div>
     </div>
     <div
         fxFlex>
-        <app-google-map
+        <app-world-map
             *ngIf="addresses.length > 0"
             [width]="width"
             [height]="height"
@@ -41,14 +41,14 @@
             [markers]="markers"
             [lines]="arrowLines"
             [fitMapOnMarkersChange]="true">
-        </app-google-map>
+        </app-world-map>
 
         <div
             *ngIf="addresses.length < 1"
             fxFlex
             class="movement-map-no-data">
             <span>
-                {{ 'LNG_GOOGLE_MAP_MOVEMENT_NO_DATA' | translate }}
+                {{ 'LNG_WORLD_MAP_MOVEMENT_NO_DATA' | translate }}
             </span>
         </div>
     </div>

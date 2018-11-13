@@ -19,6 +19,7 @@ export class LabResultModel {
     quantitativeResult: string;
     questionnaireAnswers: {};
     personId: string;
+    deleted: boolean;
 
     constructor(data = null) {
         this.case = new CaseModel(_.get(data, 'case'));
@@ -36,6 +37,7 @@ export class LabResultModel {
         this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
         this.quantitativeResult = _.get(data, 'quantitativeResult');
         this.personId = _.get(data, 'personId');
+        this.deleted = _.get(data, 'deleted');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }

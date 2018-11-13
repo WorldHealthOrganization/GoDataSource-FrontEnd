@@ -190,6 +190,27 @@
             </form>
         </mat-step>
 
+        <!-- step Map servers -->
+        <mat-step [stepControl]="mapServersForm">
+            <form #mapServersForm="ngForm">
+                <ng-template matStepLabel>
+                    {{'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS' | translate}}
+                </ng-template>
+
+                <app-form-name-url-list
+                    name="arcGisServers"
+                    [ngModel]="newOutbreak.arcGisServers"
+                    [namePlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME' | translate"
+                    nameTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
+                    [urlPlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL' | translate"
+                    urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
+                    [required]="true">
+                </app-form-name-url-list>
+
+                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+            </form>
+        </mat-step>
+
         <!-- step Case Investigation - questionnaire -->
         <mat-step [stepControl]="caseInvestigationForm">
             <form #caseInvestigationForm="ngForm">
@@ -243,7 +264,7 @@
             <div>
                 <button matStepperPrevious mat-raised-button>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button type="button" mat-raised-button color="primary" class="button-primary"
-                        (click)="createOutbreak([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
+                        (click)="createOutbreak([detailsForm, mapServersForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
                     {{'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON' | translate}}
                 </button>
             </div>

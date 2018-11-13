@@ -34,7 +34,7 @@
 
 <mat-card
     class="page-section page-content">
-    <app-google-map
+    <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
         width="100%"
         height="100%"
@@ -43,7 +43,7 @@
         [lines]="lines"
         [fitMapOnMarkersChange]="true"
         [displayLoading]="displayLoading">
-    </app-google-map>
+    </app-world-map>
 
     <div
         *ngIf="markers.length < 1 && !displayLoading"

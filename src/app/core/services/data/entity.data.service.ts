@@ -118,16 +118,9 @@ export class EntityDataService {
     ): LabelValuePair[] {
 
         const lightObject = [];
+
         // entity type = Case
         if (entity instanceof CaseModel) {
-
-            // dialog title: Case Details
-            lightObject.push(new LabelValuePair(
-                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_DETAILS_DIALOG_TITLE',
-                ''
-            ));
-
-            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
                 entity.firstName
@@ -137,17 +130,17 @@ export class EntityDataService {
                 entity.lastName
             ));
             // display age. decide between years and months
-            let ageToDisplay;
-            if (entity.age.months > 0) {
-                const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
-                ageToDisplay = String(entity.age.months) + ' ' + monthsLabel;
-            } else {
-                const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
-                ageToDisplay = String(entity.age.years) + ' ' + yearsLabel;
+            let ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+            let ageValue = _.get(entity, 'age.years', 0);
+            const ageMonths = _.get(entity, 'age.months', 0);
+            if (ageMonths > 0) {
+                // show age in months
+                ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+                ageValue = ageMonths;
             }
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_AGE',
-                ageToDisplay
+                `${ageValue} ${ageUnit}`
             ));
             lightObject.push(new LabelValuePair(
                 'LNG_CASE_FIELD_LABEL_GENDER',
@@ -199,29 +192,10 @@ export class EntityDataService {
                         moment(entity.dateDeceased).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
             ));
-            // insert link to full resource
-            lightObject.push(new LabelValuePair(
-                'LINK',
-                `/cases/${entity.id}/view`
-            ));
-
-            // insert link to view chain
-            lightObject.push(new LabelValuePair(
-                'LINK_CHAIN',
-                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.CASE}`
-            ));
         }
 
         // entity type = Contact
         if (entity instanceof ContactModel) {
-
-            // dialog title: Contact Details
-            lightObject.push(new LabelValuePair(
-                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACT_DETAILS_DIALOG_TITLE',
-                ''
-            ));
-
-            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
                 entity.firstName
@@ -231,18 +205,14 @@ export class EntityDataService {
                 entity.lastName
             ));
             // display age. decide between years and months
-            let ageToDisplay;
-            if (entity.age.months > 0) {
-                const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
-                ageToDisplay = String(entity.age.months) + ' ' + monthsLabel;
-            } else {
-                const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
-                ageToDisplay = String(entity.age.years) + ' ' + yearsLabel;
+            let ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+            let ageValue = _.get(entity, 'age.years', 0);
+            const ageMonths = _.get(entity, 'age.months', 0);
+            if (ageMonths > 0) {
+                // show age in months
+                ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+                ageValue = ageMonths;
             }
-            lightObject.push(new LabelValuePair(
-                'LNG_CONTACT_FIELD_LABEL_AGE',
-                ageToDisplay
-            ));
             lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_GENDER',
                 entity.gender
@@ -265,30 +235,10 @@ export class EntityDataService {
                 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
                 entity.riskReason
             ));
-
-            // link to full resource
-            lightObject.push(new LabelValuePair(
-                'LINK',
-                `/contacts/${entity.id}/view`
-            ));
-
-            // insert link to view chain
-            lightObject.push(new LabelValuePair(
-                'LINK_CHAIN',
-                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.CONTACT}`
-            ));
         }
 
         // entity type = Event
         if (entity instanceof EventModel) {
-
-            // dialog title: Event Details
-            lightObject.push(new LabelValuePair(
-                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENT_DETAILS_DIALOG_TITLE',
-                ''
-            ));
-
-            // dialog fields
             lightObject.push(new LabelValuePair(
                 'LNG_EVENT_FIELD_LABEL_NAME',
                 entity.name
@@ -309,19 +259,6 @@ export class EntityDataService {
                         moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                         ''
             ));
-
-            // link to full resource
-            lightObject.push(new LabelValuePair(
-                'LINK',
-                `/events/${entity.id}/view`
-            ));
-
-            // insert link to view chain
-            lightObject.push(new LabelValuePair(
-                'LINK_CHAIN',
-                `/transmission-chains?personId=${entity.id}&selectedEntityType=${EntityType.EVENT}`
-            ));
-
         }
 
         return lightObject;

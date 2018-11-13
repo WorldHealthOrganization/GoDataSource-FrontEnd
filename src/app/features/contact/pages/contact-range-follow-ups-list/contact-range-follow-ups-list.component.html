@@ -1,0 +1,132 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side filters -->
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    [appliedFilters]="appliedSideFilters"
+    (filtersApplied)="applySideFilters($event)">
+</app-side-filters>
+
+<mat-card class="page-section page-content">
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <div
+            fxFlex>
+            {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
+        </div>
+        <div
+            fxFlex fxLayout="row" fxLayoutGap="10px">
+            <div
+                *ngFor="let status of dailyStatusesArray"
+                [style.background-color]="status.colorCode"
+                class="follow-up-range-status-legend">
+                {{ status.value | translate }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading data data -->
+    <div
+        *ngIf="displayLoading"
+        class="follow-up-range-loading"
+    >
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!displayLoading">
+        <!-- Reset Filters -->
+        <div class="reset-filters">
+            <button mat-raised-button (click)="needsRefreshList(true)">
+                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+            </button>
+        </div>
+
+        <div
+            class="follow-up-range-table-content">
+            <!-- Table headers -->
+            <div
+                fxFlex fxLayout="row">
+
+                <!-- Contact Name -->
+                <div
+                    fxFlex="240px"
+                    class="follow-up-range-date-header">
+                    {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
+                </div>
+
+                <!-- Statuses -->
+                <div
+                    *ngFor="let date of daysToDisplay"
+                    fxFlex="36px"
+                    class="follow-up-range-date-header follow-up-range-date-column-header">
+                    <div
+                        class="follow-up-range-date-header-text">
+                        {{ date | dateShort }}
+                    </div>
+                </div>
+
+                <!-- Fill empty space -->
+                <div
+                    fxFlex
+                    class="follow-up-range-date-header">
+                    <!-- placeholder -->
+                </div>
+            </div>
+
+            <!-- Table Rows -->
+            <div
+                fxFlex fxLayout="column" fxLayoutGap="2px"
+                class="follow-up-range-records">
+                <div
+                    *ngFor="let contactFollowUpData of followUpsGroupedByContact"
+                    fxFlex fxLayout="row"
+                    class="follow-up-range-records-row">
+
+                    <!-- Contact Name -->
+                    <div
+                        fxFlex="240px"
+                        class="follow-up-range-column-data follow-up-range-name-column-data">
+                        <a
+                            [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
+                            {{ contactFollowUpData.contact.name }}
+                        </a>
+                    </div>
+
+                    <!-- Statuses -->
+                    <div
+                        *ngFor="let date of daysToDisplay"
+                        fxFlex="36px" fxLayout="row" fxLayoutGap="1px"
+                        class="follow-up-range-column-data follow-up-range-date-column-data">
+                        <ng-container
+                            *ngIf="contactFollowUpData.followUps[date]">
+                            <div
+                                *ngFor="let followUp of contactFollowUpData.followUps[date]"
+                                fxFlex
+                                [style.background-color]="dailyStatuses[followUp.statusId]?.colorCode"
+                                class="follow-up-range-date-column-data-status"
+                                [matTooltip]="'Contact: ' + contactFollowUpData.contact.name + ' / ' + 'Date: ' + date + ' / ' + (dailyStatuses[followUp.statusId]?.value | translate)"
+                                [routerLink]="['/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]">
+                                <!-- placeholder -->
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <!-- Fill empty space -->
+                    <div
+                        fxFlex
+                        class="follow-up-range-column-data">
+                        <!-- placeholder -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-card>

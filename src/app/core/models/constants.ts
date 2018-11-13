@@ -32,6 +32,7 @@ export class Constants {
     // default display constants
     static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
     static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
+    static DEFAULT_DATE_SHORT_DISPLAY_FORMAT = 'MM/DD';
 
     // default random configs
     static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -47,6 +48,13 @@ export class Constants {
     static PAGE_SIZE_OPTIONS = [10, 25, 50];
     static DEFAULT_PAGE_SIZE = 25;
     static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+
+    // dialog constants
+    static DIALOG = {
+        DATA_ITEM_TYPE: {
+            LINK: 'LINK'
+        }
+    };
 
     // AGE constants
     static DEFAULT_AGE_MAX_YEARS = 150;

@@ -202,6 +202,23 @@
 
             </mat-tab>
 
+            <!-- tab Map Servers -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    {{'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS' | translate}}
+                </ng-template>
+                <app-form-name-url-list
+                    name="arcGisServers"
+                    [ngModel]="outbreak.arcGisServers"
+                    [disabled]="viewOnly"
+                    [namePlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME' | translate"
+                    nameTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
+                    [urlPlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL' | translate"
+                    urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
+                    [required]="true">
+                </app-form-name-url-list>
+            </mat-tab>
+
             <!-- tab Case Investigation -->
             <mat-tab>
                 <ng-template mat-tab-label>

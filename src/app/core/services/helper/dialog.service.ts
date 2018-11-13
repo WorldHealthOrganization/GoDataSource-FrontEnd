@@ -21,7 +21,8 @@ export enum ExportDataExtension {
     ODS = 'ods',
     JSON = 'json',
     PDF = 'pdf',
-    ZIP = 'zip'
+    ZIP = 'zip',
+    QR = 'qr'
 }
 
 @Injectable()
@@ -130,6 +131,7 @@ export class DialogService {
         extensionPlaceholder?: string,
         fileType?: ExportDataExtension,
         allowedExportTypes?: ExportDataExtension[],
+        allowedExportTypesKey?: string,
         displayEncrypt?: boolean,
         encryptPlaceholder?: string,
         displayAnonymize?: boolean,
@@ -142,7 +144,9 @@ export class DialogService {
         extraAPIData?: {
             [key: string]: any
         },
-        isPOST?: boolean
+        isPOST?: boolean,
+        extraDialogFields?: DialogField[],
+        fileExtension?: string
     }) {
         // default values
         if (!data.extensionPlaceholder) {
@@ -185,10 +189,15 @@ export class DialogService {
             data.extraAPIData = {};
         }
 
+        // check if we have a different export type key
+        if (!data.allowedExportTypesKey) {
+            data.allowedExportTypesKey = 'fileType';
+        }
+
         // construct list of inputs that we need in the dialog
-        const fieldsList: DialogField[] = [
+        let fieldsList: DialogField[] = [
             new DialogField({
-                name: 'fileType',
+                name: data.allowedExportTypesKey,
                 placeholder: data.extensionPlaceholder,
                 inputOptions: _.map(data.allowedExportTypes, (item: ExportDataExtension) => {
                     return new LabelValuePair(
@@ -230,6 +239,14 @@ export class DialogService {
             );
         }
 
+        // add custom fields to dialog
+        if (data.extraDialogFields) {
+            fieldsList = [
+                ...fieldsList,
+                ...data.extraDialogFields
+            ];
+        }
+
         // construct query builder
         let qb: RequestQueryBuilder;
         if (
@@ -257,17 +274,17 @@ export class DialogService {
                     (data.isPOST ?
                         this.importExportDataService.exportPOSTData(
                             data.url,
-                            {
-                                ...answer.inputValue.value,
-                                ...data.extraAPIData
-                            }
+                            _.merge(
+                                answer.inputValue.value,
+                                data.extraAPIData
+                            )
                         ) :
                         this.importExportDataService.exportData(
                             data.url,
-                            {
-                                ...answer.inputValue.value,
-                                ...data.extraAPIData
-                            },
+                            _.merge(
+                                answer.inputValue.value,
+                                data.extraAPIData
+                            ),
                             qb
                         )
                     ).catch((err) => {
@@ -278,12 +295,28 @@ export class DialogService {
 
                         const link = data.buttonDownloadFile.nativeElement;
                         link.href = urlT;
-                        link.download = `${data.fileName}.${answer.inputValue.value.fileType}`;
+                        link.download = `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`;
                         link.click();
 
                         window.URL.revokeObjectURL(urlT);
                     });
                 }
             });
+    }
+
+    /**
+     * Display custom dialog
+     * @param componentOrTemplateRef
+     * @param config
+     */
+    showCustomDialog(
+        componentOrTemplateRef: any,
+        config: any
+    ): Observable<any> {
+        // open dialog
+        return this.dialog.open(
+            componentOrTemplateRef,
+            config
+        ).afterClosed();
     }
 }

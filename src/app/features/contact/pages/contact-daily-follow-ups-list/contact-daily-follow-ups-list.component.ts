@@ -12,7 +12,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, DialogFieldType, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
@@ -842,5 +842,26 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     dateInTheFuture(followUpDate): boolean {
         const date = followUpDate ? moment(followUpDate) : null;
         return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
+    }
+
+    /**
+     * Modify follow-up questionnaire
+     * @param followUp
+     */
+    modifyQuestionnaire(followUp: FollowUpModel) {
+        this.dialogService.showCustomDialog(
+            ModifyContactFollowUpQuestionnaireDialogComponent, {
+                ...ModifyContactFollowUpQuestionnaireDialogComponent.DEFAULT_CONFIG,
+                ...{
+                    data: new ModifyContactFollowUpQuestionnaireData(
+                        followUp,
+                        this.selectedOutbreak
+                    )
+                }
+            }
+        ).subscribe(() => {
+            // NOTHING TO DO HERE
+            // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
+        });
     }
 }
