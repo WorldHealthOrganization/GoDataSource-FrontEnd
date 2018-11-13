@@ -89,7 +89,7 @@ export class TeamListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
 
-        this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder);
+        this.teamsListCount$ = this.teamDataService.getTeamsCount(countQueryBuilder).share();
     }
 
     /**

@@ -1,3 +1,4 @@
-<div class="total-number-container" *ngIf="totalNumberOfRecords">
-    {{ totalNumberOfRecords}} {{ 'RESULTS' | translate }}
+<div
+    class="total-number-container">
+    {{'LNG_COMMON_LABEL_RECORDS_NUMBER' | translate:{ value: value ? value : 0 } }}
 </div>

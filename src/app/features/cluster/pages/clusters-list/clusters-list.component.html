@@ -17,7 +17,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [totalNumberOfRecords]="( clustersListCount$ | async)?.count">
+    [value]="(clustersListCount$ | async)?.count">
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">

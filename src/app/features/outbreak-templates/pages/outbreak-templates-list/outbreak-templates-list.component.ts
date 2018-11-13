@@ -28,7 +28,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     ];
 
     outbreakTemplatesList$: Observable<any>;
-    outbreakTemplatesListCount$: Observable<any>;
 
     diseasesList$: Observable<any[]>;
 
@@ -93,7 +92,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     refreshList() {
         // retrieve the list of Events
         this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder);
-        this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService.getOutbreakTemplatesListCount();
     }
 
     /**

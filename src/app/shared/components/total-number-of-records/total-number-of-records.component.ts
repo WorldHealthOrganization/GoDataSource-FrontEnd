@@ -8,7 +8,7 @@ import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 })
 export class TotalNumberOfRecordsComponent implements OnInit {
 
-    @Input() totalNumberOfRecords: number;
+    @Input() value: number;
 
     constructor() {
     }

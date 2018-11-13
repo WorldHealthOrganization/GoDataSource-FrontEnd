@@ -634,7 +634,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             this.followUpsListCount$ = this.followUpsDataService
-                .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder);
+                .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
+                .share();
         }
     }
 

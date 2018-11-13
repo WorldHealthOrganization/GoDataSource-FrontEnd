@@ -90,7 +90,7 @@ export class UserListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder);
+        this.usersListCount$ = this.userDataService.getUsersCount(countQueryBuilder).share();
     }
 
     /**

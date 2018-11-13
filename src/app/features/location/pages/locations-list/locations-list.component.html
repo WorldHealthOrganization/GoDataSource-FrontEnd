@@ -48,7 +48,7 @@
 
 <!--Total number of records from the list-->
 <app-total-number-of-records
-    [totalNumberOfRecords]="( locationsListCount$ | async)?.count">
+    [value]="(locationsListCount$ | async)?.count">
 </app-total-number-of-records>
 
 <div [ngClass]="{ 'form-section': !!parentId }">
