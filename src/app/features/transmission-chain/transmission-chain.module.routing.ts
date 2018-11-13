@@ -14,9 +14,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT,
-                PERMISSION.READ_CASE,
-                PERMISSION.READ_CONTACT
+                PERMISSION.READ_REPORT
             ]
         }
     },
@@ -28,9 +26,7 @@ const routes: Routes = [
         data: {
             permissions: [
                 PERMISSION.READ_OUTBREAK,
-                PERMISSION.READ_REPORT,
-                PERMISSION.READ_CASE,
-                PERMISSION.READ_CONTACT
+                PERMISSION.READ_REPORT
             ]
         }
     },
@@ -41,9 +37,8 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [
-                PERMISSION.READ_REPORT,
-                PERMISSION.READ_CASE,
-                PERMISSION.READ_CONTACT
+                PERMISSION.READ_OUTBREAK,
+                PERMISSION.READ_REPORT
             ]
         }
     }

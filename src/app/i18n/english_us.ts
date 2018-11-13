@@ -216,6 +216,7 @@ export const EnglishUsLang = {
          * API Errors
          */
         'LNG_API_ERROR_CODE_UNKNOWN_ERROR': 'Something went wrong! Please contact an administrator.',
+        'LNG_API_ERROR_CODE_MISSING_REQUIRED_PERMISSION': 'Your role doesn\'t allow you to perform this operation.',
         'LNG_API_ERROR_CODE_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'One of the addresses must be set as Current Address',
         'LNG_API_ERROR_CODE_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Multiple addresses set as Usual Place of Residence. Only one address should be set as Usual Place of Residence',
         'LNG_API_ERROR_CODE_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Addresses set as Previous Usual Place of Residence must have a date set',
