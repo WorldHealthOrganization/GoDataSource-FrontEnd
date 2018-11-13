@@ -5,7 +5,7 @@ export class HelpCategoryModel {
     name: string;
     description: string;
     order: number;
-    deleted: boolean
+    deleted: boolean;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
