@@ -972,6 +972,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
+
+        /**
+         * Follow-ups list page => Questionnaire dialog
+         */
+        'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE': 'Save',
+        'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_CANCEL': 'Cancel',
+        'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE': 'Follow-up saved!',
 
         /**
          * Create Follow-up page
