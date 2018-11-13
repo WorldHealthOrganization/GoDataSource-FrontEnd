@@ -65,7 +65,7 @@
         </mat-card>
     </div>
 
-
+    <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship"
         class="page-section create-relationship"
@@ -101,6 +101,45 @@
                 <div fxLayout="row">
                     <button mat-raised-button color="primary" class="button-primary" type="submit">
                         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_BUTTON' | translate}}
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </mat-card>
+
+    <!-- Create new Contact for Case/Event -->
+    <mat-card
+        *ngIf="selectedNodes.canCreateContact"
+        class="page-section create-contact"
+        fxFlex
+    >
+        <form #form="ngForm" (submit)="createContact(form)">
+
+            <div fxLayout="column" fxLayoutGap="10px">
+
+                <span class="section-title">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
+                </span>
+
+                <app-form-contact-quick
+                    name="contact"
+                    [ngModel]="newContact"
+                ></app-form-contact-quick>
+
+                <span class="section-title">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
+                </span>
+
+                <app-form-relationship-quick
+                    name="relationship"
+                    [ngModel]="newRelationship"
+                    required="true"
+                ></app-form-relationship-quick>
+
+                <div fxLayout="row">
+                    <button mat-raised-button color="primary" class="button-primary" type="submit">
+                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_BUTTON' | translate}}
                     </button>
                 </div>
             </div>

@@ -78,4 +78,19 @@ export class SelectedNodes {
             )
         );
     }
+
+    /**
+     * Check if we can create a Contact for a selected node
+     */
+    get canCreateContact(): boolean {
+        return (
+            // do we have a single Node selected?
+            this.nodes.length === 1 &&
+            // a Contact can be created only for a Case or an Event
+            (
+                this.sourceNode.type === EntityType.CASE ||
+                this.sourceNode.type === EntityType.EVENT
+            )
+        );
+    }
 }

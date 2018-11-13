@@ -1,0 +1,39 @@
+<div
+    class="follow-up-questionnaire-dialog-main">
+    <div
+        *ngIf="loading"
+        class="follow-up-dialog-loading">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div
+        *ngIf="!loading">
+        <form #form="ngForm">
+            <app-form-fill-questionnaire
+                name="questionnaireAnswers"
+                [ngModel]="data.followUp.questionnaireAnswers"
+                [questions]="data.outbreak.contactFollowUpTemplate"
+            ></app-form-fill-questionnaire>
+
+            <div
+                 fxFlex fxLayout="row" fxLayoutAlign="end">
+                <button
+                    mat-button
+                    type="button"
+                    class="dialog-button"
+                    (click)="cancel()"
+                >
+                    {{ 'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_CANCEL' | translate }}
+                </button>
+                <button
+                    mat-button
+                    type="button"
+                    class="dialog-button"
+                    [disabled]="form.invalid"
+                    (click)="save(form)"
+                >
+                    {{ 'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE' | translate }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
