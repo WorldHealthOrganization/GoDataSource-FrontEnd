@@ -58,8 +58,9 @@
 
     <!-- Loading data data -->
     <div
+        *ngIf="displayLoading"
         class="follow-up-range-loading"
-        *ngIf="displayLoading">
+    >
         <mat-spinner></mat-spinner>
     </div>
 
