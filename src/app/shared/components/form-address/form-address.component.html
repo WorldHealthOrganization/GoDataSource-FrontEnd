@@ -149,6 +149,32 @@
             </div>
 
             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-input
+                        [name]="name + '[addressLine1]'"
+                        [(ngModel)]="address.addressLine1"
+                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
+                        [disabled]="disabled"
+                        [required]="false"
+                        (input)="onChange()">
+                    </app-form-input>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('addressLine1')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div fxFlex fxLayout="row" fxLayoutGap="20px">
                     <div fxFlex fxLayout="row" fxLayoutGap="5px">
                         <app-form-input
@@ -204,32 +230,6 @@
                                 <span class="xt-icon">fileCopy</span>
                             </button>
                         </div>
-                    </div>
-                </div>
-
-                <div fxFlex fxLayout="row" fxLayoutGap="5px">
-                    <app-form-input
-                        [name]="name + '[addressLine1]'"
-                        [(ngModel)]="address.addressLine1"
-                        [placeholder]="'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1' | translate"
-                        tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
-                        [disabled]="disabled"
-                        [required]="false"
-                        (input)="onChange()">
-                    </app-form-input>
-                    <div
-                        *ngIf="displayCopyField"
-                        fxFlex="40px"
-                        fxLayout="column"
-                        fxLayoutAlign="center">
-                        <button
-                            class="copy-field-button"
-                            type="button"
-                            mat-icon-button
-                            [title]="displayCopyFieldDescription"
-                            (click)="triggerCopyValue('addressLine1')">
-                            <span class="xt-icon">fileCopy</span>
-                        </button>
                     </div>
                 </div>
             </div>
