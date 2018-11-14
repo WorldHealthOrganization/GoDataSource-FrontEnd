@@ -3,6 +3,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { DialogField } from '../dialog/dialog.component';
 
 @Component({
     selector: 'app-export-button',
@@ -30,6 +31,11 @@ export class ExportButtonComponent {
     @Input() queryBuilder: RequestQueryBuilder;
     @Input() queryBuilderClearOthers: string[];
     @Input() menuItem: boolean = false;
+    @Input() isPOST: boolean = false;
+    @Input() extraAPIData: {
+        [key: string]: any
+    };
+    @Input() extraDialogFields: DialogField[];
 
     /**
      * If file type is provided, allowedExportTypes will be ignored
@@ -59,7 +65,10 @@ export class ExportButtonComponent {
             fileName: this.fileName,
             buttonDownloadFile: this.buttonDownloadFile,
             queryBuilder: this.queryBuilder,
-            queryBuilderClearOthers: this.queryBuilderClearOthers
+            queryBuilderClearOthers: this.queryBuilderClearOthers,
+            isPOST: this.isPOST,
+            extraAPIData: this.extraAPIData,
+            extraDialogFields: this.extraDialogFields
         });
     }
 }

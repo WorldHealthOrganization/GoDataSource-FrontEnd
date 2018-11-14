@@ -26,7 +26,7 @@ export class FollowUpModel {
         this.statusId = _.get(data, 'statusId');
         this.outbreakId = _.get(data, 'outbreakId');
 
-        this.address = _.get(data, 'address');
+        this.address = new AddressModel(_.get(data, 'address'));
 
         this.contact = _.get(data, 'contact', {});
         this.contact = new ContactModel(this.contact);

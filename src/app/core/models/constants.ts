@@ -505,6 +505,17 @@ export class Constants {
         }
     };
 
+    static RANGE_FOLLOW_UP_EXPORT_GROUP_BY = {
+        PLACE: {
+            label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE',
+            value: 'place'
+        },
+        CASE: {
+            label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE',
+            value: 'case'
+        }
+    };
+
     /**
      * Today date
      */
