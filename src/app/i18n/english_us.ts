@@ -17,6 +17,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
+        'LNG_LAYOUT_MENU_ITEM_HELP': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -2064,7 +2065,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
-        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item approved!',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
 
         /**
@@ -2083,6 +2084,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
         'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
 
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_TITLE': 'Help',
 
     }
 };

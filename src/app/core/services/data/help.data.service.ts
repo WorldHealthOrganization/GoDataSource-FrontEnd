@@ -77,6 +77,7 @@ export class HelpDataService {
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
         queryBuilder.include('category');
+        queryBuilder.filter.where({approved: true});
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-items?filter=${filter}`),
@@ -153,7 +154,6 @@ export class HelpDataService {
     approveHelpItem(categoryId: string, itemId: string): Observable<any> {
         return this.http.post(`help-categories/${categoryId}/help-items/${itemId}/approve`, {});
     }
-
 
 }
 

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { UserModel } from './user.model';
+import { HelpCategoryModel } from './help-category.model';
 
 export class HelpItemModel {
     id: string;
@@ -11,6 +12,7 @@ export class HelpItemModel {
     approvedDate: string;
     comment: string;
     user: UserModel;
+    category: HelpCategoryModel;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -22,6 +24,7 @@ export class HelpItemModel {
         this.approvedDate = _.get(data, 'approvedDate');
         this.comment = _.get(data, 'comment');
         this.user = _.get(data, 'user');
+        this.category = _.get(data, 'category');
     }
 
 }
