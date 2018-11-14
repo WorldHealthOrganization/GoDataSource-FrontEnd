@@ -36,6 +36,11 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(eventsListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
     <div class="reset-filters">

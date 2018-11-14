@@ -60,6 +60,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_ANONYMIZE_FIELDS': 'Anonymize Fields',
         'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
         'LNG_COMMON_LABEL_NO_RECORDS_SELECTED': 'No records selected',
+        'LNG_COMMON_LABEL_RECORDS_NUMBER': '{{value}} results',
 
         /**
          * General Actions
@@ -156,6 +157,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
         'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
         'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
 
         /**
          * Dialogs fields placeholders
@@ -220,6 +222,7 @@ export const EnglishUsLang = {
         'LNG_API_ERROR_CODE_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'One of the addresses must be set as Current Address',
         'LNG_API_ERROR_CODE_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Multiple addresses set as Usual Place of Residence. Only one address should be set as Usual Place of Residence',
         'LNG_API_ERROR_CODE_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Addresses set as Previous Usual Place of Residence must have a date set',
+        'LNG_API_ERROR_CODE_MODEL_IN_USE': '{{userRoleName}} role is in use and cannot be deleted',
 
         /**
          * Common Fields
@@ -242,6 +245,10 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION': '',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT': 'Latitude',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION': '',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG': 'Longitude',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION': '',
         'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS': 'Add another address',
         'LNG_ADDRESS_LABEL_NO_ADDRESSES': 'No addresses',
 
@@ -1018,10 +1025,19 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Relationships created!',
 
         /**
+         * Range Follow-up export fields
+         */
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE': 'Place',
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE': 'Case',
+
+        /**
          * Range Follow-ups list page
          */
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON': 'Export Data',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE': 'Export Data',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON': 'Group by',
 
         /**
          * Event fields
