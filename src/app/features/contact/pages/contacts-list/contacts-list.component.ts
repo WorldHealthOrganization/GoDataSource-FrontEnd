@@ -68,6 +68,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     // new contacts grouped by exposure types
     countedNewContactsGroupedByExposureType$: Observable<any[]>;
+    countedContactsByRiskLevel: Observable<any[]>;
 
     // risk level
     riskLevelsList$: Observable<any[]>;
@@ -195,6 +196,29 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                                 .map((data: ExposureTypeGroupModel) => {
                                     return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
                                         const refItem: ReferenceDataEntryModel = _.find(refExposureTypeData.entries, { id: item.id });
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            item.id,
+                                            item.contactIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        );
+                                    });
+                                });
+                        });
+                }
+                if (this.selectedOutbreak) {
+                    this.countedContactsByRiskLevel = this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
+                        .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+                            return this.contactDataService
+                                .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
+                                .map((data) => {
+                                    console.log(data);
+                                    return _.map(data ? data.riskLevel : [], (item) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: item.id });
+                                        console.log(item);
                                         return new CountedItemsListItem(
                                             item.count,
                                             item.id,

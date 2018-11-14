@@ -130,6 +130,11 @@ export class ContactDataService {
         );
     }
 
+    getContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+           return this.http.get(`outbreaks/${outbreakId}/contacts/per-risk-level/count?filter=${filter}`);
+    }
+
     /**
      * Retrieve the list of new Contacts who were seen each day
      * @param {string} outbreakId
