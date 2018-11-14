@@ -2,6 +2,31 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <app-export-button
+                        *ngIf="exportRangeFollowUpsUrl && exportRangeExtraAPIData"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE' | translate"
+                        [url]="exportRangeFollowUpsUrl"
+                        [fileName]="exportRangeFollowUpsFileName"
+                        [fileType]="ExportDataExtension.PDF"
+                        [isPOST]="true"
+                        [extraAPIData]="exportRangeExtraAPIData"
+                        [extraDialogFields]="exportRangeExtraDialogFields">
+                    </app-export-button>
+                </mat-menu>
+            </div>
         </div>
     </ng-container>
 </app-topnav>
