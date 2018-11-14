@@ -139,14 +139,8 @@ html, body, ul, li, div, span {
 .form-slide-tooltip,
 .form-locations-select-tooltip {
     .mat-input-element,
-    .mat-select,
-    .slide-with-icon,
-    ng-select {
+    .mat-select {
         width: ~'calc(100% - 24px)';
-    }
-
-    ng-select {
-        display: inline-block;
     }
 
     .form-icon {
@@ -155,6 +149,27 @@ html, body, ul, li, div, span {
         line-height: 0;
         float: right;
         margin-top: 7px;
+    }
+
+    ng-select {
+        .ng-select-container {
+            padding-right: 24px;
+        }
+    }
+}
+
+.form-locations-select-tooltip {
+    .form-icon {
+        position: absolute;
+        right: 24px;
+        margin-top: -37px;
+    }
+}
+
+.form-slide-tooltip {
+    .form-icon {
+        margin-bottom: 12px;
+        margin-left: 5px;
     }
 }
 

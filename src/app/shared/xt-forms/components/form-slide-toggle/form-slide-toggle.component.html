@@ -2,29 +2,26 @@
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <div fxFlex fxLayout="row" fxLayoutAlign="start end">
-        <div
-            class="slide-with-icon">
-            <mat-slide-toggle
-                *ngIf="!readonly"
-                [(ngModel)]="value"
-                [attr.name]="name"
-                [labelPosition]="labelBefore ? 'before' : 'after'"
-                [disabled]="disabled"
-                (click)="onClick()" (change)="onChange()">
-                {{label}}
-            </mat-slide-toggle>
+        <mat-slide-toggle
+            *ngIf="!readonly"
+            [(ngModel)]="value"
+            [attr.name]="name"
+            [labelPosition]="labelBefore ? 'before' : 'after'"
+            [disabled]="disabled"
+            (click)="onClick()" (change)="onChange()">
+            {{label}}
+        </mat-slide-toggle>
 
-            <span
-                *ngIf="readonly"
-                class="label-readonly">
-                <ng-container *ngIf="value">
-                    {{label}}
-                </ng-container>
-                <ng-container *ngIf="!value">
-                    {{notCheckedLabel}}
-                </ng-container>
-            </span>
-        </div>
+        <span
+            *ngIf="readonly"
+            class="label-readonly">
+            <ng-container *ngIf="value">
+                {{label}}
+            </ng-container>
+            <ng-container *ngIf="!value">
+                {{notCheckedLabel}}
+            </ng-container>
+        </span>
 
         <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
     </div>

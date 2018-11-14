@@ -74,7 +74,8 @@
                         [disabled]="disabled"
                         [required]="required"
                         [useOutbreakLocations]="true"
-                        (changed)="onChange()">
+                        (changed)="onChange()"
+                        (itemChanged)="locationChanged($event)">
                     </app-form-location-dropdown>
                     <div
                         *ngIf="displayCopyField"
@@ -91,9 +92,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <div fxFlex fxLayout="row" fxLayoutGap="20px">
                     <div fxFlex fxLayout="row" fxLayoutGap="5px">
                         <app-form-input
@@ -147,7 +146,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-input
                         [name]="name + '[addressLine1]'"
@@ -171,6 +172,64 @@
                             (click)="triggerCopyValue('addressLine1')">
                             <span class="xt-icon">fileCopy</span>
                         </button>
+                    </div>
+                </div>
+
+                <div fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                        <app-form-input
+                            #latInput
+                            [name]="name + '[geoLocation][lat]'"
+                            [(ngModel)]="address.geoLocation.lat"
+                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate"
+                            tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                            [disabled]="disabled"
+                            [required]="lngInput.value?.length > 0"
+                            type="number"
+                            (input)="onChange()">
+                        </app-form-input>
+                        <div
+                            *ngIf="displayCopyField"
+                            fxFlex="40px"
+                            fxLayout="column"
+                            fxLayoutAlign="center">
+                            <button
+                                class="copy-field-button"
+                                type="button"
+                                mat-icon-button
+                                [title]="displayCopyFieldDescription"
+                                (click)="triggerCopyValue('geoLocation[lat]')">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                        <app-form-input
+                            #lngInput
+                            [name]="name + '[geoLocation][lng]'"
+                            [(ngModel)]="address.geoLocation.lng"
+                            [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate"
+                            tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                            [disabled]="disabled"
+                            [required]="latInput.value?.length > 0"
+                            type="number"
+                            (input)="onChange()">
+                        </app-form-input>
+                        <div
+                            *ngIf="displayCopyField"
+                            fxFlex="40px"
+                            fxLayout="column"
+                            fxLayoutAlign="center">
+                            <button
+                                class="copy-field-button"
+                                type="button"
+                                mat-icon-button
+                                [title]="displayCopyFieldDescription"
+                                (click)="triggerCopyValue('geoLocation[lng]')">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
