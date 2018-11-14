@@ -97,11 +97,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED'
             }),
             new VisibleColumnModel({
-                field: 'approved_by',
+                field: 'approvedBy',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY'
             }),
             new VisibleColumnModel({
-                field: 'approved_date',
+                field: 'approvedDate',
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE'
             }),
             new VisibleColumnModel({
@@ -136,6 +136,14 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Check if we have write access to help
+     * @returns {boolean}
+     */
+    hasHelpApproveAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.APPROVE_HELP);
+    }
+
+    /**
      * Delete specific item
      * @param {HelpItemModel} item
      */
@@ -154,6 +162,33 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // reload data
+                            this.needsRefreshList(true);
+                        });
+                }
+            });
+    }
+
+    /**
+     * Approve specific item
+     * @param {HelpItemModel} item
+     */
+    approveHelpItem(item: HelpItemModel) {
+        // show confirm dialog
+        const translatedData = {title: this.i18nService.instant(item.title)};
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM', translatedData)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.helpDataService
+                        .approveHelpItem(item.categoryId, item.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE');
 
                             // reload data
                             this.needsRefreshList(true);

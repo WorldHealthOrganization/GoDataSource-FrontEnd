@@ -143,5 +143,16 @@ export class HelpDataService {
         return this.http.delete(`help-categories/${categoryId}/help-items/${itemId}`);
     }
 
+    /**
+     * Approve help item
+     * @param {string} categoryId
+     * @param {string} itemId
+     * @returns {Observable<any>}
+     */
+    approveHelpItem(categoryId: string, itemId: string): Observable<any> {
+        return this.http.post(`help-categories/${categoryId}/help-items/${itemId}/approve`, {});
+    }
+
+
 }
 
