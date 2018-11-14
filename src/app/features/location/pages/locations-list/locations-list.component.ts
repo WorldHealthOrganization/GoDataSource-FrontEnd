@@ -109,7 +109,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         // remove paginator from query builder
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
-        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder);
+        this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).share();
     }
 
     /**

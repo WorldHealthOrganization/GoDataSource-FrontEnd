@@ -46,6 +46,11 @@
     </ng-container>
 </app-topnav>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(locationsListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <div [ngClass]="{ 'form-section': !!parentId }">
     <div class="form-content">
         <mat-card class="page-section page-content">

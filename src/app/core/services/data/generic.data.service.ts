@@ -171,5 +171,13 @@ export class GenericDataService {
     getDataModuleOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.DATA_MODULES));
     }
+
+    /**
+     * Retrieve the list of range follow-up export group by values
+     * @returns {Observable<any[]>}
+     */
+    getRangeFollowUpGroupByOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY));
+    }
 }
 
