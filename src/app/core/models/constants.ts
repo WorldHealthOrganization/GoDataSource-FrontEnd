@@ -489,6 +489,83 @@ export class Constants {
         }
     };
 
+    // possible modules for export sync package
+    static SYNC_PACKAGE_EXPORT_MODULES = {
+        CLUSTER: {
+            label: 'LNG_MODULE_LABEL_CLUSTER',
+            value: 'cluster'
+        },
+        FOLLOW_UP: {
+            label: 'LNG_MODULE_LABEL_FOLLOW_UP',
+            value: 'followUp'
+        },
+        LAB_RESULT: {
+            label: 'LNG_MODULE_LABEL_LAB_RESULT',
+            value: 'labResult'
+        },
+        LANGUAGE: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE',
+            value: 'language'
+        },
+        LANGUAGE_TOKEN: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE_TOKEN',
+            value: 'languageToken'
+        },
+        LOCATION: {
+            label: 'LNG_MODULE_LABEL_LOCATION',
+            value: 'location'
+        },
+        OUTBREAK: {
+            label: 'LNG_MODULE_LABEL_OUTBREAK',
+            value: 'outbreak'
+        },
+        PERSON: {
+            label: 'LNG_MODULE_LABEL_PERSON',
+            value: 'person'
+        },
+        REFERENCE_DATA: {
+            label: 'LNG_MODULE_LABEL_REFERENCE_DATA',
+            value: 'referenceData'
+        },
+        RELATIONSHIP: {
+            label: 'LNG_MODULE_LABEL_RELATIONSHIP',
+            value: 'relationship'
+        },
+        ROLE: {
+            label: 'LNG_MODULE_LABEL_ROLE',
+            value: 'role'
+        },
+        TEAM: {
+            label: 'LNG_MODULE_LABEL_TEAM',
+            value: 'team'
+        },
+        USER: {
+            label: 'LNG_MODULE_LABEL_USER',
+            value: 'user'
+        }
+    };
+
+    // possible export types for export sync package
+    static SYNC_PACKAGE_EXPORT_TYPES = {
+        MOBILE: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
+            value: 'mobile'
+        },
+        SYSTEM: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
+            value: 'system'
+        },
+        OUTBREAK: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
+            value: 'outbreak'
+        },
+        FULL: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
+            value: 'full'
+        }
+    };
+
+
     static EPI_CURVE_VIEW_TYPE = {
         DAY: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',

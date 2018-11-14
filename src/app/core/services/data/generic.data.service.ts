@@ -171,5 +171,21 @@ export class GenericDataService {
     getDataModuleOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.DATA_MODULES));
     }
+
+    /**
+     * Retrieve the list of sync package modules
+     * @returns {Observable<any[]>}
+     */
+    getSyncPackageModuleOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_MODULES));
+    }
+
+    /**
+     * Retrieve the list of sync package export types
+     * @returns {Observable<any[]>}
+     */
+    getSyncPackageExportTypeOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
+    }
 }
 

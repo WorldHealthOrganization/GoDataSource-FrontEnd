@@ -5,49 +5,62 @@
 
             <div class="topnav-actions">
                 <ng-container
-                    *ngIf="hasSysConfigWriteAccess() && settings && !waitForBackupIdToBeReady && !loading">
+                    *ngIf="!waitForBackupIdToBeReady && !loading">
 
-                    <!-- Sync client applications -->
                     <button
                         class="button-primary"
                         mat-raised-button
                         color="primary"
-                        [routerLink]="['/system-config', 'system-client-applications']">
-                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON' | translate }}
+                        [matMenuTriggerFor]="quickActionsMenu">
+                        {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                     </button>
 
-                    <!-- Sync upstream servers -->
-                    <button
-                        class="button-primary"
-                        mat-raised-button
-                        color="primary"
-                        [routerLink]="['/system-config', 'system-upstream-sync']">
-                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON' | translate }}
-                    </button>
+                    <mat-menu #quickActionsMenu="matMenu">
+                        <!-- Sync client applications -->
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/system-config', 'system-client-applications']">
+                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON' | translate }}
+                        </button>
 
-                    <!-- Modify settings -->
-                    <button
-                        class="button-primary"
-                        mat-raised-button
-                        color="primary"
-                        (click)="configureAutomaticBackupSettings()">
-                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
-                    </button>
+                        <!-- Sync upstream servers -->
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/system-config', 'system-upstream-sync']">
+                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON' | translate }}
+                        </button>
 
-                    <!-- Create backup -->
-                    <button
-                        class="button-primary"
-                        mat-raised-button
-                        color="primary"
-                        (click)="backupData()">
-                        {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON' | translate }}
-                    </button>
+                        <ng-container
+                            *ngIf="hasSysConfigWriteAccess() && settings">
+                            <!-- Modify settings -->
+                            <button
+                                mat-menu-item
+                                (click)="configureAutomaticBackupSettings()">
+                                {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
+                            </button>
+
+                            <!-- Create backup -->
+                            <button
+                                mat-menu-item
+                                (click)="backupData()">
+                                {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON' | translate }}
+                            </button>
+
+                            <!-- Export Sync Package -->
+                            <button
+                                mat-menu-item
+                                (click)="exportSyncPackage()">
+                                {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE' | translate }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
                 </ng-container>
             </div>
         </div>
     </ng-container>
 </app-topnav>
 
+<a hidden #buttonDownloadFile></a>
 <mat-card class="page-section page-content">
     <!-- Backups -->
     <ng-container

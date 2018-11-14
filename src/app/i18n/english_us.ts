@@ -1560,10 +1560,33 @@ export const EnglishUsLang = {
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
 
         /**
+         * Sync Package
+         */
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE': 'From date',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS': 'Collections',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE': 'Export Type',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION': 'Note: when exportType is present \'collections\' is ignored',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS': 'Include Users',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION': '',
+
+        /**
+         * Sync package export types
+         */
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE': 'Mobile',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM': 'System',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL': 'Full',
+
+        /**
          * System Config Main page
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
@@ -1579,6 +1602,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
 
         /**
          * Sync settings fields

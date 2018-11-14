@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
@@ -18,6 +18,10 @@ import { SystemBackupDataService } from '../../../../core/services/data/system-b
 import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as moment from 'moment';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
     selector: 'app-system-config-main',
@@ -51,6 +55,12 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
     waitForBackupIdToBeReady: string;
     loading: boolean = false;
 
+    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+
+    mappedOutbreaks: LabelValuePair[];
+    mappedCollections: LabelValuePair[];
+    mappedExportTypes: LabelValuePair[];
+
     // constants
     Constants = Constants;
 
@@ -63,7 +73,9 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         private systemSettingsDataService: SystemSettingsDataService,
         private systemBackupDataService: SystemBackupDataService,
         protected snackbarService: SnackbarService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private i18nService: I18nService,
+        private outbreakDataService: OutbreakDataService
     ) {
         super(
             snackbarService
@@ -88,6 +100,34 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
 
         // backup status list
         this.backupStatusList$ = this.genericDataService.getBackupStatusList();
+
+        // retrieve collections
+        this.genericDataService
+            .getSyncPackageModuleOptions()
+            .subscribe((mappedCollections) => {
+                this.mappedCollections = mappedCollections;
+            });
+
+        // retrieve export types
+        this.genericDataService
+            .getSyncPackageExportTypeOptions()
+            .subscribe((mappedExportTypes) => {
+                this.mappedExportTypes = mappedExportTypes;
+            });
+
+        // retrieve outbreaks
+        this.outbreakDataService
+            .getOutbreaksList()
+            .map((outbreaks: OutbreakModel[]) => {
+                return _.map(outbreaks, (outbreak: OutbreakModel) => {
+                    return new LabelValuePair(
+                        outbreak.name,
+                        outbreak.id
+                    );
+                });
+            }).subscribe((mappedOutbreaks: LabelValuePair[]) => {
+                this.mappedOutbreaks = mappedOutbreaks;
+            });
 
         // retrieve backups
         this.needsRefreshList(true);
@@ -410,5 +450,67 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                     });
             }
         });
+    }
+
+    /**
+     * Export sync package
+     */
+    exportSyncPackage() {
+        // display export dialog
+        if (this.mappedOutbreaks) {
+            this.dialogService.showExportDialog({
+                message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON',
+                url: 'sync/database-snapshot',
+                fileName: this.i18nService.instant('LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON') +
+                    ' - ' +
+                    moment().format('YYYY-MM-DD'),
+                buttonDownloadFile: this.buttonDownloadFile,
+                fileType: ExportDataExtension.ZIP,
+                exportStart: () => {
+                    this.loading = true;
+                },
+                exportFinished: () => {
+                    this.loading = false;
+                },
+                extraDialogFields: [
+                    new DialogField({
+                        name: 'fromDate',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
+                        fieldType: DialogFieldType.DATE
+                    }),
+                    new DialogField({
+                        name: 'outbreakId',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedOutbreaks,
+                        inputOptionsMultiple: true
+                    }),
+                    new DialogField({
+                        name: 'collections',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedCollections,
+                        inputOptionsMultiple: true
+                    }),
+                    new DialogField({
+                        name: 'exportType',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedExportTypes,
+                        inputOptionsMultiple: false
+                    }),
+                    new DialogField({
+                        name: 'includeUsers',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
+                        fieldType: DialogFieldType.BOOLEAN
+                    })
+                ]
+            });
+        }
     }
 }

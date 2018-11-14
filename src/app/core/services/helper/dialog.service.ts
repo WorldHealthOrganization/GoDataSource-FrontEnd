@@ -128,6 +128,8 @@ export class DialogService {
         buttonDownloadFile: ElementRef,
 
         // optional
+        exportStart?: () => void,
+        exportFinished?: (answer: DialogAnswer) => void,
         extensionPlaceholder?: string,
         fileType?: ExportDataExtension,
         allowedExportTypes?: ExportDataExtension[],
@@ -271,6 +273,12 @@ export class DialogService {
             }))
             .subscribe((answer: DialogAnswer) => {
                 if (answer.button === DialogAnswerButton.Yes) {
+                    // call export start
+                    if (data.exportStart) {
+                        data.exportStart();
+                    }
+
+                    // export
                     (data.isPOST ?
                         this.importExportDataService.exportPOSTData(
                             data.url,
@@ -289,6 +297,12 @@ export class DialogService {
                         )
                     ).catch((err) => {
                         this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+                        // call dialog closed
+                        if (data.exportFinished) {
+                            data.exportFinished(answer);
+                        }
+
                         return ErrorObservable.create(err);
                     }).subscribe((blob) => {
                         const urlT = window.URL.createObjectURL(blob);
@@ -299,7 +313,17 @@ export class DialogService {
                         link.click();
 
                         window.URL.revokeObjectURL(urlT);
+
+                        // call dialog closed
+                        if (data.exportFinished) {
+                            data.exportFinished(answer);
+                        }
                     });
+                } else {
+                    // call dialog closed
+                    if (data.exportFinished) {
+                        data.exportFinished(answer);
+                    }
                 }
             });
     }
