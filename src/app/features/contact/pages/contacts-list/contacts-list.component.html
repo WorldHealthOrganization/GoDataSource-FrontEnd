@@ -52,6 +52,11 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(contactsListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
         <!--List Color Legend-->
