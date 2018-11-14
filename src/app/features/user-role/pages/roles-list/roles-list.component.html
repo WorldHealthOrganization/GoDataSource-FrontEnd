@@ -29,7 +29,7 @@
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
+                <div class="table-header-cell" fxLayout="column">
                     <div mat-sort-header class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_NAME' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
@@ -52,8 +52,8 @@
         <!-- Description -->
         <ng-container matColumnDef="description">
             <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell column-header">
-                    {{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="descriptionFilter"
@@ -75,8 +75,8 @@
         <!-- Permissions -->
         <ng-container matColumnDef="permissions">
             <mat-header-cell *matHeaderCellDef fxFlex>
-                <div class="table-header-cell column-header">
-                    {{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS' | translate}}</div>
                     <div class="column-filter">
                         <app-form-select
                             name="rolesFilter"

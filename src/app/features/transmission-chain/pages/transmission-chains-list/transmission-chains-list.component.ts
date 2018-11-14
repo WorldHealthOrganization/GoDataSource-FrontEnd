@@ -11,6 +11,9 @@ import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -24,6 +27,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
     ];
+
+    // authenticated user
+    authUser: UserModel;
 
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
@@ -42,7 +48,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         private transmissionChainDataService: TransmissionChainDataService,
         private route: ActivatedRoute,
         protected snackbarService: SnackbarService,
-        protected listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService,
+        private authDataService: AuthDataService
     ) {
         super(
             snackbarService,
@@ -52,6 +59,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
     }
 
     ngOnInit() {
+        // authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -79,19 +89,29 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         }
     }
 
+    hasCaseReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
+    }
+
     /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
     getTableColumns(): string[] {
-        return [
+        const columns = [
             'firstContactDate',
-            'rootCase',
             'noCases',
             'noAliveCases',
             'length',
             'duration',
             'active'
         ];
+
+        if (this.hasCaseReadAccess()) {
+            // include the Root Case column on the second position
+            columns.splice(1, 0, 'rootCase');
+        }
+
+        return columns;
     }
 }

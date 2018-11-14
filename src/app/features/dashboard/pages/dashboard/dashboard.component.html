@@ -224,6 +224,18 @@
                         (moveAfter)="moveDashletAfter(dashlet)">
                     </app-cases-pending-lab-results-dashlet>
 
+                    <!-- Number of cases who are not identified though known contact list -->
+                    <app-cases-not-identified-through-contacts-dashlet
+                        *ngIf="
+                            dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
+                            isDashletVisible(dashlet) &&
+                            hasReadCasePermissions() && hasReadReportPermissions()
+                        "
+                        (hide)="hideDashlet(dashlet)"
+                        (moveBefore)="moveDashletBefore(dashlet)"
+                        (moveAfter)="moveDashletAfter(dashlet)">
+                    </app-cases-not-identified-through-contacts-dashlet>
+
                     <!-- Contacts per case mean -->
                     <app-contacts-per-case-mean-dashlet
                         *ngIf="
@@ -355,18 +367,6 @@
                         (moveBefore)="moveDashletBefore(dashlet)"
                         (moveAfter)="moveDashletAfter(dashlet)">
                     </app-new-chains-of-transmission-from-registered-contacts-dashlet>
-
-                    <!-- Number of cases who are not identified though known contact list -->
-                    <app-cases-not-identified-through-contacts-dashlet
-                        *ngIf="
-                            dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadReportPermissions()
-                        "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-not-identified-through-contacts-dashlet>
                 </ng-container>
             </div>
         </mat-card>

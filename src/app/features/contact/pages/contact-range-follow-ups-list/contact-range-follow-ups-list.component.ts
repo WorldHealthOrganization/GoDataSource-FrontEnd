@@ -16,6 +16,10 @@ import { Constants } from '../../../../core/models/constants';
 import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogField } from '../../../../shared/components';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-contact-range-follow-ups-list',
@@ -62,12 +66,25 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     availableSideFilters: FilterModel[];
     appliedSideFilters: AppliedFilterModel[];
 
+    // export
+    exportRangeFollowUpsUrl: string;
+    exportRangeFollowUpsFileName: string;
+    exportRangeExtraAPIData: {
+        [key: string]: any
+    };
+    exportRangeExtraDialogFields: DialogField[];
+
+    // constants
+    ExportDataExtension = ExportDataExtension;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         protected snackbarService: SnackbarService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private i18nService: I18nService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
@@ -78,8 +95,28 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // add page title
+        this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
+            ' - ' +
+            moment().format('YYYY-MM-DD');
+
         // side filters
         this.initializeSideFilters();
+
+        // retrieve group by options
+        this.genericDataService
+            .getRangeFollowUpGroupByOptions()
+            .subscribe((options) => {
+                this.exportRangeExtraDialogFields = [
+                    new DialogField({
+                        name: 'groupBy',
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                        inputOptions: options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        required: true
+                    })
+                ];
+            });
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -87,6 +124,15 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // selected outbreak
                 this.selectedOutbreak = selectedOutbreak;
+
+                // export url
+                this.exportRangeFollowUpsUrl = null;
+                if (
+                    this.selectedOutbreak &&
+                    this.selectedOutbreak.id
+                ) {
+                    this.exportRangeFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`;
+                }
 
                 // daily status colors
                 this.referenceDataDataService
@@ -136,6 +182,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             'date',
             dateFilter.value
         );
+
+        // set export data
+        this.exportRangeExtraAPIData = {
+            startDate: dateFilter.value.startDate,
+            endDate: dateFilter.value.endDate
+        };
     }
 
     /**
@@ -193,11 +245,19 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                         .value();
 
                     // create dates array
+                    this.exportRangeExtraAPIData = undefined;
                     this.daysToDisplay = [];
                     if (
                         minDate &&
                         maxDate
                     ) {
+                        // set export data
+                        this.exportRangeExtraAPIData = {
+                            startDate: minDate.startOf('day').format(),
+                            endDate: maxDate.endOf('day').format()
+                        };
+
+                        // push dates
                         while (minDate.isSameOrBefore(maxDate)) {
                             // add day to list
                             this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));

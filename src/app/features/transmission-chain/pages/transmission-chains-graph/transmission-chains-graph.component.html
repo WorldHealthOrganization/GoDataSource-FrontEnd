@@ -20,6 +20,7 @@
                         </button>
 
                         <button
+                            *ngIf="hasCaseReadAccess()"
                             mat-menu-item
                             [routerLink]="['/transmission-chains', 'map']">
                             {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
@@ -46,7 +47,6 @@
         [sizeOfChainsFilter]="sizeOfChainsFilter"
         [personId]="personId"
         [selectedEntityType]="selectedEntityType"
-        *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
         (nodeTapped)="onNodeTap($event)"
     ></app-transmission-chains-dashlet>
 
