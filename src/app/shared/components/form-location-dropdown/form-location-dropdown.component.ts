@@ -15,7 +15,7 @@ import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 
-class LocationAutoItem {
+export class LocationAutoItem {
     constructor(
         public id: string,
         public label: string,

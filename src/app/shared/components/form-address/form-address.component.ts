@@ -7,6 +7,9 @@ import { ReferenceDataDataService } from '../../../core/services/data/reference-
 import { Observable } from '../../../../../node_modules/rxjs/Observable';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
+import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';
+import { DialogService } from '../../../core/services/helper/dialog.service';
+import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 
 @Component({
     selector: 'app-form-address',
@@ -36,7 +39,8 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -83,4 +87,23 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
             this.value;
     }
 
+    /**
+     * Location Changed
+     * @param data
+     */
+    locationChanged(data: LocationAutoItem) {
+        if (
+            data.geoLocation &&
+            data.geoLocation.lat &&
+            data.geoLocation.lng
+        ) {
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        this.address.geoLocation.lat = data.geoLocation.lat;
+                        this.address.geoLocation.lng = data.geoLocation.lng;
+                    }
+                });
+        }
+    }
 }

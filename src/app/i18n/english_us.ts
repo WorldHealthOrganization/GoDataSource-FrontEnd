@@ -156,6 +156,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
         'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
         'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
 
         /**
          * Dialogs fields placeholders
@@ -241,6 +242,10 @@ export const EnglishUsLang = {
         'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION': '',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1': 'Address',
         'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION': '',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT': 'Latitude',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION': '',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG': 'Longitude',
+        'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION': '',
         'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS': 'Add another address',
         'LNG_ADDRESS_LABEL_NO_ADDRESSES': 'No addresses',
 
