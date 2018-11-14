@@ -459,9 +459,9 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         // display export dialog
         if (this.mappedOutbreaks) {
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON',
+                message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE',
                 url: 'sync/database-snapshot',
-                fileName: this.i18nService.instant('LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON') +
+                fileName: this.i18nService.instant('LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE') +
                     ' - ' +
                     moment().format('YYYY-MM-DD'),
                 buttonDownloadFile: this.buttonDownloadFile,
@@ -474,13 +474,13 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 },
                 extraDialogFields: [
                     new DialogField({
-                        name: 'fromDate',
+                        name: 'filter[fromDate]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
                         fieldType: DialogFieldType.DATE
                     }),
                     new DialogField({
-                        name: 'outbreakId',
+                        name: 'filter[outbreakId][inq]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -488,7 +488,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'collections',
+                        name: 'filter[collections]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -496,7 +496,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'exportType',
+                        name: 'filter[exportType]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -504,10 +504,16 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: false
                     }),
                     new DialogField({
-                        name: 'includeUsers',
+                        name: 'filter[includeUsers]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
                         fieldType: DialogFieldType.BOOLEAN
+                    }),
+                    new DialogField({
+                        name: 'password',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION',
+                        fieldType: DialogFieldType.TEXT
                     })
                 ]
             });

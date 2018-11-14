@@ -83,6 +83,16 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_OUTBREAK]
         }
+    },
+
+    // Import sync package
+    {
+        path: 'sync-package/import',
+        component: fromPages.ImportSyncPackageComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        }
     }
 ];
 

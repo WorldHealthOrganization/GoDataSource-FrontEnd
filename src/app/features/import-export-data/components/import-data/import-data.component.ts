@@ -21,7 +21,8 @@ export enum ImportDataExtension {
     XLSX = '.xlsx',
     XML = '.xml',
     ODS = '.ods',
-    JSON = '.json'
+    JSON = '.json',
+    ZIP = '.zip'
 }
 
 export enum ImportServerModelNames {

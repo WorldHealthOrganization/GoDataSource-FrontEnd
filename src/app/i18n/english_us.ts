@@ -1572,6 +1572,8 @@ export const EnglishUsLang = {
         'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION': 'Note: when exportType is present \'collections\' is ignored',
         'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS': 'Include Users',
         'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD': 'Encryption password',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION': 'Note: leave empty for no encryption',
 
         /**
          * Sync package export types
@@ -1586,7 +1588,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
@@ -1602,7 +1605,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
 
         /**
          * Sync settings fields
@@ -1974,6 +1977,11 @@ export const EnglishUsLang = {
          * Import hierarchical locations
          */
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
+
+        /**
+         * Import sync package
+         */
+        'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE': 'Import Sync Package',
 
         /**
          * Import location data
