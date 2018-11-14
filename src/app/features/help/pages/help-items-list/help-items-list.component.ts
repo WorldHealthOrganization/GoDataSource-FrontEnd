@@ -11,14 +11,12 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as _ from 'lodash';
 
 @Component({
     selector: 'app-help-items-list',
@@ -29,17 +27,15 @@ import * as _ from 'lodash';
 export class HelpItemsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_ITEMS_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories', false)
     ];
 
     // authenticated user
     authUser: UserModel;
+    categoryId: string;
+    selectedCategory: HelpCategoryModel;
 
     helpItemsList$: Observable<HelpItemModel[]>;
-
-    // list of categories
-    helpCategoriesList: HelpCategoryModel[];
-    helpCategoriesMap: any = {};
 
     // provide constants to template
     Constants = Constants;
@@ -49,14 +45,11 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
         private i18nService: I18nService
     ) {
         super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
+            snackbarService
         );
     }
 
@@ -64,17 +57,38 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        this.helpDataService
-            .getHelpCategoryList()
-            .subscribe((categories) => {
-                this.helpCategoriesList = categories;
-                _.forEach(this.helpCategoriesList, (category) => {
-                    this.helpCategoriesMap[category.id] = category;
-                });
-                // ...and re-load the list
-                this.needsRefreshList(true);
-                // initialize Side Table Columns
-                this.initializeSideTableColumns();
+        this.route.params
+            .subscribe((params: { categoryId }) => {
+                this.categoryId = params.categoryId;
+                this.helpDataService
+                    .getHelpCategory(this.categoryId)
+                    .subscribe((category) => {
+                        this.selectedCategory = category;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                this.selectedCategory.name,
+                                `/help/categories/${this.categoryId}/view`,
+                                false,
+                                {},
+                                {}
+                            )
+                        );
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                                '.',
+                                true,
+                                {},
+                                {}
+                            )
+                        );
+
+                        // ...and re-load the list
+                        this.needsRefreshList(true);
+                        // initialize Side Table Columns
+                        this.initializeSideTableColumns();
+                    });
+
             });
     }
 
@@ -89,8 +103,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
             }),
             new VisibleColumnModel({
-                field: 'categoryId',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
+                field: 'comment',
+                label: 'LNG_HELP_ITEM_FIELD_LABEL_COMMENT'
             }),
             new VisibleColumnModel({
                 field: 'approved',
@@ -117,7 +131,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of items
-        this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
+        this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder);
     }
 
     /**
@@ -156,7 +170,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                     this.helpDataService
                         .deleteHelpItem(item.categoryId, item.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err.message);
 
                             return ErrorObservable.create(err);
                         })
@@ -183,7 +197,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                     this.helpDataService
                         .approveHelpItem(item.categoryId, item.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err.message);
 
                             return ErrorObservable.create(err);
                         })

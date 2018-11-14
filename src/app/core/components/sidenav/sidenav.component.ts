@@ -104,7 +104,7 @@ export class SidenavComponent implements OnInit {
                     'help-admin',
                     'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN',
                     [PERMISSION.READ_SYS_CONFIG],
-                    '/help'
+                    '/help/categories'
                 )
             ]
         ),

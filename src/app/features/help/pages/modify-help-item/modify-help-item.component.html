@@ -72,7 +72,7 @@
 
         <button *ngIf="hasHelpWriteAccess() && viewOnly"
                 mat-raised-button color="primary" class="button-primary"
-                [routerLink]="['/help', categoryId, itemId, 'modify']">
+                [routerLink]="['/help/categories', categoryId, 'items', itemId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
 
@@ -81,7 +81,8 @@
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
-            <button type="button" [routerLink]="'/help'" mat-raised-button>
+            <button type="button"  [routerLink]="['/help/categories', categoryId, 'items']"
+                    mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
             <div class="page-tabs-navbar-placeholder"></div>

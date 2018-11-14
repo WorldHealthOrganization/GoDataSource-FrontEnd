@@ -6,23 +6,10 @@
             <div class="topnav-actions">
                 <ng-container>
                     <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
-                            [routerLink]="'./create'">
+                            [routerLink]="['/help/categories', categoryId, 'items', 'create']">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
-
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        *ngIf="!appliedListFilter"
-                        mat-menu-item
-                        [routerLink]="['/help/help-categories']">
-                        {{'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON' | translate}}
-                    </button>
-                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -52,17 +39,17 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Category -->
-        <ng-container matColumnDef="categoryId">
+        <!-- Comment -->
+        <ng-container matColumnDef="comment">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate}}
-                    </div>
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_COMMENT' | translate}}</div>
                     <div class="column-filter"></div>
                 </div>
             </mat-header-cell>
+
             <mat-cell *matCellDef="let item">
-                {{ (helpCategoriesMap[item.categoryId] ? helpCategoriesMap[item.categoryId].name : '') | translate }}
+                {{ item.comment }}
             </mat-cell>
         </ng-container>
 
@@ -89,7 +76,8 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.approvedBy }}
+                {{ item.user ? item.user.firstName + ' ' + item.user.lastName : '' }}
+
             </mat-cell>
         </ng-container>
 
@@ -119,7 +107,7 @@
                     <mat-menu #actionsMenu="matMenu">
 
                         <button
-                            *ngIf="hasHelpApproveAccess() && !item.deleted"
+                            *ngIf="hasHelpApproveAccess() && !item.approved"
                             mat-menu-item
                             (click)="approveHelpItem(item)">
                             {{'LNG_PAGE_ACTION_APPROVE' | translate}}
@@ -130,7 +118,7 @@
                         </button>
 
                         <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
-                                [routerLink]="['.', item.categoryId, item.id, 'modify']">
+                                [routerLink]="['/help/categories', item.categoryId, 'items', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>
 

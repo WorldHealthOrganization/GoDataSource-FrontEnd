@@ -27,17 +27,6 @@
                                 maxlength="100">
                             </app-form-input>
 
-                            <app-form-select
-                                name="categoryId"
-                                [(ngModel)]="helpItemData.categoryId"
-                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate"
-                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_CATEGORY_DESCRIPTION"
-                                required="true"
-                                [options]="helpCategoriesList$ | async"
-                                optionLabelKey="name"
-                                optionValueKey="id">
-                            </app-form-select>
-
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">

@@ -11,7 +11,6 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
@@ -44,14 +43,11 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute,
         private i18nService: I18nService
     ) {
         super(
-            snackbarService,
-            listFilterDataService,
-            route.queryParams
+            snackbarService
         );
     }
 
@@ -128,7 +124,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                     this.helpDataService
                         .deleteHelpCategory(category.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err.message);
 
                             return ErrorObservable.create(err);
                         })
