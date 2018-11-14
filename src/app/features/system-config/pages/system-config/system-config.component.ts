@@ -501,7 +501,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
                         inputOptions: this.mappedExportTypes,
-                        inputOptionsMultiple: false
+                        inputOptionsMultiple: false,
+                        value: Constants.SYNC_PACKAGE_EXPORT_TYPES.FULL.value
                     }),
                     new DialogField({
                         name: 'filter[where][includeUsers]',
