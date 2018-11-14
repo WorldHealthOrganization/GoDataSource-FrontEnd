@@ -202,7 +202,13 @@ const routes: Routes = [
                 canActivate: [
                     AuthGuard,
                     PasswordChangeGuard
-                ]
+                ],
+                data: {
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT
+                    ]
+                }
             },
             // Import / Export Data Module routes
             {

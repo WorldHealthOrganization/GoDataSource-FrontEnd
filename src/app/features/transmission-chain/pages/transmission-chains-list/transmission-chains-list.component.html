@@ -19,6 +19,7 @@
                             {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
                         </button>
                         <button
+                            *ngIf="hasCaseReadAccess()"
                             mat-menu-item
                             [routerLink]="['/transmission-chains', 'map']">
                             {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON' | translate}}
