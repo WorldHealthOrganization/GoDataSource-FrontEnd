@@ -13,6 +13,7 @@ export class HelpItemModel {
     comment: string;
     user: UserModel;
     category: HelpCategoryModel;
+    page: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -25,6 +26,8 @@ export class HelpItemModel {
         this.comment = _.get(data, 'comment');
         this.user = _.get(data, 'user');
         this.category = _.get(data, 'category');
+        this.page = _.get(data, 'page');
+
     }
 
 }

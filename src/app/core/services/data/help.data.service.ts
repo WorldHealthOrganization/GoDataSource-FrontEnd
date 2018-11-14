@@ -5,7 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
-import { FollowUpModel } from '../../models/follow-up.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class HelpDataService {
@@ -76,8 +76,9 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+        console.log(queryBuilder);
         queryBuilder.include('category');
-        queryBuilder.filter.where({approved: true});
+        queryBuilder.filter.where({approved: true}, false);
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-items?filter=${filter}`),
@@ -153,6 +154,26 @@ export class HelpDataService {
      */
     approveHelpItem(categoryId: string, itemId: string): Observable<any> {
         return this.http.post(`help-categories/${categoryId}/help-items/${itemId}/approve`, {});
+    }
+
+    /**
+     * Search for context specific help
+     * @param {string} url
+     */
+    getContextHelpItems(url: string): Observable<string[]> {
+        return Observable.create((observer) => {
+            this.getHelpItemsList().subscribe((items) => {
+                let helpItems = [];
+                if (url) {
+                    helpItems = _.filter(items, (item) => {
+                        const pageCheck = (item.page) ? item.page.replace('*', '[^\\/]+') : '';
+                        return (new RegExp(pageCheck)).test(url) && pageCheck;
+                    });
+                }
+                observer.next(helpItems);
+                observer.complete();
+            });
+        });
     }
 
 }

@@ -2059,6 +2059,8 @@ export const EnglishUsLang = {
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE': 'Page',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION': 'Add the link to the page. Ex: /contacts/*/view. Where * will replace the id from the URL.',
 
         /**
          * Help Items List Page

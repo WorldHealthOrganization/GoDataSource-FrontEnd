@@ -25,7 +25,8 @@ export enum ApplyListFilter {
     EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships',
     CASES_WITHOUT_DATE_OF_ONSET_CHAIN = 'cases_without_date_of_onset_chain',
     CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN = 'contacts_without_date_of_last_contact_chain',
-    EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain'
+    EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain',
+    CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items'
 }
 
 export class Constants {
