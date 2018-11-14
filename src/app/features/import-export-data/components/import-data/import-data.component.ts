@@ -59,7 +59,8 @@ export class ImportDataComponent implements OnInit {
         [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
-        [ImportDataExtension.JSON]: 'application/json'
+        [ImportDataExtension.JSON]: 'application/json',
+        [ImportDataExtension.ZIP]: 'application/zip'
     };
 
     /**
