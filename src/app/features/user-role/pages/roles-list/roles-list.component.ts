@@ -70,7 +70,7 @@ export class RolesListComponent extends ListComponent implements OnInit {
                     this.userRoleDataService
                         .deleteRole(userRole.id)
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err, {userRoleName : userRole.name});
 
                             return ErrorObservable.create(err);
                         })
