@@ -82,7 +82,7 @@ export class ClustersListComponent extends ListComponent implements OnInit {
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder);
+            this.clustersListCount$ = this.clusterDataService.getClustersCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
     }
 
