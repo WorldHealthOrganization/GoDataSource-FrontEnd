@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -22,25 +22,61 @@ import * as _ from 'lodash';
 export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_ITEMS_TITLE', '/help'),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_ITEM_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', `/help/categories/`)
     ];
 
     helpItemData: HelpItemModel = new HelpItemModel();
-    helpCategoriesList$: Observable<HelpCategoryModel[]>;
+    categoryId: string;
+    selectedCategory: HelpCategoryModel;
 
     constructor(
         private router: Router,
         private helpDataService: HelpDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private route: ActivatedRoute
     ) {
         super();
     }
 
     ngOnInit() {
-        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
+        this.route.params
+            .subscribe((params: { categoryId }) => {
+                this.categoryId = params.categoryId;
+                this.helpDataService
+                    .getHelpCategory(this.categoryId)
+                    .subscribe((category) => {
+                        this.selectedCategory = category;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                this.selectedCategory.name,
+                                `/help/categories/${this.categoryId}/view`,
+                                false,
+                                {},
+                                {}
+                            )
+                        );
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                                `/help/categories/${this.categoryId}/items`,
+                                false,
+                                {},
+                                {}
+                            )
+                        );
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_CREATE_HELP_ITEM_TITLE',
+                                '.',
+                                true,
+                                {},
+                                {}
+                            )
+                        );
+                    });
+            });
     }
 
     /**
@@ -57,9 +93,9 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
         ) {
             // add the new category
             this.helpDataService
-                .createHelpItem(this.helpItemData.categoryId, dirtyFields)
+                .createHelpItem(this.categoryId, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err.message);
 
                     return ErrorObservable.create(err);
                 })
@@ -71,7 +107,7 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
                     // update language tokens to get the translation of name and description
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to categories list
-                    this.router.navigate(['/help']);
+                    this.router.navigate([`/help/categories/${this.categoryId}/items`]);
                 });
         }
     }

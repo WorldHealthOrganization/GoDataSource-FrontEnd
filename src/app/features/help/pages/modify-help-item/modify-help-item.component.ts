@@ -24,12 +24,13 @@ import { Observable } from 'rxjs/Observable';
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_ITEMS_TITLE', '/help')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
     ];
 
     helpItemData: HelpItemModel = new HelpItemModel();
     categoryId: string;
     itemId: string;
+    selectedCategory: HelpCategoryModel;
 
     helpCategoriesList$: Observable<HelpCategoryModel[]>;
 
@@ -57,11 +58,29 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
             .subscribe((params: { categoryId, itemId }) => {
                 this.categoryId = params.categoryId;
                 this.itemId = params.itemId;
-                // get category
+
                 this.helpDataService
-                    .getHelpItem(this.categoryId, this.itemId)
-                    .subscribe(helpItemData => {
-                        this.helpItemData = new HelpItemModel(helpItemData);
+                    .getHelpCategory(this.categoryId)
+                    .subscribe((category) => {
+                        this.selectedCategory = category;
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                this.selectedCategory.name,
+                                `/help/categories/${this.categoryId}/view`,
+                                false,
+                                {},
+                                {}
+                            )
+                        );
+                        this.breadcrumbs.push(
+                            new BreadcrumbItemModel(
+                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                                `/help/categories/${this.categoryId}/items`,
+                                false,
+                                {},
+                                {}
+                            )
+                        );
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
                                 this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
@@ -71,6 +90,12 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                                 {}
                             )
                         );
+                        // get item
+                        this.helpDataService
+                            .getHelpItem(this.categoryId, this.itemId)
+                            .subscribe(helpItemData => {
+                                this.helpItemData = new HelpItemModel(helpItemData);
+                            });
                     });
             });
     }
@@ -86,7 +111,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         this.helpDataService
             .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showError(err.message);
+                this.snackbarService.showApiError(err.message);
 
                 return ErrorObservable.create(err);
             })
@@ -98,7 +123,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                 // update language tokens to get the translation of name and description
                 this.i18nService.loadUserLanguage().subscribe();
                 // navigate to the list of categories
-                this.router.navigate(['/help']);
+                this.router.navigate([`/help/categories/${this.categoryId}/items`]);
             });
     }
 

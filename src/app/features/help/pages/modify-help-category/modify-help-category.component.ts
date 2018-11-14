@@ -22,7 +22,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 export class ModifyHelpCategoryComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/help-categories')
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
     ];
 
     helpCategoryData: HelpCategoryModel = new HelpCategoryModel();
@@ -79,7 +79,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showError(err.message);
+                this.snackbarService.showApiError(err.message);
 
                 return ErrorObservable.create(err);
             })

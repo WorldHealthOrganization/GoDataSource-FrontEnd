@@ -6,23 +6,10 @@
             <div class="topnav-actions">
                 <ng-container>
                     <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
-                            [routerLink]="'/help/create-category'">
+                            [routerLink]="'/help/categories/create'">
                         {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                     </button>
                 </ng-container>
-
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <button
-                        *ngIf="!appliedListFilter"
-                        mat-menu-item
-                        [routerLink]="['/help']">
-                        {{'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON' | translate}}
-                    </button>
-                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -92,12 +79,16 @@
 
                     <mat-menu #actionsMenu="matMenu">
 
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/help', item.id, 'view-category']">
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/help/categories', item.id, 'items']">
+                            {{'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON' | translate}}
+                        </button>
+
+                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/help/categories', item.id, 'view']">
                             {{'LNG_PAGE_ACTION_VIEW' | translate}}
                         </button>
 
                         <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
-                                [routerLink]="['/help', item.id, 'modify-category']">
+                                [routerLink]="['/help/categories', item.id, 'modify']">
                             {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                         </button>
 

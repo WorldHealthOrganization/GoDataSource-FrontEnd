@@ -20,7 +20,7 @@ import * as _ from 'lodash';
 export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/help-categories'),
+        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories'),
         new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_CATEGORY_TITLE', '.', true)
     ];
 
@@ -52,7 +52,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
             this.helpDataService
                 .createHelpCategory(dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showError(err.message);
+                    this.snackbarService.showApiError(err.message);
 
                     return ErrorObservable.create(err);
                 })
@@ -64,7 +64,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
                     // update language tokens to get the translation of name and description
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to categories list
-                    this.router.navigate(['/help/help-categories']);
+                    this.router.navigate(['/help/categories']);
                 });
         }
     }
