@@ -1775,6 +1775,8 @@ export const EnglishUsLang = {
         'LNG_MODULE_LABEL_ICON': 'Icon',
         'LNG_MODULE_LABEL_BACKUP': 'Backup',
         'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
+        'LNG_MODULE_LABEL_DEVICE': 'Device',
+        'LNG_MODULE_LABEL_DEVICE_HISTORY': 'deviceHistory',
 
         /**
          * List Filters page titles

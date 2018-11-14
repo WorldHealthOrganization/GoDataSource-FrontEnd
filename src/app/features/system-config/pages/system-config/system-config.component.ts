@@ -474,13 +474,13 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 },
                 extraDialogFields: [
                     new DialogField({
-                        name: 'filter[fromDate]',
+                        name: 'filter[where][fromDate]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
                         fieldType: DialogFieldType.DATE
                     }),
                     new DialogField({
-                        name: 'filter[outbreakId][inq]',
+                        name: 'filter[where][outbreakId][inq]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -488,7 +488,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'filter[collections]',
+                        name: 'filter[where][collections]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -496,7 +496,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'filter[exportType]',
+                        name: 'filter[where][exportType]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
@@ -504,7 +504,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: false
                     }),
                     new DialogField({
-                        name: 'filter[includeUsers]',
+                        name: 'filter[where][includeUsers]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
                         fieldType: DialogFieldType.BOOLEAN

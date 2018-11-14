@@ -542,6 +542,42 @@ export class Constants {
         USER: {
             label: 'LNG_MODULE_LABEL_USER',
             value: 'user'
+        },
+        SYSTEM_SETTINGS: {
+            label: 'LNG_MODULE_LABEL_SYSTEM_SETTINGS',
+            value: 'systemSettings'
+        },
+        TEMPLATE: {
+            label: 'LNG_MODULE_LABEL_TEMPLATE',
+            value: 'template'
+        },
+        ICON: {
+            label: 'LNG_MODULE_LABEL_ICON',
+            value: 'icon'
+        },
+        HELP_CATEGORY: {
+            label: 'LNG_MODULE_LABEL_HELP_CATEGORY',
+            value: 'helpCategory'
+        },
+        HELP_ITEM: {
+            label: 'LNG_MODULE_LABEL_HELP_ITEM',
+            value: 'helpItem'
+        },
+        AUDIT_LOG: {
+            label: 'LNG_MODULE_LABEL_AUDIT_LOG',
+            value: 'auditLog'
+        },
+        FILE_ATTACHMENT: {
+            label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
+            value: 'fileAttachment'
+        },
+        DEVICE: {
+            label: 'LNG_MODULE_LABEL_DEVICE',
+            value: 'device'
+        },
+        DEVICE_HISTORY: {
+            label: 'LNG_MODULE_LABEL_DEVICE_HISTORY',
+            value: 'deviceHistory'
         }
     };
 
