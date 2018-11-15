@@ -504,6 +504,21 @@ export class Constants {
         }
     };
 
+    static GANTT_CHART_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            value: 'week'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            value: 'month'
+        }
+    };
+
     static RANGE_FOLLOW_UP_EXPORT_GROUP_BY = {
         PLACE: {
             label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE',
