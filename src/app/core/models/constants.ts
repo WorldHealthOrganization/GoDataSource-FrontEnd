@@ -506,15 +506,15 @@ export class Constants {
 
     static GANTT_CHART_VIEW_TYPE = {
         DAY: {
-            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL',
             value: 'day'
         },
         WEEK: {
-            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL',
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL',
             value: 'week'
         },
         MONTH: {
-            label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL',
             value: 'month'
         }
     };
