@@ -8,7 +8,6 @@ import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -29,6 +28,7 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
     ];
 
     outbreakTemplatesList$: Observable<any>;
+
     diseasesList$: Observable<any[]>;
 
     authUser: UserModel;
@@ -41,7 +41,6 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
         protected snackbarService: SnackbarService,
         private authDataService: AuthDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
         private dialogService: DialogService,
         private outbreakTemplateDataService: OutbreakTemplateDataService
     ) {

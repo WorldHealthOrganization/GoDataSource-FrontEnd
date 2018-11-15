@@ -267,7 +267,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 this.entityType,
                 this.entityId,
                 countQueryBuilder
-            );
+            ).share();
         }
     }
 
