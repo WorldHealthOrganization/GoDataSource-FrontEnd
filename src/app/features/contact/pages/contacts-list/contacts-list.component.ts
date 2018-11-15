@@ -14,8 +14,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
-import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import {
     ReferenceDataCategory,
@@ -68,8 +66,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // gender list
     genderList$: Observable<any[]>;
 
-    // new contacts grouped by exposure types
-    countedNewContactsGroupedByExposureType$: Observable<any[]>;
+    // contacts grouped by risk level
     countedContactsByRiskLevel: Observable<any[]>;
 
     // risk level
