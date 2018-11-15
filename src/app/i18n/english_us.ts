@@ -16,6 +16,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
+        'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -157,6 +158,8 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
         'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
         'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
+        'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
+        'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
 
         /**
@@ -2020,5 +2023,81 @@ export const EnglishUsLang = {
         'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at location:',
         'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The backups are saved at location:',
         'LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE': 'Path copied!',
+
+        /**
+         * Help Category fields
+         */
+        'LNG_HELP_CATEGORY_FIELD_LABEL_NAME': 'Name',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER': 'Order',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER_DESCRIPTION': '',
+
+        /**
+         * Help Categories List Page
+         */
+        'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE': 'Help Categories',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE': 'Category deleted!',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON': 'See Help Items',
+
+        /**
+         * Create Help Category Page
+         */
+        'LNG_PAGE_CREATE_HELP_CATEGORY_TITLE': 'Create Help Category',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_CATEGORY_BUTTON': 'Create Category',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE': 'Category created!',
+
+        /**
+         * Modify Help Category Page
+         */
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE': 'Modify Help Category',
+        'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE': 'View Help Category',
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE': 'Category updated!',
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Help Item fields
+         */
+        'LNG_HELP_ITEM_FIELD_LABEL_TITLE': 'Title',
+        'LNG_HELP_ITEM_FIELD_LABEL_TITLE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_CONTENT': 'Content',
+        'LNG_HELP_ITEM_FIELD_LABEL_CONTENT_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY': 'Category',
+        'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_COMMENT': 'Comment',
+        'LNG_HELP_ITEM_FIELD_LABEL_COMMENT_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED': 'Approved',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY': 'Approved By',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+
+        /**
+         * Help Items List Page
+         */
+        'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
+
+        /**
+         * Create Help Items Page
+         */
+        'LNG_PAGE_CREATE_HELP_ITEM_TITLE': 'Create Help Item',
+        'LNG_PAGE_CREATE_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON': 'Create Help Item',
+        'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE': 'Help item created!',
+
+        /**
+         * Modify Help Category Page
+         */
+        'LNG_PAGE_MODIFY_HELP_ITEM_TITLE': 'Modify Help Item',
+        'LNG_PAGE_VIEW_HELP_ITEM_TITLE': 'View Help Item',
+        'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
+        'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
+
+
     }
 };
