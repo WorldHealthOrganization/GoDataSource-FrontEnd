@@ -7,6 +7,12 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import { PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { AddressModel } from '../../../../core/models/address.model';
+import { PERMISSION } from '../../../../core/models/permission.model';
+import { FormControl, NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -19,11 +25,32 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
     ];
 
+    // constants
+    EntityType = EntityType;
+    AddressModel = AddressModel;
+
     // authenticated user
     authUser: UserModel;
 
     // contacts outbreak
     selectedOutbreak: OutbreakModel;
+
+    // duplicates
+    duplicatesList: PeoplePossibleDuplicateModel;
+    duplicatesListCount$: Observable<any>;
+
+    /**
+     * Visible table columns
+     */
+    tableVisibleHeaderColumns: string[] = [
+        'checkbox',
+        'type',
+        'firstName',
+        'lastName',
+        'documents',
+        'age',
+        'address'
+    ];
 
     constructor(
         private authDataService: AuthDataService,
@@ -58,7 +85,12 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list
-            // this.outbreakDataService.getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder);
+            this.duplicatesList = null;
+            this.outbreakDataService
+                .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
+                .subscribe((duplicatesList) => {
+                    this.duplicatesList = duplicatesList;
+                });
         }
     }
 
@@ -67,10 +99,80 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
-            // // remove paginator from query builder
-            // const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            // countQueryBuilder.paginator.clear();
-            // this.contactsListCount$ = this.outbreakDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
+            // remove paginator from query builder
+            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+            countQueryBuilder.paginator.clear();
+            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder);
         }
+    }
+
+    /**
+     * Has write permissions ?
+     */
+    hasWritePermissions(id: string) {
+        // check permissions
+        switch (this.duplicatesList.peopleMap[id].type) {
+            case EntityType.CASE:
+                return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+            case EntityType.CONTACT:
+                return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+            case EntityType.EVENT:
+                return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+        }
+
+        // unreachable code
+        return false;
+    }
+
+    /**
+     * Check all checkboxes
+     * @param form
+     */
+    checkAllToggle(form: NgForm) {
+        // toggle value
+        const newValue: boolean = form.controls.checkAll.value;
+
+        // set children checkboxes values
+        _.each(form.controls, (checkbox: FormControl) => {
+            checkbox.setValue(newValue);
+        });
+    }
+
+    /**
+     * Check all checkboxes
+     * @param form
+     */
+    checkOneToggle(form: NgForm) {
+        // set children checkboxes values
+        let newValue: boolean = true;
+        _.each(form.controls, (checkbox: FormControl, name: string) => {
+            if (name !== 'checkAll') {
+                newValue = newValue && checkbox.value;
+            }
+        });
+
+        // set all checkbox value
+        form.controls.checkAll.setValue(newValue);
+    }
+
+    /**
+     * Determine if we have at least one checkbox checked
+     * @param form
+     */
+    hasAtLeastOneCheckboxChecked(form: NgForm): boolean {
+        // set children checkboxes values
+        let newValue: boolean = false;
+        _.each(form.controls, (checkbox: FormControl, name: string) => {
+            if (
+                name !== 'checkAll' &&
+                checkbox.value
+            ) {
+                newValue = true;
+                return false;
+            }
+        });
+
+        // finished
+        return newValue;
     }
 }

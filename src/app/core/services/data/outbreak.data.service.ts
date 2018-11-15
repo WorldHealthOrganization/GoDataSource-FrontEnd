@@ -335,14 +335,14 @@ export class OutbreakDataService {
      * GET outbreak case / contacts & events possible duplicates
      * @param outbreakId
      * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<PeoplePossibleDuplicateModel[]>}
+     * @returns {Observable<PeoplePossibleDuplicateModel>}
      */
     getPeoplePossibleDuplicates(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-    ): Observable<PeoplePossibleDuplicateModel[]> {
+    ): Observable<PeoplePossibleDuplicateModel> {
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
+        return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates?filter=${filter}`),
             PeoplePossibleDuplicateModel
         );

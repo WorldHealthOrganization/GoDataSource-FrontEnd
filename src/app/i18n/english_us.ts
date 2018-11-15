@@ -86,6 +86,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ADD': 'Add',
         'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
+        'LNG_COMMON_BUTTON_MERGE': 'Merge',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
         'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
@@ -305,6 +306,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
+        'LNG_ENTITY_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
 
         /**
          * Outbreak date inconsistencies list page
@@ -905,6 +907,9 @@ export const EnglishUsLang = {
          * Duplicate records list page
          */
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE': 'Duplicate records',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE': 'Not applicable',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE': 'None',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING': 'Missing',
 
         /**
          * Movement Contact page

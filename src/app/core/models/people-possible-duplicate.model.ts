@@ -34,8 +34,6 @@ export class PeoplePossibleDuplicateModel {
                 case EntityType.EVENT:
                     result[id] = new EventModel(value);
                     break;
-                default:
-                    console.log('WTF ?');
             }
         }, {});
         this.groups = _.map(_.get(data, 'groups'), (item) => {
