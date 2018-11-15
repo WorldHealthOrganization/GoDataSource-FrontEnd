@@ -14,6 +14,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as domtoimage from 'dom-to-image';
 
 @Component({
     selector: 'app-dashboard',
@@ -86,6 +87,7 @@ export class DashboardComponent implements OnInit {
     contactsFollowupSuccessRateReportUrl: string = '';
 
     @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
+    @ViewChild('kpiSection') private kpiSection: ElementRef;
 
     constructor(
         private authDataService: AuthDataService,
@@ -251,20 +253,41 @@ export class DashboardComponent implements OnInit {
             .subscribe((pngBase64) => {
                 this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
-                        const urlT = window.URL.createObjectURL(blob);
-                        const link = this.buttonDownloadFile.nativeElement;
-
-                        const fileName = this.i18nService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-
-                        link.href = urlT;
-                        link.download = `${fileName}.pdf`;
-                        link.click();
-
-                        window.URL.revokeObjectURL(urlT);
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
                 });
             });
     }
 
+    /**
+     * Generate KPIs report
+     */
+    generateKpisReport() {
+        domtoimage.toPng(this.kpiSection.nativeElement)
+            .then((dataUrl) => {
+                const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+
+                this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
+                    .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
+                    });
+            });
+    }
+
+    private downloadFile(blob, fileNameToken) {
+        const urlT = window.URL.createObjectURL(blob);
+        // window.open(urlT);
+        const link = this.buttonDownloadFile.nativeElement;
+
+        const fileName = this.i18nService.instant(fileNameToken);
+
+        link.href = urlT;
+        link.download = `${fileName}.pdf`;
+        link.click();
+
+        window.URL.revokeObjectURL(urlT);
+    }
 }
+
+
 
 
