@@ -15,7 +15,13 @@
 <mat-card class="page-section page-content">
 
     <div>
-
+        <app-form-input
+            name="lhelpSearchFilter"
+            [(ngModel)]="searchedTerm"
+            placeholder="Filter"
+            (optionChanged)="filterByTextFieldHelpSearch($event)"
+            [displayFilterIcon]="true">
+        </app-form-input>
     </div>
 
     <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">

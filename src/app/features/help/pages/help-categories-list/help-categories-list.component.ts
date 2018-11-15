@@ -124,7 +124,7 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
                     this.helpDataService
                         .deleteHelpCategory(category.id)
                         .catch((err) => {
-                            this.snackbarService.showApiError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })

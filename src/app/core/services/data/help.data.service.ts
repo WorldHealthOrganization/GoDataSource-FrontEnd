@@ -88,6 +88,21 @@ export class HelpDataService {
 
     /**
      * Get the list of help items
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<HelpItemModel[]>}
+     */
+    getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+        queryBuilder.include('category');
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`help-categories/search-help-items?filter=${filter}`)
+                .map((res) => _.get(res, 'items', [])),
+            HelpItemModel
+        );
+    }
+
+    /**
+     * Get the list of help items
      * @param {string} categoryId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<HelpItemModel[]>}

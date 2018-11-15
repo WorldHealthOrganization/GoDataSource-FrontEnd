@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -11,6 +12,8 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-help-search',
@@ -31,10 +34,11 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
 
+    searchedTerm: string = '';
+
     constructor(
         private helpDataService: HelpDataService,
         protected snackbarService: SnackbarService,
-        private dialogService: DialogService,
         protected listFilterDataService: ListFilterDataService,
         private route: ActivatedRoute
     ) {
@@ -52,7 +56,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
         this.needsRefreshList(true);
         // initialize Side Table Columns
         this.initializeSideTableColumns();
-
     }
 
     /**
@@ -82,14 +85,27 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of items
-        this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
+        if (_.isEmpty(this.searchedTerm)) {
+            this.queryBuilder.filter.where({approved: true}, true);
+            this.queryBuilder.filter.remove('$text');
+            this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
+        } else {
+            // remove the approved property as it is not working together with the text search. The items should be filtered in the API.
+            this.queryBuilder.filter.remove('approved');
+            this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder);
+        }
     }
 
-    /**
-     * Get total number of items, based on the applied filters
-     */
-    refreshListCount() {
 
+    /**
+     * Filter the list by a text field
+     * @param {string} value
+     * @param {RequestFilterOperator} operator
+     */
+    filterByTextFieldHelpSearch(value: string) {
+        this.queryBuilder.filter.where({$text: {search: value}}, true);
+        // refresh list
+        this.needsRefreshList();
     }
 
 }

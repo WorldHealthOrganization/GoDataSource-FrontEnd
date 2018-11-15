@@ -113,7 +113,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         this.helpDataService
             .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showApiError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })
