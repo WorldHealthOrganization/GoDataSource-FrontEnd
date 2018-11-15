@@ -5,6 +5,7 @@ import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class HelpDataService {
