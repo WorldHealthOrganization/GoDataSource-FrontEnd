@@ -5,7 +5,6 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
