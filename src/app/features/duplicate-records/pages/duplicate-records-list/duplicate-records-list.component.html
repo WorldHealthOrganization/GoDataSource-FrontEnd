@@ -171,7 +171,8 @@
                         <button
                             mat-raised-button color="primary" class="button-primary"
                             type="button"
-                            [disabled]="!hasAtLeastOneCheckboxChecked(tableForm)">
+                            [disabled]="!hasAtLeastTwoCheckboxChecked(tableForm)"
+                            (click)="mergeCheckedRecords(tableForm)">
                             {{'LNG_COMMON_BUTTON_MERGE' | translate}}
                         </button>
                     </div>

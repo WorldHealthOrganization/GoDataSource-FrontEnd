@@ -159,20 +159,50 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      * Determine if we have at least one checkbox checked
      * @param form
      */
-    hasAtLeastOneCheckboxChecked(form: NgForm): boolean {
+    hasAtLeastTwoCheckboxChecked(form: NgForm): boolean {
         // set children checkboxes values
-        let newValue: boolean = false;
+        let checkedItems: number = 0;
         _.each(form.controls, (checkbox: FormControl, name: string) => {
             if (
                 name !== 'checkAll' &&
                 checkbox.value
             ) {
-                newValue = true;
-                return false;
+                checkedItems++;
+                if (checkedItems > 1) {
+                    return false;
+                }
             }
         });
 
         // finished
-        return newValue;
+        return checkedItems === 2;
+    }
+
+    /**
+     * Merge records
+     * @param form
+     */
+    mergeCheckedRecords(form: NgForm) {
+        // determine merge ids
+        const mergeIds: string[] = [];
+        _.each(form.controls, (checkbox: FormControl, name: string) => {
+            if (
+                name !== 'checkAll' &&
+                checkbox.value
+            ) {
+                // determine id
+                const id: string = name.substring(
+                    name.indexOf('[') + 1,
+                    name.indexOf(']')
+                );
+
+                // add it to merge list
+                mergeIds.push(id);
+            }
+        });
+
+        // redirect to merge page
+        console.log(mergeIds);
+        // #TODO
     }
 }
