@@ -76,6 +76,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+        queryBuilder.include('category');
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-items?filter=${filter}`),
@@ -90,7 +91,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
     getHelpItemsCategoryList(categoryId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-
+        queryBuilder.include('user');
         const filter = queryBuilder.buildQuery();
 
         return this.modelHelper.mapObservableListToModel(
@@ -142,6 +143,17 @@ export class HelpDataService {
     deleteHelpItem(categoryId: string, itemId: string): Observable<any> {
         return this.http.delete(`help-categories/${categoryId}/help-items/${itemId}`);
     }
+
+    /**
+     * Approve help item
+     * @param {string} categoryId
+     * @param {string} itemId
+     * @returns {Observable<any>}
+     */
+    approveHelpItem(categoryId: string, itemId: string): Observable<any> {
+        return this.http.post(`help-categories/${categoryId}/help-items/${itemId}/approve`, {});
+    }
+
 
 }
 

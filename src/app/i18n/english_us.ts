@@ -75,6 +75,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_CLONE': 'Clone',
         'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD': 'Copy to clipboard',
+        'LNG_PAGE_ACTION_APPROVE': 'Approve',
 
         /**
          * Common buttons
@@ -160,6 +161,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
         'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
+        'LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM': 'Are you sure you want to approve this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
 
         /**
@@ -2080,6 +2082,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item deleted!',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
 
         /**
