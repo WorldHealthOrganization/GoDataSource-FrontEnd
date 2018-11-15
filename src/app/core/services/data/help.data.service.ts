@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestFilter, RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
-import { FollowUpModel } from '../../models/follow-up.model';
+import { HelpItemSearchModel } from '../../models/help-item-search.model';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
 export class HelpDataService {
@@ -13,8 +14,7 @@ export class HelpDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Help Categories
@@ -77,7 +77,6 @@ export class HelpDataService {
      */
     getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
         queryBuilder.include('category');
-        queryBuilder.filter.where({approved: true});
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`help-items?filter=${filter}`),
@@ -87,18 +86,30 @@ export class HelpDataService {
 
     /**
      * Get the list of help items
-     * @param {string} searchedText
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<HelpItemModel[]>}
      */
-    getHelpItemsListSearch(searchedText: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+    getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
         queryBuilder.include('category');
-        // queryBuilder.filter.where({approved: true});
-        queryBuilder.filter.where({$text: { search: searchedText } });
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
+        return Observable.create((observer: Subscriber<HelpItemModel[]>) => {
+            this.searchHelpItems(filter).subscribe((result) => {
+                observer.next(result.items);
+                observer.complete();
+            });
+        });
+    }
+
+    /**
+     * Search help items
+     * @param {RequestFilter} filter
+     * @returns {Observable<HelpItemSearchModel>}
+     */
+    searchHelpItems(filter: RequestFilter): Observable<HelpItemSearchModel> {
+
+        return this.modelHelper.mapObservableToModel(
             this.http.get(`help-categories/search-help-items?filter=${filter}`),
-            HelpItemModel
+            HelpItemSearchModel
         );
     }
 
