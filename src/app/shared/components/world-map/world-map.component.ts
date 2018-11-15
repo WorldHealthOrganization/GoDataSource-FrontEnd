@@ -191,21 +191,24 @@ export class WorldMapComponent implements OnInit {
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // set map layers
-                this.layers = _.map(
-                    _.filter(selectedOutbreak.arcGisServers, 'url'),
-                    (mapServer: MapServerModel) => {
-                        return new TileLayer({
-                            source: new TileArcGISRest({
-                                url: mapServer.url
-                            })
+                // no outbreak yet ?
+                if (selectedOutbreak) {
+                    // set map layers
+                    this.layers = _.map(
+                        _.filter(selectedOutbreak.arcGisServers, 'url'),
+                        (mapServer: MapServerModel) => {
+                            return new TileLayer({
+                                source: new TileArcGISRest({
+                                    url: mapServer.url
+                                })
+                            });
                         });
-                    });
 
-                // wait for binding to take effect => ngIf
-                setTimeout(() => {
-                    this.initializeMap();
-                });
+                    // wait for binding to take effect => ngIf
+                    setTimeout(() => {
+                        this.initializeMap();
+                    });
+                }
             });
     }
 

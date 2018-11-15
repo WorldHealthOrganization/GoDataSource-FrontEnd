@@ -37,6 +37,12 @@
                                 (click)="generateEpiCurveReport()">
                                 {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
                             </button>
+
+                            <button
+                                mat-menu-item
+                                (click)="generateKpisReport()">
+                                {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
+                            </button>
                         </ng-container>
                     </mat-menu>
                 </div>
@@ -114,262 +120,264 @@
         </mat-card>
 
         <!-- KPIs -->
-        <mat-card
-            *ngFor="let group of kpiGroups"
-            class="page-section">
+        <div #kpiSection>
+            <mat-card
+                *ngFor="let group of kpiGroups"
+                class="page-section">
 
-            <!-- KPIs section header -->
-            <div class="dashlet-kpi-header" fxLayout="row" fxLayoutAlign="space-between center">
-                <div>
-                    {{group.title | translate}}
-                </div>
+                <!-- KPIs section header -->
+                <div class="dashlet-kpi-header" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div>
+                        {{group.title | translate}}
+                    </div>
 
-                <div>
-                    <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">menu</span>
-                    </button>
-
-                    <mat-menu #actionsMenu="matMenu">
-                        <button class="dashboard-kpi-menu-item" mat-menu-item (click)="showAllDashlets(group.id)">
-                            {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
+                    <div>
+                        <button mat-icon-button [disableRipple]="true" [matMenuTriggerFor]="actionsMenu">
+                            <span class="xt-icon">menu</span>
                         </button>
-                    </mat-menu>
-                </div>
-            </div>
 
-            <!-- KPIs list -->
-            <div fxLayout="row wrap">
-                <ng-container *ngFor="let dashlet of group.dashlets">
-                    <!-- Cases who have died -->
-                    <app-cases-deceased-dashlet
-                        *ngIf="
+                        <mat-menu #actionsMenu="matMenu">
+                            <button class="dashboard-kpi-menu-item" mat-menu-item (click)="showAllDashlets(group.id)">
+                                {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+
+                <!-- KPIs list -->
+                <div fxLayout="row wrap">
+                    <ng-container *ngFor="let dashlet of group.dashlets">
+                        <!-- Cases who have died -->
+                        <app-cases-deceased-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CASES_DECEASED &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-deceased-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-deceased-dashlet>
 
-                    <!-- Cases hospitalised -->
-                    <app-cases-hospitalised-dashlet
-                        *ngIf="
+                        <!-- Cases hospitalised -->
+                        <app-cases-hospitalised-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CASES_HOSPITALISED &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-hospitalised-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-hospitalised-dashlet>
 
-                    <!-- Cases with Less than x Contacts -->
-                    <app-cases-less-contacts-dashlet
-                        *ngIf="
+                        <!-- Cases with Less than x Contacts -->
+                        <app-cases-less-contacts-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-less-contacts-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-less-contacts-dashlet>
 
-                    <!-- New cases detected in the previous x days among contacts -->
-                    <app-new-cases-previous-days-contacts-dashlet
-                        *ngIf="
+                        <!-- New cases detected in the previous x days among contacts -->
+                        <app-new-cases-previous-days-contacts-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-new-cases-previous-days-contacts-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-new-cases-previous-days-contacts-dashlet>
 
-                    <!-- Cases refusing to be transferred to a treatment unit -->
-                    <app-cases-refusing-treatment-dashlet
-                        *ngIf="
+                        <!-- Cases refusing to be transferred to a treatment unit -->
+                        <app-cases-refusing-treatment-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-refusing-treatment-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-refusing-treatment-dashlet>
 
-                    <!-- New cases in previous x days in known transmission chains -->
-                    <app-new-cases-previous-days-transmission-chains-dashlet
-                        *ngIf="
+                        <!-- New cases in previous x days in known transmission chains -->
+                        <app-new-cases-previous-days-transmission-chains-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-new-cases-previous-days-transmission-chains-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-new-cases-previous-days-transmission-chains-dashlet>
 
-                    <!-- Suspect Cases where the lab result is pending -->
-                    <app-cases-pending-lab-results-dashlet
-                        *ngIf="
+                        <!-- Suspect Cases where the lab result is pending -->
+                        <app-cases-pending-lab-results-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-pending-lab-results-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-pending-lab-results-dashlet>
 
-                    <!-- Contacts per case mean -->
-                    <app-contacts-per-case-mean-dashlet
-                        *ngIf="
+                        <!-- Number of cases who are not identified though known contact list -->
+                        <app-cases-not-identified-through-contacts-dashlet
+                            *ngIf="
+                            dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
+                            isDashletVisible(dashlet) &&
+                            hasReadCasePermissions() && hasReadReportPermissions()
+                        "
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-cases-not-identified-through-contacts-dashlet>
+
+                        <!-- Contacts per case mean -->
+                        <app-contacts-per-case-mean-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-per-case-mean-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-per-case-mean-dashlet>
 
-                    <!-- Contacts per case median -->
-                    <app-contacts-per-case-median-dashlet
-                        *ngIf="
+                        <!-- Contacts per case median -->
+                        <app-contacts-per-case-median-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-per-case-median-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-per-case-median-dashlet>
 
-                    <!-- Contacts on the follow-up list -->
-                    <app-contacts-on-followup-list-dashlet
-                        *ngIf="
+                        <!-- Contacts on the follow-up list -->
+                        <app-contacts-on-followup-list-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-on-followup-list-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-on-followup-list-dashlet>
 
-                    <!-- Contacts Lost to follow-up -->
-                    <app-contacts-lost-to-follow-up-dashlet
-                        *ngIf="
+                        <!-- Contacts Lost to follow-up -->
+                        <app-contacts-lost-to-follow-up-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-lost-to-follow-up-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-lost-to-follow-up-dashlet>
 
-                    <!-- Contacts Not Seen -->
-                    <app-contacts-not-seen-dashlet
-                        *ngIf="
+                        <!-- Contacts Not Seen -->
+                        <app-contacts-not-seen-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-not-seen-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-not-seen-dashlet>
 
-                    <!-- Number of contacts becoming cases in period & location -->
-                    <app-contacts-become-cases-dashlet
-                        *ngIf="
+                        <!-- Number of contacts becoming cases in period & location -->
+                        <app-contacts-become-cases-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-become-cases-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-become-cases-dashlet>
 
-                    <!-- Contacts seen each day -->
-                    <app-contacts-seen-each-day-dashlet
-                        *ngIf="
+                        <!-- Contacts seen each day -->
+                        <app-contacts-seen-each-day-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_SEEN_EACH_DAY &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-seen-each-day-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-seen-each-day-dashlet>
 
-                    <!-- Contacts with successful follow-ups -->
-                    <app-contacts-with-successful-follow-ups-dashlet
-                        *ngIf="
+                        <!-- Contacts with successful follow-ups -->
+                        <app-contacts-with-successful-follow-ups-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&
                             isDashletVisible(dashlet) &&
                             hasReadContactPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-contacts-with-successful-follow-ups-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-contacts-with-successful-follow-ups-dashlet>
 
-                    <!-- number of independent chains of transmission -->
-                    <app-independent-transmission-chains-dashlet
-                        *ngIf="
+                        <!-- number of independent chains of transmission -->
+                        <app-independent-transmission-chains-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&
                             isDashletVisible(dashlet) &&
                             hasReadCasePermissions() && hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-independent-transmission-chains-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-independent-transmission-chains-dashlet>
 
-                    <!-- Number of active chains of transmission -->
-                    <app-number-of-active-chains-of-transmission-dashlet
-                        *ngIf="
+                        <!-- Number of active chains of transmission -->
+                        <app-number-of-active-chains-of-transmission-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&
                             isDashletVisible(dashlet) &&
                             hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-number-of-active-chains-of-transmission-dashlet>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-number-of-active-chains-of-transmission-dashlet>
 
-                    <!-- Number of new chains of transmission from registered contacts who have became cases-->
-                    <app-new-chains-of-transmission-from-registered-contacts-dashlet
-                        *ngIf="
+                        <!-- Number of new chains of transmission from registered contacts who have became cases-->
+                        <app-new-chains-of-transmission-from-registered-contacts-dashlet
+                            *ngIf="
                             dashlet === DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES &&
                             isDashletVisible(dashlet) &&
                             hasReadReportPermissions()
                         "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-new-chains-of-transmission-from-registered-contacts-dashlet>
-
-                    <!-- Number of cases who are not identified though known contact list -->
-                    <app-cases-not-identified-through-contacts-dashlet
-                        *ngIf="
-                            dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadReportPermissions()
-                        "
-                        (hide)="hideDashlet(dashlet)"
-                        (moveBefore)="moveDashletBefore(dashlet)"
-                        (moveAfter)="moveDashletAfter(dashlet)">
-                    </app-cases-not-identified-through-contacts-dashlet>
-                </ng-container>
-            </div>
-        </mat-card>
+                            (hide)="hideDashlet(dashlet)"
+                            (moveBefore)="moveDashletBefore(dashlet)"
+                            (moveAfter)="moveDashletAfter(dashlet)">
+                        </app-new-chains-of-transmission-from-registered-contacts-dashlet>
+                    </ng-container>
+                </div>
+            </mat-card>
+        </div>
 
         <canvas id="tempCanvas"></canvas>
         <a hidden #buttonDownloadFile></a>

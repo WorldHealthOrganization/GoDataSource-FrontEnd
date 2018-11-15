@@ -99,6 +99,12 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/languages'
+                ),
+                new ChildNavItem(
+                    'help-admin',
+                    'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/help/categories'
                 )
             ]
         ),
