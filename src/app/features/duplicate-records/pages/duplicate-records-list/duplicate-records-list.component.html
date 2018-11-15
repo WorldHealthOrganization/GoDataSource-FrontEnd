@@ -50,7 +50,6 @@
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item;" fxFlex="60px">
                                     <app-form-checkbox
-                                        *ngIf="hasWritePermissions(item)"
                                         #listCheckedIndividual
                                         [name]="'recordCheck[' + item + ']'"
                                         class="table-checkbox"

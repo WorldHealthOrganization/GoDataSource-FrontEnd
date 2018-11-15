@@ -1,0 +1,139 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Router } from '@angular/router';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { NgForm } from '@angular/forms';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
+import { Observable } from 'rxjs/Observable';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { Moment } from 'moment';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import * as _ from 'lodash';
+
+@Component({
+    selector: 'app-case-merge-duplicate-records',
+    encapsulation: ViewEncapsulation.None,
+    templateUrl: './case-merge-duplicate-records.component.html',
+    styleUrls: ['./case-merge-duplicate-records.component.less']
+})
+export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
+    breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
+        new BreadcrumbItemModel('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
+    ];
+
+    caseData: CaseModel = new CaseModel();
+
+    genderList$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
+    caseRiskLevelsList$: Observable<any[]>;
+    occupationsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
+
+    selectedOutbreak: OutbreakModel = new OutbreakModel();
+
+    serverToday: Moment = null;
+
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    caseIdMaskValidator: Observable<boolean>;
+
+    constructor(
+        private router: Router,
+        private caseDataService: CaseDataService,
+        private outbreakDataService: OutbreakDataService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private snackbarService: SnackbarService,
+        private formHelper: FormHelperService,
+        private genericDataService: GenericDataService
+    ) {
+        super();
+    }
+
+    ngOnInit() {
+        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
+        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
+
+        // get today time
+        this.genericDataService
+            .getServerUTCToday()
+            .subscribe((curDate) => {
+                this.serverToday = curDate;
+            });
+
+        // by default, enforce Case having an address
+        this.caseData.addresses.push(new AddressModel());
+        // pre-set the initial address as "current address"
+        this.caseData.addresses[0].typeId = AddressType.CURRENT_ADDRESS;
+
+        // get selected outbreak
+        this.outbreakDataService
+            .getSelectedOutbreak()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                this.selectedOutbreak = selectedOutbreak;
+
+                // set visual ID translate data
+                this.visualIDTranslateData = {
+                    mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                };
+
+                // set visual ID validator
+                this.caseIdMaskValidator = Observable.create((observer) => {
+                    this.outbreakDataService.generateVisualIDCheckValidity(
+                        this.selectedOutbreak.id,
+                        this.caseData.visualId
+                    ).subscribe((isValid: boolean) => {
+                        observer.next(isValid);
+                        observer.complete();
+                    });
+                });
+            });
+    }
+
+    createNewCase(stepForms: NgForm[]) {
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        // add age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+            delete dirtyFields.ageDob;
+        }
+
+        // validate
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
+            // add the new Case
+            this.caseDataService
+                .createCase(this.selectedOutbreak.id, dirtyFields)
+                .catch((err) => {
+                    this.snackbarService.showApiError(err);
+
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+
+                    // navigate to listing page
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/cases']);
+                });
+        }
+    }
+}

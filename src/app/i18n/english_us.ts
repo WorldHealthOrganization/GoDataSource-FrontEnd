@@ -910,6 +910,23 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE': 'Not applicable',
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE': 'None',
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING': 'Missing',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE': 'What to create?',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS': 'You don\'t have writes to merge any of the selected types',
+
+        /**
+         * Case merge duplicate records page
+         */
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE': 'Case - merge duplicate records',
+
+        /**
+         * Contact merge duplicate records page
+         */
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact - merge duplicate records',
+
+        /**
+         * Event merge duplicate records page
+         */
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE': 'Event - merge duplicate records',
 
         /**
          * Movement Contact page

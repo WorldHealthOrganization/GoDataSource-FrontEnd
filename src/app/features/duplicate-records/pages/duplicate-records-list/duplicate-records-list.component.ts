@@ -13,6 +13,11 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { FormControl, NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+import { EntityModel } from '../../../../core/models/entity.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -53,9 +58,11 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     ];
 
     constructor(
+        private router: Router,
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService
     ) {
         super(
             snackbarService
@@ -104,24 +111,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             countQueryBuilder.paginator.clear();
             this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder);
         }
-    }
-
-    /**
-     * Has write permissions ?
-     */
-    hasWritePermissions(id: string) {
-        // check permissions
-        switch (this.duplicatesList.peopleMap[id].type) {
-            case EntityType.CASE:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
-            case EntityType.CONTACT:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
-            case EntityType.EVENT:
-                return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
-        }
-
-        // unreachable code
-        return false;
     }
 
     /**
@@ -201,8 +190,68 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             }
         });
 
-        // redirect to merge page
-        console.log(mergeIds);
-        // #TODO
+        // determine if we have multiple types that we want ot merge
+        const types: EntityType[] = _.chain(mergeIds)
+            .map((id: string) => this.duplicatesList.peopleMap[id])
+            .uniqBy('type')
+            .map('type')
+            .filter((type: EntityType) => {
+                // check permissions
+                switch (type) {
+                    case EntityType.CASE:
+                        return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
+                    case EntityType.CONTACT:
+                        return this.authUser.hasPermissions(PERMISSION.WRITE_CONTACT);
+                    case EntityType.EVENT:
+                        return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+                }
+            })
+            .value();
+
+        // check if we have write access to any of the present types
+        if (types.length < 1) {
+            this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
+            return;
+        }
+
+        // just one type..then redirect
+        if (types.length < 2) {
+            // redirect to merge page
+            this.router.navigate(
+                ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
+                    queryParams: {
+                        ids: JSON.stringify(mergeIds)
+                    }
+                }
+            );
+        } else {
+            // multiple types? we need to choose what we want to create
+            this.dialogService.showInput(
+                new DialogConfiguration({
+                    message: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE',
+                    yesLabel: 'LNG_COMMON_BUTTON_SELECT',
+                    fieldsList: [
+                        new DialogField({
+                            name: 'type',
+                            placeholder: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+                            required: true,
+                            inputOptions: _.map(types, (type: string) => new LabelValuePair(type, type)),
+                            inputOptionsMultiple: false
+                        }
+                    )],
+                }), true)
+                .subscribe((answer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // redirect to merge page
+                        this.router.navigate(
+                            ['/duplicated-records', EntityModel.getLinkForEntityType(answer.inputValue.value.type), 'merge'], {
+                                queryParams: {
+                                    ids: JSON.stringify(mergeIds)
+                                }
+                            }
+                        );
+                    }
+                });
+        }
     }
 }
