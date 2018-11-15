@@ -87,6 +87,23 @@ export class HelpDataService {
 
     /**
      * Get the list of help items
+     * @param {string} searchedText
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<HelpItemModel[]>}
+     */
+    getHelpItemsListSearch(searchedText: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
+        queryBuilder.include('category');
+        // queryBuilder.filter.where({approved: true});
+        queryBuilder.filter.where({$text: { search: searchedText } });
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`help-categories/search-help-items?filter=${filter}`),
+            HelpItemModel
+        );
+    }
+
+    /**
+     * Get the list of help items
      * @param {string} categoryId
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<HelpItemModel[]>}
