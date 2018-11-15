@@ -226,7 +226,7 @@ export class CaseDataService {
     getDelayBetweenOnsetAndLabTesting(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesDelayBetweenOnsetLabTestModel[]> {
         const filter = queryBuilder.buildQuery();
 
-        return this.modelHelper.mapObservableToModel(
+        return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-lab-testing?filter=${filter}`),
             MetricCasesDelayBetweenOnsetLabTestModel
         );

@@ -88,7 +88,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                     name: 'Delayaaa'
                 }]
         };
-        this.ganttChart = new SVGGantt('#svg-root', this.ganttData, options);
+
 
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -99,6 +99,9 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                         .getDelayBetweenOnsetAndLabTesting(selectedOutbreak.id)
                         .subscribe((results) => {
                             this.metricResults = results;
+                            this.formatData();
+                            console.log(this.ganttData);
+                            this.ganttChart = new SVGGantt('#svg-root', this.ganttData, options);
                             // format data
                         });
                 }
@@ -113,22 +116,19 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
         chartDataItem.name = 'aaaa';
         const children = [];
         _.forEach(this.metricResults, (result) => {
-            const chartDataItemChild:any = {};
-            chartDataItemChild.id = result.case.id;
-            chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
-            chartDataItemChild.from = result.dateOfOnset;
-            chartDataItemChild.from = result.dateOfFirstLabTest;
-
-            //id: 1,
-            //     name: 'group 1',
-            //     children: [{
-            //         id: 11,
-            //         name: 'task 11',
-            //         from: new Date('2015-09-01 00:00:00'),
-            //         to: new Date('2015-09-12 00:00:00'),
-            //         percent: 0.5
-            //     }]
+            if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest)) {
+                const chartDataItemChild:any = {};
+                chartDataItemChild.id = result.case.id;
+                chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
+                chartDataItemChild.from = result.dateOfOnset;
+                chartDataItemChild.to = result.dateOfFirstLabTest;
+                // chartDataItemChild.percent = result.dateOfFirstLabTest;
+                children.push(chartDataItemChild);
+            }
         });
+        chartDataItem.children = children;
+        chartData.push(chartDataItem);
+        this.ganttData = chartData;
     }
 
 
@@ -145,7 +145,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
             this.maxTickCulling = this.chartDataCategories.length / 3;
         }
         // re-render chart
-        this.retrieveData();
+       this.formatData();
     }
 
 }
