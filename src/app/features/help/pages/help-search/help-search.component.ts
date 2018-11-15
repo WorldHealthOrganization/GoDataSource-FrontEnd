@@ -1,22 +1,16 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
-import { PERMISSION } from '../../../../core/models/permission.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-help-search',
@@ -27,11 +21,8 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 export class HelpSearchComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help/categories', true)
+        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
     ];
-
-    // authenticated user
-    authUser: UserModel;
 
     helpItemsList$: Observable<HelpItemModel[]>;
 
@@ -42,21 +33,19 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
 
     constructor(
         private helpDataService: HelpDataService,
-        private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private route: ActivatedRoute,
-        private i18nService: I18nService
+        protected listFilterDataService: ListFilterDataService,
+        private route: ActivatedRoute
     ) {
         super(
-            snackbarService
+            snackbarService,
+            listFilterDataService,
+            route.queryParams
         );
     }
 
     ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
         this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
 
         // ...and re-load the list
@@ -101,76 +90,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
      */
     refreshListCount() {
 
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_HELP);
-    }
-
-    /**
-     * Check if we have write access to help
-     * @returns {boolean}
-     */
-    hasHelpApproveAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.APPROVE_HELP);
-    }
-
-    /**
-     * Delete specific item
-     * @param {HelpItemModel} item
-     */
-    deleteHelpItem(item: HelpItemModel) {
-        // show confirm dialog
-        const translatedData = {title: this.i18nService.instant(item.title)};
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM', translatedData)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.helpDataService
-                        .deleteHelpItem(item.categoryId, item.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
-    }
-
-    /**
-     * Approve specific item
-     * @param {HelpItemModel} item
-     */
-    approveHelpItem(item: HelpItemModel) {
-        // show confirm dialog
-        const translatedData = {title: this.i18nService.instant(item.title)};
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM', translatedData)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.helpDataService
-                        .approveHelpItem(item.categoryId, item.id)
-                        .catch((err) => {
-                            this.snackbarService.showApiError(err.message);
-
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE');
-
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
-                }
-            });
     }
 
 }

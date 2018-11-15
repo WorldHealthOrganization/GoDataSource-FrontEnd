@@ -14,6 +14,7 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs/Observable';
+import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -44,7 +45,8 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private cacheService: CacheService
     ) {
         super(route);
     }
@@ -117,7 +119,8 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
-
+                // remove help items from cache
+                this.cacheService.remove(CacheKey.HELP_ITEMS);
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 // update language tokens to get the translation of name and description
