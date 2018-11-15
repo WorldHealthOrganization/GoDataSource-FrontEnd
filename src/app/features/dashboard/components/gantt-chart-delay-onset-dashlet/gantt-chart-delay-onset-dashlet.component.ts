@@ -38,54 +38,26 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     ngOnInit() {
 
-        // const data = [{
-        //     id: 1,
-        //     name: 'group 1',
-        //     children: [{
-        //         id: 11,
-        //         name: 'task 11',
-        //         from: new Date('2015-09-01 00:00:00'),
-        //         to: new Date('2015-09-12 00:00:00'),
-        //         percent: 0.5
-        //     }]
-        // }];
-
         const options = {
             // View mode: day/week/month
-            viewMode: 'week',
-            onClick: (item) => {console.log(item)},
-            offsetY: 60,
-            rowHeight: 40,
-            barHeight: 16,
-            thickWidth: 1.4,
-            footerHeight: 50,
+            viewMode: 'month',
+            onClick: (item) => {},
             styleOptions: {
                 BG: '#fff',
-                groupBg: '#f5f5f5',
+                groupBg: '#fff',
                 lineColor: '#eee',
                 redLineColor: '#f04134',
                 baseBar: '#b8c2cc',
                 greenBar: '#52c41a',
-                groupBar: '#52c41a',
+                groupBar: '#fff',
                 redBar: '#ed7f2c',
                 textColor: '#222',
-                lightTextColor: '#999',
-                lineWidth: '1px',
-                thickLineWidth: '1.4px',
-                fontSize: '14px',
-                smallFontSize: '12px',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                lightTextColor: '#999'
             },
             legends:
                 [{
                     type: 'bar',
                     name: 'Remainingaaa'
-                }, {
-                    type: 'green',
-                    name: 'Completedaaaa'
-                }, {
-                    type: 'red',
-                    name: 'Delayaaa'
                 }]
         };
 
@@ -112,17 +84,16 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
     formatData() {
         const chartData = [];
         const chartDataItem:any = {};
-        chartDataItem.id = 'aaa';
-        chartDataItem.name = 'aaaa';
+        chartDataItem.id = '';
+        chartDataItem.name = '';
         const children = [];
         _.forEach(this.metricResults, (result) => {
-            if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest)) {
+            if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest) && result.delay > 0) {
                 const chartDataItemChild:any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
                 chartDataItemChild.to = new Date(Date.parse(result.dateOfFirstLabTest));
-                // chartDataItemChild.percent = result.dateOfFirstLabTest;
                 children.push(chartDataItemChild);
             }
         });
