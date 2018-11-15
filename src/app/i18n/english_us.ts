@@ -1550,6 +1550,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL': 'Cases by classification and location',
         'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL': 'Contacts follow up success rate',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
+        'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
 
         /**
