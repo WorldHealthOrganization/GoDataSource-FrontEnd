@@ -9,6 +9,7 @@ import { ListFilterDataService } from './list-filter.data.service';
 import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-count-stratified.model';
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
+import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
 
 @Injectable()
 export class CaseDataService {
@@ -219,6 +220,15 @@ export class CaseDataService {
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/per-location-level/count?filter=${filter}`),
             MetricCasesPerLocationCountsModel
+        );
+    }
+
+    getDelayBetweenOnsetAndLabTesting(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesDelayBetweenOnsetLabTestModel[]> {
+        const filter = queryBuilder.buildQuery();
+
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-lab-testing?filter=${filter}`),
+            MetricCasesDelayBetweenOnsetLabTestModel
         );
     }
 

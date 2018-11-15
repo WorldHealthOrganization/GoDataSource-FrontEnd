@@ -9,7 +9,8 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as Gantt from 'frappe-gantt';
+import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
+import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -20,125 +21,117 @@ import * as Gantt from 'frappe-gantt';
 export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
-    caseClassificationsList: ReferenceDataEntryModel[];
-    chartData: any = [];
-    chartDataObject: any = {};
-    metricData: MetricCasesCountStratified[];
     chartDataCategories: any = [];
-    chartDataColumns: any = [];
     viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
     Constants = Constants;
     maxTickCulling: number = 1;
-    mapCaseClassifications: any = {};
-    colorPattern: string[] = [];
 
-    @ViewChild('gantt') ganttEl: ElementRef;
-    tasks: any;
-    gantt: any;
+    metricResults: MetricCasesDelayBetweenOnsetLabTestModel[];
+    ganttData: any;
+    ganttChart: any;
 
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService
     ) {}
 
     ngOnInit() {
 
-        this.tasks = [
-            {
-                id: 'Task 1',
-                name: 'Redesign website',
-                start: '2016-12-28',
-                end: '2016-12-31',
-                progress: 20,
-                dependencies: 'Task 2, Task 3'
-            }];
+        // const data = [{
+        //     id: 1,
+        //     name: 'group 1',
+        //     children: [{
+        //         id: 11,
+        //         name: 'task 11',
+        //         from: new Date('2015-09-01 00:00:00'),
+        //         to: new Date('2015-09-12 00:00:00'),
+        //         percent: 0.5
+        //     }]
+        // }];
 
-
-        if (this.tasks.length) {
-            this.gantt = new Gantt.default(this.ganttEl.nativeElement, this.tasks, {});
-        }
+        const options = {
+            // View mode: day/week/month
+            viewMode: 'week',
+            onClick: (item) => {console.log(item)},
+            offsetY: 60,
+            rowHeight: 40,
+            barHeight: 16,
+            thickWidth: 1.4,
+            footerHeight: 50,
+            styleOptions: {
+                BG: '#fff',
+                groupBg: '#f5f5f5',
+                lineColor: '#eee',
+                redLineColor: '#f04134',
+                baseBar: '#b8c2cc',
+                greenBar: '#52c41a',
+                groupBar: '#52c41a',
+                redBar: '#ed7f2c',
+                textColor: '#222',
+                lightTextColor: '#999',
+                lineWidth: '1px',
+                thickLineWidth: '1.4px',
+                fontSize: '14px',
+                smallFontSize: '12px',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+            },
+            legends:
+                [{
+                    type: 'bar',
+                    name: 'Remainingaaa'
+                }, {
+                    type: 'green',
+                    name: 'Completedaaaa'
+                }, {
+                    type: 'red',
+                    name: 'Delayaaa'
+                }]
+        };
+        this.ganttChart = new SVGGantt('#svg-root', this.ganttData, options);
 
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
                     this.selectedOutbreak = selectedOutbreak;
-                    this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-                        .subscribe((caseClassification) => {
-                            this.mapCaseClassifications = {};
-                            this.caseClassificationsList = caseClassification.entries;
-                            // map classifications to translation and color
-                            _.forEach(this.caseClassificationsList, (caseClassificationItem, key) => {
-                                this.mapCaseClassifications[caseClassificationItem.value] = {};
-                                this.mapCaseClassifications[caseClassificationItem.value].valueTranslated = this.i18nService.instant(caseClassificationItem.value);
-                                this.mapCaseClassifications[caseClassificationItem.value].colorCode = caseClassificationItem.colorCode;
-                            });
-                            // get the data
-                            this.retrieveData();
+                    this.caseDataService
+                        .getDelayBetweenOnsetAndLabTesting(selectedOutbreak.id)
+                        .subscribe((results) => {
+                            this.metricResults = results;
+                            // format data
                         });
                 }
             });
 
     }
 
-    /**
-     * get the data from API
-     */
-    retrieveData() {
-        // empty objects
-        this.chartData = {};
-        this.chartDataCategories = [];
-        this.chartDataColumns = [];
-        this.colorPattern = [];
-        this.caseDataService
-            .getCasesStratifiedByClassificationOverTime(this.selectedOutbreak.id, this.viewType)
-            .subscribe((results) => {
-                this.metricData = results;
-                // convert data to chart data format
-                this.chartDataObject = this.setEpiCurveResults();
-                const chartDataTemp = [];
-                _.forEach(Object.keys(this.chartDataObject), (key) => {
-                    chartDataTemp.push(this.chartDataObject[key]);
-                });
-                this.chartData = chartDataTemp;
-            });
+    formatData() {
+        const chartData = [];
+        const chartDataItem:any = {};
+        chartDataItem.id = 'aaa';
+        chartDataItem.name = 'aaaa';
+        const children = [];
+        _.forEach(this.metricResults, (result) => {
+            const chartDataItemChild:any = {};
+            chartDataItemChild.id = result.case.id;
+            chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
+            chartDataItemChild.from = result.dateOfOnset;
+            chartDataItemChild.from = result.dateOfFirstLabTest;
+
+            //id: 1,
+            //     name: 'group 1',
+            //     children: [{
+            //         id: 11,
+            //         name: 'task 11',
+            //         from: new Date('2015-09-01 00:00:00'),
+            //         to: new Date('2015-09-12 00:00:00'),
+            //         percent: 0.5
+            //     }]
+        });
     }
 
-    /**
-     * set the data needed for the chart
-     */
-    setEpiCurveResults() {
-        const chartData = {};
-        this.colorPattern = [];
-        _.forEach(this.metricData, (metric, metricKey) => {
-            // create the array with categories ( dates displayed on x axis )
-            this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-            // create an array with data for each classification
-            _.forEach(Object.keys(metric.classification), (key) => {
-                if (key !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
-                    if (this.mapCaseClassifications[key]) {
-                        const translatedKey = this.mapCaseClassifications[key].valueTranslated;
-                        if (chartData[translatedKey]) {
-                            chartData[translatedKey].push(metric.classification[key]);
-                        } else {
-                            // the first element from the array needs to be the classification
-                            this.chartDataColumns.push(translatedKey);
-                            // also push the color corresponding the classification
-                            this.colorPattern.push(this.mapCaseClassifications[key].colorCode);
-                            chartData[translatedKey] = [];
-                            chartData[translatedKey].push(translatedKey);
-                            // push first value
-                            chartData[translatedKey].push(metric.classification[key]);
-                        }
-                    }
-                }
-            });
-        });
-        return chartData;
-    }
+
 
     /**
      * trigger change view: days, months, weeks
