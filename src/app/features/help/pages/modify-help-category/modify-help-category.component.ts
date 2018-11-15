@@ -79,7 +79,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showApiError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })

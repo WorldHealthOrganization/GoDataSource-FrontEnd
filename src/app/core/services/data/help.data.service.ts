@@ -2,11 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { RequestFilter, RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
-import { HelpItemSearchModel } from '../../models/help-item-search.model';
-import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
 export class HelpDataService {
@@ -92,24 +90,10 @@ export class HelpDataService {
     getHelpItemsListSearch(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
         queryBuilder.include('category');
         const filter = queryBuilder.buildQuery();
-        return Observable.create((observer: Subscriber<HelpItemModel[]>) => {
-            this.searchHelpItems(filter).subscribe((result) => {
-                observer.next(result.items);
-                observer.complete();
-            });
-        });
-    }
-
-    /**
-     * Search help items
-     * @param {RequestFilter} filter
-     * @returns {Observable<HelpItemSearchModel>}
-     */
-    searchHelpItems(filter: RequestFilter): Observable<HelpItemSearchModel> {
-
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`help-categories/search-help-items?filter=${filter}`),
-            HelpItemSearchModel
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`help-categories/search-help-items?filter=${filter}`)
+                .map((res) => _.get(res, 'items', [])),
+            HelpItemModel
         );
     }
 
