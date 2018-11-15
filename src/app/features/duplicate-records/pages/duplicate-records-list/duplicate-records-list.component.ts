@@ -6,6 +6,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -44,10 +45,10 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
 
-                // // initialize pagination
-                // this.initPaginator();
-                // // ...and re-load the list when the Selected Outbreak is changed
-                // this.needsRefreshList(true);
+                // initialize pagination
+                this.initPaginator();
+                // ...and re-load the list when the Selected Outbreak is changed
+                this.needsRefreshList(true);
             });
     }
 
@@ -57,7 +58,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list
-            // this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder);
+            // this.outbreakDataService.getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder);
         }
     }
 
@@ -66,10 +67,10 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      */
     refreshListCount() {
         if (this.selectedOutbreak) {
-            // remove paginator from query builder
+            // // remove paginator from query builder
             // const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             // countQueryBuilder.paginator.clear();
-            // this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
+            // this.contactsListCount$ = this.outbreakDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder);
         }
     }
 }

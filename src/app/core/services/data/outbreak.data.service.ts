@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
+import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 
 @Injectable()
 export class OutbreakDataService {
@@ -328,6 +329,37 @@ export class OutbreakDataService {
         ).map((visualID: string | VisualIdErrorModel) => {
             return _.isString(visualID);
         });
+    }
+
+    /**
+     * GET outbreak case / contacts & events possible duplicates
+     * @param outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<PeoplePossibleDuplicateModel[]>}
+     */
+    getPeoplePossibleDuplicates(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<PeoplePossibleDuplicateModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates?filter=${filter}`),
+            PeoplePossibleDuplicateModel
+        );
+    }
+
+    /**
+     * Return total number of case / contacts & events possible duplicates
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getPeoplePossibleDuplicatesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates/count?where=${whereFilter}`);
     }
 }
 
