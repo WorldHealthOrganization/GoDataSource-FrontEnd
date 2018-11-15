@@ -120,8 +120,8 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                 const chartDataItemChild:any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
-                chartDataItemChild.from = result.dateOfOnset;
-                chartDataItemChild.to = result.dateOfFirstLabTest;
+                chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
+                chartDataItemChild.to = new Date(Date.parse(result.dateOfFirstLabTest));
                 // chartDataItemChild.percent = result.dateOfFirstLabTest;
                 children.push(chartDataItemChild);
             }
