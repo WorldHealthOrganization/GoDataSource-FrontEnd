@@ -509,11 +509,11 @@ export class Constants {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL',
             value: 'day'
         },
-        WEEK: {
+        MONTH: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL',
             value: 'month'
         },
-        MONTH: {
+        WEEK: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL',
             value: 'week'
         }
