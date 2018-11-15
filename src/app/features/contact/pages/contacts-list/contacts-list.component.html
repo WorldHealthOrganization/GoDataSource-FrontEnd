@@ -43,11 +43,6 @@
 </app-side-columns>
 
 <app-counted-items-list
-    [items]="countedNewContactsGroupedByExposureType$ | async"
-    (optionChanged)="filterBySelectField('id', $event.ids, null)">
-</app-counted-items-list>
-
-<app-counted-items-list
     [items]="countedContactsByRiskLevel| async"
     (optionChanged)="filterBySelectField('id', $event.ids, null)">
 </app-counted-items-list>

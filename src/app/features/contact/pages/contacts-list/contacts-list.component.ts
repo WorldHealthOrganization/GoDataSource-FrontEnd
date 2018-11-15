@@ -37,6 +37,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import 'rxjs/add/operator/mergeMap';
+import { RiskLevelModel } from '../../../../core/models/risk-level.model';
+import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -186,42 +188,19 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
                 }
 
-                // get new contacts grouped by exposure types
-                if (this.selectedOutbreak) {
-                    this.countedNewContactsGroupedByExposureType$ = this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
-                        .mergeMap((refExposureTypeData: ReferenceDataCategoryModel) => {
-                            return this.contactDataService
-                                .getNewContactsGroupedByExposureType(this.selectedOutbreak.id)
-                                .map((data: ExposureTypeGroupModel) => {
-                                    return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refExposureTypeData.entries, { id: item.id });
-                                        return new CountedItemsListItem(
-                                            item.count,
-                                            item.id,
-                                            item.contactIDs,
-                                            refItem ?
-                                                refItem.getColorCode() :
-                                                Constants.DEFAULT_COLOR_REF_DATA
-                                        );
-                                    });
-                                });
-                        });
-                }
+                // get grouped contacts by risk level
                 if (this.selectedOutbreak) {
                     this.countedContactsByRiskLevel = this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
+                        .getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL)
                         .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
                             return this.contactDataService
                                 .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
-                                .map((data) => {
-                                    console.log(data);
-                                    return _.map(data ? data.riskLevel : [], (item) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: item.id });
-                                        console.log(item);
+                                .map((data: RiskLevelGroupModel) => {
+                                    return _.map(data ? data.riskLevel : [], (item: RiskLevelModel, itemId) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId });
                                         return new CountedItemsListItem(
                                             item.count,
-                                            item.id,
+                                            itemId,
                                             item.contactIDs,
                                             refItem ?
                                                 refItem.getColorCode() :

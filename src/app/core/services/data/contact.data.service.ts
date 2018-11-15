@@ -7,6 +7,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { ExposureTypeGroupModel } from '../../models/exposure-type-group';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 import { AddressModel } from '../../models/address.model';
+import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 
 @Injectable()
 export class ContactDataService {
@@ -118,21 +119,16 @@ export class ContactDataService {
     }
 
     /**
-     * Retrieve the list of new Contacts grouped by Exposure Type
+     * Retrieve the list of contacts grouped by the risk level
      * @param {string} outbreakId
-     * @returns {Observable<ExposureTypeGroupModel>}
+     * @returns {Observable<RiskLevelGroupModel>}
      */
-    getNewContactsGroupedByExposureType(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ExposureTypeGroupModel> {
+    getContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<RiskLevelGroupModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/contacts/new-by-exposure-type/count?filter=${filter}`),
-            ExposureTypeGroupModel
+            this.http.get(`outbreaks/${outbreakId}/contacts/per-risk-level/count?filter=${filter}`),
+            RiskLevelGroupModel
         );
-    }
-
-    getContactsGroupedByRiskLevel(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
-        const filter = queryBuilder.buildQuery();
-           return this.http.get(`outbreaks/${outbreakId}/contacts/per-risk-level/count?filter=${filter}`);
     }
 
     /**
