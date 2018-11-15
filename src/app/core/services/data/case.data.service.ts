@@ -223,6 +223,12 @@ export class CaseDataService {
         );
     }
 
+    /**
+     * get delay between date of onset and date of first lab testing - gantt chart
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<MetricCasesDelayBetweenOnsetLabTestModel[]>}
+     */
     getDelayBetweenOnsetAndLabTesting(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesDelayBetweenOnsetLabTestModel[]> {
         const filter = queryBuilder.buildQuery();
 
