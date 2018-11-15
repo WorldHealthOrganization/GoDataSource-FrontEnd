@@ -43,8 +43,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
     constructor(
         private caseDataService: CaseDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private outbreakDataService: OutbreakDataService,
-        private i18nService: I18nService
+        private outbreakDataService: OutbreakDataService
     ) {}
 
     ngOnInit() {
