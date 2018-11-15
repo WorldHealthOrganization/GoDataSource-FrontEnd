@@ -96,13 +96,13 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
      */
     formatData() {
         const chartData = [];
-        const chartDataItem:any = {};
+        const chartDataItem: any = {};
         chartDataItem.id = '';
         chartDataItem.name = '';
         const children = [];
         _.forEach(this.metricResults, (result) => {
             if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest) && result.delay > 0) {
-                const chartDataItemChild:any = {};
+                const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;
                 chartDataItemChild.from = new Date(Date.parse(result.dateOfOnset));
