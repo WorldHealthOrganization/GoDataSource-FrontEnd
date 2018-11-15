@@ -60,7 +60,7 @@ export class ImportDataComponent implements OnInit {
         [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
         [ImportDataExtension.JSON]: 'application/json',
-        [ImportDataExtension.ZIP]: 'application/zip'
+        [ImportDataExtension.ZIP]: 'application/x-zip-compressed'
     };
 
     /**
@@ -273,6 +273,11 @@ export class ImportDataComponent implements OnInit {
     decryptPassword: string;
 
     /**
+     * Decrypt password alias
+     */
+    @Input() decryptPasswordAlias: string = 'decryptPassword';
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -372,9 +377,9 @@ export class ImportDataComponent implements OnInit {
         // handle before upload preparation
         this.uploader.onBeforeUploadItem = () => {
             if (this.decryptPassword) {
-                this.uploader.options.additionalParameter.decryptPassword = this.decryptPassword;
+                this.uploader.options.additionalParameter[this.decryptPasswordAlias] = this.decryptPassword;
             } else {
-                delete this.uploader.options.additionalParameter.decryptPassword;
+                delete this.uploader.options.additionalParameter[this.decryptPasswordAlias];
             }
         };
 
