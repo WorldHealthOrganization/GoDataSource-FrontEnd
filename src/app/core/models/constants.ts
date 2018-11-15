@@ -511,11 +511,11 @@ export class Constants {
         },
         WEEK: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL',
-            value: 'week'
+            value: 'month'
         },
         MONTH: {
             label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL',
-            value: 'month'
+            value: 'week'
         }
     };
 
