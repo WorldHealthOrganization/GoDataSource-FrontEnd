@@ -912,6 +912,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING': 'Missing',
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE': 'What to create?',
         'LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS': 'You don\'t have writes to merge any of the selected types',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_MERGE_EVENT_WITH_OTHER': 'Something went wrong, you shouldn\'t be able to merge an event with a case / contact',
 
         /**
          * Case merge duplicate records page

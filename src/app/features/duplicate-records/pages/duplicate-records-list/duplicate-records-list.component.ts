@@ -208,6 +208,15 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             })
             .value();
 
+        // we shouldn't be able to merge an event with something else
+        if (
+            types.length > 1 &&
+            _.indexOf(types, EntityType.EVENT) > -1
+        ) {
+            this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_MERGE_EVENT_WITH_OTHER');
+            return;
+        }
+
         // check if we have write access to any of the present types
         if (types.length < 1) {
             this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
