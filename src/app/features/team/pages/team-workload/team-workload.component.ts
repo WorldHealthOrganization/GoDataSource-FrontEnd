@@ -149,7 +149,8 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
      * @returns {string}
      */
     getTotalFollowupsCount(teamId: string, date: string, d: number) {
-        let result = '0:0';
+        const of = this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL');
+        let result = `0 ${of} 0`;
         // first column - show team name
         if (d === 0) {
             if (this.teamsMap[teamId]) {
@@ -160,7 +161,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
                 if (this.teamsMap[teamId].dates[date]) {
                     const total = this.teamsMap[teamId].dates[date].totalFollowupsCount;
                     const successful = this.teamsMap[teamId].dates[date].successfulFollowupsCount;
-                    result = successful + ':' + total;
+                    result = `${successful} ${of} ${total}`;
                 }
             }
         }
