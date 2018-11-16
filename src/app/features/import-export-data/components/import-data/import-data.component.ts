@@ -324,9 +324,7 @@ export class ImportDataComponent implements OnInit {
             allowedMimeType: this.allowedMimeTypes,
             authToken: this.authDataService.getAuthToken(),
             url: `${environment.apiUrl}/${this.importFileUrl}`,
-            additionalParameter: {
-                model: this._model
-            },
+            additionalParameter: {},
             itemAlias: this.fileUploadAlias
         });
 
@@ -376,6 +374,12 @@ export class ImportDataComponent implements OnInit {
 
         // handle before upload preparation
         this.uploader.onBeforeUploadItem = () => {
+            // add model only if necessary
+            if (this._model) {
+                this.uploader.options.additionalParameter.model = this._model;
+            }
+
+            // decrypt password
             if (this.decryptPassword) {
                 this.uploader.options.additionalParameter[this.decryptPasswordAlias] = this.decryptPassword;
             } else {
