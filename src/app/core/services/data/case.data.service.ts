@@ -108,6 +108,11 @@ export class CaseDataService {
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
+    getCasesGroupedByClassification(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/per-classification/count?filter=${filter}`);
+    }
+
     /**
      * Return count of deceased cases
      * @param {string} outbreakId

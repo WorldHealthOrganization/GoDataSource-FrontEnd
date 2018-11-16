@@ -370,6 +370,9 @@ export abstract class ListComponent {
      * @param {string} valueKey
      */
     filterBySelectField(property: string, values: any | any[], valueKey: string = 'value') {
+        console.log(property);
+        console.log(values);
+        console.log(valueKey);
         this.queryBuilder.filter.bySelect(property, values, true, valueKey);
 
         // refresh list

@@ -15,7 +15,10 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import {
+    ReferenceDataCategory, ReferenceDataCategoryModel,
+    ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -29,6 +32,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -49,6 +53,8 @@ export class CasesListComponent extends ListComponent implements OnInit {
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<any>;
+    // cases grouped by classification
+    countedCasesGroupedByClassification$: Observable<any>;
 
     caseClassificationsList$: Observable<any[]>;
     genderList$: Observable<any[]>;
@@ -161,6 +167,27 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
+                    this.countedCasesGroupedByClassification$ = this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+                        .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
+                            return this.caseDataService
+                                .getCasesGroupedByClassification(this.selectedOutbreak.id)
+                                .map((data) => {
+                                console.log(data);
+                                    return _.map(data ? data.classification : [], (item, itemId) => {
+                                        console.log(item);
+                                        const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            itemId,
+                                            item.contactIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        )
+                                    });
+                                });
+                        });
                     // initialize side filters
                     this.initializeSideFilters();
                 }
