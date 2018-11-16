@@ -729,7 +729,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_TEAMS_WORKLOAD_TITLE': 'Teams Workload',
         'LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL': 'Team',
-        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': 'of',
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': '{{done}} of {{total}}',
 
         /**
          * User fields
