@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -54,8 +54,6 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
     // used to determine when a backup has finished so we can start the restore process...
     waitForBackupIdToBeReady: string;
     loading: boolean = false;
-
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     mappedOutbreaks: LabelValuePair[];
     mappedCollections: LabelValuePair[];
@@ -464,7 +462,6 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 fileName: this.i18nService.instant('LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE') +
                     ' - ' +
                     moment().format('YYYY-MM-DD'),
-                buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP,
                 exportStart: () => {
                     this.loading = true;

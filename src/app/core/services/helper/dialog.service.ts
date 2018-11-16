@@ -1,4 +1,4 @@
-import { ElementRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import {
     DialogAnswer, DialogAnswerButton,
@@ -12,6 +12,7 @@ import { ImportExportDataService } from '../data/import-export.data.service';
 import { SnackbarService } from './snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import * as FileSaver from 'file-saver';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -125,7 +126,6 @@ export class DialogService {
         message: string,
         url: string,
         fileName: string,
-        buttonDownloadFile: ElementRef,
 
         // optional
         exportStart?: () => void,
@@ -305,14 +305,10 @@ export class DialogService {
 
                         return ErrorObservable.create(err);
                     }).subscribe((blob) => {
-                        const urlT = window.URL.createObjectURL(blob);
-
-                        const link = data.buttonDownloadFile.nativeElement;
-                        link.href = urlT;
-                        link.download = `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`;
-                        link.click();
-
-                        window.URL.revokeObjectURL(urlT);
+                        FileSaver.saveAs(
+                            blob,
+                            `${data.fileName}.${data.fileExtension ? data.fileExtension : answer.inputValue.value[data.allowedExportTypesKey]}`
+                        );
 
                         // call dialog closed
                         if (data.exportFinished) {

@@ -57,7 +57,7 @@ export class ImportExportDataService {
 
         // add other custom fields caused by API inconsistencies...
         _.each(data, (value: any, key: string) => {
-            completeURL += `&${key}=` + JSON.stringify(value);
+            completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
         });
 
         // filter ?

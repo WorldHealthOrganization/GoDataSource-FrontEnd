@@ -77,7 +77,6 @@
         </div>
     </div>
 
-    <a hidden #buttonDownloadFile></a>
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
