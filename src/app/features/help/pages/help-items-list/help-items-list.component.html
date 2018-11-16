@@ -67,7 +67,7 @@
         </ng-container>
 
         <!-- Approved By -->
-        <ng-container matColumnDef="approved_by">
+        <ng-container matColumnDef="approvedBy">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY' | translate }}</div>
@@ -76,12 +76,13 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.approved_by }}
+                {{ item.user ? item.user.firstName + ' ' + item.user.lastName : '' }}
+
             </mat-cell>
         </ng-container>
 
         <!-- Approved Date -->
-        <ng-container matColumnDef="approved_date">
+        <ng-container matColumnDef="approvedDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">{{ 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE' | translate }}</div>
@@ -90,7 +91,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.approved_date | dateDefault }}
+                {{ item.approvedDate | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -105,10 +106,16 @@
 
                     <mat-menu #actionsMenu="matMenu">
 
-                        <button mat-menu-item [routerLink]="['/help/categories', item.categoryId, 'items', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        <button
+                            *ngIf="hasHelpApproveAccess() && !item.approved"
+                            mat-menu-item
+                            (click)="approveHelpItem(item)">
+                            {{'LNG_PAGE_ACTION_APPROVE' | translate}}
                         </button>
 
+                        <button mat-menu-item [routerLink]="['.', item.categoryId, item.id, 'view']">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
 
                         <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
                                 [routerLink]="['/help/categories', item.categoryId, 'items', item.id, 'modify']">
