@@ -31,7 +31,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
     styleUrls: ['./contact-merge-duplicate-records.component.less']
 })
 export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
         new BreadcrumbItemModel('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
@@ -39,19 +38,6 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
 
     // selected outbreak ID
     outbreakId: string;
-
-    contactData: ContactModel = new ContactModel();
-
-    entityType: EntityType;
-    entityId: string;
-
-    genderList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-
-    relatedEntityData: CaseModel|EventModel;
-    relationship: RelationshipModel = new RelationshipModel();
-
-    serverToday: Moment = null;
 
     constructor(
         private router: Router,
@@ -69,92 +55,76 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     }
 
     ngOnInit() {
-        // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-
-        // by default, enforce Contact having an address
-        this.contactData.addresses.push(new AddressModel());
-        // pre-set the initial address as "current address"
-        this.contactData.addresses[0].typeId = AddressType.CURRENT_ADDRESS;
-
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
-
-        // retrieve query params
-        this.route.queryParams
-            .subscribe((params: {entityType, entityId}) => {
-                this.entityType = _.get(params, 'entityType');
-                this.entityId = _.get(params, 'entityId');
-
-                // check if we have proper values ( case or event ID )
-                if (
-                    !this.entityType ||
-                    !this.entityId
-                ) {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
-
-                    // navigate to Cases/Events listing page
-                    this.disableDirtyConfirm();
-                    if (this.entityType === EntityType.EVENT) {
-                        this.router.navigate(['/events']);
-                    } else {
-                        this.router.navigate(['/cases']);
-                    }
-
-                    return;
-                }
-
-                // update breadcrumbs
-                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true));
-
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .catch((err) => {
-                        // show error message
-                        this.snackbarService.showError(err.message);
-
-                        // redirect to cases
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/cases']);
-                        return ErrorObservable.create(err);
-                    })
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.outbreakId = selectedOutbreak.id;
-
-                        // retrieve Case/Event information
-                        this.entityDataService
-                            .getEntity(this.entityType, selectedOutbreak.id, this.entityId)
-                            .catch((err) => {
-                                // show error message
-                                this.snackbarService.showError(err.message);
-
-                                // navigate to Cases/Events listing page
-                                this.disableDirtyConfirm();
-                                if (this.entityType === EntityType.EVENT) {
-                                    this.router.navigate(['/events']);
-                                } else {
-                                    this.router.navigate(['/cases']);
-                                }
-
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((relatedEntityData: CaseModel|EventModel) => {
-                                // initialize Case/Event
-                                this.relatedEntityData = relatedEntityData;
-                                this.relationship.persons.push(
-                                    new RelationshipPersonModel({
-                                        id: this.entityId
-                                    })
-                                );
-                            });
-                    });
-            });
+        // // retrieve query params
+        // this.route.queryParams
+        //     .subscribe((params: {entityType, entityId}) => {
+        //         this.entityType = _.get(params, 'entityType');
+        //         this.entityId = _.get(params, 'entityId');
+        //
+        //         // check if we have proper values ( case or event ID )
+        //         if (
+        //             !this.entityType ||
+        //             !this.entityId
+        //         ) {
+        //             this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_WARNING_CASE_OR_EVENT_REQUIRED');
+        //
+        //             // navigate to Cases/Events listing page
+        //             this.disableDirtyConfirm();
+        //             if (this.entityType === EntityType.EVENT) {
+        //                 this.router.navigate(['/events']);
+        //             } else {
+        //                 this.router.navigate(['/cases']);
+        //             }
+        //
+        //             return;
+        //         }
+        //
+        //         // update breadcrumbs
+        //         this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true));
+        //
+        //         // get selected outbreak
+        //         this.outbreakDataService
+        //             .getSelectedOutbreak()
+        //             .catch((err) => {
+        //                 // show error message
+        //                 this.snackbarService.showError(err.message);
+        //
+        //                 // redirect to cases
+        //                 this.disableDirtyConfirm();
+        //                 this.router.navigate(['/cases']);
+        //                 return ErrorObservable.create(err);
+        //             })
+        //             .subscribe((selectedOutbreak: OutbreakModel) => {
+        //                 this.outbreakId = selectedOutbreak.id;
+        //
+        //                 // retrieve Case/Event information
+        //                 this.entityDataService
+        //                     .getEntity(this.entityType, selectedOutbreak.id, this.entityId)
+        //                     .catch((err) => {
+        //                         // show error message
+        //                         this.snackbarService.showError(err.message);
+        //
+        //                         // navigate to Cases/Events listing page
+        //                         this.disableDirtyConfirm();
+        //                         if (this.entityType === EntityType.EVENT) {
+        //                             this.router.navigate(['/events']);
+        //                         } else {
+        //                             this.router.navigate(['/cases']);
+        //                         }
+        //
+        //                         return ErrorObservable.create(err);
+        //                     })
+        //                     .subscribe((relatedEntityData: CaseModel|EventModel) => {
+        //                         // initialize Case/Event
+        //                         this.relatedEntityData = relatedEntityData;
+        //                         this.relationship.persons.push(
+        //                             new RelationshipPersonModel({
+        //                                 id: this.entityId
+        //                             })
+        //                         );
+        //                     });
+        //             });
+        //     });
     }
 
     /**
