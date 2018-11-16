@@ -15,6 +15,7 @@ import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-dashboard',
@@ -86,7 +87,6 @@ export class DashboardComponent implements OnInit {
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
     constructor(
@@ -274,20 +274,10 @@ export class DashboardComponent implements OnInit {
     }
 
     private downloadFile(blob, fileNameToken) {
-        const urlT = window.URL.createObjectURL(blob);
-        // window.open(urlT);
-        const link = this.buttonDownloadFile.nativeElement;
-
         const fileName = this.i18nService.instant(fileNameToken);
-
-        link.href = urlT;
-        link.download = `${fileName}.pdf`;
-        link.click();
-
-        window.URL.revokeObjectURL(urlT);
+        FileSaver.saveAs(
+            blob,
+            `${fileName}.pdf`
+        );
     }
 }
-
-
-
-

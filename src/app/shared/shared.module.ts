@@ -14,6 +14,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MglTimelineModule } from 'angular-mgl-timeline';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FileUploadModule } from 'ng2-file-upload';
+import { NgxWigModule } from 'ngx-wig';
 
 @NgModule({
     imports: [
@@ -27,7 +28,8 @@ import { FileUploadModule } from 'ng2-file-upload';
         TranslateModule,
         MglTimelineModule,
         NgxChartsModule,
-        FileUploadModule
+        FileUploadModule,
+        NgxWigModule
     ],
     declarations: [
         ...fromSharedComponents.components,
@@ -46,6 +48,7 @@ import { FileUploadModule } from 'ng2-file-upload';
         AngularMaterialModule,
         MglTimelineModule,
         NgxChartsModule,
+        NgxWigModule,
         ...fromSharedDirectives.directives,
         ...fromSharedPipes.pipes,
         ...fromSharedComponents.components

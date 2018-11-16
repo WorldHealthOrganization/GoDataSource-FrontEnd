@@ -21,7 +21,8 @@ export enum ImportDataExtension {
     XLSX = '.xlsx',
     XML = '.xml',
     ODS = '.ods',
-    JSON = '.json'
+    JSON = '.json',
+    ZIP = '.zip'
 }
 
 export enum ImportServerModelNames {
@@ -58,7 +59,8 @@ export class ImportDataComponent implements OnInit {
         [ImportDataExtension.XLSX]: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         [ImportDataExtension.XML]: 'text/xml',
         [ImportDataExtension.ODS]: 'application/vnd.oasis.opendocument.spreadsheet',
-        [ImportDataExtension.JSON]: 'application/json'
+        [ImportDataExtension.JSON]: 'application/json',
+        [ImportDataExtension.ZIP]: 'application/x-zip-compressed'
     };
 
     /**
@@ -271,6 +273,11 @@ export class ImportDataComponent implements OnInit {
     decryptPassword: string;
 
     /**
+     * Decrypt password alias
+     */
+    @Input() decryptPasswordAlias: string = 'decryptPassword';
+
+    /**
      * Constructor
      * @param snackbarService
      * @param authDataService
@@ -317,9 +324,7 @@ export class ImportDataComponent implements OnInit {
             allowedMimeType: this.allowedMimeTypes,
             authToken: this.authDataService.getAuthToken(),
             url: `${environment.apiUrl}/${this.importFileUrl}`,
-            additionalParameter: {
-                model: this._model
-            },
+            additionalParameter: {},
             itemAlias: this.fileUploadAlias
         });
 
@@ -369,10 +374,16 @@ export class ImportDataComponent implements OnInit {
 
         // handle before upload preparation
         this.uploader.onBeforeUploadItem = () => {
+            // add model only if necessary
+            if (this._model) {
+                this.uploader.options.additionalParameter.model = this._model;
+            }
+
+            // decrypt password
             if (this.decryptPassword) {
-                this.uploader.options.additionalParameter.decryptPassword = this.decryptPassword;
+                this.uploader.options.additionalParameter[this.decryptPasswordAlias] = this.decryptPassword;
             } else {
-                delete this.uploader.options.additionalParameter.decryptPassword;
+                delete this.uploader.options.additionalParameter[this.decryptPasswordAlias];
             }
         };
 

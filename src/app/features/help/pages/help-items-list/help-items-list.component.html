@@ -1,0 +1,141 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+                <ng-container>
+                    <button *ngIf="hasHelpWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                            [routerLink]="['/help/categories', categoryId, 'items', 'create']">
+                        {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side columns -->
+<app-side-columns
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
+<mat-card class="page-section page-content">
+
+    <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
+
+        <!-- Title -->
+        <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_TITLE' | translate}}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.title | translate }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Comment -->
+        <ng-container matColumnDef="comment">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_COMMENT' | translate}}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item">
+                {{ item.comment }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Approved -->
+        <ng-container matColumnDef="approved">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED' | translate }}</div>
+                    <div class="column-filter"></div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-yes-no-label [value]="item.approved"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Approved By -->
+        <ng-container matColumnDef="approvedBy">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY' | translate }}</div>
+                    <div class="column-filter">
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.user ? item.user.firstName + ' ' + item.user.lastName : '' }}
+
+            </mat-cell>
+        </ng-container>
+
+        <!-- Approved Date -->
+        <ng-container matColumnDef="approvedDate">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE' | translate }}</div>
+                    <div class="column-filter">
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.approvedDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Inline Actions -->
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+            <mat-cell *matCellDef="let item" fxFlex="70px">
+                <div>
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                        <span class="xt-icon">moreVertical</span>
+                    </button>
+
+                    <mat-menu #actionsMenu="matMenu">
+
+                        <button
+                            *ngIf="hasHelpApproveAccess() && !item.approved"
+                            mat-menu-item
+                            (click)="approveHelpItem(item)">
+                            {{'LNG_PAGE_ACTION_APPROVE' | translate}}
+                        </button>
+
+                        <button mat-menu-item [routerLink]="['/help/categories/', item.categoryId, 'items', item.id, 'view']">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
+
+                        <button *ngIf="hasHelpWriteAccess() && !item.deleted" mat-menu-item
+                                [routerLink]="['/help/categories', item.categoryId, 'items', item.id, 'modify']">
+                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        </button>
+
+                        <button
+                            *ngIf="hasHelpWriteAccess() && !item.deleted"
+                            mat-menu-item class="mat-menu-item-delete"
+                            (click)="deleteHelpItem(item)">
+                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                        </button>
+
+                    </mat-menu>
+                </div>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+        <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
+    </mat-table>
+
+</mat-card>

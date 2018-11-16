@@ -41,7 +41,7 @@ export class QuestionModel {
     variable: string;
     category: string;
     required: boolean;
-    order: number;
+    order: number = 1;
     answerType: string;
     answers: AnswerModel[];
 

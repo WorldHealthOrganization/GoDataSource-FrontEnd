@@ -42,6 +42,7 @@ import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-g
 import { LanguageResolver } from './resolvers/language.resolver';
 import { BulkAddContactsService } from './helper/bulk-add-contacts.service';
 import { AuditLogDataService } from './data/audit-log.data.service';
+import { HelpDataService } from './data/help.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -78,6 +79,7 @@ export const services: any[] = [
     AttachmentDataService,
     TeamDataService,
     AuditLogDataService,
+    HelpDataService,
 
     // guard services
     AuthGuard,

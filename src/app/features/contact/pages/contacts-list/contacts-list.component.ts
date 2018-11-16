@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -89,7 +89,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -576,7 +575,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
             url: this.exportContactsUrl,
             fileName: this.contactsDataExportFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
 
             // // optional
             allowedExportTypes: this.allowedExportTypes,
@@ -610,7 +608,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                 fileName: this.contactsDataExportFileName,
-                buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
                 anonymizeFields: anonymizeFields,

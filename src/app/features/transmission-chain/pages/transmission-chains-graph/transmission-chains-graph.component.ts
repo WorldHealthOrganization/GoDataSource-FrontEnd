@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -27,8 +27,8 @@ import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import 'rxjs/add/operator/switchMap';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -43,8 +43,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
     ];
 
     @ViewChild(TransmissionChainsDashletComponent) cotDashletChild;
-    // used for export
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     // authenticated user
     authUser: UserModel;
@@ -139,13 +137,11 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     // call the api for the pdf
                     this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
                         .subscribe((blob) => {
-                            const urlT = window.URL.createObjectURL(blob);
-                            const link = this.buttonDownloadFile.nativeElement;
                             const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
-                            link.href = urlT;
-                            link.download = `${fileName}.pdf`;
-                            link.click();
-                            window.URL.revokeObjectURL(urlT);
+                            FileSaver.saveAs(
+                                blob,
+                                `${fileName}.pdf`
+                            );
                         });
                 }
             });

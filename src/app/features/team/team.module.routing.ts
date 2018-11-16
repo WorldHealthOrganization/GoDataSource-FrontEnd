@@ -35,7 +35,7 @@ const routes: Routes = [
             action: ViewModifyComponentAction.VIEW
         }
     },
-    // Edit Outbreak
+    // Edit team
     {
         path: ':teamId/modify',
         component: fromPages.ModifyTeamComponent,
@@ -47,7 +47,16 @@ const routes: Routes = [
         canDeactivate: [
             PageChangeConfirmationGuard
         ]
-    }
+    },
+    // View workload
+    {
+        path: 'workload',
+        component: fromPages.TeamWorkloadComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_TEAM]
+        }
+    },
 
 ];
 

@@ -42,7 +42,11 @@ export enum PERMISSION {
 
     // followups
     READ_FOLLOWUP = 'read_followup',
-    WRITE_FOLLOWUP = 'write_followup'
+    WRITE_FOLLOWUP = 'write_followup',
+
+    // help
+    WRITE_HELP = 'write_help',
+    APPROVE_HELP = 'approve_help'
 }
 
 export class PermissionModel {

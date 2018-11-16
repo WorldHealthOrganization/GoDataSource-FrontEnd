@@ -14,6 +14,22 @@
                     [routerLink]="['/teams', 'create']">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
+
+                <button
+                    class="button-primary"
+                    mat-raised-button
+                    color="primary"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/teams', 'workload']">
+                        {{'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD' | translate}}
+                    </button>
+                </mat-menu>
             </ng-container>
         </div>
     </ng-container>

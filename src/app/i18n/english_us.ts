@@ -16,6 +16,8 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
+        'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
+        'LNG_LAYOUT_MENU_ITEM_HELP': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -74,6 +76,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_ACTION_MODIFY': 'Modify',
         'LNG_PAGE_ACTION_CLONE': 'Clone',
         'LNG_PAGE_ACTION_COPY_TO_CLIPBOARD': 'Copy to clipboard',
+        'LNG_PAGE_ACTION_APPROVE': 'Approve',
 
         /**
          * Common buttons
@@ -157,6 +160,9 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'This user is already assigned to the following teams: {{teamNames}}. Are you sure you want to add it to this team as well ?',
         'LNG_DIALOG_CONFIRM_SAVE_SAME_LOCATIONS_TEAM': 'These locations already have the following teams assigned: {{teamNames}}. Do you want to continue ?',
         'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION': 'Export chains of transmission',
+        'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
+        'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
+        'LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM': 'Are you sure you want to approve this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
 
         /**
@@ -701,6 +707,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+        'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD': 'Workload',
 
         /**
          * Create Team page
@@ -716,6 +723,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
         'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
         'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Teams workload
+         */
+        'LNG_PAGE_TEAMS_WORKLOAD_TITLE': 'Teams Workload',
+        'LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL': 'Team',
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': '{{done}} of {{total}}',
 
         /**
          * User fields
@@ -1326,6 +1340,8 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER': 'Order',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
@@ -1533,6 +1549,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
 
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
@@ -1577,10 +1597,36 @@ export const EnglishUsLang = {
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
 
         /**
+         * Sync Package
+         */
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE': 'From date',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS': 'Collections',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION': 'Note: Leave empty to export everything',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE': 'Export Type',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION': 'Note: when Export Type is present "collections" is ignored',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS': 'Include Users',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD': 'Encryption password',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION': 'Note: leave empty for no encryption',
+
+        /**
+         * Sync package export types
+         */
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE': 'Mobile',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM': 'System',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL': 'Full',
+
+        /**
          * System Config Main page
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
@@ -1596,6 +1642,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
 
         /**
          * Sync settings fields
@@ -1765,6 +1812,8 @@ export const EnglishUsLang = {
         'LNG_MODULE_LABEL_ICON': 'Icon',
         'LNG_MODULE_LABEL_BACKUP': 'Backup',
         'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
+        'LNG_MODULE_LABEL_DEVICE': 'Device',
+        'LNG_MODULE_LABEL_DEVICE_HISTORY': 'deviceHistory',
 
         /**
          * List Filters page titles
@@ -1785,6 +1834,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
         'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
+        'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE': 'Help - Context Sensitive',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -1969,6 +2019,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
 
         /**
+         * Import sync package
+         */
+        'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE': 'Import Sync Package',
+
+        /**
          * Import location data
          */
         'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
@@ -2020,5 +2075,88 @@ export const EnglishUsLang = {
         'LNG_PAGE_CLOUD_BACKUP_APP_INSTALL' : 'The app is installed at location:',
         'LNG_PAGE_CLOUD_BACKUP_APP_BACKUP_PATH' : 'The backups are saved at location:',
         'LNG_PAGE_CLOUD_BACKUP_ACTION_COPY_PATH_SUCCESS_MESSAGE': 'Path copied!',
+
+        /**
+         * Help Category fields
+         */
+        'LNG_HELP_CATEGORY_FIELD_LABEL_NAME': 'Name',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER': 'Order',
+        'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER_DESCRIPTION': '',
+
+        /**
+         * Help Categories List Page
+         */
+        'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE': 'Help Categories',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE': 'Category deleted!',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON': 'See Help Items',
+
+        /**
+         * Create Help Category Page
+         */
+        'LNG_PAGE_CREATE_HELP_CATEGORY_TITLE': 'Create Help Category',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_CATEGORY_BUTTON': 'Create Category',
+        'LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE': 'Category created!',
+
+        /**
+         * Modify Help Category Page
+         */
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE': 'Modify Help Category',
+        'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE': 'View Help Category',
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE': 'Category updated!',
+        'LNG_PAGE_MODIFY_HELP_CATEGORY_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Help Item fields
+         */
+        'LNG_HELP_ITEM_FIELD_LABEL_TITLE': 'Title',
+        'LNG_HELP_ITEM_FIELD_LABEL_TITLE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_CONTENT': 'Content',
+        'LNG_HELP_ITEM_FIELD_LABEL_CONTENT_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY': 'Category',
+        'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_COMMENT': 'Comment',
+        'LNG_HELP_ITEM_FIELD_LABEL_COMMENT_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED': 'Approved',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY': 'Approved By',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
+        'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE': 'Page',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION': 'Add the link to the page. Ex: /contacts/*/view. Where * will replace the id from the URL.',
+
+        /**
+         * Help Items List Page
+         */
+        'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item approved!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
+
+        /**
+         * Create Help Items Page
+         */
+        'LNG_PAGE_CREATE_HELP_ITEM_TITLE': 'Create Help Item',
+        'LNG_PAGE_CREATE_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON': 'Create Help Item',
+        'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE': 'Help item created!',
+
+        /**
+         * Modify Help Category Page
+         */
+        'LNG_PAGE_MODIFY_HELP_ITEM_TITLE': 'Modify Help Item',
+        'LNG_PAGE_VIEW_HELP_ITEM_TITLE': 'View Help Item',
+        'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
+        'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_TITLE': 'Help',
+
     }
 };

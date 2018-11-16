@@ -25,7 +25,8 @@ export enum ApplyListFilter {
     EVENTS_WITHOUT_RELATIONSHIPS  = 'events_without_relationships',
     CASES_WITHOUT_DATE_OF_ONSET_CHAIN = 'cases_without_date_of_onset_chain',
     CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN = 'contacts_without_date_of_last_contact_chain',
-    EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain'
+    EVENTS_WITHOUT_DATE_CHAIN = 'events_without_date_chain',
+    CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items'
 }
 
 export class Constants {
@@ -173,7 +174,8 @@ export class Constants {
         [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
         [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN',
         [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
-        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN'
+        [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN',
+        [Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS]: 'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE'
     };
 
     // Options for Yes/No dropdowns
@@ -489,6 +491,119 @@ export class Constants {
         }
     };
 
+    // possible modules for export sync package
+    static SYNC_PACKAGE_EXPORT_MODULES = {
+        CLUSTER: {
+            label: 'LNG_MODULE_LABEL_CLUSTER',
+            value: 'cluster'
+        },
+        FOLLOW_UP: {
+            label: 'LNG_MODULE_LABEL_FOLLOW_UP',
+            value: 'followUp'
+        },
+        LAB_RESULT: {
+            label: 'LNG_MODULE_LABEL_LAB_RESULT',
+            value: 'labResult'
+        },
+        LANGUAGE: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE',
+            value: 'language'
+        },
+        LANGUAGE_TOKEN: {
+            label: 'LNG_MODULE_LABEL_LANGUAGE_TOKEN',
+            value: 'languageToken'
+        },
+        LOCATION: {
+            label: 'LNG_MODULE_LABEL_LOCATION',
+            value: 'location'
+        },
+        OUTBREAK: {
+            label: 'LNG_MODULE_LABEL_OUTBREAK',
+            value: 'outbreak'
+        },
+        PERSON: {
+            label: 'LNG_MODULE_LABEL_PERSON',
+            value: 'person'
+        },
+        REFERENCE_DATA: {
+            label: 'LNG_MODULE_LABEL_REFERENCE_DATA',
+            value: 'referenceData'
+        },
+        RELATIONSHIP: {
+            label: 'LNG_MODULE_LABEL_RELATIONSHIP',
+            value: 'relationship'
+        },
+        ROLE: {
+            label: 'LNG_MODULE_LABEL_ROLE',
+            value: 'role'
+        },
+        TEAM: {
+            label: 'LNG_MODULE_LABEL_TEAM',
+            value: 'team'
+        },
+        USER: {
+            label: 'LNG_MODULE_LABEL_USER',
+            value: 'user'
+        },
+        SYSTEM_SETTINGS: {
+            label: 'LNG_MODULE_LABEL_SYSTEM_SETTINGS',
+            value: 'systemSettings'
+        },
+        TEMPLATE: {
+            label: 'LNG_MODULE_LABEL_TEMPLATE',
+            value: 'template'
+        },
+        ICON: {
+            label: 'LNG_MODULE_LABEL_ICON',
+            value: 'icon'
+        },
+        HELP_CATEGORY: {
+            label: 'LNG_MODULE_LABEL_HELP_CATEGORY',
+            value: 'helpCategory'
+        },
+        HELP_ITEM: {
+            label: 'LNG_MODULE_LABEL_HELP_ITEM',
+            value: 'helpItem'
+        },
+        AUDIT_LOG: {
+            label: 'LNG_MODULE_LABEL_AUDIT_LOG',
+            value: 'auditLog'
+        },
+        FILE_ATTACHMENT: {
+            label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
+            value: 'fileAttachment'
+        },
+        DEVICE: {
+            label: 'LNG_MODULE_LABEL_DEVICE',
+            value: 'device'
+        },
+        DEVICE_HISTORY: {
+            label: 'LNG_MODULE_LABEL_DEVICE_HISTORY',
+            value: 'deviceHistory'
+        }
+    };
+
+    // possible export types for export sync package
+    static SYNC_PACKAGE_EXPORT_TYPES = {
+        MOBILE: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
+            value: 'mobile'
+        },
+        SYSTEM: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
+            value: 'system'
+        },
+        OUTBREAK: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
+            value: 'outbreak'
+        },
+        FULL: {
+            label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
+            value: 'full'
+        }
+    };
+
+
     static EPI_CURVE_VIEW_TYPE = {
         DAY: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL',
@@ -501,6 +616,21 @@ export class Constants {
         MONTH: {
             label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL',
             value: 'month'
+        }
+    };
+
+    static GANTT_CHART_VIEW_TYPE = {
+        DAY: {
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL',
+            value: 'day'
+        },
+        MONTH: {
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL',
+            value: 'month'
+        },
+        WEEK: {
+            label: 'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL',
+            value: 'week'
         }
     };
 

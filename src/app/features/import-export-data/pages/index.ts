@@ -8,6 +8,7 @@ import { ImportContactDataComponent } from './import-contact-data/import-contact
 import { ImportOutbreakDataComponent } from './import-outbreak-data/import-outbreak-data.component';
 import { ImportLocationDataComponent } from './import-location-data/import-location-data.component';
 import { ImportLanguageTokensComponent } from './import-language-tokens/import-language-tokens.component';
+import { ImportSyncPackageComponent } from './import-sync-package/import-sync-package.component';
 
 // export each page component individually
 export * from './import-location-data/import-location-data.component';
@@ -19,6 +20,7 @@ export * from './import-case-data/import-case-data.component';
 export * from './import-contact-data/import-contact-data.component';
 export * from './import-outbreak-data/import-outbreak-data.component';
 export * from './import-language-tokens/import-language-tokens.component';
+export * from './import-sync-package/import-sync-package.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
@@ -30,5 +32,6 @@ export const pageComponents: any[] = [
     ImportCaseDataComponent,
     ImportContactDataComponent,
     ImportOutbreakDataComponent,
-    ImportLanguageTokensComponent
+    ImportLanguageTokensComponent,
+    ImportSyncPackageComponent
 ];
