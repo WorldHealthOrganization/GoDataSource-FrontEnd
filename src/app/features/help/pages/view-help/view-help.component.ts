@@ -14,18 +14,17 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs/Observable';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 
 @Component({
-    selector: 'app-modify-help-item',
+    selector: 'app-view-help-item',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './modify-help-item.component.html',
-    styleUrls: ['./modify-help-item.component.less']
+    templateUrl: './view-help.component.html',
+    styleUrls: ['./view-help.component.less']
 })
-export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
+export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
+        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help')
     ];
 
     helpItemData: HelpItemModel = new HelpItemModel();
@@ -45,8 +44,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private i18nService: I18nService,
-        private cacheService: CacheService
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -67,25 +65,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                         this.selectedCategory = category;
                         this.breadcrumbs.push(
                             new BreadcrumbItemModel(
-                                this.selectedCategory.name,
-                                `/help/categories/${this.categoryId}/view`,
-                                false,
-                                {},
-                                {}
-                            )
-                        );
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
-                                `/help/categories/${this.categoryId}/items`,
-                                false,
-                                {},
-                                {}
-                            )
-                        );
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
+                                'LNG_PAGE_VIEW_HELP_ITEM_TITLE',
                                 '.',
                                 true,
                                 {},
@@ -99,34 +79,6 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                                 this.helpItemData = new HelpItemModel(helpItemData);
                             });
                     });
-            });
-    }
-
-    modifyHelpCategory(form: NgForm) {
-        const dirtyFields: any = this.formHelper.getDirtyFields(form);
-
-        if (!this.formHelper.validateForm(form)) {
-            return;
-        }
-
-        // modify the help item
-        this.helpDataService
-            .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-
-                return ErrorObservable.create(err);
-            })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
-                // remove help items from cache
-                this.cacheService.remove(CacheKey.HELP_ITEMS);
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                // update language tokens to get the translation of name and description
-                this.i18nService.loadUserLanguage().subscribe();
-                // navigate to the list of categories
-                this.router.navigate([`/help/categories/${this.categoryId}/items`]);
             });
     }
 

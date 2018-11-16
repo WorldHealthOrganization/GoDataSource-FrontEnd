@@ -1,36 +1,32 @@
+@color-question-background: #f0f0f0;
+@color-question-border: #dedede;
+
 app-form-question-list {
     .question-card {
-        margin-left: 0px;
-        padding-left: 0px;
-        padding-right: 0px;
-        padding-top: 0px;
+        padding: 0 !important;
+        margin: 8px !important;
     }
 
     .app-form-question {
-        width: 100%;
-        min-width: 100%;
-        padding: 0px;
-        margin: 0px;
 
         .question-wrapper {
-            border-bottom: 1px solid #F2F2F2;
-            background-color: #F0F0F0;
-            padding: 15px;
-        }
-
-        .question-box {
-            padding: 5px;
-            margin: 5px;
+            background-color: @color-question-background;
+            border-bottom: 1px solid @color-question-border;
+            padding: 5px 10px;
         }
 
         .question-badge {
             border-radius: 20px;
-            background: #999999;
-            color: #FDFDFD;
-            padding: 10px;
+            padding: 10px 0;
             height: 40px;
             width: 40px;
-            margin: auto 5px;
+            text-align: center;
+            background: #999999;
+            color: #FDFDFD;
+        }
+
+        .question-answers {
+            margin: 5px 10px 0 30px;
         }
     }
 }

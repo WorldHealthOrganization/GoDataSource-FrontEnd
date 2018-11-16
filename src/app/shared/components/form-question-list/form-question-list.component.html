@@ -1,30 +1,36 @@
 <div class="form-element"
     [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
-    <div fxLayout="row">
-        <!-- btn to add a new question -->
-        <button mat-button type="button" *ngIf="!viewOnly"
-                color="primary" class="link-primary"
-                (click)="addNewQuestion()">
-            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
-        </button>
-    </div>
-
     <form #groupForm="ngForm">
         <!-- list of questions -->
-        <div *ngFor="let question of values; let i = index" fxFlex fxLayout="row"
-             fxLayoutAlign="start center">
+        <div
+            *ngFor="let question of values; let i = index"
+            fxFlex fxLayout="row" fxLayoutAlign="start center"
+        >
             <mat-card class="page-section question-card" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-                <div class="app-form-question">
-                    <div fxLayout="row" class="question-wrapper">
+                <div class="app-form-question" fxFlex fxLayout="column">
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px" class="question-wrapper">
 
                         <!-- question badge -->
                         <div class="question-badge" fxFlex="40px">
                             {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
                         </div>
 
+                        <!-- question order -->
+                        <div fxFlex="70px">
+                            <app-form-input
+                                [name]="name + '[' + i + '][order]'"
+                                [(ngModel)]="values[i].order"
+                                type="number"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                (optionChanged)="onChange()">
+                            </app-form-input>
+                        </div>
+
                         <!-- question text -->
-                        <div class="question-box" fxFlex="30">
+                        <div fxFlex>
                             <app-form-input
                                 [name]="name + '[' + i + '][text]'"
                                 [ngModel]="question.text | translate"
@@ -38,7 +44,7 @@
                         </div>
 
                         <!-- question variable -->
-                        <div class="question-box" fxFlex="10">
+                        <div fxFlex="150px">
                             <app-form-input
                                 [name]="name + '[' + i + '][variable]'"
                                 [(ngModel)]="values[i].variable"
@@ -54,7 +60,7 @@
                         </div>
 
                         <!-- question category -->
-                        <div class="question-box" fxFlex="15">
+                        <div fxFlex="250px">
                             <app-form-select
                                 [name]="name + '[' + i + '][category]'"
                                 [(ngModel)]="values[i].category"
@@ -68,7 +74,7 @@
                         </div>
 
                         <!-- question - answer type -->
-                        <div class="question-box" fxFlex>
+                        <div fxFlex="200px">
                             <app-form-select
                                 [name]="name + '[' + i + '][answerType]'"
                                 [(ngModel)]="values[i].answerType"
@@ -83,7 +89,7 @@
                         </div>
 
                         <!-- question actions -->
-                        <div class="question-box  text-right" fxFlex="215px" *ngIf="!viewOnly">
+                        <div class="text-right" fxFlex="215px" *ngIf="!viewOnly">
                             <app-form-slide-toggle
                                 [name]="name + '[' + i + '][required]'"
                                 [(ngModel)]="values[i].required"
@@ -99,16 +105,17 @@
                                 <span class="xt-icon">delete</span>
                             </button>
                         </div>
-                        <div class="question-box text-right" fxFlex="20" *ngIf="viewOnly">
+                        <div class="text-right" fxFlex="20" *ngIf="viewOnly">
                             <div>{{ (question.required ? 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED' : '') | translate}}</div>
                         </div>
                     </div>
 
-                    <div fxFlex fxLayout="row">
+                    <div
+                        *ngIf="question.answerType === answerTypes.MULTIPLE_OPTIONS.value || question.answerType === answerTypes.SINGLE_SELECTION.value"
+                        fxFlex fxLayout="row" class="question-answers"
+                    >
                         <!-- answers list -->
                         <app-form-answer-list
-                            class="app-form-answer-list-container"
-                            *ngIf="question.answerType === answerTypes.MULTIPLE_OPTIONS.value || question.answerType === answerTypes.SINGLE_SELECTION.value"
                             [name]="name + '[' + i + '][answers]'"
                             [ngModel]="question.answers"
                             [viewOnly]="viewOnly"
@@ -124,4 +131,13 @@
             </mat-card>
         </div>
     </form>
+
+    <div fxLayout="row">
+        <!-- btn to add a new question -->
+        <button mat-button type="button" *ngIf="!viewOnly"
+                color="primary" class="link-primary"
+                (click)="addNewQuestion()">
+            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
+        </button>
+    </div>
 </div>

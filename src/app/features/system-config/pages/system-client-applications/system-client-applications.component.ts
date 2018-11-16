@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -46,9 +46,6 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
 
     // constants
     UserSettings = UserSettings;
-
-    // handle downloads
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     /**
      * Constructor
@@ -271,7 +268,6 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
             fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
                 ' - ' +
                 moment().format('YYYY-MM-DD'),
-            buttonDownloadFile: this.buttonDownloadFile,
             allowedExportTypes: [
                 ExportDataExtension.JSON,
                 ExportDataExtension.QR

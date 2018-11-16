@@ -7,6 +7,9 @@ import { MatSidenav } from '@angular/material';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { SnackbarService } from '../../services/helper/snackbar.service';
 import { ReferenceDataDataService } from '../../services/data/reference-data.data.service';
+import { HelpDataService } from '../../services/data/help.data.service';
+import * as _ from 'lodash';
+import { Constants } from '../../models/constants';
 
 @Component({
     selector: 'app-authenticated',
@@ -21,12 +24,15 @@ export class AuthenticatedComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    contextSearchHelpItems: string[];
+
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private helpDataService: HelpDataService
     ) {
         // detect when the route is changed
         this.router.events.subscribe(() => {
@@ -72,12 +78,37 @@ export class AuthenticatedComponent implements OnInit {
             if (navStart.url === '/') {
                 redirectRootToDashboard();
             }
+            // check for context help
+            this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
+                if (_.isEmpty(items)) {
+                    this.contextSearchHelpItems = null;
+                } else {
+                    this.contextSearchHelpItems = items;
+                }
+            });
         });
 
         // redirect root to dashboard
         if (this.router.url === '/') {
             redirectRootToDashboard();
         }
+
+        this.helpDataService.getContextHelpItems(this.router.url).subscribe((items) => {
+            if (_.isEmpty(items)) {
+                this.contextSearchHelpItems = null;
+            } else {
+                this.contextSearchHelpItems = items;
+            }
+        });
+
+    }
+
+    /**
+     * open page with context sensitive help items
+     */
+    openContextHelp() {
+        const helpItemsIds = _.map(this.contextSearchHelpItems, 'id');
+        this.router.navigate(['/help'], { queryParams: { applyListFilter: Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS, helpItemsIds: helpItemsIds }});
     }
 
 }
