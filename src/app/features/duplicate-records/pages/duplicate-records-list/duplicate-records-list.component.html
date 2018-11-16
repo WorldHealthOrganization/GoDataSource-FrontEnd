@@ -12,12 +12,6 @@
     [value]="(duplicatesListCount$ | async)?.count">
 </app-total-number-of-records>
 
-<!-- Side filters -->
-<app-side-filters
-    [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)">
-</app-side-filters>
-
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
         <div class="reset-filters">

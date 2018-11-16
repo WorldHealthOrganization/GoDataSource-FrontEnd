@@ -16,9 +16,6 @@ import { FormControl, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
@@ -45,9 +42,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     // duplicates
     duplicatesList: PeoplePossibleDuplicateModel;
     duplicatesListCount$: Observable<any>;
-
-    // available side filters
-    availableSideFilters: FilterModel[] = [];
 
     /**
      * Visible table columns
@@ -79,9 +73,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
-        // initialize side filters
-        this.initializeSideFilters();
-
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -93,21 +84,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
-    }
-
-    /**
-     * Initialize Side Filters
-     */
-    initializeSideFilters() {
-        // set available side filters
-        this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'type',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-                type: FilterType.MULTISELECT,
-                options$: this.genericDataService.getEntityTypeOptions()
-            })
-        ];
     }
 
     /**
