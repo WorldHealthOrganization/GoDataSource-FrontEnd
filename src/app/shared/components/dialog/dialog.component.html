@@ -96,6 +96,29 @@
                         [disabled]="field.disabled">
                     </app-form-input>
 
+                    <!-- Boolean -->
+                    <app-form-slide-toggle
+                        *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [label]="field.placeholder | translate:confirmData?.translateData"
+                        [tooltip]="field.description"
+                        [required]="field.required"
+                        [disabled]="field.disabled">
+                    </app-form-slide-toggle>
+
+                    <!-- Date -->
+                    <app-form-datepicker
+                        *ngIf="field.fieldType === DialogFieldType.DATE"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [tooltip]="field.description"
+                        [required]="field.required"
+                        [disabled]="field.disabled"
+                        app-date-validator
+                    ></app-form-datepicker>
+
                     <!-- Date range -->
                     <app-form-daterange
                         *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"

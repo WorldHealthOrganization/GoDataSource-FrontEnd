@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -64,7 +64,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     exportOutbreaksUrl: string = 'outbreaks/export';
     outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -363,7 +362,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE',
             url: this.exportOutbreaksUrl,
             fileName: this.outbreaksDataExporFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
 
             // // optional
             allowedExportTypes: this.allowedExportTypes,

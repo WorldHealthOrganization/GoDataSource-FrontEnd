@@ -12,6 +12,14 @@
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
 
+            <button *ngIf="contextSearchHelpItems"
+                class="context-help-trigger"
+                mat-raised-button
+                color="primary"
+                (click)="openContextHelp()">
+                <span class="xt-icon">help</span>
+            </button>
+
             <router-outlet></router-outlet>
 
         </mat-sidenav-content>
