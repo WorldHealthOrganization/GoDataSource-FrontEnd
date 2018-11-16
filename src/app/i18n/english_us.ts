@@ -17,6 +17,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
+        'LNG_LAYOUT_MENU_ITEM_HELP': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -1790,6 +1791,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
         'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
+        'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE': 'Help - Context Sensitive',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -2076,13 +2078,15 @@ export const EnglishUsLang = {
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE': 'Page',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION': 'Add the link to the page. Ex: /contacts/*/view. Where * will replace the id from the URL.',
 
         /**
          * Help Items List Page
          */
         'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
-        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item approved!',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
 
         /**
@@ -2101,6 +2105,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
         'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
 
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_TITLE': 'Help',
 
     }
 };

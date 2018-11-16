@@ -170,7 +170,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                     this.helpDataService
                         .deleteHelpItem(item.categoryId, item.id)
                         .catch((err) => {
-                            this.snackbarService.showApiError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })
@@ -197,7 +197,7 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
                     this.helpDataService
                         .approveHelpItem(item.categoryId, item.id)
                         .catch((err) => {
-                            this.snackbarService.showApiError(err.message);
+                            this.snackbarService.showApiError(err);
 
                             return ErrorObservable.create(err);
                         })
