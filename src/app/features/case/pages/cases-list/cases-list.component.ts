@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -67,7 +67,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
     exportCasesUrl: string;
     casesDataExportFileName: string = moment().format('YYYY-MM-DD');
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -551,7 +550,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
             url: this.exportCasesUrl,
             fileName: this.casesDataExportFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
 
             // // optional
             allowedExportTypes: this.allowedExportTypes,
@@ -573,7 +571,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
-                buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP
             });
         }
@@ -601,7 +598,6 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 message: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                 fileName: this.casesDataExportFileName,
-                buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
                 anonymizeFields: anonymizeFields,
