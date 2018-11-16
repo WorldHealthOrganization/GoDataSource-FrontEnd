@@ -2,27 +2,13 @@ import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Observable } from 'rxjs/Observable';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { RelationshipModel, RelationshipPersonModel } from '../../../../core/models/relationship.model';
-import { CaseModel } from '../../../../core/models/case.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { EntityType } from '../../../../core/models/entity-type';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { EventModel } from '../../../../core/models/event.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -91,14 +77,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
-        private contactDataService: ContactDataService,
-        private entityDataService: EntityDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private relationshipDataService: RelationshipDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService,
         private i18nService: I18nService
     ) {
         super();
