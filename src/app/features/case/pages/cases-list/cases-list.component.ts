@@ -173,18 +173,16 @@ export class CasesListComponent extends ListComponent implements OnInit {
                             return this.caseDataService
                                 .getCasesGroupedByClassification(this.selectedOutbreak.id)
                                 .map((data) => {
-                                console.log(data);
                                     return _.map(data ? data.classification : [], (item, itemId) => {
-                                        console.log(item);
                                         const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
                                         return new CountedItemsListItem(
                                             item.count,
                                             itemId,
-                                            item.contactIDs,
+                                            item.caseIDs,
                                             refItem ?
                                                 refItem.getColorCode() :
                                                 Constants.DEFAULT_COLOR_REF_DATA
-                                        )
+                                        );
                                     });
                                 });
                         });
