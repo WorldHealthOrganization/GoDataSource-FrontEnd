@@ -3,6 +3,7 @@ import { ContactModel } from './contact.model';
 import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
+import { LabelValuePair } from './label-value-pair';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -44,5 +45,20 @@ export class EntityModel {
         }
 
         return entityTypeLink;
+    }
+
+    /**
+     * Unique values
+     * @param records
+     * @param path
+     */
+    static uniqueValueOptions(
+        records: EntityModel[],
+        path: string
+    ): LabelValuePair[] {
+        return _.chain(records)
+            .map((record: EntityModel) => _.get(record.model, path))
+            .uniqBy((value: any) => _.isString(value) ? value.toLowerCase() : value)
+            .value();
     }
 }

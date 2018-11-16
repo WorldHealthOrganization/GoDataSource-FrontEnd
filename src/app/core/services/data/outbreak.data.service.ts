@@ -34,8 +34,7 @@ export class OutbreakDataService {
         private storageService: StorageService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Outbreaks
@@ -360,6 +359,23 @@ export class OutbreakDataService {
     ): Observable<any> {
         const whereFilter = queryBuilder.filter.generateCondition(true);
         return this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Retrieve records from db
+     * @param outbreakId
+     * @param queryBuilder
+     * @returns {Observable<EntityModel[]>}
+     */
+    getPeopleList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`),
+            EntityModel
+        );
     }
 }
 
