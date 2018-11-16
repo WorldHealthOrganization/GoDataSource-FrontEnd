@@ -709,6 +709,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+        'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD': 'Workload',
 
         /**
          * Create Team page
@@ -724,6 +725,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
         'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
         'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Teams workload
+         */
+        'LNG_PAGE_TEAMS_WORKLOAD_TITLE': 'Teams Workload',
+        'LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL': 'Team',
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': '{{done}} of {{total}}',
 
         /**
          * User fields
@@ -1360,6 +1368,8 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER': 'Order',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
@@ -1567,6 +1577,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
 
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
@@ -1580,6 +1594,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
          * Backup modules
