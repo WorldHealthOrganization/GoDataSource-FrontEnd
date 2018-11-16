@@ -12,11 +12,13 @@
 
     <form #groupForm="ngForm">
         <!-- list of questions -->
-        <div *ngFor="let question of values; let i = index" fxFlex fxLayout="row"
-             fxLayoutAlign="start center">
+        <div
+            *ngFor="let question of values; let i = index"
+            fxFlex fxLayout="row" fxLayoutAlign="start center"
+        >
             <mat-card class="page-section question-card" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-                <div class="app-form-question">
-                    <div fxLayout="row" class="question-wrapper">
+                <div class="app-form-question" fxFlex fxLayout="column">
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px" class="question-wrapper">
 
                         <!-- question badge -->
                         <div class="question-badge" fxFlex="40px">

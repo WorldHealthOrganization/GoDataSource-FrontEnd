@@ -19,7 +19,7 @@
         <div *ngFor="let answer of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <div class="app-form-answer">
-                <div fxLayout="row" class="answer-wrapper">
+                <div fxLayout="row" fxLayoutAlign="start center" class="answer-wrapper">
                     <!-- form-answer badge -->
                     <div class="answer-badge" fxFlex="40px">
                         {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + (i + 1) }}
