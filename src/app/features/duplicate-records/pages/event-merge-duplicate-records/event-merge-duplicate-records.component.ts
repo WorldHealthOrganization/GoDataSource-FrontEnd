@@ -11,9 +11,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { Moment } from 'moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { AddressType } from '../../../../core/models/address.model';
 
 @Component({
     selector: 'app-event-merge-duplicate-records',
@@ -33,35 +30,23 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
 
     eventData: EventModel = new EventModel();
 
-    serverToday: Moment = null;
-
     constructor(
         private router: Router,
         private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private genericDataService: GenericDataService
+        private formHelper: FormHelperService
     ) {
         super();
     }
 
     ngOnInit() {
-        // get today time
-        this.genericDataService
-            .getServerUTCToday()
-            .subscribe((curDate) => {
-                this.serverToday = curDate;
-            });
-
         // get selected outbreak
         this.outbreakDataService
             .getSelectedOutbreak()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.outbreakId = selectedOutbreak.id;
             });
-        // pre-set the initial address as "current address"
-        this.eventData.address.typeId = AddressType.CURRENT_ADDRESS;
     }
 
     /**
