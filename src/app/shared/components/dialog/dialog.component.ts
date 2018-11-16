@@ -61,7 +61,9 @@ export class DialogAnswer {
 export enum DialogFieldType {
     SELECT = 'select',
     TEXT = 'text',
-    DATE_RANGE = 'date-range'
+    DATE_RANGE = 'date-range',
+    DATE = 'date',
+    BOOLEAN = 'boolean'
 }
 
 export class DialogField {

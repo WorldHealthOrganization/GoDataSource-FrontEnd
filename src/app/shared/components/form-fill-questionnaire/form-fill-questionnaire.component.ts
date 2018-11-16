@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import * as _ from 'lodash';
 import { GroupBase } from '../../xt-forms/core';
@@ -14,6 +14,7 @@ import { AttachmentDataService } from '../../../core/services/data/attachment.da
 import { AttachmentModel } from '../../../core/models/attachment.model';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
+import * as FileSaver from 'file-saver';
 
 interface UploaderData {
     uploader: FileUploader;
@@ -54,8 +55,6 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     @Output() copyValue = new EventEmitter<string>();
 
     @Input() hideCategories: boolean = false;
-
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     /**
      * File uploader
@@ -357,14 +356,10 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         this.attachmentDataService
             .downloadAttachment(this.selectedOutbreak.id, this.value[questionVariable])
             .subscribe((blob) => {
-                const urlT = window.URL.createObjectURL(blob);
-
-                const link = this.buttonDownloadFile.nativeElement;
-                link.href = urlT;
-                link.download = this.uploadersData[questionVariable].attachment.name;
-                link.click();
-
-                window.URL.revokeObjectURL(urlT);
+                FileSaver.saveAs(
+                    blob,
+                    this.uploadersData[questionVariable].attachment.name
+                );
             });
     }
 

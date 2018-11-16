@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -72,7 +72,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XML,
@@ -826,7 +825,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             message: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE',
             url: this.exportFollowUpsUrl,
             fileName: this.followUpsDataExportFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
 
             // // optional
             allowedExportTypes: this.allowedExportTypes,

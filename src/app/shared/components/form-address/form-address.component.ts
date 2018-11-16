@@ -106,4 +106,22 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
                 });
         }
     }
+
+    /**
+     * Update Lat Lng
+     * @param property
+     * @param data
+     */
+    onChangeLatLng(
+        property: string,
+        value
+    ) {
+        // set value
+        this.address.geoLocation[property] = value ? parseFloat(value) : undefined;
+
+        // on change trigger
+        setTimeout(() => {
+            super.onChange();
+        });
+    }
 }

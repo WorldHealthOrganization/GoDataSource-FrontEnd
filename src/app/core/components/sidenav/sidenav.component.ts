@@ -256,15 +256,15 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_TEAM],
             [],
             '/teams'
+        ),
+        new NavItem(
+            'help',
+            'LNG_LAYOUT_MENU_ITEM_HELP',
+            'help',
+            [],
+            [],
+            '/help'
         )
-        // new NavItem(
-        //     'help',
-        //     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
-        //     'help',
-        //     [],
-        //     [],
-        //     '/help'
-        // )
     ];
 
     constructor(

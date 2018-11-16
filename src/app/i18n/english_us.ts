@@ -17,6 +17,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
+        'LNG_LAYOUT_MENU_ITEM_HELP': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -1609,10 +1610,36 @@ export const EnglishUsLang = {
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
 
         /**
+         * Sync Package
+         */
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE': 'From date',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS': 'Collections',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION': 'Note: Leave empty to export everything',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE': 'Export Type',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION': 'Note: when Export Type is present "collections" is ignored',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS': 'Include Users',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD': 'Encryption password',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION': 'Note: leave empty for no encryption',
+
+        /**
+         * Sync package export types
+         */
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE': 'Mobile',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM': 'System',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL': 'Full',
+
+        /**
          * System Config Main page
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
@@ -1628,6 +1655,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
 
         /**
          * Sync settings fields
@@ -1797,6 +1825,8 @@ export const EnglishUsLang = {
         'LNG_MODULE_LABEL_ICON': 'Icon',
         'LNG_MODULE_LABEL_BACKUP': 'Backup',
         'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
+        'LNG_MODULE_LABEL_DEVICE': 'Device',
+        'LNG_MODULE_LABEL_DEVICE_HISTORY': 'deviceHistory',
 
         /**
          * List Filters page titles
@@ -1817,6 +1847,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
         'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
+        'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE': 'Help - Context Sensitive',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -2001,6 +2032,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
 
         /**
+         * Import sync package
+         */
+        'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE': 'Import Sync Package',
+
+        /**
          * Import location data
          */
         'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
@@ -2103,13 +2139,15 @@ export const EnglishUsLang = {
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE': 'Page',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION': 'Add the link to the page. Ex: /contacts/*/view. Where * will replace the id from the URL.',
 
         /**
          * Help Items List Page
          */
         'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
-        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item approved!',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
 
         /**
@@ -2128,6 +2166,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
         'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
 
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_TITLE': 'Help',
 
     }
 };

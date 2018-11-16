@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
@@ -43,8 +43,6 @@ export class ExportButtonComponent {
     @Input() fileType: ExportDataExtension;
     @Input() allowedExportTypes: ExportDataExtension[];
 
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
-
     constructor(
         private dialogService: DialogService = null
     ) {}
@@ -63,7 +61,6 @@ export class ExportButtonComponent {
             allowedExportTypes: this.allowedExportTypes,
             yesLabel: this.yesLabel,
             fileName: this.fileName,
-            buttonDownloadFile: this.buttonDownloadFile,
             queryBuilder: this.queryBuilder,
             queryBuilderClearOthers: this.queryBuilderClearOthers,
             isPOST: this.isPOST,
