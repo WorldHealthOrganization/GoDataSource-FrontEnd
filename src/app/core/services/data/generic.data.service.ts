@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class GenericDataService {
@@ -85,6 +86,26 @@ export class GenericDataService {
         }
 
         return availableTypes;
+    }
+
+    /**
+     * Get entity type options
+     */
+    getEntityTypeOptions(): Observable<any[]> {
+        return Observable.of([
+            new LabelValuePair(
+                EntityType.CASE,
+                EntityType.CASE
+            ),
+            new LabelValuePair(
+                EntityType.CONTACT,
+                EntityType.CONTACT
+            ),
+            new LabelValuePair(
+                EntityType.EVENT,
+                EntityType.EVENT
+            )
+        ]);
     }
 
     /**

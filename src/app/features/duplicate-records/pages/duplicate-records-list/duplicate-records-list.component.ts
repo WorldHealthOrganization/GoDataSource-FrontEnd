@@ -18,6 +18,8 @@ import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -44,6 +46,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     duplicatesList: PeoplePossibleDuplicateModel;
     duplicatesListCount$: Observable<any>;
 
+    // available side filters
+    availableSideFilters: FilterModel[] = [];
+
     /**
      * Visible table columns
      */
@@ -62,7 +67,8 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
         private authDataService: AuthDataService,
         protected snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private genericDataService: GenericDataService
     ) {
         super(
             snackbarService
@@ -72,6 +78,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     ngOnInit() {
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
+
+        // initialize side filters
+        this.initializeSideFilters();
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -84,6 +93,21 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
                 // ...and re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    initializeSideFilters() {
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'type',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+                type: FilterType.MULTISELECT,
+                options$: this.genericDataService.getEntityTypeOptions()
+            })
+        ];
     }
 
     /**
@@ -109,7 +133,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder);
+            this.duplicatesListCount$ = this.outbreakDataService.getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
     }
 
