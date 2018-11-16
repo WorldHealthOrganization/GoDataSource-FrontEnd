@@ -232,12 +232,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             })
             .value();
 
-        // we shouldn't be able to merge an event with something else
-        if (
-            types.length > 1 &&
-            _.indexOf(types, EntityType.EVENT) > -1
-        ) {
-            this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_MERGE_EVENT_WITH_OTHER');
+        // we shouldn't be able to merge two types...
+        if (types.length > 1) {
+            this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED');
             return;
         }
 
@@ -247,44 +244,13 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             return;
         }
 
-        // just one type..then redirect
-        if (types.length < 2) {
-            // redirect to merge page
-            this.router.navigate(
-                ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
-                    queryParams: {
-                        ids: JSON.stringify(mergeIds)
-                    }
+        // redirect to merge page
+        this.router.navigate(
+            ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
+                queryParams: {
+                    ids: JSON.stringify(mergeIds)
                 }
-            );
-        } else {
-            // multiple types? we need to choose what we want to create
-            this.dialogService.showInput(
-                new DialogConfiguration({
-                    message: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE',
-                    yesLabel: 'LNG_COMMON_BUTTON_SELECT',
-                    fieldsList: [
-                        new DialogField({
-                            name: 'type',
-                            placeholder: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-                            required: true,
-                            inputOptions: _.map(types, (type: string) => new LabelValuePair(type, type)),
-                            inputOptionsMultiple: false
-                        }
-                    )],
-                }), true)
-                .subscribe((answer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        // redirect to merge page
-                        this.router.navigate(
-                            ['/duplicated-records', EntityModel.getLinkForEntityType(answer.inputValue.value.type), 'merge'], {
-                                queryParams: {
-                                    ids: JSON.stringify(mergeIds)
-                                }
-                            }
-                        );
-                    }
-                });
-        }
+            }
+        );
     }
 }
