@@ -10,6 +10,7 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { LocationAutoItem } from '../form-location-dropdown/form-location-dropdown.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-form-address',
@@ -116,8 +117,11 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
         property: string,
         value
     ) {
-        // set value
-        this.address.geoLocation[property] = value ? parseFloat(value) : undefined;
+        _.set(
+            this.address,
+            `geoLocation.${property}`,
+            value ? parseFloat(value) : undefined
+        );
 
         // on change trigger
         setTimeout(() => {
