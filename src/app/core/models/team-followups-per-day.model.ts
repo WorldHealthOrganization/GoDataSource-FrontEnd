@@ -21,7 +21,7 @@ export class TeamFollowupsPerDayModel {
 
     constructor(data = null) {
         this.totalFollowupsCount = _.get(data, 'totalFollowupsCount');
-        this.successfulFollowupsCount = _.get(data, 'successfulFollowupsCount',);
+        this.successfulFollowupsCount = _.get(data, 'successfulFollowupsCount');
         this.teams = _.get(data, 'teams', []);
     }
 }
