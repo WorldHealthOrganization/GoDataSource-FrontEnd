@@ -58,13 +58,21 @@ export class EntityModel {
         path: string,
         valueParser: (value: any) => any,
         labelValueMap: (value: any) => LabelValuePair,
-    ): LabelValuePair[] {
-        return _.chain(records)
+    ): { options: LabelValuePair[], value: any } {
+        // construct options
+        const options: LabelValuePair[] = _.chain(records)
             .map((record: EntityModel) => _.get(record.model, path))
             .filter((value) => value !== '' && value !== undefined && value !== null)
             .uniqBy((value: any) => valueParser(value))
             .map((value) => labelValueMap(value))
             .value();
+
+        // finished
+        return {
+            options: options,
+            value: options.length === 1 ?
+                options[0].value : undefined
+        };
     }
 
     /**
@@ -75,7 +83,7 @@ export class EntityModel {
     static uniqueStringOptions(
         records: EntityModel[],
         path: string
-    ): LabelValuePair[] {
+    ): { options: LabelValuePair[], value: any } {
         return EntityModel.uniqueValueOptions(
             records,
             path,
@@ -92,7 +100,7 @@ export class EntityModel {
     static uniqueDateOptions(
         records: EntityModel[],
         path: string
-    ): LabelValuePair[] {
+    ): { options: LabelValuePair[], value: any } {
         return EntityModel.uniqueValueOptions(
             records,
             path,
@@ -110,7 +118,7 @@ export class EntityModel {
     static uniqueBooleanOptions(
         records: EntityModel[],
         path: string
-    ): LabelValuePair[] {
+    ): { options: LabelValuePair[], value: any } {
         return EntityModel.uniqueValueOptions(
             records,
             path,
@@ -128,7 +136,7 @@ export class EntityModel {
     static uniqueAddressOptions(
         records: EntityModel[],
         path: string
-    ): LabelValuePair[] {
+    ): { options: LabelValuePair[], value: any } {
         return EntityModel.uniqueValueOptions(
             records,
             path,

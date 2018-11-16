@@ -37,12 +37,30 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     address: AddressModel = new AddressModel();
 
     uniqueOptions: {
-        name: LabelValuePair[],
-        date: LabelValuePair[],
-        dateOfReporting: LabelValuePair[],
-        isDateOfReportingApproximate: LabelValuePair[],
-        description: LabelValuePair[],
-        address: LabelValuePair[],
+        name: {
+            options: LabelValuePair[],
+            value: any
+        },
+        date: {
+            options: LabelValuePair[],
+            value: any
+        },
+        dateOfReporting: {
+            options: LabelValuePair[],
+            value: any
+        },
+        isDateOfReportingApproximate: {
+            options: LabelValuePair[],
+            value: any
+        },
+        description: {
+            options: LabelValuePair[],
+            value: any
+        },
+        address: {
+            options: LabelValuePair[],
+            value: any
+        }
     };
 
     constructor(
@@ -96,12 +114,30 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     determineUniqueValues() {
         // initialize
         this.uniqueOptions = {
-            name: [],
-            date: [],
-            dateOfReporting: [],
-            isDateOfReportingApproximate: [],
-            description: [],
-            address: []
+            name: {
+                options: [],
+                value: undefined
+            },
+            date: {
+                options: [],
+                value: undefined
+            },
+            dateOfReporting: {
+                options: [],
+                value: undefined
+            },
+            isDateOfReportingApproximate: {
+                options: [],
+                value: undefined
+            },
+            description: {
+                options: [],
+                value: undefined
+            },
+            address: {
+                options: [],
+                value: undefined
+            }
         };
 
         // determine unique values
@@ -112,6 +148,9 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
             this.uniqueOptions.description = EntityModel.uniqueStringOptions(this.mergeRecords, 'description');
             this.uniqueOptions.address = EntityModel.uniqueAddressOptions(this.mergeRecords, 'address');
+
+            // address
+            this.address = this.uniqueOptions.address.value ? this.uniqueOptions.address.value : new AddressModel();
         }
     }
 

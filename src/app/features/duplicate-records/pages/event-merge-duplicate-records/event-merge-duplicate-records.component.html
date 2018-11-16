@@ -20,47 +20,47 @@
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-select
                                 name="name"
-                                ngModel
+                                [ngModel]="uniqueOptions?.name.value"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
-                                [options]="uniqueOptions?.name"
+                                [options]="uniqueOptions?.name.options"
                                 required="true">
                             </app-form-select>
 
                             <app-form-select
                                 name="date"
-                                ngModel
+                                [ngModel]="uniqueOptions?.date.value"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
-                                [options]="uniqueOptions?.date"
+                                [options]="uniqueOptions?.date.options"
                                 required="true">
                             </app-form-select>
 
                             <app-form-select
                                 name="dateOfReporting"
-                                ngModel
+                                [ngModel]="uniqueOptions?.dateOfReporting.value"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                [options]="uniqueOptions?.dateOfReporting"
+                                [options]="uniqueOptions?.dateOfReporting.options"
                                 required="true">
                             </app-form-select>
 
                             <app-form-select
                                 name="isDateOfReportingApproximate"
-                                ngModel
+                                [ngModel]="uniqueOptions?.isDateOfReportingApproximate.value"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
-                                [options]="uniqueOptions?.isDateOfReportingApproximate">
+                                [options]="uniqueOptions?.isDateOfReportingApproximate.options">
                             </app-form-select>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
                             <app-form-select
                                 name="description"
-                                ngModel
+                                [ngModel]="uniqueOptions?.description.value"
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                                [options]="uniqueOptions?.description">
+                                [options]="uniqueOptions?.description.options">
                             </app-form-select>
                         </div>
                     </div>
@@ -80,9 +80,9 @@
                 <mat-card class="page-section">
                     <app-form-select
                         name="selectedAddress"
-                        ngModel
+                        [ngModel]="uniqueOptions?.address.value"
                         [placeholder]="'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate"
-                        [options]="uniqueOptions?.address"
+                        [options]="uniqueOptions?.address.options"
                         (optionChanged)="changedAddress($event)">
                     </app-form-select>
 
