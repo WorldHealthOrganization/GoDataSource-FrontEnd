@@ -190,6 +190,30 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                     }
                 });
             });
+
+            // merge all addresses
+            // const currentAddress: AddressModel;
+            // this.contactData.addresses = [];
+            // _.each(this.mergeRecords, (ent: EntityModel) => {
+            //     _.each((ent.model as ContactModel).addresses, (address: AddressModel) => {
+            //         if (
+            //             address.date ||
+            //             address.locationId ||
+            //             address.fullAddress
+            //         ) {
+            //             // current address ?
+            //             // if we have multiple current addresses then we need to change them to previously addresses
+            //             if (address.typeId === AddressType.CURRENT_ADDRESS) {
+            //                 if (currentAddress) {
+            //
+            //                 } else {
+            //                     currentAddress = address;
+            //                 }
+            //             }
+            //         }
+            //     });
+            // });
+
         }
     }
 
