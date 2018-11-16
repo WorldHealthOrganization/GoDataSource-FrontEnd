@@ -707,6 +707,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+        'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD': 'Workload',
 
         /**
          * Create Team page
@@ -722,6 +723,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
         'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
         'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Teams workload
+         */
+        'LNG_PAGE_TEAMS_WORKLOAD_TITLE': 'Teams Workload',
+        'LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL': 'Team',
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': '{{done}} of {{total}}',
 
         /**
          * User fields

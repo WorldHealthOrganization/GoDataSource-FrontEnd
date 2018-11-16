@@ -1,0 +1,27 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+
+    <div fxFlex fxLayout="row">
+
+        <div class="workload-table-wrapper">
+            <table class="team-workload-table">
+                <tr>
+                    <th *ngFor="let date of dates">{{date}}</th>
+                </tr>
+                <tr *ngFor="let teamId of selectedTeamsIds; let j = index">
+                    <td *ngFor="let date of dates; let d = index">
+                        {{ getTotalFollowupsCount(teamId, date, d) }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</mat-card>
