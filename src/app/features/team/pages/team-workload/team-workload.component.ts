@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -35,8 +33,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
         )
     ];
 
-    // authenticated user
-    authUser: UserModel;
     selectedOutbreak: OutbreakModel;
     metricTeamsFollowups: TeamFollowupsPerDayModel;
     dates: string[] = [];
@@ -45,7 +41,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
     selectedTeamsIds: string[] = [];
 
     constructor(
-        private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
         protected snackbarService: SnackbarService,
@@ -59,8 +54,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
         // subscribe to the Selected Outbreak
         this.outbreakDataService
             .getSelectedOutbreakSubject()
