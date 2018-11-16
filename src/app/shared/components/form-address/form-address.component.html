@@ -180,13 +180,13 @@
                         <app-form-input
                             #latInput
                             [name]="name + '[geoLocation][lat]'"
-                            [(ngModel)]="address.geoLocation.lat"
+                            [ngModel]="address.geoLocation.lat"
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="lngInput.value?.length > 0"
+                            [required]="lngInput.value"
                             type="number"
-                            (input)="onChange()">
+                            (optionChanged)="onChangeLatLng('lat', $event)">
                         </app-form-input>
                         <div
                             *ngIf="displayCopyField"
@@ -208,13 +208,13 @@
                         <app-form-input
                             #lngInput
                             [name]="name + '[geoLocation][lng]'"
-                            [(ngModel)]="address.geoLocation.lng"
+                            [ngModel]="address.geoLocation.lng"
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="latInput.value?.length > 0"
+                            [required]="latInput.value"
                             type="number"
-                            (input)="onChange()">
+                            (optionChanged)="onChangeLatLng('lng', $event)">
                         </app-form-input>
                         <div
                             *ngIf="displayCopyField"
