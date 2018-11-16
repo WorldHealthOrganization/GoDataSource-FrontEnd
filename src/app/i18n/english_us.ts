@@ -1541,6 +1541,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
 
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
