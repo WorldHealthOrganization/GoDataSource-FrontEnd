@@ -73,7 +73,11 @@
                                     </div>
                                 </mat-header-cell>
                                 <mat-cell *matCellDef="let item">
-                                    {{ duplicatesList.peopleMap[item]?.type | translate }}
+                                    <a
+                                        *ngIf="duplicatesList.peopleMap[item]"
+                                        [routerLink]="['/' + EntityModel.getLinkForEntityType(duplicatesList.peopleMap[item].type), duplicatesList.peopleMap[item].id, 'view']">
+                                        {{ duplicatesList.peopleMap[item].type | translate }}
+                                    </a>
                                 </mat-cell>
                             </ng-container>
 

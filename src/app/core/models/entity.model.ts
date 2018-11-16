@@ -61,10 +61,11 @@ export class EntityModel {
     ): { options: LabelValuePair[], value: any } {
         // construct options
         const options: LabelValuePair[] = _.chain(records)
-            .map((record: EntityModel) => _.get(record.model, path))
+            .map((record: EntityModel) => path ? _.get(record.model, path) : record.model)
             .filter((value) => value !== '' && value !== undefined && value !== null)
             .uniqBy((value: any) => valueParser(value))
             .map((value) => labelValueMap(value))
+            .filter((value: LabelValuePair) => value.label !== '' && value.value !== '' && value.value !== undefined && value.value !== null)
             .value();
 
         // finished
@@ -143,6 +144,52 @@ export class EntityModel {
             // no need to do something custom
             (value) => value,
             (value) => new LabelValuePair((value as AddressModel).fullAddress, value)
+        );
+    }
+
+    /**
+     * Unique values
+     * @param records
+     */
+    static uniqueAgeDobOptions(
+        records: EntityModel[],
+        yearsLabel: string,
+        monthsLabel: string
+    ): { options: LabelValuePair[], value: any } {
+        // convert dob to string
+        const dobString = (dob): string => {
+            return dob ?
+                dob :
+                '';
+        };
+
+        // convert age to string
+        const ageString = (age): string => {
+            return !age ?
+                '' : (
+                    age.months > 0 ?
+                        `${age.months} ${monthsLabel}` : (
+                            age.years > 0 ?
+                                `${age.years} ${yearsLabel}` :
+                                ''
+                        )
+                );
+        };
+
+        // convert age dob to string
+        const ageDobString = (dob, age): string => {
+            dob = dobString(dob);
+            age = ageString(age);
+            return `${dob} ${age}`.trim();
+        };
+
+        // return age / dob unique options
+        return EntityModel.uniqueValueOptions(
+            records,
+            '',
+            // no need to do something custom
+            (value: CaseModel | ContactModel) => ageDobString(value.dob, value.age),
+            (value) => new LabelValuePair(ageDobString(value.dob, value.age), value)
         );
     }
 }

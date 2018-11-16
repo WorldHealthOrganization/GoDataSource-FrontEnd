@@ -32,6 +32,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     // constants
     EntityType = EntityType;
     AddressModel = AddressModel;
+    EntityModel = EntityModel;
 
     // authenticated user
     authUser: UserModel;
