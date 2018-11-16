@@ -18,53 +18,50 @@
                     <div fxLayout="column">
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
+                            <app-form-select
                                 name="name"
-                                [(ngModel)]="eventData.name"
+                                ngModel
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
-                                required="true"
-                                maxlength="100">
-                            </app-form-input>
+                                [options]="uniqueOptions?.name"
+                                required="true">
+                            </app-form-select>
 
-                            <app-form-datepicker
+                            <app-form-select
                                 name="date"
-                                [(ngModel)]="eventData.date"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE'| translate"
+                                ngModel
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
-                                required="true"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
+                                [options]="uniqueOptions?.date"
+                                required="true">
+                            </app-form-select>
 
-                            <app-form-datepicker
+                            <app-form-select
                                 name="dateOfReporting"
-                                [(ngModel)]="eventData.dateOfReporting"
-                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                                ngModel
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                required="true"
-                                [maxDate]="serverToday"
-                                app-date-validator
-                                [dateSameOrBefore]="serverToday">
-                            </app-form-datepicker>
+                                [options]="uniqueOptions?.dateOfReporting"
+                                required="true">
+                            </app-form-select>
 
-                            <app-form-slide-toggle
+                            <app-form-select
                                 name="isDateOfReportingApproximate"
-                                [(ngModel)]="eventData.isDateOfReportingApproximate"
-                                [label]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION">
-                            </app-form-slide-toggle>
+                                ngModel
+                                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
+                                [options]="uniqueOptions?.isDateOfReportingApproximate">
+                            </app-form-select>
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-textarea
+                            <app-form-select
                                 name="description"
-                                [(ngModel)]="eventData.description"
+                                ngModel
                                 [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
                                 tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
-                                maxlength="500">
-                            </app-form-textarea>
+                                [options]="uniqueOptions?.description">
+                            </app-form-select>
                         </div>
                     </div>
                 </mat-card>
@@ -81,9 +78,18 @@
                 <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
 
                 <mat-card class="page-section">
+                    <app-form-select
+                        name="selectedAddress"
+                        ngModel
+                        [placeholder]="'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate"
+                        [options]="uniqueOptions?.address"
+                        (optionChanged)="changedAddress($event)">
+                    </app-form-select>
+
                     <app-form-address
                         name="address"
-                        [(ngModel)]="eventData.address">
+                        [ngModel]="address"
+                        [disabled]="true">
                     </app-form-address>
                 </mat-card>
 

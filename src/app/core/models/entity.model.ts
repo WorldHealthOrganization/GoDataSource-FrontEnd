@@ -4,6 +4,7 @@ import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { LabelValuePair } from './label-value-pair';
+import { AddressModel } from './address.model';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -52,13 +53,88 @@ export class EntityModel {
      * @param records
      * @param path
      */
-    static uniqueValueOptions(
+    private static uniqueValueOptions(
         records: EntityModel[],
-        path: string
+        path: string,
+        valueParser: (value: any) => any,
+        labelValueMap: (value: any) => LabelValuePair,
     ): LabelValuePair[] {
         return _.chain(records)
             .map((record: EntityModel) => _.get(record.model, path))
-            .uniqBy((value: any) => _.isString(value) ? value.toLowerCase() : value)
+            .filter((value) => value !== '' && value !== undefined && value !== null)
+            .uniqBy((value: any) => valueParser(value))
+            .map((value) => labelValueMap(value))
             .value();
+    }
+
+    /**
+     * Unique values
+     * @param records
+     * @param path
+     */
+    static uniqueStringOptions(
+        records: EntityModel[],
+        path: string
+    ): LabelValuePair[] {
+        return EntityModel.uniqueValueOptions(
+            records,
+            path,
+            (value) => _.isString(value) ? value.toLowerCase() : value,
+            (value) => new LabelValuePair(value, value)
+        );
+    }
+
+    /**
+     * Unique values
+     * @param records
+     * @param path
+     */
+    static uniqueDateOptions(
+        records: EntityModel[],
+        path: string
+    ): LabelValuePair[] {
+        return EntityModel.uniqueValueOptions(
+            records,
+            path,
+            // no need to do something custom
+            (value) => value,
+            (value) => new LabelValuePair(value, value)
+        );
+    }
+
+    /**
+     * Unique values
+     * @param records
+     * @param path
+     */
+    static uniqueBooleanOptions(
+        records: EntityModel[],
+        path: string
+    ): LabelValuePair[] {
+        return EntityModel.uniqueValueOptions(
+            records,
+            path,
+            // no need to do something custom
+            (value) => value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+            (value) => new LabelValuePair(value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO', value)
+        );
+    }
+
+    /**
+     * Unique values
+     * @param records
+     * @param path
+     */
+    static uniqueAddressOptions(
+        records: EntityModel[],
+        path: string
+    ): LabelValuePair[] {
+        return EntityModel.uniqueValueOptions(
+            records,
+            path,
+            // no need to do something custom
+            (value) => value,
+            (value) => new LabelValuePair((value as AddressModel).fullAddress, value)
+        );
     }
 }

@@ -6,12 +6,14 @@ import { NgForm } from '@angular/forms';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { EventModel } from '../../../../core/models/event.model';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { AddressModel } from '../../../../core/models/address.model';
+import * as _ from 'lodash';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-event-merge-duplicate-records',
@@ -29,23 +31,23 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     // selected outbreak ID
     outbreakId: string;
 
-    eventData: EventModel = new EventModel();
-
     mergeRecordIds: string[];
     mergeRecords: EntityModel[];
+
+    address: AddressModel = new AddressModel();
 
     uniqueOptions: {
         name: LabelValuePair[],
         date: LabelValuePair[],
         dateOfReporting: LabelValuePair[],
         isDateOfReportingApproximate: LabelValuePair[],
-        description: LabelValuePair[]
+        description: LabelValuePair[],
+        address: LabelValuePair[],
     };
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private eventDataService: EventDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService
@@ -98,15 +100,27 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
             date: [],
             dateOfReporting: [],
             isDateOfReportingApproximate: [],
-            description: []
+            description: [],
+            address: []
         };
 
         // determine unique values
         if (this.mergeRecords) {
-            this.uniqueOptions.name = EntityModel.uniqueValueOptions(this.mergeRecords, 'name');
+            this.uniqueOptions.name = EntityModel.uniqueStringOptions(this.mergeRecords, 'name');
+            this.uniqueOptions.date = EntityModel.uniqueDateOptions(this.mergeRecords, 'date');
+            this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
+            this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
+            this.uniqueOptions.description = EntityModel.uniqueStringOptions(this.mergeRecords, 'description');
+            this.uniqueOptions.address = EntityModel.uniqueAddressOptions(this.mergeRecords, 'address');
         }
+    }
 
-        console.log(this.uniqueOptions);
+    /**
+     * Address changed
+     * @param data
+     */
+    changedAddress(data: LabelValuePair) {
+        this.address = data ? data.value : new AddressModel();
     }
 
     /**
@@ -114,28 +128,35 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
      * @param {NgForm[]} stepForms
      */
     createNewEvent(stepForms: NgForm[]) {
-        // // get forms fields
-        // const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        //
-        // if (
-        //     this.formHelper.isFormsSetValid(stepForms) &&
-        //     !_.isEmpty(dirtyFields)
-        // ) {
-        //     // add the new Event
-        //     this.eventDataService
-        //         .createEvent(this.outbreakId, dirtyFields)
-        //         .catch((err) => {
-        //             this.snackbarService.showError(err.message);
-        //
-        //             return ErrorObservable.create(err);
-        //         })
-        //         .subscribe(() => {
-        //             this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
-        //
-        //             // navigate to listing page
-        //             this.disableDirtyConfirm();
-        //             this.router.navigate(['/events']);
-        //         });
-        // }
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        // sanitize
+        delete dirtyFields.selectedAddress;
+
+        // merge records
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
+            // add the new Event
+            this.outbreakDataService
+                .mergePeople(
+                    this.outbreakId,
+                    EntityType.EVENT,
+                    this.mergeRecordIds,
+                    dirtyFields
+                ).catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                })
+                .subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_SUCCESS_MESSAGE');
+
+                    // navigate to listing page
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/duplicated-records']);
+                });
+        }
     }
 }

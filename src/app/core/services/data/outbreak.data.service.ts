@@ -21,6 +21,7 @@ import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-
 import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class OutbreakDataService {
@@ -375,6 +376,28 @@ export class OutbreakDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`),
             EntityModel
+        );
+    }
+
+    /**
+     * Merge people
+     * @param outbreakId
+     * @param type
+     * @param ids
+     * @param modelData
+     */
+    mergePeople(
+        outbreakId: string,
+        type: EntityType,
+        ids: string[],
+        modelData: any
+    ): Observable<any> {
+        return this.http.post(
+            `outbreaks/${outbreakId}/merge`, {
+                type: type,
+                ids: ids,
+                model: modelData
+            }
         );
     }
 }

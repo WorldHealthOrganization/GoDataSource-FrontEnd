@@ -931,6 +931,7 @@ export const EnglishUsLang = {
          * Event merge duplicate records page
          */
         'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE': 'Event - merge duplicate records',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_SUCCESS_MESSAGE': 'Event merged!',
 
         /**
          * Movement Contact page
