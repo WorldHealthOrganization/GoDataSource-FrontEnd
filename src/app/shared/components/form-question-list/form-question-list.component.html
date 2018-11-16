@@ -16,8 +16,21 @@
                             {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
                         </div>
 
+                        <!-- question order -->
+                        <div fxFlex="70px">
+                            <app-form-input
+                                [name]="name + '[' + i + '][order]'"
+                                [(ngModel)]="values[i].order"
+                                type="number"
+                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
+                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                (optionChanged)="onChange()">
+                            </app-form-input>
+                        </div>
+
                         <!-- question text -->
-                        <div fxFlex="30">
+                        <div fxFlex>
                             <app-form-input
                                 [name]="name + '[' + i + '][text]'"
                                 [ngModel]="question.text | translate"
@@ -31,7 +44,7 @@
                         </div>
 
                         <!-- question variable -->
-                        <div fxFlex="10">
+                        <div fxFlex="150px">
                             <app-form-input
                                 [name]="name + '[' + i + '][variable]'"
                                 [(ngModel)]="values[i].variable"
@@ -47,7 +60,7 @@
                         </div>
 
                         <!-- question category -->
-                        <div fxFlex="15">
+                        <div fxFlex="250px">
                             <app-form-select
                                 [name]="name + '[' + i + '][category]'"
                                 [(ngModel)]="values[i].category"
@@ -61,7 +74,7 @@
                         </div>
 
                         <!-- question - answer type -->
-                        <div fxFlex>
+                        <div fxFlex="200px">
                             <app-form-select
                                 [name]="name + '[' + i + '][answerType]'"
                                 [(ngModel)]="values[i].answerType"
