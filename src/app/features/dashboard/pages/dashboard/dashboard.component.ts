@@ -273,6 +273,20 @@ export class DashboardComponent implements OnInit {
             });
     }
 
+    /**
+     * generate Gantt chart report - image will be exported as pdf
+     */
+    generateGanttChartReport() {
+        this.domService
+            .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
+            .subscribe((pngBase64) => {
+                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL');
+                    });
+            });
+    }
+
     private downloadFile(blob, fileNameToken) {
         const fileName = this.i18nService.instant(fileNameToken);
         FileSaver.saveAs(

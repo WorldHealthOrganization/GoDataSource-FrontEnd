@@ -80,13 +80,13 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
      */
     displayChart() {
         // remove existing element then create the new one
-        const elem = document.getElementById('svg-root');
+        const elem = document.getElementById('gantt-svg-root');
         if (elem) {
             elem.innerHTML = '';
         }
         // only display id data is available
         if (!_.isEmpty(this.metricResults)) {
-            this.ganttChart = new SVGGantt('#svg-root', this.ganttData, this.options);
+            this.ganttChart = new SVGGantt('#gantt-svg-root', this.ganttData, this.options);
         }
     }
 

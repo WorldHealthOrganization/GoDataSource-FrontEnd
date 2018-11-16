@@ -1566,6 +1566,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
          * Backup modules
