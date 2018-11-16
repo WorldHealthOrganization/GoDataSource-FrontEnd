@@ -253,10 +253,6 @@ export class FollowUpsDataService {
      */
     getFollowUpsPerDayTeam(outbreakId: string, firstDate: string, lastDate: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamFollowupsPerDayModel> {
         queryBuilder.filter.byRange('date', new FormRangeModel({from: firstDate, to: lastDate}));
-        console.log(queryBuilder);
-        console.log(firstDate);
-        console.log(lastDate);
-
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/per-team-per-day/count?filter=${filter}`),
