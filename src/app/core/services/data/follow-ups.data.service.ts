@@ -11,6 +11,8 @@ import 'rxjs/add/operator/mergeMap';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { MetricContactsModel } from '../../models/metrics/metric-contacts.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../models/metrics/metric.contacts-with-success-follow-up.model';
+import { TeamFollowupsPerDayModel } from '../../models/team-followups-per-day.model';
+import { FormRangeModel } from '../../../shared/components/form-range/form-range.model';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -240,5 +242,27 @@ export class FollowUpsDataService {
             MetricContactsWithSuccessfulFollowUp
         );
     }
+
+    /**
+     * get team workload
+     * @param {string} outbreakId
+     * @param {string} firstDate
+     * @param {string} lastDate
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<TeamFollowupsPerDayModel>}
+     */
+    getFollowUpsPerDayTeam(outbreakId: string, firstDate: string, lastDate: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamFollowupsPerDayModel> {
+        queryBuilder.filter.byRange('date', new FormRangeModel({from: firstDate, to: lastDate}));
+        console.log(queryBuilder);
+        console.log(firstDate);
+        console.log(lastDate);
+
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/follow-ups/per-team-per-day/count?filter=${filter}`),
+            TeamFollowupsPerDayModel
+        );
+    }
+
 }
 
