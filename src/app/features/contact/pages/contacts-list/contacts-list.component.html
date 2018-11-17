@@ -49,7 +49,7 @@
     </app-total-number-of-records>
     <!--Contacts grouped by risk level-->
     <app-counted-items-list
-        [items]="countedContactsByRiskLevel| async"
+        [items]="countedContactsByRiskLevel$ | async"
         (optionChanged)="filterBySelectField('id', $event.ids, null)">
     </app-counted-items-list>
 </div>

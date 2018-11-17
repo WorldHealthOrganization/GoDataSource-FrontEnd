@@ -67,7 +67,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     genderList$: Observable<any[]>;
 
     // contacts grouped by risk level
-    countedContactsByRiskLevel: Observable<any[]>;
+    countedContactsByRiskLevel$: Observable<any[]>;
 
     // risk level
     riskLevelsList$: Observable<any[]>;
@@ -186,13 +186,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
                 // get grouped contacts by risk level
                 if (this.selectedOutbreak) {
-                    this.countedContactsByRiskLevel = this.referenceDataDataService
+                    this.countedContactsByRiskLevel$ = this.referenceDataDataService
                         .getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL)
                         .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
                             return this.contactDataService
                                 .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
                                 .map((data: RiskLevelGroupModel) => {
-                                    return _.map(data ? data.riskLevel : [], (item: RiskLevelModel, itemId) => {
+                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
                                         const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId });
                                         return new CountedItemsListItem(
                                             item.count,

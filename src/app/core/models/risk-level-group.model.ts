@@ -3,10 +3,10 @@ import { RiskLevelModel } from './risk-level.model';
 
 export class RiskLevelGroupModel {
     count: number;
-    riskLevel: RiskLevelModel[];
+    riskLevels: RiskLevelModel[];
 
     constructor(data = null) {
         this.count = _.get(data, 'count');
-        this.riskLevel = _.get(data, 'riskLevel', []);
+        this.riskLevels = _.get(data, 'riskLevel', []);
     }
 }
