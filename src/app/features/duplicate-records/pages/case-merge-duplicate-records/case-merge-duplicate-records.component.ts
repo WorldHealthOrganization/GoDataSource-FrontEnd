@@ -533,29 +533,30 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         delete dirtyFields.selectedQuestionnaireAnswers;
 
         // merge records
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
-            !_.isEmpty(dirtyFields)
-        ) {
-            // add the new Contact
-            this.displayLoading = true;
-            this.outbreakDataService
-                .mergePeople(
-                    this.selectedOutbreak.id,
-                    EntityType.CASE,
-                    this.mergeRecordIds,
-                    dirtyFields
-                ).catch((err) => {
-                    this.displayLoading = false;
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                }).subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
+        if (!_.isEmpty(dirtyFields)) {
+            if (this.formHelper.isFormsSetValid(stepForms)) {
+                // add the new Contact
+                this.displayLoading = true;
+                this.outbreakDataService
+                    .mergePeople(
+                        this.selectedOutbreak.id,
+                        EntityType.CASE,
+                        this.mergeRecordIds,
+                        dirtyFields
+                    ).catch((err) => {
+                        this.displayLoading = false;
+                        this.snackbarService.showError(err.message);
+                        return ErrorObservable.create(err);
+                    }).subscribe(() => {
+                        this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/duplicated-records']);
-                });
+                        // navigate to listing page
+                        this.disableDirtyConfirm();
+                        this.router.navigate(['/duplicated-records']);
+                    });
+            } else {
+                this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            }
         }
     }
 }

@@ -181,29 +181,30 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
         delete dirtyFields.selectedAddress;
 
         // merge records
-        if (
-            this.formHelper.isFormsSetValid(stepForms) &&
-            !_.isEmpty(dirtyFields)
-        ) {
-            // add the new Event
-            this.displayLoading = true;
-            this.outbreakDataService
-                .mergePeople(
-                    this.outbreakId,
-                    EntityType.EVENT,
-                    this.mergeRecordIds,
-                    dirtyFields
-                ).catch((err) => {
-                    this.displayLoading = false;
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                }).subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
+        if (!_.isEmpty(dirtyFields)) {
+            if (this.formHelper.isFormsSetValid(stepForms)) {
+                // add the new Event
+                this.displayLoading = true;
+                this.outbreakDataService
+                    .mergePeople(
+                        this.outbreakId,
+                        EntityType.EVENT,
+                        this.mergeRecordIds,
+                        dirtyFields
+                    ).catch((err) => {
+                        this.displayLoading = false;
+                        this.snackbarService.showError(err.message);
+                        return ErrorObservable.create(err);
+                    }).subscribe(() => {
+                        this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/duplicated-records']);
-                });
+                        // navigate to listing page
+                        this.disableDirtyConfirm();
+                        this.router.navigate(['/duplicated-records']);
+                    });
+            } else {
+                this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            }
         }
     }
 }
