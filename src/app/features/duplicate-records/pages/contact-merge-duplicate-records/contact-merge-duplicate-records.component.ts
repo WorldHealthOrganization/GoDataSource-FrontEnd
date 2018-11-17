@@ -194,7 +194,6 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
             this.uniqueOptions.phoneNumber = EntityModel.uniqueStringOptions(this.mergeRecords, 'phoneNumber');
             this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
-            this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
             this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
                 this.mergeRecords,
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
