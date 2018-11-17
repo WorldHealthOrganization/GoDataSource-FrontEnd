@@ -384,6 +384,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
@@ -930,6 +931,11 @@ export const EnglishUsLang = {
          * Case merge duplicate records page
          */
         'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE': 'Case - merge duplicate records',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASE_BUTTON': 'Merge cases',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE': 'Cases merged!',
 
         /**
          * Contact merge duplicate records page
@@ -938,7 +944,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts merged!',
         'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
         'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
-        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON': 'Merge contacts',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts',
 
         /**
          * Event merge duplicate records page
