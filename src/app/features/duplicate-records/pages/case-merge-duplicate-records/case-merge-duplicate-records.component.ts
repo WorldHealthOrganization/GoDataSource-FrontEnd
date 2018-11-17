@@ -18,6 +18,8 @@ import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { NgForm } from '@angular/forms';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',
@@ -500,36 +502,60 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
      * @param stepForms
      */
     createNewCase(stepForms: NgForm[]) {
-        // // get forms fields
-        // const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        //
-        // // add age & dob information
-        // if (dirtyFields.ageDob) {
-        //     dirtyFields.age = dirtyFields.ageDob.age;
-        //     dirtyFields.dob = dirtyFields.ageDob.dob;
-        //     delete dirtyFields.ageDob;
-        // }
-        //
-        // // validate
-        // if (
-        //     this.formHelper.isFormsSetValid(stepForms) &&
-        //     !_.isEmpty(dirtyFields)
-        // ) {
-        //     // add the new Case
-        //     this.caseDataService
-        //         .createCase(this.selectedOutbreak.id, dirtyFields)
-        //         .catch((err) => {
-        //             this.snackbarService.showApiError(err);
-        //
-        //             return ErrorObservable.create(err);
-        //         })
-        //         .subscribe(() => {
-        //             this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
-        //
-        //             // navigate to listing page
-        //             this.disableDirtyConfirm();
-        //             this.router.navigate(['/cases']);
-        //         });
-        // }
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        // sanitize current Address
+        if (dirtyFields.address) {
+            // initialize addresses if there are no other addresses
+            if (!dirtyFields.addresses) {
+                dirtyFields.addresses = [];
+            }
+
+            // add current address
+            dirtyFields.addresses.push(dirtyFields.address);
+
+            // remove unnecessary data
+            delete dirtyFields.address;
+            delete dirtyFields.selectedAddress;
+        }
+
+        // sanitize age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+
+            // remove unnecessary data
+            delete dirtyFields.ageDob;
+        }
+
+        // sanitize questionnaire answers
+        delete dirtyFields.selectedQuestionnaireAnswers
+
+        // merge records
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
+            // add the new Contact
+            this.displayLoading = true;
+            this.outbreakDataService
+                .mergePeople(
+                    this.selectedOutbreak.id,
+                    EntityType.CASE,
+                    this.mergeRecordIds,
+                    dirtyFields
+                ).catch((err) => {
+                    this.displayLoading = false;
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                }).subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
+
+                    // navigate to listing page
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/duplicated-records']);
+                });
+        }
     }
 }
