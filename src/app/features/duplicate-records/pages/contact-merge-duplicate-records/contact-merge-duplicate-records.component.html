@@ -5,177 +5,184 @@
 </app-topnav>
 
 <div class="page-content">
+    <div
+        *ngIf="displayLoading"
+        class="merge-loading">
+        <mat-spinner></mat-spinner>
+    </div>
 
-    <mat-horizontal-stepper linear #stepper>
+    <div
+        *ngIf="!displayLoading">
+        <mat-horizontal-stepper linear #stepper>
 
-        <!-- Personal step -->
-        <mat-step [stepControl]="personalForm">
-            <form #personalForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE'| translate}}</ng-template>
+            <!-- Personal step -->
+            <mat-step [stepControl]="personalForm">
+                <form #personalForm="ngForm">
+                    <ng-template matStepLabel>{{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE'| translate}}</ng-template>
 
-                <!-- Personal Details section -->
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-select
-                                name="firstName"
-                                [ngModel]="uniqueOptions?.firstName.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
-                                [options]="uniqueOptions?.firstName.options"
-                                required="true">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="middleName"
-                                [ngModel]="uniqueOptions?.middleName.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
-                                [options]="uniqueOptions?.middleName.options">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="lastName"
-                                [ngModel]="uniqueOptions?.lastName.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
-                                [options]="uniqueOptions?.lastName.options">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="gender"
-                                [ngModel]="uniqueOptions?.gender.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
-                                [options]="uniqueOptions?.gender.options">
-                            </app-form-select>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <div
-                                fxFlex fxLayout="row" fxLayoutGap="20px">
+                    <!-- Personal Details section -->
+                    <mat-card class="page-section">
+                        <div fxLayout="column">
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                                 <app-form-select
-                                    name="phoneNumber"
-                                    [ngModel]="uniqueOptions?.phoneNumber.value"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE' | translate"
-                                    tooltip="LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION"
-                                    [options]="uniqueOptions?.phoneNumber.options">
+                                    name="firstName"
+                                    [ngModel]="uniqueOptions?.firstName.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+                                    [options]="uniqueOptions?.firstName.options"
+                                    required="true">
                                 </app-form-select>
 
                                 <app-form-select
-                                    name="occupation"
-                                    [ngModel]="uniqueOptions?.occupation.value"
-                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                                    tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                                    [options]="uniqueOptions?.occupation.options">
+                                    name="middleName"
+                                    [ngModel]="uniqueOptions?.middleName.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION"
+                                    [options]="uniqueOptions?.middleName.options">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="lastName"
+                                    [ngModel]="uniqueOptions?.lastName.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+                                    [options]="uniqueOptions?.lastName.options">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="gender"
+                                    [ngModel]="uniqueOptions?.gender.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
+                                    [options]="uniqueOptions?.gender.options">
                                 </app-form-select>
                             </div>
 
-                            <app-form-select
-                                name="ageDob"
-                                [ngModel]="uniqueOptions?.ageDob.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION"
-                                [options]="uniqueOptions?.ageDob.options">
-                            </app-form-select>
+                            <div fxLayout="row" fxLayoutGap="20px">
+                                <div
+                                    fxFlex fxLayout="row" fxLayoutGap="20px">
+                                    <app-form-select
+                                        name="phoneNumber"
+                                        [ngModel]="uniqueOptions?.phoneNumber.value"
+                                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_PHONE' | translate"
+                                        tooltip="LNG_CONTACT_FIELD_LABEL_PHONE_DESCRIPTION"
+                                        [options]="uniqueOptions?.phoneNumber.options">
+                                    </app-form-select>
+
+                                    <app-form-select
+                                        name="occupation"
+                                        [ngModel]="uniqueOptions?.occupation.value"
+                                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+                                        tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+                                        [options]="uniqueOptions?.occupation.options">
+                                    </app-form-select>
+                                </div>
+
+                                <app-form-select
+                                    name="ageDob"
+                                    [ngModel]="uniqueOptions?.ageDob.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_AGE' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION"
+                                    [options]="uniqueOptions?.ageDob.options">
+                                </app-form-select>
+                            </div>
+
+                            <div fxLayout="row" fxLayoutGap="20px">
+                                <app-form-select
+                                    name="dateOfReporting"
+                                    [ngModel]="uniqueOptions?.dateOfReporting.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                    [options]="uniqueOptions?.dateOfReporting.options"
+                                    [required]="true">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="isDateOfReportingApproximate"
+                                    [ngModel]="uniqueOptions?.isDateOfReportingApproximate.value"
+                                    [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                    tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
+                                    [options]="uniqueOptions?.isDateOfReportingApproximate.options">
+                                </app-form-select>
+
+                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!-- placeholder --></div>
+                            </div>
+
                         </div>
+                    </mat-card>
 
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-select
-                                name="dateOfReporting"
-                                [ngModel]="uniqueOptions?.dateOfReporting.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                                [options]="uniqueOptions?.dateOfReporting.options"
-                                [required]="true">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="isDateOfReportingApproximate"
-                                [ngModel]="uniqueOptions?.isDateOfReportingApproximate.value"
-                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
-                                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
-                                [options]="uniqueOptions?.isDateOfReportingApproximate.options">
-                            </app-form-select>
-
-                            <div fxFlex><!-- placeholder --></div>
-                            <div fxFlex><!-- placeholder --></div>
-                        </div>
-
+                    <!-- Documents section -->
+                    <div class="section-title">
+                        {{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
                     </div>
-                </mat-card>
+                    <app-form-document-list
+                        name="documents"
+                        [(ngModel)]="contactData.documents"
+                        [disabled]="true">
+                    </app-form-document-list>
 
-                <!-- Documents section -->
-                <div class="section-title">
-                    {{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
-                </div>
-                <app-form-document-list
-                    name="documents"
-                    [(ngModel)]="contactData.documents"
-                    [disabled]="true">
-                </app-form-document-list>
+                    <div>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    </div>
+                </form>
+            </mat-step>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
-                </div>
-            </form>
-        </mat-step>
+            <!-- Address step -->
+            <mat-step [stepControl]="addressForm">
+                <form #addressForm="ngForm">
+                    <ng-template matStepLabel>
+                        {{ 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}
+                    </ng-template>
 
-        <!-- Address step -->
-        <mat-step [stepControl]="addressForm">
-            <form #addressForm="ngForm">
+                    <mat-card
+                        *ngIf="uniqueOptions?.currentAddresses.options.length > 0"
+                        class="page-section">
+                        <app-form-select
+                            name="selectedAddress"
+                            [ngModel]="uniqueOptions?.currentAddresses.value"
+                            [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS' | translate"
+                            [options]="uniqueOptions?.currentAddresses.options"
+                            (optionChanged)="changedAddress($event)"
+                            [clearable]="false">
+                        </app-form-select>
+
+                        <app-form-address
+                            name="address"
+                            [ngModel]="address"
+                            [disabled]="true">
+                        </app-form-address>
+                    </mat-card>
+
+                    <app-form-address-list
+                        name="addresses"
+                        [(ngModel)]="contactData.addresses"
+                        [disabled]="true">
+                    </app-form-address-list>
+
+                    <div>
+                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    </div>
+                </form>
+            </mat-step>
+
+            <!-- Final step -->
+            <mat-step>
                 <ng-template matStepLabel>
-                    {{ 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}
+                    {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
                 </ng-template>
 
-                <mat-card
-                    *ngIf="uniqueOptions?.currentAddresses.options.length > 0"
-                    class="page-section">
-                    <app-form-select
-                        name="selectedAddress"
-                        [ngModel]="uniqueOptions?.currentAddresses.value"
-                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS' | translate"
-                        [options]="uniqueOptions?.currentAddresses.options"
-                        (optionChanged)="changedAddress($event)"
-                        [clearable]="false">
-                    </app-form-select>
-
-                    <app-form-address
-                        name="address"
-                        [ngModel]="address"
-                        [disabled]="true">
-                    </app-form-address>
-                </mat-card>
-
-                <app-form-address-list
-                    name="addresses"
-                    [(ngModel)]="contactData.addresses"
-                    [disabled]="true">
-                </app-form-address-list>
+                {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
                 <div>
                     <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button *app-selected-outbreak-is-active type="button" mat-button
+                            (click)="createNewContact([personalForm, addressForm])">
+                        {{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON' | translate}}
+                    </button>
                 </div>
-            </form>
-        </mat-step>
-
-        <!-- Final step -->
-        <mat-step>
-            <ng-template matStepLabel>
-                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
-            </ng-template>
-
-            {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-
-            <div>
-                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button
-                        (click)="createNewContact([personalForm, addressForm])">
-                    {{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON' | translate}}
-                </button>
-            </div>
-        </mat-step>
-    </mat-horizontal-stepper>
-
+            </mat-step>
+        </mat-horizontal-stepper>
+    </div>
 </div>

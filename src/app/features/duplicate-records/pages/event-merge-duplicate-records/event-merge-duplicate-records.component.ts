@@ -31,6 +31,9 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     // selected outbreak ID
     outbreakId: string;
 
+    // loading flag - display spinner instead of table
+    displayLoading: boolean = false;
+
     mergeRecordIds: string[];
     mergeRecords: EntityModel[];
 
@@ -76,6 +79,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
     ngOnInit() {
         // get merge ids
         // retrieve query params
+        this.displayLoading = true;
         this.route.queryParams
             .subscribe((params: { ids }) => {
                 // record ids
@@ -103,6 +107,9 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
 
                                 // determine unique values
                                 this.determineUniqueValues();
+
+                                // finished
+                                this.displayLoading = false;
                             });
                     });
             });

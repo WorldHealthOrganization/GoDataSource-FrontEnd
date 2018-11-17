@@ -37,6 +37,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     // selected outbreak ID
     outbreakId: string;
 
+    // loading flag - display spinner instead of table
+    displayLoading: boolean = false;
+
     address: AddressModel = new AddressModel();
 
     mergeRecordIds: string[];
@@ -99,6 +102,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
     ngOnInit() {
         // get merge ids
         // retrieve query params
+        this.displayLoading = true;
         this.route.queryParams
             .subscribe((params: { ids }) => {
                 // record ids
@@ -126,6 +130,9 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
 
                                 // determine unique values
                                 this.determineUniqueValues();
+
+                                // finished
+                                this.displayLoading = false;
                             });
                     });
             });
