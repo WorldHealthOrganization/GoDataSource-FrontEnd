@@ -289,11 +289,12 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
      * @param {NgForm[]} stepForms
      */
     createNewContact(stepForms: NgForm[]) {
-        // // get forms fields
-        // const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        // const relationship = _.get(dirtyFields, 'relationship');
-        // delete dirtyFields.relationship;
-        //
+        // get forms fields
+        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+
+        // sanitize
+        console.log(dirtyFields);
+
         // // add age & dob information
         // if (dirtyFields.ageDob) {
         //     dirtyFields.age = dirtyFields.ageDob.age;
@@ -339,7 +340,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         //                     return ErrorObservable.create(err);
         //                 })
         //                 .subscribe(() => {
-        //                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+        //                     this.snackbarService.showSuccess('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
         //
         //                     // navigate to listing page
         //                     this.disableDirtyConfirm();

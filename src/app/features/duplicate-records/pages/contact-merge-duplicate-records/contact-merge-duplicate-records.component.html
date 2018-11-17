@@ -11,7 +11,7 @@
         <!-- Personal step -->
         <mat-step [stepControl]="personalForm">
             <form #personalForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE'| translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE'| translate}}</ng-template>
 
                 <!-- Personal Details section -->
                 <mat-card class="page-section">
@@ -125,7 +125,7 @@
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
                 <ng-template matStepLabel>
-                    {{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}
+                    {{ 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}
                 </ng-template>
 
                 <mat-card
@@ -171,8 +171,8 @@
             <div>
                 <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
                 <button *app-selected-outbreak-is-active type="button" mat-button
-                        (click)="createNewContact([personalForm, addressForm, relationshipForm])">
-                    {{'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON' | translate}}
+                        (click)="createNewContact([personalForm, addressForm])">
+                    {{'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

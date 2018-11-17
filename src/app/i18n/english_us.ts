@@ -935,12 +935,19 @@ export const EnglishUsLang = {
          * Contact merge duplicate records page
          */
         'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact - merge duplicate records',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts merged!',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON': 'Merge contacts',
 
         /**
          * Event merge duplicate records page
          */
         'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE': 'Event - merge duplicate records',
-        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_SUCCESS_MESSAGE': 'Event merged!',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE': 'Events merged!',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON': 'Merge events',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
 
         /**
          * Movement Contact page

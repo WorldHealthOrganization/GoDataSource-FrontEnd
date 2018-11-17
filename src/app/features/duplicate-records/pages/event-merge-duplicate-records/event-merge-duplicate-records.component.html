@@ -11,7 +11,7 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' | translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_DETAILS_TITLE' | translate}}</ng-template>
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -75,7 +75,7 @@
         <!-- Address step -->
         <mat-step [stepControl]="addressForm">
             <form #addressForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
+                <ng-template matStepLabel>{{ 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}</ng-template>
 
                 <mat-card class="page-section">
                     <app-form-select
@@ -106,8 +106,8 @@
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div>
                 <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">
-                    {{'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON' | translate}}
+                <button type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">
+                    {{'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>
