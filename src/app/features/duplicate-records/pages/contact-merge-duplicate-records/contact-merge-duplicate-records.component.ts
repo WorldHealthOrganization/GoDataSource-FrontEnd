@@ -331,6 +331,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Contact
+            this.displayLoading = true;
             this.outbreakDataService
                 .mergePeople(
                     this.outbreakId,
@@ -338,6 +339,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                     this.mergeRecordIds,
                     dirtyFields
                 ).catch((err) => {
+                    this.displayLoading = false;
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 }).subscribe(() => {

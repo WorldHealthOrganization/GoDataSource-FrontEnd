@@ -186,6 +186,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
             !_.isEmpty(dirtyFields)
         ) {
             // add the new Event
+            this.displayLoading = true;
             this.outbreakDataService
                 .mergePeople(
                     this.outbreakId,
@@ -193,6 +194,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
                     this.mergeRecordIds,
                     dirtyFields
                 ).catch((err) => {
+                    this.displayLoading = false;
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 }).subscribe(() => {
