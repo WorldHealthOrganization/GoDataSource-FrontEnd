@@ -199,7 +199,7 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                 this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
             );
-            this.uniqueOptions.dateOfReporting = EntityModel.uniqueStringOptions(this.mergeRecords, 'dateOfReporting');
+            this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
 
             // merge all documents
