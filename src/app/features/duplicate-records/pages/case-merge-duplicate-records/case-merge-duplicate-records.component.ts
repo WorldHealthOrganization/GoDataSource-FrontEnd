@@ -530,7 +530,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         }
 
         // sanitize questionnaire answers
-        delete dirtyFields.selectedQuestionnaireAnswers
+        delete dirtyFields.selectedQuestionnaireAnswers;
 
         // merge records
         if (
