@@ -45,15 +45,6 @@
             fxFlex>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
         </div>
-        <div
-            fxFlex fxLayout="row" fxLayoutGap="10px">
-            <div
-                *ngFor="let status of dailyStatusesArray"
-                [style.background-color]="status.colorCode"
-                class="follow-up-range-status-legend">
-                {{ status.value | translate }}
-            </div>
-        </div>
     </div>
 
     <!-- Loading data data -->
@@ -67,10 +58,19 @@
     <div
         *ngIf="!displayLoading">
         <!-- Reset Filters -->
-        <div class="reset-filters">
-            <button mat-raised-button (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
+        <div class="top-section-wrapper">
+            <!--List Color Legend-->
+            <div>
+                <app-color-list-legend
+                    [referenceDataCategory]="ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS">
+                </app-color-list-legend>
+            </div>
+
+            <div class="reset-filters">
+                <button mat-raised-button (click)="needsRefreshList(true)">
+                    {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                </button>
+            </div>
         </div>
 
         <div
