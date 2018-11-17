@@ -277,16 +277,6 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             ));
         }
 
-        // usual place of address is required..add empty address
-        if (this.uniqueOptions.currentAddresses.options.length < 1) {
-            this.uniqueOptions.currentAddresses.options.push(new LabelValuePair(
-                this.i18nService.instant('LNG_COMMON_LABEL_NONE'),
-                new AddressModel({
-                    typeId: AddressType.CURRENT_ADDRESS
-                })
-            ));
-        }
-
         // preselect current address ?
         if (this.uniqueOptions.currentAddresses.options.length === 1) {
             this.uniqueOptions.currentAddresses.value = this.uniqueOptions.currentAddresses.options[0].value;

@@ -193,6 +193,7 @@
                     </mat-card>
 
                     <app-form-address-list
+                        *ngIf="caseData.addresses?.length > 0"
                         name="addresses"
                         [ngModel]="caseData.addresses"
                         [disabled]="true"

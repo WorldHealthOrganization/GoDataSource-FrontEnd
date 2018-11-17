@@ -155,6 +155,7 @@
                     </mat-card>
 
                     <app-form-address-list
+                        *ngIf="contactData.addresses?.length > 0"
                         name="addresses"
                         [ngModel]="contactData.addresses"
                         [disabled]="true"
