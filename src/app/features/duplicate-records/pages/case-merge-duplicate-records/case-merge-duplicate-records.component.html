@@ -158,7 +158,7 @@
                     <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>
                     <app-form-document-list
                         name="documents"
-                        [(ngModel)]="caseData.documents"
+                        [ngModel]="caseData.documents"
                         [disabled]="true">
                     </app-form-document-list>
 
@@ -267,7 +267,7 @@
                         </div>
                     </mat-card>
 
-                    <!--Outcome section-->
+                    <!-- Outcome section -->
                     <mat-card class="page-section">
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
@@ -324,7 +324,7 @@
                     <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate}}</div>
                     <app-form-daterange-list
                         name="hospitalizationDates"
-                        [(ngModel)]="caseData.hospitalizationDates"
+                        [ngModel]="caseData.hospitalizationDates"
                         fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                         toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
                         [disabled]="true">
@@ -334,7 +334,7 @@
                     <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate}}</div>
                     <app-form-daterange-list
                         name="isolationDates"
-                        [(ngModel)]="caseData.isolationDates"
+                        [ngModel]="caseData.isolationDates"
                         fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                         toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
                         [disabled]="true">
