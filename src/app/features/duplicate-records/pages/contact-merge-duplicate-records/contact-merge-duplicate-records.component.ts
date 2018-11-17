@@ -17,6 +17,8 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 @Component({
     selector: 'app-contact-merge-duplicate-records',
@@ -292,61 +294,52 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
-        // sanitize
-        console.log(dirtyFields);
+        // sanitize current Address
+        if (dirtyFields.address) {
+            // initialize addresses if there are no other addresses
+            if (!dirtyFields.addresses) {
+                dirtyFields.addresses = [];
+            }
 
-        // // add age & dob information
-        // if (dirtyFields.ageDob) {
-        //     dirtyFields.age = dirtyFields.ageDob.age;
-        //     dirtyFields.dob = dirtyFields.ageDob.dob;
-        //     delete dirtyFields.ageDob;
-        // }
-        //
-        // // create relationship & contact
-        // if (
-        //     this.formHelper.isFormsSetValid(stepForms) &&
-        //     !_.isEmpty(dirtyFields) &&
-        //     !_.isEmpty(relationship)
-        // ) {
-        //     // add the new Contact
-        //     this.contactDataService
-        //         .createContact(this.outbreakId, dirtyFields)
-        //         .catch((err) => {
-        //             this.snackbarService.showApiError(err);
-        //
-        //             return ErrorObservable.create(err);
-        //         })
-        //         .subscribe((contactData: ContactModel) => {
-        //             this.relationshipDataService
-        //                 .createRelationship(
-        //                     this.outbreakId,
-        //                     EntityType.CONTACT,
-        //                     contactData.id,
-        //                     relationship
-        //                 )
-        //                 .catch((err) => {
-        //                     // display error message
-        //                     this.snackbarService.showApiError(err);
-        //
-        //                     // remove contact
-        //                     this.contactDataService
-        //                         .deleteContact(this.outbreakId, contactData.id)
-        //                         .catch((errDC) => {
-        //                             return ErrorObservable.create(errDC);
-        //                         })
-        //                         .subscribe();
-        //
-        //                     // finished
-        //                     return ErrorObservable.create(err);
-        //                 })
-        //                 .subscribe(() => {
-        //                     this.snackbarService.showSuccess('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
-        //
-        //                     // navigate to listing page
-        //                     this.disableDirtyConfirm();
-        //                     this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
-        //                 });
-        //         });
-        // }
+            // add current address
+            dirtyFields.addresses.push(dirtyFields.address);
+
+            // remove unnecessary data
+            delete dirtyFields.address;
+            delete dirtyFields.selectedAddress;
+        }
+
+        // sanitize age & dob information
+        if (dirtyFields.ageDob) {
+            dirtyFields.age = dirtyFields.ageDob.age;
+            dirtyFields.dob = dirtyFields.ageDob.dob;
+
+            // remove unnecessary data
+            delete dirtyFields.ageDob;
+        }
+
+        // merge records
+        if (
+            this.formHelper.isFormsSetValid(stepForms) &&
+            !_.isEmpty(dirtyFields)
+        ) {
+            // add the new Contact
+            this.outbreakDataService
+                .mergePeople(
+                    this.outbreakId,
+                    EntityType.CONTACT,
+                    this.mergeRecordIds,
+                    dirtyFields
+                ).catch((err) => {
+                    this.snackbarService.showError(err.message);
+                    return ErrorObservable.create(err);
+                }).subscribe(() => {
+                    this.snackbarService.showSuccess('LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
+
+                    // navigate to listing page
+                    this.disableDirtyConfirm();
+                    this.router.navigate(['/duplicated-records']);
+                });
+        }
     }
 }

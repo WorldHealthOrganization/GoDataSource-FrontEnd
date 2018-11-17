@@ -188,8 +188,7 @@ export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges im
                 ).catch((err) => {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
-                })
-                .subscribe(() => {
+                }).subscribe(() => {
                     this.snackbarService.showSuccess('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
                     // navigate to listing page
