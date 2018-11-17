@@ -27,7 +27,7 @@
                             <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                                 <app-form-select
                                     name="name"
-                                    [ngModel]="uniqueOptions?.name.value"
+                                    [(ngModel)]="uniqueOptions?.name.value"
                                     [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
                                     tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
                                     [options]="uniqueOptions?.name.options"
@@ -36,7 +36,7 @@
 
                                 <app-form-select
                                     name="date"
-                                    [ngModel]="uniqueOptions?.date.value"
+                                    [(ngModel)]="uniqueOptions?.date.value"
                                     [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
                                     tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
                                     [options]="uniqueOptions?.date.options"
@@ -45,7 +45,7 @@
 
                                 <app-form-select
                                     name="dateOfReporting"
-                                    [ngModel]="uniqueOptions?.dateOfReporting.value"
+                                    [(ngModel)]="uniqueOptions?.dateOfReporting.value"
                                     [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
                                     tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
                                     [options]="uniqueOptions?.dateOfReporting.options"
@@ -54,7 +54,7 @@
 
                                 <app-form-select
                                     name="isDateOfReportingApproximate"
-                                    [ngModel]="uniqueOptions?.isDateOfReportingApproximate.value"
+                                    [(ngModel)]="uniqueOptions?.isDateOfReportingApproximate.value"
                                     [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
                                     tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
                                     [options]="uniqueOptions?.isDateOfReportingApproximate.options">
@@ -64,7 +64,7 @@
                             <div fxLayout="row" fxLayoutGap="20px">
                                 <app-form-select
                                     name="description"
-                                    [ngModel]="uniqueOptions?.description.value"
+                                    [(ngModel)]="uniqueOptions?.description.value"
                                     [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
                                     tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
                                     [options]="uniqueOptions?.description.options">
@@ -87,7 +87,7 @@
                     <mat-card class="page-section">
                         <app-form-select
                             name="selectedAddress"
-                            [ngModel]="uniqueOptions?.address.value"
+                            [(ngModel)]="uniqueOptions?.address.value"
                             [placeholder]="'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate"
                             [options]="uniqueOptions?.address.options"
                             (optionChanged)="changedAddress($event)">
