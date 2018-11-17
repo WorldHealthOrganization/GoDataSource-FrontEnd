@@ -14,6 +14,9 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DocumentModel } from '../../../../core/models/document.model';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
+import * as moment from 'moment';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-contact-merge-duplicate-records',
@@ -31,6 +34,8 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
 
     // selected outbreak ID
     outbreakId: string;
+
+    address: AddressModel = new AddressModel();
 
     mergeRecordIds: string[];
     mergeRecords: EntityModel[];
@@ -69,6 +74,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             value: any
         },
         isDateOfReportingApproximate: {
+            options: LabelValuePair[],
+            value: any
+        },
+        currentAddresses: {
             options: LabelValuePair[],
             value: any
         }
@@ -161,6 +170,10 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             isDateOfReportingApproximate: {
                 options: [],
                 value: undefined
+            },
+            currentAddresses: {
+                options: [],
+                value: undefined
             }
         };
 
@@ -182,39 +195,93 @@ export class ContactMergeDuplicateRecordsComponent extends ConfirmOnFormChanges 
             this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
 
             // merge all documents
-            this.contactData.documents = [];
-            _.each(this.mergeRecords, (ent: EntityModel) => {
-                _.each((ent.model as ContactModel).documents, (doc: DocumentModel) => {
-                    if (doc.number || doc.type) {
-                        this.contactData.documents.push(doc);
-                    }
-                });
-            });
+            this.determineDocuments();
 
-            // merge all addresses
-            // const currentAddress: AddressModel;
-            // this.contactData.addresses = [];
-            // _.each(this.mergeRecords, (ent: EntityModel) => {
-            //     _.each((ent.model as ContactModel).addresses, (address: AddressModel) => {
-            //         if (
-            //             address.date ||
-            //             address.locationId ||
-            //             address.fullAddress
-            //         ) {
-            //             // current address ?
-            //             // if we have multiple current addresses then we need to change them to previously addresses
-            //             if (address.typeId === AddressType.CURRENT_ADDRESS) {
-            //                 if (currentAddress) {
-            //
-            //                 } else {
-            //                     currentAddress = address;
-            //                 }
-            //             }
-            //         }
-            //     });
-            // });
-
+            // merge all addresses, keep just one current address
+            this.determineAddresses();
         }
+    }
+
+    /**
+     * Determine documents
+     */
+    private determineDocuments() {
+        // merge all documents
+        this.contactData.documents = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            _.each((ent.model as ContactModel).documents, (doc: DocumentModel) => {
+                if (doc.number || doc.type) {
+                    this.contactData.documents.push(doc);
+                }
+            });
+        });
+    }
+
+    /**
+     * Determine addresses
+     */
+    private determineAddresses() {
+        // merge all addresses, keep just one current address
+        let currentAddress: AddressModel;
+        this.contactData.addresses = [];
+        _.each(this.mergeRecords, (ent: EntityModel) => {
+            _.each((ent.model as ContactModel).addresses, (address: AddressModel) => {
+                if (
+                    address.locationId ||
+                    address.fullAddress
+                ) {
+                    // current address ?
+                    // if we have multiple current addresses then we need to change them to previously addresses
+                    if (address.typeId === AddressType.CURRENT_ADDRESS) {
+                        if (address.date) {
+                            // we have multiple current addresses ?
+                            if (currentAddress) {
+                                // address is newer?
+                                if (moment(currentAddress.date).isBefore(moment(address.date))) {
+                                    currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
+                                    this.contactData.addresses.push(currentAddress);
+                                    currentAddress = address;
+                                } else {
+                                    address.typeId = AddressType.PREVIOUS_ADDRESS;
+                                    this.contactData.addresses.push(address);
+                                }
+                            } else {
+                                currentAddress = address;
+                            }
+                        } else {
+                            this.uniqueOptions.currentAddresses.options.push(new LabelValuePair(
+                                address.fullAddress,
+                                address
+                            ));
+                        }
+                    } else {
+                        this.contactData.addresses.push(address);
+                    }
+                }
+            });
+        });
+
+        // do we have a current address ?
+        if (currentAddress) {
+            this.uniqueOptions.currentAddresses.options.push(new LabelValuePair(
+                `${currentAddress.fullAddress} ( ${moment(currentAddress.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)} )`,
+                currentAddress
+            ));
+        }
+
+        // preselect current address ?
+        if (this.uniqueOptions.currentAddresses.options.length === 1) {
+            this.uniqueOptions.currentAddresses.value = this.uniqueOptions.currentAddresses.options[0].value;
+            this.address = this.uniqueOptions.currentAddresses.value;
+        }
+    }
+
+    /**
+     * Address changed
+     * @param data
+     */
+    changedAddress(data: LabelValuePair) {
+        this.address = data ? data.value : new AddressModel();
     }
 
     /**

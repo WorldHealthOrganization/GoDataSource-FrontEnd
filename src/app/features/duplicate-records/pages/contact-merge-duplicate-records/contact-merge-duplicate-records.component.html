@@ -128,9 +128,29 @@
                     {{ 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE' | translate }}
                 </ng-template>
 
+                <mat-card
+                    *ngIf="uniqueOptions?.currentAddresses.options.length > 0"
+                    class="page-section">
+                    <app-form-select
+                        name="selectedAddress"
+                        [ngModel]="uniqueOptions?.currentAddresses.value"
+                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS' | translate"
+                        [options]="uniqueOptions?.currentAddresses.options"
+                        (optionChanged)="changedAddress($event)"
+                        [clearable]="false">
+                    </app-form-select>
+
+                    <app-form-address
+                        name="address"
+                        [ngModel]="address"
+                        [disabled]="true">
+                    </app-form-address>
+                </mat-card>
+
                 <app-form-address-list
                     name="addresses"
-                    [(ngModel)]="contactData.addresses">
+                    [(ngModel)]="contactData.addresses"
+                    [disabled]="true">
                 </app-form-address-list>
 
                 <div>
