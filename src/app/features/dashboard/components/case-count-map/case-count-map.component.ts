@@ -67,6 +67,11 @@ export class CaseCountMapComponent implements OnInit {
 
             // configure case search criteria
             const qb = new RequestQueryBuilder();
+
+            // only address information is needed
+            qb.fields('addresses');
+
+            // only current addresses with geo location are relevant
             qb.filter.where({
                 addresses: {
                     elemMatch: {
