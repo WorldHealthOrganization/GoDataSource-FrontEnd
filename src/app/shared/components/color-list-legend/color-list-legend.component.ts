@@ -39,8 +39,4 @@ export class ColorListLegendComponent implements OnInit {
                 });
             });
     }
-
-    getDotColor(item: LegendDot) {
-        return item.colorCode ? item.colorCode : '';
-    }
 }

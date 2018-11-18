@@ -15,11 +15,7 @@ import { DialogService, ExportDataExtension } from '../../../../core/services/he
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import {
-    ReferenceDataCategory,
-    ReferenceDataCategoryModel,
-    ReferenceDataEntryModel
-} from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ActivatedRoute } from '@angular/router';
 import 'rxjs/add/operator/filter';
@@ -99,23 +95,23 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     ];
 
     anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ID', 'id' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_GENDER', 'gender' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_PHONE', 'phoneNumber' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_AGE', 'age' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_TYPE', 'type' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
-        new LabelValuePair( 'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' )
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_GENDER', 'gender'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PHONE', 'phoneNumber'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_AGE', 'age'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased')
     ];
 
     constructor(
@@ -186,14 +182,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
                 // get grouped contacts by risk level
                 if (this.selectedOutbreak) {
-                    this.countedContactsByRiskLevel$ = this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL)
+                    this.countedContactsByRiskLevel$ = riskLevel$
                         .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
                             return this.contactDataService
                                 .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
                                 .map((data: RiskLevelGroupModel) => {
                                     return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId });
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
                                         return new CountedItemsListItem(
                                             item.count,
                                             itemId,

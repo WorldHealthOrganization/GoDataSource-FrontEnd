@@ -15,7 +15,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -29,6 +29,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-cases-list',
@@ -50,7 +51,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<any>;
 
+    // cases grouped by classification
+    countedCasesGroupedByClassification$: Observable<any>;
+
     caseClassificationsList$: Observable<any[]>;
+    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
     genderList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -78,35 +83,35 @@ export class CasesListComponent extends ListComponent implements OnInit {
     ];
 
     anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ID', 'id' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_GENDER', 'gender' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOB', 'dob' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_AGE', 'age' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DECEASED', 'deceased' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES', 'hospitalizationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES', 'isolationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES', 'incubationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TYPE', 'type' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused' )
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_GENDER', 'gender'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOB', 'dob'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_AGE', 'age'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DECEASED', 'deceased'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_DECEASED', 'dateDeceased'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES', 'hospitalizationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ISOLATION_DATES', 'isolationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_INCUBATION_DATES', 'incubationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
     ];
 
     constructor(
@@ -140,7 +145,22 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
+        this.caseClassificationsList$ = caseClassifications$.map((data: ReferenceDataCategoryModel) => {
+            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                new LabelValuePair(entry.value, entry.id)
+            );
+        });
+        caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
+            this.caseClassificationsListMap = _.transform(
+                caseClassificationCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
@@ -160,6 +180,24 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
+                    this.countedCasesGroupedByClassification$ = caseClassifications$
+                        .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
+                            return this.caseDataService
+                                .getCasesGroupedByClassification(this.selectedOutbreak.id)
+                                .map((data) => {
+                                    return _.map(data ? data.classification : [], (item, itemId) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
+                                        return new CountedItemsListItem(
+                                            item.count,
+                                            itemId,
+                                            item.caseIDs,
+                                            refItem ?
+                                                refItem.getColorCode() :
+                                                Constants.DEFAULT_COLOR_REF_DATA
+                                        );
+                                    });
+                                });
+                        });
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -453,6 +491,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Retrieve Case classification color accordingly to Case's Classification value
+     * @param item
+     */
+    getCaseClassificationColor(item: CaseModel) {
+        const classificationData = _.get(this.caseClassificationsListMap, item.classification);
+        return _.get(classificationData, 'colorCode', '');
+    }
+
+    /**
      * Delete specific case from the selected outbreak
      * @param {CaseModel} caseModel
      */
@@ -501,6 +548,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 }
             });
     }
+
     /**
      * Convert a case to contact
      * @param caseModel

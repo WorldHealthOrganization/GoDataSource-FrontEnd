@@ -42,7 +42,7 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
-<div fxLayout fxLayoutAlign="space-between center">
+<div fxLayout fxLayoutAlign="space-between end">
     <!--Total number of records from the list-->
     <app-total-number-of-records
         [value]="(contactsListCount$ | async)?.count">
