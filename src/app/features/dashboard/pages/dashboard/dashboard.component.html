@@ -49,12 +49,6 @@
                                 (click)="generateKpisReport()">
                                 {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
                             </button>
-
-                            <button
-                                mat-menu-item
-                                (click)="generateCaseCountMap()">
-                                {{'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_LABEL' | translate}}
-                            </button>
                         </ng-container>
                     </mat-menu>
                 </div>
@@ -147,7 +141,7 @@
             <div class="other-kpi-header">
                 {{ 'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_TITLE' | translate }}
             </div>
-            <app-case-count-map #caseCountMap></app-case-count-map>
+            <app-case-count-map></app-case-count-map>
         </mat-card>
 
         <!-- KPIs -->
