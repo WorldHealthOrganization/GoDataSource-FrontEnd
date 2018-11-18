@@ -42,20 +42,24 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
-<app-counted-items-list
-    [items]="countedNewContactsGroupedByExposureType$ | async"
-    (optionChanged)="filterBySelectField('id', $event.ids, null)">
-</app-counted-items-list>
+<div fxLayout fxLayoutAlign="space-between center">
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(contactsListCount$ | async)?.count">
+    </app-total-number-of-records>
+    <!--Contacts grouped by risk level-->
+    <app-counted-items-list
+        [items]="countedContactsByRiskLevel$ | async"
+        (optionChanged)="filterBySelectField('id', $event.ids, null)">
+    </app-counted-items-list>
+</div>
 
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(contactsListCount$ | async)?.count">
-</app-total-number-of-records>
+
 
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
