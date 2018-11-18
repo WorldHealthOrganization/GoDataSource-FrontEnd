@@ -34,8 +34,6 @@ export class CountedItemsListComponent {
     @Output() optionChanged = new EventEmitter<any>();
 
     onChange(item) {
-        console.log(this.items);
-        console.log(item);
         this.optionChanged.emit(item);
     }
 }

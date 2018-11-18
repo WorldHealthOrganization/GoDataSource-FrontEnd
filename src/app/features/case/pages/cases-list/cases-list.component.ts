@@ -15,10 +15,7 @@ import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
-import {
-    ReferenceDataCategory, ReferenceDataCategoryModel,
-    ReferenceDataEntryModel
-} from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -33,7 +30,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
-import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -54,6 +50,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     // list of existing cases
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<any>;
+
     // cases grouped by classification
     countedCasesGroupedByClassification$: Observable<any>;
 
@@ -86,35 +83,35 @@ export class CasesListComponent extends ListComponent implements OnInit {
     ];
 
     anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ID', 'id' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_GENDER', 'gender' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOB', 'dob' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_AGE', 'age' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DECEASED', 'deceased' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_DECEASED', 'dateDeceased' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES', 'hospitalizationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_ISOLATION_DATES', 'isolationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_INCUBATION_DATES', 'incubationDates' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TYPE', 'type' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate' ),
-        new LabelValuePair( 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused' )
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ID', 'id'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_FIRST_NAME', 'firstName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_LAST_NAME', 'lastName'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_GENDER', 'gender'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_OCCUPATION', 'occupation'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOB', 'dob'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_AGE', 'age'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_RISK_REASON', 'riskReason'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DOCUMENTS', 'documents'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ADDRESSES', 'addresses'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION', 'dateOfInfection'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET', 'dateOfOnset'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', 'isDateOfOnsetApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', 'dateBecomeCase'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DECEASED', 'deceased'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_DECEASED', 'dateDeceased'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES', 'hospitalizationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_ISOLATION_DATES', 'isolationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_INCUBATION_DATES', 'incubationDates'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TYPE', 'type'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
+        new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
     ];
 
     constructor(
@@ -183,8 +180,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
-                    this.countedCasesGroupedByClassification$ = this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+                    this.countedCasesGroupedByClassification$ = caseClassifications$
                         .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
                             return this.caseDataService
                                 .getCasesGroupedByClassification(this.selectedOutbreak.id)
@@ -552,6 +548,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 }
             });
     }
+
     /**
      * Convert a case to contact
      * @param caseModel
