@@ -19,10 +19,16 @@ export class WorldMapPoint {
     ) {}
 }
 
+export enum WorldMapMarkerType {
+    IMAGE = 'image',
+    CIRCLE = 'circle'
+}
+
 export class WorldMapMarker {
     constructor(
         public point: WorldMapPoint,
-        public label?: string
+        public label?: string,
+        public type: WorldMapMarkerType = WorldMapMarkerType.IMAGE
     ) {}
 }
 
