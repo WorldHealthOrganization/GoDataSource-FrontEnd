@@ -304,22 +304,22 @@
             </mat-cell>
         </ng-container>
 
-        <!--Deleted -->
+        <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DELETED' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="riskLevelFilter"
-                            ngModel
+                            name="deletedFilter"
+                            [ngModel]="false"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>

@@ -34,6 +34,15 @@
 
 <mat-card
     class="page-section page-content">
+    <div class="top-section-wrapper">
+        <!--List Color Legend-->
+        <div>
+            <app-color-list-legend
+                [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+            </app-color-list-legend>
+        </div>
+    </div>
+
     <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
         width="100%"
