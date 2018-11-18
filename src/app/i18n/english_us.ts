@@ -1550,7 +1550,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
-        'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_TITLE': 'Case count by location',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
@@ -1566,11 +1565,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
-        'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_LABEL': 'Case Count Map',
 
         /**
          * Case Count Map
          */
+        'LNG_PAGE_CASE_COUNT_TITLE': 'Case count map',
         'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL': 'Aggregate distance',
 
         /**
@@ -1864,6 +1863,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Details',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_LABEL_DURATION_DAYS': 'days',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GEO_MAP_BUTTON': 'Geospatially map',
+        'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_CASE_COUNT_MAP_BUTTON': 'Case count map',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON': 'List',
         'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON': 'Graph',
 
@@ -1872,6 +1872,9 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE': 'Geospatially Map',
         'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_NO_DATA': 'No chains with geo location provided',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_CASE_COUNT_MAP_BUTTON': 'Case count map',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_LIST_BUTTON': 'List',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_GRAPH_BUTTON': 'Graph',
 
         /**
          * Chains of Transmission Graph
@@ -1905,6 +1908,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE': 'You are currently seeing the chains with size:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON': 'You are currently seeing the chains for person:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT': 'Export Chains of Transmission',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_COUNT_MAP_BUTTON': 'Case count map',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR': 'Scale',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Date',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION': '',

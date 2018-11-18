@@ -26,6 +26,17 @@ const routes: Routes = [
                 PERMISSION.READ_CASE
             ]
         }
+    },
+    // Case Count Map
+    {
+        path: 'case-count-map',
+        component: fromPages.CaseCountMapComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [
+                PERMISSION.READ_CASE
+            ]
+        }
     }
 ];
 

@@ -16,14 +16,19 @@
                         <button
                             mat-menu-item
                             [routerLink]="['/transmission-chains']">
-                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_GRAPH_BUTTON' | translate}}
+                            {{'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_GRAPH_BUTTON' | translate}}
                         </button>
                         <button
                             mat-menu-item
                             [routerLink]="['/transmission-chains', 'list']">
-                            {{'LNG_PAGE_LIST_TRANSMISSION_CHAINS_ACTION_LIST_BUTTON' | translate}}
+                            {{'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_LIST_BUTTON' | translate}}
                         </button>
 
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'case-count-map']">
+                            {{'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ACTION_CASE_COUNT_MAP_BUTTON' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
 
