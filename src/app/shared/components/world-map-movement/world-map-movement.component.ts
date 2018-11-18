@@ -2,7 +2,7 @@ import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AddressModel, AddressType } from '../../../core/models/address.model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPoint } from '../world-map/world-map.component';
+import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../world-map/world-map.component';
 
 @Component({
     selector: 'app-world-map-movement',
@@ -25,7 +25,10 @@ export class WorldMapMovementComponent {
     @Input() set addresses(items: AddressModel[]) {
         // init
         this.markers = [];
-        const path = new WorldMapPath(true);
+        const path = new WorldMapPath({
+            points: [],
+            type: WorldMapPathType.ARROW
+        });
         this.arrowLines = [ path ];
 
         // sort addresses
@@ -38,13 +41,13 @@ export class WorldMapMovementComponent {
             return moment(item.date);
         }).map((item, index) => {
             // add marker
-            this.markers.push(new WorldMapMarker(
-                new WorldMapPoint(
+            this.markers.push(new WorldMapMarker({
+                point: new WorldMapPoint(
                     item.geoLocation.lat,
                     item.geoLocation.lng
                 ),
-                (index + 1).toString()
-            ));
+                label: (index + 1).toString()
+            }));
 
             // display lines only between usual place addresses ( current & history )
             const currentAddress = new AddressModel(item);

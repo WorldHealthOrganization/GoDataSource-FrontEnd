@@ -96,12 +96,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                         }
 
                         // add marker
-                        this.markers.push(new WorldMapMarker(
-                            new WorldMapPoint(
+                        this.markers.push(new WorldMapMarker({
+                            point: new WorldMapPoint(
                                 address.geoLocation.lat,
                                 address.geoLocation.lng
                             )
-                        ));
+                        }));
 
                         // add marker to map list
                         _.set(markersMap, `[${chainIndex}][${markerId}]`, this.markers.length - 1);
@@ -158,11 +158,12 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                                 markersMap[chainIndex][rel.entityIds[0]] !== undefined &&
                                 markersMap[chainIndex][rel.entityIds[1]] !== undefined
                             ) {
-                                this.lines.push(new WorldMapPath(
-                                    false,
-                                    this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
-                                    this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
-                                ));
+                                this.lines.push(new WorldMapPath({
+                                    points: [
+                                        this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
+                                        this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
+                                    ]
+                                }));
                             }
                         });
                     });

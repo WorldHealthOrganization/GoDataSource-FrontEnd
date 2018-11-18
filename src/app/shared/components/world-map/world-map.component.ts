@@ -7,7 +7,7 @@ import { TileArcGISRest, Vector as VectorSource } from 'ol/source';
 import { transform } from 'ol/proj';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
-import { Icon, Style, Text, Fill, Stroke } from 'ol/style';
+import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../core/models/map-server.model';
@@ -25,21 +25,51 @@ export enum WorldMapMarkerType {
 }
 
 export class WorldMapMarker {
-    constructor(
-        public point: WorldMapPoint,
-        public label?: string,
-        public type: WorldMapMarkerType = WorldMapMarkerType.IMAGE
-    ) {}
+    point: WorldMapPoint;
+    label: string;
+    labelColor: string = '#FFF';
+    type: WorldMapMarkerType = WorldMapMarkerType.IMAGE;
+
+    constructor(data: {
+        // required
+        point: WorldMapPoint,
+
+        // optional
+        label?: string,
+        labelColor?: string,
+        type?: WorldMapMarkerType
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data
+        );
+    }
+}
+
+export enum WorldMapPathType {
+    LINE = 'line',
+    ARROW = 'arrow'
 }
 
 export class WorldMapPath {
-    public points: WorldMapPoint[];
+    points: WorldMapPoint[];
+    type: WorldMapPathType = WorldMapPathType.LINE;
+    color: string = '#000';
 
-    constructor(
-        public addArrows: boolean = false,
-        ...points: WorldMapPoint[]
-    ) {
-        this.points = points;
+    constructor(data: {
+        // required
+        points: WorldMapPoint[],
+
+        // optional
+        type?: WorldMapPathType,
+        color?: string
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data
+        );
     }
 
     add(point: WorldMapPoint) {
@@ -123,11 +153,6 @@ export class WorldMapComponent implements OnInit {
     }
 
     /**
-     * Marker Text color
-     */
-    @Input() markerTextColor: string = '#FFF';
-
-    /**
      * Map Lines
      */
     private _lines: WorldMapPath[] = [];
@@ -141,11 +166,6 @@ export class WorldMapComponent implements OnInit {
     get lines(): WorldMapPath[] {
         return this._lines;
     }
-
-    /**
-     * Lines color
-     */
-    @Input() lineColor: string = '#000';
 
     /**
      * Minimum map zoom level ( >= 1 )
@@ -278,16 +298,27 @@ export class WorldMapComponent implements OnInit {
 
             // create icons style for marker
             const style: {
-                image: Icon,
+                image?: Icon | CircleStyle,
                 text?: Text
-            } = {
-                image: new Icon({
-                    anchor: [0.5, 0.9],
-                    anchorXUnits: 'fraction',
-                    anchorYUnits: 'fraction',
-                    src: '/assets/images/pin.png'
-                })
-            };
+            } = {};
+
+            // set image
+            switch (markerData.type) {
+                case WorldMapMarkerType.IMAGE:
+                    style.image = new Icon({
+                        anchor: [0.5, 0.9],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction',
+                        src: '/assets/images/pin.png'
+                    });
+                    break;
+
+                case WorldMapMarkerType.CIRCLE:
+                    // style.image = new CircleStyle({
+                    //     radius
+                    // });
+                    break;
+            }
 
             // if label provided attach it
             if (markerData.label) {
@@ -296,7 +327,7 @@ export class WorldMapComponent implements OnInit {
                     offsetY: -24,
                     font: 'bold 14px Roboto',
                     fill: new Fill({
-                        color: this.markerTextColor
+                        color: markerData.labelColor
                     })
                 });
             }
@@ -329,7 +360,7 @@ export class WorldMapComponent implements OnInit {
                 // not first & we need to add arrows ?
                 if (
                     index > 0 &&
-                    path.addArrows
+                    path.type === WorldMapPathType.ARROW
                 ) {
                     // determine arrow rotation according to line points
                     const rotation: number = Math.atan2(
@@ -345,7 +376,7 @@ export class WorldMapComponent implements OnInit {
                             offsetX: -5,
                             font: 'bold 30px Roboto',
                             fill: new Fill({
-                                color: this.lineColor
+                                color: path.color
                             }),
                             rotation: -rotation
                         })
@@ -367,7 +398,7 @@ export class WorldMapComponent implements OnInit {
             // stylize path
             featurePath.setStyle(new Style({
                 stroke: new Stroke({
-                    color: this.lineColor,
+                    color: path.color,
                     width: 3
                 })
             }));
