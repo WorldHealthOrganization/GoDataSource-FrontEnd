@@ -1,0 +1,10 @@
+<div fxLayout="column" fxFlex fxLayoutAlign="center">
+    <app-world-map
+        *ngIf="markers.length > 0 || displayLoading"
+        width="100%"
+        height="400px"
+        [markers]="markers"
+        [fitMapOnMarkersChange]="true"
+        [displayLoading]="displayLoading">
+    </app-world-map>
+</div>

@@ -83,7 +83,7 @@ export class AddressModel {
                 });
             });
 
-            // we use elemMatch because of a loopback v3 bug
+            // search
             qb.filter.where({
                 and: conditions
             }, false);

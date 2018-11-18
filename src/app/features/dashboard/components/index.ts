@@ -22,6 +22,7 @@ import { CasesHospitalizedPieChartDashletComponent } from './cases-hospitalized-
 import { CasesByGeographicLocationDashletComponent } from './case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
 import { CasesNotIdentifiedThroughContactsDashletComponent } from './cases-not-identified-through-contacts-dashlet/cases-not-identified-through-contacts-dashlet.component';
 import { GanttChartDelayOnsetDashletComponent } from './gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
+import { CaseCountMapComponent } from './case-count-map/case-count-map.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -47,6 +48,7 @@ export const components: any[] = [
     CasesHospitalizedPieChartDashletComponent,
     CasesByGeographicLocationDashletComponent,
     CasesNotIdentifiedThroughContactsDashletComponent,
-    GanttChartDelayOnsetDashletComponent
+    GanttChartDelayOnsetDashletComponent,
+    CaseCountMapComponent
 ];
 

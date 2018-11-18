@@ -137,6 +137,14 @@
 
         </mat-card>
 
+        <mat-card class="page-section">
+            <!-- case count map -->
+            <div class="other-kpi-header">
+                {{ 'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_TITLE' | translate }}
+            </div>
+            <app-case-count-map></app-case-count-map>
+        </mat-card>
+
         <!-- KPIs -->
         <div #kpiSection>
             <mat-card
