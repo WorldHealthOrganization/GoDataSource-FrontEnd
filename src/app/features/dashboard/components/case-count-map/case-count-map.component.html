@@ -1,4 +1,18 @@
 <div fxLayout="column" fxFlex fxLayoutAlign="center">
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <div fxFlex="200px">
+            {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
+        </div>
+        <mat-slider
+            fxFlex
+            [min]="10"
+            [max]="150"
+            [(ngModel)]="clusterDistance"
+            [tickInterval]="10">
+        </mat-slider>
+    </div>
+
     <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
         width="100%"
@@ -6,6 +20,7 @@
         [markers]="markers"
         [fitMapOnMarkersChange]="true"
         [displayLoading]="displayLoading"
-        [fitLayer]="WorldMapMarkerLayer.CLUSTER">
+        [fitLayer]="WorldMapMarkerLayer.CLUSTER"
+        [clusterDistance]="clusterDistance">
     </app-world-map>
 </div>

@@ -146,7 +146,16 @@ export class WorldMapComponent implements OnInit {
     /**
      * Merge distance
      */
-    @Input() clusterDistance: number = 10;
+    private _clusterDistance: number = 10;
+    @Input() set clusterDistance(clusterDistance: number) {
+        this._clusterDistance = clusterDistance;
+        if (this.mapClusterSource) {
+            this.mapClusterSource.setDistance(clusterDistance);
+        }
+    }
+    get clusterDistance(): number {
+        return this._clusterDistance;
+    }
 
     /**
      * Map cluster vector source

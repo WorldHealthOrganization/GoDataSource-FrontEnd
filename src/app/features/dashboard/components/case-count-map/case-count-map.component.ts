@@ -26,6 +26,8 @@ export class CaseCountMapComponent implements OnInit {
     // constants
     WorldMapMarkerLayer = WorldMapMarkerLayer;
 
+    clusterDistance: number = 10;
+
     /**
      * Constructor
      */
