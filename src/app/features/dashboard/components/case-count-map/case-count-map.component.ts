@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
+import { CanvasGantt, StrGantt, SVGGantt } from 'gantt';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AddressType } from '../../../../core/models/address.model';
-import { WorldMapMarker, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
+import { WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
 
 @Component({
@@ -22,6 +22,9 @@ export class CaseCountMapComponent implements OnInit {
     displayLoading: boolean = true;
 
     markers: WorldMapMarker[] = [];
+
+    // constants
+    WorldMapMarkerLayer = WorldMapMarkerLayer;
 
     /**
      * Constructor
@@ -86,7 +89,8 @@ export class CaseCountMapComponent implements OnInit {
                             point: new WorldMapPoint(
                                 address.geoLocation.lat,
                                 address.geoLocation.lng
-                            )
+                            ),
+                            layer: WorldMapMarkerLayer.CLUSTER
                         }));
                     });
 

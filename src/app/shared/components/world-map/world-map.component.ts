@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { TileArcGISRest, Vector as VectorSource } from 'ol/source';
+import { TileArcGISRest, Vector as VectorSource, Cluster } from 'ol/source';
 import { transform } from 'ol/proj';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
@@ -24,6 +24,11 @@ export enum WorldMapMarkerType {
     CIRCLE = 'circle'
 }
 
+export enum WorldMapMarkerLayer {
+    OVERLAY = 'overlay',
+    CLUSTER = 'cluster'
+}
+
 export class WorldMapMarker {
     point: WorldMapPoint;
     label: string;
@@ -31,6 +36,7 @@ export class WorldMapMarker {
     type: WorldMapMarkerType = WorldMapMarkerType.IMAGE;
     radius: number = 5;
     color: string = '#000';
+    layer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
 
     constructor(data: {
         // required
@@ -41,7 +47,8 @@ export class WorldMapMarker {
         labelColor?: string,
         type?: WorldMapMarkerType,
         radius?: number,
-        color?: string
+        color?: string,
+        layer?: WorldMapMarkerLayer
     }) {
         // assign properties
         Object.assign(
@@ -135,6 +142,38 @@ export class WorldMapComponent implements OnInit {
      * Map Overlay Layer Source
      */
     mapOverlayLayerSource: VectorSource;
+
+    /**
+     * Merge distance
+     */
+    @Input() clusterDistance: number = 10;
+
+    /**
+     * Map cluster vector source
+     */
+    mapClusterLayerSource: VectorSource;
+
+    /**
+     * Cluster
+     */
+    mapClusterSource: Cluster;
+
+    /**
+     * Style cache
+     */
+    styleCache: {
+        [size: number]: Style
+    } = {};
+
+    /**
+     * Cluster size color
+     */
+    @Input() clusterLabelColor: string = '#FFF';
+
+    /**
+     * Fit layer
+     */
+    @Input() fitLayer: WorldMapMarkerLayer = WorldMapMarkerLayer.OVERLAY;
 
     /**
      * Map Markers
@@ -279,7 +318,7 @@ export class WorldMapComponent implements OnInit {
     }
 
     /**
-     * Initilize Overlay
+     * Initialize Overlay
      */
     reinitializeOverlay() {
         // check if we have something to reinitialize
@@ -289,9 +328,24 @@ export class WorldMapComponent implements OnInit {
 
         // clear markers & lines
         this.mapOverlayLayerSource.clear();
+        this.mapClusterLayerSource.clear();
+        this.styleCache = {};
 
         // add markers
         _.each(this.markers, (markerData: WorldMapMarker) => {
+            // do we need to draw this one to overlay ?
+            if (markerData.layer === WorldMapMarkerLayer.CLUSTER) {
+                this.mapClusterLayerSource.addFeature(new Feature(
+                    new Point(this.transformFromLatLng(
+                        markerData.point.latitude,
+                        markerData.point.longitude
+                    ))
+                ));
+
+                // finished
+                return;
+            }
+
             // create marker
             const marker: Feature = new Feature(
                 new Point(this.transformFromLatLng(
@@ -415,7 +469,44 @@ export class WorldMapComponent implements OnInit {
         });
 
         // determine bounds
-        this.markerBounds = this.mapOverlayLayerSource.getExtent();
+        this.markerBounds = this.fitLayer === WorldMapMarkerLayer.CLUSTER ?
+            this.mapClusterLayerSource.getExtent() :
+            this.mapOverlayLayerSource.getExtent();
+    }
+
+    /**
+     * Style Features
+     * @param feature
+     */
+    clusterStyleFeature(feature: Feature): Style {
+        // determine number of items
+        const size: number = feature.get('features').length;
+
+        // do we have already a style configured for what we need to display ?
+        if (this.styleCache[size]) {
+            return this.styleCache[size];
+        }
+
+        // create a new style
+        this.styleCache[size] = new Style({
+            image: new Icon({
+                anchor: [0.5, 0.9],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                src: '/assets/images/pin.png'
+            }),
+            text: new Text({
+                text: size.toString(),
+                offsetY: -24,
+                font: 'bold 10px Roboto',
+                fill: new Fill({
+                    color: this.clusterLabelColor
+                })
+            })
+        });
+
+        // finished
+        return this.styleCache[size];
     }
 
     /**
@@ -449,6 +540,23 @@ export class WorldMapComponent implements OnInit {
 
         // add overlay - markers & lines layer
         this.layers.push(this.mapOverlayLayer);
+
+        // initialize cluster layer source
+        this.mapClusterLayerSource = new VectorSource();
+
+        // initialize cluster
+        this.mapClusterSource = new Cluster({
+            distance: this.clusterDistance,
+            source: this.mapClusterLayerSource
+        });
+
+        // add cluster layer
+        this.layers.push(new VectorLayer({
+            source: this.mapClusterSource,
+            style: (feature: Feature): Style => {
+                return this.clusterStyleFeature(feature);
+            }
+        }));
 
         // initialize map
         this.map = new Map({
