@@ -1,10 +1,15 @@
 <div class="colors-legend-container">
-    <div *ngFor="let legendDot of optionsList$ | async" class="color-container">
-        <span *ngIf="legendDot.colorCode"
-              class="color-dot"
-              [style.color]="getDotColor(legendDot)">
-            &#9679;
-        </span>
-        {{ legendDot.colorCode ? [legendDot.label | translate] : '' }}
-    </div>
+    <ng-container
+        *ngFor="let legendDot of optionsList$ | async"
+    >
+        <div
+            *ngIf="legendDot.colorCode"
+            class="color-container"
+        >
+            <span class="color-dot" [style.color]="legendDot.colorCode">
+                &#9679;
+            </span>
+            {{legendDot.label | translate}}
+        </div>
+    </ng-container>
 </div>

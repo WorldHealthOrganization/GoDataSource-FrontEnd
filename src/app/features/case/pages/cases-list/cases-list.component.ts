@@ -33,6 +33,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
     selector: 'app-cases-list',
@@ -57,6 +58,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
     countedCasesGroupedByClassification$: Observable<any>;
 
     caseClassificationsList$: Observable<any[]>;
+    caseClassificationsListMap: { [id: string]: ReferenceDataEntryModel };
     genderList$: Observable<any[]>;
     yesNoOptionsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -146,7 +148,22 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        const caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
+        this.caseClassificationsList$ = caseClassifications$.map((data: ReferenceDataCategoryModel) => {
+            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                new LabelValuePair(entry.value, entry.id)
+            );
+        });
+        caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
+            this.caseClassificationsListMap = _.transform(
+                caseClassificationCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
@@ -475,6 +492,15 @@ export class CasesListComponent extends ListComponent implements OnInit {
      */
     hasReportAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
+    }
+
+    /**
+     * Retrieve Case classification color accordingly to Case's Classification value
+     * @param item
+     */
+    getCaseClassificationColor(item: CaseModel) {
+        const classificationData = _.get(this.caseClassificationsListMap, item.classification);
+        return _.get(classificationData, 'colorCode', '');
     }
 
     /**
