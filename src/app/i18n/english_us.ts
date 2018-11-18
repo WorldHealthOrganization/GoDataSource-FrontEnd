@@ -88,6 +88,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ADD': 'Add',
         'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
+        'LNG_COMMON_BUTTON_MERGE': 'Merge',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
         'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
@@ -308,6 +309,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
+        'LNG_ENTITY_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
 
         /**
          * Outbreak date inconsistencies list page
@@ -382,6 +384,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
@@ -845,6 +848,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
+        'LNG_CONTACT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
@@ -913,6 +917,45 @@ export const EnglishUsLang = {
         'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy',
 
         /**
+         * Duplicate records list page
+         */
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE': 'Duplicate records',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE': 'Not applicable',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE': 'None',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING': 'Missing',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE': 'What to create?',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS': 'You don\'t have writes to merge any of the selected types',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED': 'Something went wrong, you shouldn\'t be able to merge two types of records',
+
+        /**
+         * Case merge duplicate records page
+         */
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE': 'Case - merge duplicate records',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASE_BUTTON': 'Merge cases',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE': 'Cases merged!',
+
+        /**
+         * Contact merge duplicate records page
+         */
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact - merge duplicate records',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts merged!',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts',
+
+        /**
+         * Event merge duplicate records page
+         */
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE': 'Event - merge duplicate records',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE': 'Events merged!',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON': 'Merge events',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
          * Movement Contact page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact movement',
@@ -921,7 +964,6 @@ export const EnglishUsLang = {
          * Chronology Contact page
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact chronology',
-
 
         /**
          * Relationship Fields

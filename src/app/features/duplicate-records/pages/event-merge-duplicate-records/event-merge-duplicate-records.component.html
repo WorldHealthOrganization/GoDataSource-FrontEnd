@@ -1,0 +1,123 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<div class="page-content">
+    <div
+        *ngIf="displayLoading"
+        class="merge-loading">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div
+        *ngIf="!displayLoading">
+        <mat-horizontal-stepper linear #stepper>
+
+            <!-- Details step -->
+            <mat-step [stepControl]="detailsForm">
+                <form #detailsForm="ngForm">
+                    <ng-template matStepLabel>{{'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_DETAILS_TITLE' | translate}}</ng-template>
+
+                    <!-- Details section -->
+                    <mat-card class="page-section">
+                        <div fxLayout="column">
+
+                            <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                                <app-form-select
+                                    name="name"
+                                    [(ngModel)]="uniqueOptions?.name.value"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
+                                    [options]="uniqueOptions?.name.options"
+                                    required="true">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="date"
+                                    [(ngModel)]="uniqueOptions?.date.value"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
+                                    [options]="uniqueOptions?.date.options"
+                                    required="true">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="dateOfReporting"
+                                    [(ngModel)]="uniqueOptions?.dateOfReporting.value"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                                    [options]="uniqueOptions?.dateOfReporting.options"
+                                    required="true">
+                                </app-form-select>
+
+                                <app-form-select
+                                    name="isDateOfReportingApproximate"
+                                    [(ngModel)]="uniqueOptions?.isDateOfReportingApproximate.value"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION"
+                                    [options]="uniqueOptions?.isDateOfReportingApproximate.options">
+                                </app-form-select>
+                            </div>
+
+                            <div fxLayout="row" fxLayoutGap="20px">
+                                <app-form-select
+                                    name="description"
+                                    [(ngModel)]="uniqueOptions?.description.value"
+                                    [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
+                                    tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                                    [options]="uniqueOptions?.description.options">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-card>
+
+                    <div>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    </div>
+                </form>
+            </mat-step>
+
+            <!-- Address step -->
+            <mat-step [stepControl]="addressForm">
+                <form #addressForm="ngForm">
+                    <ng-template matStepLabel>{{ 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}</ng-template>
+
+                    <mat-card class="page-section">
+                        <app-form-select
+                            name="selectedAddress"
+                            [(ngModel)]="uniqueOptions?.address.value"
+                            [placeholder]="'LNG_EVENT_FIELD_LABEL_ADDRESS' | translate"
+                            [options]="uniqueOptions?.address.options"
+                            (optionChanged)="changedAddress($event)">
+                        </app-form-select>
+
+                        <app-form-address
+                            name="address"
+                            [ngModel]="address"
+                            [disabled]="true">
+                        </app-form-address>
+                    </mat-card>
+
+                    <div>
+                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    </div>
+                </form>
+            </mat-step>
+
+            <!-- Final step -->
+            <mat-step>
+                <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
+                {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
+                <div>
+                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">
+                        {{'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON' | translate}}
+                    </button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </div>
+</div>

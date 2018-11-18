@@ -20,7 +20,7 @@ export class SystemUpstreamServerModel {
         this.timeout = _.get(data, 'timeout', 0);
         this.credentials = new SystemUpstreamServerCredentialsModel(_.get(data, 'credentials'));
         this.syncInterval = _.get(data, 'syncInterval', 0);
-        this.syncOnEveryChange = _.get(data, 'syncOnEveryChange', true);
+        this.syncOnEveryChange = _.get(data, 'syncOnEveryChange', false);
         this.syncEnabled = _.get(data, 'syncEnabled', true);
     }
 }

@@ -19,6 +19,15 @@ export class AddressModel {
     date: string;
     geoLocation: { lat: number, lng: number };
 
+    /**
+     * Search for current address
+     * @param addresses
+     * @returns {AddressModel | undefined}
+     */
+    static getCurrentAddress(addresses: AddressModel[]): AddressModel {
+        return _.find(addresses, { typeId: AddressType.CURRENT_ADDRESS });
+    }
+
     constructor(data = null, locationsList = []) {
         this.typeId = _.get(data, 'typeId');
         this.city = _.get(data, 'city');

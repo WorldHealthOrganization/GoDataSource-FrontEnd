@@ -20,6 +20,8 @@ import * as _ from 'lodash';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
+import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class OutbreakDataService {
@@ -33,8 +35,7 @@ export class OutbreakDataService {
         private storageService: StorageService,
         private snackbarService: SnackbarService,
         private authDataService: AuthDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Retrieve the list of Outbreaks
@@ -328,6 +329,76 @@ export class OutbreakDataService {
         ).map((visualID: string | VisualIdErrorModel) => {
             return _.isString(visualID);
         });
+    }
+
+    /**
+     * GET outbreak case / contacts & events possible duplicates
+     * @param outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<PeoplePossibleDuplicateModel>}
+     */
+    getPeoplePossibleDuplicates(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<PeoplePossibleDuplicateModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates?filter=${filter}`),
+            PeoplePossibleDuplicateModel
+        );
+    }
+
+    /**
+     * Return total number of case / contacts & events possible duplicates
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getPeoplePossibleDuplicatesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+        return this.http.get(`outbreaks/${outbreakId}/people/possible-duplicates/count?where=${whereFilter}`);
+    }
+
+    /**
+     * Retrieve records from db
+     * @param outbreakId
+     * @param queryBuilder
+     * @returns {Observable<EntityModel[]>}
+     */
+    getPeopleList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityModel[]> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableListToModel(
+            this.http.get(`outbreaks/${outbreakId}/people?filter=${filter}`),
+            EntityModel
+        );
+    }
+
+    /**
+     * Merge people
+     * @param outbreakId
+     * @param type
+     * @param ids
+     * @param modelData
+     */
+    mergePeople(
+        outbreakId: string,
+        type: EntityType,
+        ids: string[],
+        modelData: any
+    ): Observable<any> {
+        return this.http.post(
+            `outbreaks/${outbreakId}/merge`, {
+                type: type,
+                ids: ids,
+                model: modelData
+            }
+        );
     }
 }
 
