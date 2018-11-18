@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CanvasGantt, StrGantt, SVGGantt } from 'gantt';
@@ -6,8 +6,10 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AddressType } from '../../../../core/models/address.model';
-import { WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
+import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-case-count-map',
@@ -27,6 +29,8 @@ export class CaseCountMapComponent implements OnInit {
     WorldMapMarkerLayer = WorldMapMarkerLayer;
 
     clusterDistance: number = 10;
+
+    @ViewChild('worldMap') worldMap: WorldMapComponent;
 
     /**
      * Constructor
@@ -100,5 +104,24 @@ export class CaseCountMapComponent implements OnInit {
                     this.displayLoading = false;
                 });
         }
+    }
+
+    /**
+     * Print to blob
+     */
+    printToBlob(): Observable<Blob> {
+        return Observable.create((observer: Subscriber<Blob>) => {
+            if (this.worldMap) {
+                this.worldMap
+                    .printToBlob()
+                    .subscribe((blob) => {
+                        observer.next(blob);
+                        observer.complete();
+                    });
+            } else {
+                observer.next(null);
+                observer.complete();
+            }
+        });
     }
 }

@@ -16,6 +16,7 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
 import * as FileSaver from 'file-saver';
+import { CaseCountMapComponent } from '../../components/case-count-map/case-count-map.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -88,6 +89,8 @@ export class DashboardComponent implements OnInit {
     contactsFollowupSuccessRateReportUrl: string = '';
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
+
+    @ViewChild('caseCountMap') private caseCountMap: CaseCountMapComponent;
 
     constructor(
         private authDataService: AuthDataService,
@@ -287,11 +290,44 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    private downloadFile(blob, fileNameToken) {
+    /**
+     * Print Case Count Map
+     */
+    generateCaseCountMap() {
+        if (this.caseCountMap) {
+            this.caseCountMap
+                .printToBlob()
+                .subscribe((blob) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        this.importExportDataService
+                            .exportImageToPdf({
+                                image: reader.result.split(',')[1],
+                                responseType: 'blob',
+                                splitFactor: 1
+                            }).subscribe((fileBlob) => {
+                                this.downloadFile(fileBlob, 'LNG_PAGE_DASHBOARD_CASE_COUNT_MAP_LABEL');
+                            });
+                    };
+                    reader.readAsDataURL(blob);
+                });
+        }
+    }
+
+    /**
+     * Download File
+     * @param blob
+     * @param fileNameToken
+     */
+    private downloadFile(
+        blob,
+        fileNameToken,
+        extension: string = 'pdf'
+    ) {
         const fileName = this.i18nService.instant(fileNameToken);
         FileSaver.saveAs(
             blob,
-            `${fileName}.pdf`
+            `${fileName}.${extension}`
         );
     }
 }

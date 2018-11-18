@@ -11,6 +11,8 @@ import { Icon, Style, Text, Fill, Stroke, Circle as CircleStyle } from 'ol/style
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../core/models/map-server.model';
+import { Observable } from 'rxjs/Observable';
+import { Subscriber } from 'rxjs/Subscriber';
 
 export class WorldMapPoint {
     constructor(
@@ -277,7 +279,8 @@ export class WorldMapComponent implements OnInit {
                         (mapServer: MapServerModel) => {
                             return new TileLayer({
                                 source: new TileArcGISRest({
-                                    url: mapServer.url
+                                    url: mapServer.url,
+                                    crossOrigin: 'anonymous'
                                 })
                             });
                         });
@@ -600,5 +603,35 @@ export class WorldMapComponent implements OnInit {
             'EPSG:4326',
             'EPSG:3857'
         );
+    }
+
+    /**
+     * Print map to blob
+     */
+    printToBlob(): Observable<Blob> {
+        return Observable.create((observer: Subscriber<Blob>) => {
+            // map initialized
+            if (this.map) {
+                // wait for map render
+                this.map.once('rendercomplete', (event) => {
+                    const canvas = event.context.canvas;
+                    if (navigator.msSaveBlob) {
+                        observer.next(canvas.msToBlob());
+                        observer.complete();
+                    } else {
+                        canvas.toBlob(function (blob) {
+                            observer.next(blob);
+                            observer.complete();
+                        });
+                    }
+                });
+
+                // render
+                this.map.renderSync();
+            } else {
+                observer.next(null);
+                observer.complete();
+            }
+        });
     }
 }
