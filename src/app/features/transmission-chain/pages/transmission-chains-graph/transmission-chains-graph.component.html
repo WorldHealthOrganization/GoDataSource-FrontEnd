@@ -32,6 +32,12 @@
                             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' | translate}}
                         </button>
 
+                        <button
+                            *ngIf="hasCaseReadAccess()"
+                            mat-menu-item
+                            [routerLink]="['/transmission-chains', 'case-count-map']">
+                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASE_COUNT_MAP_BUTTON' | translate}}
+                        </button>
                     </ng-container>
                 </mat-menu>
 

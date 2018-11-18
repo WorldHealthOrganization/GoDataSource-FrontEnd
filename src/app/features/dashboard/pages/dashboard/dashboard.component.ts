@@ -287,11 +287,20 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    private downloadFile(blob, fileNameToken) {
+    /**
+     * Download File
+     * @param blob
+     * @param fileNameToken
+     */
+    private downloadFile(
+        blob,
+        fileNameToken,
+        extension: string = 'pdf'
+    ) {
         const fileName = this.i18nService.instant(fileNameToken);
         FileSaver.saveAs(
             blob,
-            `${fileName}.pdf`
+            `${fileName}.${extension}`
         );
     }
 }

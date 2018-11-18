@@ -1,0 +1,34 @@
+<app-topnav [activeOutbreakEditable]="false">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card
+    class="page-section page-content">
+    <div
+        fxFlex fxLayout="row" fxLayoutGap="20px">
+        <div fxFlex="200px">
+            {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
+        </div>
+        <mat-slider
+            fxFlex
+            [min]="10"
+            [max]="150"
+            [(ngModel)]="clusterDistance"
+            [tickInterval]="10">
+        </mat-slider>
+    </div>
+
+    <app-world-map
+        *ngIf="markers.length > 0 || displayLoading"
+        #worldMap
+        width="100%"
+        height="calc(100% - 50px)"
+        [markers]="markers"
+        [fitMapOnMarkersChange]="true"
+        [displayLoading]="displayLoading"
+        [fitLayer]="WorldMapMarkerLayer.CLUSTER"
+        [clusterDistance]="clusterDistance">
+    </app-world-map>
+</mat-card>

@@ -34,8 +34,6 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
     markers: WorldMapMarker[] = [];
     lines: WorldMapPath[] = [];
 
-    selectedGeoPoint: WorldMapPoint;
-
     displayLoading: boolean = true;
 
     // selected Outbreak
@@ -89,7 +87,6 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                 const markersMap = {};
                 this.markers = [];
                 this.lines = [];
-                this.selectedGeoPoint = null;
 
                 // add valid address to marked
                 const addValidAddressToMarker = (

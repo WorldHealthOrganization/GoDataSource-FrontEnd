@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {
     MatButtonModule,
     MatInputModule,
+    MatSliderModule,
     MatSnackBarModule,
     MatMenuModule,
     MatSortModule,
@@ -30,6 +31,7 @@ import {
     imports: [
         MatButtonModule,
         MatInputModule,
+        MatSliderModule,
         MatSnackBarModule,
         MatMenuModule,
         MatTableModule,
@@ -56,6 +58,7 @@ import {
     exports: [
         MatButtonModule,
         MatInputModule,
+        MatSliderModule,
         MatSnackBarModule,
         MatMenuModule,
         MatTableModule,
