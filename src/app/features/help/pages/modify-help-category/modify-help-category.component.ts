@@ -79,7 +79,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
         this.helpDataService
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {
-                this.snackbarService.showApiError(err.message);
+                this.snackbarService.showApiError(err);
 
                 return ErrorObservable.create(err);
             })
@@ -91,7 +91,7 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                 // update language tokens to get the translation of name and description
                 this.i18nService.loadUserLanguage().subscribe();
                 // navigate to the list of categories
-                this.router.navigate(['/help/help-categories']);
+                this.router.navigate(['/help/categories']);
             });
     }
 

@@ -8,6 +8,16 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 
 const routes: Routes = [
+    // Help view / search
+    {
+        path: '',
+        component: fromPages.HelpSearchComponent
+    },
+    // Help view single item
+    {
+        path: 'categories/:categoryId/items/:itemId/view-global',
+        component: fromPages.ViewHelpComponent
+    },
     // Help categories list
     {
         path: 'categories',

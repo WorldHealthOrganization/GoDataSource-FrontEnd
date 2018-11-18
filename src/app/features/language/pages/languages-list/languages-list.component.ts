@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -33,7 +33,6 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
     languagesList$: Observable<LanguageModel[]>;
 
     @ViewChild('topNav') topNav: TopnavComponent;
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
 
     constructor(
         private languageDataService: LanguageDataService,
@@ -121,7 +120,6 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE',
             url: `languages/${language.id}/language-tokens/export`,
             fileName: language.name,
-            buttonDownloadFile: this.buttonDownloadFile,
             fileType: ExportDataExtension.XLSX
         });
     }

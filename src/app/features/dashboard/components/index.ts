@@ -21,6 +21,7 @@ import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary
 import { CasesHospitalizedPieChartDashletComponent } from './cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
 import { CasesByGeographicLocationDashletComponent } from './case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
 import { CasesNotIdentifiedThroughContactsDashletComponent } from './cases-not-identified-through-contacts-dashlet/cases-not-identified-through-contacts-dashlet.component';
+import { GanttChartDelayOnsetDashletComponent } from './gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
@@ -45,6 +46,7 @@ export const components: any[] = [
     CaseSummaryDashletComponent,
     CasesHospitalizedPieChartDashletComponent,
     CasesByGeographicLocationDashletComponent,
-    CasesNotIdentifiedThroughContactsDashletComponent
+    CasesNotIdentifiedThroughContactsDashletComponent,
+    GanttChartDelayOnsetDashletComponent
 ];
 

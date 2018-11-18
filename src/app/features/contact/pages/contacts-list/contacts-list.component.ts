@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -14,8 +14,6 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ExposureTypeGroupModel } from '../../../../core/models/exposure-type-group';
-import { ExposureTypeModel } from '../../../../core/models/exposure-type';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import {
     ReferenceDataCategory,
@@ -37,6 +35,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import 'rxjs/add/operator/mergeMap';
+import { RiskLevelModel } from '../../../../core/models/risk-level.model';
+import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
 
 @Component({
     selector: 'app-contacts-list',
@@ -66,8 +66,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // gender list
     genderList$: Observable<any[]>;
 
-    // new contacts grouped by exposure types
-    countedNewContactsGroupedByExposureType$: Observable<any[]>;
+    // contacts grouped by risk level
+    countedContactsByRiskLevel$: Observable<any[]>;
 
     // risk level
     riskLevelsList$: Observable<any[]>;
@@ -89,7 +89,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.CSV,
         ExportDataExtension.XLS,
@@ -185,19 +184,19 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
                 }
 
-                // get new contacts grouped by exposure types
+                // get grouped contacts by risk level
                 if (this.selectedOutbreak) {
-                    this.countedNewContactsGroupedByExposureType$ = this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
-                        .mergeMap((refExposureTypeData: ReferenceDataCategoryModel) => {
+                    this.countedContactsByRiskLevel$ = this.referenceDataDataService
+                        .getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL)
+                        .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
                             return this.contactDataService
-                                .getNewContactsGroupedByExposureType(this.selectedOutbreak.id)
-                                .map((data: ExposureTypeGroupModel) => {
-                                    return _.map(data ? data.exposureType : [], (item: ExposureTypeModel) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refExposureTypeData.entries, { id: item.id });
+                                .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
+                                .map((data: RiskLevelGroupModel) => {
+                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, { id: itemId });
                                         return new CountedItemsListItem(
                                             item.count,
-                                            item.id,
+                                            itemId,
                                             item.contactIDs,
                                             refItem ?
                                                 refItem.getColorCode() :
@@ -576,7 +575,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             message: 'LNG_PAGE_LIST_CASES_EXPORT_TITLE',
             url: this.exportContactsUrl,
             fileName: this.contactsDataExportFileName,
-            buttonDownloadFile: this.buttonDownloadFile,
 
             // // optional
             allowedExportTypes: this.allowedExportTypes,
@@ -610,7 +608,6 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                 fileName: this.contactsDataExportFileName,
-                buttonDownloadFile: this.buttonDownloadFile,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
                 anonymizeFields: anonymizeFields,

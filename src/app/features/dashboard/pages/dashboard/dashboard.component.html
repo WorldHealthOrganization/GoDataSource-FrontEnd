@@ -40,9 +40,16 @@
 
                             <button
                                 mat-menu-item
+                                (click)="generateGanttChartReport()">
+                                {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
+                            </button>
+
+                            <button
+                                mat-menu-item
                                 (click)="generateKpisReport()">
                                 {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
                             </button>
+
                         </ng-container>
                     </mat-menu>
                 </div>
@@ -116,6 +123,17 @@
             <app-epi-curve-dashlet
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
             </app-epi-curve-dashlet>
+
+        </mat-card>
+
+        <mat-card class="page-section">
+
+            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE' | translate}}</div>
+
+            <!-- gantt chart -->
+            <app-gantt-chart-delay-onset-dashlet
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+            </app-gantt-chart-delay-onset-dashlet>
 
         </mat-card>
 
@@ -380,7 +398,6 @@
         </div>
 
         <canvas id="tempCanvas"></canvas>
-        <a hidden #buttonDownloadFile></a>
 
     </div>
 </div>

@@ -211,15 +211,16 @@ export class SidenavComponent implements OnInit {
             '/clusters',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
-        // new NavItem(
-        //     'duplicated-records',
-        //     'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-        //     'fileCopy',
-        //     // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
-        //     [],
-        //     [],
-        //     '/users'
-        // ),
+        new NavItem(
+            'duplicated-records',
+            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
+            'fileCopy',
+            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
+            [],
+            [],
+            '/duplicated-records',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
         new NavItem(
             'transmission-chains',
             'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
@@ -255,15 +256,15 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_TEAM],
             [],
             '/teams'
+        ),
+        new NavItem(
+            'help',
+            'LNG_LAYOUT_MENU_ITEM_HELP',
+            'help',
+            [],
+            [],
+            '/help'
         )
-        // new NavItem(
-        //     'help',
-        //     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
-        //     'help',
-        //     [],
-        //     [],
-        //     '/help'
-        // )
     ];
 
     constructor(

@@ -15,6 +15,7 @@ import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-dashboard',
@@ -86,7 +87,6 @@ export class DashboardComponent implements OnInit {
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
-    @ViewChild('buttonDownloadFile') private buttonDownloadFile: ElementRef;
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
     constructor(
@@ -273,21 +273,25 @@ export class DashboardComponent implements OnInit {
             });
     }
 
+    /**
+     * generate Gantt chart report - image will be exported as pdf
+     */
+    generateGanttChartReport() {
+        this.domService
+            .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
+            .subscribe((pngBase64) => {
+                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                    .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL');
+                    });
+            });
+    }
+
     private downloadFile(blob, fileNameToken) {
-        const urlT = window.URL.createObjectURL(blob);
-        // window.open(urlT);
-        const link = this.buttonDownloadFile.nativeElement;
-
         const fileName = this.i18nService.instant(fileNameToken);
-
-        link.href = urlT;
-        link.download = `${fileName}.pdf`;
-        link.click();
-
-        window.URL.revokeObjectURL(urlT);
+        FileSaver.saveAs(
+            blob,
+            `${fileName}.pdf`
+        );
     }
 }
-
-
-
-

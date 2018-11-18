@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { HttpClient } from '@angular/common/http';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { LabelValuePair } from '../../models/label-value-pair';
 
 @Injectable()
 export class GenericDataService {
@@ -85,6 +86,26 @@ export class GenericDataService {
         }
 
         return availableTypes;
+    }
+
+    /**
+     * Get entity type options
+     */
+    getEntityTypeOptions(): Observable<any[]> {
+        return Observable.of([
+            new LabelValuePair(
+                EntityType.CASE,
+                EntityType.CASE
+            ),
+            new LabelValuePair(
+                EntityType.CONTACT,
+                EntityType.CONTACT
+            ),
+            new LabelValuePair(
+                EntityType.EVENT,
+                EntityType.EVENT
+            )
+        ]);
     }
 
     /**
@@ -170,6 +191,22 @@ export class GenericDataService {
      */
     getDataModuleOptions(): Observable<any[]> {
         return Observable.of(Object.values(Constants.DATA_MODULES));
+    }
+
+    /**
+     * Retrieve the list of sync package modules
+     * @returns {Observable<any[]>}
+     */
+    getSyncPackageModuleOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_MODULES));
+    }
+
+    /**
+     * Retrieve the list of sync package export types
+     * @returns {Observable<any[]>}
+     */
+    getSyncPackageExportTypeOptions(): Observable<any[]> {
+        return Observable.of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
     }
 
     /**

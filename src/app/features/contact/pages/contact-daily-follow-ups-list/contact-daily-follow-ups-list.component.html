@@ -103,7 +103,6 @@
                                 {{ 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS' | translate }}
                             </button>
 
-                            <a hidden #buttonDownloadFile></a>
                             <button
                                 *ngIf="exportFollowUpsUrl"
                                 mat-menu-item
@@ -275,15 +274,14 @@
                     <div class="column-filter">
                         <app-form-select
                             name="deletedFilter"
-                            ngModel
+                            [ngModel]="false"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [clearable]="false"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>

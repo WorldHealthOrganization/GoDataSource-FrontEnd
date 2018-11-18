@@ -42,20 +42,24 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
-<app-counted-items-list
-    [items]="countedNewContactsGroupedByExposureType$ | async"
-    (optionChanged)="filterBySelectField('id', $event.ids, null)">
-</app-counted-items-list>
+<div fxLayout fxLayoutAlign="space-between center">
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(contactsListCount$ | async)?.count">
+    </app-total-number-of-records>
+    <!--Contacts grouped by risk level-->
+    <app-counted-items-list
+        [items]="countedContactsByRiskLevel$ | async"
+        (optionChanged)="filterBySelectField('id', $event.ids, null)">
+    </app-counted-items-list>
+</div>
 
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(contactsListCount$ | async)?.count">
-</app-total-number-of-records>
+
 
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
@@ -77,7 +81,6 @@
         </div>
     </div>
 
-    <a hidden #buttonDownloadFile></a>
     <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
@@ -301,22 +304,22 @@
             </mat-cell>
         </ng-container>
 
-        <!--Deleted -->
+        <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DELETED' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="riskLevelFilter"
-                            ngModel
+                            name="deletedFilter"
+                            [ngModel]="false"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByDeletedField($event.value)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
-                            [displayInvisibleItems]="true"
-                            [displayFilterIcon]="true">
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>

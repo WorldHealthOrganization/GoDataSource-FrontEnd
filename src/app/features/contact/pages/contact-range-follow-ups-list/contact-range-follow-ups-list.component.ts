@@ -58,8 +58,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         // status ID => Status
         [statusId: string]: ReferenceDataEntryModel
     } = {};
-    dailyStatusesArray: ReferenceDataEntryModel[];
 
+    // loading flag - display spinner instead of table
     displayLoading: boolean = false;
 
     // side filters
@@ -76,6 +76,7 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // constants
     ExportDataExtension = ExportDataExtension;
+    ReferenceDataCategory = ReferenceDataCategory;
 
     constructor(
         private authDataService: AuthDataService,
@@ -139,7 +140,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     .getReferenceDataByCategory(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS)
                     .subscribe((data: ReferenceDataCategoryModel) => {
                         this.dailyStatuses = {};
-                        this.dailyStatusesArray = data.entries;
                         _.each(data.entries, (entry: ReferenceDataEntryModel) => {
                             this.dailyStatuses[entry.id] = entry;
                         });

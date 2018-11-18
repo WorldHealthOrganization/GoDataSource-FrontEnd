@@ -132,6 +132,22 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_EVENT]
                 }
             },
+            // Duplicate records routes
+            {
+                path: ModulePath.DuplicateRecordsModule,
+                loadChildren: './features/duplicate-records/duplicate-records.module#DuplicateRecordsModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [
+                        PERMISSION.READ_CASE,
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_EVENT
+                    ]
+                }
+            },
             // Cluster Module routes
             {
                 path: ModulePath.ClusterModule,

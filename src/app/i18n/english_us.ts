@@ -17,6 +17,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP': 'Cloud Backup',
         'LNG_LAYOUT_MENU_ITEM_LANGUAGES': 'Languages',
         'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN': 'Help',
+        'LNG_LAYOUT_MENU_ITEM_HELP': 'Help',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL': 'Outbreaks',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL': 'Templates',
         'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEAMS_LABEL': 'Teams',
@@ -87,6 +88,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ADD': 'Add',
         'LNG_COMMON_BUTTON_MODIFY': 'Modify',
         'LNG_COMMON_BUTTON_EDIT': 'Edit',
+        'LNG_COMMON_BUTTON_MERGE': 'Merge',
         'LNG_COMMON_BUTTON_VIEW': 'View',
         'LNG_COMMON_BUTTON_SELECT': 'Select',
         'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
@@ -307,6 +309,7 @@ export const EnglishUsLang = {
         'LNG_ENTITY_FIELD_LABEL_PLACE': 'Place',
         'LNG_ENTITY_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES': 'Inconsistencies',
+        'LNG_ENTITY_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
 
         /**
          * Outbreak date inconsistencies list page
@@ -381,6 +384,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
         'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
+        'LNG_CASE_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
 
         /**
@@ -706,6 +710,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_TEAMS_TITLE': 'Teams & Assignments',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE': 'Team deleted',
         'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE': 'The team cannot be deleted as it is currently in use',
+        'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD': 'Workload',
 
         /**
          * Create Team page
@@ -721,6 +726,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_TEAM_TITLE': 'Modify Team',
         'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE': 'Team updated',
         'LNG_PAGE_MODIFY_TEAM_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * Teams workload
+         */
+        'LNG_PAGE_TEAMS_WORKLOAD_TITLE': 'Teams Workload',
+        'LNG_PAGE_TEAMS_WORKLOAD_TEAM_LABEL': 'Team',
+        'LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL': '{{done}} of {{total}}',
 
         /**
          * User fields
@@ -836,6 +848,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
+        'LNG_CONTACT_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS': 'Follow-ups',
         'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES': 'Cases',
         'LNG_CONTACT_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
@@ -904,6 +917,45 @@ export const EnglishUsLang = {
         'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy',
 
         /**
+         * Duplicate records list page
+         */
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE': 'Duplicate records',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE': 'Not applicable',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NONE': 'None',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_MISSING': 'Missing',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_DIALOG_CHOOSE_TYPE': 'What to create?',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS': 'You don\'t have writes to merge any of the selected types',
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED': 'Something went wrong, you shouldn\'t be able to merge two types of records',
+
+        /**
+         * Case merge duplicate records page
+         */
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE': 'Case - merge duplicate records',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE': 'Questionnaire',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASE_BUTTON': 'Merge cases',
+        'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE': 'Cases merged!',
+
+        /**
+         * Contact merge duplicate records page
+         */
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE': 'Contact - merge duplicate records',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE': 'Contacts merged!',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE': 'Personal',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+        'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACT_BUTTON': 'Merge contacts',
+
+        /**
+         * Event merge duplicate records page
+         */
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE': 'Event - merge duplicate records',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE': 'Events merged!',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENT_BUTTON': 'Merge events',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE': 'Address',
+
+        /**
          * Movement Contact page
          */
         'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE': 'Contact movement',
@@ -912,7 +964,6 @@ export const EnglishUsLang = {
          * Chronology Contact page
          */
         'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE': 'Contact chronology',
-
 
         /**
          * Relationship Fields
@@ -1331,6 +1382,8 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE': 'Q',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT': 'Question',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION': '',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER': 'Order',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE': 'Variable',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION': '',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY': 'Category',
@@ -1538,6 +1591,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
 
         'LNG_PAGE_DASHBOARD_CASE_SUMMARY_TITLE': 'Case Summary',
         'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE': 'Hospitalization Summary',
@@ -1551,6 +1608,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
+        'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
          * Backup modules
@@ -1582,10 +1640,36 @@ export const EnglishUsLang = {
         'LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL_DESCRIPTION': '',
 
         /**
+         * Sync Package
+         */
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE': 'From date',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS': 'Collections',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION': 'Note: Leave empty to export everything',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE': 'Export Type',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION': 'Note: when Export Type is present "collections" is ignored',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS': 'Include Users',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION': '',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD': 'Encryption password',
+        'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION': 'Note: leave empty for no encryption',
+
+        /**
+         * Sync package export types
+         */
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE': 'Mobile',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM': 'System',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK': 'Outbreak',
+        'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL': 'Full',
+
+        /**
          * System Config Main page
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
@@ -1601,6 +1685,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
 
         /**
          * Sync settings fields
@@ -1770,6 +1855,8 @@ export const EnglishUsLang = {
         'LNG_MODULE_LABEL_ICON': 'Icon',
         'LNG_MODULE_LABEL_BACKUP': 'Backup',
         'LNG_MODULE_LABEL_FILE_ATTACHMENT': 'File attachment',
+        'LNG_MODULE_LABEL_DEVICE': 'Device',
+        'LNG_MODULE_LABEL_DEVICE_HISTORY': 'deviceHistory',
 
         /**
          * List Filters page titles
@@ -1790,6 +1877,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN': 'Cases without date of onset',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Contacts without date of last contact',
         'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN': 'Events whithout date',
+        'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE': 'Help - Context Sensitive',
         'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases over time and place',
         'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS': 'Active chains of transmission',
         'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES': 'Chains of transmission from contacts who became cases',
@@ -1974,6 +2062,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE': 'Import Hierarchical Locations',
 
         /**
+         * Import sync package
+         */
+        'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE': 'Import Sync Package',
+
+        /**
          * Import location data
          */
         'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE': 'Import Location Data',
@@ -2076,13 +2169,15 @@ export const EnglishUsLang = {
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_BY_DESCRIPTION': '',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE': 'Approved Date',
         'LNG_HELP_ITEM_FIELD_LABEL_APPROVED_DATE_DESCRIPTION': '',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE': 'Page',
+        'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION': 'Add the link to the page. Ex: /contacts/*/view. Where * will replace the id from the URL.',
 
         /**
          * Help Items List Page
          */
         'LNG_PAGE_LIST_HELP_ITEMS_TITLE': 'Help Items',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_SUCCESS_MESSAGE': 'Help item deleted!',
-        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item deleted!',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_SUCCESS_MESSAGE': 'Help item approved!',
         'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_HELP_CATEGORIES_BUTTON': 'See Help Categories',
 
         /**
@@ -2101,6 +2196,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE': 'Help item updated!',
         'LNG_PAGE_MODIFY_HELP_ITEM_TAB_DETAILS_TITLE': 'Details',
 
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_TITLE': 'Help',
 
     }
 };

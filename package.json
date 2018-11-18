@@ -6,6 +6,7 @@
         "ng": "ng",
         "start": "ng serve --host 0.0.0.0 --port 4550",
         "build": "ng build --prod --aot --build-optimizer",
+        "build-high-memory": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --prod --aot --build-optimizer",
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"
@@ -37,6 +38,8 @@
         "cytoscape-cola": "2.2.4",
         "cytoscape-dagre": "2.2.2",
         "dom-to-image": "2.6.0",
+        "gantt": "2.4.0",
+        "file-saver": "2.0.0",
         "hammerjs": "^2.0.8",
         "handsontable": "6.0.0",
         "lodash": "4.17.10",

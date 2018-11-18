@@ -12,6 +12,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
+import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 
 @Component({
     selector: 'app-create-help-item',
@@ -35,7 +36,8 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private i18nService: I18nService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private cacheService: CacheService
     ) {
         super();
     }
@@ -95,13 +97,14 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
             this.helpDataService
                 .createHelpItem(this.categoryId, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err.message);
+                    this.snackbarService.showApiError(err);
 
                     return ErrorObservable.create(err);
                 })
                 .subscribe(() => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
-
+                    // remove help items from cache
+                    this.cacheService.remove(CacheKey.HELP_ITEMS);
                     // navigate to listing page
                     this.disableDirtyConfirm();
                     // update language tokens to get the translation of name and description

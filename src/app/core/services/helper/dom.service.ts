@@ -29,7 +29,7 @@ export class DomService {
     }
 
     /**
-     * convert svg images to png images
+     * Convert SVG to PNG image
      * @param selector
      * @param splitFactor
      * @param tempCanvasSelector
@@ -42,9 +42,8 @@ export class DomService {
                 width: 1190,
                 height: 840
             };
+
             // compute render size based on server page size and split factor
-            // compute page and image aspect ratio
-            const pageAspectRatio = pageSize.width / pageSize.height;
             // get graph svg container
             const graphContainer: any = document.querySelector(selector);
             // get graph container dimensions
@@ -52,21 +51,21 @@ export class DomService {
             const graphContainerSVGHeight = graphContainer.height.baseVal.value;
             // get image ratio
             const imageAspectRatio = graphContainerSVGWidth / graphContainerSVGHeight;
-            // initialize canvas dimensions with page dimensions on the server
-            const render = {
-                width: pageSize.width * splitFactor,
-                height: pageSize.height * splitFactor
-            };
-            // if the image is wider than page (proportionally)
-            if (imageAspectRatio > pageAspectRatio) {
-                // resize its width according to the split factor
-                render.width = pageSize.width * splitFactor;
-                render.height = pageSize.width * splitFactor * 1 / imageAspectRatio;
-            } else {
-                // otherwise resize its height according to the split factor
+
+            // initialize canvas dimensions
+            const render: any = {};
+
+            // check image format (landscape or portrait)
+            if (imageAspectRatio > 1) {
+                // landscape mode; enlarge the image vertically, to match the height of the page
                 render.width = pageSize.height * splitFactor * imageAspectRatio;
                 render.height = pageSize.height * splitFactor;
+            } else {
+                // portrait mode; enlarge the image horizontally, to match the width of the page
+                render.width = pageSize.width * splitFactor;
+                render.height = pageSize.width * splitFactor / imageAspectRatio;
             }
+
             // get SVG as string
             const svgString = new XMLSerializer().serializeToString(graphContainer);
             // get canvas container

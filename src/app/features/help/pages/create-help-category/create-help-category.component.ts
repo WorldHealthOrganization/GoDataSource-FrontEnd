@@ -52,7 +52,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
             this.helpDataService
                 .createHelpCategory(dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err.message);
+                    this.snackbarService.showApiError(err);
 
                     return ErrorObservable.create(err);
                 })

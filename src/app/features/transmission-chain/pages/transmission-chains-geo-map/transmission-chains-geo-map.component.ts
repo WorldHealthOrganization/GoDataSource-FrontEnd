@@ -6,7 +6,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { WorldMapMarker, WorldMapPath, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
+import { WorldMapMarker, WorldMapMarkerType, WorldMapPath, WorldMapPoint } from '../../../../shared/components/world-map/world-map.component';
 import * as _ from 'lodash';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { EntityModel } from '../../../../core/models/entity.model';
@@ -14,6 +14,10 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -37,10 +41,14 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
     // selected Outbreak
     selectedOutbreak: OutbreakModel;
 
+    // constants
+    ReferenceDataCategory = ReferenceDataCategory;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private transmissionChainDataService: TransmissionChainDataService
+        private transmissionChainDataService: TransmissionChainDataService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {}
 
     ngOnInit() {
@@ -63,113 +71,124 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
             // display loading
             this.displayLoading = true;
 
-            // load independent chains
-            this.transmissionChainDataService
-                .getIndependentTransmissionChainsList(
-                    this.selectedOutbreak.id
-                )
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((chainsData: TransmissionChainModel[]) => {
-                    // reset data
-                    const markersMap = {};
-                    this.markers = [];
-                    this.lines = [];
-                    this.selectedGeoPoint = null;
+            // retrieve chin data & person colors
+            return Observable.forkJoin([
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
+                this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id)
+            ]).catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            }).subscribe(([personTypes, chainsData]: [ReferenceDataCategoryModel, TransmissionChainModel[]]) => {
+                // map colors to types
+                const typeToColorMap = {};
+                _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
+                    typeToColorMap[entry.id] = entry.colorCode;
+                });
 
-                    // add valid address to marked
-                    const addValidAddressToMarker = (
-                        address: AddressModel,
-                        chainIndex: number,
-                        markerId: string
-                    ) => {
-                        // validate address
-                        if (
-                            _.isEmpty(address) ||
-                            _.isEmpty(address.geoLocation) ||
-                            !_.isNumber(address.geoLocation.lat) ||
-                            !_.isNumber(address.geoLocation.lng)
-                        ) {
-                            return;
+                // reset data
+                const markersMap = {};
+                this.markers = [];
+                this.lines = [];
+                this.selectedGeoPoint = null;
+
+                // add valid address to marked
+                const addValidAddressToMarker = (
+                    address: AddressModel,
+                    chainIndex: number,
+                    markerId: string,
+                    type: string
+                ) => {
+                    // validate address
+                    if (
+                        _.isEmpty(address) ||
+                        _.isEmpty(address.geoLocation) ||
+                        !_.isNumber(address.geoLocation.lat) ||
+                        !_.isNumber(address.geoLocation.lng)
+                    ) {
+                        return;
+                    }
+
+                    // add marker
+                    this.markers.push(new WorldMapMarker({
+                        point: new WorldMapPoint(
+                            address.geoLocation.lat,
+                            address.geoLocation.lng
+                        ),
+                        type: WorldMapMarkerType.CIRCLE,
+                        color: typeToColorMap[type] ? typeToColorMap[type] : '#000'
+                    }));
+
+                    // add marker to map list
+                    _.set(markersMap, `[${chainIndex}][${markerId}]`, this.markers.length - 1);
+                };
+
+                // go though each chain and create relevant markers
+                _.each(chainsData, (chain: TransmissionChainModel, chainIndex: number) => {
+                    // create markers
+                    _.each(chain.nodes, (node: EntityModel) => {
+                        switch (node.type) {
+                            // events
+                            case EntityType.EVENT:
+                                addValidAddressToMarker(
+                                    (node.model as EventModel).address,
+                                    chainIndex,
+                                    node.model.id,
+                                    node.type
+                                );
+                                break;
+
+                            // contacts ( same as case )
+                            case EntityType.CONTACT:
+                                addValidAddressToMarker(
+                                    _.find(
+                                        (node.model as ContactModel).addresses,
+                                        {
+                                            typeId: AddressType.CURRENT_ADDRESS
+                                        }
+                                    ),
+                                    chainIndex,
+                                    node.model.id,
+                                    node.type
+                                );
+                                break;
+
+                            // cases ( same as contact )
+                            case EntityType.CASE:
+                                addValidAddressToMarker(
+                                    _.find(
+                                        (node.model as CaseModel).addresses,
+                                        {
+                                            typeId: AddressType.CURRENT_ADDRESS
+                                        }
+                                    ),
+                                    chainIndex,
+                                    node.model.id,
+                                    node.type
+                                );
+                                break;
                         }
-
-                        // add marker
-                        this.markers.push(new WorldMapMarker(
-                            new WorldMapPoint(
-                                address.geoLocation.lat,
-                                address.geoLocation.lng
-                            )
-                        ));
-
-                        // add marker to map list
-                        _.set(markersMap, `[${chainIndex}][${markerId}]`, this.markers.length - 1);
-                    };
-
-                    // go though each chain and create relevant markers
-                    _.each(chainsData, (chain: TransmissionChainModel, chainIndex: number) => {
-                        // create markers
-                        _.each(chain.nodes, (node: EntityModel) => {
-                            switch (node.type) {
-                                // events
-                                case EntityType.EVENT:
-                                    addValidAddressToMarker(
-                                        (node.model as EventModel).address,
-                                        chainIndex,
-                                        node.model.id
-                                    );
-                                    break;
-
-                                // contacts ( same as case )
-                                case EntityType.CONTACT:
-                                    addValidAddressToMarker(
-                                        _.find(
-                                            (node.model as ContactModel).addresses,
-                                            {
-                                                typeId: AddressType.CURRENT_ADDRESS
-                                            }
-                                        ),
-                                        chainIndex,
-                                        node.model.id
-                                    );
-                                    break;
-
-                                // cases ( same as contact )
-                                case EntityType.CASE:
-                                    addValidAddressToMarker(
-                                        _.find(
-                                            (node.model as CaseModel).addresses,
-                                            {
-                                                typeId: AddressType.CURRENT_ADDRESS
-                                            }
-                                        ),
-                                        chainIndex,
-                                        node.model.id
-                                    );
-                                    break;
-                            }
-                        });
-
-                        // connect markers
-                        _.each(chain.chainRelations, (rel: TransmissionChainRelation) => {
-                            // check if we have markers for relation records
-                            if (
-                                markersMap[chainIndex][rel.entityIds[0]] !== undefined &&
-                                markersMap[chainIndex][rel.entityIds[1]] !== undefined
-                            ) {
-                                this.lines.push(new WorldMapPath(
-                                    false,
-                                    this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
-                                    this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
-                                ));
-                            }
-                        });
                     });
 
-                    // finished loading data
-                    this.displayLoading = false;
+                    // connect markers
+                    _.each(chain.chainRelations, (rel: TransmissionChainRelation) => {
+                        // check if we have markers for relation records
+                        if (
+                            markersMap[chainIndex][rel.entityIds[0]] !== undefined &&
+                            markersMap[chainIndex][rel.entityIds[1]] !== undefined
+                        ) {
+                            this.lines.push(new WorldMapPath({
+                                points: [
+                                    this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
+                                    this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
+                                ]
+                            }));
+                        }
+                    });
                 });
+
+                // finished loading data
+                this.displayLoading = false;
+            });
         }
     }
 }
