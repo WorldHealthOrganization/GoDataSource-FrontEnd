@@ -29,6 +29,8 @@ export class WorldMapMarker {
     label: string;
     labelColor: string = '#FFF';
     type: WorldMapMarkerType = WorldMapMarkerType.IMAGE;
+    radius: number = 5;
+    color: string = '#000';
 
     constructor(data: {
         // required
@@ -37,7 +39,9 @@ export class WorldMapMarker {
         // optional
         label?: string,
         labelColor?: string,
-        type?: WorldMapMarkerType
+        type?: WorldMapMarkerType,
+        radius?: number,
+        color?: string
     }) {
         // assign properties
         Object.assign(
@@ -314,9 +318,12 @@ export class WorldMapComponent implements OnInit {
                     break;
 
                 case WorldMapMarkerType.CIRCLE:
-                    // style.image = new CircleStyle({
-                    //     radius
-                    // });
+                    style.image = new CircleStyle({
+                        radius: markerData.radius,
+                        fill: new Fill({
+                            color: markerData.color
+                        })
+                    });
                     break;
             }
 
