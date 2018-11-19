@@ -174,14 +174,15 @@
                     <ng-container *ngFor="let dashlet of group.dashlets">
                         <!-- Cases who have died -->
                         <app-cases-deceased-dashlet
-                            *ngIf="
-                            dashlet === DashboardDashlet.CASES_DECEASED &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                            *ngIf="dashlet === DashboardDashlet.CASES_DECEASED &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-cases-deceased-dashlet>
 
                         <!-- Cases hospitalised -->

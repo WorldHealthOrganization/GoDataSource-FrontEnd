@@ -636,9 +636,19 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds, date}): void {
+    protected applyListFilters(queryParams: {
+        applyListFilter,
+        x,
+        dateRange,
+        locationIds,
+        date,
+        global
+    }): void {
         // update breadcrumbs
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
+
+        // get global filter values
+        const globalFilters = this.getGlobalFilterValues(queryParams);
 
         // check params for apply list filter
         this.appliedListFilter = queryParams.applyListFilter;
@@ -661,7 +671,12 @@ export abstract class ListComponent {
             // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
                 // add condition for deceased cases
-                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                    'dateDeceased',
+                    globalFilters.date,
+                    'addresses.locationId',
+                    globalFilters.locationId
+                );
                 this.appliedListFilterQueryBuilder.filter.where({
                     deceased: true
                 }, true);
@@ -955,6 +970,39 @@ export abstract class ListComponent {
                 break;
 
         }
+    }
+
+    /**
+     * Retrieve Global Filter Values
+     * @param queryParams
+     */
+    getGlobalFilterValues(queryParams: {
+        global?: string | {
+            date?: Moment,
+            locationId?: string
+        }
+    }): {
+        date?: Moment,
+        locationId?: string
+    } {
+        // do we need to decode global filters ?
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = !queryParams.global ?
+            {} : (
+                _.isString(queryParams.global) ?
+                    JSON.parse(queryParams.global as string) :
+                    queryParams.global
+            );
+
+        // parse date
+        if (global.date) {
+            global.date = moment(global.date);
+        }
+
+        // finished
+        return global;
     }
 
     /**

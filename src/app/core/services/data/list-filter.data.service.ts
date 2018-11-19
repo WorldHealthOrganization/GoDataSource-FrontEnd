@@ -419,4 +419,40 @@ export class ListFilterDataService {
         });
         return qb;
     }
+
+    /**
+     * Global filters
+     * @param dateFieldPath
+     * @param locationFieldPath
+     */
+    getGlobalFilterQB(
+        dateFieldPath: string,
+        dateFieldValue: Moment,
+        locationFieldPath: string,
+        locationFieldValue: string
+    ): RequestQueryBuilder {
+        // construct query builder
+        const qb = new RequestQueryBuilder();
+
+        // add date condition
+        if (!_.isEmpty(dateFieldValue)) {
+            qb.filter.byDateRange(
+                dateFieldPath, {
+                    startDate: dateFieldValue.startOf('day').format(),
+                    endDate: dateFieldValue.endOf('day').format()
+                }
+            );
+        }
+
+        // add location condition
+        if (!_.isEmpty(locationFieldValue)) {
+            qb.filter.byEquality(
+                locationFieldPath,
+                locationFieldValue
+            );
+        }
+
+        // finished
+        return qb;
+    }
 }

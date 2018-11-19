@@ -119,13 +119,26 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getDeceasedCasesCount(outbreakId: string): Observable<any> {
-        // generate a query builder for deceased
+    getDeceasedCasesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // construct query
         const filterQueryBuilder = new RequestQueryBuilder();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // deceased condition
         filterQueryBuilder.filter.where({
             deceased: true
         }, true);
+
+        // generate a query builder for deceased
         const filter = filterQueryBuilder.filter.generateCondition(true);
+
         // call endpoint
         return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
     }
