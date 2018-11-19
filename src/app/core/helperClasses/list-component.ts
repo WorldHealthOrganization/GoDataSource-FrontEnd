@@ -649,6 +649,7 @@ export abstract class ListComponent {
 
         // get global filter values
         const globalFilters = this.getGlobalFilterValues(queryParams);
+        let globalQb: RequestQueryBuilder;
 
         // check params for apply list filter
         this.appliedListFilter = queryParams.applyListFilter;
@@ -690,15 +691,25 @@ export abstract class ListComponent {
 
             // filter cases hospitalised
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
-                // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesHospitalized()
-                    .subscribe((qbFilterCasesHospitalized) => {
-                        this.appliedListFilterQueryBuilder = qbFilterCasesHospitalized;
-                        this.mergeListFilterToMainFilter();
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
 
-                        // refresh list
-                        this.needsRefreshList(true);
-                    });
+                // get the correct query builder and merge with the existing one
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(globalFilters.date);
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
                 break;
 
             // Filter contacts not seen

@@ -10,6 +10,8 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class CaseDataService {
@@ -146,14 +148,22 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getHospitalisedCasesCount(outbreakId: string): Observable<any> {
+    getHospitalisedCasesCount(
+        outbreakId: string,
+        date: string | Moment = moment(),
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         // get the query builder and call the endpoint
-        return this.listFilterDataService.filterCasesHospitalized()
-            .mergeMap((filterQueryBuilder) => {
-                const filter = filterQueryBuilder.buildQuery();
-                // call endpoint
-                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-            });
+        const filterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(date);
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**

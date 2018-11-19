@@ -187,14 +187,15 @@
 
                         <!-- Cases hospitalised -->
                         <app-cases-hospitalised-dashlet
-                            *ngIf="
-                            dashlet === DashboardDashlet.CASES_HOSPITALISED &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                            *ngIf="dashlet === DashboardDashlet.CASES_HOSPITALISED &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-cases-hospitalised-dashlet>
 
                         <!-- Cases with Less than x Contacts -->

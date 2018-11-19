@@ -107,6 +107,7 @@
     </app-total-number-of-records>
 
     <app-counted-items-list
+        *ngIf="!appliedListFilter"
         [items]="countedCasesGroupedByClassification$ | async"
         (optionChanged)="filterBySelectField('id', $event.ids, null)">
     </app-counted-items-list>

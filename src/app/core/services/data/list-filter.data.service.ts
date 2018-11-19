@@ -87,35 +87,33 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of cases
      * @returns {RequestQueryBuilder}
      */
-    filterCasesHospitalized(): Observable<RequestQueryBuilder> {
-        // get server current time to compare with hospitalisation dates
-        return this.genericDataService
-            .getServerUTCCurrentDateTime()
-            .map((serverDateTime: string) => {
-                // generate a query builder for hospitalized cases
-                const filterQueryBuilder = new RequestQueryBuilder();
-                // compare hospitalisation dates start and end with current date
-                filterQueryBuilder.filter.where({
-                    [RequestFilterOperator.AND]: [
-                        {
-                            'hospitalizationDates.startDate': {
-                                lte: moment(serverDateTime).endOf('day').toISOString()
-                            }
-                        }, {
-                            [RequestFilterOperator.OR]: [{
-                                'hospitalizationDates.endDate': {
-                                    eq: null
-                                }
-                            }, {
-                                'hospitalizationDates.endDate': {
-                                    gte: moment(serverDateTime).startOf('day').toISOString()
-                                }
-                            }]
+    filterCasesHospitalized(date: string | Moment): RequestQueryBuilder {
+        // generate a query builder for hospitalized cases
+        const filterQueryBuilder = new RequestQueryBuilder();
+
+        // compare hospitalisation dates start and end with current date
+        filterQueryBuilder.filter.where({
+            [RequestFilterOperator.AND]: [
+                {
+                    'hospitalizationDates.startDate': {
+                        lte: moment(date).endOf('day').toISOString()
+                    }
+                }, {
+                    [RequestFilterOperator.OR]: [{
+                        'hospitalizationDates.endDate': {
+                            eq: null
                         }
-                    ]
-                }, true);
-                return filterQueryBuilder;
-            });
+                    }, {
+                        'hospitalizationDates.endDate': {
+                            gte: moment(date).startOf('day').toISOString()
+                        }
+                    }]
+                }
+            ]
+        }, true);
+
+        // finished
+        return filterQueryBuilder;
     }
 
     /**
@@ -435,7 +433,10 @@ export class ListFilterDataService {
         const qb = new RequestQueryBuilder();
 
         // add date condition
-        if (!_.isEmpty(dateFieldValue)) {
+        if (
+            !_.isEmpty(dateFieldPath) &&
+            !_.isEmpty(dateFieldValue)
+        ) {
             qb.filter.byDateRange(
                 dateFieldPath, {
                     startDate: dateFieldValue.startOf('day').format(),
@@ -445,7 +446,10 @@ export class ListFilterDataService {
         }
 
         // add location condition
-        if (!_.isEmpty(locationFieldValue)) {
+        if (
+            !_.isEmpty(locationFieldPath) &&
+            !_.isEmpty(locationFieldValue)
+        ) {
             qb.filter.byEquality(
                 locationFieldPath,
                 locationFieldValue

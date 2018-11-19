@@ -64,8 +64,8 @@ export abstract class DashletComponent {
      * @param locationFieldPath
      */
     getGlobalFilterQB(
-        dateFieldPath: string,
-        locationFieldPath: string
+        dateFieldPath: string | null,
+        locationFieldPath: string | null
     ): RequestQueryBuilder {
         return this.listFilterDataService.getGlobalFilterQB(
             dateFieldPath,
