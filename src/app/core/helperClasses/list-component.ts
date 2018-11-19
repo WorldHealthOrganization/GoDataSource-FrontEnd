@@ -674,7 +674,7 @@ export abstract class ListComponent {
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
                     'dateDeceased',
                     globalFilters.date,
-                    'addresses.locationId',
+                    'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
                 this.appliedListFilterQueryBuilder.filter.where({

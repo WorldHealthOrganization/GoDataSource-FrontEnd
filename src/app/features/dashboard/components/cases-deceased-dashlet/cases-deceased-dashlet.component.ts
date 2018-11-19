@@ -55,7 +55,7 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
             // add global filters
             const qb = this.getGlobalFilterQB(
                 'dateDeceased',
-                'addresses.locationId'
+                'addresses.parentLocationIdFilter'
             );
 
             // retrieve data

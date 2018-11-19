@@ -137,10 +137,8 @@ export class CaseDataService {
         }, true);
 
         // generate a query builder for deceased
-        const filter = filterQueryBuilder.filter.generateCondition(true);
-
-        // call endpoint
-        return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**
