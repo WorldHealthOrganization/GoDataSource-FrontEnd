@@ -15,12 +15,13 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -62,7 +63,8 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
 
     // reference data
     genderList$: Observable<any[]>;
-    entityTypesList$: Observable<any[]>;
+    personTypesList$: Observable<any[]>;
+    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
     riskLevelsList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
 
@@ -90,9 +92,24 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
     ngOnInit() {
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        this.entityTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.PERSON_TYPE).share();
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).share();
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).share();
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        this.personTypesList$ = personTypes$.map((data: ReferenceDataCategoryModel) => {
+            return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
+                new LabelValuePair(entry.value, entry.id)
+            );
+        });
+        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+            this.personTypesListMap = _.transform(
+                personTypeCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         // side filters
         this.generateSideFilters();
@@ -188,7 +205,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
-            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder);
+            this.entitiesListCount$ = this.entityDataService.getEntitiesCount(this.outbreakId, countQueryBuilder).share();
         }
     }
 
@@ -198,7 +215,7 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                 fieldName: 'type',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
                 type: FilterType.MULTISELECT,
-                options$: this.entityTypesList$,
+                options$: this.personTypesList$,
                 sortable: true
             }),
             new FilterModel({
@@ -290,6 +307,14 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             // call method from parent class
             super.sortBy(data, objectDetailsSort);
         }
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
     }
 
     /**

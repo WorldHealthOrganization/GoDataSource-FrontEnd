@@ -7,7 +7,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -41,6 +41,7 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
     // reference data
     genderList$: Observable<any[]>;
     riskLevelsList$: Observable<any[]>;
+    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
     // constants
     EntityType = EntityType;
@@ -67,6 +68,17 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
         // retrieve cluster info
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+            this.personTypesListMap = _.transform(
+                personTypeCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         // get cluster ID from route params
         this.route.params.subscribe((params: { clusterId }) => {
@@ -183,5 +195,13 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     hasEventWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
     }
 }

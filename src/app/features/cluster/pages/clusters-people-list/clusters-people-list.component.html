@@ -22,11 +22,11 @@
         <div class="reset-filters">
             <!--Reset Filters-->
             <div>
-                <button mat-raised-button (click)="resetFiltersToSideFilters()">
+                <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
                     {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                 </button>
 
-                <button mat-raised-button (click)="needsRefreshList(true)">
+                <button type="button" mat-raised-button (click)="needsRefreshList(true)">
                     {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                 </button>
             </div>
@@ -54,7 +54,7 @@
                     </div>
                 </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 {{item.type === EntityType.EVENT ? item.name : item.firstName}}
             </mat-cell>
         </ng-container>
@@ -78,7 +78,7 @@
                     </div>
                 </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 {{item.lastName}}
             </mat-cell>
         </ng-container>
@@ -104,7 +104,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
@@ -132,7 +132,7 @@
                     </div>
                 </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
@@ -160,7 +160,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.RISK_LEVEL"
                     [value]="item.riskLevel">
@@ -181,7 +181,7 @@
                     </div>
                 </mat-header-cell>
 
-                <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+                <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                     <!-- placeholder -->
                 </mat-cell>
             </ng-container>
@@ -199,7 +199,7 @@
                     </div>
                 </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 {{item.mainAddress.location?.name}}
             </mat-cell>
         </ng-container>
@@ -217,7 +217,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [ngClass]="'cell-' + item.type">
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
                 {{item.mainAddress.fullAddress}}
             </mat-cell>
         </ng-container>
