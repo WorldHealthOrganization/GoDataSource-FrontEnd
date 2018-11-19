@@ -968,6 +968,9 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
+        'LNG_RELATIONSHIP_FIELD_LABEL_TYPE': 'Type',
+        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_EXPOSURE': 'Exposed To',
+        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_CONTACT': 'Contact Of',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',

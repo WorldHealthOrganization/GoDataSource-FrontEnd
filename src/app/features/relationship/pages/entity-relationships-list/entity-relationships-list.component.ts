@@ -13,7 +13,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
@@ -70,20 +70,14 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     relationshipsList$: Observable<RelationshipModel[]>;
     relationshipsListCount$: Observable<any>;
 
-    // list of certainty levels
+    // reference data
     certaintyLevelList$: Observable<any>;
-
-    // list of exposure types
     exposureTypeList$: Observable<any>;
-
-    // list of exposures frequency
     exposuresFrequencyList$: Observable<any>;
-
-    // list of exposures durations
     exposureDurationList$: Observable<any>;
-
-    // list of relationships
     relationshipTypeList$: Observable<any>;
+
+    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
     // provide constants to template
     Constants = Constants;
@@ -116,6 +110,17 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
         this.exposureDurationList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
         this.relationshipTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+            this.personTypesListMap = _.transform(
+                personTypeCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         this.route.params
             .subscribe((params: { entityType, entityId }) => {
@@ -176,12 +181,16 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // default table columns
         this.tableColumns = [
             new VisibleColumnModel({
+                field: 'people.lastName',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
+            }),
+            new VisibleColumnModel({
                 field: 'people.firstName',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'people.lastName',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME'
+                field: 'type',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'contactDate',
@@ -197,11 +206,13 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             }),
             new VisibleColumnModel({
                 field: 'exposureFrequencyId',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY'
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'exposureDurationId',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION'
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'socialRelationshipTypeId',
@@ -273,6 +284,14 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
     hasEntityWriteAccess(): boolean {
         return this.authUser.hasPermissions(this.entityMap[this.entityType].writePermission);
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
     }
 
     /**
