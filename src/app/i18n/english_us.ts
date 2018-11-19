@@ -94,7 +94,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
-        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share Exposures',
+        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
@@ -594,7 +594,7 @@ export const EnglishUsLang = {
         /**
          * Entity Relationships list share - assign - create pages
          */
-        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
+        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share Relationships',
         'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Assign To',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE': 'Create relationships',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE': 'Relationships created!',
@@ -968,8 +968,8 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
-        'LNG_RELATIONSHIP_FIELD_LABEL_TYPE': 'Type',
-        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_EXPOSURE': 'Exposed To',
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE': 'Type',
+        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_EXPOSURE': 'Exposure',
         'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_CONTACT': 'Contact Of',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION': '',

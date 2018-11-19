@@ -27,7 +27,6 @@
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
-    <!-- Reset Filters -->
     <div class="top-section-wrapper">
         <!--Color Legend-->
         <div>
@@ -44,7 +43,6 @@
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>
-
     </div>
 
     <mat-table #table [dataSource]="relationshipsList$ | async" matSort (matSortChange)="sortBy($event)">
@@ -112,7 +110,7 @@
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
                     <div class="column-header">
-                        {{'LNG_RELATIONSHIP_FIELD_LABEL_TYPE' | translate}}
+                        {{'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE' | translate}}
                     </div>
                     <div class="column-filter">
                         <!-- placeholder -->

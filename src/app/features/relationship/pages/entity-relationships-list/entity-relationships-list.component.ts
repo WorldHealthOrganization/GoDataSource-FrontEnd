@@ -190,7 +190,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             }),
             new VisibleColumnModel({
                 field: 'type',
-                label: 'LNG_RELATIONSHIP_FIELD_LABEL_TYPE'
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE'
             }),
             new VisibleColumnModel({
                 field: 'contactDate',
