@@ -112,6 +112,14 @@
                                     [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
                                 </app-form-range>
 
+                                <!-- DATE -->
+                                <app-form-datepicker
+                                    *ngIf="filter.filter?.type === FilterType.DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate">
+                                </app-form-datepicker>
+
                                 <!-- DATE RANGE Filter-->
                                 <app-form-daterange
                                     *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
@@ -124,7 +132,7 @@
 
                                 <!-- Address Location -->
                                 <app-form-location-dropdown
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
+                                    *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"

@@ -56,6 +56,13 @@
         </ng-container>
     </app-topnav>
 
+    <!-- Side filters -->
+    <app-side-filters
+        [filterOptions]="availableSideFilters"
+        (filtersApplied)="applySideFilters($event)">
+    </app-side-filters>
+
+    <!-- Dashboard items -->
     <div class="page-content">
 
         <div

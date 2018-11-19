@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { AddressModel } from '../../../core/models/address.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-side-filters',
@@ -19,7 +20,13 @@ export class SideFiltersComponent {
     // available filters to be applied
     _filterOptions: FilterModel[] = [];
     @Input() set filterOptions(values: FilterModel[]) {
+        // filter options
         this._filterOptions = values;
+
+        // required applied fields
+        this.addRequiredAndValueFilters();
+
+        // sort options
         this.updateSortFields();
     }
     get filterOptions(): FilterModel[] {
@@ -32,7 +39,10 @@ export class SideFiltersComponent {
     // extra sort options from the ones provided in the filters
     _extraSortOptions: SortModel[] = [];
     @Input() set extraSortOptions(values: SortModel[]) {
+        // extra options
         this._extraSortOptions = values;
+
+        // sort options
         this.updateSortFields();
     }
     get extraSortOptions(): SortModel[] {
@@ -42,8 +52,10 @@ export class SideFiltersComponent {
     // apply filters handler
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
 
+    @ViewChild('form') form: NgForm;
+
     // applied filters
-    @Input() appliedFilters: AppliedFilterModel[];
+    appliedFilters: AppliedFilterModel[];
     // selected operator to be used between filters
     appliedFilterOperator: RequestFilterOperator;
     // applied sorting criteria
@@ -122,17 +134,46 @@ export class SideFiltersComponent {
     }
 
     clear() {
-        this.appliedFilters = [new AppliedFilterModel()];
         this.appliedFilterOperator = RequestFilterOperator.AND;
         this.appliedSort = [];
+        this.addRequiredAndValueFilters();
     }
 
     reset() {
         this.clear();
-        this.queryBuilder = new RequestQueryBuilder();
-        this.filtersApplied.emit(this.getQueryBuilder());
+        setTimeout(() => {
+            this.apply(this.form);
+        });
+    }
 
-        this.closeSideNav();
+    /**
+     * Add filters resulted from filter options
+     */
+    private addRequiredAndValueFilters() {
+        // reinitialize applied filters
+        this.appliedFilters = [];
+
+        // go through filter options and add an applied filter for all required & value options
+        _.each(this.filterOptions, (option: FilterModel) => {
+            if (
+                option.required ||
+                option.value
+            ) {
+                // initialize filter
+                const filter: AppliedFilterModel = new AppliedFilterModel();
+                filter.readonly = option.required;
+                filter.filter = option;
+                filter.value = option.value;
+
+                // add filter
+                this.appliedFilters.push(filter);
+            }
+        });
+
+        // if empty, then we need to add at least one empty applied field
+        if (this.appliedFilters.length < 1) {
+            this.appliedFilters.push(new AppliedFilterModel());
+        }
     }
 
     /**
@@ -240,6 +281,7 @@ export class SideFiltersComponent {
                     break;
 
                 case FilterType.ADDRESS:
+                case FilterType.LOCATION:
                     // contains / within
                     switch (comparator) {
                         case FilterComparator.LOCATION:
@@ -302,6 +344,23 @@ export class SideFiltersComponent {
                 case FilterType.RANGE_DATE:
                     // between / before / after
                     qb.filter.byDateRange(filter.fieldName, appliedFilter.value, false);
+                    break;
+
+                case FilterType.DATE:
+                    // between
+                    const date = _.isEmpty(appliedFilter.value) ?
+                        null :
+                        moment(appliedFilter.value);
+                    qb.filter.byDateRange(
+                        filter.fieldName,
+                        date && date.isValid() ?
+                            {
+                                startDate: date.startOf('day'),
+                                endDate: date.endOf('day')
+                            } :
+                            null,
+                        false
+                    );
                     break;
 
                 case FilterType.SELECT:

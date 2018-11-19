@@ -16,6 +16,7 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
 import * as FileSaver from 'file-saver';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 
 @Component({
     selector: 'app-dashboard',
@@ -87,6 +88,9 @@ export class DashboardComponent implements OnInit {
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
+    // available side filters
+    availableSideFilters: FilterModel[] = [];
+
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
     constructor(
@@ -96,8 +100,7 @@ export class DashboardComponent implements OnInit {
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -113,6 +116,30 @@ export class DashboardComponent implements OnInit {
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
+
+        // initialize Side Filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    private initializeSideFilters() {
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                type: FilterType.DATE,
+                required: true
+            }),
+            new FilterModel({
+                fieldName: 'locationId',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+                type: FilterType.LOCATION,
+                required: true
+            })
+        ];
     }
 
     private initializeDashlets() {
@@ -302,5 +329,13 @@ export class DashboardComponent implements OnInit {
             blob,
             `${fileName}.${extension}`
         );
+    }
+
+    /**
+     * Apply side filters
+     * @param data
+     */
+    applySideFilters(data) {
+        console.log(data);
     }
 }

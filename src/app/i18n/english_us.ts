@@ -1548,6 +1548,12 @@ export const EnglishUsLang = {
         'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To',
 
         /**
+         * Global filter fields
+         */
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE': 'Date',
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION': 'Location',
+
+        /**
          * Dashboard Page
          */
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
@@ -1980,6 +1986,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT': 'Contains',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD': 'Keyword',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DATE': 'Day is',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',
