@@ -342,7 +342,5 @@ export class DashboardComponent implements OnInit {
         // set filters
         this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
         this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
-        console.log(this.globalFilterDate);
-        console.log(this.globalFilterLocationId);
     }
 }
