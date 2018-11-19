@@ -22,8 +22,7 @@ export class TransmissionChainDataService {
         private http: HttpClient,
         private modelHelper: ModelHelperService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     /**
      * Map Transmission chain to Chain model
@@ -103,9 +102,9 @@ export class TransmissionChainDataService {
         if (dateGlobalFilter) {
             const rQBGlobalDate = new RequestQueryBuilder();
             rQBGlobalDate.filter.where({
-                    where: {
-                        endDate: dateGlobalFilter
-                    }
+                where: {
+                    endDate: dateGlobalFilter
+                }
             });
             const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
             filter.where = {...filter.where, ...filterDate.where};
@@ -244,6 +243,7 @@ export class TransmissionChainDataService {
                             }
                         }
                         // determine label
+                        // name
                         if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                             nodeData.label = nodeData.name;
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
@@ -256,18 +256,21 @@ export class TransmissionChainDataService {
                             } else {
                                 nodeData.label = '';
                             }
+                            // date of onset
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET.value) {
                             if (node.type === EntityType.CASE) {
                                 nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                             } else {
                                 nodeData.label = '';
                             }
+                            // gender
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
                             } else {
                                 nodeData.label = '';
                             }
+                            // location
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
                             nodeData.label = '';
                             if (node.type !== EntityType.EVENT) {
@@ -280,6 +283,24 @@ export class TransmissionChainDataService {
                                         nodeData.label = location.name;
                                     }
                                 }
+                            }
+                            // initials
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.INITIALS.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                const firstNameInitial = (!_.isEmpty(node.model.firstName)) ? node.model.firstName.slice(0, 1) : '';
+                                const lastNameInitial = (!_.isEmpty(node.model.lastName)) ? node.model.lastName.slice(0, 1) : '';
+                                nodeData.label = firstNameInitial + ' ' + lastNameInitial;
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // unique id
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.UNIQUE_ID.value) {
+                            if (node.type === EntityType.CASE) {
+                                const gender = colorCriteria.nodeLabelValues[node.model.gender] ? colorCriteria.nodeLabelValues[node.model.gender] : '';
+                                const visualId = node.model.visualId ? node.model.visualId : '';
+                                nodeData.label = visualId + ';' + node.model.name + ';' + gender;
+                            } else {
+                                nodeData.label = '';
                             }
                         }
                         graphData.nodes.push({data: nodeData});

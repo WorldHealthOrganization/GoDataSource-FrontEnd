@@ -438,6 +438,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
         }
+        // populate nodeLabelValues with gender values as they need to be translated
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.UNIQUE_ID.value) {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(nodeLabelValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+            });
+        }
 
     }
 
