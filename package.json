@@ -41,7 +41,7 @@
         "gantt": "2.4.0",
         "file-saver": "2.0.0",
         "hammerjs": "^2.0.8",
-        "handsontable": "6.0.0",
+        "handsontable": "6.2.0",
         "lodash": "4.17.10",
         "moment": "2.22.1",
         "ng2-file-upload": "1.3.0",
