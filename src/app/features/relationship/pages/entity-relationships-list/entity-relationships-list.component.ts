@@ -76,7 +76,6 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     exposuresFrequencyList$: Observable<any>;
     exposureDurationList$: Observable<any>;
     relationshipTypeList$: Observable<any>;
-
     personTypesListMap: { [id: string]: ReferenceDataEntryModel };
 
     // provide constants to template
