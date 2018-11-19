@@ -36,9 +36,9 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     }));
 
     constructor(
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -65,4 +65,9 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
                 this.contactsSeenEachDay = result.contactsSeenCount;
             });
     }
+
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }

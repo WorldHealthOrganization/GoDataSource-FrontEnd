@@ -6,6 +6,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',
@@ -32,9 +33,10 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
 
     constructor(
         private followUpDataService: FollowUpsDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -75,6 +77,10 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
         }
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

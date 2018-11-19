@@ -5,7 +5,7 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import * as moment from 'moment';
-
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -24,9 +24,10 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
 
     constructor(
         private followUpDataService: FollowUpsDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -46,6 +47,10 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
 
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

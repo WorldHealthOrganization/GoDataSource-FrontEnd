@@ -45,9 +45,9 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -119,4 +119,8 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
         }
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }

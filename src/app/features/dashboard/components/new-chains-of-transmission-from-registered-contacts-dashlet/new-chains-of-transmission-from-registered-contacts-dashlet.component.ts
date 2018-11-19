@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -22,9 +23,10 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private transmissionChainDataService: TransmissionChainDataService
+        private transmissionChainDataService: TransmissionChainDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -39,4 +41,8 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }

@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-contacts-per-case-mean-dashlet',
@@ -17,9 +18,10 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
 
     constructor(
         private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -37,6 +39,10 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

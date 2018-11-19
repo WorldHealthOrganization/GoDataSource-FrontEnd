@@ -4,6 +4,7 @@ import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-cases-pending-lab-results-dashlet',
@@ -20,9 +21,10 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
 
     constructor(
         private caseDataService: CaseDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -41,6 +43,10 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

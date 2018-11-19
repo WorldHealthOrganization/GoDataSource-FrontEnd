@@ -32,9 +32,9 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -65,6 +65,10 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
         }
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

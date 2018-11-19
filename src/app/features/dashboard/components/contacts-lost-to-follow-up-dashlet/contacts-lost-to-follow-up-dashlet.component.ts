@@ -5,6 +5,7 @@ import { Constants } from '../../../../core/models/constants';
 import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import * as moment from 'moment';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -24,9 +25,10 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private followUpsDataService: FollowUpsDataService
+        private followUpsDataService: FollowUpsDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -43,4 +45,8 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }

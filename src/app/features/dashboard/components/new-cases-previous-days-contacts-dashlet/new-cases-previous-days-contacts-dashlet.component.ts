@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -7,6 +6,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-new-cases-previous-days-contacts-dashlet',
@@ -34,9 +34,10 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
 
     constructor(
         private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -77,6 +78,10 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
         }
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

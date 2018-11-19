@@ -33,9 +33,9 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
     }));
 
     constructor(
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -66,4 +66,8 @@ export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComp
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }

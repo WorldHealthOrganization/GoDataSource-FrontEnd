@@ -6,6 +6,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -31,9 +32,10 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
 
     constructor(
         private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -73,6 +75,10 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
         }
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

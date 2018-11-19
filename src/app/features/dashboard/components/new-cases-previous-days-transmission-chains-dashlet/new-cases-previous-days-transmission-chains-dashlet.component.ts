@@ -6,6 +6,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
@@ -33,9 +34,10 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
 
     constructor(
         private relationshipDataService: RelationshipDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -86,6 +88,10 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             0;
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 

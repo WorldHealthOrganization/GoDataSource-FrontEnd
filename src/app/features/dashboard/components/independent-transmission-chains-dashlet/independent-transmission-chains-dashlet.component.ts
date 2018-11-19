@@ -3,6 +3,7 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
     selector: 'app-independent-transmission-chains-dashlet',
@@ -17,9 +18,10 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
@@ -38,6 +40,10 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
             });
     }
 
+    /**
+     * Refresh data
+     */
+    refreshData() {}
 }
 
 
