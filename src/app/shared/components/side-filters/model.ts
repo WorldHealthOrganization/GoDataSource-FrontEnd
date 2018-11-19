@@ -99,6 +99,9 @@ export class FilterModel {
     required: boolean = false;
     value: any;
 
+    // select multiple / single option(s)
+    multipleOptions: boolean = true;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -114,7 +117,8 @@ export class FilterModel {
         extraConditions?: RequestQueryBuilder,
         childQueryBuilderKey?: string,
         required?: boolean,
-        value?: any
+        value?: any,
+        multipleOptions?: boolean
     }) {
         // set handler
         this.self = this;

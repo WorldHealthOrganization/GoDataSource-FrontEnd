@@ -137,7 +137,8 @@ export class DashboardComponent implements OnInit {
                 fieldName: 'locationId',
                 fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
                 type: FilterType.LOCATION,
-                required: true
+                required: true,
+                multipleOptions: false
             })
         ];
     }
