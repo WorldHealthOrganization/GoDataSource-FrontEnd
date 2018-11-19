@@ -17,6 +17,8 @@ import * as _ from 'lodash';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute } from '@angular/router';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -37,8 +39,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     // entities
     entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
 
+    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
+
     // constants
     EntityType = EntityType;
+    ReferenceDataCategory = ReferenceDataCategory;
 
     /**
      * Constructor
@@ -48,7 +53,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
         private outbreakDataService: OutbreakDataService,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        protected route: ActivatedRoute
+        protected route: ActivatedRoute,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -61,6 +67,19 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
     ngOnInit() {
         // init breadcrumbs
         this.initBreadcrumbs();
+
+        // reference data
+        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).share();
+        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
+            this.personTypesListMap = _.transform(
+                personTypeCategory.entries,
+                (result, entry: ReferenceDataEntryModel) => {
+                    // groupBy won't work here since groupBy will put an array instead of one value
+                    result[entry.id] = entry;
+                },
+                {}
+            );
+        });
 
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -128,6 +147,14 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
                 )
             );
         }
+    }
+
+    /**
+     * Retrieve Person Type color
+     */
+    getPersonTypeColor(personType) {
+        const personTypeData = _.get(this.personTypesListMap, personType);
+        return _.get(personTypeData, 'colorCode', '');
     }
 
     /**
