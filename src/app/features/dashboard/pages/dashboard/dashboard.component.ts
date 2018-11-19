@@ -83,9 +83,8 @@ export class DashboardComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
 
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.PDF
-    ];
+    // constants
+    ExportDataExtension = ExportDataExtension;
 
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
