@@ -128,17 +128,17 @@ export class DashboardComponent implements OnInit {
         // set available side filters
         this.availableSideFilters = [
             new FilterModel({
-                fieldName: 'date',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-                type: FilterType.DATE,
-                required: true
-            }),
-            new FilterModel({
                 fieldName: 'locationId',
                 fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
                 type: FilterType.LOCATION,
                 required: true,
                 multipleOptions: false
+            }),
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                type: FilterType.DATE,
+                required: true
             })
         ];
     }

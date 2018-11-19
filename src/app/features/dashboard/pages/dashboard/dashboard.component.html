@@ -59,7 +59,8 @@
     <!-- Side filters -->
     <app-side-filters
         [filterOptions]="availableSideFilters"
-        (filtersApplied)="applySideFilters($event)">
+        (filtersCollected)="applySideFilters($event)"
+        [fixedFilters]="true">
     </app-side-filters>
 
     <!-- Dashboard items -->

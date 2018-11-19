@@ -218,7 +218,7 @@ export class AppliedFilterModel {
 
         // date
         [FilterType.DATE]: [{
-            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DATE',
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
             value: FilterComparator.DATE,
             valueType: ValueType.DATE
         }],
@@ -296,6 +296,24 @@ export class AppliedFilterModel {
     }
     public get comparator(): FilterComparator {
         return this._comparator;
+    }
+
+    /**
+     * Constructor
+     * @param data
+     */
+    constructor(data?: {
+        readonly?: boolean,
+        filter?: FilterModel,
+        value?: any,
+        extraValues?: any,
+        comparator?: FilterComparator
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data ? data : {}
+        );
     }
 
     /**

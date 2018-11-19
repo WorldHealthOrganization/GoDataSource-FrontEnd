@@ -19,8 +19,9 @@
                         {{'LNG_SIDE_FILTERS_TITLE' | translate}}
                     </div>
 
-                    <div class="actions">
-
+                    <div
+                        *ngIf="!fixedFilters"
+                        class="actions">
                         <div fxFlex fxLayout="row" class="switch-buttons">
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
@@ -116,8 +117,7 @@
                                 <app-form-datepicker
                                     *ngIf="filter.filter?.type === FilterType.DATE"
                                     [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate">
+                                    [(ngModel)]="filter.value">
                                 </app-form-datepicker>
 
                                 <!-- DATE RANGE Filter-->
@@ -180,7 +180,13 @@
 
                     </div>
 
-                    <button type="button" mat-button color="primary" class="add-side-filter" (click)="addFilter()">
+                    <button
+                        *ngIf="!fixedFilters"
+                        type="button"
+                        mat-button
+                        color="primary"
+                        class="add-side-filter"
+                        (click)="addFilter()">
                         {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
 
@@ -243,6 +249,7 @@
                     </div>
 
                     <button
+                        *ngIf="!fixedFilters"
                         class="add-side-filter"
                         type="button"
                         mat-button

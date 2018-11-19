@@ -51,8 +51,17 @@ export class SideFiltersComponent {
 
     // apply filters handler
     @Output() filtersApplied = new EventEmitter<RequestQueryBuilder>();
+    @Output() filtersCollected = new EventEmitter<AppliedFilterModel[]>();
 
+    /**
+     * Form
+     */
     @ViewChild('form') form: NgForm;
+
+    /**
+     * Fixed filters ( can' add other filters, can't change operator..etc) ?
+     */
+    @Input() fixedFilters: boolean = false;
 
     // applied filters
     appliedFilters: AppliedFilterModel[];
@@ -160,10 +169,11 @@ export class SideFiltersComponent {
                 option.value
             ) {
                 // initialize filter
-                const filter: AppliedFilterModel = new AppliedFilterModel();
-                filter.readonly = option.required;
-                filter.filter = option;
-                filter.value = option.value;
+                const filter: AppliedFilterModel = new AppliedFilterModel({
+                    readonly: option.required,
+                    filter: option,
+                    value: option.value
+                });
 
                 // add filter
                 this.appliedFilters.push(filter);
@@ -226,7 +236,11 @@ export class SideFiltersComponent {
         queryBuilder.filter.setOperator(filterOperator);
 
         // set conditions
+        const appliedFilters: AppliedFilterModel[] = [];
         _.each(filters, (appliedFilter: AppliedFilterModel) => {
+            // construct list of applied filters
+            appliedFilters.push(new AppliedFilterModel(appliedFilter));
+
             // there is no point in adding a condition if no value is provided
             if (
                 appliedFilter.value === undefined ||
@@ -411,6 +425,10 @@ export class SideFiltersComponent {
         this.queryBuilder = queryBuilder;
         this.filtersApplied.emit(this.getQueryBuilder());
 
+        // send filters
+        this.filtersCollected.emit(appliedFilters);
+
+        // close side nav
         this.closeSideNav();
     }
 }
