@@ -81,7 +81,7 @@ const routes: Routes = [
         }
     },
 
-    // Follow-ups list
+    // Daily Follow-ups list
     {
         path: 'follow-ups',
         component: fromPages.ContactDailyFollowUpsListComponent,
@@ -93,6 +93,15 @@ const routes: Routes = [
     // Follow-ups list from a case
     {
         path: 'case-related-follow-ups/:caseId',
+        component: fromPages.ContactDailyFollowUpsListComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_FOLLOWUP]
+        }
+    },
+    // Follow-ups list from a contact
+    {
+        path: 'contact-related-follow-ups/:contactId',
         component: fromPages.ContactDailyFollowUpsListComponent,
         canActivate: [AuthGuard],
         data: {

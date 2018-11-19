@@ -216,5 +216,8 @@
         <button mat-raised-button type="button" [routerLink]="['/contacts', contactData.id, 'chronology']">
             {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY' | translate }}
         </button>
+        <button mat-raised-button type="button" [routerLink]="['/contacts/contact-related-follow-ups', contactData.id]">
+            {{ 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS' | translate }}
+        </button>
     </div>
 </form>
