@@ -59,8 +59,6 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-
-
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
         <!--List Color Legend-->
@@ -406,6 +404,10 @@
                             mat-menu-item
                             [routerLink]="['.', item.id, 'chronology']">
                             {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
+                        </button>
+
+                        <button mat-menu-item [routerLink]="['/contacts/contact-related-follow-ups', item.id]">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS' | translate }}
                         </button>
 
                         <ng-container

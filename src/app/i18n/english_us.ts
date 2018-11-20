@@ -868,6 +868,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE': 'Contact converted to case!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
@@ -900,6 +901,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
 
         /**
          * Bulk Add Contacts page
