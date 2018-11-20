@@ -793,8 +793,21 @@ export abstract class ListComponent {
 
             // filter suspect cases with pending lab result
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    'dateOfOnset',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list

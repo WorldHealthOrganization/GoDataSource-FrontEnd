@@ -186,11 +186,20 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getCasesPendingLabResultCount(outbreakId: string): Observable<any> {
+    getCasesPendingLabResultCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         // get the query builder and call the endpoint
         const filterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
-        const filter = filterQueryBuilder.buildQuery();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
         // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 

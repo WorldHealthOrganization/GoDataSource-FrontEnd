@@ -247,11 +247,9 @@ export class ListFilterDataService {
         // generate a query builder for cases pending lab result
         const filterQueryBuilder = new RequestQueryBuilder();
         const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
-        labResultsQueryBuilder.queryBuilder.filter
-            .where(
-                {
-                    status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
-                }, true);
+        labResultsQueryBuilder.queryBuilder.filter.where({
+            status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
+        }, true);
 
         return filterQueryBuilder;
     }

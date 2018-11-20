@@ -13,9 +13,15 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     styleUrls: ['./cases-pending-lab-results-dashlet.component.less']
 })
 export class CasesPendingLabResultsDashletComponent extends DashletComponent implements OnInit {
-
     // number of cases pending lab result
     casesPendingLabResultCount: number;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
     // constants to be used for applyListFilters
     Constants: any = Constants;
 
@@ -29,16 +35,13 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
 
     ngOnInit() {
         // get number of cases pending lab result
+        this.displayLoading = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for cases pending lab result
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.caseDataService
-                        .getCasesPendingLabResultCount(selectedOutbreak.id)
-                        .subscribe((result) => {
-                            this.casesPendingLabResultCount = result.count;
-                        });
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call(false);
                 }
             });
     }
@@ -46,7 +49,25 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        // get the results for cases pending lab result
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'dateOfOnset',
+                'addresses.parentLocationIdFilter'
+            );
+
+            // retrieve data
+            this.displayLoading = true;
+            this.caseDataService
+                .getCasesPendingLabResultCount(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.casesPendingLabResultCount = result.count;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
 
 
