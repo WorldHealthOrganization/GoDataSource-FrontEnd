@@ -285,47 +285,6 @@ export class ListFilterDataService {
     }
 
     /**
-     * Create the query builder for contacts becoming cases overtime and place
-     * @returns {RequestQueryBuilder}
-     */
-    filterCasesFromContactsOvertimeAndPlace(
-        dateRange: DateRangeModel = null,
-        locationIds: string[] = null
-    ): RequestQueryBuilder {
-        // generate a query builder
-        const qb = new RequestQueryBuilder();
-
-        // filter by date range?
-        if (
-            !_.isEmpty(dateRange) && (
-                !_.isEmpty(dateRange.startDate) ||
-                !_.isEmpty(dateRange.endDate)
-            )
-        ) {
-            // filter by date range
-            qb.filter.byDateRange('dateBecomeCase', dateRange);
-        } else {
-            // any date
-            qb.filter.where({
-                'dateBecomeCase': {
-                    neq: null
-                }
-            });
-        }
-
-        // filter by location?
-        if (!_.isEmpty(locationIds)) {
-            qb.filter.where({
-                'addresses.locationId': {
-                    inq: locationIds
-                }
-            });
-        }
-
-        return qb;
-    }
-
-    /**
      * Create the query builder for filtering the list of cases without relationships
      * @returns {RequestQueryBuilder}
      */

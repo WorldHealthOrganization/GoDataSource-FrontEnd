@@ -499,6 +499,16 @@ export class RequestFilter {
     }
 
     /**
+     * Check if a key is used in a condition
+     * @param property
+     */
+    has(property: string): boolean {
+        return _.find(this.conditions, (condition) => {
+            return Object.keys(condition)[0] === property;
+        }) !== undefined;
+    }
+
+    /**
      * Remove all operations of a given type on a list of properties
      * @param {RequestFilterOperator} operator
      * @param {string[]} properties

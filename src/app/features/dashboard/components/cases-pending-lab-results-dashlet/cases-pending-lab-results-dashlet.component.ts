@@ -41,7 +41,7 @@ export class CasesPendingLabResultsDashletComponent extends DashletComponent imp
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
                     this.outbreakId = selectedOutbreak.id;
-                    this.refreshDataCaller.call(false);
+                    this.refreshDataCaller.call();
                 }
             });
     }

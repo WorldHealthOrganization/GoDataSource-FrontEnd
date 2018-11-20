@@ -639,8 +639,6 @@ export abstract class ListComponent {
     protected applyListFilters(queryParams: {
         applyListFilter,
         x,
-        dateRange,
-        locationIds,
         date,
         global
     }): void {
@@ -848,12 +846,25 @@ export abstract class ListComponent {
 
             // filter contacts becoming cases overtime and place
             case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
-                const dateRange: DateRangeModel = queryParams.dateRange ? JSON.parse(queryParams.dateRange) : undefined;
-                const locationIds: string[] = queryParams.locationIds;
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
-                    dateRange,
-                    locationIds
+                // add condition for deceased cases
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                    'dateBecomeCase',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
                 );
+
+                // do we need to include default condition ?
+                if (!this.appliedListFilterQueryBuilder.filter.has('dateBecomeCase')) {
+                    // any date
+                    this.appliedListFilterQueryBuilder.filter.where({
+                        'dateBecomeCase': {
+                            neq: null
+                        }
+                    });
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list

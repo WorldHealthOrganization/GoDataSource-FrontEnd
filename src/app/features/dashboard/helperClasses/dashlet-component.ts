@@ -11,7 +11,7 @@ export abstract class DashletComponent {
     private _globalFilterDate: Moment;
     @Input() set globalFilterDate(globalFilterDate: Moment) {
         this._globalFilterDate = globalFilterDate;
-        this.refreshDataCaller.call(false);
+        this.refreshDataCaller.call();
     }
     get globalFilterDate(): Moment {
         return this._globalFilterDate;
@@ -21,7 +21,7 @@ export abstract class DashletComponent {
     private _globalFilterLocationId: string;
     @Input() set globalFilterLocationId(globalFilterLocationId: string) {
         this._globalFilterLocationId = globalFilterLocationId;
-        this.refreshDataCaller.call(false);
+        this.refreshDataCaller.call();
     }
     get globalFilterLocationId(): string {
         return this._globalFilterLocationId;

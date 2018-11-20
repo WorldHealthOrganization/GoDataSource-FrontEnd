@@ -41,7 +41,7 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
                     this.outbreakId = selectedOutbreak.id;
-                    this.refreshDataCaller.call(false);
+                    this.refreshDataCaller.call();
                 }
             });
     }
