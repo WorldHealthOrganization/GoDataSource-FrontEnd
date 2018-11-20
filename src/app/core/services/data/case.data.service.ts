@@ -209,11 +209,20 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getCasesRefusingTreatmentCount(outbreakId: string): Observable<any> {
+    getCasesRefusingTreatmentCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         // generate a query builder for cases refusing treatment
         const filterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
-        const filter = filterQueryBuilder.buildQuery();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
         // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 

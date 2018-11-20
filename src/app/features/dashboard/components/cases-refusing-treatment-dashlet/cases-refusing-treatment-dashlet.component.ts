@@ -13,9 +13,15 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     styleUrls: ['./cases-refusing-treatment-dashlet.component.less']
 })
 export class CasesRefusingTreatmentDashletComponent extends DashletComponent implements OnInit {
-
     // number of cases refusing treatment
     casesRefusingTreatmentCount: number;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
     // constants to be used for applyListFilters
     Constants: any = Constants;
 
@@ -29,16 +35,13 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
 
     ngOnInit() {
         // get number of cases refusing treatment
+        this.displayLoading = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for cases refusing treatment
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.caseDataService
-                        .getCasesRefusingTreatmentCount(selectedOutbreak.id)
-                        .subscribe((result) => {
-                            this.casesRefusingTreatmentCount = result.count;
-                        });
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call(false);
                 }
             });
     }
@@ -46,7 +49,25 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        // get the results for cases refusing treatment
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'dateOfOnset',
+                'addresses.parentLocationIdFilter'
+            );
+
+            // retrieve data
+            this.displayLoading = true;
+            this.caseDataService
+                .getCasesRefusingTreatmentCount(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.casesRefusingTreatmentCount = result.count;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
 
 
