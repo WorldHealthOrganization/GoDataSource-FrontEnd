@@ -24,6 +24,7 @@ export class AuthenticatedComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    Constants = Constants;
     contextSearchHelpItems: string[];
 
     constructor(
@@ -83,7 +84,7 @@ export class AuthenticatedComponent implements OnInit {
                 if (_.isEmpty(items)) {
                     this.contextSearchHelpItems = null;
                 } else {
-                    this.contextSearchHelpItems = items;
+                    this.contextSearchHelpItems = _.map(items, 'id');
                 }
             });
         });
@@ -97,18 +98,10 @@ export class AuthenticatedComponent implements OnInit {
             if (_.isEmpty(items)) {
                 this.contextSearchHelpItems = null;
             } else {
-                this.contextSearchHelpItems = items;
+                this.contextSearchHelpItems = _.map(items, 'id');
             }
         });
 
-    }
-
-    /**
-     * open page with context sensitive help items
-     */
-    openContextHelp() {
-        const helpItemsIds = _.map(this.contextSearchHelpItems, 'id');
-        this.router.navigate(['/help'], { queryParams: { applyListFilter: Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS, helpItemsIds: helpItemsIds }});
     }
 
 }
