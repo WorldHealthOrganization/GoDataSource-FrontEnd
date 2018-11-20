@@ -113,7 +113,7 @@
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
-                <mat-menu #actionsMenu="matMenu">
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                     <button
                         mat-menu-item
                         [routerLink]="['/cases', item.people[0]?.model.id, 'view']"

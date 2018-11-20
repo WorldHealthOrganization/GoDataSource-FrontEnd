@@ -166,7 +166,7 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
+                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
                                     [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
