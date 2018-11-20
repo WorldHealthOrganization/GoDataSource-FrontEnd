@@ -29,6 +29,7 @@ import 'rxjs/add/operator/switchMap';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
+import { DomService } from '../../../../core/services/helper/dom.service';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -78,7 +79,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
-        private contactDataService: ContactDataService
+        private contactDataService: ContactDataService,
+        private domService: DomService
     ) {}
 
     ngOnInit() {
@@ -159,6 +161,13 @@ export class TransmissionChainsGraphComponent implements OnInit {
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
                 // add node to selected persons list
                 this.selectedNodes.addNode(entityData);
+
+                // focus boxes
+                setTimeout(() => {
+                    this.domService.scrollItemIntoView(
+                        '.selected-node-details'
+                    );
+                });
             });
     }
 
