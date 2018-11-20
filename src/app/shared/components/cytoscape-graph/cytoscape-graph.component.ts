@@ -35,7 +35,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     showLegend: boolean = true;
 
-    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -107,7 +106,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 });
             if (this.timelineViewType === 'horizontal') {
                 // using 150px as it looks fine
-                posX = datesIndex * 150;
+                posX = datesIndex * 200;
             } else {
                 // timeline vertical view
                 // using 100px as it looks fine
@@ -179,11 +178,29 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     // the style for the timeline view. The label field is modified in order to display dateTimeline
     timelineStyle: any = [
         {
-            selector: 'node',
+            selector: ':parent',
+            css: {
+                'background-color': '#fff',
+                'color': '#000',
+                'label': 'data(label)',
+                'text-wrap': 'wrap',
+                'display': 'data(displayTimeline)',
+                'background-image': 'data(picture)',
+                'height': 30,
+                'width': 30,
+                'background-fit': 'cover',
+                'border-color': '#808080',
+                'border-width': 2,
+                'shape': 'triangle'
+            }
+        },
+        {
+            selector: ':child',
+            // selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(labelTimeline)',
+                'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)',
                 'background-image': 'data(picture)',
@@ -232,6 +249,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
+
     }
 
     public ngOnChanges(): any {
@@ -299,16 +317,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
                 }
                 this.datesArray.push(node.data.dateTimeline);
-
-                const nodeTimelineDate = _.find(this.timelineNodes, {id: node.data.dateTimeline});
-                // console.log(nodeTimelineDate);
-                if ( _.isEmpty(nodeTimelineDate)) {
-                    const nodeTD = new GraphNodeModel({id: node.data.dateTimeline, name: node.data.dateTimeline, dateTimeline: node.data.dateTimeline});
-                    this.cy.add([
-                        {group: 'nodes', data: nodeTD}]);
-                    this.timelineNodes.push(nodeTD);
-                }
             }
+
         });
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);

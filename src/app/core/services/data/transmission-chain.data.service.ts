@@ -184,14 +184,18 @@ export class TransmissionChainDataService {
      * @param filters
      * @param colorCriteria
      * @param locationsList
+     * @param selectedViewType
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
+    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[], selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
         const selectedNodeIds: string[] = [];
         // get labels for uears / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+
+        const timelineCheckpointNodes: GraphNodeModel[] = [];
+
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
@@ -202,27 +206,37 @@ export class TransmissionChainDataService {
                     // show nodes based on their type
                     if (node.type === EntityType.CONTACT && filters.showContacts) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfLastContact)) {
-                            nodeProps.dateTimeline = node.model.dateOfLastContact;
-                            nodeProps.parenta = node.model.dateOfLastContact;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.contactNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.EVENT && filters.showEvents) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.data)) {
-                            nodeProps.dateTimeline = node.model.date;
-                            nodeProps.parenta = node.model.date;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.data)) {
+                                nodeProps.dateTimeline = node.model.date;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.eventNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.CASE) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfOnset)) {
-                            nodeProps.dateTimeline = node.model.dateOfOnset;
-                            nodeProps.dateTimeline = node.model.dateOfOnset;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfOnset)) {
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.caseNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     }
                     if (allowAdd) {
@@ -285,7 +299,19 @@ export class TransmissionChainDataService {
                                 }
                             }
                         }
-                        console.log(nodeData);
+
+                        // add compound node if not exists
+                        if (!_.isEmpty(nodeData.dateTimeline)) {
+                            const nodeTimelineDate = _.find(timelineCheckpointNodes, {id: nodeData.dateTimeline});
+                            if ( _.isEmpty(nodeTimelineDate)) {
+                                const nodeCheckpoint = new GraphNodeModel({id: nodeData.dateTimeline, name: nodeData.dateTimeline, dateTimeline: nodeData.dateTimeline});
+                                nodeCheckpoint.label = nodeCheckpoint.dateTimeline;
+                                nodeCheckpoint.nodeColor = '#fff';
+                                nodeCheckpoint.nodeNameColor = '#000';
+                                graphData.nodes.push({data: nodeCheckpoint});
+                                timelineCheckpointNodes.push(nodeCheckpoint);
+                            }
+                        }
                         graphData.nodes.push({data: nodeData});
                         selectedNodeIds.push(nodeData.id);
                     }

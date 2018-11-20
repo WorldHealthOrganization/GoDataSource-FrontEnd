@@ -11,14 +11,13 @@ export class GraphNodeModel {
     dateTimeline: string;
     // use this field to remove nodes with no date for timeline
     displayTimeline: string;
-    labelTimeline: string;
     // default node colors and icon
     nodeColor: string;
     nodeNameColor: string;
     picture: string;
     label: string;
     // parent node - used for timeline view
-    parenta: string;
+    parent: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -30,17 +29,14 @@ export class GraphNodeModel {
         this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
         this.picture = _.get(data, 'picture', 'none');
 
-        this.parenta = _.get(data, 'parent', 'aaaaaaaa');
+        this.parent = _.get(data, 'parent', '');
 
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-            this.parenta = this.dateTimeline;
+            this.parent = this.dateTimeline;
         } else {
             this.displayTimeline = 'none';
-            this.parenta = '';
+            this.parent = '';
         }
-
-        // label to be used when displaying the timeline view
-        this.labelTimeline = this.name + '\n' + this.dateTimeline;
     }
 }
