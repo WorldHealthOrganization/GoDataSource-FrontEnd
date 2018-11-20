@@ -303,6 +303,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
                     this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
+                    console.log(this.graphElements);
                 } else {
                     this.graphElements = [];
                 }

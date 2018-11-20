@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
+import { GraphNodeModel } from '../../../core/models/graph-node.model';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -211,6 +212,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDates: any = {};
 
+    timelineNodes: any = [];
+
 
     constructor(
         private genericDataService: GenericDataService,
@@ -284,6 +287,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         // empty the already set timeline and dates arrays
         this.timelineDates = {};
         this.datesArray = [];
+
+        this.timelineNodes = [];
         // loop through nodes to extract the dates ( dateTimeline)
         _.forEach(this.elements.nodes, (node, key) => {
             if (!_.isEmpty(node.data.dateTimeline)) {
@@ -294,6 +299,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
                 }
                 this.datesArray.push(node.data.dateTimeline);
+
+                const nodeTimelineDate = _.find(this.timelineNodes, {id: node.data.dateTimeline});
+                // console.log(nodeTimelineDate);
+                if ( _.isEmpty(nodeTimelineDate)) {
+                    const nodeTD = new GraphNodeModel({id: node.data.dateTimeline, name: node.data.dateTimeline, dateTimeline: node.data.dateTimeline});
+                    this.cy.add([
+                        {group: 'nodes', data: nodeTD}]);
+                    this.timelineNodes.push(nodeTD);
+                }
             }
         });
         this.datesArray = _.uniq(this.datesArray);

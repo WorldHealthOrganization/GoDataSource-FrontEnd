@@ -204,6 +204,7 @@ export class TransmissionChainDataService {
                         allowAdd = true;
                         if (!_.isEmpty(node.model.dateOfLastContact)) {
                             nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            nodeProps.parenta = node.model.dateOfLastContact;
                         } else {
                             graphData.contactNodesWithoutDates.push(node.model.id);
                         }
@@ -211,12 +212,14 @@ export class TransmissionChainDataService {
                         allowAdd = true;
                         if (!_.isEmpty(node.model.data)) {
                             nodeProps.dateTimeline = node.model.date;
+                            nodeProps.parenta = node.model.date;
                         } else {
                             graphData.eventNodesWithoutDates.push(node.model.id);
                         }
                     } else if (node.type === EntityType.CASE) {
                         allowAdd = true;
                         if (!_.isEmpty(node.model.dateOfOnset)) {
+                            nodeProps.dateTimeline = node.model.dateOfOnset;
                             nodeProps.dateTimeline = node.model.dateOfOnset;
                         } else {
                             graphData.caseNodesWithoutDates.push(node.model.id);
@@ -282,6 +285,7 @@ export class TransmissionChainDataService {
                                 }
                             }
                         }
+                        console.log(nodeData);
                         graphData.nodes.push({data: nodeData});
                         selectedNodeIds.push(nodeData.id);
                     }

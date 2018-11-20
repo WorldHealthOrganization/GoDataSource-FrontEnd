@@ -17,6 +17,8 @@ export class GraphNodeModel {
     nodeNameColor: string;
     picture: string;
     label: string;
+    // parent node - used for timeline view
+    parenta: string;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -28,10 +30,14 @@ export class GraphNodeModel {
         this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
         this.picture = _.get(data, 'picture', 'none');
 
+        this.parenta = _.get(data, 'parent', 'aaaaaaaa');
+
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            this.parenta = this.dateTimeline;
         } else {
             this.displayTimeline = 'none';
+            this.parenta = '';
         }
 
         // label to be used when displaying the timeline view
