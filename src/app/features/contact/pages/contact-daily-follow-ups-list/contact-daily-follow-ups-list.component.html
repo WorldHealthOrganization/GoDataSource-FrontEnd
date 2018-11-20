@@ -1,4 +1,4 @@
-<app-topnav [activeOutbreakEditable]="!caseId">
+<app-topnav [activeOutbreakEditable]="!caseId && !contactId">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
@@ -300,7 +300,7 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
+                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                         <button mat-menu-item [routerLink]="['/contacts', item.personId, 'follow-ups', item.id, 'view' ]">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>

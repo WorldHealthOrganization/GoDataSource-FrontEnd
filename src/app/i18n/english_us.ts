@@ -24,7 +24,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
-        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Range Follow-ups',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Follow-up dashboard',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': 'Lab Results',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
@@ -399,7 +399,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE': 'Case successfully converted to contact!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
-        'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups for related contacts',
         'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
@@ -644,6 +644,8 @@ export const EnglishUsLang = {
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL': 'Geographical Level',
         'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION': 'Parent Location',
+        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION': '',
 
         /**
          * Locations list page
@@ -866,6 +868,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE': 'Contact converted to case!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
@@ -898,6 +901,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
 
         /**
          * Bulk Add Contacts page
@@ -1023,7 +1027,7 @@ export const EnglishUsLang = {
         /**
          * Follow-ups list page
          */
-        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups for related contacts',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Follow-up deleted!',
@@ -1681,7 +1685,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Create sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
