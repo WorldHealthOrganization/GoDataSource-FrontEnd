@@ -122,8 +122,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 // navigate to listing page
                 this.disableDirtyConfirm();
                 this.router.navigate(
-                    this.locationData.parentLocationId ?
-                        ['/locations', this.locationData.parentLocationId, 'children'] :
+                    dirtyFields.parentLocationId ?
+                        ['/locations', dirtyFields.parentLocationId, 'children'] :
                         ['/locations'])
                 ;
             });
