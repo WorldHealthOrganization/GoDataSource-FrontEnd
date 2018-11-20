@@ -23,6 +23,7 @@ import { Constants } from '../../../../core/models/constants';
 import { BulkAddContactsService } from '../../../../core/services/helper/bulk-add-contacts.service';
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -33,6 +34,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
+        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
         new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
     ];
@@ -359,7 +361,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                     this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
                                     // navigate to listing page
-                                    this.router.navigate(['/contacts']);
+                                    this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
                                 });
                         });
                 }
