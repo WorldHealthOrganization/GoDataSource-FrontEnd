@@ -58,12 +58,13 @@
 
 </mat-card>
 
-<div class="page-content" fxLayout="row wrap" fxLayoutGap="20px">
+<div
+    fxLayout="row wrap" fxLayoutGap="20px"
+    class="page-content selected-node-details">
     <div
         *ngFor="let person of selectedNodes.nodes; let index = index"
         fxFlex="400px"
-        fxLayout="column"
-    >
+        fxLayout="column">
         <mat-card class="page-section">
             <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
         </mat-card>
