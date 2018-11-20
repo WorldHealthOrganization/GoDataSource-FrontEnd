@@ -105,9 +105,7 @@ export class CaseDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
