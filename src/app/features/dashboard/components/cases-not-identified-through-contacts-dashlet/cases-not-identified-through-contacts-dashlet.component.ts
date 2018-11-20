@@ -2,8 +2,6 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
@@ -21,13 +19,11 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     // constants to be used for applyListFilters
     Constants = Constants;
 
-    // selected outbreak
-    selectedOutbreak;
+    // outbreak
+    outbreakId: string;
 
-    // refresh only after we finish changing data
-    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
-    }));
+    // loading data
+    displayLoading: boolean = false;
 
     constructor(
         private caseDataService: CaseDataService,
@@ -39,36 +35,42 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
 
     ngOnInit() {
         // get contacts on followup list count
+        this.displayLoading = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
-                    this.triggerUpdateValues.call(true);
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call(false);
                 }
             });
     }
 
     /**
-     * Handles the call to the API to get the count
+     * Refresh data
      */
-    updateValues() {
-        if (
-            this.selectedOutbreak &&
-            this.selectedOutbreak.id
-        ) {
+    refreshData() {
+        // get the results for contacts on the follow up list
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'dateOfOnset',
+                'addresses.parentLocationIdFilter'
+            );
+
+            // merge other conditions
+            qb.merge(this.listFilterDataService.filterCasesNotIdentifiedThroughContacts());
+
+            // retrieve data
+            this.displayLoading = true;
             this.caseDataService
-                .getCasesCount(this.selectedOutbreak.id, this.listFilterDataService.filterCasesNotIdentifiedThroughContacts())
+                .getCasesCount(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.count = result.count;
+                    this.displayLoading = false;
                 });
         }
     }
-
-    /**
-     * Refresh data
-     */
-    refreshData() {}
 }
 
 

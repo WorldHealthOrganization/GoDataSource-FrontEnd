@@ -982,7 +982,21 @@ export abstract class ListComponent {
 
             // Filter cases who are not identified though known contact list
             case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    'dateOfOnset',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
