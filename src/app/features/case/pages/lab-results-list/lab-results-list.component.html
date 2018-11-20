@@ -318,7 +318,7 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
+                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                         <button *ngIf="!item.deleted"
                                 mat-menu-item
                                 [routerLink]="['/cases', item.personId, 'lab-results', item.id, 'view']"
