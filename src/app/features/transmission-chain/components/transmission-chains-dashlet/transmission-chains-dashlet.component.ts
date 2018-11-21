@@ -439,13 +439,21 @@ export class TransmissionChainsDashletComponent implements OnInit {
             });
         }
         // populate nodeLabelValues with gender values as they need to be translated
-        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.UNIQUE_ID.value) {
-            this.legend.nodeLabelValues = [];
-            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
-            _.forEach(nodeLabelValues, (value, key) => {
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
+            this.legend.genderValues = [];
+            const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(genderValues, (value, key) => {
                 // get gender transcriptions
-                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+                this.legend.genderValues[value.value] = this.i18nService.instant(value.value);
             });
+
+            this.legend.classificationValues = [];
+            const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.CASE_CLASSIFICATION], 'entries', []);
+            _.forEach(classificationValues, (value, key) => {
+                // get classification transcriptions
+                this.legend.classificationValues[value.value] = this.i18nService.instant(value.value);
+            });
+
         }
 
     }

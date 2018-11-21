@@ -191,6 +191,9 @@ export class TransmissionChainDataService {
         // get labels for uears / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+        const onsetLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_LABEL');
+        const onsetApproximateLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_APRROXIMATE_LABEL');
+
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
@@ -246,6 +249,7 @@ export class TransmissionChainDataService {
                         // name
                         if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value) {
                             nodeData.label = nodeData.name;
+                            // age
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
                             if (node.type !== EntityType.EVENT && !_.isEmpty(node.model.age)) {
                                 if (node.model.age.months > 0) {
@@ -289,16 +293,47 @@ export class TransmissionChainDataService {
                             if (node.type !== EntityType.EVENT) {
                                 const firstNameInitial = (!_.isEmpty(node.model.firstName)) ? node.model.firstName.slice(0, 1) : '';
                                 const lastNameInitial = (!_.isEmpty(node.model.lastName)) ? node.model.lastName.slice(0, 1) : '';
-                                nodeData.label = firstNameInitial + ' ' + lastNameInitial;
+                                nodeData.label = lastNameInitial + ' ' + firstNameInitial;
                             } else {
                                 nodeData.label = '';
                             }
-                            // unique id
-                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.UNIQUE_ID.value) {
-                            if (node.type === EntityType.CASE) {
-                                const gender = colorCriteria.nodeLabelValues[node.model.gender] ? colorCriteria.nodeLabelValues[node.model.gender] : '';
-                                const visualId = node.model.visualId ? node.model.visualId : '';
-                                nodeData.label = visualId + ';' + node.model.name + ';' + gender;
+                            // visual id
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = node.model.visualId;
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // concatenated details
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                const lastName = node.model.lastName ? node.model.lastName : '';
+                                const firstName = node.model.firstName ? node.model.firstName : '';
+                                const gender = colorCriteria.genderValues[node.model.gender] ? colorCriteria.genderValues[node.model.gender] : '';
+                                const visualId = node.model.visualId ? '\n' + node.model.visualId : '';
+                                const age = !_.isEmpty(node.model.age) ?
+                                    node.model.age.months > 0 ?
+                                        node.model.age.months + ' ' + monthsLabel :
+                                        node.model.age.years + ' ' + yearsLabel
+                                    : '';
+                                const classification = colorCriteria.classificationValues[node.model.classification] && node.type === EntityType.CASE ?
+                                    '\n' + colorCriteria.classificationValues[node.model.classification] :
+                                    '';
+                                const mainAddr = node.model.mainAddress;
+                                let locationName = '';
+                                if (!_.isEmpty(mainAddr.locationId)) {
+                                    const location = _.find(locationsList, function (l) {
+                                        return l.id === mainAddr.locationId;
+                                    });
+                                    if (location) {
+                                        locationName = '\n' + location.name;
+                                    }
+                                }
+                                const onset = !_.isEmpty(node.model.dateOfOnset) && node.type === EntityType.CASE ?
+                                    '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ( node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '' ) :
+                                    '';
+
+                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + locationName + onset;
                             } else {
                                 nodeData.label = '';
                             }

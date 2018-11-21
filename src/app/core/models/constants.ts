@@ -357,9 +357,13 @@ export class Constants {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_INITIALS',
             value: 'initials'
         },
-        UNIQUE_ID: {
-            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_UNIQUE_ID',
-            value: 'unique_id'
+        VISUAL_ID: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_VISUAL_ID',
+            value: 'visual_id'
+        },
+        CONCATENATED_DETAILS: {
+            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_CONCATENATED_DETAILS',
+            value: 'concatenated_details'
         }
     };
 
