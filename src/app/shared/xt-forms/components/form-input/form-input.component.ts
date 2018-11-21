@@ -112,8 +112,10 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         super.ngAfterViewInit();
     }
 
+    /**
+     * toggle show / hide password
+     */
     togglePasswordDisplay() {
-        console.log('aaa');
         if (this.tempTypeOverwritten === 'password') {
             this.type = 'password';
             this.tempTypeOverwritten = '';
