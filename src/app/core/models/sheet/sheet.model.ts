@@ -96,7 +96,7 @@ export class NumericSheetColumn extends AbstractSheetColumn {
 }
 
 /**
- * Numeric cell
+ * Integer cell
  */
 export class IntegerSheetColumn extends NumericSheetColumn {
     constructor(
