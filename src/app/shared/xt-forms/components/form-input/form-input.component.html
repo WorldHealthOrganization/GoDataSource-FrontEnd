@@ -1,4 +1,4 @@
-<div class="form-input-container form-element {{ tooltip ? 'form-input-tooltip' : '' }} "
+<div class="form-input-container form-element {{ tooltip ? 'form-input-tooltip' : '' }} {{ type === 'password' || tempTypeOverwritten === 'password' ? 'form-input-password' : '' }} "
      [id]="identifier" [ngClass]="{invalid: (invalid)}">
 
     <mat-form-field
@@ -28,6 +28,8 @@
             [max]="max"/>
 
         <span *ngIf="tooltip" [matTooltip]="tooltip" class="xt-icon form-icon">help</span>
+        <span *ngIf="type === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibility</span>
+        <span *ngIf="tempTypeOverwritten === 'password'" [matTooltip]="" class="xt-icon form-password-icon" (click)="togglePasswordDisplay()">visibilityOf</span>
 
     </mat-form-field>
 
