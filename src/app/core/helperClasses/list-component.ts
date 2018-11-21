@@ -12,7 +12,6 @@ import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
-import { DateRangeModel } from '../models/date-range.model';
 import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';

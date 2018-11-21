@@ -42,6 +42,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
     EntityType = EntityType;
 
+    queryParamsData: any;
+
     constructor(
         private router: Router,
         private outbreakDataService: OutbreakDataService,
@@ -62,6 +64,15 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // get query params
+        this.route.queryParams
+            .subscribe((queryParams: any) => {
+                this.queryParamsData = queryParams;
+
+                // init filters
+                this.resetFiltersAddDefault();
+            });
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -71,6 +82,37 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 // re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+    }
+
+    /**
+     * Initialize filters
+     */
+    resetFiltersAddDefault() {
+        // get global filter values
+        if (
+            this.queryParamsData &&
+            !this.appliedListFilter
+        ) {
+            const globalFilters = this.getGlobalFilterValues(this.queryParamsData);
+
+            // date
+            const qb = this.listFilterDataService.getGlobalFilterQB(
+                'contactDate',
+                globalFilters.date,
+                null,
+                null
+            );
+
+            // location
+            if (globalFilters.locationId) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CASE)
+                    .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+            }
+
+            // merge
+            this.queryBuilder.merge(qb);
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-independent-transmission-chains-dashlet',
@@ -12,9 +13,14 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     styleUrls: ['./independent-transmission-chains-dashlet.component.less']
 })
 export class IndependentTransmissionChainsDashletComponent extends DashletComponent implements OnInit {
-
     // number of independent transmission chains
     independentTransmissionChainsCount: number;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
@@ -26,16 +32,13 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
 
     ngOnInit() {
         // get number of independent transmission chains
+        this.displayLoading = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for independent transmission chains
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.transmissionChainDataService
-                        .getCountIndependentTransmissionChains(selectedOutbreak.id)
-                        .subscribe((result) => {
-                            this.independentTransmissionChainsCount = result.length;
-                        });
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call();
                 }
             });
     }
@@ -43,7 +46,32 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        // get the results for independent transmission chains
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'contactDate',
+                null
+            );
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CASE)
+                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.transmissionChainDataService
+                .getCountIndependentTransmissionChains(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.independentTransmissionChainsCount = result.length;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
 
 

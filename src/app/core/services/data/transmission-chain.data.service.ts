@@ -128,9 +128,7 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
@@ -147,9 +145,7 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases?filter=${filter}`
         ).map(this.mapTransmissionChainToModel);
@@ -160,9 +156,13 @@ export class TransmissionChainDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
-    getCountIndependentTransmissionChains(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+    getCountIndependentTransmissionChains(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricIndependentTransmissionChainsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count`),
+            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
             MetricIndependentTransmissionChainsModel
         );
     }
@@ -189,7 +189,7 @@ export class TransmissionChainDataService {
     convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
         const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
         const selectedNodeIds: string[] = [];
-        // get labels for uears / months - age field
+        // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         if (!_.isEmpty(chains)) {

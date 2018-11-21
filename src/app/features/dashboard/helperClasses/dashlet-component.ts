@@ -80,7 +80,7 @@ export abstract class DashletComponent {
      * @param otherParams
      */
     getDashletParamsIncludingGlobalFilters(
-        otherParams: { [key: string]: any }
+        otherParams: { [key: string]: any } = {}
     ): { [key: string]: any } {
         // construct global filter
         const global: {

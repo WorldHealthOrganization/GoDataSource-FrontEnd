@@ -377,13 +377,15 @@
                         <!-- number of independent chains of transmission -->
                         <app-independent-transmission-chains-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-independent-transmission-chains-dashlet>
 
                         <!-- Number of active chains of transmission -->
