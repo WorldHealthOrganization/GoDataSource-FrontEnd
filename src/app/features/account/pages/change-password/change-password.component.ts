@@ -4,11 +4,11 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { RouterHelperService } from '../../../../core/services/helper/router-helper.service';
 import { ModelHelperService } from '../../../../core/services/helper/model-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-change-password',
@@ -29,7 +29,7 @@ export class ChangePasswordComponent {
     passwordChanged: boolean = false;
 
     constructor(
-        private routerHelper: RouterHelperService,
+        private router: Router,
         private userDataService: UserDataService,
         private snackbarService: SnackbarService,
         private modelHelperService: ModelHelperService,
@@ -69,7 +69,7 @@ export class ChangePasswordComponent {
 
                                 // refresh page
                                 if (redirect) {
-                                    this.routerHelper.navigateForce(['/dashboard']);
+                                    this.router.navigate(['/dashboard']);
                                 }
                             });
                     };
