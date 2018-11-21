@@ -71,6 +71,8 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     public identifier = `form-input-${FormInputComponent.identifier++}`;
 
+    tempTypeOverwritten: string;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
@@ -108,5 +110,16 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
         });
 
         super.ngAfterViewInit();
+    }
+
+    togglePasswordDisplay() {
+        console.log('aaa');
+        if (this.tempTypeOverwritten === 'password') {
+            this.type = 'password';
+            this.tempTypeOverwritten = '';
+        } else {
+            this.type = 'text';
+            this.tempTypeOverwritten = 'password';
+        }
     }
 }
