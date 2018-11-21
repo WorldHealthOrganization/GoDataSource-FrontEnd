@@ -25,6 +25,7 @@
             [disabled]="disabled"
             [required]="required"
             [matTooltip]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP' | translate"
+            [matTooltipPosition]="'right'"
             (change)="triggerItemChanged($event)">
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                 <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
