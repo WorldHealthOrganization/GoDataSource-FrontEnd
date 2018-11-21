@@ -58,8 +58,19 @@ export class ChangePasswordComponent {
                         this.authDataService
                             .reloadAndPersistAuthUser()
                             .subscribe((authenticatedUser) => {
+                                // in case user was forced to change password, then we don't need to redirect him since he has to set security questions
+                                const redirect: boolean = !this.authUser.passwordChange;
+
+                                // update user settings
                                 this.authUser = authenticatedUser.user;
+
+                                // display message
                                 this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+
+                                // refresh page
+                                if (redirect) {
+                                    this.routerHelper.navigateForce(['/dashboard']);
+                                }
                             });
                     };
 
