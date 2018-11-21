@@ -55,7 +55,10 @@ export abstract class AbstractSheetColumn {
         this.validations.push(validationType);
 
         // merge all individual validators into a single validation function that will be passed to 'handsontable'
-        this.validationFunc = SheetCellValidator.mergeValidations(this.validations);
+        this.validationFunc = SheetCellValidator.mergeValidations(
+            this.validations,
+            this
+        );
     }
 }
 
@@ -84,8 +87,27 @@ export class DateSheetColumn extends AbstractSheetColumn {
  */
 export class NumericSheetColumn extends AbstractSheetColumn {
     constructor(
+        public min?: number,
+        public max?: number,
+        public isInteger: boolean = false
     ) {
         super(SheetCellType.NUMERIC);
+    }
+}
+
+/**
+ * Numeric cell
+ */
+export class IntegerSheetColumn extends NumericSheetColumn {
+    constructor(
+        public min?: number,
+        public max?: number
+    ) {
+        super(
+            min,
+            max,
+            true
+        );
     }
 }
 

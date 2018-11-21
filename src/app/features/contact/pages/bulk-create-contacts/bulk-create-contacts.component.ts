@@ -16,7 +16,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DateSheetColumn, DropdownSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { SheetCellType } from '../../../../core/models/sheet/sheet-cell-type';
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
@@ -170,10 +170,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
                 .setProperty('contact.occupation')
                 .setOptions(this.occupationsList$, this.i18nService),
-            new NumericSheetColumn()
+            new IntegerSheetColumn(
+                0,
+                Constants.DEFAULT_AGE_MAX_YEARS)
                 .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
                 .setProperty('contact.age.years'),
-            new NumericSheetColumn()
+            new IntegerSheetColumn(
+                0,
+                11)
                 .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
                 .setProperty('contact.age.months'),
             new DateSheetColumn()
