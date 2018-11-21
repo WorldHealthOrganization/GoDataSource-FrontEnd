@@ -60,9 +60,6 @@ export class ChangePasswordComponent {
                             .subscribe((authenticatedUser) => {
                                 this.authUser = authenticatedUser.user;
                                 this.snackbarService.showSuccess('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
-
-                                // refresh page
-                                this.routerHelper.navigateForce(['/account/change-password']);
                             });
                     };
 
