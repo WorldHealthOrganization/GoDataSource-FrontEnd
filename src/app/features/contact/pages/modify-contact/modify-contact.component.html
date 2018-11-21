@@ -114,12 +114,12 @@
 
                             <app-form-select
                                 *ngIf="contactData.followUp?.status"
-                                name="followUpStatus"
+                                name="followUp.status"
                                 [ngModel]="contactData.followUp?.status"
                                 [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
                                 tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
                                 [options]="finalFollowUpStatus$ | async"
-                                [disabled]="true">
+                                [disabled]="viewOnly">
                             </app-form-select>
                             <div
                                 *ngIf="!contactData.followUp?.status"
