@@ -19,6 +19,7 @@ import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
     selector: 'app-locations-list',
@@ -183,5 +184,19 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      */
     hasLocationWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    }
+
+    /**
+     * Search location changed
+     * @param data
+     */
+    searchLocationChanged(data: LocationAutoItem) {
+        if (
+            data &&
+            data.id
+        ) {
+            // redirect
+            this.router.navigate(['/locations', data.id, 'children']);
+        }
     }
 }
