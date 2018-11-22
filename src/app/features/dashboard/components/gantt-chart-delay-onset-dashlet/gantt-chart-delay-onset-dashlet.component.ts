@@ -17,13 +17,12 @@ import * as _ from 'lodash';
     styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
 })
 export class GanttChartDelayOnsetDashletComponent implements OnInit {
-
-    selectedOutbreak: OutbreakModel;
+    // constants
     viewType = Constants.GANTT_CHART_VIEW_TYPE.WEEK.value;
     Constants = Constants;
 
     metricResults: MetricCasesDelayBetweenOnsetLabTestModel[];
-    ganttData: any;
+    ganttData: any = [];
     ganttChart: any;
 
     options = {
@@ -38,6 +37,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     caseRefDataColor: string = '';
 
+    loading: boolean = false;
 
     constructor(
         private caseDataService: CaseDataService,
@@ -46,14 +46,13 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-
+        this.loading = true;
         this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-
                     // get case person type color
+                    this.loading = true;
                     this.referenceDataDataService
                         .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
                         .subscribe((personTypes) => {
@@ -68,6 +67,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                                         this.metricResults = results;
                                         this.formatData();
                                         this.displayChart();
+                                        this.loading = false;
                                     });
                             }
                         });
@@ -85,8 +85,15 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
             elem.innerHTML = '';
         }
         // only display id data is available
-        if (!_.isEmpty(this.metricResults)) {
-            this.ganttChart = new SVGGantt('#gantt-svg-root', this.ganttData, this.options);
+        if (
+            !_.isEmpty(this.ganttData) &&
+            !_.isEmpty(this.ganttData[0].children)
+        ) {
+            this.ganttChart = new SVGGantt(
+                '#gantt-svg-root',
+                this.ganttData,
+                this.options
+            );
         }
     }
 
@@ -100,7 +107,11 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
         chartDataItem.name = '';
         const children = [];
         _.forEach(this.metricResults, (result) => {
-            if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest) && result.delay > 0) {
+            if (
+                !_.isEmpty(result.dateOfOnset) &&
+                !_.isEmpty(result.dateOfFirstLabTest)
+                && result.delay > 0
+            ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;

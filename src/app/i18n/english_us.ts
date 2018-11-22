@@ -1616,6 +1616,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
+         * Gantt chart dashlet
+         */
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data...',
+
+        /**
          * Case Count Map
          */
         'LNG_PAGE_CASE_COUNT_TITLE': 'Case count map',
