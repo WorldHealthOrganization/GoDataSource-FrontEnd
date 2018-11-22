@@ -59,21 +59,25 @@
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-input
+                                #latInput
                                 name="geoLocation[lat]"
-                                [(ngModel)]="locationData.geoLocation.lat"
+                                [ngModel]="locationData.geoLocation?.lat"
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
                                 tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
-                                [required]="!!locationData.geoLocation?.lng"
-                                type="number">
+                                [required]="isLatLngRequired(lngInput.value)"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lat', $event)">
                             </app-form-input>
 
                             <app-form-input
+                                #lngInput
                                 name="geoLocation[lng]"
-                                [(ngModel)]="locationData.geoLocation.lng"
+                                [ngModel]="locationData.geoLocation?.lng"
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
                                 tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
-                                [required]="!!locationData.geoLocation?.lat"
-                                type="number">
+                                [required]="isLatLngRequired(latInput.value)"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lng', $event)">
                             </app-form-input>
 
                             <div fxFlex><!-- placeholder --></div>

@@ -14,6 +14,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-modify-location',
@@ -103,8 +104,37 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
     }
 
     modifyLocation(form: NgForm) {
+        // retrieve dirty fields
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
+        // even if we set value to float, some browser might get it as a string sicne we use form for this...
+        // so..we need to force again the geo location to have numbers
+        const lat: number | string = _.get(dirtyFields, 'geoLocation.lat');
+        if (
+            !_.isNumber(lat) &&
+            !_.isEmpty(lat)
+        ) {
+            _.set(dirtyFields, 'geoLocation.lat', parseFloat(lat as string));
+        }
+        const lng: number | string = _.get(dirtyFields, 'geoLocation.lng');
+        if (
+            !_.isNumber(lng) &&
+            !_.isEmpty(lng)
+        ) {
+            _.set(dirtyFields, 'geoLocation.lng', parseFloat(lng as string));
+        }
+
+        // check if we nee to remove geo Location
+        if (
+            dirtyFields.geoLocation !== undefined &&
+            dirtyFields.geoLocation.lat === undefined &&
+            dirtyFields.geoLocation.lng === undefined
+        ) {
+            // on update we need to send it to remove the previous values
+            dirtyFields.geoLocation = null;
+        }
+
+        // validate
         if (!this.formHelper.validateForm(form)) {
             return;
         }
@@ -135,5 +165,31 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
      */
     hasLocationWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    }
+
+    /**
+     * Update Lat Lng
+     * @param property
+     * @param data
+     */
+    onChangeLatLng(
+        property: string,
+        value
+    ) {
+        _.set(
+            this.locationData,
+            `geoLocation.${property}`,
+            value ? parseFloat(value) : undefined
+        );
+    }
+
+    /**
+     * Check if lat & lng are required
+     */
+    isLatLngRequired(value: any) {
+        return _.isString(value) ?
+            value.length > 0 : (
+                value || value === 0
+            );
     }
 }
