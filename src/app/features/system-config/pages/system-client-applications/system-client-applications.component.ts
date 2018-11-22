@@ -94,17 +94,27 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
             new VisibleColumnModel({
                 field: 'active',
                 label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE'
-            }),
-            new VisibleColumnModel({
-                field: 'outbreaks',
-                label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS'
-            }),
+            })
+        ];
+
+        // outbreaks
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.tableColumns.push(
+                new VisibleColumnModel({
+                    field: 'outbreaks',
+                    label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS'
+                })
+            );
+        }
+
+        // actions
+        this.tableColumns.push(
             new VisibleColumnModel({
                 field: 'actions',
                 required: true,
                 excludeFromSave: true
             })
-        ];
+        );
     }
 
     /**
@@ -113,10 +123,12 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
     refreshList() {
         this.clientApplicationsServerList = [];
         Observable.forkJoin([
-            this.outbreakDataService.getOutbreaksList(),
+            this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) ?
+                this.outbreakDataService.getOutbreaksList() :
+                Observable.of([]),
             this.systemSettingsDataService.getSystemSettings()
         ]).catch((err) => {
-            this.snackbarService.showError(err.message);
+            this.snackbarService.showApiError(err);
             return ErrorObservable.create(err);
         }).subscribe(([outbreaksList, systemSettings]: [OutbreakModel[], SystemSettingsModel]) => {
             // map outbreaks
