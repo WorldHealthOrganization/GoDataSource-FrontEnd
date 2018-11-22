@@ -5,7 +5,9 @@
         <mat-card class="page-section">
             <ng-content></ng-content>
 
-            <div fxFlex fxLayout="column" fxLayoutGap="40px">
+            <div
+                *ngIf="questionsGroupedByCategory?.length > 0"
+                fxFlex fxLayout="column" fxLayoutGap="40px">
                 <div
                     *ngFor="let categoryData of questionsGroupedByCategory"
                     fxFlex fxLayout="column" fxLayoutAlign="start stretch">
@@ -181,6 +183,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div
+                *ngIf="questionsGroupedByCategory?.length < 1"
+                fxFlex fxLayout="row" fxLayoutAlign="center">
+                {{ 'LNG_QUESTIONNAIRE_TEMPLATE_NO_DATA_LABEL' | translate }}
             </div>
         </mat-card>
     </form>
