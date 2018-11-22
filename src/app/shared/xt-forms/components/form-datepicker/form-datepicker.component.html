@@ -12,7 +12,8 @@
             [disabled]="disabled"
             (blur)="onBlur()"
             (input)="onChange()"
-            (focus)="pickerStartDate.open()"
+            (click)="showDatePickerDialog(pickerStartDate)"
+            (focus)="showDatePickerDialog(pickerStartDate)"
             [max]="maxDate"
             [min]="minDate"/>
 
