@@ -164,7 +164,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM': 'Are you sure you want to approve this help item: "{{title}}"',
-        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current latitude and longitude with location\'s values?',
 
         /**
          * Dialogs fields placeholders
@@ -1614,6 +1614,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
+
+        /**
+         * Gantt chart dashlet
+         */
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart.',
 
         /**
          * Case Count Map
