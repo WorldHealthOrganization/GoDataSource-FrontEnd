@@ -206,7 +206,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
-     * Generate KPIs report
+     * Download the Daily Follow-ups Form
      */
     downloadDailyFollowUpsForm() {
         if (this.selectedOutbreak && this.followUpDateElem.value) {
