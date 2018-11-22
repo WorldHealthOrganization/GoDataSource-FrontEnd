@@ -1408,6 +1408,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
+        'LNG_QUESTIONNAIRE_TEMPLATE_NO_DATA_LABEL': 'There are no questions that you need to fill out',
 
         /**
          * Outbreak Fields
@@ -1477,6 +1478,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS': '*If no map server is provided, then the default ones will be used',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
