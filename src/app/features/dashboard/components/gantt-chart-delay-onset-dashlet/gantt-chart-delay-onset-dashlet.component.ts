@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -9,6 +9,7 @@ import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -16,7 +17,7 @@ import * as _ from 'lodash';
     templateUrl: './gantt-chart-delay-onset-dashlet.component.html',
     styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
 })
-export class GanttChartDelayOnsetDashletComponent implements OnInit {
+export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     // constants
     viewType = Constants.GANTT_CHART_VIEW_TYPE.WEEK.value;
     Constants = Constants;
@@ -39,6 +40,8 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     loading: boolean = false;
 
+    outbreakSubscriber: Subscription;
+
     constructor(
         private caseDataService: CaseDataService,
         private referenceDataDataService: ReferenceDataDataService,
@@ -47,7 +50,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     ngOnInit() {
         this.loading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
@@ -73,6 +76,14 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                         });
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // fix for append child error
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
