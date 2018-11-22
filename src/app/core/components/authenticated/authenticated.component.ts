@@ -10,6 +10,7 @@ import { ReferenceDataDataService } from '../../services/data/reference-data.dat
 import { HelpDataService } from '../../services/data/help.data.service';
 import * as _ from 'lodash';
 import { Constants } from '../../models/constants';
+import { PERMISSION } from '../../models/permission.model';
 
 @Component({
     selector: 'app-authenticated',
@@ -55,14 +56,16 @@ export class AuthenticatedComponent implements OnInit {
         }
 
         // determine the Selected Outbreak and display message if different than the active one.
-        this.outbreakDataService
-            .determineSelectedOutbreak()
-            .subscribe(() => {
-                this.outbreakDataService.getSelectedOutbreakSubject()
-                    .subscribe(() => {
-                        this.outbreakDataService.checkActiveSelectedOutbreak();
-                    });
-            });
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.outbreakDataService
+                .determineSelectedOutbreak()
+                .subscribe(() => {
+                    this.outbreakDataService.getSelectedOutbreakSubject()
+                        .subscribe(() => {
+                            this.outbreakDataService.checkActiveSelectedOutbreak();
+                        });
+                });
+        }
 
         // cache reference data
         this.referenceDataDataService.getReferenceData().subscribe();

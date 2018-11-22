@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Observable } from 'rxjs/Observable';
@@ -10,6 +10,7 @@ import { LanguageModel } from '../../../core/models/language.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-topnav',
@@ -17,7 +18,7 @@ import * as _ from 'lodash';
     templateUrl: './topnav.component.html',
     styleUrls: ['./topnav.component.less']
 })
-export class TopnavComponent implements OnInit {
+export class TopnavComponent implements OnInit, OnDestroy {
 
     @Input() activeOutbreakEditable: boolean = true;
 
@@ -33,6 +34,8 @@ export class TopnavComponent implements OnInit {
 
     // list of languages
     languagesList$: Observable<LanguageModel[]>;
+
+    getSelectedOutbreakSubject: Subscription;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -50,7 +53,7 @@ export class TopnavComponent implements OnInit {
 
     ngOnInit() {
         // subscribe to the selected outbreak stream
-        this.outbreakDataService
+        this.getSelectedOutbreakSubject = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((outbreak: OutbreakModel) => {
                 if (outbreak) {
@@ -61,6 +64,13 @@ export class TopnavComponent implements OnInit {
                     this.selectedOutbreak = outbreak;
                 }
             });
+    }
+
+    ngOnDestroy() {
+        if (this.getSelectedOutbreakSubject) {
+            this.getSelectedOutbreakSubject.unsubscribe();
+            this.getSelectedOutbreakSubject = null;
+        }
     }
 
     /**
@@ -82,22 +92,26 @@ export class TopnavComponent implements OnInit {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         // outbreak data
-        this.outbreakDataService
-            .getOutbreaksList()
-            .map((outbreaksList) => {
-                return _.map(outbreaksList, (outbreak: OutbreakModel) => {
-                    // do we need to update name of the outbreak ?
-                    if (outbreak.id === this.authUser.activeOutbreakId) {
-                        outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
-                    }
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.outbreakDataService
+                .getOutbreaksList()
+                .map((outbreaksList) => {
+                    return _.map(outbreaksList, (outbreak: OutbreakModel) => {
+                        // do we need to update name of the outbreak ?
+                        if (outbreak.id === this.authUser.activeOutbreakId) {
+                            outbreak.name = this.i18nService.instant('LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL', outbreak);
+                        }
 
-                    // finished
-                    return outbreak;
+                        // finished
+                        return outbreak;
+                    });
+                })
+                .subscribe((outbreaksList) => {
+                    this.outbreaksList = outbreaksList;
                 });
-            })
-            .subscribe((outbreaksList) => {
-                this.outbreaksList = outbreaksList;
-            });
+        } else {
+            this.outbreaksList = [];
+        }
     }
 
     /**

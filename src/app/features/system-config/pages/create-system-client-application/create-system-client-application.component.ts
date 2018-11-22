@@ -16,6 +16,9 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { Constants } from '../../../../core/models/constants';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
     selector: 'app-create-system-upstream-sync',
@@ -41,7 +44,11 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
 
     outbreaksOptionsList$: Observable<OutbreakModel[]>;
 
+    // authenticated user
+    authUser: UserModel;
+
     constructor(
+        private authDataService: AuthDataService,
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
@@ -53,8 +60,13 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
     }
 
     ngOnInit() {
+        // get the authenticated user
+        this.authUser = this.authDataService.getAuthenticatedUser();
+
         // retrieve outbreaks
-        this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksList();
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.outbreaksOptionsList$ = this.outbreakDataService.getOutbreaksList();
+        }
     }
 
     /**
@@ -100,6 +112,10 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
 
                 });
         }
+    }
+
+    hasOutbreakReadAccess(): boolean {
+        return this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK);
     }
 
     /**
