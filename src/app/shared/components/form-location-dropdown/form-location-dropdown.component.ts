@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
 
 export class LocationAutoItem {
     constructor(
@@ -64,6 +65,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     get tooltip(): string {
         return this._tooltip;
     }
+
+    @ViewChild('locationHandler') locationHandler: NgSelectComponent;
 
     locationItems: LocationAutoItem[];
 
@@ -341,5 +344,14 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      */
     triggerItemChanged(item: LocationAutoItem) {
         this.itemChanged.emit(item);
+    }
+
+    /**
+     * Unselect value
+     */
+    clear() {
+        _.each(this.locationHandler.selectedItems, (opt: NgOption) => {
+            this.locationHandler.unselect(opt);
+        });
     }
 }

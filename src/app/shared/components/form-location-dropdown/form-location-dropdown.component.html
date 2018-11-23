@@ -3,6 +3,7 @@
 
     <form #groupForm="ngForm">
         <ng-select
+            #locationHandler
             [name]="name"
             [(ngModel)]="value"
             [items]="locationItems"
