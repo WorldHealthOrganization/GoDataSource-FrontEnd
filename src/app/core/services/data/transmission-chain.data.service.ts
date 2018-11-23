@@ -332,7 +332,7 @@ export class TransmissionChainDataService {
                                 const onset = !_.isEmpty(node.model.dateOfOnset) && node.type === EntityType.CASE ?
                                     '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ( node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '' ) :
                                     '';
-
+                                // concatenate results
                                 nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + locationName + onset;
                             } else {
                                 nodeData.label = '';
