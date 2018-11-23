@@ -935,9 +935,7 @@ export abstract class ListComponent {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-
-                const followedDate: Moment = moment(queryParams.date);
-                this.listFilterDataService.filterContactsWithSuccessfulFollowup(followedDate)
+                this.listFilterDataService.filterContactsWithSuccessfulFollowup(globalFilters.date, globalFilters.locationId)
                     .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)

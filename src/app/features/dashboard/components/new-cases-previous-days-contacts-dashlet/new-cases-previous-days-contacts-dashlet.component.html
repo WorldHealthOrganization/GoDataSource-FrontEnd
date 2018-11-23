@@ -1,7 +1,7 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
     [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS, x: xDaysAmongContacts}"
-    [value]="casesAmongContactsCount + '/' + newCases"
+    [value]="casesAmongContactsCount + ' / ' + newCases"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
     (moveAfter)="onMoveAfter()">

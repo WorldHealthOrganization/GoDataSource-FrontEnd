@@ -250,7 +250,10 @@ export class FollowUpsDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
-    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {
+    getContactsWithSuccessfulFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsWithSuccessfulFollowUp> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-with-successful-follow-ups/count?filter=${filter}`),

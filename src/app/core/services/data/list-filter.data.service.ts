@@ -9,7 +9,6 @@ import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
-import { DateRangeModel } from '../../models/date-range.model';
 import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
@@ -341,11 +340,16 @@ export class ListFilterDataService {
      * @param {date} date
      * @returns {Observable<any>}
      */
-    filterContactsWithSuccessfulFollowup(date: Moment): Observable<any> {
+    filterContactsWithSuccessfulFollowup(date: Moment, location: string): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
             // build the query builder
             const qb = new RequestQueryBuilder();
+
+            // empty date ?
+            if (_.isEmpty(date)) {
+                date = moment();
+            }
 
             // filter by date
             qb.filter.byDateRange(
@@ -356,6 +360,13 @@ export class ListFilterDataService {
                 }
             );
 
+            // location
+            if (location) {
+                qb.include('contact').queryBuilder.filter
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // filter
             return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
         });
     }

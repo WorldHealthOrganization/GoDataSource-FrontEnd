@@ -369,13 +369,15 @@
                         <!-- Contacts with successful follow-ups -->
                         <app-contacts-with-successful-follow-ups-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-with-successful-follow-ups-dashlet>
 
                         <!-- number of independent chains of transmission -->
