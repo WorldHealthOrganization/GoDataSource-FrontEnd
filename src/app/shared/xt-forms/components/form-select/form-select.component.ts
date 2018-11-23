@@ -94,7 +94,7 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
     }
 
     /**
-     * Set value from select
+     * Set value from select option
      * @param {string} value
      */
     writeValue(value: string) {
