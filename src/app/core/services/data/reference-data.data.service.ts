@@ -10,6 +10,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { UserModel } from '../../models/user.model';
 import { I18nService } from '../helper/i18n.service';
 import { LabelValuePair } from '../../models/label-value-pair';
+import { isUndefined } from 'util';
 
 @Injectable()
 export class ReferenceDataDataService {
@@ -101,7 +102,8 @@ export class ReferenceDataDataService {
                         entry.value,
                         entry.id,
                         !entry.active,
-                        entry.active
+                        entry.active,
+                        isUndefined(entry.iconId) ? null : entry.iconUrl
                     )
                 );
             });
