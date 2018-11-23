@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -32,6 +32,9 @@ import { MatTable } from '@angular/material';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { NgModel } from '@angular/forms';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -67,9 +70,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     teamsListMap: any = {};
 
+    // print daily Follow-ups
     printDailyFollowUpsUrl: string;
     followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
     printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
+    // export Follow-ups
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     allowedExportTypes: ExportDataExtension[] = [
@@ -89,6 +94,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     caseId: string;
     caseData: CaseModel;
 
+    contactId: string;
+    contactData: ContactModel;
+
+    @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
+    followUpDateValue: string;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -101,7 +112,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         private referenceDataDataService: ReferenceDataDataService,
         private teamDataService: TeamDataService,
         protected route: ActivatedRoute,
-        private caseDataService: CaseDataService
+        private caseDataService: CaseDataService,
+        private contactDataService: ContactDataService
     ) {
         super(
             snackbarService
@@ -136,11 +148,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // get case id
         this.route.params
-            .subscribe((params: { caseId }) => {
+            .subscribe((params: { caseId, contactId }) => {
                 // case Id arrives only from cases list, view & modify pages
                 // coming directly to daily page doesn't provide us with a case id
                 this.caseId = params.caseId;
-                if (!this.caseId) {
+
+                // contact Id arrives only from contacts list, view & modify pages
+                // coming directly to daily page doesn't provide us with a contact id
+                this.contactId = params.contactId;
+
+                // no need to retrieve any data? then we can initialize breadcrumbs
+                if (!this.caseId && !this.contactId) {
                     this.initializeBreadcrumbs();
                 }
 
@@ -154,6 +172,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         // export url
                         this.exportFollowUpsUrl = null;
                         this.printDailyFollowUpsUrl = null;
+
                         if (
                             this.selectedOutbreak &&
                             this.selectedOutbreak.id
@@ -164,6 +183,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                             // retrieve case data
                             if (this.caseId) {
                                 this.retrieveCaseData();
+                            }
+
+                            // retrieve contact data
+                            if (this.contactId) {
+                                this.retrieveContactData();
                             }
                         }
 
@@ -182,6 +206,36 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
+     * Download the Daily Follow-ups Form
+     */
+    downloadDailyFollowUpsForm() {
+        if (this.selectedOutbreak && this.followUpDateElem.value) {
+            const isoDate = this.followUpDateElem.value.toISOString();
+            this.followUpsDataService.downloadDailyFollowUpsForm(this.selectedOutbreak.id, isoDate)
+                .subscribe((blob) => {
+                    this.downloadFile(blob, 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
+                });
+        }
+    }
+
+    /**
+     * Download File
+     * @param blob
+     * @param fileNameToken
+     */
+    private downloadFile(
+        blob,
+        fileNameToken,
+        extension: string = 'pdf'
+    ) {
+        const fileName = this.i18nService.instant(fileNameToken);
+        FileSaver.saveAs(
+            blob,
+            `${fileName}.${extension}`
+        );
+    }
+
+    /**
      * Retrieve case data
      */
     retrieveCaseData() {
@@ -190,6 +244,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             .getCase(this.selectedOutbreak.id, this.caseId)
             .subscribe((caseData: CaseModel) => {
                 this.caseData = caseData;
+                this.initializeBreadcrumbs();
+            });
+    }
+
+    /**
+     * Retrieve contact data
+     */
+    retrieveContactData() {
+        // retrieve case data
+        this.contactDataService
+            .getContact(this.selectedOutbreak.id, this.contactId)
+            .subscribe((contactData: ContactModel) => {
+                this.contactData = contactData;
                 this.initializeBreadcrumbs();
             });
     }
@@ -215,6 +282,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             this.breadcrumbs.push(new BreadcrumbItemModel(
                 this.caseData.name,
                 `/cases/${this.caseData.id}/view`
+            ));
+        }
+
+        // add contact data ?
+        if (this.contactData) {
+            this.breadcrumbs.push(new BreadcrumbItemModel(
+                this.contactData.name,
+                `/contacts/${this.contactData.id}/view`
             ));
         }
 
@@ -266,8 +341,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'date',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+                field: 'contact.dateOfLastContact',
+                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
                 field: 'area',
@@ -289,7 +364,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -616,6 +692,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('whereCase').filter.byEquality('id', this.caseId);
+            }
+
+            // add contact id
+            if (this.contactId) {
+                this.queryBuilder.filter.byEquality(
+                    'personId',
+                    this.contactId
+                );
             }
 
             // retrieve the list of Follow Ups

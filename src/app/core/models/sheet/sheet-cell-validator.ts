@@ -11,14 +11,17 @@ export class SheetCellValidator {
     static CELL_VALIDATION_TYPE = {
         [SheetCellType.DATE]: SheetCellValidationType.DATE,
         [SheetCellType.DROPDOWN]: SheetCellValidationType.DROPDOWN,
-        [SheetCellType.NUMERIC]: SheetCellValidationType.POSITIVE_INTEGER
+        [SheetCellType.NUMERIC]: SheetCellValidationType.NUMERIC
     };
 
     /**
      * Merge multiple validations into a single function respecting the format that 'handsontable' expects
      * @param validationTypes
      */
-    static mergeValidations(validationTypes: SheetCellValidationType[]) {
+    static mergeValidations(
+        validationTypes: SheetCellValidationType[],
+        sheetColumn: any
+    ) {
         return function(value, callback) {
             // do not validate empty rows
             if (value === SheetCellValidator.EMPTY_ROW_CELL_VALUE) {
@@ -55,7 +58,7 @@ export class SheetCellValidator {
                             callback(true);
                         }
                     }
-                });
+                }, sheetColumn);
             });
         };
     }
@@ -86,10 +89,26 @@ export class SheetCellValidator {
                     callback(false);
                 };
 
-            case SheetCellValidationType.POSITIVE_INTEGER:
+            case SheetCellValidationType.NUMERIC:
                 // custom validator for Positive Integer cells
-                return (value, callback) => {
-                    callback(/^([1-9]*|null)$/.test(value));
+                return (value, callback, sheetColumn) => {
+                    // empty string is handled by required validator
+                    if (value === '') {
+                        callback(true);
+                    } else {
+                        callback((
+                                sheetColumn.isInteger ?
+                                    _.isInteger(value) :
+                                    _.isNumber(value)
+                            ) && (
+                                sheetColumn.min === undefined ||
+                                value >= sheetColumn.min
+                            ) && (
+                                sheetColumn.max === undefined ||
+                                value <= sheetColumn.max
+                            )
+                        );
+                    }
                 };
         }
 

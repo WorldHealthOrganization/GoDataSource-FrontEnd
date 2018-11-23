@@ -80,7 +80,7 @@
                                 name="caseIdMask"
                                 [(ngModel)]="newOutbreak.caseIdMask"
                                 [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK' | translate"
-                                tooltip="'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
                             </app-form-input>
 
@@ -196,6 +196,8 @@
                 <ng-template matStepLabel>
                     {{'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS' | translate}}
                 </ng-template>
+
+                {{ 'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS' | translate }}
 
                 <app-form-name-url-list
                     name="arcGisServers"

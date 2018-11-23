@@ -46,10 +46,34 @@
     </ng-container>
 </app-topnav>
 
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(locationsListCount$ | async)?.count">
-</app-total-number-of-records>
+<div
+    fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        fxFlex
+        [value]="(locationsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <div
+        fxFlex
+        class="location-search-filter"
+        [ngClass]="{ 'form-section': !!parentId }">
+        <app-form-location-dropdown
+            fxFlex
+            name="locationIds"
+            [ngModel]="undefined"
+            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+            [useOutbreakLocations]="false"
+            (itemChanged)="searchLocationChanged($event)">
+        </app-form-location-dropdown>
+
+        <div
+            *ngIf="parentId"
+            class="form-actions">
+            <!-- placeholder -->
+        </div>
+    </div>
+</div>
 
 <div [ngClass]="{ 'form-section': !!parentId }">
     <div class="form-content">
@@ -59,10 +83,10 @@
 
             <!-- Reset Filters -->
             <div class="reset-filters">
-                <button mat-raised-button (click)="resetFiltersToSideFilters()">
+                <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
                     {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                 </button>
-                <button mat-raised-button (click)="needsRefreshList(true)">
+                <button type="button" mat-raised-button (click)="needsRefreshList(true)">
                     {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                 </button>
             </div>
@@ -186,7 +210,7 @@
                             <span class="xt-icon">moreVertical</span>
                         </button>
 
-                        <mat-menu #actionsMenu="matMenu">
+                        <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                             <button mat-menu-item [routerLink]="['/locations', item.id, 'children']">
                                 {{'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN' | translate}}
                             </button>

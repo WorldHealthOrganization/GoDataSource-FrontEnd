@@ -10,6 +10,7 @@ import { ReferenceDataDataService } from '../../services/data/reference-data.dat
 import { HelpDataService } from '../../services/data/help.data.service';
 import * as _ from 'lodash';
 import { Constants } from '../../models/constants';
+import { PERMISSION } from '../../models/permission.model';
 
 @Component({
     selector: 'app-authenticated',
@@ -24,6 +25,7 @@ export class AuthenticatedComponent implements OnInit {
     // authenticated user
     authUser: UserModel;
 
+    Constants = Constants;
     contextSearchHelpItems: string[];
 
     constructor(
@@ -54,14 +56,16 @@ export class AuthenticatedComponent implements OnInit {
         }
 
         // determine the Selected Outbreak and display message if different than the active one.
-        this.outbreakDataService
-            .determineSelectedOutbreak()
-            .subscribe(() => {
-                this.outbreakDataService.getSelectedOutbreakSubject()
-                    .subscribe(() => {
-                        this.outbreakDataService.checkActiveSelectedOutbreak();
-                    });
-            });
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.outbreakDataService
+                .determineSelectedOutbreak()
+                .subscribe(() => {
+                    this.outbreakDataService.getSelectedOutbreakSubject()
+                        .subscribe(() => {
+                            this.outbreakDataService.checkActiveSelectedOutbreak();
+                        });
+                });
+        }
 
         // cache reference data
         this.referenceDataDataService.getReferenceData().subscribe();
@@ -83,7 +87,7 @@ export class AuthenticatedComponent implements OnInit {
                 if (_.isEmpty(items)) {
                     this.contextSearchHelpItems = null;
                 } else {
-                    this.contextSearchHelpItems = items;
+                    this.contextSearchHelpItems = _.map(items, 'id');
                 }
             });
         });
@@ -97,18 +101,10 @@ export class AuthenticatedComponent implements OnInit {
             if (_.isEmpty(items)) {
                 this.contextSearchHelpItems = null;
             } else {
-                this.contextSearchHelpItems = items;
+                this.contextSearchHelpItems = _.map(items, 'id');
             }
         });
 
-    }
-
-    /**
-     * open page with context sensitive help items
-     */
-    openContextHelp() {
-        const helpItemsIds = _.map(this.contextSearchHelpItems, 'id');
-        this.router.navigate(['/help'], { queryParams: { applyListFilter: Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS, helpItemsIds: helpItemsIds }});
     }
 
 }

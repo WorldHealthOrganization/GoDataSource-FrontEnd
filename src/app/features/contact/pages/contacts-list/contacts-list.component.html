@@ -59,8 +59,6 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-
-
 <mat-card class="page-section page-content">
     <div class="top-section-wrapper">
         <!--List Color Legend-->
@@ -72,10 +70,10 @@
 
         <div class="reset-filters">
             <!-- Reset Filters -->
-            <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
             </button>
-            <button mat-raised-button (click)="needsRefreshList(true)">
+            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>
@@ -365,7 +363,7 @@
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
-                <mat-menu #actionsMenu="matMenu">
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                     <ng-container
                         *ngIf="!item.deleted">
 
@@ -406,6 +404,10 @@
                             mat-menu-item
                             [routerLink]="['.', item.id, 'chronology']">
                             {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
+                        </button>
+
+                        <button mat-menu-item [routerLink]="['/contacts/contact-related-follow-ups', item.id]">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS' | translate }}
                         </button>
 
                         <ng-container

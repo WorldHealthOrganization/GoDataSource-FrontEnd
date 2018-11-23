@@ -72,19 +72,36 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
+        // even if we set value to float, some browser might get it as a string sicne we use form for this...
+        // so..we need to force again the geo location to have numbers
+        const lat: number | string = _.get(dirtyFields, 'geoLocation.lat');
+        if (
+            !_.isNumber(lat) &&
+            !_.isEmpty(lat)
+        ) {
+            _.set(dirtyFields, 'geoLocation.lat', parseFloat(lat as string));
+        }
+        const lng: number | string = _.get(dirtyFields, 'geoLocation.lng');
+        if (
+            !_.isNumber(lng) &&
+            !_.isEmpty(lng)
+        ) {
+            _.set(dirtyFields, 'geoLocation.lng', parseFloat(lng as string));
+        }
+
+        // check if we nee to remove geo Location
+        if (
+            dirtyFields.geoLocation !== undefined &&
+            dirtyFields.geoLocation.lat === undefined &&
+            dirtyFields.geoLocation.lng === undefined
+        ) {
+            // on create we don't need to send it
+            delete dirtyFields.geoLocation;
+        }
+
         // set parent location
         if (this.parentId) {
             dirtyFields.parentLocationId = this.parentId;
-        }
-
-        // remove geo location if empty
-        if (
-            dirtyFields.geoLocation && (
-                !dirtyFields.geoLocation.lat ||
-                !dirtyFields.geoLocation.lng
-            )
-        ) {
-            delete dirtyFields.geoLocation;
         }
 
         // create record
@@ -108,5 +125,31 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
                     this.router.navigate(this.parentId ? ['/locations', this.parentId, 'children'] : ['/locations']);
                 });
         }
+    }
+
+    /**
+     * Update Lat Lng
+     * @param property
+     * @param data
+     */
+    onChangeLatLng(
+        property: string,
+        value
+    ) {
+        _.set(
+            this.locationData,
+            `geoLocation.${property}`,
+            value ? parseFloat(value) : undefined
+        );
+    }
+
+    /**
+     * Check if lat & lng are required
+     */
+    isLatLngRequired(value: any) {
+        return _.isString(value) ?
+            value.length > 0 : (
+                value || value === 0
+            );
     }
 }

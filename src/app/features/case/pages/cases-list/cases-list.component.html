@@ -123,10 +123,10 @@
 
         <div class="reset-filters">
             <!-- Reset Filters -->
-            <button mat-raised-button (click)="resetFiltersToSideFilters()">
+            <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
             </button>
-            <button mat-raised-button (click)="needsRefreshList(true)">
+            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>
@@ -382,7 +382,7 @@
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
-                <mat-menu #actionsMenu="matMenu">
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                     <ng-container *app-selected-outbreak-is-active>
                         <ng-container
                             *ngIf="hasContactWriteAccess() && !item.deleted">

@@ -63,16 +63,6 @@ html, body, ul, li, div, span {
             .mat-cell {
                 font-size: 16px !important;
                 padding-left: @cell-padding-left;
-
-                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE {
-                    color: @color-case;
-                }
-                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT {
-                    color: @color-contact;
-                }
-                &.cell-LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT {
-                    color: @color-event;
-                }
             }
         }
 
@@ -265,6 +255,18 @@ ng-select {
                     caret-color: @material-invalid-color;
                 }
             }
+        }
+    }
+}
+
+.cdk-overlay-container {
+    .cdk-overlay-pane {
+        .table-max-sized-menu {
+            max-height: ~"calc(50vh - 48px)";
+        }
+
+        .mat-option {
+            touch-action: auto !important;
         }
     }
 }

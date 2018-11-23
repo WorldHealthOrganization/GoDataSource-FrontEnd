@@ -25,6 +25,8 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'visibilityOf': '&#xe91d;',
+            'visibility': '&#xe91e;',
             'swapVertical': '&#xe91c;',
             'close': '&#xe91b;',
             'person_pin': '&#xe91a;',

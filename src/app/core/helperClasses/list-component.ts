@@ -941,14 +941,18 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS:
                 // get the help items ids that need to be updated
                 const helpItemsIds = _.get(queryParams, 'helpItemsIds', null);
+                const itemsIds: string[] = (_.isArray(helpItemsIds) ?
+                        helpItemsIds :
+                        [helpItemsIds]
+                ) as string[];
                 // get the correct query builder and merge with the existing one
                 // merge query builder
                 this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
                 this.appliedListFilterQueryBuilder.filter.where({
                     id: {
-                        'inq': helpItemsIds
+                        'inq': itemsIds
                     }
-                }, false);
+                }, true);
                 this.mergeListFilterToMainFilter();
                 // refresh list
                 this.needsRefreshList(true);

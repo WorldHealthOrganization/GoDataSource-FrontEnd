@@ -61,6 +61,16 @@ export class RelationshipModel {
             return entityId !== currentEntityId;
         });
     }
+
+    /**
+     * Whether a person is the Source of the relationship or the Target
+     * @param entityId
+     */
+    isSource(entityId: string): boolean {
+        // find person information
+        const personInfo = _.find(this.persons, {id: entityId});
+        return _.get(personInfo, 'source', false);
+    }
 }
 
 export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {
