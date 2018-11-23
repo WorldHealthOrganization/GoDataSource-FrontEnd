@@ -279,25 +279,29 @@
                         <!-- Contacts per case mean -->
                         <app-contacts-per-case-mean-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-per-case-mean-dashlet>
 
                         <!-- Contacts per case median -->
                         <app-contacts-per-case-median-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-per-case-median-dashlet>
 
                         <!-- Contacts on the follow-up list -->

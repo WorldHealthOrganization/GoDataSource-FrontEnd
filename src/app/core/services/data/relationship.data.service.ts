@@ -180,9 +180,13 @@ export class RelationshipDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricContactsPerCaseModel>}
      */
-    getMetricsOfContactsPerCase(outbreakId: string): Observable<MetricContactsPerCaseModel> {
+    getMetricsOfContactsPerCase(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsPerCaseModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count`),
+            this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count?filter=${filter}`),
             MetricContactsPerCaseModel
         );
     }
