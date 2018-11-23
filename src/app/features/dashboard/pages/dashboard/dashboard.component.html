@@ -319,13 +319,15 @@
                         <!-- Contacts Lost to follow-up -->
                         <app-contacts-lost-to-follow-up-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-lost-to-follow-up-dashlet>
 
                         <!-- Contacts Not Seen -->

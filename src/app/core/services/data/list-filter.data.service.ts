@@ -176,11 +176,27 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts that are lost to follow-up
      * @returns {RequestQueryBuilder}
      */
-    filterContactsLostToFollowUp(): Observable<RequestQueryBuilder> {
+    filterContactsLostToFollowUp(date, location): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
-            const defaultDate = moment().add(-1, 'days').format('YYYY-MM-DD');
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'date',
+                date,
+                null,
+                null
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // location
+            if (location) {
+                qb.include('contact').queryBuilder.filter
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
             return this.followUpDataService
-                .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id, defaultDate)
+                .getNumberOfContactsWhoAreLostToFollowUp(selectedOutbreak.id, qb)
                 .map((result: MetricContactsLostToFollowUpModel) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();

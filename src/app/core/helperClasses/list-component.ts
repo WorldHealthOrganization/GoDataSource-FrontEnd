@@ -743,9 +743,8 @@ export abstract class ListComponent {
 
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
-
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsLostToFollowUp()
+                this.listFilterDataService.filterContactsLostToFollowUp(globalFilters.date, globalFilters.locationId)
                     .subscribe((qbFilterContactsLostToFollowUp) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;

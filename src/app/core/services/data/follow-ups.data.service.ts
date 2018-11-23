@@ -232,12 +232,11 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<Object>}
      */
-    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string, date: string): Observable<any> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getNumberOfContactsWhoAreLostToFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count?filter=${filter}`),
             MetricContactsLostToFollowUpModel
