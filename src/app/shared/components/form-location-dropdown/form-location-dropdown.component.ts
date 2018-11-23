@@ -296,7 +296,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      */
     onBlur() {
         // touch group
-        super.touch();
+        this.touch();
 
         // add location condition & refresh
         if (this.needToRetrieveBackData) {
@@ -343,7 +343,13 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * @param item
      */
     triggerItemChanged(item: LocationAutoItem) {
-        this.itemChanged.emit(item);
+        // on change handler
+        this.onChange();
+
+        // trigger event listeners
+        setTimeout(() => {
+            this.itemChanged.emit(item);
+        });
     }
 
     /**
@@ -353,5 +359,18 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         _.each(this.locationHandler.selectedItems, (opt: NgOption) => {
             this.locationHandler.unselect(opt);
         });
+    }
+
+    /**
+     * Touch and trigger search
+     */
+    public touchAndTriggerSearch() {
+        // touch
+        this.touch();
+
+        // trigger search if necessary
+        if (_.isEmpty(this.locationItems)) {
+            this.addLocationConditionAndRefresh();
+        }
     }
 }
