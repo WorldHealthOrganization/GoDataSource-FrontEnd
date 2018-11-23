@@ -103,9 +103,9 @@ export class TransmissionChainDataService {
         if (dateGlobalFilter) {
             const rQBGlobalDate = new RequestQueryBuilder();
             rQBGlobalDate.filter.where({
-                    where: {
-                        endDate: dateGlobalFilter
-                    }
+                where: {
+                    endDate: dateGlobalFilter
+                }
             });
             const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
             filter.where = {...filter.where, ...filterDate.where};
@@ -188,13 +188,14 @@ export class TransmissionChainDataService {
      * @returns {any}
      */
     convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[], selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [], timelineDateCheckpoints: []};
         const selectedNodeIds: string[] = [];
         // get labels for uears / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
 
-        const timelineCheckpointNodes: GraphNodeModel[] = [];
+        let minTimelineDate: string = '';
+        let maxTimelineDate: string = '';
 
         if (!_.isEmpty(chains)) {
             // will use firstChainData to load all the nodes
@@ -300,22 +301,39 @@ export class TransmissionChainDataService {
                             }
                         }
 
-                        // add compound node if not exists
+                        // check min / max dates
                         if (!_.isEmpty(nodeData.dateTimeline)) {
-                            const nodeTimelineDate = _.find(timelineCheckpointNodes, {id: nodeData.dateTimeline});
-                            if ( _.isEmpty(nodeTimelineDate)) {
-                                const nodeCheckpoint = new GraphNodeModel({id: nodeData.dateTimeline, name: nodeData.dateTimeline, dateTimeline: nodeData.dateTimeline});
-                                nodeCheckpoint.label = nodeCheckpoint.dateTimeline;
-                                nodeCheckpoint.nodeColor = '#fff';
-                                nodeCheckpoint.nodeNameColor = '#000';
-                                graphData.nodes.push({data: nodeCheckpoint});
-                                timelineCheckpointNodes.push(nodeCheckpoint);
+                            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || _.isEmpty(maxTimelineDate)) {
+                                maxTimelineDate = nodeData.dateTimeline;
+                            }
+                            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || _.isEmpty(minTimelineDate)) {
+                                minTimelineDate = nodeData.dateTimeline;
                             }
                         }
                         graphData.nodes.push({data: nodeData});
                         selectedNodeIds.push(nodeData.id);
                     }
                 });
+
+                // generate checkpoint nodes
+                graphData.timelineDateCheckpoints = [];
+                const counterDate = moment(minTimelineDate);
+                counterDate.subtract(1, 'days');
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+                while (counterDate.isBefore(moment(maxTimelineDate))) {
+                    counterDate.add(1, 'days');
+                    const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                    graphData.timelineDateCheckpoints.push(counterDateFormatted);
+                    // generate node
+                    const checkpointNode = new GraphNodeModel({
+                        dateTimeline: counterDateFormatted,
+                        id: counterDateFormatted,
+                        name: counterDateFormatted,
+                        nodeType: 'checkpoint'
+                    });
+                    graphData.nodes.push({data: checkpointNode});
+                }
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             }
 
             // generate edges based on the nodes included in the graph

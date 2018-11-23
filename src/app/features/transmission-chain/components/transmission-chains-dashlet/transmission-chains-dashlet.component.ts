@@ -470,17 +470,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
     }
 
     /**
-     * return the tooltip for criteria based on the selected view type
-     * @returns {string}
-     */
-    tooltipViewTimeline() {
-        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
-                : null
-        );
-    }
-
-    /**
      * reset chain - navigate to chains of transmission not filtered
      */
     resetChain() {

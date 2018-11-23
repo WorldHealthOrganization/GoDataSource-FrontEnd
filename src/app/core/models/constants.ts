@@ -66,6 +66,9 @@ export class Constants {
     // default color to be used in chains of transmission
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
+    // default color to be used in chains - timeline checkpoints
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS = '#000';
+
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
     static ANSWER_TYPES = {

@@ -16,8 +16,12 @@ export class GraphNodeModel {
     nodeNameColor: string;
     picture: string;
     label: string;
-    // parent node - used for timeline view
-    parent: string;
+    // used to display the checkpoint nodes
+    nodeType: string;
+    shape: string = 'ellipse';
+    labelPosition: string = 'top';
+    height: number = 40;
+    width: number = 40;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -28,15 +32,21 @@ export class GraphNodeModel {
         this.nodeColor = _.get(data, 'nodeColor', Constants.DEFAULT_COLOR_CHAINS);
         this.nodeNameColor = _.get(data, 'nodeNameColor', Constants.DEFAULT_COLOR_CHAINS);
         this.picture = _.get(data, 'picture', 'none');
+        this.nodeType = _.get(data, 'nodeType', 'data');
 
-        this.parent = _.get(data, 'parent', '');
 
         if ( this.dateTimeline ) {
             this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-            this.parent = this.dateTimeline;
         } else {
             this.displayTimeline = 'none';
-            this.parent = '';
+        }
+
+        if (this.nodeType === 'checkpoint') {
+            this.label = this.name;
+            this.shape = 'rectangle';
+            this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS;
+            this.labelPosition = 'center';
+            this.width = 95;
         }
     }
 }

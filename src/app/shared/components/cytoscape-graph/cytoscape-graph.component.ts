@@ -32,6 +32,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
+    maxTimelineIndex: number = 0;
 
     showLegend: boolean = true;
 
@@ -126,11 +127,19 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 }
                 if (this.timelineViewType === 'horizontal') {
                     // using 100 px as it looks fine
-                    posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                    if (nodeData.nodeType === 'checkpoint') {
+                        posY = (this.maxTimelineIndex) * -100;
+                    } else {
+                        posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                    }
                 } else {
                     // timeline vertical view
                     // using 200 px as it looks fine
-                    posX = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 200 : (nodeIndex - 1) * 200 * -1;
+                    if (nodeData.nodeType === 'checkpoint') {
+                        posX = (this.maxTimelineIndex) * -100;
+                    } else {
+                        posX = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 200 : (nodeIndex - 1) * 200 * -1;
+                    }
                 }
                 return {x: posX, y: posY};
             }
@@ -141,7 +150,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     layout: any;
 
     defaultZoom: any = {
-        min: 0.1,
+        min: 0.05,
         max: 4
     };
 
@@ -175,28 +184,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     ];
 
-    // the style for the timeline view. The label field is modified in order to display dateTimeline
+    // the style for the timeline view.
     timelineStyle: any = [
         {
-            selector: ':parent',
-            css: {
-                'background-color': '#fff',
-                'color': '#000',
-                'label': 'data(label)',
-                'text-wrap': 'wrap',
-                'display': 'data(displayTimeline)',
-                'background-image': 'data(picture)',
-                'height': 30,
-                'width': 30,
-                'background-fit': 'cover',
-                'border-color': '#808080',
-                'border-width': 2,
-                'shape': 'triangle'
-            }
-        },
-        {
-            selector: ':child',
-            // selector: 'node',
+            selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
@@ -204,9 +195,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)',
                 'background-image': 'data(picture)',
-                'height': 30,
-                'width': 30,
+                'height': 'data(height)',
+                'width': 'data(width)',
+                'shape': 'data(shape)',
                 'background-fit': 'cover',
+                'text-valign': 'data(labelPosition)',
                 'border-color': 'data(nodeColor)',
                 'border-width': 3
             }
@@ -291,11 +284,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             this.edgeTapped.emit(edge.json().data);
         });
 
-        // document.getElementById('cy').style.height = String(5000) + 'px';
-        // document.getElementById('cy').style.width = String(5000) + 'px';
-        // this.cy.resize();
-        // this.cy.fit();
-
     }
 
     /**
@@ -312,6 +300,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             if (!_.isEmpty(node.data.dateTimeline)) {
                 if (this.timelineDates[node.data.dateTimeline]) {
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                    if (this.timelineDates[node.data.dateTimeline].length > this.maxTimelineIndex) {
+                        this.maxTimelineIndex = this.timelineDates[node.data.dateTimeline].length;
+                    }
                 } else {
                     this.timelineDates[node.data.dateTimeline] = [];
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
