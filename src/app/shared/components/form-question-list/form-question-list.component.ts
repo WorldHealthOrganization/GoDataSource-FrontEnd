@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {Component, Host, Inject, Input, OnInit, Optional, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Host, Inject, Input, OnInit, Optional, Output, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListBase } from '../../xt-forms/core/list-base';
 import { QuestionModel } from '../../../core/models/question.model';
@@ -32,6 +32,8 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     @Input() scrollToQuestion: boolean = true;
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';
+
+    @Output() blur = new EventEmitter<any>();
 
     @ViewChildren(FormAnswerListComponent) answerLists: QueryList<FormAnswerListComponent>;
     additionalControlsToCheck: { [ name: string ]: AbstractControl };
@@ -118,6 +120,14 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
 
         // value changed
         this.onChange();
+    }
+
+    /**
+     * Emit a suggestion of variable name for user
+     * @param {string} questionName
+     */
+    emitSuggestionOfVariableName(questionName: string) {
+        this.blur.emit(questionName);
     }
 
     /**

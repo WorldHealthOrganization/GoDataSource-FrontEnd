@@ -39,7 +39,8 @@
                                 required="true"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChangeBind(i, 'text', $event)"
-                                (initialized)="onInitializeBind(i, 'text', $event)">
+                                (initialized)="onInitializeBind(i, 'text', $event)"
+                                (blur)="emitSuggestionOfVariableName($event)">
                             </app-form-input>
                         </div>
 
