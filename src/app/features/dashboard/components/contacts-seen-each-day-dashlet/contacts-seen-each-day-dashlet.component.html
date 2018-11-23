@@ -1,20 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
-    [params]="queryParams"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
     [value]="contactsSeenEachDay"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
-
-    <div>
-        {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate}}
-    </div>
-
-    <app-form-datepicker
-        fxFlexOffset="5px"
-        name="dateFilter"
-        [ngModel]="date"
-        (optionChanged)="onDateChanged($event)">
-    </app-form-datepicker>
-
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY' | translate }}
 </app-dashboard-custom-metric-dashlet>

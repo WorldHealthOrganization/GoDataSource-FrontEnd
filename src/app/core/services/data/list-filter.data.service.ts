@@ -316,11 +316,16 @@ export class ListFilterDataService {
      * @param {date} date
      * @returns {Observable<any>}
      */
-    filterContactsSeen(date: Moment): Observable<any> {
+    filterContactsSeen(date: Moment, location: string): Observable<any> {
         // get the outbreakId
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // build the query builder
             const qb = new RequestQueryBuilder();
+
+            // empty date ?
+            if (_.isEmpty(date)) {
+                date = moment();
+            }
 
             // filter by date
             qb.filter.byDateRange(
@@ -330,6 +335,12 @@ export class ListFilterDataService {
                     endDate: moment(date).endOf('day')
                 }
             );
+
+            // location
+            if (location) {
+                qb.include('contact').queryBuilder.filter
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
 
             return this.contactDataService.getNumberOfContactsSeenEachDay(selectedOutbreak.id, qb);
         });

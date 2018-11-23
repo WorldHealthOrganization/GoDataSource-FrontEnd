@@ -915,9 +915,7 @@ export abstract class ListComponent {
 
             // Filter contacts seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-
-                const date: Moment = moment(queryParams.date);
-                this.listFilterDataService.filterContactsSeen(date)
+                this.listFilterDataService.filterContactsSeen(globalFilters.date, globalFilters.locationId)
                     .subscribe((result: MetricContactsSeenEachDays) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = new RequestQueryBuilder();

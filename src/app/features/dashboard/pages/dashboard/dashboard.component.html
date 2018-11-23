@@ -357,13 +357,15 @@
                         <!-- Contacts seen each day -->
                         <app-contacts-seen-each-day-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_SEEN_EACH_DAY &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_SEEN_EACH_DAY &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-seen-each-day-dashlet>
 
                         <!-- Contacts with successful follow-ups -->
