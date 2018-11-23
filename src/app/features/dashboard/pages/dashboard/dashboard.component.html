@@ -405,13 +405,15 @@
                         <!-- Number of new chains of transmission from registered contacts who have became cases-->
                         <app-new-chains-of-transmission-from-registered-contacts-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES &&
-                            isDashletVisible(dashlet) &&
-                            hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES &&
+                                isDashletVisible(dashlet) &&
+                                hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-new-chains-of-transmission-from-registered-contacts-dashlet>
                     </ng-container>
                 </div>

@@ -172,9 +172,13 @@ export class TransmissionChainDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricIndependentTransmissionChainsModel>}
      */
-    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(outbreakId: string): Observable<MetricIndependentTransmissionChainsModel> {
+    getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricIndependentTransmissionChainsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count`),
+            this.http.get(`/outbreaks/${outbreakId}/relationships/new-transmission-chains-from-registered-contacts-who-became-cases/filtered-count?filter=${filter}`),
             MetricIndependentTransmissionChainsModel);
     }
 

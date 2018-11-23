@@ -102,10 +102,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                     // NOTHING - IGNORE
                     break;
 
-                case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
-                    // #TODO
-                    break;
-
+                // case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
                 default:
                     // date
                     qb = this.listFilterDataService.getGlobalFilterQB(
