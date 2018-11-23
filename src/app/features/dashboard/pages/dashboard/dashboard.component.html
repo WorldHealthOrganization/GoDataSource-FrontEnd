@@ -391,13 +391,15 @@
                         <!-- Number of active chains of transmission -->
                         <app-number-of-active-chains-of-transmission-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-number-of-active-chains-of-transmission-dashlet>
 
                         <!-- Number of new chains of transmission from registered contacts who have became cases-->

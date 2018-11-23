@@ -836,7 +836,27 @@ export abstract class ListComponent {
 
             // filter cases among contacts
             case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+                // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterActiveChainsOfTransmission();
+
+                // change the way we build query
+                this.appliedListFilterQueryBuilder.filter.firstLevelConditions();
+
+                // date
+                if (globalFilters.date) {
+                    this.appliedListFilterQueryBuilder.filter.byEquality(
+                        'endDate',
+                        globalFilters.date.endOf('day').format('YYYY-MM-DD')
+                    );
+                }
+
+                // location
+                if (globalFilters.locationId) {
+                    this.appliedListFilterQueryBuilder.include('people').queryBuilder.filter
+                        .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list

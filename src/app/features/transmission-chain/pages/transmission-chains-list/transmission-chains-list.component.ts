@@ -14,6 +14,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -68,6 +69,7 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         this.route.queryParams
             .subscribe((queryParams: any) => {
                 this.queryParamsData = queryParams;
+                this.appliedListFilter = queryParams.applyListFilter;
 
                 // init filters
                 this.resetFiltersAddDefault();
@@ -89,29 +91,42 @@ export class TransmissionChainsListComponent extends ListComponent implements On
      */
     resetFiltersAddDefault() {
         // get global filter values
-        if (
-            this.queryParamsData &&
-            !this.appliedListFilter
-        ) {
+        if (this.queryParamsData) {
+            // get global filters
             const globalFilters = this.getGlobalFilterValues(this.queryParamsData);
 
-            // date
-            const qb = this.listFilterDataService.getGlobalFilterQB(
-                'contactDate',
-                globalFilters.date,
-                null,
-                null
-            );
+            // generate query builder
+            let qb: RequestQueryBuilder;
+            switch (this.appliedListFilter) {
+                case ApplyListFilter.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+                    // NOTHING - IGNORE
+                    break;
 
-            // location
-            if (globalFilters.locationId) {
-                qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CASE)
-                    .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                    // #TODO
+                    break;
+
+                default:
+                    // date
+                    qb = this.listFilterDataService.getGlobalFilterQB(
+                        'contactDate',
+                        globalFilters.date,
+                        null,
+                        null
+                    );
+
+                    // location
+                    if (globalFilters.locationId) {
+                        qb.include('people').queryBuilder.filter
+                            .byEquality('type', EntityType.CASE)
+                            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                    }
             }
 
             // merge
-            this.queryBuilder.merge(qb);
+            if (qb) {
+                this.queryBuilder.merge(qb);
+            }
         }
     }
 
