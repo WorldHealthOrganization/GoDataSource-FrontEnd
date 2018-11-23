@@ -44,28 +44,6 @@
                                 type="number">
                             </app-form-input>
 
-                            <div fxFlex><!-- placeholder --></div>
-                        </div>
-
-                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
-                            <app-form-input
-                                name="geoLocation[lat]"
-                                [(ngModel)]="locationData.geoLocation.lat"
-                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
-                                tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
-                                [required]="!!locationData.geoLocation?.lng"
-                                type="number">
-                            </app-form-input>
-
-                            <app-form-input
-                                name="geoLocation[lng]"
-                                [(ngModel)]="locationData.geoLocation.lng"
-                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
-                                tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
-                                [required]="!!locationData.geoLocation?.lat"
-                                type="number">
-                            </app-form-input>
-
                             <app-form-select
                                 name="geographicalLevelId"
                                 [(ngModel)]="locationData.geographicalLevelId"
@@ -77,7 +55,32 @@
                                 required="false"
                                 multiple="false">
                             </app-form-select>
+                        </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px" fxFlex>
+                            <app-form-input
+                                #latInput
+                                name="geoLocation[lat]"
+                                [ngModel]="locationData.geoLocation?.lat"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
+                                [required]="isLatLngRequired(lngInput.value)"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lat', $event)">
+                            </app-form-input>
+
+                            <app-form-input
+                                #lngInput
+                                name="geoLocation[lng]"
+                                [ngModel]="locationData.geoLocation?.lng"
+                                [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
+                                tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
+                                [required]="isLatLngRequired(latInput.value)"
+                                type="number"
+                                (optionChanged)="onChangeLatLng('lng', $event)">
+                            </app-form-input>
+
+                            <div fxFlex><!-- placeholder --></div>
                             <div fxFlex><!-- placeholder --></div>
                         </div>
                     </div>

@@ -24,7 +24,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL': 'Clusters',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL': 'Contacts',
         'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL': 'Daily Follow-ups',
-        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Range Follow-ups',
+        'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL': 'Follow-up dashboard',
         'LNG_LAYOUT_MENU_ITEM_CASES_LABEL': 'Cases',
         'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': 'Lab Results',
         'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL': 'Events',
@@ -94,7 +94,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_ASSIGN_TO': 'Assign To',
         'LNG_COMMON_BUTTON_ADD_DATE_RANGE': 'Add another date range',
         'LNG_COMMON_BUTTON_RELATIONSHIPS': 'Relationships',
-        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share Exposures',
+        'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS': 'Share Relationships',
         'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
         'LNG_COMMON_BUTTON_REFRESH_LIST': 'Refresh',
         'LNG_COMMON_BUTTON_EXPORT': 'Export',
@@ -164,7 +164,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM': 'Are you sure you want to approve this help item: "{{title}}"',
-        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current latitude and longitude with location\'s values?',
 
         /**
          * Dialogs fields placeholders
@@ -399,7 +399,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE': 'Case successfully converted to contact!',
         'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON': 'See cases without relationships',
         'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
-        'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups for related contacts',
         'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION': 'Export empty case investigation',
         'LNG_PAGE_LIST_CASES_EXPORT_BUTTON': 'Export Case Data',
         'LNG_PAGE_LIST_CASES_EXPORT_TITLE': 'Export Case Data',
@@ -594,7 +594,7 @@ export const EnglishUsLang = {
         /**
          * Entity Relationships list share - assign - create pages
          */
-        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share exposures',
+        'LNG_PAGE_LIST_ENTITY_SHARE_RELATIONSHIPS_TITLE': 'Share Relationships',
         'LNG_PAGE_LIST_ENTITY_ASSIGN_RELATIONSHIPS_TITLE': 'Assign To',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE': 'Create relationships',
         'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE': 'Relationships created!',
@@ -644,6 +644,8 @@ export const EnglishUsLang = {
         'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION': '',
         'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL': 'Geographical Level',
         'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION': '',
+        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION': 'Parent Location',
+        'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION': '',
 
         /**
          * Locations list page
@@ -846,6 +848,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT': 'Date of Last Contact',
         'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_LABEL_ADDRESS': 'Address',
@@ -866,6 +869,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Contact deleted!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE': 'Contact converted to case!',
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
@@ -898,6 +902,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE': 'Contact saved!',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
+        'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
 
         /**
          * Bulk Add Contacts page
@@ -968,6 +973,9 @@ export const EnglishUsLang = {
         /**
          * Relationship Fields
          */
+        'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE': 'Type',
+        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_EXPOSURE': 'Exposure',
+        'LNG_RELATIONSHIP_FIELD_VALUE_TYPE_CONTACT': 'Contact Of',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE': 'Date of last contact',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION': '',
         'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED': 'Is Contact Date Estimated?',
@@ -1020,7 +1028,8 @@ export const EnglishUsLang = {
         /**
          * Follow-ups list page
          */
-        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups for related contacts',
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE': 'Showing Follow-ups for date:',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Follow-up deleted!',
@@ -1034,6 +1043,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON': 'Print daily Follow-ups form',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME': 'Daily Follow-ups form',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
@@ -1401,6 +1412,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
+        'LNG_QUESTIONNAIRE_TEMPLATE_NO_DATA_LABEL': 'There are no questions that you need to fill out',
 
         /**
          * Outbreak Fields
@@ -1470,6 +1482,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS': '*If no map server is provided, then the default ones will be used',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1609,6 +1622,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
+         * Gantt chart dashlet
+         */
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart.',
+
+        /**
          * Case Count Map
          */
         'LNG_PAGE_CASE_COUNT_TITLE': 'Case count map',
@@ -1672,7 +1690,7 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Download sync package',
+        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Create sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
         'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',

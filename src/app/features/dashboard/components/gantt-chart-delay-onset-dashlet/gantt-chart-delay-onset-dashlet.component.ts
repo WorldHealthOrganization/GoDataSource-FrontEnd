@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -9,6 +9,7 @@ import { SVGGantt, CanvasGantt, StrGantt } from 'gantt';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -16,14 +17,13 @@ import * as _ from 'lodash';
     templateUrl: './gantt-chart-delay-onset-dashlet.component.html',
     styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
 })
-export class GanttChartDelayOnsetDashletComponent implements OnInit {
-
-    selectedOutbreak: OutbreakModel;
+export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
+    // constants
     viewType = Constants.GANTT_CHART_VIEW_TYPE.WEEK.value;
     Constants = Constants;
 
     metricResults: MetricCasesDelayBetweenOnsetLabTestModel[];
-    ganttData: any;
+    ganttData: any = [];
     ganttChart: any;
 
     options = {
@@ -38,6 +38,9 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
 
     caseRefDataColor: string = '';
 
+    loading: boolean = false;
+
+    outbreakSubscriber: Subscription;
 
     constructor(
         private caseDataService: CaseDataService,
@@ -46,14 +49,13 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-
-        this.outbreakDataService
+        this.loading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-
                     // get case person type color
+                    this.loading = true;
                     this.referenceDataDataService
                         .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
                         .subscribe((personTypes) => {
@@ -68,11 +70,20 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
                                         this.metricResults = results;
                                         this.formatData();
                                         this.displayChart();
+                                        this.loading = false;
                                     });
                             }
                         });
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // fix for append child error
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -85,8 +96,15 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
             elem.innerHTML = '';
         }
         // only display id data is available
-        if (!_.isEmpty(this.metricResults)) {
-            this.ganttChart = new SVGGantt('#gantt-svg-root', this.ganttData, this.options);
+        if (
+            !_.isEmpty(this.ganttData) &&
+            !_.isEmpty(this.ganttData[0].children)
+        ) {
+            this.ganttChart = new SVGGantt(
+                '#gantt-svg-root',
+                this.ganttData,
+                this.options
+            );
         }
     }
 
@@ -100,7 +118,11 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit {
         chartDataItem.name = '';
         const children = [];
         _.forEach(this.metricResults, (result) => {
-            if (!_.isEmpty(result.dateOfOnset) && !_.isEmpty(result.dateOfFirstLabTest) && result.delay > 0) {
+            if (
+                !_.isEmpty(result.dateOfOnset) &&
+                !_.isEmpty(result.dateOfFirstLabTest)
+                && result.delay > 0
+            ) {
                 const chartDataItemChild: any = {};
                 chartDataItemChild.id = result.case.id;
                 chartDataItemChild.name = result.case.firstName + ' ' + result.case.lastName;

@@ -9,7 +9,7 @@
 <mat-card class="page-section page-content">
     <!-- Filters -->
     <div class="reset-filters">
-        <button mat-raised-button (click)="needsRefreshList(true)">
+        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -131,7 +131,7 @@
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
-                <mat-menu #actionsMenu="matMenu">
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                     <button
                         mat-menu-item
                         [routerLink]="['/cases', item.primaryCase?.id, 'view']"

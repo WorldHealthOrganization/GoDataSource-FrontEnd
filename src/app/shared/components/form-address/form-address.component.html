@@ -184,7 +184,7 @@
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="lngInput.value"
+                            [required]="isLatLngRequired(lngInput.value)"
                             type="number"
                             (optionChanged)="onChangeLatLng('lat', $event)">
                         </app-form-input>
@@ -212,7 +212,7 @@
                             [placeholder]="'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG' | translate"
                             tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
                             [disabled]="disabled"
-                            [required]="latInput.value"
+                            [required]="isLatLngRequired(latInput.value)"
                             type="number"
                             (optionChanged)="onChangeLatLng('lng', $event)">
                         </app-form-input>

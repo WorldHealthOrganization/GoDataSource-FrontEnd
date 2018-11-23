@@ -108,7 +108,14 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     if (outbreak && outbreak.id) {
                         this.outbreakId = outbreak.id;
 
-                        this.refreshLocationList();
+                        // wait for all binding to take effect
+                        setTimeout(() => {
+                            // bring only top location when empty search
+                            this.addLocationCondition();
+
+                            // retrieve data
+                            this.refreshLocationList();
+                        });
                     }
                 });
         }

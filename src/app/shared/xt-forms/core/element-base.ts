@@ -35,14 +35,14 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
 
         this.registerOnTouched(() => {
             // run validations when element is changed
-            this.validate();
+            this.validate(true);
         });
     }
 
     /**
      * Validate a custom form control
      */
-    protected validate() {
+    protected validate(touch: boolean = false) {
         setTimeout(() => {
             // wait for the next tick so angular can update the form control value
             // before we run the validations
@@ -120,7 +120,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
             if (ngSubmitEvent) {
                 ngSubmitEvent.subscribe(() => {
                     // run validations when form is submitted
-                    this.validate();
+                    this.validate(true);
                 });
             }
 

@@ -77,7 +77,7 @@
                         <span class="xt-icon">moreVertical</span>
                     </button>
 
-                    <mat-menu #actionsMenu="matMenu">
+                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                         <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/help/categories', item.id, 'items']">
                             {{'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON' | translate}}

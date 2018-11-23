@@ -278,12 +278,14 @@ export class SidenavComponent implements OnInit {
 
     ngOnInit() {
         // retrieve list of outbreaks
-        this.outbreakDataService.getOutbreaksList().subscribe((outbreaks) => {
-            // no outbreak ?
-            if (outbreaks.length < 1) {
-                this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
-            }
-        });
+        if (this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK)) {
+            this.outbreakDataService.getOutbreaksList().subscribe((outbreaks) => {
+                // no outbreak ?
+                if (outbreaks.length < 1) {
+                    this.snackbarService.showNotice('LNG_GENERIC_WARNING_NO_OUTBREAKS');
+                }
+            });
+        }
 
         // subscribe to the selected outbreak stream
         this.outbreakDataService

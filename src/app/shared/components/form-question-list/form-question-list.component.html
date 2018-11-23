@@ -69,6 +69,7 @@
                                 required="true"
                                 [options]="questionCategoriesList$ | async"
                                 [disabled]="viewOnly"
+                                [clearable]="false"
                                 (optionChanged)="onChange()">
                             </app-form-select>
                         </div>

@@ -5,6 +5,7 @@ import { routing } from './relationship.module.routing';
 import { SharedModule } from '../../shared/shared.module';
 
 // components
+import * as fromComponents from './components';
 import * as fromPages from './pages';
 
 @NgModule({
@@ -14,6 +15,7 @@ import * as fromPages from './pages';
 
     ],
     declarations: [
+        ...fromComponents.components,
         ...fromPages.pageComponents
     ],
     entryComponents: []

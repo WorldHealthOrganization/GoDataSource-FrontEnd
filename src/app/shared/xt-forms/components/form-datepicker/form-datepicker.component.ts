@@ -17,6 +17,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { Moment } from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { MatDatepicker } from '@angular/material';
 
 // Define format to be used into datepicker
 export const DEFAULT_FORMAT = {
@@ -105,5 +106,14 @@ export class FormDatepickerComponent extends ElementBase<string> {
         setTimeout(() => {
             this.optionChanged.emit(this.value);
         });
+    }
+
+    /**
+     * Show date picker dialog if necessary
+     */
+    showDatePickerDialog(pickerStartDate: MatDatepicker<any>) {
+        if (!pickerStartDate.opened) {
+            pickerStartDate.open();
+        }
     }
 }

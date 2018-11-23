@@ -12,13 +12,13 @@
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
 
-            <button *ngIf="contextSearchHelpItems"
+            <a *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"
-                mat-raised-button
-                color="primary"
-                (click)="openContextHelp()">
+                target="_blank"
+                [routerLink]="['/help']"
+                [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS, helpItemsIds: contextSearchHelpItems }">
                 <span class="xt-icon">help</span>
-            </button>
+            </a>
 
             <router-outlet></router-outlet>
 

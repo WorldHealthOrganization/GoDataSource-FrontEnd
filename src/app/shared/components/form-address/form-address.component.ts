@@ -128,4 +128,14 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
             super.onChange();
         });
     }
+
+    /**
+     * Check if lat & lng are required
+     */
+    isLatLngRequired(value: any) {
+        return _.isString(value) ?
+            value.length > 0 : (
+                value || value === 0
+            );
+    }
 }
