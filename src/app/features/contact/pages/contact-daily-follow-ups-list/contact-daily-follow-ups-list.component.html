@@ -28,6 +28,12 @@
                         [fileType]="printDailyFollowUpsFileType">
                     </app-export-button>
 
+                    <button
+                        mat-menu-item
+                        (click)="downloadDailyFollowUpsForm()">
+                        {{'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate}}
+                    </button>
+
                     <app-export-button
                         *ngIf="exportFollowUpsUrl"
                         [menuItem]="true"
@@ -74,6 +80,21 @@
         <button type="button" mat-raised-button (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
+        <span>{{'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE' | translate}}</span>
+        <div fxLayout="column">
+            <app-form-datepicker
+                #followUpDate
+                name="dateFilter"
+                [ngModel]="dateFilterDefaultValue"
+                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
+                (optionChanged)="filterByDateField('date', $event)"
+                app-reset-input-on-side-filter
+                [resetToPristineValue]="false">
+            </app-form-datepicker>
+        </div>
     </div>
 
     <mat-table #table [dataSource]="followUpsList$ | async" matSort (matSortChange)="sortBy($event)">
@@ -170,25 +191,23 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Date -->
-        <ng-container matColumnDef="date">
+        <!-- Date of Last Contact -->
+        <ng-container matColumnDef="contact.dateOfLastContact">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate }}</div>
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
                     <div class="column-filter">
-                        <app-form-datepicker
+                        <app-form-daterange
                             name="dateFilter"
-                            [ngModel]="dateFilterDefaultValue"
-                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="filterByDateField('date', $event)"
-                            app-reset-input-on-side-filter
-                            [resetToPristineValue]="false">
-                        </app-form-datepicker>
+                            ngModel
+                            (changed)="filterByRelation('contact').byDateRange('dateOfLastContact', $event)"
+                            app-reset-input-on-side-filter>
+                        </app-form-daterange>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ item.date | dateDefault }}
+                {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
 

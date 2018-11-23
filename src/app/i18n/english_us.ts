@@ -164,7 +164,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY': 'Are you sure you want to delete this category: "{{name}}"',
         'LNG_DIALOG_CONFIRM_DELETE_HELP_ITEM': 'Are you sure you want to delete this help item: "{{title}}"',
         'LNG_DIALOG_CONFIRM_APPROVE_HELP_ITEM': 'Are you sure you want to approve this help item: "{{title}}"',
-        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current lat & lng with area lat & lng?',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': 'Do you want to replace current latitude and longitude with location\'s values?',
 
         /**
          * Dialogs fields placeholders
@@ -848,6 +848,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION': '',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Is Date of reporting approximate',
         'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION': '',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT': 'Date of Last Contact',
         'LNG_CONTACT_FIELD_LABEL_TYPE': 'Type',
         'LNG_CONTACT_FIELD_LABEL_ADDRESSES': 'Address',
         'LNG_CONTACT_FIELD_LABEL_ADDRESS': 'Address',
@@ -1028,6 +1029,7 @@ export const EnglishUsLang = {
          * Follow-ups list page
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_TITLE': 'Follow-ups for related contacts',
+        'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_FOLLOW_UPS_FOR_DATE': 'Showing Follow-ups for date:',
         'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON': 'Generate Follow-up',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE': 'Follow-ups generated!',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Follow-up deleted!',
@@ -1041,6 +1043,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON': 'Print daily Follow-ups form',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME': 'Daily Follow-ups form',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
@@ -1408,6 +1412,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT': 'Alert?',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ALERT_ALERT': 'Alert',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS': 'Questions',
+        'LNG_QUESTIONNAIRE_TEMPLATE_NO_DATA_LABEL': 'There are no questions that you need to fill out',
 
         /**
          * Outbreak Fields
@@ -1477,6 +1482,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_OUTBREAK_TITLE': 'Create New Outbreak',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS': 'Details',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS': 'Map Servers',
+        'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS': '*If no map server is provided, then the default ones will be used',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_CREATE_OUTBREAK_TAB_LAB_RESULTS': 'Lab Results',
@@ -1619,6 +1625,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
+
+        /**
+         * Gantt chart dashlet
+         */
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart.',
 
         /**
          * Case Count Map

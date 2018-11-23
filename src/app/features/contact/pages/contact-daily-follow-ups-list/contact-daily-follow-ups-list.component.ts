@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -33,6 +33,8 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { NgModel } from '@angular/forms';
+import * as FileSaver from 'file-saver';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -68,9 +70,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     teamsListMap: any = {};
 
+    // print daily Follow-ups
     printDailyFollowUpsUrl: string;
     followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
     printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
+    // export Follow-ups
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
     allowedExportTypes: ExportDataExtension[] = [
@@ -92,6 +96,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     contactId: string;
     contactData: ContactModel;
+
+    @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
+    followUpDateValue: string;
 
     constructor(
         private authDataService: AuthDataService,
@@ -165,6 +172,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         // export url
                         this.exportFollowUpsUrl = null;
                         this.printDailyFollowUpsUrl = null;
+
                         if (
                             this.selectedOutbreak &&
                             this.selectedOutbreak.id
@@ -195,6 +203,36 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    /**
+     * Download the Daily Follow-ups Form
+     */
+    downloadDailyFollowUpsForm() {
+        if (this.selectedOutbreak && this.followUpDateElem.value) {
+            const isoDate = this.followUpDateElem.value.toISOString();
+            this.followUpsDataService.downloadDailyFollowUpsForm(this.selectedOutbreak.id, isoDate)
+                .subscribe((blob) => {
+                    this.downloadFile(blob, 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
+                });
+        }
+    }
+
+    /**
+     * Download File
+     * @param blob
+     * @param fileNameToken
+     */
+    private downloadFile(
+        blob,
+        fileNameToken,
+        extension: string = 'pdf'
+    ) {
+        const fileName = this.i18nService.instant(fileNameToken);
+        FileSaver.saveAs(
+            blob,
+            `${fileName}.${extension}`
+        );
     }
 
     /**
@@ -303,8 +341,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'date',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+                field: 'contact.dateOfLastContact',
+                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
             new VisibleColumnModel({
                 field: 'area',
@@ -326,7 +364,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED'
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',

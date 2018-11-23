@@ -33,6 +33,7 @@
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION"
                                 [options]="diseasesList$ | async"
                                 required="true"
+                                [clearable]="false"
                                 [disabled]="viewOnly">
                             </app-form-select>
 

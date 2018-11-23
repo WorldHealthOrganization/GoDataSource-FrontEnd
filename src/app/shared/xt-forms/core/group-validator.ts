@@ -116,7 +116,7 @@ export abstract class GroupValidator<T> extends ElementBase<T> implements AfterV
     /**
      * Override validate functions
      */
-    protected validate() {
+    protected validate(touch: boolean = false) {
         // validate group
         this.validateGroup();
 
@@ -124,6 +124,8 @@ export abstract class GroupValidator<T> extends ElementBase<T> implements AfterV
         super.validate();
 
         // touch list
-        this.touch();
+        if (touch) {
+            this.touch();
+        }
     }
 }
