@@ -15,7 +15,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
         multi: true
     }]
 })
-export class FormSelectComponent extends ElementBase<string> implements AfterViewInit {
+export class FormSelectComponent extends ElementBase<string | string[]> implements AfterViewInit {
     static identifier: number = 0;
 
     @HostBinding('class.form-element-host') isFormElement = true;
@@ -26,10 +26,17 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() disabled: boolean = false;
     @Input() name: string;
     @Input() multiple: boolean = false;
-    @Input() options: any[];
+    private _options: any[];
+    @Input() set options(options: any[]) {
+        this._options = options;
+        this.initSelectedOptions();
+    }
+    get options(): any[] {
+        return this._options;
+    }
     @Input() optionLabelKey: string = 'label';
     @Input() optionLabelPrefixKey: string = null;
-    @Input() optionLabelImgKey: string = null;
+    @Input() optionLabelImgKey: string = 'iconUrl';
     @Input() optionValueKey: string = 'value';
     @Input() optionTooltipKey: string = 'tooltip';
     @Input() optionDisabledKey: string = 'disabled';
@@ -53,6 +60,8 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     @Input() displayFilterIcon: boolean = false;
 
     @Input() noneLabel: string = 'LNG_COMMON_LABEL_NONE';
+    // options for select-trigger
+    selectedOptions: any[] = [];
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
@@ -85,6 +94,32 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
     }
 
     /**
+     * Set value from select option
+     * @param {string} value
+     */
+    writeValue(value: string) {
+        super.writeValue(value);
+        this.initSelectedOptions();
+    }
+
+    /**
+     * Create options for select-trigger
+     */
+    private initSelectedOptions() {
+        const selectedOptionsIds = this.value ? (
+            _.isArray(this.value) ?
+                this.value :
+                [this.value]
+        ) : [];
+
+        this.selectedOptions = !_.isEmpty(this.options) ? _.map(selectedOptionsIds, (selectedValue) => {
+            return _.find(this.options, (option) => {
+                return option[this.optionValueKey] === selectedValue;
+            });
+        }) : [];
+    }
+
+    /**
      * Function triggered when the selected value is changed
      * @param selectedValue The new value that has been selected
      */
@@ -109,6 +144,7 @@ export class FormSelectComponent extends ElementBase<string> implements AfterVie
         }
 
         // emit the currently selected option(s)
+        this.initSelectedOptions();
         return this.optionChanged.emit(selectedOptions);
     }
 

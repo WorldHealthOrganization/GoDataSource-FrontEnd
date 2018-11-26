@@ -34,9 +34,11 @@ export class AddressModel {
         this.postalCode = _.get(data, 'postalCode');
         this.addressLine1 = _.get(data, 'addressLine1');
         this.locationId = _.get(data, 'locationId');
-        this.location = new LocationModel(
-            _.find(locationsList, {id: this.locationId})
-        );
+        this.location = locationsList && locationsList.length > 0 ?
+            new LocationModel(
+                _.find(locationsList, {id: this.locationId})
+            ) :
+            new LocationModel(_.get(data, 'location'));
         this.date = _.get(data, 'date', moment().toISOString());
         this.geoLocation = _.get(data, 'geoLocation', {});
     }
