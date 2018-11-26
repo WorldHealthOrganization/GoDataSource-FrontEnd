@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-independent-transmission-chains-dashlet',
@@ -12,7 +13,7 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './independent-transmission-chains-dashlet.component.html',
     styleUrls: ['./independent-transmission-chains-dashlet.component.less']
 })
-export class IndependentTransmissionChainsDashletComponent extends DashletComponent implements OnInit {
+export class IndependentTransmissionChainsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of independent transmission chains
     independentTransmissionChainsCount: number;
 
@@ -21,6 +22,10 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
 
     // loading data
     displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
@@ -33,7 +38,7 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
     ngOnInit() {
         // get number of independent transmission chains
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -41,6 +46,20 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -62,9 +81,15 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.transmissionChainDataService
+            this.previousSubscriber = this.transmissionChainDataService
                 .getCountIndependentTransmissionChains(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.independentTransmissionChainsCount = result.length;

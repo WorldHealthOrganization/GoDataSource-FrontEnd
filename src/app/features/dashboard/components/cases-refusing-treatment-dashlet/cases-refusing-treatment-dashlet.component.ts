@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-cases-refusing-treatment-dashlet',
@@ -12,7 +13,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './cases-refusing-treatment-dashlet.component.html',
     styleUrls: ['./cases-refusing-treatment-dashlet.component.less']
 })
-export class CasesRefusingTreatmentDashletComponent extends DashletComponent implements OnInit {
+export class CasesRefusingTreatmentDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases refusing treatment
     casesRefusingTreatmentCount: number;
 
@@ -25,6 +26,10 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
     // constants to be used for applyListFilters
     Constants: any = Constants;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
@@ -36,7 +41,7 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
     ngOnInit() {
         // get number of cases refusing treatment
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -44,6 +49,20 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -58,9 +77,15 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
                 'addresses.parentLocationIdFilter'
             );
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.caseDataService
+            this.previousSubscriber = this.caseDataService
                 .getCasesRefusingTreatmentCount(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.casesRefusingTreatmentCount = result.count;

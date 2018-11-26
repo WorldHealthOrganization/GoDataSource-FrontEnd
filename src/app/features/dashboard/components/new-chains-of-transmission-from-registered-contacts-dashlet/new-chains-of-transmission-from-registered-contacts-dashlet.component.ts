@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -6,6 +6,7 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -13,7 +14,7 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './new-chains-of-transmission-from-registered-contacts-dashlet.component.html',
     styleUrls: ['./new-chains-of-transmission-from-registered-contacts-dashlet.component.less']
 })
-export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent extends DashletComponent implements OnInit {
+export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of new chains of transmission from registered contacts who became cases
     numOfNewChainsOfTransmissionFromRegContactsBecomeCases: number;
 
@@ -28,6 +29,10 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
     // loading data
     displayLoading: boolean = false;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
@@ -39,7 +44,7 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
     ngOnInit() {
         // get number of deceased cases
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -47,6 +52,20 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -67,9 +86,15 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.transmissionChainDataService
+            this.previousSubscriber = this.transmissionChainDataService
                 .getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.numOfNewChainsOfTransmissionFromRegContactsBecomeCases = result.length;

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -6,6 +6,7 @@ import { Constants } from '../../../../core/models/constants';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-number-of-active-chains-of-transmission-dashlet',
@@ -13,7 +14,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
     templateUrl: './number-of-active-chains-of-transmission.component.html',
     styleUrls: ['./number-of-active-chains-of-transmission.component.less']
 })
-export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponent implements OnInit {
+export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of active chains of transmission
     numberOfActiveChains: number;
 
@@ -26,6 +27,10 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
     // loading data
     displayLoading: boolean = false;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
         private outbreakDataService: OutbreakDataService,
@@ -37,7 +42,7 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
     ngOnInit() {
         // get number of independent transmission chains
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -45,6 +50,20 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -73,9 +92,15 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.transmissionChainDataService
+            this.previousSubscriber = this.transmissionChainDataService
                 .getCountIndependentTransmissionChains(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.numberOfActiveChains = result.activeChainsCount;

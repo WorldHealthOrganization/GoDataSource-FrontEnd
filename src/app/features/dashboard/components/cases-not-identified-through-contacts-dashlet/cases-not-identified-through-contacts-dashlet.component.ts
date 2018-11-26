@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-cases-not-identified-through-contacts-dashlet',
@@ -12,7 +13,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './cases-not-identified-through-contacts-dashlet.component.html',
     styleUrls: ['./cases-not-identified-through-contacts-dashlet.component.less']
 })
-export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletComponent implements OnInit {
+export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // Number of cases who are not identified though known contact list
     count: number = 0;
 
@@ -25,6 +26,10 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     // loading data
     displayLoading: boolean = false;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
@@ -36,7 +41,7 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -44,6 +49,20 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -61,9 +80,15 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
             // merge other conditions
             qb.merge(this.listFilterDataService.filterCasesNotIdentifiedThroughContacts());
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.caseDataService
+            this.previousSubscriber = this.caseDataService
                 .getCasesCount(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.count = result.count;

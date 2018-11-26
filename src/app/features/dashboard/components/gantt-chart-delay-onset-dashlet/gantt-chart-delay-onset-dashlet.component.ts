@@ -79,7 +79,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // fix for append child error
+        // outbreak subscriber
         if (this.outbreakSubscriber) {
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;

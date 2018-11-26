@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -6,6 +6,7 @@ import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metri
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -13,7 +14,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
     templateUrl: './contacts-lost-to-follow-up-dashlet.component.html',
     styleUrls: ['./contacts-lost-to-follow-up-dashlet.component.less']
 })
-export class ContactsLostToFollowUpDashletComponent extends DashletComponent implements OnInit {
+export class ContactsLostToFollowUpDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of contacts who are lost to follow-up
     noContactsLostToFollowUp: number;
 
@@ -26,6 +27,10 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
     // loading data
     displayLoading: boolean = false;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private followUpsDataService: FollowUpsDataService,
@@ -37,7 +42,7 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
     ngOnInit() {
         // get number of deceased cases
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -45,6 +50,20 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -68,8 +87,14 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             this.displayLoading = true;
-            this.followUpsDataService
+            this.previousSubscriber = this.followUpsDataService
                 .getNumberOfContactsWhoAreLostToFollowUp(this.outbreakId, qb)
                 .subscribe((result: MetricContactsLostToFollowUpModel) => {
                     this.noContactsLostToFollowUp = result.contactsCount;

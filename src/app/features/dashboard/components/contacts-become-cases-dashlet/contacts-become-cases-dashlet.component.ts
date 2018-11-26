@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -7,6 +7,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-contacts-become-cases-dashlet',
@@ -14,7 +15,7 @@ import { Observable } from 'rxjs/Observable';
     templateUrl: './contacts-become-cases-dashlet.component.html',
     styleUrls: ['./contacts-become-cases-dashlet.component.less']
 })
-export class ContactsBecomeCasesDashletComponent extends DashletComponent implements OnInit {
+export class ContactsBecomeCasesDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of contacts become cases over time and place
     contactsBecomeCasesCount: number;
 
@@ -32,6 +33,10 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
     // loading data
     displayLoading: boolean = false;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     constructor(
         private caseDataService: CaseDataService,
         private outbreakDataService: OutbreakDataService,
@@ -43,7 +48,7 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
     ngOnInit() {
         // get contacts on followup list count
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -51,6 +56,20 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -75,9 +94,15 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
                 });
             }
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            Observable.forkJoin([
+            this.previousSubscriber = Observable.forkJoin([
                 this.caseDataService.getCasesCount(this.outbreakId, qb),
                 this.caseDataService.getCasesCount(this.outbreakId)
             ]).subscribe(([qbCountResult, countResult]) => {

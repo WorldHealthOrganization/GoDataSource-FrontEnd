@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-cases-hospitalised-dashlet',
@@ -12,7 +13,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './cases-hospitalised-dashlet.component.html',
     styleUrls: ['./cases-hospitalised-dashlet.component.less']
 })
-export class CasesHospitalisedDashletComponent extends DashletComponent implements OnInit {
+export class CasesHospitalisedDashletComponent extends DashletComponent implements OnInit, OnDestroy {
 
     // number of hospitalised cases
     casesHospitalisedCount: number;
@@ -33,10 +34,14 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
         super(listFilterDataService);
     }
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
     ngOnInit() {
         // get number of hospitalised cases
         this.displayLoading = true;
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
@@ -44,6 +49,20 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
                     this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -58,9 +77,15 @@ export class CasesHospitalisedDashletComponent extends DashletComponent implemen
                 'addresses.parentLocationIdFilter'
             );
 
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
             // retrieve data
             this.displayLoading = true;
-            this.caseDataService
+            this.previousSubscriber = this.caseDataService
                 .getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb)
                 .subscribe((result) => {
                     this.casesHospitalisedCount = result.count;
