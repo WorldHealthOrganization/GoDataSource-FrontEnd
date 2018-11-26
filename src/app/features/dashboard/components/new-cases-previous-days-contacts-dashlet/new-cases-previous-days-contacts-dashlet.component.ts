@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -7,6 +7,9 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-new-cases-previous-days-contacts-dashlet',
@@ -14,8 +17,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './new-cases-previous-days-contacts-dashlet.component.html',
     styleUrls: ['./new-cases-previous-days-contacts-dashlet.component.less']
 })
-export class NewCasesPreviousDaysContactsDashletComponent extends DashletComponent implements OnInit {
-
+export class NewCasesPreviousDaysContactsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases with less than x contacts
     casesAmongContactsCount: number = 0;
     // number of new cases
@@ -24,12 +26,20 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
     xDaysAmongContacts: number;
     // constants to be used for applyListFilters
     Constants = Constants;
-    // selected outbreak
-    selectedOutbreak;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     // refresh only after we finish changing data
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
+        this.refreshData();
     }));
 
     constructor(
@@ -42,15 +52,30 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
 
     ngOnInit() {
         // get contacts on followup list count
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
+                    this.outbreakId = selectedOutbreak.id;
                     this.xDaysAmongContacts = selectedOutbreak.noDaysAmongContacts;
-                    this.triggerUpdateValues.call(true);
+                    this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -63,25 +88,55 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
     }
 
     /**
-     * Handles the call to the API to get the count
-     *
+     * Refresh data
      */
-    updateValues() {
-        // get the results for contacts not seen
-        if (this.selectedOutbreak && this.selectedOutbreak.id) {
-            this.relationshipDataService
-                .getCountIdsOfCasesAmongKnownContacts(this.selectedOutbreak.id, this.xDaysAmongContacts)
+    refreshData() {
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                null,
+                'addresses.parentLocationIdFilter'
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.where({
+                    dateOfReporting: {
+                        lte: moment(this.globalFilterDate).toISOString()
+                    }
+                });
+            }
+
+            // convert noLessContacts to number as the API expects
+            const noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts  : _.parseInt(this.xDaysAmongContacts);
+            if (_.isNumber(noDaysAmongContacts)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysAmongContacts',
+                    noDaysAmongContacts
+                );
+            }
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = this.relationshipDataService
+                .getCountIdsOfCasesAmongKnownContacts(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.casesAmongContactsCount = result.newCasesAmongKnownContactsCount;
                     this.newCases = result.newCasesCount;
+                    this.displayLoading = false;
                 });
         }
     }
-
-    /**
-     * Refresh data
-     */
-    refreshData() {}
 }
 
 

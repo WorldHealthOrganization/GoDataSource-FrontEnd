@@ -776,7 +776,7 @@ export abstract class ListComponent {
                 // get the number of days  if it was updated
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesAmongKnownContacts(noDaysAmongContacts)
+                this.listFilterDataService.filterCasesAmongKnownContacts(globalFilters.date, globalFilters.locationId, noDaysAmongContacts)
                     .subscribe((qbFilterCasesAmongKnownContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;

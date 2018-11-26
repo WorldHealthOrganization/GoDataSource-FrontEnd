@@ -177,7 +177,7 @@ export class ListFilterDataService {
             }
 
             // convert noLessContacts to number as the API expects
-            noLessContacts = _.parseInt(noLessContacts);
+            noLessContacts = _.isNumber(noLessContacts) || _.isEmpty(noLessContacts) ? noLessContacts  : _.parseInt(noLessContacts);
             if (_.isNumber(noLessContacts)) {
                 // create filter for daysNotSeen
                 qb.filter.byEquality(
@@ -266,10 +266,40 @@ export class ListFilterDataService {
      * @param {number} noDaysAmongContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesAmongKnownContacts(noDaysAmongContacts: number = null): Observable<RequestQueryBuilder> {
+    filterCasesAmongKnownContacts(date, location, noDaysAmongContacts): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                null,
+                null,
+                'addresses.parentLocationIdFilter',
+                location
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // date
+            if (date) {
+                qb.filter.where({
+                    dateOfReporting: {
+                        lte: moment(date).toISOString()
+                    }
+                });
+            }
+
+            // convert noLessContacts to number as the API expects
+            noDaysAmongContacts = _.isNumber(noDaysAmongContacts) || _.isEmpty(noDaysAmongContacts) ? noDaysAmongContacts  : _.parseInt(noDaysAmongContacts);
+            if (_.isNumber(noDaysAmongContacts)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysAmongContacts',
+                    noDaysAmongContacts
+                );
+            }
+
             return this.relationshipDataService
-                .getCountIdsOfCasesAmongKnownContacts(selectedOutbreak.id, noDaysAmongContacts)
+                .getCountIdsOfCasesAmongKnownContacts(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();

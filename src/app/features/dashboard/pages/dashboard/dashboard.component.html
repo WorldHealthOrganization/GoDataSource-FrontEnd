@@ -215,13 +215,15 @@
                         <!-- New cases detected in the previous x days among contacts -->
                         <app-new-cases-previous-days-contacts-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-new-cases-previous-days-contacts-dashlet>
 
                         <!-- Cases refusing to be transferred to a treatment unit -->

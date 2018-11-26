@@ -103,7 +103,7 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
             }
 
             // convert noLessContacts to number as the API expects
-            const noLessContacts: number = _.parseInt(this.xLessContacts);
+            const noLessContacts: number = _.isNumber(this.xLessContacts) || _.isEmpty(this.xLessContacts) ? this.xLessContacts  : _.parseInt(this.xLessContacts);
             if (_.isNumber(noLessContacts)) {
                 // create filter for daysNotSeen
                 qb.filter.byEquality(
