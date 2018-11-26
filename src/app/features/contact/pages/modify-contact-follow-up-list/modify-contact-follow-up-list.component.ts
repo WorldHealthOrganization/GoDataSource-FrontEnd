@@ -19,6 +19,8 @@ import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { TeamModel } from '../../../../core/models/team.model';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
 
 @Component({
     selector: 'app-modify-contact-follow-ups-list',
@@ -41,6 +43,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
 
     dailyStatusTypeOptions$: Observable<any[]>;
 
+    teamsList$: Observable<TeamModel[]>;
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -49,7 +53,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         private snackbarService: SnackbarService,
         private dialogService: DialogService,
         private formHelper: FormHelperService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private teamDataService: TeamDataService
     ) {
         super();
     }
@@ -57,6 +62,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     ngOnInit() {
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
+
+        this.teamsList$ = this.teamDataService.getTeamsList();
 
         // get selected outbreak
         this.outbreakDataService
