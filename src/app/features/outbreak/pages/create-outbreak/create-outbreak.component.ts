@@ -112,13 +112,4 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 });
         }
     }
-
-    /**
-     * Make a suggestion of variable name depends on question name
-     * @param {string} sectionName
-     * @param {string} questionName
-     */
-    makeSuggestionOfVariableName(sectionName: string, questionName: string) {
-        this.newOutbreak[sectionName][this.newOutbreak[sectionName].length - 1].variable = _.camelCase(questionName);
-    }
 }

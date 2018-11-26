@@ -33,7 +33,7 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';
 
-    @Output() blur = new EventEmitter<any>();
+    @Input() autoSuggestVariable: boolean = false;
 
     @ViewChildren(FormAnswerListComponent) answerLists: QueryList<FormAnswerListComponent>;
     additionalControlsToCheck: { [ name: string ]: AbstractControl };
@@ -123,11 +123,14 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     }
 
     /**
-     * Emit a suggestion of variable name for user
-     * @param {string} questionName
+     * Make a variable suggestion for user
+     * @param {number} index
+     * @param {string} value
      */
-    emitSuggestionOfVariableName(questionName: string) {
-        this.blur.emit(questionName);
+    makeVariableSuggestion(index: number, value: any) {
+        if (this.autoSuggestVariable) {
+            this.values[index].variable = _.camelCase(value);
+        }
     }
 
     /**
