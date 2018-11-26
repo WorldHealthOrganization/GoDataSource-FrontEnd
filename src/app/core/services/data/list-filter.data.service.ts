@@ -13,6 +13,7 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class ListFilterDataService {
@@ -155,10 +156,38 @@ export class ListFilterDataService {
      * @param {number} noLessContacts
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesLessThanContacts(noLessContacts: number = null): Observable<RequestQueryBuilder> {
+    filterCasesLessThanContacts(date, location, noLessContacts): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'contactDate',
+                date,
+                null,
+                null
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // location
+            if (location) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CONTACT)
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
+            // convert noLessContacts to number as the API expects
+            noLessContacts = _.parseInt(noLessContacts);
+            if (_.isNumber(noLessContacts)) {
+                // create filter for daysNotSeen
+                qb.filter.byEquality(
+                    'noLessContacts',
+                    noLessContacts
+                );
+            }
+
             return this.relationshipDataService
-                .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id, noLessContacts)
+                .getCountIdsOfCasesLessThanXContacts(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired case ids
                     const filterQueryBuilder = new RequestQueryBuilder();
