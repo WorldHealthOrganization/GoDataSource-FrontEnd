@@ -201,13 +201,15 @@
                         <!-- Cases with Less than x Contacts -->
                         <app-cases-less-contacts-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-cases-less-contacts-dashlet>
 
                         <!-- New cases detected in the previous x days among contacts -->

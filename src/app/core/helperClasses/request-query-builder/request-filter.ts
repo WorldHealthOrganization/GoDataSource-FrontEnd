@@ -150,17 +150,20 @@ export class RequestFilter {
     /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
-     * @param {string} value
+     * @param {string | number} value
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
     byEquality(
         property: string,
-        value: string,
+        value: string | number,
         replace: boolean = true,
         caseInsensitive: boolean = false
     ) {
-        if (_.isEmpty(value)) {
+        if (
+            _.isEmpty(value) &&
+            !_.isNumber(value)
+        ) {
             // remove filter
             this.remove(property);
         } else {
@@ -179,7 +182,7 @@ export class RequestFilter {
                     this.where({
                         [property]: {
                             regexp: '/^' +
-                                RequestFilter.escapeStringForRegex(value)
+                                RequestFilter.escapeStringForRegex(value as string)
                                     .replace(/%/g, '.*')
                                     .replace(/\\\?/g, '.') +
                                 '$/i'

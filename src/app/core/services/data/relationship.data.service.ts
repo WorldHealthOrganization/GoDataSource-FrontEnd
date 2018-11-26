@@ -197,15 +197,11 @@ export class RelationshipDataService {
      * @param {number} noLessContacts
      * @returns {Observable<MetricCasesWithContactsModel>}
      */
-    getCountIdsOfCasesLessThanXContacts(outbreakId: string, noLessContacts: number = null): Observable<MetricCasesWithContactsModel> {
-        // convert noLessContacts to number as the API expects
-        noLessContacts = _.parseInt(noLessContacts);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noLessContacts: noLessContacts}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfCasesLessThanXContacts(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesWithContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/relationships/cases-with-less-than-x-contacts/count?filter=${filter}`),
             MetricCasesWithContactsModel

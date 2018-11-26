@@ -1,12 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import * as _ from 'lodash';
+import { EntityType } from '../../../../core/models/entity-type';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -14,21 +15,25 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './cases-less-contacts-dashlet.component.html',
     styleUrls: ['./cases-less-contacts-dashlet.component.less']
 })
-export class CasesLessContactsDashletComponent extends DashletComponent implements OnInit {
-
+export class CasesLessContactsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases with less than x contacts
     casesLessContactsCount: number;
+
     // x metric set on outbreak
     xLessContacts: number;
-    // constants to be used for applyListFilters
-    Constants = Constants;
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
 
-    // refresh only after we finish changing data
-    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
-    }));
+    // constants
+    Constants = Constants;
+
+    // selected outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     constructor(
         private relationshipDataService: RelationshipDataService,
@@ -40,15 +45,30 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
 
     ngOnInit() {
         // get contacts on followup list count
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
+                    this.outbreakId = selectedOutbreak.id;
                     this.xLessContacts = selectedOutbreak.noLessContacts;
-                    this.triggerUpdateValues.call(true);
+                    this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // fix for append child error
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -57,28 +77,57 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
      */
     onChangeSetting(newXLessContacts) {
         this.xLessContacts = newXLessContacts;
-        this.triggerUpdateValues.call();
-    }
-
-    /**
-     * Handles the call to the API to get the count
-     */
-    updateValues() {
-        // get the results for contacts not seen
-        if (this.selectedOutbreak && this.selectedOutbreak.id) {
-            // get the number of days used to filter not seen contacts
-            this.relationshipDataService
-                .getCountIdsOfCasesLessThanXContacts(this.selectedOutbreak.id, this.xLessContacts)
-                .subscribe((result) => {
-                    this.casesLessContactsCount = result.casesCount;
-                });
-        }
+        this.refreshDataCaller.call();
     }
 
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        // get the results for contacts not seen
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                'contactDate',
+                null
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CONTACT)
+                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // convert noLessContacts to number as the API expects
+            const noLessContacts: number = _.parseInt(this.xLessContacts);
+            if (_.isNumber(noLessContacts)) {
+                // create filter for daysNotSeen
+                qb.filter.byEquality(
+                    'noLessContacts',
+                    noLessContacts
+                );
+            }
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // get the number of days used to filter not seen contacts
+            this.displayLoading = true;
+            this.previousSubscriber = this.relationshipDataService
+                .getCountIdsOfCasesLessThanXContacts(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.casesLessContactsCount = result.casesCount;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
 
 
