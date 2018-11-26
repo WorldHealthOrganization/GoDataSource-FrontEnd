@@ -30,7 +30,9 @@ export class ReferenceDataEntryModel {
     iconUrl: string;
     set iconId(iconId: string) {
         this._iconId = iconId;
-        this.iconUrl = `${environment.apiUrl}/icons/${this.iconId}/download`;
+        this.iconUrl = _.isEmpty(this.iconId) ?
+            undefined :
+            `${environment.apiUrl}/icons/${this.iconId}/download`;
     }
     get iconId(): string {
         return this._iconId;

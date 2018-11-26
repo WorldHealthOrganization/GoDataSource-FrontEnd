@@ -77,21 +77,23 @@
 
         <!-- Address step -->
         <mat-step [stepControl]="addressForm">
-            <form #addressForm="ngForm">
-                <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
+            <div class="address-min-height">
+                <form #addressForm="ngForm">
+                    <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_EVENT_TAB_ADDRESS_TITLE' | translate }}</ng-template>
 
-                <mat-card class="page-section">
-                    <app-form-address
-                        name="address"
-                        [(ngModel)]="eventData.address">
-                    </app-form-address>
-                </mat-card>
+                    <mat-card class="page-section">
+                        <app-form-address
+                            name="address"
+                            [(ngModel)]="eventData.address">
+                        </app-form-address>
+                    </mat-card>
 
-                <div>
-                    <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
-                </div>
-            </form>
+                    <div>
+                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    </div>
+                </form>
+            </div>
         </mat-step>
 
         <!-- Final step -->
