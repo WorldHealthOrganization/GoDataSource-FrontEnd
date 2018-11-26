@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Host, Inject, Input, OnInit, Optional, Output, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { Component, Host, Inject, Input, OnInit, Optional, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListBase } from '../../xt-forms/core/list-base';
 import { QuestionModel } from '../../../core/models/question.model';
