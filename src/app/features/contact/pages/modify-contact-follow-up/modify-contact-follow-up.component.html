@@ -98,7 +98,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
 
-        <button *ngIf="viewOnly && hasFollowUpsWriteAccess()"
+        <button *ngIf="viewOnly && hasFollowUpsWriteAccess() && !dateInTheFuture(followUpData.date)"
                 mat-raised-button color="primary" class="button-primary"
                 [routerLink]="['/contacts', contactId,'follow-ups', followUpId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}

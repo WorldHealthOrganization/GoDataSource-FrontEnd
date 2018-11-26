@@ -23,6 +23,26 @@
             (blur)="onBlur()"
             [disabled]="disabled"
             (selectionChange)="onChange(selectElement.value)">
+            <mat-select-trigger>
+                <div
+                    *ngFor="let option of selectedOptions; let first = first"
+                    class="custom-select-trigger-value">
+
+                    {{ first ? '' : ', ' }}
+
+                    <!-- Image -->
+                    <img
+                        *ngIf="optionLabelImgKey && option[optionLabelImgKey]"
+                        height="13px"
+                        [src]="option[optionLabelImgKey]"/>
+
+                    <!-- Prefix -->
+                    {{ optionLabelPrefixKey && option[optionLabelPrefixKey] ? (option[optionLabelPrefixKey] | translate) + ' => ' : '' }}
+
+                    <!-- Label -->
+                    {{option[optionLabelKey] | translate}}
+                </div>
+            </mat-select-trigger>
             <mat-option
                 *ngIf="clearable && !multiple"
                 [value]="null">
@@ -37,7 +57,7 @@
                     [disabled]="!allowSelectionOfDisabledItems && option[optionDisabledKey] || optionReadOnly">
                     <!-- Image -->
                     <img
-                        *ngIf="optionLabelImgKey"
+                        *ngIf="optionLabelImgKey && option[optionLabelImgKey]"
                         height="24px"
                         [src]="option[optionLabelImgKey]"/>
 

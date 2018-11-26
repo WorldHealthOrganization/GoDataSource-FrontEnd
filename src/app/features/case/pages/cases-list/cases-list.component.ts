@@ -148,7 +148,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         const caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
         this.caseClassificationsList$ = caseClassifications$.map((data: ReferenceDataCategoryModel) => {
             return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id)
+                new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
             );
         });
         caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {

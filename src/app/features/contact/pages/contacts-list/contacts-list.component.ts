@@ -148,7 +148,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
         this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
             return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                new LabelValuePair(entry.value, entry.id)
+                new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
             );
         });
         riskLevel$.subscribe((riskCategory: ReferenceDataCategoryModel) => {

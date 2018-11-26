@@ -19,6 +19,8 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
+import { Constants } from '../../../../core/models/constants';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-modify-follow-up',
@@ -155,5 +157,13 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
      */
     hasContactReadAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.READ_CONTACT);
+    }
+
+    /**
+     * Check if date is in future
+     */
+    dateInTheFuture(followUpDate): boolean {
+        const date = followUpDate ? moment(followUpDate) : null;
+        return !!(date && date.startOf('day').isAfter(Constants.getCurrentDate()));
     }
 }
