@@ -8,6 +8,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs/Subscription';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -34,6 +36,11 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
     // subscribers
     outbreakSubscriber: Subscription;
     previousSubscriber: Subscription;
+
+    // refresh only after we finish changing data
+    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshData();
+    }));
 
     constructor(
         private relationshipDataService: RelationshipDataService,
@@ -77,7 +84,7 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
      */
     onChangeSetting(newXLessContacts) {
         this.xLessContacts = newXLessContacts;
-        this.refreshDataCaller.call();
+        this.triggerUpdateValues.call();
     }
 
     /**
