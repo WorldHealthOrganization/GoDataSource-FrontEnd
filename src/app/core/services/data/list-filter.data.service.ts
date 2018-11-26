@@ -244,10 +244,42 @@ export class ListFilterDataService {
      * @param {number} noDaysInChains
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterCasesInKnownChains(noDaysInChains: number = null): Observable<RequestQueryBuilder> {
+    filterCasesInKnownChains(date, location, noDaysInChains): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            // add global filters
+            const qb = new RequestQueryBuilder();
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // convert
+            noDaysInChains = _.isNumber(noDaysInChains) || _.isEmpty(noDaysInChains) ? noDaysInChains : _.parseInt(noDaysInChains);
+            if (_.isNumber(noDaysInChains)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysInChains',
+                    noDaysInChains
+                );
+            }
+
+            // date
+            if (date) {
+                qb.filter.where({
+                    contactDate: {
+                        lte: moment(date).toISOString()
+                    }
+                });
+            }
+
+            // location
+            if (location) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CASE)
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
             return this.relationshipDataService
-                .getCountOfCasesInKnownTransmissionChains(selectedOutbreak.id, noDaysInChains)
+                .getCountOfCasesInKnownTransmissionChains(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired case ids
                     const filterQueryBuilder = new RequestQueryBuilder();
@@ -288,7 +320,7 @@ export class ListFilterDataService {
                 });
             }
 
-            // convert noLessContacts to number as the API expects
+            // convert
             noDaysAmongContacts = _.isNumber(noDaysAmongContacts) || _.isEmpty(noDaysAmongContacts) ? noDaysAmongContacts  : _.parseInt(noDaysAmongContacts);
             if (_.isNumber(noDaysAmongContacts)) {
                 // create filter

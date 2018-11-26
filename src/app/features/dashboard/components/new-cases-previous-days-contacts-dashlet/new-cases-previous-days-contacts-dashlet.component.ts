@@ -110,7 +110,7 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
                 });
             }
 
-            // convert noLessContacts to number as the API expects
+            // convert
             const noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts  : _.parseInt(this.xDaysAmongContacts);
             if (_.isNumber(noDaysAmongContacts)) {
                 // create filter

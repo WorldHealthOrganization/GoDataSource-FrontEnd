@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -7,6 +7,11 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
+import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',
@@ -14,8 +19,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './new-cases-previous-days-transmission-chains-dashlet.component.html',
     styleUrls: ['./new-cases-previous-days-transmission-chains-dashlet.component.less']
 })
-export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends DashletComponent implements OnInit {
-
+export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of cases in previous x days in known transmission chains
     casesKnownTransmissionChainsCount: number = 0;
     // nr of new cases
@@ -24,12 +28,20 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
     xPreviousDays: number;
     // constants to be used for applyListFilters
     Constants = Constants;
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     // refresh only after we finish changing data
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
+        this.refreshData();
     }));
 
     constructor(
@@ -42,15 +54,30 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
 
     ngOnInit() {
         // get number of cases in previous x days in known transmission chains
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
+                    this.outbreakId = selectedOutbreak.id;
                     this.xPreviousDays = selectedOutbreak.noDaysInChains;
-                    this.triggerUpdateValues.call(true);
+                    this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -64,34 +91,59 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
     }
 
     /**
-     * Handles the call to the API to get the count
+     * Refresh data
      */
-    updateValues() {
-        // get the results for cases in previous x days in known transmission chains
-        if (this.selectedOutbreak && this.selectedOutbreak.id) {
-            this.relationshipDataService
-                .getCountOfCasesInKnownTransmissionChains(this.selectedOutbreak.id, this.xPreviousDays)
+    refreshData() {
+        if (this.outbreakId) {
+            // add global filters
+            const qb = new RequestQueryBuilder();
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // convert
+            const xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays  : _.parseInt(this.xPreviousDays);
+            if (_.isNumber(xPreviousDays)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysInChains',
+                    xPreviousDays
+                );
+            }
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.where({
+                    contactDate: {
+                        lte: moment(this.globalFilterDate).toISOString()
+                    }
+                });
+            }
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.include('people').queryBuilder.filter
+                    .byEquality('type', EntityType.CASE)
+                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = this.relationshipDataService
+                .getCountOfCasesInKnownTransmissionChains(this.outbreakId, qb)
                 .subscribe((result) => {
                     this.casesKnownTransmissionChainsCount = result.newCases;
                     this.totalCases = result.total;
+                    this.displayLoading = false;
                 });
         }
     }
-
-    /**
-     * Calculate percentage of new cases in transmission chains
-     * @returns {number}
-     */
-    percentageCases() {
-        return this.totalCases ?
-            Math.round(this.casesKnownTransmissionChainsCount / this.totalCases * 100) :
-            0;
-    }
-
-    /**
-     * Refresh data
-     */
-    refreshData() {}
 }
 
 

@@ -243,13 +243,15 @@
                         <!-- New cases in previous x days in known transmission chains -->
                         <app-new-cases-previous-days-transmission-chains-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadCasePermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_IN_KNOWN_TRANSMISSION_CHAINS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadCasePermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-new-cases-previous-days-transmission-chains-dashlet>
 
                         <!-- Suspect Cases where the lab result is pending -->

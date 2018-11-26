@@ -760,7 +760,7 @@ export abstract class ListComponent {
                 // get the number of days if it was updated
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesInKnownChains(noDaysInChains)
+                this.listFilterDataService.filterCasesInKnownChains(globalFilters.date, globalFilters.locationId, noDaysInChains)
                     .subscribe((qbFilterCasesInKnownChains) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
