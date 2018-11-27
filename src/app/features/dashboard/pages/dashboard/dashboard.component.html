@@ -13,7 +13,6 @@
 
                     <mat-menu #quickActionsMenu="matMenu">
                         <ng-container>
-
                             <app-export-button
                                 [menuItem]="true"
                                 [fileType]="ExportDataExtension.PDF"
@@ -75,7 +74,9 @@
                     <!-- case summary pie chart -->
                     <div fxLayoutAlign="center">
                         <app-case-summary-dashlet
-                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-case-summary-dashlet>
                     </div>
                 </mat-card>

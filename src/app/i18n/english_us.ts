@@ -1627,9 +1627,14 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
+         * Case summary dashlet
+         */
+        'LNG_PAGE_DASHLET_CASE_SUMMARY_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
          * Gantt chart dashlet
          */
-        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart.',
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart',
 
         /**
          * Case Count Map

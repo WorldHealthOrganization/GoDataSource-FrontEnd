@@ -28,10 +28,11 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<CaseModel[]>}
      */
-    getCasesList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<CaseModel[]> {
-
+    getCasesList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<CaseModel[]> {
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
             CaseModel
