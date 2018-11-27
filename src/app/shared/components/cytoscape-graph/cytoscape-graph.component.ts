@@ -163,6 +163,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'background-image': 'data(picture)',
+                'text-wrap': 'wrap',
                 'height': 30,
                 'width': 30,
                 'background-fit': 'cover',
@@ -268,6 +269,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             elements: this.elements,
             minZoom: this.defaultZoom.min,
             maxZoom: this.defaultZoom.max,
+            wheelSensitivity: 0.3,
             ready: () => {
                 // show spinner when layout starts to draw
                 this.showLoading = true;

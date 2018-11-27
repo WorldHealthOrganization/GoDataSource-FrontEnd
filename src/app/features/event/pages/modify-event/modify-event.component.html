@@ -74,13 +74,15 @@
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE' | translate">
-                <mat-card class="page-section">
-                    <app-form-address
-                        name="address"
-                        [(ngModel)]="eventData.address"
-                        [disabled]="viewOnly">
-                    </app-form-address>
-                </mat-card>
+                <div class="address-min-height">
+                    <mat-card class="page-section">
+                        <app-form-address
+                            name="address"
+                            [(ngModel)]="eventData.address"
+                            [disabled]="viewOnly">
+                        </app-form-address>
+                    </mat-card>
+                </div>
             </mat-tab>
 
         </mat-tab-group>

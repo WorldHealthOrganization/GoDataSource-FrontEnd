@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {Component, Host, Inject, Input, OnInit, Optional, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { Component, Host, Inject, Input, OnInit, Optional, QueryList, SkipSelf, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlContainer, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ListBase } from '../../xt-forms/core/list-base';
 import { QuestionModel } from '../../../core/models/question.model';
@@ -32,6 +32,8 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
     @Input() scrollToQuestion: boolean = true;
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';
+
+    @Input() autoSuggestVariable: boolean = false;
 
     @ViewChildren(FormAnswerListComponent) answerLists: QueryList<FormAnswerListComponent>;
     additionalControlsToCheck: { [ name: string ]: AbstractControl };
@@ -118,6 +120,17 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
 
         // value changed
         this.onChange();
+    }
+
+    /**
+     * Make a variable suggestion for user
+     * @param {number} index
+     * @param {string} value
+     */
+    makeVariableSuggestion(index: number, value: any) {
+        if (this.autoSuggestVariable) {
+            this.values[index].variable = _.camelCase(value);
+        }
     }
 
     /**

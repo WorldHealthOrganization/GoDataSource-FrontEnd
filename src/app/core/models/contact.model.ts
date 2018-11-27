@@ -27,6 +27,7 @@ export class ContactModel {
     dateBecomeContact: string;
     dateBecomeCase: string;
     wasCase: boolean;
+    visualId: string;
 
     followUp: {
         originalStartDate: string,
@@ -72,6 +73,7 @@ export class ContactModel {
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.deleted = _.get(data, 'deleted');
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+        this.visualId = _.get(data, 'visualId', '');
 
         this.followUp = _.get(data, 'followUp');
 

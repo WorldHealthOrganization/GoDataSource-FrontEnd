@@ -14,7 +14,15 @@
                 *ngFor="let address of addresses; let index = index"
                 class="movement-timeline-locations-item"
                 (click)="gotoLocation(index)">
-                {{ (index + 1) + '. [' + (address.date | dateDefault) + '] ' + address.fullAddress}}
+                {{ (index + 1) +
+                    '. [' +
+                    ( address.date | dateDefault ) +
+                    '] ' + (
+                        address.location ?
+                            address.location.name + ': ' :
+                            ''
+                    ) +
+                    address.fullAddress }}
             </div>
 
             <div
