@@ -12,8 +12,8 @@ import { Constants } from '../../models/constants';
 import { I18nService } from '../helper/i18n.service';
 import * as moment from 'moment';
 import * as _ from 'lodash';
-import { CaseModel } from '../../models/case.model';
 import { LocationModel } from '../../models/location.model';
+import { Moment } from 'moment';
 
 @Injectable()
 export class TransmissionChainDataService {
@@ -68,9 +68,8 @@ export class TransmissionChainDataService {
         size: number = null,
         personId: string = null,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        dateGlobalFilter: string = null
+        dateGlobalFilter: string | Moment = null
     ): Observable<TransmissionChainModel[]> {
-
         // generate filter for person fields
         let filter = queryBuilder.filter.generateFirstCondition(false, false);
 
@@ -103,7 +102,7 @@ export class TransmissionChainDataService {
             const rQBGlobalDate = new RequestQueryBuilder();
             rQBGlobalDate.filter.where({
                 where: {
-                    endDate: dateGlobalFilter
+                    endDate: moment(dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
                 }
             });
             const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);

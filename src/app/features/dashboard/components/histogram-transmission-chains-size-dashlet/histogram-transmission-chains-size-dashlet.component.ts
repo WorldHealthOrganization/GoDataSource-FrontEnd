@@ -11,6 +11,7 @@ import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Subscription } from 'rxjs/Subscription';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -151,7 +152,37 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
      * @param event
      */
     onSelectChart(event) {
-        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: event.name } });
+        const otherParams = {
+            sizeOfChainsFilter: event.name
+        };
+
+        // construct global filter
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = {};
+
+        // do we have a global date set ?
+        if (!_.isEmpty(this.globalFilterDate)) {
+            global.date = this.globalFilterDate;
+        }
+
+        // do we have a global location Id set ?
+        if (!_.isEmpty(this.globalFilterLocationId)) {
+            global.locationId = this.globalFilterLocationId;
+        }
+
+        // do we need to include global filters ?
+        if (_.isEmpty(global)) {
+            this.router.navigate(['/transmission-chains'], { queryParams: otherParams });
+        } else {
+            this.router.navigate(['/transmission-chains'], {
+                queryParams: {
+                    global: JSON.stringify(global),
+                    ...otherParams
+                }
+            });
+        }
     }
 
     /**
@@ -165,10 +196,35 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
                 this.previousSubscriber = null;
             }
 
+            // query builder
+            const qb = new RequestQueryBuilder();
+            if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                    'addresses.parentLocationIdFilter',
+                    this.globalFilterLocationId
+                );
+            }
+
+            // configure
+            const rQB = new RequestQueryBuilder();
+            if (!qb.filter.isEmpty()) {
+                rQB.filter.where({
+                    person: {
+                        where: qb.filter.generateCondition()
+                    }
+                });
+            }
+
             // get chain data and convert to array of size and number
             this.displayLoading = true;
             this.previousSubscriber = this.transmissionChainDataService
-                .getIndependentTransmissionChainData(this.outbreakId)
+                .getIndependentTransmissionChainData(
+                    this.outbreakId,
+                    null,
+                    null,
+                    rQB,
+                    this.globalFilterDate
+                )
                 .subscribe((chains) => {
                     this.setHistogramResults(chains);
                     this.displayLoading = false;
