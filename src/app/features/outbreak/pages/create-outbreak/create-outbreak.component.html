@@ -220,7 +220,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreak.caseInvestigationTemplate">
+                    [ngModel]="newOutbreak.caseInvestigationTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
@@ -234,7 +235,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreak.contactFollowUpTemplate">
+                    [ngModel]="newOutbreak.contactFollowUpTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
@@ -248,7 +250,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="labResultsTemplate"
-                    [ngModel]="newOutbreak.labResultsTemplate">
+                    [ngModel]="newOutbreak.labResultsTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
                 <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
