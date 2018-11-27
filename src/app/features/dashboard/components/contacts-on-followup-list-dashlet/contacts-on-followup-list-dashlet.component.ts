@@ -1,11 +1,12 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
-import * as moment from 'moment';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-contacts-on-followup-list-dashlet',
@@ -13,14 +14,22 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './contacts-on-followup-list-dashlet.component.html',
     styleUrls: ['./contacts-on-followup-list-dashlet.component.less']
 })
-export class ContactsOnFollowupListDashletComponent extends DashletComponent implements OnInit {
-
+export class ContactsOnFollowupListDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of contacts on the followup list
     contactsOnFollowUpListCount: number = 0;
+
     // constants to be used for applyListFilters
     Constants = Constants;
-    // filter by day - default - yesterday
-    date: string = moment().add(-1, 'days').format('YYYY-MM-DD');
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     constructor(
         private followUpDataService: FollowUpsDataService,
@@ -31,26 +40,72 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
     }
 
     ngOnInit() {
-        // get contacts on followup list count
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for contacts on the follow up list
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.followUpDataService
-                        .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, this.date)
-                        .subscribe((result) => {
-                            this.contactsOnFollowUpListCount = result.contactsCount;
-                        });
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call();
                 }
             });
+    }
 
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        if (this.outbreakId) {
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                null,
+                'address.parentLocationIdFilter'
+            );
+
+            // no date provided, then we need to set the default one
+            // filter by day - default - yesterday
+            let date = this.globalFilterDate;
+            if (!date) {
+                date = moment().add(-1, 'days');
+            }
+
+            // date condition
+            qb.filter.byEquality(
+                'date',
+                moment(date).format('YYYY-MM-DD')
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = this.followUpDataService
+                .getCountIdsOfContactsOnTheFollowUpList(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.contactsOnFollowUpListCount = result.contactsCount;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
-
-

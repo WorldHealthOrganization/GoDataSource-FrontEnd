@@ -7,6 +7,8 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-contacts-lost-to-follow-up-dashlet',
@@ -73,9 +75,19 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
         // get the number of contacts who are lost to follow-up
         if (this.outbreakId) {
             // add global filters
-            const qb = this.getGlobalFilterQB(
+            const qb = new RequestQueryBuilder();
+
+            // no date provided, then we need to set the default one
+            // filter by day - default - yesterday
+            let date = this.globalFilterDate;
+            if (!date) {
+                date = moment().add(-1, 'days');
+            }
+
+            // date condition
+            qb.filter.byEquality(
                 'date',
-                null
+                moment(date).format('YYYY-MM-DD')
             );
 
             // change the way we build query

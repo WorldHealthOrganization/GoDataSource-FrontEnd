@@ -178,12 +178,11 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string, date: string): Observable<MetricContactsModel> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsOnTheFollowUpList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
             MetricContactsModel

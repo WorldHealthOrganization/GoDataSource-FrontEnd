@@ -43,11 +43,34 @@ export class ListFilterDataService {
      * Create the query builder for filtering the list of contacts
      * @returns {RequestQueryBuilder}
      */
-    filterContactsOnFollowUpLists(): Observable<RequestQueryBuilder> {
+    filterContactsOnFollowUpLists(date, location): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
-            const defaultDate = moment().add(-1, 'days').format('YYYY-MM-DD');
+            // add global filters
+            const qb = this.getGlobalFilterQB(
+                null,
+                null,
+                'address.parentLocationIdFilter',
+                location
+            );
+
+            // no date provided, then we need to set the default one
+            // filter by day - default - yesterday
+            if (!date) {
+                date = moment().add(-1, 'days');
+            }
+
+            // date condition
+            qb.filter.byEquality(
+                'date',
+                moment(date).format('YYYY-MM-DD')
+            );
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // filter
             return this.followUpDataService
-                .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, defaultDate)
+                .getCountIdsOfContactsOnTheFollowUpList(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();
@@ -208,11 +231,18 @@ export class ListFilterDataService {
     filterContactsLostToFollowUp(date, location): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
-            const qb = this.getGlobalFilterQB(
+            const qb = new RequestQueryBuilder();
+
+            // no date provided, then wqe need to set teh default one
+            // filter by day - default - yesterday
+            if (!date) {
+                date = moment().add(-1, 'days');
+            }
+
+            // date condition
+            qb.filter.byEquality(
                 'date',
-                date,
-                null,
-                null
+                moment(date).format('YYYY-MM-DD')
             );
 
             // change the way we build query

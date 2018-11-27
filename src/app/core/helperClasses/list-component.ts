@@ -655,7 +655,7 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpLists()
+                this.listFilterDataService.filterContactsOnFollowUpLists(globalFilters.date, globalFilters.locationId)
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
