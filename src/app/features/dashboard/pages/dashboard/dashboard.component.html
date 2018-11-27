@@ -88,7 +88,9 @@
                     <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_CASE_BY_GEOGRAPHIC_LOCATION_TITLE' | translate}}</div>
                     <div fxLayoutAlign="center">
                         <app-case-by-geographic-location-dashlet
-                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-case-by-geographic-location-dashlet>
                     </div>
                 </mat-card>

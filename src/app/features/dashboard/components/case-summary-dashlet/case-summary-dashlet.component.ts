@@ -54,7 +54,7 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
     previousSubscriber: Subscription;
 
     // loading data
-    displayLoading: boolean = false;
+    displayLoading: boolean = true;
 
     /**
      * Global Filters changed
@@ -167,7 +167,6 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
      * Refresh Data
      */
     refreshData() {
-        // get the results for hospitalised cases
         if (this.outbreakId) {
             // release previous subscriber
             if (this.previousSubscriber) {

@@ -256,10 +256,11 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricCasesPerLocationCountsModel>}
      */
-    getCasesPerLocation(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesPerLocationCountsModel> {
-
+    getCasesPerLocation(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesPerLocationCountsModel> {
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/per-location-level/count?filter=${filter}`),
             MetricCasesPerLocationCountsModel
