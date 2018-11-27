@@ -102,7 +102,9 @@
                     <!-- case hospitalization status pie chart -->
                     <div fxLayoutAlign="center">
                         <app-cases-hospitalized-pie-chart-dashlet
-                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-cases-hospitalized-pie-chart-dashlet>
                     </div>
                 </mat-card>

@@ -149,9 +149,14 @@ export class CaseDataService {
      */
     getHospitalisedCasesCount(
         outbreakId: string,
-        date: string | Moment = moment(),
+        date,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
+        // set default date ?
+        if (!date) {
+            date = moment();
+        }
+
         // get the query builder and call the endpoint
         const filterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(date);
 
@@ -170,14 +175,27 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getIsolatedCasesCount(outbreakId: string): Observable<any> {
-        // get the query builder and call the endpoint
-        return this.listFilterDataService.filterCasesIsolated()
-            .mergeMap((filterQueryBuilder) => {
-                const filter = filterQueryBuilder.buildQuery();
-                // call endpoint
-                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-            });
+    getIsolatedCasesCount(
+        outbreakId: string,
+        date,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // set default date ?
+        if (!date) {
+            date = moment();
+        }
+
+        // construct query builder
+        const filterQueryBuilder = this.listFilterDataService.filterCasesIsolated(date);
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**

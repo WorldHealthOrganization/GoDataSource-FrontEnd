@@ -1637,6 +1637,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHLET_CASES_BY_GEOGRAPHIC_LOCATION_NO_DATA_LABEL': 'There is no data to build the chart',
 
         /**
+         * Hospitalization Summary dashlet
+         */
+        'LNG_PAGE_DASHLET_HOSPITALIZATION_SUMMARY_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
          * Gantt chart dashlet
          */
         'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart',
