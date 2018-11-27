@@ -1,0 +1,26 @@
+app-histogram-transmission-chains-size-dashlet {
+    .dashlet-no-data {
+        height: 150px;
+    }
+
+    .dashlet-loading {
+        height: 150px;
+        text-align: center;
+
+        @mat-spinner-width: 32px;
+        @mat-spinner-height: 32px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+            position: absolute;
+            top: ~'calc(50% - 16px)';
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -7,6 +7,10 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Moment } from 'moment';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -14,13 +18,47 @@ import { EntityType } from '../../../../core/models/entity-type';
     templateUrl: './histogram-transmission-chains-size-dashlet.component.html',
     styleUrls: ['./histogram-transmission-chains-size-dashlet.component.less']
 })
-export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
-
-    selectedOutbreak: OutbreakModel;
-    chainsSize: any;
+export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, OnDestroy {
     histogramResults: any = [];
-    selectedSizeOfChains = 0;
     caseRefDataColor: string = '';
+
+    // Global filters => Date
+    private _globalFilterDate: Moment;
+    @Input() set globalFilterDate(globalFilterDate: Moment) {
+        this._globalFilterDate = globalFilterDate;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterDate(): Moment {
+        return this._globalFilterDate;
+    }
+
+    // Global Filters => Location
+    private _globalFilterLocationId: string;
+    @Input() set globalFilterLocationId(globalFilterLocationId: string) {
+        this._globalFilterLocationId = globalFilterLocationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterLocationId(): string {
+        return this._globalFilterLocationId;
+    }
+
+    // outbreak
+    outbreakId: string;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+    refdataSubscriber: Subscription;
+
+    // loading data
+    displayLoading: boolean = true;
+
+    /**
+     * Global Filters changed
+     */
+    protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshData();
+    }), 100);
 
     constructor(
         private transmissionChainDataService: TransmissionChainDataService,
@@ -30,28 +68,46 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-
-                    // get case person type color
-                    this.referenceDataDataService
-                        .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
-                        .subscribe((personTypes) => {
-                            const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
-                            if (casePersonType) {
-                                this.caseRefDataColor = casePersonType.colorCode;
-                            }
-                        });
-
-                    // get chain data and convert to array of size and number
-                    this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id).subscribe((chains) => {
-                        this.setHistogramResults(chains);
-                    });
+        // get case person type color
+        this.refdataSubscriber = this.referenceDataDataService
+            .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
+            .subscribe((personTypes) => {
+                const casePersonType = _.find(personTypes.entries, {value: EntityType.CASE});
+                if (casePersonType) {
+                    this.caseRefDataColor = casePersonType.colorCode;
                 }
             });
+
+        // outbreak
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
+            .getSelectedOutbreakSubject()
+            .subscribe((selectedOutbreak: OutbreakModel) => {
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call();
+                }
+            });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
+
+        // ref data
+        if (this.refdataSubscriber) {
+            this.refdataSubscriber.unsubscribe();
+            this.refdataSubscriber = null;
+        }
     }
 
     /**
@@ -59,16 +115,19 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
      * @param chains
      */
     setHistogramResults(chains) {
-        this.chainsSize = {};
+        // determine size
+        const chainsSize = {};
         this.histogramResults = [];
-        _.forEach(chains, (value, key) => {
-            if (!_.isEmpty(this.chainsSize) && this.chainsSize[value.size]) {
-                this.chainsSize[value.size]++;
+        _.forEach(chains, (value) => {
+            if (!_.isEmpty(chainsSize) && chainsSize[value.size]) {
+                chainsSize[value.size]++;
             } else {
-                this.chainsSize[value.size] = 1;
+                chainsSize[value.size] = 1;
             }
         });
-        _.forEach(this.chainsSize, (value, key) => {
+
+        // push to chart
+        _.forEach(chainsSize, (value, key) => {
             this.histogramResults.push({name: key, value: value});
         });
     }
@@ -92,8 +151,28 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit {
      * @param event
      */
     onSelectChart(event) {
-        this.selectedSizeOfChains = event.name;
-        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: this.selectedSizeOfChains } });
+        this.router.navigate(['/transmission-chains'], {queryParams: { sizeOfChainsFilter: event.name } });
     }
 
+    /**
+     * Refresh Data
+     */
+    refreshData() {
+        if (this.outbreakId) {
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // get chain data and convert to array of size and number
+            this.displayLoading = true;
+            this.previousSubscriber = this.transmissionChainDataService
+                .getIndependentTransmissionChainData(this.outbreakId)
+                .subscribe((chains) => {
+                    this.setHistogramResults(chains);
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
