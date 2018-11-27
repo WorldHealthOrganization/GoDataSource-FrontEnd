@@ -47,6 +47,15 @@ export class GraphNodeModel {
             this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS;
             this.labelPosition = 'center';
             this.width = 95;
+            // change color if first day of week or first day of month
+            if (moment(this.dateTimeline).isoWeekday() === 1) {
+                // monday
+                this.nodeColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK;
+            }
+            if (moment(this.dateTimeline).format('D') === '1') {
+                // first day of month
+                this.nodeColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH;
+            }
         }
     }
 }
