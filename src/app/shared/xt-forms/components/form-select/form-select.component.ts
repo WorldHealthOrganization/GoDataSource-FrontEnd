@@ -112,11 +112,16 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
                 [this.value]
         ) : [];
 
-        this.selectedOptions = !_.isEmpty(this.options) ? _.map(selectedOptionsIds, (selectedValue) => {
-            return _.find(this.options, (option) => {
-                return option[this.optionValueKey] === selectedValue;
-            });
-        }) : [];
+        this.selectedOptions = !_.isEmpty(this.options) ?
+            _.transform(selectedOptionsIds, (result, selectedValue) => {
+                const v = _.find(this.options, (option) => {
+                    return option[this.optionValueKey] === selectedValue;
+                });
+                if (v !== undefined) {
+                    result.push(v);
+                }
+            }, []) :
+            [];
     }
 
     /**

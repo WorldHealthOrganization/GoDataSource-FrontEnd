@@ -59,6 +59,7 @@
         class="location-search-filter"
         [ngClass]="{ 'form-section': !!parentId }">
         <app-form-location-dropdown
+            #locationFilter
             fxFlex
             name="locationIds"
             [ngModel]="undefined"
