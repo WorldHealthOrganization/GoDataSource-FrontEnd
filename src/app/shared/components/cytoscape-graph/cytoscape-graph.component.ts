@@ -128,17 +128,17 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 if (this.timelineViewType === 'horizontal') {
                     // using 100 px as it looks fine
                     if (nodeData.nodeType === 'checkpoint') {
-                        posY = (this.maxTimelineIndex) * -100;
+                        posY = -100;
                     } else {
-                        posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                        posY = (nodeIndex) * 100;
                     }
                 } else {
                     // timeline vertical view
                     // using 200 px as it looks fine
                     if (nodeData.nodeType === 'checkpoint') {
-                        posX = (this.maxTimelineIndex) * -100;
+                        posX = -200;
                     } else {
-                        posX = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 200 : (nodeIndex - 1) * 200 * -1;
+                        posX = (nodeIndex) * 200;
                     }
                 }
                 return {x: posX, y: posY};
@@ -150,7 +150,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     layout: any;
 
     defaultZoom: any = {
-        min: 0.05,
+        min: 0.02,
         max: 4
     };
 
@@ -225,6 +225,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     timelineNodes: any = [];
 
+    timelineNodesIndexes: any = [];
 
     constructor(
         private genericDataService: GenericDataService,
@@ -308,6 +309,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 } else {
                     this.timelineDates[node.data.dateTimeline] = [];
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                    this.timelineNodesIndexes[node.data.dateTimeline] = [];
                 }
                 this.datesArray.push(node.data.dateTimeline);
             }
@@ -415,7 +417,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             scale = 4;
         }
 
-        const png64 = this.cy.png({bg: 'white', scale: scale});
+        let png64 = '';
+        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+           png64 = this.cy.png({bg: 'white', full: true});
+        } else {
+           png64 = this.cy.png({bg: 'white', scale: scale});
+        }
+
         return png64;
     }
 
