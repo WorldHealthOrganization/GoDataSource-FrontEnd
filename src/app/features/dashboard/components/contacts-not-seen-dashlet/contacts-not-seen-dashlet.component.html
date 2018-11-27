@@ -1,13 +1,13 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN, x: xDaysNotSeen }"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN, x: xDaysNotSeen })"
     [value]="contactsNotSeenCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
 
     <div fxLayout="row" fxLayoutGap="10px">
-
         <div>
             {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE' | translate}}
         </div>

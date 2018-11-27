@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -7,6 +7,10 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { Subscription } from 'rxjs/Subscription';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import * as moment from 'moment';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-contacts-not-seen-dashlet',
@@ -14,22 +18,30 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
     templateUrl: './contacts-not-seen-dashlet.component.html',
     styleUrls: ['./contacts-not-seen-dashlet.component.less']
 })
-export class ContactsNotSeenDashletComponent extends DashletComponent implements OnInit {
-
+export class ContactsNotSeenDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of days defined on outbreak (x)
     xDaysNotSeen: number;
+
     // number of contacts not seen in x days
     contactsNotSeenCount: number;
+
     // constants to be used for applyListFilters
     Constants: any = Constants;
-    // selected outbreak
-    selectedOutbreak: OutbreakModel;
+
+    // outbreak
+    outbreakId: string;
+
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
 
     // refresh only after we finish changing data
     private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
+        this.refreshData();
     }));
-
 
     constructor(
         private followUpDataService: FollowUpsDataService,
@@ -41,16 +53,30 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
 
     ngOnInit() {
         // get number of not seen contacts
-        this.outbreakDataService
+        this.displayLoading = true;
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                // get the results for contacts not seen
                 if (selectedOutbreak) {
-                    this.selectedOutbreak = selectedOutbreak;
+                    this.outbreakId = selectedOutbreak.id;
                     this.xDaysNotSeen = selectedOutbreak.noDaysNotSeen;
-                    this.triggerUpdateValues.call(true);
+                    this.refreshDataCaller.call();
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
@@ -58,29 +84,63 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
      * @param newXDaysNotSeen
      */
     onChangeSetting(newXDaysNotSeen) {
-        this.xDaysNotSeen = newXDaysNotSeen;
         // get number of not seen contacts
+        this.xDaysNotSeen = newXDaysNotSeen;
         this.triggerUpdateValues.call();
-    }
-
-    /**
-     * Handles the call to the API to get the count
-     */
-    updateValues() {
-        // get the results for contacts not seen
-        if (this.selectedOutbreak && this.selectedOutbreak.id) {
-            this.followUpDataService
-                .getCountIdsOfContactsNotSeen(this.selectedOutbreak.id, this.xDaysNotSeen)
-                .subscribe((result) => {
-                    this.contactsNotSeenCount = result.contactsCount;
-                });
-        }
     }
 
     /**
      * Refresh data
      */
-    refreshData() {}
+    refreshData() {
+        if (this.outbreakId) {
+            // add global filters
+            const qb = new RequestQueryBuilder();
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // convert
+            const xDaysNotSeen: number = _.isNumber(this.xDaysNotSeen) || _.isEmpty(this.xDaysNotSeen) ? this.xDaysNotSeen  : _.parseInt(this.xDaysNotSeen);
+            if (_.isNumber(xDaysNotSeen)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysNotSeen',
+                    xDaysNotSeen
+                );
+            }
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.where({
+                    date: {
+                        lte: moment(this.globalFilterDate).toISOString()
+                    }
+                });
+            }
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.include('contact').queryBuilder.filter
+                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+            }
+
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = this.followUpDataService
+                .getCountIdsOfContactsNotSeen(this.outbreakId, qb)
+                .subscribe((result) => {
+                    this.contactsNotSeenCount = result.contactsCount;
+                    this.displayLoading = false;
+                });
+        }
+    }
 }
 
 

@@ -89,10 +89,41 @@ export class ListFilterDataService {
      * @param {number} noDaysNotSeen
      * @returns {Observable<RequestQueryBuilder>}
      */
-    filterContactsNotSeen(noDaysNotSeen: number = null): Observable<RequestQueryBuilder> {
+    filterContactsNotSeen(date, location, noDaysNotSeen): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
+            // add global filters
+            const qb = new RequestQueryBuilder();
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // convert
+            noDaysNotSeen = _.isNumber(noDaysNotSeen) || _.isEmpty(noDaysNotSeen) ? noDaysNotSeen : _.parseInt(noDaysNotSeen);
+            if (_.isNumber(noDaysNotSeen)) {
+                // create filter
+                qb.filter.byEquality(
+                    'noDaysNotSeen',
+                    noDaysNotSeen
+                );
+            }
+
+            // date
+            if (date) {
+                qb.filter.where({
+                    date: {
+                        lte: moment(date).toISOString()
+                    }
+                });
+            }
+
+            // location
+            if (location) {
+                qb.include('contact').queryBuilder.filter
+                    .byEquality('addresses.parentLocationIdFilter', location);
+            }
+
             return this.followUpDataService
-                .getCountIdsOfContactsNotSeen(selectedOutbreak.id, noDaysNotSeen)
+                .getCountIdsOfContactsNotSeen(selectedOutbreak.id, qb)
                 .map((result) => {
                     // update queryBuilder filter with desired contacts ids
                     const filterQueryBuilder = new RequestQueryBuilder();

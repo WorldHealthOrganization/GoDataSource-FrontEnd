@@ -85,8 +85,8 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
      * @param newXPreviousDays
      */
     onChangeSetting(newXPreviousDays) {
-        this.xPreviousDays = newXPreviousDays;
         // get number of cases in previous x days in known transmission chains
+        this.xPreviousDays = newXPreviousDays;
         this.triggerUpdateValues.call();
     }
 

@@ -210,15 +210,11 @@ export class FollowUpsDataService {
      * @param {number} daysNotSeen
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsNotSeen(outbreakId: string, daysNotSeen: number): Observable<MetricContactsModel> {
-        // convert daysNotSeen to number as the API expects
-        daysNotSeen = Number(daysNotSeen);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noDaysNotSeen: daysNotSeen}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsNotSeen(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-not-seen/count?filter=${filter}`),
             MetricContactsModel

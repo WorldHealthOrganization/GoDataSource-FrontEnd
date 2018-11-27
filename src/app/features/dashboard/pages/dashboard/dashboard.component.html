@@ -341,13 +341,15 @@
                         <!-- Contacts Not Seen -->
                         <app-contacts-not-seen-dashlet
                             *ngIf="
-                            dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&
-                            isDashletVisible(dashlet) &&
-                            hasReadContactPermissions() && hasReadReportPermissions()
-                        "
+                                dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&
+                                isDashletVisible(dashlet) &&
+                                hasReadContactPermissions() && hasReadReportPermissions()
+                            "
                             (hide)="hideDashlet(dashlet)"
                             (moveBefore)="moveDashletBefore(dashlet)"
-                            (moveAfter)="moveDashletAfter(dashlet)">
+                            (moveAfter)="moveDashletAfter(dashlet)"
+                            [globalFilterDate]="globalFilterDate"
+                            [globalFilterLocationId]="globalFilterLocationId">
                         </app-contacts-not-seen-dashlet>
 
                         <!-- Number of contacts becoming cases in period & location -->
