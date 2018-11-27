@@ -382,6 +382,11 @@ export class ListFilterDataService {
             // convert
             noDaysAmongContacts = _.isNumber(noDaysAmongContacts) || _.isEmpty(noDaysAmongContacts) ? noDaysAmongContacts  : _.parseInt(noDaysAmongContacts);
             if (_.isNumber(noDaysAmongContacts)) {
+                // add number of days until current day
+                if (date) {
+                    noDaysAmongContacts += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysAmongContacts',

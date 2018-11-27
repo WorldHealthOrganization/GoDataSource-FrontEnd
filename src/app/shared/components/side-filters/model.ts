@@ -2,6 +2,7 @@
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 
 // value types
 enum ValueType {
@@ -99,6 +100,8 @@ export class FilterModel {
     required: boolean = false;
     value: any;
 
+    maxDate: string | Moment;
+
     // select multiple / single option(s)
     multipleOptions: boolean = true;
 
@@ -118,7 +121,8 @@ export class FilterModel {
         childQueryBuilderKey?: string,
         required?: boolean,
         value?: any,
-        multipleOptions?: boolean
+        multipleOptions?: boolean,
+        maxDate?: string | Moment
     }) {
         // set handler
         this.self = this;

@@ -142,7 +142,8 @@ export class DashboardComponent implements OnInit {
                 fieldName: 'date',
                 fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
                 type: FilterType.DATE,
-                required: true
+                required: true,
+                maxDate: moment()
             })
         ];
     }

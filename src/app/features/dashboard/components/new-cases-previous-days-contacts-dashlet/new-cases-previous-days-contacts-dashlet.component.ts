@@ -111,8 +111,13 @@ export class NewCasesPreviousDaysContactsDashletComponent extends DashletCompone
             }
 
             // convert
-            const noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts  : _.parseInt(this.xDaysAmongContacts);
+            let noDaysAmongContacts: number = _.isNumber(this.xDaysAmongContacts) || _.isEmpty(this.xDaysAmongContacts) ? this.xDaysAmongContacts  : _.parseInt(this.xDaysAmongContacts);
             if (_.isNumber(noDaysAmongContacts)) {
+                // add number of days until current day
+                if (this.globalFilterDate) {
+                    noDaysAmongContacts += moment().endOf('day').diff(moment(this.globalFilterDate).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysAmongContacts',

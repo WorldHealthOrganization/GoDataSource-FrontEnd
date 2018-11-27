@@ -117,7 +117,8 @@
                                 <app-form-datepicker
                                     *ngIf="filter.filter?.type === FilterType.DATE"
                                     [name]="'filter[filters][' + i + '][value]'"
-                                    [(ngModel)]="filter.value">
+                                    [(ngModel)]="filter.value"
+                                    [maxDate]="filter.filter?.maxDate">
                                 </app-form-datepicker>
 
                                 <!-- DATE RANGE Filter-->
