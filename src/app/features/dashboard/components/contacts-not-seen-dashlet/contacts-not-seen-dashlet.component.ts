@@ -101,8 +101,13 @@ export class ContactsNotSeenDashletComponent extends DashletComponent implements
             qb.filter.firstLevelConditions();
 
             // convert
-            const xDaysNotSeen: number = _.isNumber(this.xDaysNotSeen) || _.isEmpty(this.xDaysNotSeen) ? this.xDaysNotSeen  : _.parseInt(this.xDaysNotSeen);
+            let xDaysNotSeen: number = _.isNumber(this.xDaysNotSeen) || _.isEmpty(this.xDaysNotSeen) ? this.xDaysNotSeen  : _.parseInt(this.xDaysNotSeen);
             if (_.isNumber(xDaysNotSeen)) {
+                // add number of days until current day
+                if (this.globalFilterDate) {
+                    xDaysNotSeen += moment().endOf('day').diff(moment(this.globalFilterDate).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysNotSeen',

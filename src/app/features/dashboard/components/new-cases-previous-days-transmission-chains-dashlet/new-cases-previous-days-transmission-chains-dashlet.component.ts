@@ -102,8 +102,13 @@ export class NewCasesPreviousDaysTransmissionChainsDashletComponent extends Dash
             qb.filter.firstLevelConditions();
 
             // convert
-            const xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays  : _.parseInt(this.xPreviousDays);
+            let xPreviousDays: number = _.isNumber(this.xPreviousDays) || _.isEmpty(this.xPreviousDays) ? this.xPreviousDays  : _.parseInt(this.xPreviousDays);
             if (_.isNumber(xPreviousDays)) {
+                // add number of days until current day
+                if (this.globalFilterDate) {
+                    xPreviousDays += moment().endOf('day').diff(moment(this.globalFilterDate).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysInChains',

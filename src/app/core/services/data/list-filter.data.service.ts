@@ -100,6 +100,11 @@ export class ListFilterDataService {
             // convert
             noDaysNotSeen = _.isNumber(noDaysNotSeen) || _.isEmpty(noDaysNotSeen) ? noDaysNotSeen : _.parseInt(noDaysNotSeen);
             if (_.isNumber(noDaysNotSeen)) {
+                // add number of days until current day
+                if (date) {
+                    noDaysNotSeen += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysNotSeen',
@@ -314,6 +319,11 @@ export class ListFilterDataService {
             // convert
             noDaysInChains = _.isNumber(noDaysInChains) || _.isEmpty(noDaysInChains) ? noDaysInChains : _.parseInt(noDaysInChains);
             if (_.isNumber(noDaysInChains)) {
+                // add number of days until current day
+                if (date) {
+                    noDaysInChains += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+                }
+
                 // create filter
                 qb.filter.byEquality(
                     'noDaysInChains',
