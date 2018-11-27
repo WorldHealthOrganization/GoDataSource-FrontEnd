@@ -99,6 +99,16 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
      */
     buildChartData(caseHospitalizationCount, caseIsolationCount, caseListCount) {
         const caseHospitalizationSummaryResults: MetricChartDataModel[] = [];
+
+        // check for no data
+        if (
+            caseHospitalizationCount === 0 &&
+            caseIsolationCount === 0 &&
+            caseListCount === 0
+        ) {
+            return caseHospitalizationSummaryResults;
+        }
+
         caseHospitalizationSummaryResults.push({
             value: caseHospitalizationCount,
             name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL')
