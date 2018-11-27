@@ -128,25 +128,21 @@
         </mat-card>
 
         <mat-card class="page-section">
-
             <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE' | translate}}</div>
 
             <!-- epi curve -->
             <app-epi-curve-dashlet
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
             </app-epi-curve-dashlet>
-
         </mat-card>
 
         <mat-card class="page-section">
-
             <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE' | translate}}</div>
 
             <!-- gantt chart -->
             <app-gantt-chart-delay-onset-dashlet
                 *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
             </app-gantt-chart-delay-onset-dashlet>
-
         </mat-card>
 
         <!-- KPIs -->
