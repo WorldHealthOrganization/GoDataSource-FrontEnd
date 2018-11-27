@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,7 +19,7 @@ import * as _ from 'lodash';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 
 @Component({
     selector: 'app-locations-list',
@@ -47,6 +47,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+
+    @ViewChild('locationFilter') locationFilter: FormLocationDropdownComponent;
 
     // export
     hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -196,6 +198,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             data.id
         ) {
             // redirect
+            this.locationFilter.clear();
             this.router.navigate(['/locations', data.id, 'children']);
         }
     }

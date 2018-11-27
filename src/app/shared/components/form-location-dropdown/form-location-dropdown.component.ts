@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Input, Output, EventEmitter, HostBinding, ViewChild, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase } from '../../xt-forms/core';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ErrorMessage } from '../../xt-forms/core/error-message';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { NgOption, NgSelectComponent } from '@ng-select/ng-select';
 
 export class LocationAutoItem {
     constructor(
@@ -39,7 +40,7 @@ export class LocationAutoItem {
         multi: true
     }]
 })
-export class FormLocationDropdownComponent extends GroupBase<string | string[]> implements OnInit {
+export class FormLocationDropdownComponent extends GroupBase<string | string[]> implements OnInit, OnDestroy {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
     @Input() multiple: boolean = false;
@@ -65,6 +66,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         return this._tooltip;
     }
 
+    @ViewChild('locationHandler') locationHandler: NgSelectComponent;
+
     locationItems: LocationAutoItem[];
 
     locationLoading: boolean = false;
@@ -78,6 +81,8 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     previousSubscription: Subscription;
 
     needToRetrieveBackData: boolean = false;
+
+    outbreakSubscriber: Subscription;
 
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
@@ -102,7 +107,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     ngOnInit() {
         if (this.useOutbreakLocations) {
             // get selected outbreak
-            this.outbreakDataService
+            this.outbreakSubscriber = this.outbreakDataService
                 .getSelectedOutbreak()
                 .subscribe((outbreak) => {
                     if (outbreak && outbreak.id) {
@@ -149,18 +154,35 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
     }
 
     /**
+     * Release resources
+     */
+    ngOnDestroy(): void {
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+
+        // stop previous subscription
+        if (this.previousSubscription) {
+            this.previousSubscription.unsubscribe();
+            this.previousSubscription = null;
+        }
+    }
+
+    /**
      * Add location condition
      */
     addLocationCondition() {
         // construct the value filter
         let whereFilter;
-        if (!this.value) {
-            // empty value; selecting only top-level locations
-            whereFilter = {
-                parentLocationId: {
-                    eq: null
-                }
-            };
+        if (_.isEmpty(this.value)) {
+            // empty value => selecting only top-level locations
+            whereFilter = (this.useOutbreakLocations && this.outbreakId) ?
+                null : {
+                    parentLocationId: {
+                        eq: null
+                    }
+                };
         } else if (this.multiple) {
             // multi select
             whereFilter = {
@@ -187,11 +209,15 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
                     synonyms: true
                 }]
             })
-            .where(whereFilter)
             .flag(
                 'includeChildren',
-            this.value ? true : false
+                !_.isEmpty(this.value)
             );
+
+        // add condition only if necessary
+        if (!_.isEmpty(whereFilter)) {
+            this.queryBuilder.filter.where(whereFilter);
+        }
     }
 
     /**
@@ -253,6 +279,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
         // stop previous subscription
         if (this.previousSubscription) {
             this.previousSubscription.unsubscribe();
+            this.previousSubscription = null;
         }
 
         // set the new subscription
@@ -293,7 +320,7 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      */
     onBlur() {
         // touch group
-        super.touch();
+        this.touch();
 
         // add location condition & refresh
         if (this.needToRetrieveBackData) {
@@ -340,6 +367,34 @@ export class FormLocationDropdownComponent extends GroupBase<string | string[]> 
      * @param item
      */
     triggerItemChanged(item: LocationAutoItem) {
-        this.itemChanged.emit(item);
+        // on change handler
+        this.onChange();
+
+        // trigger event listeners
+        setTimeout(() => {
+            this.itemChanged.emit(item);
+        });
+    }
+
+    /**
+     * Unselect value
+     */
+    clear() {
+        _.each(this.locationHandler.selectedItems, (opt: NgOption) => {
+            this.locationHandler.unselect(opt);
+        });
+    }
+
+    /**
+     * Touch and trigger search
+     */
+    public touchAndTriggerSearch() {
+        // touch
+        this.touch();
+
+        // trigger search if necessary
+        if (_.isEmpty(this.locationItems)) {
+            this.addLocationConditionAndRefresh();
+        }
     }
 }

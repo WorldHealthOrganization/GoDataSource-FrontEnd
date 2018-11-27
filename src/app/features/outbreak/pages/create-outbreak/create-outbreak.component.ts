@@ -112,5 +112,4 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                 });
         }
     }
-
 }

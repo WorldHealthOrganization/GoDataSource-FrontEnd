@@ -3,14 +3,12 @@
 
     <form #groupForm="ngForm">
         <ng-select
+            #locationHandler
             [name]="name"
             [(ngModel)]="value"
             [items]="locationItems"
             [placeholder]="placeholder + (placeholder && required ? ' *' : '')"
             [loadingText]="loadingText | translate"
-            (change)="onChange()"
-            (blur)="onBlur()"
-            (focus)="touch()"
             bindLabel="label"
             bindValue="id"
             [hideSelected]="false"
@@ -26,6 +24,8 @@
             [required]="required"
             [matTooltip]="'LNG_SEARCH_LOCATIONS_AUTO_COMPLETE_HOVER_TOOLTIP' | translate"
             [matTooltipPosition]="'right'"
+            (blur)="onBlur()"
+            (focus)="touchAndTriggerSearch()"
             (change)="triggerItemChanged($event)">
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                 <span [app-ng-option-highlight]="search" [style.padding-left]="(item.level * 30) + 'px'">
