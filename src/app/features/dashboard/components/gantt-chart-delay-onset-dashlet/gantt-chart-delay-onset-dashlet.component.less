@@ -6,4 +6,33 @@ app-gantt-chart-delay-onset-dashlet {
         max-height: 600px;
         margin-bottom: 10px;
    }
+
+    .has-data-wait-for-bind {
+        min-height: 400px;
+    }
+
+    .dashlet-no-data {
+        height: 400px;
+    }
+
+    .dashlet-loading {
+        height: 400px;
+        text-align: center;
+
+        @mat-spinner-width: 32px;
+        @mat-spinner-height: 32px;
+
+        mat-spinner {
+            display: inline-block;
+            width: @mat-spinner-width !important;
+            height: @mat-spinner-height !important;
+            position: absolute;
+            top: ~'calc(50% - 16px)';
+
+            svg {
+                width: @mat-spinner-width !important;
+                height: @mat-spinner-height !important;
+            }
+        }
+    }
 }

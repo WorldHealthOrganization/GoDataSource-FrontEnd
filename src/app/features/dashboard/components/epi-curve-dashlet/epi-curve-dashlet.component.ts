@@ -92,6 +92,12 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
                     this.mapCaseClassifications[caseClassificationItem.value].colorCode = caseClassificationItem.colorCode;
                 });
 
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
                 // outbreak
                 this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
@@ -227,7 +233,7 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
 
             // get data
             this.displayLoading = true;
-            this.refdataSubscriber = this.caseDataService
+            this.previousSubscriber = this.caseDataService
                 .getCasesStratifiedByClassificationOverTime(this.outbreakId, qb)
                 .subscribe((results) => {
                     // convert data to chart data format

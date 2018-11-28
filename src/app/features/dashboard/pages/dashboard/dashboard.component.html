@@ -143,7 +143,9 @@
 
             <!-- gantt chart -->
             <app-gantt-chart-delay-onset-dashlet
-                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                [globalFilterDate]="globalFilterDate"
+                [globalFilterLocationId]="globalFilterLocationId">
             </app-gantt-chart-delay-onset-dashlet>
         </mat-card>
 
