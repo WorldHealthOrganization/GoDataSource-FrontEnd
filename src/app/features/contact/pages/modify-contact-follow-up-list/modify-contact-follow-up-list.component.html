@@ -93,7 +93,17 @@
                                     </div>
                                 </div>
 
-                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                                    <app-form-select
+                                        [name]="'followUps[' + i + '][teamId]'"
+                                        [ngModel]="followUpData.teamId"
+                                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                                        tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
+                                        [options]="teamsList$ | async"
+                                        optionLabelKey="name"
+                                        optionValueKey="id">
+                                    </app-form-select>
+                                </div>
                             </div>
 
                             <div

@@ -68,6 +68,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
 
     @Output() optionChanged = new EventEmitter<any>();
     @Output() initialized = new EventEmitter<any>();
+    @Output() blur = new EventEmitter<any>();
 
     public identifier = `form-input-${FormInputComponent.identifier++}`;
 
@@ -92,6 +93,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
      */
     onBlur() {
         this.touch();
+        this.blur.emit(this.value);
     }
 
     /**
