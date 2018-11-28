@@ -1647,6 +1647,11 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHLET_SIZE_OF_CHAINS_OF_TRANSMISSION_NO_DATA_LABEL': 'There is no data to build the chart',
 
         /**
+         * Cases counts over time stratified by classification
+         */
+        'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
          * Gantt chart dashlet
          */
         'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart',

@@ -82,7 +82,7 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
             if (this.globalFilterDate) {
                 qb.filter.byEquality(
                     'endDate',
-                    this.globalFilterDate.endOf('day').format('YYYY-MM-DD')
+                    this.globalFilterDate.format('YYYY-MM-DD')
                 );
             }
 

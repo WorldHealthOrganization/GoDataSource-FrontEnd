@@ -132,7 +132,9 @@
 
             <!-- epi curve -->
             <app-epi-curve-dashlet
-                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()">
+                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+                [globalFilterDate]="globalFilterDate"
+                [globalFilterLocationId]="globalFilterLocationId">
             </app-epi-curve-dashlet>
         </mat-card>
 

@@ -246,16 +246,15 @@ export class CaseDataService {
     /**
      * Cases count stratified by classification over time
      * @param {string} outbreakId
-     * @param {string} periodType
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricCasesCountStratified[]>}
      */
-    getCasesStratifiedByClassificationOverTime(outbreakId: string, periodType: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesCountStratified[]> {
-        queryBuilder.filter.where({periodType: periodType});
-        const filter = queryBuilder.filter.generateFirstCondition(true, true);
-
+    getCasesStratifiedByClassificationOverTime(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesCountStratified[]> {
+        const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/contacts/classification-over-time/count?filter=${filter}`);
-
         return obs.map(
             (listResult) => {
                 const results = [];
