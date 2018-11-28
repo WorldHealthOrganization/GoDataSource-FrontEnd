@@ -26,6 +26,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -65,6 +66,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     // route params
     entityType: EntityType;
     entityId: string;
+    // route data
+    relationshipType: RelationshipType;
 
     // list of relationships
     relationshipsList$: Observable<RelationshipModel[]>;
@@ -104,6 +107,14 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // get relationship type
+        this.route.data.subscribe((routeData) => {
+            this.relationshipType = routeData.relationshipType;
+
+            this.needsRefreshList(true);
+        });
+
+        // reference data
         this.certaintyLevelList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL);
         this.exposureTypeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
         this.exposuresFrequencyList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
@@ -154,16 +165,19 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                                 return ErrorObservable.create(err);
                             })
                             .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
-                                // add new breadcrumb: Entity Modify page
+                                // add new breadcrumb: Entity View page
                                 this.breadcrumbs.push(
                                     new BreadcrumbItemModel(
                                         entityData.name,
-                                        `${this.entityMap[this.entityType].link}/${this.entityId}/modify`
+                                        `${this.entityMap[this.entityType].link}/${this.entityId}/view`
                                     )
                                 );
                                 // add new breadcrumb: page title
+                                const pageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+                                    'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+                                    'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
                                 this.breadcrumbs.push(
-                                    new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE', null, true)
+                                    new BreadcrumbItemModel(pageTitle, null, true)
                                 );
                             });
                     });
@@ -229,7 +243,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
      * Re(load) the Relationships list, based on the applied filter, sort criterias
      */
     refreshList() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (this.outbreakId && this.entityType && this.entityId && this.relationshipType) {
 
             // include related people in response
             const qb = new RequestQueryBuilder();
@@ -242,13 +256,23 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 }
             }, true);
 
-            // retrieve the list of Relationships
-            this.relationshipsList$ = this.relationshipDataService.getEntityRelationships(
-                this.outbreakId,
-                this.entityType,
-                this.entityId,
-                qb
-            );
+            if (this.relationshipType === RelationshipType.EXPOSURE) {
+                // retrieve the list of exposures
+                this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
+                    this.outbreakId,
+                    this.entityType,
+                    this.entityId,
+                    qb
+                );
+            } else {
+                // retrieve the list of contacts
+                this.relationshipsList$ = this.relationshipDataService.getEntityContacts(
+                    this.outbreakId,
+                    this.entityType,
+                    this.entityId,
+                    qb
+                );
+            }
         }
     }
 
@@ -256,7 +280,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
      * Get total number of items, based on the applied filters
      */
     refreshListCount() {
-        if (this.outbreakId && this.entityType && this.entityId) {
+        if (this.outbreakId && this.entityType && this.entityId && this.relationshipType) {
 
             // include related people in response
             const qb = new RequestQueryBuilder();
@@ -272,12 +296,24 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             // remove paginator from query builder
             const countQueryBuilder = _.cloneDeep(qb);
             countQueryBuilder.paginator.clear();
-            this.relationshipsListCount$ = this.relationshipDataService.getEntityRelationshipsCount(
-                this.outbreakId,
-                this.entityType,
-                this.entityId,
-                countQueryBuilder
-            ).share();
+
+            if (this.relationshipType === RelationshipType.EXPOSURE) {
+                // count the exposures
+                this.relationshipsListCount$ = this.relationshipDataService.getEntityExposuresCount(
+                    this.outbreakId,
+                    this.entityType,
+                    this.entityId,
+                    countQueryBuilder
+                ).share();
+            } else {
+                // count the contacts
+                this.relationshipsListCount$ = this.relationshipDataService.getEntityContactsCount(
+                    this.outbreakId,
+                    this.entityType,
+                    this.entityId,
+                    countQueryBuilder
+                ).share();
+            }
         }
     }
 

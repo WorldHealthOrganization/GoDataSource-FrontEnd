@@ -588,6 +588,8 @@ export const EnglishUsLang = {
          * Entity Relationships list page
          */
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE': 'Relationships',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE': 'Exposures',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE': 'Contacts',
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP': 'Add',
         'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE': 'Relationship deleted!',
 

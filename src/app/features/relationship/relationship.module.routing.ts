@@ -6,8 +6,25 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { RelationshipType } from '../../core/enums/relationship-type.enum';
 
 const routes: Routes = [
+    // Entity Exposure Relationships list
+    {
+        path: ':entityType/:entityId/exposures',
+        component: fromPages.EntityRelationshipsListComponent,
+        data: {
+            relationshipType: RelationshipType.EXPOSURE
+        }
+    },
+    // Entity Contact Relationships list
+    {
+        path: ':entityType/:entityId/contacts',
+        component: fromPages.EntityRelationshipsListComponent,
+        data: {
+            relationshipType: RelationshipType.CONTACT
+        }
+    },
     // Entity Relationships list
     {
         path: ':entityType/:entityId',
