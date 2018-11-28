@@ -10,6 +10,8 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class CaseDataService {
@@ -26,10 +28,11 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<CaseModel[]>}
      */
-    getCasesList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<CaseModel[]> {
-
+    getCasesList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<CaseModel[]> {
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
             CaseModel
@@ -103,9 +106,7 @@ export class CaseDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<any> {
-
         const filter = queryBuilder.buildQuery();
-
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
@@ -119,15 +120,26 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getDeceasedCasesCount(outbreakId: string): Observable<any> {
-        // generate a query builder for deceased
+    getDeceasedCasesCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // construct query
         const filterQueryBuilder = new RequestQueryBuilder();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // deceased condition
         filterQueryBuilder.filter.where({
             deceased: true
         }, true);
-        const filter = filterQueryBuilder.filter.generateCondition(true);
-        // call endpoint
-        return this.http.get(`outbreaks/${outbreakId}/cases/count?where=${filter}`);
+
+        // generate a query builder for deceased
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -135,14 +147,27 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getHospitalisedCasesCount(outbreakId: string): Observable<any> {
+    getHospitalisedCasesCount(
+        outbreakId: string,
+        date,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // set default date ?
+        if (!date) {
+            date = moment();
+        }
+
         // get the query builder and call the endpoint
-        return this.listFilterDataService.filterCasesHospitalized()
-            .mergeMap((filterQueryBuilder) => {
-                const filter = filterQueryBuilder.buildQuery();
-                // call endpoint
-                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-            });
+        const filterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(date);
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -150,14 +175,27 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getIsolatedCasesCount(outbreakId: string): Observable<any> {
-        // get the query builder and call the endpoint
-        return this.listFilterDataService.filterCasesIsolated()
-            .mergeMap((filterQueryBuilder) => {
-                const filter = filterQueryBuilder.buildQuery();
-                // call endpoint
-                return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-            });
+    getIsolatedCasesCount(
+        outbreakId: string,
+        date,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        // set default date ?
+        if (!date) {
+            date = moment();
+        }
+
+        // construct query builder
+        const filterQueryBuilder = this.listFilterDataService.filterCasesIsolated(date);
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
+        // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
+        return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**
@@ -165,11 +203,20 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getCasesPendingLabResultCount(outbreakId: string): Observable<any> {
+    getCasesPendingLabResultCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         // get the query builder and call the endpoint
         const filterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
-        const filter = filterQueryBuilder.buildQuery();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
         // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
@@ -179,27 +226,35 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<any>}
      */
-    getCasesRefusingTreatmentCount(outbreakId: string): Observable<any> {
+    getCasesRefusingTreatmentCount(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
         // generate a query builder for cases refusing treatment
         const filterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
-        const filter = filterQueryBuilder.buildQuery();
+
+        // add other conditions
+        if (!queryBuilder.isEmpty()) {
+            filterQueryBuilder.merge(queryBuilder);
+        }
+
         // call endpoint
+        const filter = filterQueryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
     /**
      * Cases count stratified by classification over time
      * @param {string} outbreakId
-     * @param {string} periodType
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricCasesCountStratified[]>}
      */
-    getCasesStratifiedByClassificationOverTime(outbreakId: string, periodType: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesCountStratified[]> {
-        queryBuilder.filter.where({periodType: periodType});
-        const filter = queryBuilder.filter.generateFirstCondition(true, true);
-
+    getCasesStratifiedByClassificationOverTime(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesCountStratified[]> {
+        const filter = queryBuilder.buildQuery();
         const obs = this.http.get(`outbreaks/${outbreakId}/contacts/classification-over-time/count?filter=${filter}`);
-
         return obs.map(
             (listResult) => {
                 const results = [];
@@ -218,10 +273,11 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricCasesPerLocationCountsModel>}
      */
-    getCasesPerLocation(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesPerLocationCountsModel> {
-
+    getCasesPerLocation(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesPerLocationCountsModel> {
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/per-location-level/count?filter=${filter}`),
             MetricCasesPerLocationCountsModel
@@ -234,9 +290,11 @@ export class CaseDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricCasesDelayBetweenOnsetLabTestModel[]>}
      */
-    getDelayBetweenOnsetAndLabTesting(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricCasesDelayBetweenOnsetLabTestModel[]> {
+    getDelayBetweenOnsetAndLabTesting(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricCasesDelayBetweenOnsetLabTestModel[]> {
         const filter = queryBuilder.buildQuery();
-
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/delay-onset-lab-testing?filter=${filter}`),
             MetricCasesDelayBetweenOnsetLabTestModel

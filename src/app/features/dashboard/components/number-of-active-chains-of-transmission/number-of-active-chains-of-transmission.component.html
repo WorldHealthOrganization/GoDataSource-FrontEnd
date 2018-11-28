@@ -1,9 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/transmission-chains/list'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS}"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS})"
     [value]="numberOfActiveChains"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
     {{ 'LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS' | translate}}
 </app-dashboard-custom-metric-dashlet>

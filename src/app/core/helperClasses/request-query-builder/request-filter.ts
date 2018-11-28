@@ -13,6 +13,8 @@ export class RequestFilter {
     private operator: RequestFilterOperator = RequestFilterOperator.AND;
     // flags
     private flags: { [key: string]: any } = {};
+    // migrate conditions to first level
+    private generateConditionsOnFirstLevel: boolean = false;
 
     /**
      * Escape string
@@ -148,17 +150,20 @@ export class RequestFilter {
     /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
-     * @param {string} value
+     * @param {string | number} value
      * @param {boolean} replace
      * @returns {RequestFilter}
      */
     byEquality(
         property: string,
-        value: string,
+        value: string | number,
         replace: boolean = true,
         caseInsensitive: boolean = false
     ) {
-        if (_.isEmpty(value)) {
+        if (
+            _.isEmpty(value) &&
+            !_.isNumber(value)
+        ) {
             // remove filter
             this.remove(property);
         } else {
@@ -177,7 +182,7 @@ export class RequestFilter {
                     this.where({
                         [property]: {
                             regexp: '/^' +
-                                RequestFilter.escapeStringForRegex(value)
+                                RequestFilter.escapeStringForRegex(value as string)
                                     .replace(/%/g, '.*')
                                     .replace(/\\\?/g, '.') +
                                 '$/i'
@@ -499,6 +504,16 @@ export class RequestFilter {
     }
 
     /**
+     * Check if a key is used in a condition
+     * @param property
+     */
+    has(property: string): boolean {
+        return _.find(this.conditions, (condition) => {
+            return Object.keys(condition)[0] === property;
+        }) !== undefined;
+    }
+
+    /**
      * Remove all operations of a given type on a list of properties
      * @param {RequestFilterOperator} operator
      * @param {string[]} properties
@@ -543,16 +558,43 @@ export class RequestFilter {
     }
 
     /**
+     * Generate conditions on first level
+     */
+    firstLevelConditions() {
+        this.generateConditionsOnFirstLevel = true;
+        return this;
+    }
+
+    /**
+     * Generate conditions on multilevel ( add operator, etc ... )
+     */
+    multiLevelConditions() {
+        this.generateConditionsOnFirstLevel = false;
+        return this;
+    }
+
+    /**
      * Generates a new "where" condition for Loopback API, applying the current filter type between all current conditions
      * @param {boolean} stringified
      * @returns {{}}
      */
     generateCondition(stringified: boolean = false) {
-        let condition = this.conditions.length === 0 ?
-            {} :
-            {
-                [this.operator]: this.conditions
-            };
+        // first level conditions ?
+        let condition;
+        if (this.generateConditionsOnFirstLevel) {
+            condition = _.transform(this.conditions, (result, conditionData) => {
+                // this could overwrite other conditions with the same property, but since API isn't able to process multi level conditions in this case..it won't matter if we overwrite it...
+                _.each(conditionData, (data, property) => {
+                    result[property] = data;
+                });
+            }, {});
+        } else {
+            condition = this.conditions.length === 0 ?
+                {} :
+                {
+                    [this.operator]: this.conditions
+                };
+        }
 
         // append flags
         condition = Object.assign(

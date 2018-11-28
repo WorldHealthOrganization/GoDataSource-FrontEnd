@@ -178,12 +178,11 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsOnTheFollowUpList(outbreakId: string, date: string): Observable<MetricContactsModel> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsOnTheFollowUpList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
             MetricContactsModel
@@ -211,15 +210,11 @@ export class FollowUpsDataService {
      * @param {number} daysNotSeen
      * @returns {Observable<MetricContactsModel>}
      */
-    getCountIdsOfContactsNotSeen(outbreakId: string, daysNotSeen: number): Observable<MetricContactsModel> {
-        // convert daysNotSeen to number as the API expects
-        daysNotSeen = Number(daysNotSeen);
-        // create filter for daysNotSeen
-        const filterQueryBuilder = new RequestQueryBuilder();
-        filterQueryBuilder.filter.where(
-            {noDaysNotSeen: daysNotSeen}
-        );
-        const filter = filterQueryBuilder.filter.generateFirstCondition(true, true);
+    getCountIdsOfContactsNotSeen(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsModel> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-not-seen/count?filter=${filter}`),
             MetricContactsModel
@@ -232,12 +227,11 @@ export class FollowUpsDataService {
      * @param {string} date
      * @returns {Observable<Object>}
      */
-    getNumberOfContactsWhoAreLostToFollowUp(outbreakId: string, date: string): Observable<any> {
-        const qb = new RequestQueryBuilder();
-        qb.filter.where(
-            {date: date}
-        );
-        const filter = qb.filter.generateFirstCondition(true, true);
+    getNumberOfContactsWhoAreLostToFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<any> {
+        const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-lost-to-follow-up/count?filter=${filter}`),
             MetricContactsLostToFollowUpModel
@@ -250,7 +244,10 @@ export class FollowUpsDataService {
      * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<MetricContactsWithSuccessfulFollowUp>}
      */
-    getContactsWithSuccessfulFollowUp(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsWithSuccessfulFollowUp> {
+    getContactsWithSuccessfulFollowUp(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsWithSuccessfulFollowUp> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-with-successful-follow-ups/count?filter=${filter}`),

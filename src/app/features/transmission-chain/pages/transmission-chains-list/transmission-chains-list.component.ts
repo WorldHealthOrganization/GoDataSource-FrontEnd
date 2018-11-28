@@ -14,6 +14,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -42,6 +43,8 @@ export class TransmissionChainsListComponent extends ListComponent implements On
 
     EntityType = EntityType;
 
+    queryParamsData: any;
+
     constructor(
         private router: Router,
         private outbreakDataService: OutbreakDataService,
@@ -62,6 +65,16 @@ export class TransmissionChainsListComponent extends ListComponent implements On
         // authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
+        // get query params
+        this.route.queryParams
+            .subscribe((queryParams: any) => {
+                this.queryParamsData = queryParams;
+                this.appliedListFilter = queryParams.applyListFilter;
+
+                // init filters
+                this.resetFiltersAddDefault();
+            });
+
         // subscribe to the Selected Outbreak Subject stream
         this.outbreakDataService
             .getSelectedOutbreakSubject()
@@ -71,6 +84,47 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 // re-load the list when the Selected Outbreak is changed
                 this.needsRefreshList(true);
             });
+    }
+
+    /**
+     * Initialize filters
+     */
+    resetFiltersAddDefault() {
+        // get global filter values
+        if (this.queryParamsData) {
+            // get global filters
+            const globalFilters = this.getGlobalFilterValues(this.queryParamsData);
+
+            // generate query builder
+            let qb: RequestQueryBuilder;
+            switch (this.appliedListFilter) {
+                case ApplyListFilter.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+                    // NOTHING - IGNORE
+                    break;
+
+                // case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+                default:
+                    // date
+                    qb = this.listFilterDataService.getGlobalFilterQB(
+                        'contactDate',
+                        globalFilters.date,
+                        null,
+                        null
+                    );
+
+                    // location
+                    if (globalFilters.locationId) {
+                        qb.include('people').queryBuilder.filter
+                            .byEquality('type', EntityType.CASE)
+                            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                    }
+            }
+
+            // merge
+            if (qb) {
+                this.queryBuilder.merge(qb);
+            }
+        }
     }
 
     /**

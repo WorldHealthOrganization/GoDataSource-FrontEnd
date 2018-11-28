@@ -2,6 +2,7 @@
 import { Observable } from 'rxjs/Observable';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { Moment } from 'moment';
 
 // value types
 enum ValueType {
@@ -9,6 +10,7 @@ enum ValueType {
     SELECT = 'select',
     RANGE_NUMBER = 'range_number',
     RANGE_DATE = 'range_date',
+    DATE = 'date',
     LAT_LNG_WITHIN = 'address_within'
 }
 
@@ -20,7 +22,9 @@ export enum FilterType {
     RANGE_NUMBER = 'range_number',
     RANGE_AGE = 'range_age',
     RANGE_DATE = 'range_date',
-    ADDRESS = 'address'
+    DATE = 'date',
+    ADDRESS = 'address',
+    LOCATION = 'location'
 }
 
 // comparator types
@@ -34,7 +38,8 @@ export enum FilterComparator {
     AFTER = 'after',
     CONTAINS = 'contains',
     LOCATION = 'location',
-    WITHIN = 'within'
+    WITHIN = 'within',
+    DATE = 'date'
 }
 
 // Model for Available Filter
@@ -91,6 +96,15 @@ export class FilterModel {
     // children query builders ( either main qb or relationship qb )
     childQueryBuilderKey: string;
 
+    // required ? - add filter from teh start, also you won't be able to remove it
+    required: boolean = false;
+    value: any;
+
+    maxDate: string | Moment;
+
+    // select multiple / single option(s)
+    multipleOptions: boolean = true;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -104,7 +118,11 @@ export class FilterModel {
         relationshipPath?: string[],
         relationshipLabel?: string,
         extraConditions?: RequestQueryBuilder,
-        childQueryBuilderKey?: string
+        childQueryBuilderKey?: string,
+        required?: boolean,
+        value?: any,
+        multipleOptions?: boolean,
+        maxDate?: string | Moment
     }) {
         // set handler
         this.self = this;
@@ -202,6 +220,13 @@ export class AppliedFilterModel {
             valueType: ValueType.RANGE_DATE
         }],
 
+        // date
+        [FilterType.DATE]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS',
+            value: FilterComparator.DATE,
+            valueType: ValueType.DATE
+        }],
+
         // address
         [FilterType.ADDRESS]: [{
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
@@ -215,6 +240,13 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN',
             value: FilterComparator.WITHIN,
             valueType: ValueType.LAT_LNG_WITHIN
+        }],
+
+        // location
+        [FilterType.LOCATION]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION',
+            value: FilterComparator.LOCATION,
+            valueType: ValueType.SELECT
         }]
     };
 
@@ -224,7 +256,9 @@ export class AppliedFilterModel {
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
-        [FilterType.ADDRESS]: FilterComparator.CONTAINS
+        [FilterType.DATE]: FilterComparator.DATE,
+        [FilterType.ADDRESS]: FilterComparator.CONTAINS,
+        [FilterType.LOCATION]: FilterComparator.LOCATION
     };
 
     // applied filter
@@ -266,6 +300,24 @@ export class AppliedFilterModel {
     }
     public get comparator(): FilterComparator {
         return this._comparator;
+    }
+
+    /**
+     * Constructor
+     * @param data
+     */
+    constructor(data?: {
+        readonly?: boolean,
+        filter?: FilterModel,
+        value?: any,
+        extraValues?: any,
+        comparator?: FilterComparator
+    }) {
+        // assign properties
+        Object.assign(
+            this,
+            data ? data : {}
+        );
     }
 
     /**

@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
 import { Observable } from 'rxjs/Observable';
@@ -9,6 +8,11 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import 'rxjs/add/observable/forkJoin';
+import { Moment } from 'moment';
+import { Subscription } from 'rxjs/Subscription';
+import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
+import { Subscriber } from 'rxjs/Subscriber';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -16,80 +20,168 @@ import 'rxjs/add/observable/forkJoin';
     templateUrl: './cases-hospitalized-pie-chart-dashlet.component.html',
     styleUrls: ['./cases-hospitalized-pie-chart-dashlet.component.less']
 })
-export class CasesHospitalizedPieChartDashletComponent implements OnInit {
-
-    selectedOutbreak: OutbreakModel;
-    caseListCount: number = 0;
-    caseHospitalizationCount: number = 0;
-    caseIsolationCount: number = 0;
+export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDestroy {
     caseHospitalizationSummaryResults: any = [];
+
+    // Global filters => Date
+    private _globalFilterDate: Moment;
+    @Input() set globalFilterDate(globalFilterDate: Moment) {
+        this._globalFilterDate = globalFilterDate;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterDate(): Moment {
+        return this._globalFilterDate;
+    }
+
+    // Global Filters => Location
+    private _globalFilterLocationId: string;
+    @Input() set globalFilterLocationId(globalFilterLocationId: string) {
+        this._globalFilterLocationId = globalFilterLocationId;
+        this.refreshDataCaller.call();
+    }
+    get globalFilterLocationId(): string {
+        return this._globalFilterLocationId;
+    }
+
+    // outbreak
+    outbreakId: string;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
+    previousSubscriber: Subscription;
+
+    // loading data
+    displayLoading: boolean = true;
+
+    /**
+     * Global Filters changed
+     */
+    protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+        this.refreshData();
+    }), 100);
 
     constructor(
         private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService,
         private caseDataService: CaseDataService,
         private i18nService: I18nService,
         protected snackbarService: SnackbarService
     ) {}
 
     ngOnInit() {
-        this.outbreakDataService
+        // outbreak
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-                    // get data
-                    this.initializeData();
+                if (selectedOutbreak) {
+                    this.outbreakId = selectedOutbreak.id;
+                    this.refreshDataCaller.call();
                 }
             });
     }
 
-    /**
-     * get necessary data
-     */
-    initializeData() {
-        Observable.forkJoin([
-            this.caseDataService
-                .getHospitalisedCasesCount(this.selectedOutbreak.id),
-            this.caseDataService
-                .getIsolatedCasesCount(this.selectedOutbreak.id),
-            this.caseDataService
-                .getCasesCount(this.selectedOutbreak.id)
-        ]).catch((err) => {
-            this.snackbarService.showError(err.message);
-            return ErrorObservable.create(err);
-        }).subscribe(([hospitalizedCountResults, isolatedCountResults, casesCountResults]) => {
-            this.caseHospitalizationCount = hospitalizedCountResults.count;
-            this.caseIsolationCount = isolatedCountResults.count;
-            this.caseListCount = casesCountResults.count;
-            this.caseHospitalizationSummaryResults = this.buildChartData();
-        });
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
 
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
      * Build chart data object
      * @returns {MetricChartDataModel[]}
      */
-    buildChartData() {
+    buildChartData(caseHospitalizationCount, caseIsolationCount, caseListCount) {
         const caseHospitalizationSummaryResults: MetricChartDataModel[] = [];
-        caseHospitalizationSummaryResults.push(
-            {
-                value: this.caseHospitalizationCount,
-                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL')
-            });
-        caseHospitalizationSummaryResults.push(
-            {
-                value: this.caseIsolationCount,
-                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL')
-            });
-        const caseNotHospitalized = this.caseListCount - this.caseHospitalizationCount - this.caseIsolationCount;
-        caseHospitalizationSummaryResults.push(
-            {
-                value: caseNotHospitalized,
-                name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL')
-            });
+
+        // check for no data
+        if (
+            caseHospitalizationCount === 0 &&
+            caseIsolationCount === 0 &&
+            caseListCount === 0
+        ) {
+            return caseHospitalizationSummaryResults;
+        }
+
+        caseHospitalizationSummaryResults.push({
+            value: caseHospitalizationCount,
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL')
+        });
+        caseHospitalizationSummaryResults.push({
+            value: caseIsolationCount,
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL')
+        });
+
+        const caseNotHospitalized = caseListCount - caseHospitalizationCount - caseIsolationCount;
+        caseHospitalizationSummaryResults.push({
+            value: caseNotHospitalized,
+            name: this.i18nService.instant('LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL')
+        });
+
         return caseHospitalizationSummaryResults;
     }
 
+    /**
+     * Refresh Data
+     */
+    refreshData() {
+        if (this.outbreakId) {
+            // release previous subscriber
+            if (this.previousSubscriber) {
+                this.previousSubscriber.unsubscribe();
+                this.previousSubscriber = null;
+            }
+
+            // construct query builder
+            const qb = new RequestQueryBuilder();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateOfOnset', {
+                        startDate: this.globalFilterDate.startOf('day').format(),
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                    'addresses.parentLocationIdFilter',
+                    this.globalFilterLocationId
+                );
+            }
+
+            // retrieve data
+            this.displayLoading = true;
+            this.previousSubscriber = Observable.forkJoin([
+                this.caseDataService
+                    .getHospitalisedCasesCount(this.outbreakId, this.globalFilterDate, qb),
+                this.caseDataService
+                    .getIsolatedCasesCount(this.outbreakId, this.globalFilterDate, qb),
+                this.caseDataService
+                    .getCasesCount(this.outbreakId, qb)
+            ]).catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            }).subscribe(([hospitalizedCountResults, isolatedCountResults, casesCountResults]) => {
+                // construct chart
+                this.caseHospitalizationSummaryResults = this.buildChartData(
+                    hospitalizedCountResults.count,
+                    isolatedCountResults.count,
+                    casesCountResults.count
+                );
+
+                // finished
+                this.displayLoading = false;
+            });
+        }
+    }
 }

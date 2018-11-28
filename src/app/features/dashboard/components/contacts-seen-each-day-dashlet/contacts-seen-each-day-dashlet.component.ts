@@ -1,13 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 import { Constants } from '../../../../core/models/constants';
-import { Subscriber } from 'rxjs/Subscriber';
-import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { Moment } from 'moment';
-import * as moment from 'moment';
-import * as _ from 'lodash';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-contacts-seen-each-day-dashlet',
@@ -15,13 +11,9 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
     templateUrl: './contacts-seen-each-day-dashlet.component.html',
     styleUrls: ['./contacts-seen-each-day-dashlet.component.less']
 })
-export class ContactsSeenEachDayDashletComponent extends DashletComponent implements OnInit {
-
+export class ContactsSeenEachDayDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // number of contacts seen each day
     contactsSeenEachDay: number;
-
-    // filter by date
-    date: Moment = moment();
 
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN
@@ -30,39 +22,45 @@ export class ContactsSeenEachDayDashletComponent extends DashletComponent implem
     // constants to be used for applyListFilter
     Constants: any = Constants;
 
-    // refresh only after we finish changing data
-    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
-    }));
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    previousSubscriber: Subscription;
 
     constructor(
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
-        this.triggerUpdateValues.call(true);
+        this.refreshDataCaller.call();
     }
 
-    onDateChanged(date) {
-        this.date = date;
-
-        // update
-        this.triggerUpdateValues.call();
+    ngOnDestroy() {
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
-    updateValues () {
-        if (_.isEmpty(this.date) || !this.date.isValid()) {
-            this.date = moment();
+    /**
+     * Refresh data
+     */
+    refreshData() {
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
         }
 
-        this.queryParams.date = this.date.toISOString();
-
-        // get the results for contacts seen
-        this.listFilterDataService.filterContactsSeen(this.date)
+        this.displayLoading = true;
+        this.previousSubscriber = this.listFilterDataService.filterContactsSeen(this.globalFilterDate, this.globalFilterLocationId)
             .subscribe((result: MetricContactsSeenEachDays) => {
                 this.contactsSeenEachDay = result.contactsSeenCount;
+                this.displayLoading = false;
             });
     }
 }

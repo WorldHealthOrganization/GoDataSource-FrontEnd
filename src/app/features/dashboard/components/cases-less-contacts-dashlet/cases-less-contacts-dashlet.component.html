@@ -1,13 +1,13 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS, x: xLessContacts }"
+    [params]="getDashletParamsIncludingGlobalFilters({ applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS, x: xLessContacts })"
     [value]="casesLessContactsCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
 
     <div fxLayout="row" fxLayoutGap="10px">
-
         <div>
             {{'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE' | translate}}
         </div>

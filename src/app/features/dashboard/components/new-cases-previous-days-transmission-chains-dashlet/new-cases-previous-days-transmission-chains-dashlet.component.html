@@ -1,10 +1,11 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS, x: xPreviousDays}"
-    [value]="this.casesKnownTransmissionChainsCount + '/' + this.totalCases"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_KNOWN_TRANSMISSION_CHAINS, x: xPreviousDays})"
+    [value]="this.casesKnownTransmissionChainsCount + ' / ' + this.totalCases"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
 
     <div fxLayout="row" fxLayoutGap="10px">
 

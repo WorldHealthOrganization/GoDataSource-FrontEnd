@@ -135,7 +135,10 @@ export class ContactDataService {
      * @param {string} outbreakId
      * @returns {Observable<MetricContactsSeenEachDays>}
      */
-    getNumberOfContactsSeenEachDay(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<MetricContactsSeenEachDays> {
+    getNumberOfContactsSeenEachDay(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<MetricContactsSeenEachDays> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
             this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts-seen/count?filter=${filter}`),

@@ -1,20 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/contacts'"
-    [params]="queryParams"
-    [value]="contactsWithSuccessfulFollowup.contactsWithSuccessfulFollowupsCount + '/' + contactsWithSuccessfulFollowup.totalContactsWithFollowupsCount"
+    [params]="getDashletParamsIncludingGlobalFilters(queryParams)"
+    [value]="contactsWithSuccessfulFollowup?.contactsWithSuccessfulFollowupsCount + ' / ' + contactsWithSuccessfulFollowup?.totalContactsWithFollowupsCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
-
-    <div>
-        {{'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP' | translate}}
-    </div>
-
-    <app-form-datepicker
-        fxFlexOffset="5px"
-        name="dateFilter"
-        [ngModel]="date"
-        (optionChanged)="onDateChanged($event)">
-    </app-form-datepicker>
-
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
+    {{ 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP' | translate }}
 </app-dashboard-custom-metric-dashlet>
