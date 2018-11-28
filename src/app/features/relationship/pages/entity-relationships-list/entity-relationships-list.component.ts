@@ -249,13 +249,6 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
-            peopleQueryBuilder.queryBuilder.filter.where({
-                id: {
-                    neq: this.entityId
-                }
-            }, true);
-
             if (this.relationshipType === RelationshipType.EXPOSURE) {
                 // retrieve the list of exposures
                 this.relationshipsList$ = this.relationshipDataService.getEntityExposures(
