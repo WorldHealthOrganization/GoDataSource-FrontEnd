@@ -421,6 +421,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 ]
                 // childQueryBuilderKey: 'whereCase'
             })
+            // timeFilter => DATE
         ];
 
         // Contact
