@@ -74,6 +74,7 @@ export class SideFiltersComponent {
     RequestFilterOperator = RequestFilterOperator;
     FilterType = FilterType;
     FilterComparator = FilterComparator;
+    AppliedFilterModel = AppliedFilterModel;
     Constants = Constants;
 
     // keep query builder
@@ -291,6 +292,33 @@ export class SideFiltersComponent {
                         // FilterComparator.TEXT_STARTS_WITH
                         default:
                             qb.filter.byText(filter.fieldName, appliedFilter.value, false);
+                    }
+                    break;
+
+                case FilterType.NUMBER:
+                    switch (comparator) {
+                        case FilterComparator.BEFORE:
+                            qb.filter.where({
+                                [filter.fieldName]: {
+                                    lte: appliedFilter.value
+                                }
+                            });
+                            break;
+                        case FilterComparator.AFTER:
+                            qb.filter.where({
+                                [filter.fieldName]: {
+                                    gte: appliedFilter.value
+                                }
+                            });
+                            break;
+
+                        // case FilterComparator.IS:
+                        default:
+                            qb.filter.byEquality(
+                                filter.fieldName,
+                                appliedFilter.value
+                            );
+                            break;
                     }
                     break;
 

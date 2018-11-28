@@ -18,7 +18,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -411,6 +411,15 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                 type: FilterType.SELECT,
                 options$: this.dailyStatusTypeOptions$
+            }),
+            new FilterModel({
+                fieldName: 'weekNumber',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
+                type: FilterType.NUMBER,
+                allowedComparators: [
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
+                ]
+                // childQueryBuilderKey: 'whereCase'
             })
         ];
 
