@@ -201,8 +201,8 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 'shape': 'data(shape)',
                 'background-fit': 'cover',
                 'text-valign': 'data(labelPosition)',
-                'border-color': 'data(nodeColor)',
-                'border-width': 3
+                'border-color': 'data(borderColor)',
+                'border-width': 1
             }
         },
         {
