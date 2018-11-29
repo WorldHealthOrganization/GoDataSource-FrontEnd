@@ -35,6 +35,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { NgModel } from '@angular/forms';
 import * as FileSaver from 'file-saver';
+import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -69,6 +70,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     dateFilterDefaultValue: Moment;
 
     teamsListMap: any = {};
+    teamsListArray: TeamModel[];
+    teamsList$: Observable<TeamModel[]>;
 
     // print daily Follow-ups
     printDailyFollowUpsUrl: string;
@@ -136,7 +139,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.initializeHeaderFilters();
 
         // load teams list
-        this.teamDataService.getTeamsList().subscribe( (teamsList) => {
+        this.teamsList$ = this.teamDataService.getTeamsList().share();
+        this.teamsList$.subscribe( (teamsList) => {
+            this.teamsListArray = teamsList;
             _.forEach(teamsList, (team) => {
                 this.teamsListMap[team.id] = team;
             });
@@ -399,6 +404,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 fieldName: 'date',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
                 type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'teamId',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                type: FilterType.MULTISELECT,
+                options$: this.teamsList$,
+                optionsLabelKey: 'name',
+                optionsValueKey: 'id'
             }),
             new FilterModel({
                 fieldName: 'targeted',
