@@ -69,8 +69,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     dateFilterDefaultValue: Moment;
 
-    teamsListMap: any = {};
-    teamsListArray: TeamModel[];
     teamsList$: Observable<TeamModel[]>;
 
     // print daily Follow-ups
@@ -140,12 +138,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // load teams list
         this.teamsList$ = this.teamDataService.getTeamsList().share();
-        this.teamsList$.subscribe( (teamsList) => {
-            this.teamsListArray = teamsList;
-            _.forEach(teamsList, (team) => {
-                this.teamsListMap[team.id] = team;
-            });
-        });
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -959,5 +951,33 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             // NOTHING TO DO HERE
             // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
         });
+    }
+
+    /**
+     * Change FollowUp Team
+     */
+    changeFollowUpTeam(
+        followUp: FollowUpModel,
+        team: TeamModel
+    ) {
+        // modify follow-up
+        this.followUpsDataService
+            .modifyFollowUp(
+                this.selectedOutbreak.id,
+                followUp.personId,
+                followUp.id, {
+                    teamId: team ? team.id : null
+                }
+            ).catch((err) => {
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            }).subscribe(() => {
+                // update loaded follow-up data
+                followUp.teamId = team.id;
+
+                // show success ?
+                // this might not be the best idea...maybe we can replace / remove it
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
+            });
     }
 }

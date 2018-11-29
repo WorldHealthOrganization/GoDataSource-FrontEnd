@@ -248,10 +248,10 @@
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate }}</div>
                     <div class="column-filter">
                         <app-form-select
-                            name="teamId"
+                            name="teamIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="teamsListArray"
+                            [options]="teamsList$ | async"
                             (optionChanged)="filterBySelectField('teamId', $event, 'id')"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -265,7 +265,15 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ teamsListMap[item.teamId] ? teamsListMap[item.teamId].name : '' }}
+                <app-form-select
+                    name="teamId"
+                    [ngModel]="item.teamId"
+                    [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
+                    [options]="teamsList$ | async"
+                    optionLabelKey="name"
+                    optionValueKey="id"
+                    (optionChanged)="changeFollowUpTeam(item, $event)">
+                </app-form-select>
             </mat-cell>
         </ng-container>
 
