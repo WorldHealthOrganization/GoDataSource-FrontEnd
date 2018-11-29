@@ -46,23 +46,21 @@ export class GraphNodeModel {
         if (this.nodeType === 'checkpoint') {
             this.label = this.name;
             this.shape = 'rectangle';
-            this.nodeNameColor = '#727272';
+            this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_TEXT;
             this.labelPosition = 'center';
             this.width = 100;
-            this.borderColor = '#dcdcdc';
-            this.nodeColor = '#fff';
+            this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_BORDER;
+            this.nodeColor = Constants.DEFAULT_BACKGROUND_COLOR_NODES_CHAINS;
             // change color if first day of week or first day of month
             if (moment(this.dateTimeline).isoWeekday() === 1) {
                 // monday
-                this.nodeColor = '#fff';
-                this.borderColor = '#2A2A2A';
-                this.nodeNameColor = '#2A2A2A';
+                this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_BORDER;
+                this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_TEXT;
             }
             if (moment(this.dateTimeline).format('D') === '1') {
                 // first day of month
-                this.nodeColor = '#fff';
-                this.borderColor = '#4DB0A0';
-                this.nodeNameColor = '#3A9A8A';
+                this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_BORDER;
+                this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT;
             }
         }
     }

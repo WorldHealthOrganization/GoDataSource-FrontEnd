@@ -67,13 +67,25 @@ export class Constants {
     static DEFAULT_COLOR_CHAINS = '#A8A8A8';
 
     // default color to be used in chains - timeline checkpoints
-    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS = '#000';
+    static DEFAULT_BACKGROUND_COLOR_NODES_CHAINS = '#fff';
 
-    // default color to be used in chains - timeline checkpoints - first day of week
-    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK = '#fff';
+    // default color to be used in chains - timeline checkpoints - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_BORDER = '#dcdcdc';
 
-    // default color to be used in chains - timeline checkpoints - first day of week
-    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH = '#fff';
+    // default color to be used in chains - timeline checkpoints - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_TEXT = '#727272';
+
+    // default color to be used in chains - timeline checkpoints - first day of week - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_BORDER = '#2A2A2A';
+
+    // default color to be used in chains - timeline checkpoints - first day of week - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_TEXT = '#2A2A2A';
+
+    // default color to be used in chains - timeline checkpoints - first day of month - border
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_BORDER = '#4DB0A0';
+
+    // default color to be used in chains - timeline checkpoints - first day of month - text
+    static DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT = '#3A9A8A';
 
     // these need to be hardcoded, this is why we don't pull them from reference data
     // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
