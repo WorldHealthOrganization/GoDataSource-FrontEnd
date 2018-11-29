@@ -1025,6 +1025,7 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
         'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION': '',
         'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER': 'Week number',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER': 'Time filter',
 
         /**
          * Follow-ups list page

@@ -114,6 +114,9 @@ export class FilterModel {
         valueType: ValueType
     }[];
 
+    // flag where property instead of creating specific rules...
+    flagIt: boolean;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -136,7 +139,8 @@ export class FilterModel {
             label?: string,
             value: FilterComparator,
             valueType: ValueType
-        }[]
+        }[],
+        flagIt?: boolean
     }) {
         // set handler
         this.self = this;
