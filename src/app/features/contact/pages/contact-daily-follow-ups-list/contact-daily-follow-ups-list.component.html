@@ -251,7 +251,7 @@
                             name="teamIdFilter"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="teamsList$ | async"
+                            [options]="teamsListLoaded"
                             (optionChanged)="filterBySelectField('teamId', $event, 'id')"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -269,7 +269,7 @@
                     name="teamId"
                     [ngModel]="item.teamId"
                     [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
-                    [options]="teamsList$ | async"
+                    [options]="teamsListLoaded"
                     optionLabelKey="name"
                     optionValueKey="id"
                     (optionChanged)="changeFollowUpTeam(item, $event)">

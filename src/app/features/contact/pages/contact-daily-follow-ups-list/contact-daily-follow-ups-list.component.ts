@@ -70,6 +70,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     dateFilterDefaultValue: Moment;
 
     teamsList$: Observable<TeamModel[]>;
+    teamsListLoaded: TeamModel[];
 
     // print daily Follow-ups
     printDailyFollowUpsUrl: string;
@@ -137,7 +138,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.initializeHeaderFilters();
 
         // load teams list
+        // using share does the job, but it takes a bit to see the changes in the list
+        // loading an array is instantaneous
         this.teamsList$ = this.teamDataService.getTeamsList().share();
+        this.teamsList$.subscribe((teamsList) => {
+            this.teamsListLoaded = teamsList;
+        });
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
