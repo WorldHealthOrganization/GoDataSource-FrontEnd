@@ -1,13 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Constants } from '../../../../core/models/constants';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import * as _ from 'lodash';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-contacts-with-successful-follow-ups-dashlet',
@@ -15,55 +11,53 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
     templateUrl: './contacts-with-successful-follow-ups-dashlet.component.html',
     styleUrls: ['./contacts-with-successful-follow-ups-dashlet.component.less']
 })
-export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComponent implements OnInit {
-
+export class ContactsWithSuccessfulFollowUpsDashletComponent extends DashletComponent implements OnInit, OnDestroy {
     // contacts with successfulFollowup
-    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp = new MetricContactsWithSuccessfulFollowUp();
-
-    // filter by day
-    date: Moment = moment();
+    contactsWithSuccessfulFollowup: MetricContactsWithSuccessfulFollowUp;
 
     queryParams: any = {
         applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP
     };
 
-    // refresh only after we finish changing data
-    private triggerUpdateValues = new DebounceTimeCaller(new Subscriber<void>(() => {
-        this.updateValues();
-    }));
+    // loading data
+    displayLoading: boolean = false;
+
+    // subscribers
+    previousSubscriber: Subscription;
 
     constructor(
-        private listFilterDataService: ListFilterDataService
+        protected listFilterDataService: ListFilterDataService
     ) {
-        super();
+        super(listFilterDataService);
     }
 
     ngOnInit() {
-        this.triggerUpdateValues.call(true);
+        this.refreshDataCaller.call();
     }
 
-    onDateChanged(date) {
-        this.date = date;
-
-        // update
-        this.triggerUpdateValues.call();
+    ngOnDestroy() {
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
+        }
     }
 
     /**
-     * Update list
+     * Refresh data
      */
-    updateValues() {
-        if (_.isEmpty(this.date) || !this.date.isValid()) {
-            this.date = moment();
+    refreshData() {
+        // release previous subscriber
+        if (this.previousSubscriber) {
+            this.previousSubscriber.unsubscribe();
+            this.previousSubscriber = null;
         }
 
-        this.queryParams.date = this.date.toISOString();
-
-        // get the results for contacts seen
-        this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.date)
+        this.displayLoading = true;
+        this.previousSubscriber = this.listFilterDataService.filterContactsWithSuccessfulFollowup(this.globalFilterDate, this.globalFilterLocationId)
             .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                 this.contactsWithSuccessfulFollowup = result;
+                this.displayLoading = false;
             });
     }
-
 }

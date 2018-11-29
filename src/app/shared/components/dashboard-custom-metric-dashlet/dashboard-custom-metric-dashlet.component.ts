@@ -18,6 +18,9 @@ export class DashboardCustomMetricDashletComponent {
     @Output() moveBefore = new EventEmitter<void>();
     @Output() moveAfter = new EventEmitter<void>();
 
+    // loading data
+    @Input() displayLoading: boolean = false;
+
     onHide() {
         this.hide.emit();
     }

@@ -49,6 +49,7 @@
     </app-total-number-of-records>
     <!--Contacts grouped by risk level-->
     <app-counted-items-list
+        *ngIf="!appliedListFilter"
         [items]="countedContactsByRiskLevel$ | async"
         (optionChanged)="filterBySelectField('id', $event.ids, null)">
     </app-counted-items-list>

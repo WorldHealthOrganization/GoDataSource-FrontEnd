@@ -24,6 +24,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { CytoscapeGraphComponent } from '../../../../shared/components/cytoscape-graph/cytoscape-graph.component';
 import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { Moment } from 'moment';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -156,7 +158,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         private relationshipDataService: RelationshipDataService,
         private i18nService: I18nService,
         private locationDataService: LocationDataService,
-        private clusterDataService: ClusterDataService
+        private clusterDataService: ClusterDataService,
+        protected route: ActivatedRoute
     ) {}
 
     ngOnInit() {
@@ -178,6 +181,35 @@ export class TransmissionChainsDashletComponent implements OnInit {
         this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
         this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
         this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
+
+        // check if we have global filters set
+        this.route.queryParams.subscribe((queryParams: any) => {
+            // do we need to decode global filters ?
+            const global: {
+                date?: Moment,
+                locationId?: string
+            } = !queryParams.global ?
+                {} : (
+                    _.isString(queryParams.global) ?
+                        JSON.parse(queryParams.global as string) :
+                        queryParams.global
+                );
+
+            // parse date
+            if (global.date) {
+                global.date = moment(global.date);
+            }
+
+            // date
+            if (global.date) {
+                this.dateGlobalFilter = global.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            }
+
+            // location
+            if (global.locationId) {
+                this.filters.locationId = global.locationId;
+            }
+        });
 
         this.initializeReferenceData()
             .catch((err) => {
@@ -206,6 +238,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
                                     this.legend.clustersList[cluster.id] = cluster.name;
                                 });
                             });
+
                         // load chain
                         this.displayChainsOfTransmission();
                     });
@@ -290,7 +323,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
             // configure
             const rQB = new RequestQueryBuilder();
-
             if (!requestQueryBuilder.filter.isEmpty()) {
                 rQB.filter.where({
                     person: {

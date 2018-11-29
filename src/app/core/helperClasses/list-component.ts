@@ -12,7 +12,6 @@ import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { Subscriber } from '../../../../node_modules/rxjs/Subscriber';
-import { DateRangeModel } from '../models/date-range.model';
 import { Moment } from 'moment';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import * as moment from 'moment';
@@ -636,9 +635,18 @@ export abstract class ListComponent {
      * Verify what list filter is sent into the query params and updates the query builder based in this.
      * @param queryParams
      */
-    protected applyListFilters(queryParams: {applyListFilter, x, dateRange, locationIds, date}): void {
+    protected applyListFilters(queryParams: {
+        applyListFilter,
+        x,
+        date,
+        global
+    }): void {
         // update breadcrumbs
         this.setListFilterBreadcrumbs(queryParams.applyListFilter, queryParams);
+
+        // get global filter values
+        const globalFilters = this.getGlobalFilterValues(queryParams);
+        let globalQb: RequestQueryBuilder;
 
         // check params for apply list filter
         this.appliedListFilter = queryParams.applyListFilter;
@@ -647,7 +655,7 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
 
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsOnFollowUpLists()
+                this.listFilterDataService.filterContactsOnFollowUpLists(globalFilters.date, globalFilters.locationId)
                     .subscribe((qbFilterContactsOnFollowUpLists) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
@@ -661,7 +669,12 @@ export abstract class ListComponent {
             // filter cases deceased
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
                 // add condition for deceased cases
-                this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                    'dateDeceased',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
                 this.appliedListFilterQueryBuilder.filter.where({
                     deceased: true
                 }, true);
@@ -675,15 +688,25 @@ export abstract class ListComponent {
 
             // filter cases hospitalised
             case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
-                // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesHospitalized()
-                    .subscribe((qbFilterCasesHospitalized) => {
-                        this.appliedListFilterQueryBuilder = qbFilterCasesHospitalized;
-                        this.mergeListFilterToMainFilter();
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    null,
+                    null,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
 
-                        // refresh list
-                        this.needsRefreshList(true);
-                    });
+                // get the correct query builder and merge with the existing one
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesHospitalized(globalFilters.date);
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
+                this.mergeListFilterToMainFilter();
+
+                // refresh list
+                this.needsRefreshList(true);
                 break;
 
             // Filter contacts not seen
@@ -691,7 +714,7 @@ export abstract class ListComponent {
                 // get the number of days if it was updated
                 const noDaysNotSeen = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsNotSeen(noDaysNotSeen)
+                this.listFilterDataService.filterContactsNotSeen(globalFilters.date, globalFilters.locationId, noDaysNotSeen)
                     .subscribe((qbFilterContactsNotSeen) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
@@ -707,7 +730,7 @@ export abstract class ListComponent {
                 // get the number of contacts if it was updated
                 const noLessContacts = _.get(queryParams, 'x', null);
                   // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesLessThanContacts(noLessContacts)
+                this.listFilterDataService.filterCasesLessThanContacts(globalFilters.date, globalFilters.locationId, noLessContacts)
                     .subscribe((qbFilterCasesLessThanContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
@@ -720,9 +743,8 @@ export abstract class ListComponent {
 
             // Filter contacts lost to follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
-
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterContactsLostToFollowUp()
+                this.listFilterDataService.filterContactsLostToFollowUp(globalFilters.date, globalFilters.locationId)
                     .subscribe((qbFilterContactsLostToFollowUp) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
@@ -738,7 +760,7 @@ export abstract class ListComponent {
                 // get the number of days if it was updated
                 const noDaysInChains = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesInKnownChains(noDaysInChains)
+                this.listFilterDataService.filterCasesInKnownChains(globalFilters.date, globalFilters.locationId, noDaysInChains)
                     .subscribe((qbFilterCasesInKnownChains) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
@@ -754,7 +776,7 @@ export abstract class ListComponent {
                 // get the number of days  if it was updated
                 const noDaysAmongContacts = _.get(queryParams, 'x', null);
                 // get the correct query builder and merge with the existing one
-                this.listFilterDataService.filterCasesAmongKnownContacts(noDaysAmongContacts)
+                this.listFilterDataService.filterCasesAmongKnownContacts(globalFilters.date, globalFilters.locationId, noDaysAmongContacts)
                     .subscribe((qbFilterCasesAmongKnownContacts) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
@@ -767,8 +789,21 @@ export abstract class ListComponent {
 
             // filter suspect cases with pending lab result
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    'dateOfOnset',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -777,8 +812,21 @@ export abstract class ListComponent {
 
             // filter suspect cases refusing treatment
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    'dateOfOnset',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -787,7 +835,27 @@ export abstract class ListComponent {
 
             // filter cases among contacts
             case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+                // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterActiveChainsOfTransmission();
+
+                // change the way we build query
+                this.appliedListFilterQueryBuilder.filter.firstLevelConditions();
+
+                // date
+                if (globalFilters.date) {
+                    this.appliedListFilterQueryBuilder.filter.byEquality(
+                        'endDate',
+                        globalFilters.date.endOf('day').format('YYYY-MM-DD')
+                    );
+                }
+
+                // location
+                if (globalFilters.locationId) {
+                    this.appliedListFilterQueryBuilder.include('people').queryBuilder.filter
+                        .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -796,12 +864,25 @@ export abstract class ListComponent {
 
             // filter contacts becoming cases overtime and place
             case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
-                const dateRange: DateRangeModel = queryParams.dateRange ? JSON.parse(queryParams.dateRange) : undefined;
-                const locationIds: string[] = queryParams.locationIds;
-                this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesFromContactsOvertimeAndPlace(
-                    dateRange,
-                    locationIds
+                // add condition for deceased cases
+                this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
+                    'dateBecomeCase',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
                 );
+
+                // do we need to include default condition ?
+                if (!this.appliedListFilterQueryBuilder.filter.has('dateBecomeCase')) {
+                    // any date
+                    this.appliedListFilterQueryBuilder.filter.where({
+                        'dateBecomeCase': {
+                            neq: null
+                        }
+                    });
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -833,9 +914,7 @@ export abstract class ListComponent {
 
             // Filter contacts seen
             case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-
-                const date: Moment = moment(queryParams.date);
-                this.listFilterDataService.filterContactsSeen(date)
+                this.listFilterDataService.filterContactsSeen(globalFilters.date, globalFilters.locationId)
                     .subscribe((result: MetricContactsSeenEachDays) => {
                         // merge query builder
                         this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
@@ -853,9 +932,7 @@ export abstract class ListComponent {
 
             // Filter contacts witch successful follow-up
             case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-
-                const followedDate: Moment = moment(queryParams.date);
-                this.listFilterDataService.filterContactsWithSuccessfulFollowup(followedDate)
+                this.listFilterDataService.filterContactsWithSuccessfulFollowup(globalFilters.date, globalFilters.locationId)
                     .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
                         const contactIDs: string[] = _.chain(result.contacts)
                             .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
@@ -930,7 +1007,21 @@ export abstract class ListComponent {
 
             // Filter cases who are not identified though known contact list
             case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
+                // add condition for deceased cases
+                globalQb = this.listFilterDataService.getGlobalFilterQB(
+                    'dateOfOnset',
+                    globalFilters.date,
+                    'addresses.parentLocationIdFilter',
+                    globalFilters.locationId
+                );
+
+                // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
+                if (!globalQb.isEmpty()) {
+                    this.appliedListFilterQueryBuilder.merge(globalQb);
+                }
+
+                // merge query builder
                 this.mergeListFilterToMainFilter();
 
                 // refresh list
@@ -959,6 +1050,39 @@ export abstract class ListComponent {
                 break;
 
         }
+    }
+
+    /**
+     * Retrieve Global Filter Values
+     * @param queryParams
+     */
+    getGlobalFilterValues(queryParams: {
+        global?: string | {
+            date?: Moment,
+            locationId?: string
+        }
+    }): {
+        date?: Moment,
+        locationId?: string
+    } {
+        // do we need to decode global filters ?
+        const global: {
+            date?: Moment,
+            locationId?: string
+        } = !queryParams.global ?
+            {} : (
+                _.isString(queryParams.global) ?
+                    JSON.parse(queryParams.global as string) :
+                    queryParams.global
+            );
+
+        // parse date
+        if (global.date) {
+            global.date = moment(global.date);
+        }
+
+        // finished
+        return global;
     }
 
     /**

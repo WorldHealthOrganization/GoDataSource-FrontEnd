@@ -34,8 +34,8 @@
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
-    [appliedFilters]="appliedSideFilters"
-    (filtersApplied)="applySideFilters($event)">
+    (filtersApplied)="applySideFilters($event)"
+    [fixedFilters]="true">
 </app-side-filters>
 
 <mat-card class="page-section page-content">
@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <!-- Loading data data -->
+    <!-- Loading data -->
     <div
         *ngIf="displayLoading"
         class="follow-up-range-loading"

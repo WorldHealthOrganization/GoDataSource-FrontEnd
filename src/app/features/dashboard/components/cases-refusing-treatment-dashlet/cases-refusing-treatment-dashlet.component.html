@@ -1,9 +1,10 @@
 <app-dashboard-custom-metric-dashlet
     [link]="'/cases'"
-    [params]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT}"
+    [params]="getDashletParamsIncludingGlobalFilters({applyListFilter: Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT})"
     [value]="casesRefusingTreatmentCount"
     (hide)="onHide()"
     (moveBefore)="onMoveBefore()"
-    (moveAfter)="onMoveAfter()">
+    (moveAfter)="onMoveAfter()"
+    [displayLoading]="displayLoading">
     {{ 'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE' | translate}}
 </app-dashboard-custom-metric-dashlet>

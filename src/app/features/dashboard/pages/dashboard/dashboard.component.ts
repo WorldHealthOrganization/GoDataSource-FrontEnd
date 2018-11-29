@@ -16,6 +16,9 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as domtoimage from 'dom-to-image';
 import * as FileSaver from 'file-saver';
+import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-dashboard',
@@ -80,12 +83,17 @@ export class DashboardComponent implements OnInit {
 
     selectedOutbreak: OutbreakModel;
 
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.PDF
-    ];
+    // constants
+    ExportDataExtension = ExportDataExtension;
 
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
+
+    // available side filters
+    availableSideFilters: FilterModel[] = [];
+
+    globalFilterDate: Moment;
+    globalFilterLocationId: string;
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
@@ -96,8 +104,7 @@ export class DashboardComponent implements OnInit {
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService
-    ) {
-    }
+    ) {}
 
     ngOnInit() {
         this.authUser = this.authDataService.getAuthenticatedUser();
@@ -113,6 +120,32 @@ export class DashboardComponent implements OnInit {
                     this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
                 }
             });
+
+        // initialize Side Filters
+        this.initializeSideFilters();
+    }
+
+    /**
+     * Initialize Side Filters
+     */
+    private initializeSideFilters() {
+        // set available side filters
+        this.availableSideFilters = [
+            new FilterModel({
+                fieldName: 'locationId',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+                type: FilterType.LOCATION,
+                required: true,
+                multipleOptions: false
+            }),
+            new FilterModel({
+                fieldName: 'date',
+                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                type: FilterType.DATE,
+                required: true,
+                maxDate: moment()
+            })
+        ];
     }
 
     private initializeDashlets() {
@@ -237,14 +270,6 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
-     * Check if the user has read team permission
-     * @returns {boolean}
-     */
-    hasReadUserPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_TEAM);
-    }
-
-    /**
      * generate EPI curve report - image will be exported as pdf
      */
     generateEpiCurveReport() {
@@ -302,5 +327,20 @@ export class DashboardComponent implements OnInit {
             blob,
             `${fileName}.${extension}`
         );
+    }
+
+    /**
+     * Apply side filters
+     * @param data
+     */
+    applySideFilters(filters: AppliedFilterModel[]) {
+        // retrieve date & location filters
+        // retrieve location filter
+        const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
+        const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
+
+        // set filters
+        this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
+        this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
     }
 }

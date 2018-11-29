@@ -64,7 +64,6 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
 
     // side filters
     availableSideFilters: FilterModel[];
-    appliedSideFilters: AppliedFilterModel[];
 
     // export
     exportRangeFollowUpsUrl: string;
@@ -156,37 +155,30 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
      */
     initializeSideFilters() {
         // set available side filters
-        // Follow-ups
+        const dateFilterValue = {
+            startDate: moment().add(-1, 'days').startOf('day').format(),
+            endDate: moment().add(10, 'days').endOf('day').format()
+        };
         this.availableSideFilters = [
             new FilterModel({
                 fieldName: 'date',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-                type: FilterType.RANGE_DATE
+                type: FilterType.RANGE_DATE,
+                required: true,
+                value: dateFilterValue
             })
         ];
-
-        // set initial side filters
-        const dateFilter = new AppliedFilterModel();
-        dateFilter.readonly = true;
-        dateFilter.filter = _.find(this.availableSideFilters, { fieldName: 'date' });
-        dateFilter.value = {
-            startDate: moment().add(-1, 'days').startOf('day').format(),
-            endDate: moment().add(10, 'days').endOf('day').format()
-        };
-
-        // display in side filters
-        this.appliedSideFilters = [dateFilter];
 
         // setup list query builder
         this.queryBuilder.filter.byDateRange(
             'date',
-            dateFilter.value
+            dateFilterValue
         );
 
         // set export data
         this.exportRangeExtraAPIData = {
-            startDate: dateFilter.value.startDate,
-            endDate: dateFilter.value.endDate
+            startDate: dateFilterValue.startDate,
+            endDate: dateFilterValue.endDate
         };
     }
 

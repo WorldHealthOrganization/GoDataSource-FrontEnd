@@ -1561,6 +1561,12 @@ export const EnglishUsLang = {
         'LNG_FORM_RANGE_FIELD_LABEL_TO': 'To',
 
         /**
+         * Global filter fields
+         */
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE': 'Date',
+        'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION': 'Location',
+
+        /**
          * Dashboard Page
          */
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
@@ -1592,8 +1598,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT': 'CASES WITH PENDING LAB RESULT',
         'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS': 'CASES NOT IDENTIFIED THROUGH CONTACTS',
         'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE': 'CASES REFUSING TO BE TRANSFERRED TO A TREATMENT UNIT',
-        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_BEFORE_TIME_PERIOD': 'CONTACTS BECOMING CASES IN PERIOD',
-        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_AFTER_TIME_PERIOD': 'AND LOCATION',
+        'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE': 'Contacts becoming cases',
         'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES': 'CHAINS OF TRANSMISSION FROM REGISTERED CONTACTS WHO BECAME CASES',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE': 'Histogram - Size of Chains of Transmission',
         'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL': 'Size of chains',
@@ -1622,9 +1627,34 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
+         * Case summary dashlet
+         */
+        'LNG_PAGE_DASHLET_CASE_SUMMARY_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
+         * Cases by geographic location dashlet
+         */
+        'LNG_PAGE_DASHLET_CASES_BY_GEOGRAPHIC_LOCATION_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
+         * Hospitalization Summary dashlet
+         */
+        'LNG_PAGE_DASHLET_HOSPITALIZATION_SUMMARY_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
+         * Histogram - size of chains of transmission dashlet
+         */
+        'LNG_PAGE_DASHLET_SIZE_OF_CHAINS_OF_TRANSMISSION_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
+         * Cases counts over time stratified by classification
+         */
+        'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL': 'There is no data to build the chart',
+
+        /**
          * Gantt chart dashlet
          */
-        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart.',
+        'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart',
 
         /**
          * Case Count Map
@@ -2004,6 +2034,7 @@ export const EnglishUsLang = {
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT': 'Contains',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD': 'Keyword',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN': 'Between',
+        'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DAY_IS': 'Day is',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE': 'Before',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER': 'After',
         'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL': 'Less or equal',

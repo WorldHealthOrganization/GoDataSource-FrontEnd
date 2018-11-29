@@ -19,8 +19,9 @@
                         {{'LNG_SIDE_FILTERS_TITLE' | translate}}
                     </div>
 
-                    <div class="actions">
-
+                    <div
+                        *ngIf="!fixedFilters"
+                        class="actions">
                         <div fxFlex fxLayout="row" class="switch-buttons">
                             <button fxFlex type="button" mat-raised-button
                                     [color]="isFilterOperator(RequestFilterOperator.AND) ? 'primary' : ''"
@@ -112,6 +113,14 @@
                                     [toPlaceholder]="filter.filter?.type === FilterType.RANGE_AGE ? 'LNG_AGE_FIELD_FILTER_LABEL_TO' : 'LNG_FORM_RANGE_FIELD_LABEL_TO'">
                                 </app-form-range>
 
+                                <!-- DATE -->
+                                <app-form-datepicker
+                                    *ngIf="filter.filter?.type === FilterType.DATE"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    [maxDate]="filter.filter?.maxDate">
+                                </app-form-datepicker>
+
                                 <!-- DATE RANGE Filter-->
                                 <app-form-daterange
                                     *ngIf="filter.filter?.type === FilterType.RANGE_DATE"
@@ -122,13 +131,13 @@
                                     [endDateVisible]="filter.comparator === FilterComparator.BETWEEN || filter.comparator === FilterComparator.BEFORE">
                                 </app-form-daterange>
 
-                                <!-- Address Location -->
+                                <!-- Address Location / Location -->
                                 <app-form-location-dropdown
-                                    *ngIf="filter.filter?.type === FilterType.ADDRESS && filter.comparator === FilterComparator.LOCATION"
+                                    *ngIf="(filter.filter?.type === FilterType.ADDRESS || filter.filter?.type === FilterType.LOCATION) && filter.comparator === FilterComparator.LOCATION"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [ngModel]="filter.value"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION' | translate"
-                                    [multiple]="true"
+                                    [multiple]="filter.filter?.multipleOptions"
                                     [useOutbreakLocations]="true"
                                     (changed)="filter.value = $event;">
                                 </app-form-location-dropdown>
@@ -172,7 +181,13 @@
 
                     </div>
 
-                    <button type="button" mat-button color="primary" class="add-side-filter" (click)="addFilter()">
+                    <button
+                        *ngIf="!fixedFilters"
+                        type="button"
+                        mat-button
+                        color="primary"
+                        class="add-side-filter"
+                        (click)="addFilter()">
                         {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
 
@@ -235,6 +250,7 @@
                     </div>
 
                     <button
+                        *ngIf="!fixedFilters"
                         class="add-side-filter"
                         type="button"
                         mat-button
