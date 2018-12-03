@@ -51,10 +51,11 @@
                                 [(ngModel)]="values[i].variable"
                                 [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
                                 tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
-                                required="true"
+                                [required]="true"
                                 [readonly]="!question.new && question.variable && variableReadOnly"
                                 [disabled]="viewOnly"
                                 (optionChanged)="onChange()"
+                                (blur)="onBlurVariable(values[i])"
                                 app-unique-validator="\]\[variable\]$"
                                 [additionalControlsToCheck]="additionalControlsToCheck">
                             </app-form-input>
