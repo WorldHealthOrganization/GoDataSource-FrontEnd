@@ -69,8 +69,8 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -88,9 +88,9 @@
                         </app-form-address>
                     </mat-card>
 
-                    <div>
-                        <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                        <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <div class="stepper-wrapper">
+                        <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                        <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                     </div>
                 </form>
             </div>
@@ -100,9 +100,9 @@
         <mat-step>
             <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
-            <div>
-                <button mat-button matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-button (click)="createNewEvent([detailsForm, addressForm])">
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="primary" (click)="createNewEvent([detailsForm, addressForm])">
                     {{'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON' | translate}}
                 </button>
             </div>
