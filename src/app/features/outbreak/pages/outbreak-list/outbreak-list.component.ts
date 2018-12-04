@@ -25,6 +25,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -62,40 +63,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
 
     @ViewChild('topNav') topNav: TopnavComponent;
 
-    exportOutbreaksUrl: string = 'outbreaks/export';
-    outbreaksDataExporFileName: string = moment().format('YYYY-MM-DD');
-    allowedExportTypes: ExportDataExtension[] = [
-        ExportDataExtension.CSV,
-        ExportDataExtension.XLS,
-        ExportDataExtension.XLSX,
-        ExportDataExtension.XML,
-        ExportDataExtension.JSON,
-        ExportDataExtension.ODS
-    ];
-
-    anonymizeFields: LabelValuePair[] = [
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_ID', 'id' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_NAME', 'name' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION', 'description' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DISEASE', 'disease' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_START_DATE', 'startDate' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_END_DATE', 'endDate' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS', 'periodOfFollowup' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY', 'frequencyOfFollowUp' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY', 'frequencyOfFollowUpPerDay' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS', 'noDaysAmongContacts' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS', 'noDaysInChains' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN', 'noDaysNotSeen' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS', 'noLessContacts' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT', 'noDaysNewContacts' ),
-        new LabelValuePair( 'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION', 'caseInvestigationTemplate' ),
-        new LabelValuePair( 'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP', 'contactFollowUpTemplate' ),
-        new LabelValuePair( 'LNG_PAGE_CREATE_CASE_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE', 'labResultsTemplate' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK', 'caseIdMask' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES', 'countries' ),
-        new LabelValuePair( 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS', 'longPeriodsBetweenCaseOnset' ),
-    ];
-
     constructor(
         private outbreakDataService: OutbreakDataService,
         private userDataService: UserDataService,
@@ -127,11 +94,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             })
         );
 
-        // add page title
-        this.outbreaksDataExporFileName = this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_TITLE') +
-            ' - ' +
-            this.outbreaksDataExporFileName;
-
         // initialize Side Table Columns
         this.initializeSideTableColumns();
 
@@ -145,11 +107,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
     initializeSideTableColumns() {
         // default table columns
         this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'checkbox',
-                required: true,
-                excludeFromSave: true
-            }),
             new VisibleColumnModel({
                 field: 'name',
                 label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
@@ -202,7 +159,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         qb.include('locations');
 
         // retrieve the list of Outbreaks
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb);
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**
@@ -335,41 +293,6 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
-    }
-
-    /**
-     * Export selected records
-     */
-    exportSelectedOutbreaks() {
-        // get list of follow-ups that we want to modify
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
-            return;
-        }
-
-        // construct query builder
-        const qb = new RequestQueryBuilder();
-        qb.filter.bySelect(
-            'id',
-            selectedRecords,
-            true,
-            null
-        );
-
-        // display export dialog
-        this.dialogService.showExportDialog({
-            // required
-            message: 'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE',
-            url: this.exportOutbreaksUrl,
-            fileName: this.outbreaksDataExporFileName,
-
-            // // optional
-            allowedExportTypes: this.allowedExportTypes,
-            queryBuilder: qb,
-            displayEncrypt: true,
-            displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
-        });
     }
 
     /**

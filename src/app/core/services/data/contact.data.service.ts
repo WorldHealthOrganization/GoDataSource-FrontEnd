@@ -7,6 +7,8 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsSeenEachDays } from '../../models/metrics/metric-contacts-seen-each-days.model';
 import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
+import { EntityModel } from '../../models/entity.model';
+import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class ContactDataService {
@@ -108,13 +110,16 @@ export class ContactDataService {
     }
 
     /**
-     * Add multiple Contacts for a Case
+     * Add multiple Contacts for a Case or Event
      * @param outbreakId
-     * @param caseId
+     * @param sourceEntityType
+     * @param sourceEntityId
      * @param contactsData
      */
-    bulkAddContacts(outbreakId: string, caseId: string, contactsData: any[]): Observable<any> {
-        return this.http.post(`outbreaks/${outbreakId}/cases/${caseId}/contacts`, contactsData);
+    bulkAddContacts(outbreakId: string, sourceEntityType: EntityType, sourceEntityId: string, contactsData: any[]): Observable<any> {
+        const entityTypeLinkPath = EntityModel.getLinkForEntityType(sourceEntityType);
+
+        return this.http.post(`outbreaks/${outbreakId}/${entityTypeLinkPath}/${sourceEntityId}/contacts`, contactsData);
     }
 
     /**

@@ -16,6 +16,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-user-list',
@@ -80,7 +81,8 @@ export class UserListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // get the list of existing users
-        this.usersList$ = this.userDataService.getUsersList(this.queryBuilder);
+        this.usersList$ = this.userDataService.getUsersList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

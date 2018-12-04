@@ -75,16 +75,6 @@ const routes: Routes = [
         }
     },
 
-    // Import outbreak data
-    {
-        path: 'outbreak-data/import',
-        component: fromPages.ImportOutbreakDataComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_OUTBREAK]
-        }
-    },
-
     // Import sync package
     {
         path: 'sync-package/import',

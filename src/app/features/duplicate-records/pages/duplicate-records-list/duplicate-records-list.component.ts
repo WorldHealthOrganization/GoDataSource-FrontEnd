@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-duplicate-records-list',
@@ -96,6 +97,9 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
             this.duplicatesList = null;
             this.outbreakDataService
                 .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap((duplicatesList) => {
+                    this.checkEmptyList(duplicatesList.groups);
+                }))
                 .subscribe((duplicatesList) => {
                     this.duplicatesList = duplicatesList;
                 });

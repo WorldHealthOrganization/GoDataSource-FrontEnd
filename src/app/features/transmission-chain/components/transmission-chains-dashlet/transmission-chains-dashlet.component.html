@@ -130,9 +130,7 @@
         <app-form-radio
             name="nodeNameColorCriteria"
             [(ngModel)]="colorCriteria.nodeNameColorCriteria"
-            [options]="nodeColorCriteriaOptions$ | async"
-            [disabled]="selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value"
-            [tooltip]="tooltipViewTimeline() | translate">
+            [options]="nodeColorCriteriaOptions$ | async">
         </app-form-radio>
 
        <!-- node icon -->

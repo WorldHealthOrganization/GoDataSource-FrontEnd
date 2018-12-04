@@ -9,10 +9,11 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -20,7 +21,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
     templateUrl: './reference-data-category-entries-list.component.html',
     styleUrls: ['./reference-data-category-entries-list.component.less']
 })
-export class ReferenceDataCategoryEntriesListComponent extends ViewModifyComponent implements OnInit {
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
@@ -34,17 +35,14 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
     constructor(
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
-        private snackbarService: SnackbarService,
+        protected snackbarService: SnackbarService,
         private dialogService: DialogService,
         private authDataService: AuthDataService
     ) {
-        super(route);
+        super(snackbarService);
     }
 
     ngOnInit() {
-        // no need for confirm popup on this page
-        this.disableDirtyConfirm();
-
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
         // get the route params
@@ -72,7 +70,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ViewModifyCompone
                 .getReferenceDataByCategory(this.categoryId)
                 .map((category: ReferenceDataCategoryModel) => {
                     return category.entries;
-                });
+                })
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

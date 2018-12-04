@@ -8,33 +8,6 @@
                         [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
-
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
-                </button>
-
-                <mat-menu #quickActionsMenu="matMenu">
-                    <ng-container *ngIf="!appliedListFilter">
-                        <app-export-button
-                            [menuItem]="true"
-                            [label]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_BUTTON' | translate"
-                            [message]="'LNG_PAGE_LIST_OUTBREAKS_EXPORT_TITLE' | translate"
-                            [url]="exportOutbreaksUrl"
-                            [fileName]="outbreaksDataExporFileName"
-                            [allowedExportTypes]="allowedExportTypes"
-                            [displayEncrypt]="true"
-                            [displayAnonymize]="true"
-                            [anonymizeFields]="anonymizeFields"
-                            [queryBuilder]="queryBuilder">
-                        </app-export-button>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/import-export-data', 'outbreak-data', 'import']">
-                            {{'LNG_PAGE_LIST_OUTBREAKS_IMPORT_BUTTON' | translate}}
-                        </button>
-                    </ng-container>
-                </mat-menu>
             </div>
         </div>
     </ng-container>
@@ -59,46 +32,6 @@
     </div>
 
     <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
-        <!-- Checkbox -->
-        <ng-container matColumnDef="checkbox">
-            <mat-header-cell *matHeaderCellDef fxFlex="60px">
-                <div class="table-header-cell">
-                    <div>
-                        <app-form-checkbox
-                            class="table-checkbox"
-                            name="listCheckedAll"
-                            [(ngModel)]="checkedAllRecords">
-                        </app-form-checkbox>
-                    </div>
-                    <div class="column-filter">
-                        <button
-                            mat-icon-button
-                            [matMenuTriggerFor]="actionsMenuMultipleRecords">
-                            <span class="xt-icon">moreVertical</span>
-                        </button>
-
-                        <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                mat-menu-item
-                                (click)="exportSelectedOutbreaks()">
-                                {{ 'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS' | translate }}
-                            </button>
-                        </mat-menu>
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item;" fxFlex="60px">
-                <app-form-checkbox
-                    #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.id + ']'"
-                    class="table-checkbox"
-                    ngModel
-                    (optionChanged)="checkedRecord(item.id, $event)"
-                    (afterInitialize)="checkedRecord(item.id, false)">
-                </app-form-checkbox>
-            </mat-cell>
-        </ng-container>
-
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
@@ -366,6 +299,17 @@
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 </mat-card>
 
 
