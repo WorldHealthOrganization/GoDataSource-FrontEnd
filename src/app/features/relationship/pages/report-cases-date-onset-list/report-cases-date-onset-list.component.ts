@@ -12,6 +12,7 @@ import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-report-cases-date-onset-list',
@@ -71,7 +72,8 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list
-            this.casesWithOnsetList$ = this.relationshipDataService.getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id);
+            this.casesWithOnsetList$ = this.relationshipDataService.getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

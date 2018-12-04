@@ -22,6 +22,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-system-sync-logs-list',
@@ -188,7 +189,8 @@ export class SystemSyncLogsComponent extends ListComponent implements OnInit {
                     // finished
                     return log;
                 });
-            });
+            })
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

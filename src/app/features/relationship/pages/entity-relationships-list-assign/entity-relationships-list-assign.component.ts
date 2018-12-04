@@ -22,6 +22,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-entity-relationships-list-assign',
@@ -206,7 +207,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent implem
             this.entitiesList$ = this.entityDataService.getEntitiesList(
                 this.outbreakId,
                 this.queryBuilder
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

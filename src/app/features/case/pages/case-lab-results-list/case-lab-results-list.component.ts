@@ -20,6 +20,7 @@ import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-case-lab-results-list',
@@ -250,7 +251,8 @@ export class CaseLabResultsListComponent extends ListComponent implements OnInit
             this.caseId
         ) {
             // retrieve the list of lab results
-            this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder);
+            this.labResultsList$ = this.labResultDataService.getCaseLabResults(this.selectedOutbreak.id, this.caseId, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

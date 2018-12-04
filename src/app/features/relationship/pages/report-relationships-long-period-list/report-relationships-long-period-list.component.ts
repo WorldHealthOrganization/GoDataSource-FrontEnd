@@ -11,6 +11,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EntityType } from '../../../../core/models/entity-type';
 import { ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/relationship.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-report-relationships-long-period',
@@ -69,7 +70,8 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list
-            this.relationshipList$ = this.relationshipDataService.getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id);
+            this.relationshipList$ = this.relationshipDataService.getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

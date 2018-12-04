@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'arrowDropdownCircle': '&#xe91f;',
             'visibilityOf': '&#xe91d;',
             'visibility': '&#xe91e;',
             'swapVertical': '&#xe91c;',

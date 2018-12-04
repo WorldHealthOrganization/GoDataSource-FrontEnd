@@ -20,6 +20,7 @@ import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-locations-list',
@@ -40,7 +41,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     parentId: string;
 
     // list of existing locations
-    locationsList: LocationModel[];
+    locationsList$: Observable<LocationModel[]>;
     locationsListCount$: Observable<any>;
 
     yesNoOptionsList$: Observable<any[]>;
@@ -98,11 +99,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
      * Re(load) the list of Locations
      */
     refreshList() {
-        // retrieve the list of Locations
-        this.locationsList = null;
-        this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder).subscribe((locationsList) => {
-            this.locationsList = locationsList;
-        });
+        this.locationsList$ = this.locationDataService.getLocationsListByParent(this.parentId, this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

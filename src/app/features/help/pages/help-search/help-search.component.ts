@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +12,7 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-help-search',
@@ -84,16 +83,17 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
      * Re(load) the items list
      */
     refreshList() {
+        this.queryBuilder.filter.where({approved: true}, true);
         // retrieve the list of items
         if (_.isEmpty(this.searchedTerm)) {
-            this.queryBuilder.filter.where({approved: true}, true);
-            this.queryBuilder.filter.remove('$text');
+            this.queryBuilder.filter.remove('token');
             this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
         } else {
-            // remove the approved property as it is not working together with the text search. The items should be filtered in the API.
-            this.queryBuilder.filter.remove('approved');
-            this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder);
+            this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this.searchedTerm);
         }
+
+        this.helpItemsList$ = this.helpItemsList$
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
 
@@ -103,7 +103,8 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
      * @param {RequestFilterOperator} operator
      */
     filterByTextFieldHelpSearch(value: string) {
-        this.queryBuilder.filter.where({$text: {search: value}}, true);
+        this.searchedTerm = value;
+
         // refresh list
         this.needsRefreshList();
     }

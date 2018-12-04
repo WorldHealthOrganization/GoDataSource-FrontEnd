@@ -100,8 +100,8 @@
                     </div>
                 </mat-card>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -114,13 +114,12 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div>
-                <button mat-button matStepperPrevious>
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>
                     {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                 </button>
                 <button
-                    type="button"
-                    mat-button
+                    type="button" mat-raised-button color="primary"
                     (click)="createNewApplicationClient([detailsForm])">
                     {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
                 </button>

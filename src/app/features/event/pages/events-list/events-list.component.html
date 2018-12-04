@@ -160,58 +160,89 @@
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
             <mat-cell *matCellDef="let item" fxFlex="70px">
-                <div>
-                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                    <span class="xt-icon">moreVertical</span>
+                </button>
 
-                    <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                        <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasContactWriteAccess() && !item.deleted" mat-menu-item routerLink="/contacts/create"
-                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
-                                {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
-                            </button>
+                <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
-                            <mat-divider></mat-divider>
-                        </ng-container>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['/relationships', EntityType.EVENT, item.id]">
-                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
+                    <ng-container *ngIf="!item.deleted">
+                        <button mat-menu-item [routerLink]="['.', item.id, 'view']">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
-                            <button *ngIf="hasEventWriteAccess() && !item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                                {{'LNG_PAGE_ACTION_MODIFY' | translate}}
-                            </button>
+                            <ng-container *ngIf="hasEventWriteAccess()">
+                                <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
+                                    {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                                </button>
 
-                            <button
-                                *ngIf="hasEventWriteAccess() && !item.deleted"
-                                mat-menu-item class="mat-menu-item-delete"
-                                (click)="deleteEvent(item)">
-                                {{'LNG_PAGE_ACTION_DELETE' | translate}}
-                            </button>
-
-                            <button *ngIf="item.deleted && hasEventWriteAccess()" mat-menu-item class="mat-menu-item-restore"
-                                    (click)="restoreEvent(item)">
-                                {{'LNG_PAGE_ACTION_RESTORE' | translate}}
-                            </button>
+                                <button
+                                    mat-menu-item class="mat-menu-item-delete"
+                                    (click)="deleteEvent(item)">
+                                    {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                                </button>
+                            </ng-container>
                         </ng-container>
 
-                    </mat-menu>
-                </div>
+                        <mat-divider></mat-divider>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <ng-container *ngIf="hasContactWriteAccess()">
+                                <button
+                                    *ngIf="hasContactWriteAccess()"
+                                    mat-menu-item
+                                    routerLink="/contacts/create"
+                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
+                                    {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item
+                                    routerLink="/contacts/create-bulk"
+                                    [queryParams]="{ entityType: EntityType.EVENT, entityId: item.id }">
+                                    {{'LNG_PAGE_ACTION_BULK_ADD_CONTACTS' | translate}}
+                                </button>
+                            </ng-container>
+
+                            <mat-divider></mat-divider>
+                        </ng-container>
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['/relationships', EntityType.EVENT, item.id]">
+                            {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
+                        </button>
+                    </ng-container>
+
+                    <ng-container *app-selected-outbreak-is-active>
+                        <button
+                            *ngIf="item.deleted && hasEventWriteAccess()"
+                            mat-menu-item class="mat-menu-item-restore"
+                            (click)="restoreEvent(item)">
+                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
+                        </button>
+                    </ng-container>
+                </mat-menu>
             </mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
         <mat-row *matRowDef="let item; columns: visibleTableColumns"></mat-row>
     </mat-table>
+
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
 
     <mat-paginator
         [length]="(eventsListCount$ | async)?.count"
