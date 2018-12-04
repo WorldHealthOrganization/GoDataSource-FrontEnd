@@ -15,6 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-transmission-chains-list',
@@ -140,6 +141,9 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             } else {
                 this.transmissionChains$ = this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id, this.queryBuilder);
             }
+
+            this.transmissionChains$ = this.transmissionChains$
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

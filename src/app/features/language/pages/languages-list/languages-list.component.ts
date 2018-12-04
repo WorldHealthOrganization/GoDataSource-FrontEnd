@@ -13,6 +13,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components'
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-languages-list',
@@ -69,7 +70,8 @@ export class LanguagesListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of Languages
-        this.languagesList$ = this.languageDataService.getLanguagesList(this.queryBuilder);
+        this.languagesList$ = this.languageDataService.getLanguagesList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

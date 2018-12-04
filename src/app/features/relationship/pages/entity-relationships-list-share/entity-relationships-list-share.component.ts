@@ -25,6 +25,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-entity-relationships-list-share',
@@ -247,7 +248,8 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
                 this.entityType,
                 this.entityId,
                 qb
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

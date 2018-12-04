@@ -17,6 +17,7 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-help-items-list',
@@ -131,7 +132,8 @@ export class HelpItemsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // retrieve the list of items
-        this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder);
+        this.helpItemsList$ = this.helpDataService.getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

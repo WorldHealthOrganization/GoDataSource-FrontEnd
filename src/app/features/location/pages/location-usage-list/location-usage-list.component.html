@@ -94,4 +94,15 @@
         {{ 'LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS' | translate:usageDetailsListMore }}
     </div>
 
+    <div
+        *ngIf="isEmptyList"
+        class="mat-table"
+    >
+        <div class="mat-row">
+            <div class="mat-cell">
+                {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+            </div>
+        </div>
+    </div>
+
 </mat-card>

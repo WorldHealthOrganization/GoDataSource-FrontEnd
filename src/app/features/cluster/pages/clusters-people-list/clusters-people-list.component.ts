@@ -16,6 +16,7 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-clusters-people-list',
@@ -114,7 +115,8 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder);
+            this.clusterPeopleList$ = this.clusterDataService.getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

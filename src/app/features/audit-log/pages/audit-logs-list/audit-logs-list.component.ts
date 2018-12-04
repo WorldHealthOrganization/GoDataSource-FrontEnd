@@ -16,6 +16,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { Constants } from '../../../../core/models/constants';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-audit-logs-list',
@@ -166,6 +167,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
         // retrieve the list of Audit Logs
         this.auditLogsList$ = this.auditLogDataService
             .getAuditLogsList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)))
             .do((items: AuditLogModel[]) => {
                 this.auditLogsTrim = {};
                 _.each(items, (item: AuditLogModel) => {

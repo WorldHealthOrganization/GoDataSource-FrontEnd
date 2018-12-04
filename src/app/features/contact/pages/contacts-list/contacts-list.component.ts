@@ -33,6 +33,7 @@ import { VisibleColumnModel } from '../../../../shared/components/side-columns/m
 import 'rxjs/add/operator/mergeMap';
 import { RiskLevelModel } from '../../../../core/models/risk-level.model';
 import { RiskLevelGroupModel } from '../../../../core/models/risk-level-group.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-contacts-list',
@@ -419,7 +420,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Contacts
-            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder);
+            this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { UserRoleModel } from '../../../../core/models/user-role.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -13,6 +12,7 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-roles-list',
@@ -58,7 +58,8 @@ export class RolesListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // get the list of existing roles
-        this.rolesList$ = this.userRoleDataService.getRolesList(this.queryBuilder);
+        this.rolesList$ = this.userRoleDataService.getRolesList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     deleteRole(userRole: UserRoleModel) {
