@@ -133,6 +133,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 {},
                 this.eventData
             )
-        )
+        );
     }
 }
