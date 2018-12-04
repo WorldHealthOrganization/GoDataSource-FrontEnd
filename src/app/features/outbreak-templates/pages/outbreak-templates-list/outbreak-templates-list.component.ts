@@ -14,6 +14,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-outbreak-templates-list',
@@ -91,7 +92,8 @@ export class OutbreakTemplatesListComponent extends ListComponent implements OnI
      */
     refreshList() {
         // retrieve the list of Events
-        this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder);
+        this.outbreakTemplatesList$ = this.outbreakTemplateDataService.getOutbreakTemplatesList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

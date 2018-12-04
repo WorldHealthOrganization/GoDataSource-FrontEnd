@@ -86,6 +86,8 @@ export class FilterModel {
 
     // select options for SELECT and MULTISELECT filter types
     options$: Observable<any[]> = null;
+    optionsLabelKey: string = 'label';
+    optionsValueKey: string = 'value';
 
     // sortable field / relationship field ( default false )
     sortable: boolean = false;
@@ -126,6 +128,8 @@ export class FilterModel {
         fieldLabel: string,
         type: FilterType,
         options$?: Observable<any[]>,
+        optionsLabelKey?: string,
+        optionsValueKey?: string,
         sortable?: boolean,
         relationshipPath?: string[],
         relationshipLabel?: string,

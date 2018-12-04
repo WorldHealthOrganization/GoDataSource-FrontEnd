@@ -25,6 +25,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { Router } from '@angular/router';
 import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-outbreak-list',
@@ -202,7 +203,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
         qb.include('locations');
 
         // retrieve the list of Outbreaks
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb);
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

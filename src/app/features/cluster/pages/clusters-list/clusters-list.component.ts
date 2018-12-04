@@ -15,6 +15,7 @@ import { DialogAnswer } from '../../../../shared/components/dialog/dialog.compon
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as _ from 'lodash';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-clusters-list',
@@ -70,7 +71,8 @@ export class ClustersListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         if (this.selectedOutbreak) {
-            this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder);
+            this.clustersList$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

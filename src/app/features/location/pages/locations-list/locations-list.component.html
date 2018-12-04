@@ -92,7 +92,7 @@
                 </button>
             </div>
 
-            <mat-table #table [dataSource]="locationsList" matSort (matSortChange)="sortBy($event)">
+            <mat-table #table [dataSource]="locationsList$ | async" matSort (matSortChange)="sortBy($event)">
 
                 <!-- Name -->
                 <ng-container matColumnDef="name">
@@ -248,18 +248,23 @@
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
 
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
             <mat-paginator
                 [length]="(locationsListCount$ | async)?.count"
                 [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions"
                 (page)="changePage($event)">
             </mat-paginator>
-
-            <div
-                *ngIf="locationsList && locationsList.length < 1"
-                class="no-records">
-                {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
-            </div>
         </mat-card>
     </div>
 

@@ -84,16 +84,36 @@
                                     [type]="filter.filter?.type === FilterType.NUMBER ? 'number' : 'text'">
                                 </app-form-input>
 
-                                <!-- SELECT / MULTI-SELECT Filter -->
+                                <!-- SELECT Filter -->
+                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
                                 <app-form-select
-                                    *ngIf="filter.filter?.type === FilterType.SELECT || filter.filter?.type === FilterType.MULTISELECT"
+                                    *ngIf="filter.filter?.type === FilterType.SELECT"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                                     [options]="filter.filter.options$ | async"
-                                    [multiple]="filter.filter.type === FilterType.MULTISELECT"
+                                    [multiple]="false"
                                     [allowSelectionOfDisabledItems]="true"
-                                    [displayInvisibleItems]="true">
+                                    [displayInvisibleItems]="true"
+                                    [optionValueKey]="filter.filter.optionsValueKey"
+                                    [optionLabelKey]="filter.filter.optionsLabelKey">
+                                </app-form-select>
+
+                                <!-- MULTI-SELECT Filter -->
+                                <!-- had to split these two selects into one select because we can't change multiple property after initialization -->
+                                <!-- so in case we switched from a multi select to a single select an exception was raised -->
+                                <app-form-select
+                                    *ngIf="filter.filter?.type === FilterType.MULTISELECT"
+                                    [name]="'filter[filters][' + i + '][value]'"
+                                    [(ngModel)]="filter.value"
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    [options]="filter.filter.options$ | async"
+                                    [multiple]="true"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [optionValueKey]="filter.filter.optionsValueKey"
+                                    [optionLabelKey]="filter.filter.optionsLabelKey">
                                 </app-form-select>
 
                                 <!-- NUMBER / AGE RANGE Filter -->

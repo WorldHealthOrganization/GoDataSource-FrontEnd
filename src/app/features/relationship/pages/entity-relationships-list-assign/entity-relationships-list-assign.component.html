@@ -46,10 +46,39 @@
                 <ng-container matColumnDef="checkbox">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px">
                         <div class="table-header-cell">
-                            <app-form-checkbox
-                                name="listCheckedAll"
-                                [(ngModel)]="checkedAllRecords">
-                            </app-form-checkbox>
+                            <div>
+                                <button
+                                    type="button"
+                                    class="bulk-actions-button"
+                                    mat-icon-button
+                                    [disableRipple]="true"
+                                    [matMenuTriggerFor]="actionsMenuMultipleRecords"
+                                    color="accent"
+                                    [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
+                                    [disabled]="isEmptyList"
+                                >
+                                    <span class="xt-icon">arrowDropdownCircle</span>
+                                </button>
+
+                                <mat-menu #actionsMenuMultipleRecords="matMenu">
+                                    <button
+                                        *ngIf="!checkedAllRecords"
+                                        mat-menu-item
+                                        (click)="checkAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
+                                    </button>
+                                    <button
+                                        *ngIf="checkedRecords.length > 0"
+                                        mat-menu-item
+                                        (click)="uncheckAllRecords()">
+                                        {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
+                                    </button>
+                                </mat-menu>
+                            </div>
+
+                            <div class="column-filter">
+                                <!-- placeholder -->
+                            </div>
                         </div>
                     </mat-header-cell>
                     <mat-cell *matCellDef="let item;" fxFlex="70px">
@@ -285,6 +314,17 @@
                 <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
+
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
 
             <mat-paginator
                 [length]="(entitiesListCount$ | async)?.count"

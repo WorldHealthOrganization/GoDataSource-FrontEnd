@@ -137,6 +137,9 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
             .subscribe((settings: SystemSettingsModel) => {
                 this.settings = settings;
                 this.upstreamServerList = _.get(this.settings, 'upstreamServers', []);
+
+                // flag if list is empty
+                this.checkEmptyList(this.upstreamServerList);
             });
     }
 

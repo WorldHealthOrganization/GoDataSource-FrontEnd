@@ -19,6 +19,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-inconsistencies-list',
@@ -107,7 +108,8 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
      */
     refreshList() {
         if (this.outbreak) {
-            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.outbreak.id, this.queryBuilder);
+            this.entitiesList$ = this.outbreakDataService.getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

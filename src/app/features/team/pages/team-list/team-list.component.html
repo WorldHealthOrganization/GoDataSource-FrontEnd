@@ -43,7 +43,7 @@
     <div class="form-content">
         <mat-card class="page-section page-content">
 
-            <mat-table #table [dataSource]="teamsList" matSort (matSortChange)="sortBy($event)">
+            <mat-table #table [dataSource]="teamsList$" matSort (matSortChange)="sortBy($event)">
 
                 <!-- Name -->
                 <ng-container matColumnDef="name">
@@ -51,7 +51,14 @@
                         <div class="table-header-cell">
                             <div mat-sort-header class="column-header">{{ "LNG_TEAM_FIELD_LABEL_NAME" | translate}}</div>
                             <div class="column-filter">
-                                <!-- placeholder -->
+                                <app-form-input
+                                    name="nameFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                    (optionChanged)="filterByTextField('name', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
                             </div>
                         </div>
                     </mat-header-cell>
@@ -132,18 +139,23 @@
                 <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
             </mat-table>
 
+            <div
+                *ngIf="isEmptyList"
+                class="mat-table"
+            >
+                <div class="mat-row">
+                    <div class="mat-cell">
+                        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                    </div>
+                </div>
+            </div>
+
             <mat-paginator
                 [length]="(teamsListCount$ | async)?.count"
                 [pageSize]="pageSize"
                 [pageSizeOptions]="pageSizeOptions"
                 (page)="changePage($event)">
             </mat-paginator>
-
-            <div
-                *ngIf="teamsList && teamsList.length < 1"
-                class="no-records">
-                {{ 'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS' | translate }}
-            </div>
         </mat-card>
     </div>
 

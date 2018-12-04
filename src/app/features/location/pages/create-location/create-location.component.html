@@ -65,6 +65,11 @@
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT' | translate"
                                 tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION"
                                 [required]="isLatLngRequired(lngInput.value)"
+                                app-min-max-validator
+                                [min]="-90"
+                                [minNumber]="-90"
+                                [max]="90"
+                                [maxNumber]="90"
                                 type="number"
                                 (optionChanged)="onChangeLatLng('lat', $event)">
                             </app-form-input>
@@ -76,6 +81,11 @@
                                 [placeholder]="'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG' | translate"
                                 tooltip="LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION"
                                 [required]="isLatLngRequired(latInput.value)"
+                                app-min-max-validator
+                                [min]="-180"
+                                [minNumber]="-180"
+                                [max]="180"
+                                [maxNumber]="180"
                                 type="number"
                                 (optionChanged)="onChangeLatLng('lng', $event)">
                             </app-form-input>
@@ -100,8 +110,8 @@
                     [unique]="true">
                 </app-form-input-list>
 
-                <div>
-                    <button mat-button matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -114,13 +124,12 @@
 
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
 
-            <div>
-                <button mat-button matStepperPrevious>
+            <div class="stepper-wrapper">
+                <button mat-raised-button type="button" matStepperPrevious>
                     {{'LNG_STEPPER_BUTTON_BACK' | translate}}
                 </button>
                 <button
-                    type="button"
-                    mat-button
+                    type="button" mat-raised-button color="primary"
                     (click)="createNewLocation([detailsForm])">
                     {{'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON' | translate}}
                 </button>

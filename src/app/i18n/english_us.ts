@@ -37,7 +37,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
-        'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
+        'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
         'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL': 'Teams & Assignments',
         'LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL': '[Active] {{name}}',
 
@@ -63,6 +63,7 @@ export const EnglishUsLang = {
         'LNG_COMMON_LABEL_EXPORT_ERROR': 'Export failed...',
         'LNG_COMMON_LABEL_NO_RECORDS_SELECTED': 'No records selected',
         'LNG_COMMON_LABEL_RECORDS_NUMBER': '{{value}} RESULTS',
+        'LNG_COMMON_LABEL_EMPTY_TABLE': 'There are no records to be displayed',
 
         /**
          * General Actions
@@ -101,6 +102,13 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_CHANGE': 'Change',
         'LNG_COMMON_BUTTON_CLONE': 'Clone',
         'LNG_COMMON_BUTTON_QUICK_ACTIONS': 'Quick actions',
+
+        /**
+         * Bulk actions on List pages
+         */
+        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP': 'Bulk Actions',
+        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL': 'Check All',
+        'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL': 'Uncheck All',
 
         /**
          * Dialogs
@@ -659,7 +667,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON': 'Import Location Data',
         'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON': 'Add location',
         'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON': 'Add sublocation',
-        'LNG_PAGE_LIST_LOCATIONS_LABEL_NO_RECORDS': 'There are no records matching the provided conditions',
         'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON': 'Export Hierarchical Locations',
         'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE': 'Export Hierarchical Locations',
 
@@ -1050,6 +1057,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE': 'Team changed!',
 
         /**
          * Follow-ups list page => Questionnaire dialog

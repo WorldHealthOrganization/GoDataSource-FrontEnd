@@ -22,6 +22,7 @@ import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-available-entities-list',
@@ -193,7 +194,8 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
             this.entitiesList$ = this.entityDataService.getEntitiesList(
                 this.outbreakId,
                 this.queryBuilder
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
