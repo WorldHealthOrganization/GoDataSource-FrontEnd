@@ -80,9 +80,13 @@ export abstract class ListComponent {
      */
     protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
+    // pagination
     public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
     public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
     private paginatorInitialized = false;
+
+    // flag set to true if the list is empty
+    public isEmptyList: boolean;
 
     /**
      * Models for the checkbox functionality
@@ -184,6 +188,13 @@ export abstract class ListComponent {
 
         // refresh list
         this.triggerListRefresh.call(instant);
+    }
+
+    /**
+     * Checks if list is empty
+     */
+    checkEmptyList(list: any[]) {
+        this.isEmptyList = _.isEmpty(list);
     }
 
     /**
@@ -1142,6 +1153,14 @@ export abstract class ListComponent {
 
         // valid, send list of IDs back
         return selectedRecords;
+    }
+
+    public checkAllRecords() {
+        this.checkedAllRecords = true;
+    }
+
+    public uncheckAllRecords() {
+        this.checkedAllRecords = false;
     }
 
     /**

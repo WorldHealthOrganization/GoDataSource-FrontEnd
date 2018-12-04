@@ -26,6 +26,7 @@ import { EventModel } from '../../../../core/models/event.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-entity-relationships-list',
@@ -248,7 +249,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 this.entityType,
                 this.entityId,
                 qb
-            );
+            )
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

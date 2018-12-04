@@ -22,6 +22,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-system-config-main',
@@ -155,7 +156,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
      * Refresh list
      */
     refreshList() {
-        this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder);
+        this.backupsList$ = this.systemBackupDataService.getBackupList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

@@ -36,6 +36,7 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { NgModel } from '@angular/forms';
 import * as FileSaver from 'file-saver';
 import { TeamModel } from '../../../../core/models/team.model';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -715,7 +716,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
-                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder);
+                .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+                .pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

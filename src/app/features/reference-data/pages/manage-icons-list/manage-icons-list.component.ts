@@ -11,6 +11,7 @@ import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components'
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-manage-icons-list',
@@ -123,7 +124,8 @@ export class ManageIconsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         this.iconsList$ = this.iconDataService
-            .getIconsList(this.queryBuilder);
+            .getIconsList(this.queryBuilder)
+            .pipe(tap(this.checkEmptyList.bind(this)));
     }
 
     /**

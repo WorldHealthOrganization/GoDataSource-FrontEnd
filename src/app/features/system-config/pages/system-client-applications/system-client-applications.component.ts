@@ -156,6 +156,9 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                     // finished
                     return item;
                 });
+
+            // flag if list is empty
+            this.checkEmptyList(this.clientApplicationsServerList);
         });
     }
 
