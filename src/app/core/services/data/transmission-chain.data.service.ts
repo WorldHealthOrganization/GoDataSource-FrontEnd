@@ -186,14 +186,19 @@ export class TransmissionChainDataService {
      * @param filters
      * @param colorCriteria
      * @param locationsList
+     * @param selectedViewType
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[]): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: []};
+    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[], selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value): any {
+        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [], timelineDateCheckpoints: []};
         const selectedNodeIds: string[] = [];
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
         const monthsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+
+        let minTimelineDate: string = '';
+        let maxTimelineDate: string = '';
+
         const onsetLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_LABEL');
         const onsetApproximateLabel = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_APRROXIMATE_LABEL');
 
@@ -207,24 +212,37 @@ export class TransmissionChainDataService {
                     // show nodes based on their type
                     if (node.type === EntityType.CONTACT && filters.showContacts) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfLastContact)) {
-                            nodeProps.dateTimeline = node.model.dateOfLastContact;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.contactNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.contactNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.EVENT && filters.showEvents) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.data)) {
-                            nodeProps.dateTimeline = node.model.date;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.data)) {
+                                nodeProps.dateTimeline = node.model.date;
+                            } else {
+                                graphData.eventNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.eventNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     } else if (node.type === EntityType.CASE) {
                         allowAdd = true;
-                        if (!_.isEmpty(node.model.dateOfOnset)) {
-                            nodeProps.dateTimeline = node.model.dateOfOnset;
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfOnset)) {
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
-                            graphData.caseNodesWithoutDates.push(node.model.id);
+                            nodeProps.dateTimeline = null;
                         }
                     }
                     if (allowAdd) {
@@ -341,10 +359,40 @@ export class TransmissionChainDataService {
                                 nodeData.label = '';
                             }
                         }
+
+                        // check min / max dates
+                        if (!_.isEmpty(nodeData.dateTimeline)) {
+                            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || _.isEmpty(maxTimelineDate)) {
+                                maxTimelineDate = nodeData.dateTimeline;
+                            }
+                            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || _.isEmpty(minTimelineDate)) {
+                                minTimelineDate = nodeData.dateTimeline;
+                            }
+                        }
                         graphData.nodes.push({data: nodeData});
                         selectedNodeIds.push(nodeData.id);
                     }
                 });
+
+                // generate checkpoint nodes
+                graphData.timelineDateCheckpoints = [];
+                const counterDate = moment(minTimelineDate);
+                counterDate.subtract(1, 'days');
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+                while (counterDate.isBefore(moment(maxTimelineDate))) {
+                    counterDate.add(1, 'days');
+                    const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                    graphData.timelineDateCheckpoints.push(counterDateFormatted);
+                    // generate node
+                    const checkpointNode = new GraphNodeModel({
+                        dateTimeline: counterDateFormatted,
+                        id: counterDateFormatted,
+                        name: counterDateFormatted,
+                        nodeType: 'checkpoint'
+                    });
+                    graphData.nodes.push({data: checkpointNode});
+                }
+                graphData.timelineDateCheckpoints.push(counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
             }
 
             // generate edges based on the nodes included in the graph

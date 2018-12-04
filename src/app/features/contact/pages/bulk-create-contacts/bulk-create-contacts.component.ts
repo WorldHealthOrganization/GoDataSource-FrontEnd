@@ -33,11 +33,7 @@ import { EntityModel } from '../../../../core/models/entity.model';
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
-        new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
     outbreakId: string;
@@ -110,6 +106,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     return;
                 }
 
+                this.initBreadcrumbs();
+
                 // retrieve related person information
                 this.retrieveRelatedPerson();
             });
@@ -130,6 +128,26 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
                 this.retrieveRelatedPerson();
             });
+    }
+
+    /**
+     * Init breadcrumbs
+     */
+    initBreadcrumbs() {
+        if (this.relatedEntityType === EntityType.EVENT) {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+            ];
+        } else {
+            this.breadcrumbs = [
+                new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+            ];
+        }
+
+        this.breadcrumbs.push.apply(this.breadcrumbs, [
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+            new BreadcrumbItemModel('LNG_PAGE_BULK_ADD_CONTACTS_TITLE', '.', true)
+        ]);
     }
 
     /**
@@ -355,7 +373,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
                         .subscribe((data) => {
                             // create contacts
-                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityId, data)
+                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
 
