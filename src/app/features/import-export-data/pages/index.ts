@@ -5,7 +5,6 @@ import { ImportDataComponent } from '../components/import-data/import-data.compo
 import { ImportReferenceDataComponent } from './import-reference-data/import-reference-data.component';
 import { ImportCaseDataComponent } from './import-case-data/import-case-data.component';
 import { ImportContactDataComponent } from './import-contact-data/import-contact-data.component';
-import { ImportOutbreakDataComponent } from './import-outbreak-data/import-outbreak-data.component';
 import { ImportLocationDataComponent } from './import-location-data/import-location-data.component';
 import { ImportLanguageTokensComponent } from './import-language-tokens/import-language-tokens.component';
 import { ImportSyncPackageComponent } from './import-sync-package/import-sync-package.component';
@@ -18,7 +17,6 @@ export * from '../components/import-data/import-data.component';
 export * from './import-reference-data/import-reference-data.component';
 export * from './import-case-data/import-case-data.component';
 export * from './import-contact-data/import-contact-data.component';
-export * from './import-outbreak-data/import-outbreak-data.component';
 export * from './import-language-tokens/import-language-tokens.component';
 export * from './import-sync-package/import-sync-package.component';
 
@@ -31,7 +29,6 @@ export const pageComponents: any[] = [
     ImportReferenceDataComponent,
     ImportCaseDataComponent,
     ImportContactDataComponent,
-    ImportOutbreakDataComponent,
     ImportLanguageTokensComponent,
     ImportSyncPackageComponent
 ];
