@@ -35,6 +35,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { NgModel } from '@angular/forms';
 import * as FileSaver from 'file-saver';
+import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -68,7 +69,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     dateFilterDefaultValue: Moment;
 
-    teamsListMap: any = {};
+    teamsList$: Observable<TeamModel[]>;
+    teamsListLoaded: TeamModel[];
 
     // print daily Follow-ups
     printDailyFollowUpsUrl: string;
@@ -136,10 +138,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.initializeHeaderFilters();
 
         // load teams list
-        this.teamDataService.getTeamsList().subscribe( (teamsList) => {
-            _.forEach(teamsList, (team) => {
-                this.teamsListMap[team.id] = team;
-            });
+        // using share does the job, but it takes a bit to see the changes in the list
+        // loading an array is instantaneous
+        this.teamsList$ = this.teamDataService.getTeamsList().share();
+        this.teamsList$.subscribe((teamsList) => {
+            this.teamsListLoaded = teamsList;
         });
 
         // get the authenticated user
@@ -399,6 +402,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 fieldName: 'date',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
                 type: FilterType.RANGE_DATE
+            }),
+            new FilterModel({
+                fieldName: 'teamId',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                type: FilterType.MULTISELECT,
+                options$: this.teamsList$,
+                optionsLabelKey: 'name',
+                optionsValueKey: 'id'
             }),
             new FilterModel({
                 fieldName: 'targeted',
@@ -946,5 +957,33 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             // NOTHING TO DO HERE
             // not even to refresh list of follow-ups since we don't want to display this information, and it would be a waste of time to refresh the list, loose page etc...
         });
+    }
+
+    /**
+     * Change FollowUp Team
+     */
+    changeFollowUpTeam(
+        followUp: FollowUpModel,
+        team: TeamModel
+    ) {
+        // modify follow-up
+        this.followUpsDataService
+            .modifyFollowUp(
+                this.selectedOutbreak.id,
+                followUp.personId,
+                followUp.id, {
+                    teamId: team ? team.id : null
+                }
+            ).catch((err) => {
+                this.snackbarService.showApiError(err);
+                return ErrorObservable.create(err);
+            }).subscribe(() => {
+                // update loaded follow-up data
+                followUp.teamId = team.id;
+
+                // show success ?
+                // this might not be the best idea...maybe we can replace / remove it
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
+            });
     }
 }
