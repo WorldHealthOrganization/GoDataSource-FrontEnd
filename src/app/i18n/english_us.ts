@@ -230,6 +230,7 @@ export const EnglishUsLang = {
         'LNG_API_ERROR_CODE_ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE': 'Multiple addresses set as Usual Place of Residence. Only one address should be set as Usual Place of Residence',
         'LNG_API_ERROR_CODE_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE': 'Addresses set as Previous Usual Place of Residence must have a date set',
         'LNG_API_ERROR_CODE_MODEL_IN_USE': '{{userRoleName}} role is in use and cannot be deleted',
+        'LNG_API_ERROR_CODE_UPSTREAM_SERVER_SYNC_IN_PROGRESS': 'Only a sync action can be in progress at a time',
 
         /**
          * Common Fields

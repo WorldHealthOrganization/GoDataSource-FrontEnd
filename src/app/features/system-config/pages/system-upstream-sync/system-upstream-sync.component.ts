@@ -267,7 +267,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             upstreamServers: settings.upstreamServers
                         })
                         .catch((err) => {
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
@@ -296,7 +296,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                         .getSyncLog(syncLogId)
                         .catch((err) => {
                             this.loading = false;
-                            this.snackbarService.showError(err.message);
+                            this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
                         })
                         .subscribe((systemSyncLogModel: SystemSyncLogModel) => {
@@ -335,6 +335,10 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                     this.loading = true;
                     this.systemSyncDataService
                         .sync(upstreamServer.url)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            return ErrorObservable.create(err);
+                        })
                         .subscribe((result: SystemSyncModel) => {
                             syncCheckIfDone(result.syncLogId);
                         });
