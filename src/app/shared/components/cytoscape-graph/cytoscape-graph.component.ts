@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
 import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
+import { GraphNodeModel } from '../../../core/models/graph-node.model';
 
 @Component({
     selector: 'app-cytoscape-graph',
@@ -31,10 +32,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
 
     transmissionChainViewTypes$: Observable<any[]>;
     timelineViewType: string = 'horizontal';
+    maxTimelineIndex: number = 0;
 
     showLegend: boolean = true;
 
-    objectKeys = Object.keys;
     /**
      *  layout cola - bubble view
      *  Nodes are automatically arranged to optimally use the space
@@ -106,7 +107,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 });
             if (this.timelineViewType === 'horizontal') {
                 // using 150px as it looks fine
-                posX = datesIndex * 150;
+                posX = datesIndex * 200;
             } else {
                 // timeline vertical view
                 // using 100px as it looks fine
@@ -126,11 +127,19 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
                 }
                 if (this.timelineViewType === 'horizontal') {
                     // using 100 px as it looks fine
-                    posY = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 100 : (nodeIndex - 1) * 100 * -1;
+                    if (nodeData.nodeType === 'checkpoint') {
+                        posY = -100;
+                    } else {
+                        posY = (nodeIndex) * 100;
+                    }
                 } else {
                     // timeline vertical view
                     // using 200 px as it looks fine
-                    posX = (nodeIndex % 2 === 0) ? (nodeIndex - 1) * 200 : (nodeIndex - 1) * 200 * -1;
+                    if (nodeData.nodeType === 'checkpoint') {
+                        posX = -200;
+                    } else {
+                        posX = (nodeIndex) * 200;
+                    }
                 }
                 return {x: posX, y: posY};
             }
@@ -141,7 +150,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     layout: any;
 
     defaultZoom: any = {
-        min: 0.1,
+        min: 0.02,
         max: 4
     };
 
@@ -176,22 +185,24 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         }
     ];
 
-    // the style for the timeline view. The label field is modified in order to display dateTimeline
+    // the style for the timeline view.
     timelineStyle: any = [
         {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
                 'color': 'data(nodeNameColor)',
-                'label': 'data(labelTimeline)',
+                'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)',
                 'background-image': 'data(picture)',
-                'height': 30,
-                'width': 30,
+                'height': 'data(height)',
+                'width': 'data(width)',
+                'shape': 'data(shape)',
                 'background-fit': 'cover',
-                'border-color': 'data(nodeColor)',
-                'border-width': 3
+                'text-valign': 'data(labelPosition)',
+                'border-color': 'data(borderColor)',
+                'border-width': 1
             }
         },
         {
@@ -212,6 +223,9 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     datesArray: string[] = [];
     timelineDates: any = {};
 
+    timelineNodes: any = [];
+
+    timelineNodesIndexes: any = [];
 
     constructor(
         private genericDataService: GenericDataService,
@@ -230,6 +244,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         if (!this.transmissionChainViewType) {
             this.transmissionChainViewType = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value;
         }
+
     }
 
     public ngOnChanges(): any {
@@ -272,11 +287,6 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             this.edgeTapped.emit(edge.json().data);
         });
 
-        // document.getElementById('cy').style.height = String(5000) + 'px';
-        // document.getElementById('cy').style.width = String(5000) + 'px';
-        // this.cy.resize();
-        // this.cy.fit();
-
     }
 
     /**
@@ -286,17 +296,24 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         // empty the already set timeline and dates arrays
         this.timelineDates = {};
         this.datesArray = [];
+
+        this.timelineNodes = [];
         // loop through nodes to extract the dates ( dateTimeline)
         _.forEach(this.elements.nodes, (node, key) => {
             if (!_.isEmpty(node.data.dateTimeline)) {
                 if (this.timelineDates[node.data.dateTimeline]) {
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                    if (this.timelineDates[node.data.dateTimeline].length > this.maxTimelineIndex) {
+                        this.maxTimelineIndex = this.timelineDates[node.data.dateTimeline].length;
+                    }
                 } else {
                     this.timelineDates[node.data.dateTimeline] = [];
                     this.timelineDates[node.data.dateTimeline].push(node.data.id);
+                    this.timelineNodesIndexes[node.data.dateTimeline] = [];
                 }
                 this.datesArray.push(node.data.dateTimeline);
             }
+
         });
         this.datesArray = _.uniq(this.datesArray);
         this.datesArray = _.sortBy(this.datesArray);
@@ -400,7 +417,13 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             scale = 4;
         }
 
-        const png64 = this.cy.png({bg: 'white', scale: scale});
+        let png64 = '';
+        if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+           png64 = this.cy.png({bg: 'white', full: true});
+        } else {
+           png64 = this.cy.png({bg: 'white', scale: scale});
+        }
+
         return png64;
     }
 
