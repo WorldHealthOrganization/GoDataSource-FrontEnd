@@ -9,7 +9,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogAnswerButton } from '../../../../shared/components';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
