@@ -334,7 +334,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
             // get chain data and convert to graph nodes
             this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
                 if (!_.isEmpty(chains)) {
-                    this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList);
+                   this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
                 } else {
                     this.graphElements = [];
                 }
@@ -514,25 +514,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     viewTypeChanged(viewType) {
         this.selectedViewType = viewType.value;
-        if (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
-            // if node label criteria is already 'type' then do not reload the graph data.
-            if (this.colorCriteria.nodeNameColorCriteria !== 'type') {
-                this.colorCriteria.nodeNameColorCriteria = 'type';
-                // refresh chain to load the new criteria
-                this.displayChainsOfTransmission();
-            }
-        }
-    }
-
-    /**
-     * return the tooltip for criteria based on the selected view type
-     * @returns {string}
-     */
-    tooltipViewTimeline() {
-        return (this.selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_COLOR_CRITERIA_TIMELINE_VIEW_TOOLTIP'
-                : null
-        );
+        // refresh chain to load the new criteria
+        this.displayChainsOfTransmission();
     }
 
     /**
