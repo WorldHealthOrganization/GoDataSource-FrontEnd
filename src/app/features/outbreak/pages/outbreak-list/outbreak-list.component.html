@@ -32,64 +32,6 @@
     </div>
 
     <mat-table #table [dataSource]="outbreaksList$ | async" matSort (matSortChange)="sortBy($event)">
-        <!-- Checkbox -->
-        <ng-container matColumnDef="checkbox">
-            <mat-header-cell *matHeaderCellDef fxFlex="60px">
-                <div class="table-header-cell">
-                    <div>
-                        <button
-                            type="button"
-                            class="bulk-actions-button"
-                            mat-icon-button
-                            [disableRipple]="true"
-                            [matMenuTriggerFor]="actionsMenuMultipleRecords"
-                            color="accent"
-                            [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
-                            [disabled]="isEmptyList"
-                        >
-                            <span class="xt-icon">arrowDropdownCircle</span>
-                        </button>
-
-                        <mat-menu #actionsMenuMultipleRecords="matMenu">
-                            <button
-                                *ngIf="!checkedAllRecords"
-                                mat-menu-item
-                                (click)="checkAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL' | translate }}
-                            </button>
-                            <button
-                                *ngIf="checkedRecords.length > 0"
-                                mat-menu-item
-                                (click)="uncheckAllRecords()">
-                                {{ 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL' | translate }}
-                            </button>
-
-                            <mat-divider></mat-divider>
-
-                            <button
-                                mat-menu-item
-                                (click)="exportSelectedOutbreaks()">
-                                {{ 'LNG_PAGE_LIST_OUTBREAKS_GROUP_ACTION_EXPORT_SELECTED_OUTBREAKS' | translate }}
-                            </button>
-                        </mat-menu>
-                    </div>
-                    <div class="column-filter">
-                        <!-- placeholder -->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item;" fxFlex="60px">
-                <app-form-checkbox
-                    #listCheckedIndividual
-                    [name]="'listCheckedIndividual[' + item.id + ']'"
-                    class="table-checkbox"
-                    ngModel
-                    (optionChanged)="checkedRecord(item.id, $event)"
-                    (afterInitialize)="checkedRecord(item.id, false)">
-                </app-form-checkbox>
-            </mat-cell>
-        </ng-container>
-
         <!-- Name -->
         <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef>
