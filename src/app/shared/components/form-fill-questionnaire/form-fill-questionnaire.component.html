@@ -12,7 +12,7 @@
                     *ngFor="let categoryData of questionsGroupedByCategory"
                     fxFlex fxLayout="column" fxLayoutAlign="start stretch">
                     <div
-                        *ngIf="!hideCategories"
+                        *ngIf="!hideCategories && !notInSequence"
                         fxFlex fxLayout="row" fxLayoutAlign="center"
                          class="questionnaire-category-title">
                         {{ categoryData.category | translate }}

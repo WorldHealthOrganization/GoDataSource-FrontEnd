@@ -40,6 +40,7 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         category: string,
         questions: QuestionModel[]
     }[];
+    notInSequence: boolean = false;
 
     additionalQuestions: {
         [ variable: string ]: {
@@ -76,10 +77,38 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         // reset additional questions
         this.additionalQuestions = {};
 
+        // make sure we have questions ordered - these are sorted by api, but it doesn't hurt to make sure they are...
+        questions = _.sortBy(questions, 'order');
+
+        // determine if questions are ordered in sequence keeping in mind the question categories
+        const usedCategories: {
+            [category: string]: boolean
+        } = {};
+        let currentCategory: string = null;
+        this.notInSequence = false;
+        _.each(questions, (question: QuestionModel) => {
+            // check if current question category was used already before current category
+            if (
+                currentCategory !== null &&
+                currentCategory !== question.category &&
+                usedCategories[question.category] !== undefined
+            ) {
+                // we can't group by category
+                this.notInSequence = true;
+
+                // stop each
+                return false;
+            }
+
+            // set current category
+            currentCategory = question.category;
+            usedCategories[currentCategory] = true;
+        });
+
         // group them by category
         this.uploadersData = {};
         this.questionsGroupedByCategory = _.chain(questions)
-            .groupBy('category')
+            .groupBy(this.notInSequence ? () => 'dummy' : 'category')
             .transform((result, questionsData: QuestionModel[], category: string) => {
                 // map additional questions
                 _.each(questionsData, (question: QuestionModel) => {
