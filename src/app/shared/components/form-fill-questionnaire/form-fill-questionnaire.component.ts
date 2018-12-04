@@ -38,7 +38,8 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
     questionsGroupedByCategory: {
         category: string,
-        questions: QuestionModel[]
+        questions: QuestionModel[],
+        startIndex: number
     }[];
 
     additionalQuestions: {
@@ -76,43 +77,61 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
         // reset additional questions
         this.additionalQuestions = {};
 
-        // group them by category
+        // make sure we have questions ordered - these are sorted by api, but it doesn't hurt to make sure they are...
+        questions = _.sortBy(questions, 'order');
+
+        // group them by category, keeping in mind the questions order
         this.uploadersData = {};
-        this.questionsGroupedByCategory = _.chain(questions)
-            .groupBy('category')
-            .transform((result, questionsData: QuestionModel[], category: string) => {
-                // map additional questions
-                _.each(questionsData, (question: QuestionModel) => {
-                    // add file upload handler if necessary
-                    if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
-                        // create file uploader
-                        this.uploadersData[question.variable] = {
-                            uploader: new FileUploader({}),
-                            attachment: null,
-                            uploading: false
-                        };
+        this.questionsGroupedByCategory = [];
+        let currentCategory: {
+            category: string,
+            questions: QuestionModel[],
+            startIndex: number
+        } = null;
+        _.each(questions, (question: QuestionModel) => {
+            // add file upload handler if necessary
+            if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
+                // create file uploader
+                this.uploadersData[question.variable] = {
+                    uploader: new FileUploader({}),
+                    attachment: null,
+                    uploading: false
+                };
+            }
+
+            // map answers
+            _.each(question.answers, (answer: AnswerModel) => {
+                if (!_.isEmpty(answer.additionalQuestions)) {
+                    // answer value should be unique
+                    // can't use _.set since we can have dots & square brackets inside strings
+                    if (!this.additionalQuestions[question.variable]) {
+                        this.additionalQuestions[question.variable] = {};
                     }
+                    this.additionalQuestions[question.variable][answer.value] = answer.additionalQuestions;
+                }
+            });
 
-                    // map answers
-                    _.each(question.answers, (answer: AnswerModel) => {
-                        if (!_.isEmpty(answer.additionalQuestions)) {
-                            // answer value should be unique
-                            // can't use _.set since we can have dots & square brackets inside strings
-                            if (!this.additionalQuestions[question.variable]) {
-                                this.additionalQuestions[question.variable] = {};
-                            }
-                            this.additionalQuestions[question.variable][answer.value] = answer.additionalQuestions;
-                        }
-                    });
-                });
+            // check if current question category is the same as question category, if not..add a new one
+            if (
+                currentCategory === null ||
+                currentCategory.category !== question.category
+            ) {
+                // add category
+                currentCategory = {
+                    category: question.category,
+                    questions: [],
+                    startIndex: currentCategory ? (
+                        currentCategory.startIndex + currentCategory.questions.length
+                    ) : 0
+                };
 
-                // sort & add root questions
-                result.push({
-                    category: category,
-                    questions: _.sortBy(questionsData, 'order')
-                });
-            }, [])
-            .value();
+                // add to list
+                this.questionsGroupedByCategory.push(currentCategory);
+            }
+
+            // add question
+            currentCategory.questions.push(question);
+        });
 
         // initialize uploader
         this.initializeUploader();
