@@ -173,7 +173,7 @@
                         <app-form-input
                             name="firstContactFirstName"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
@@ -196,7 +196,7 @@
                         <app-form-input
                             name="firstContactFirstName"
                             ngModel
-                            placeholder="{{'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate}}"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">

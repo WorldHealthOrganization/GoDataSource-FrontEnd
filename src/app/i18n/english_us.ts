@@ -37,7 +37,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
-        'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter',
+        'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
         'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL': 'Teams & Assignments',
         'LNG_LAYOUT_ACTIVE_OUTBREAK_LABEL': '[Active] {{name}}',
 
