@@ -80,7 +80,8 @@
         </div>
     </div>
 
-    <mat-table #table [dataSource]="contactsList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
+    <mat-table #table [dataSource]="contactsList$ | async" matSort
+               (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
         <!-- Checkbox -->
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef fxFlex="60px">
@@ -132,7 +133,8 @@
         <ng-container matColumnDef="lastName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="lastNameFilter"
@@ -155,7 +157,8 @@
         <ng-container matColumnDef="firstName">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}</div>
+                    <div mat-sort-header class="column-header">{{ "LNG_CONTACT_FIELD_LABEL_FIRST_NAME" | translate}}
+                    </div>
                     <div class="column-filter">
                         <app-form-input
                             name="firstNameFilter"
@@ -249,7 +252,8 @@
         <ng-container matColumnDef="riskLevel">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="riskLevelFilter"
@@ -278,7 +282,9 @@
         <ng-container matColumnDef="finalStatus">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate
+                        }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="finalStatusFilter"
@@ -334,7 +340,8 @@
         <ng-container matColumnDef="wasCase">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_WAS_CASE' | translate }}</div>
+                    <div mat-sort-header class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_WAS_CASE' | translate }}
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="wasCase"
@@ -359,18 +366,51 @@
         <!-- Inline Actions -->
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
+
             <mat-cell *matCellDef="let item" fxFlex="70px">
                 <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
                     <span class="xt-icon">moreVertical</span>
                 </button>
 
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
-                    <ng-container
-                        *ngIf="!item.deleted">
 
-                        <ng-container
-                            *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()">
-                            <ng-container *app-selected-outbreak-is-active>
+                    <ng-container *ngIf="!item.deleted">
+
+                        <button
+                            mat-menu-item
+                            [routerLink]="['.', item.id, 'view']">
+                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        </button>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <ng-container *ngIf="hasContactWriteAccess()">
+                                <button
+                                    mat-menu-item
+                                    [routerLink]="['.', item.id, 'modify']">
+                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                </button>
+
+                                <button
+                                    *ngIf="hasCaseWriteAccess()"
+                                    mat-menu-item
+                                    class="mat-menu-item-delete"
+                                    (click)="convertContactToCase(item)">
+                                    {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
+                                </button>
+
+                                <button
+                                    mat-menu-item
+                                    class="mat-menu-item-delete"
+                                    (click)="deleteContact(item)">
+                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                </button>
+                            </ng-container>
+                        </ng-container>
+
+                        <mat-divider></mat-divider>
+
+                        <ng-container *app-selected-outbreak-is-active>
+                            <ng-container *ngIf="hasContactWriteAccess() && hasFollowUpWriteAccess()">
                                 <button
                                     mat-menu-item
                                     [routerLink]="['.', item.id, 'follow-ups', 'create' ]">
@@ -387,13 +427,11 @@
                             {{'LNG_PAGE_ACTION_SEE_RELATIONSHIPS' | translate}}
                         </button>
 
-                        <mat-divider></mat-divider>
-
-                        <button
-                            mat-menu-item
-                            [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        <button mat-menu-item [routerLink]="['/contacts/contact-related-follow-ups', item.id]">
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS' | translate }}
                         </button>
+
+                        <mat-divider></mat-divider>
 
                         <button
                             mat-menu-item
@@ -406,35 +444,6 @@
                             [routerLink]="['.', item.id, 'chronology']">
                             {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY' | translate }}
                         </button>
-
-                        <button mat-menu-item [routerLink]="['/contacts/contact-related-follow-ups', item.id]">
-                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS' | translate }}
-                        </button>
-
-                        <ng-container
-                            *ngIf="hasContactWriteAccess()">
-                            <ng-container *app-selected-outbreak-is-active>
-                                <button
-                                    mat-menu-item
-                                    [routerLink]="['.', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
-                                </button>
-
-                                <button
-                                    *ngIf="hasCaseWriteAccess()"
-                                    mat-menu-item
-                                    (click)="convertContactToCase(item)">
-                                    {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE' | translate}}
-                                </button>
-
-                                <button
-                                    mat-menu-item
-                                    class="mat-menu-item-delete"
-                                    (click)="deleteContact(item)">
-                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                                </button>
-                            </ng-container>
-                        </ng-container>
                     </ng-container>
 
                     <ng-container *app-selected-outbreak-is-active>
@@ -445,7 +454,6 @@
                             {{'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
                     </ng-container>
-
                 </mat-menu>
             </mat-cell>
         </ng-container>
