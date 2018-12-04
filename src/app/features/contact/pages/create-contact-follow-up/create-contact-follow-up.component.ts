@@ -119,12 +119,12 @@ export class CreateContactFollowUpComponent extends ConfirmOnFormChanges impleme
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newContactFollowup: FollowUpModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/contacts/follow-ups']);
+                    this.router.navigate([`/contacts/${newContactFollowup.personId}/follow-ups/${newContactFollowup.id}/modify`]);
                 });
         }
     }

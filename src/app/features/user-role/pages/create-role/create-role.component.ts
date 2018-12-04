@@ -55,12 +55,12 @@ export class CreateRoleComponent extends ConfirmOnFormChanges {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newRole: UserRoleModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/user-roles']);
+                    this.router.navigate([`/user-roles/${newRole.id}/modify`]);
                 });
         }
     }

@@ -117,12 +117,12 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newLocation: LocationModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(this.parentId ? ['/locations', this.parentId, 'children'] : ['/locations']);
+                    this.router.navigate([`/locations/${newLocation.id}/modify`]);
                 });
         }
     }

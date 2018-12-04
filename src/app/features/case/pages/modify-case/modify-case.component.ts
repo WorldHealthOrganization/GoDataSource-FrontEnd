@@ -320,12 +320,14 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedCase: CaseModel) => {
+                this.caseData = new CaseModel(modifiedCase);
+
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(['/cases']);
+                this.retrieveCaseData();
             });
     }
 

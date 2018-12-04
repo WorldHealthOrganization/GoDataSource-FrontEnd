@@ -84,12 +84,12 @@ export class CreateEventComponent extends ConfirmOnFormChanges implements OnInit
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newEvent: EventModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/events']);
+                    this.router.navigate([`/events/${newEvent.id}/modify`]);
                 });
         }
     }

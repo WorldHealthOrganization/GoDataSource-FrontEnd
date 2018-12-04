@@ -102,13 +102,14 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newOutbreak: OutbreakModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
                     // load language tokens so they will be available
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/outbreaks']);
+                    // navigate to modify page of the new outbreak
+                    this.router.navigate([`/outbreaks/${newOutbreak.id}/modify`]);
                 });
         }
     }

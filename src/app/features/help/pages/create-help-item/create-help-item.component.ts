@@ -101,7 +101,7 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newHelpItem: HelpItemModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
                     // remove help items from cache
                     this.cacheService.remove(CacheKey.HELP_ITEMS);
@@ -110,7 +110,7 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
                     // update language tokens to get the translation of name and description
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to categories list
-                    this.router.navigate([`/help/categories/${this.categoryId}/items`]);
+                    this.router.navigate([`/help/categories/${this.categoryId}/items/${newHelpItem.id}/modify`]);
                 });
         }
     }

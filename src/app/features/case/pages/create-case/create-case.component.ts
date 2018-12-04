@@ -128,12 +128,12 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newCase: CaseModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/cases']);
+                    this.router.navigate([`/cases/${newCase.id}/modify`]);
                 });
         }
     }

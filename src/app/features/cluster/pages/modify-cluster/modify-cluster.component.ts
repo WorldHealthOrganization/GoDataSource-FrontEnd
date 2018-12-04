@@ -21,9 +21,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
     styleUrls: ['./modify-cluster.component.less']
 })
 export class ModifyClusterComponent extends ViewModifyComponent implements OnInit {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -65,15 +63,7 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                             this.clusterData = new ClusterModel(clusterDataReturned);
 
                             // add breadcrumb for page title
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(
-                                    this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
-                                    null,
-                                    true,
-                                    {},
-                                    this.clusterData
-                                )
-                            );
+                            this.createBreadcrumbs();
                         });
                 });
 
@@ -120,12 +110,30 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedCluster: ClusterModel) => {
+                this.clusterData = new ClusterModel(modifiedCluster);
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(['/clusters']);
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
+    }
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
+                null,
+                true,
+                {},
+                this.clusterData
+            )
+        );
     }
 }

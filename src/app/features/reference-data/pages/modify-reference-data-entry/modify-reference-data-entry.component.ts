@@ -24,14 +24,13 @@ import { IconDataService } from '../../../../core/services/data/icon.data.servic
 })
 export class ModifyReferenceDataEntryComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     categoryId: string;
     entryId: string;
     // new Entry model
     entry: ReferenceDataEntryModel = new ReferenceDataEntryModel();
+    categoryName: string;
 
     authUser: UserModel;
 
@@ -69,20 +68,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
                     .getEntry(params.entryId)
                     .subscribe((entry: ReferenceDataEntryModel) => {
                         this.entry = entry;
-
-                        // add new breadcrumbs
-                        const categoryName = _.get(entry, 'category.name');
-                        if (categoryName) {
-                            // link to Category
-                            this.breadcrumbs.push(
-                                new BreadcrumbItemModel(categoryName, `/reference-data/${params.categoryId}`)
-                            );
-                        }
-                        // current page title
-                        this.breadcrumbs.push(
-                                new BreadcrumbItemModel(entry.value, '.', true)
-                        );
-
+                        this.categoryName = _.get(this.entry, 'category.name');
+                        this.createBreadcrumbs();
                     });
             });
     }
@@ -103,12 +90,16 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedReferenceDataEntry: ReferenceDataEntryModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
+
+                this.entry = new ReferenceDataEntryModel(modifiedReferenceDataEntry);
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate([`/reference-data/${this.categoryId}`]);
+
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
     }
 
@@ -119,4 +110,22 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_FOLLOWUP);
     }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.route.params
+            .subscribe((params: {categoryId, entryId}) => {
+                this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
+
+                if (this.categoryName) {
+                    this.breadcrumbs.push(new BreadcrumbItemModel(this.categoryName, `/reference-data/${params.categoryId}`));
+                }
+
+                this.breadcrumbs.push(new BreadcrumbItemModel(this.entry.value, '.', true));
+            });
+    }
+
 }

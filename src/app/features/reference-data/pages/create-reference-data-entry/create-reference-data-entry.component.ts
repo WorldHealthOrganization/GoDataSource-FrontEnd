@@ -88,12 +88,12 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((newReferenceDataEntry: ReferenceDataEntryModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate([`/reference-data/${this.categoryId}`]);
+                this.router.navigate([`/reference-data/${this.categoryId}/${newReferenceDataEntry.id}/modify`]);
             });
     }
 }

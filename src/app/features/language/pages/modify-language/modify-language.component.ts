@@ -21,9 +21,7 @@ import { UserModel } from '../../../../core/models/user.model';
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     languageId: string;
     languageData: LanguageModel = new LanguageModel();
@@ -55,15 +53,7 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                     .getLanguage(this.languageId)
                     .subscribe((languageData: LanguageModel) => {
                         this.languageData = languageData;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_LANGUAGE_TITLE' : 'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
-                                '.',
-                                true,
-                                {},
-                                this.languageData
-                            )
-                        );
+                        this.createBreadcrumbs();
                     });
             });
     }
@@ -90,15 +80,33 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedLanguage: LanguageModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE');
 
                 // clear cache
                 this.cacheService.remove(CacheKey.LANGUAGES);
 
+                this.languageData = new LanguageModel(modifiedLanguage);
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(['/languages']);
-            });
+                this.createBreadcrumbs();
+        });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_LANGUAGE_TITLE' : 'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
+                '.',
+                true,
+                {},
+                this.languageData
+            )
+        );
     }
 }

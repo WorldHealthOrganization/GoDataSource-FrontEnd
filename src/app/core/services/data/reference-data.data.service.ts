@@ -133,12 +133,15 @@ export class ReferenceDataDataService {
      */
     createEntry(entry): Observable<any> {
         return this.http.post(`reference-data`, entry)
-            .mergeMap(() => {
+            .mergeMap((response) => {
                 // invalidate list cache
                 this.clearReferenceDataCache();
 
                 // re-load language tokens
-                return this.i18nService.loadUserLanguage();
+                return this.i18nService.loadUserLanguage()
+                    .map(() => {
+                        return response;
+                    });
             });
     }
 
@@ -150,12 +153,15 @@ export class ReferenceDataDataService {
      */
     modifyEntry(entryId: string, entryData): Observable<any> {
         return this.http.put(`reference-data/${entryId}`, entryData)
-            .mergeMap(() => {
+            .mergeMap((response) => {
                 // invalidate list cache
                 this.clearReferenceDataCache();
 
                 // re-load language tokens
-                return this.i18nService.loadUserLanguage();
+                return this.i18nService.loadUserLanguage()
+                    .map(() => {
+                        return response;
+                    });
             });
     }
 

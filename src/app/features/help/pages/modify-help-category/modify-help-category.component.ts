@@ -90,8 +90,6 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
                 this.disableDirtyConfirm();
                 // update language tokens to get the translation of name and description
                 this.i18nService.loadUserLanguage().subscribe();
-                // navigate to the list of categories
-                this.router.navigate(['/help/categories']);
             });
     }
 

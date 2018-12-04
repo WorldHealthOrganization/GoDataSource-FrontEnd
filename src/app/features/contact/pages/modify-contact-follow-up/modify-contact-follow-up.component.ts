@@ -139,7 +139,6 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(['/contacts/follow-ups']);
             });
     }
 

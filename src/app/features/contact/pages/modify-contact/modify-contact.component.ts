@@ -28,9 +28,7 @@ import { Moment } from 'moment';
 })
 export class ModifyContactComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -96,15 +94,7 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             .getContact(selectedOutbreak.id, this.contactId)
                             .subscribe(contactDataReturned => {
                                 this.contactData = new ContactModel(contactDataReturned);
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
-                                        '.',
-                                        true,
-                                        {},
-                                        this.contactData
-                                    )
-                                );
+                                this.createBreadcrumbs();
                             });
                     });
             });
@@ -142,12 +132,31 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedContact: ContactModel) => {
+                this.contactData = new ContactModel(modifiedContact);
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(['/contacts']);
+                // update breadcrumb
+                this.createBreadcrumbs();
             });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_TITLE',
+                '.',
+                true,
+                {},
+                this.contactData
+            )
+        );
     }
 }

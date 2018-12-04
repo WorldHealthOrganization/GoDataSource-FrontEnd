@@ -54,7 +54,7 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newLanguage: LanguageModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE');
 
                     // clear cache
@@ -62,7 +62,7 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/languages']);
+                    this.router.navigate([`/languages/${newLanguage.id}/modify`]);
                 });
         }
     }

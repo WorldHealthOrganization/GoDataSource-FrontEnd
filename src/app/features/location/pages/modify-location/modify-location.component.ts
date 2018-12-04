@@ -24,12 +24,7 @@ import * as _ from 'lodash';
 })
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
-    public breadcrumbs: BreadcrumbItemModel[] =  [
-        new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_LOCATIONS_TITLE',
-            '/locations'
-        )
-    ];
+    public breadcrumbs: BreadcrumbItemModel[] =  [];
     // locations breadcrumbs
     public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
@@ -63,20 +58,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .subscribe((params: { backToCurrent }) => {
                 this.backToCurrent = params.backToCurrent;
             });
-
-        this.route.params
-            .subscribe((params: { locationId }) => {
-                this.locationId = params.locationId;
-
-                // reset breadcrumbs
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
-                    )
-                ];
-                this.locationBreadcrumbs = [];
-            });
+        this.createBreadcrumbs();
 
         if (this.locationId) {
             this.locationDataService
@@ -90,15 +72,7 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 .subscribe((locationData: {}) => {
                     // location data
                     this.locationData = new LocationModel(locationData);
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                             this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
-                            '.',
-                            true,
-                            {},
-                            this.locationData
-                        )
-                    );
+                    this.createBreadcrumbs();
                 });
         }
     }
@@ -146,16 +120,14 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedLocation: LocationModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
+                this.locationData = new LocationModel(modifiedLocation);
                 // navigate to listing page
                 this.disableDirtyConfirm();
-                this.router.navigate(
-                    dirtyFields.parentLocationId ?
-                        ['/locations', dirtyFields.parentLocationId, 'children'] :
-                        ['/locations'])
-                ;
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
     }
 
@@ -191,5 +163,40 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             value.length > 0 : (
                 value || value === 0
             );
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_LOCATIONS_TITLE',
+                '/locations'
+            ));
+        this.route.params
+            .subscribe((params: { locationId }) => {
+                this.locationId = params.locationId;
+
+                // reset breadcrumbs
+                this.breadcrumbs = [
+                    new BreadcrumbItemModel(
+                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
+                        '/locations'
+                    )
+                ];
+                this.locationBreadcrumbs = [];
+            });
+
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
+                '.',
+                true,
+                {},
+                this.locationData
+            )
+        );
     }
 }
