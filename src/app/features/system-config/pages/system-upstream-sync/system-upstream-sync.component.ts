@@ -336,6 +336,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                     this.systemSyncDataService
                         .sync(upstreamServer.url)
                         .catch((err) => {
+                            this.loading = false;
                             this.snackbarService.showApiError(err);
                             return ErrorObservable.create(err);
                         })
