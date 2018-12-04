@@ -254,7 +254,7 @@ export class CaseDataService {
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricCasesCountStratified[]> {
         const filter = queryBuilder.buildQuery();
-        const obs = this.http.get(`outbreaks/${outbreakId}/contacts/classification-over-time/count?filter=${filter}`);
+        const obs = this.http.get(`outbreaks/${outbreakId}/cases/classification-over-time/count?filter=${filter}`);
         return obs.map(
             (listResult) => {
                 const results = [];
