@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -17,8 +17,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     styleUrls: ['./reference-data-categories-list.component.less']
 })
 export class ReferenceDataCategoriesListComponent implements OnInit {
-
-    @ViewChild('table', { read: ElementRef }) table: ElementRef;
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
@@ -73,9 +71,5 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
      */
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_REFERENCE_DATA);
-    }
-
-    showLess() {
-
     }
 }
