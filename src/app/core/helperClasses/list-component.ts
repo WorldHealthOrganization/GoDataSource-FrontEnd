@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { ApplyListFilter, Constants } from '../models/constants';
 import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
 import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ResetInputOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
 import { MatPaginator, MatSort, MatSortable, PageEvent } from '@angular/material';
 import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
@@ -33,6 +33,11 @@ export abstract class ListComponent {
      * Determine all children that we need to reset when side filters are being applied
      */
     @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
+
+    /**
+     * Get Mat Table reference
+     */
+    @ViewChild('table', { read: ElementRef }) table: ElementRef;
 
     /**
      * Retrieve Mat Table sort handler

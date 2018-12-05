@@ -39,7 +39,7 @@
                     fxFlex fxLayout="row" fxLayoutGap="20px">
                     <div
                         fxFlex>
-                        <mat-table [dataSource]="group.peopleIds">
+                        <mat-table #table [dataSource]="group.peopleIds">
                             <!-- Checkbox -->
                             <ng-container matColumnDef="checkbox">
                                 <mat-header-cell *matHeaderCellDef fxFlex="60px">

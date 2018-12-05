@@ -64,7 +64,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" fxFlex>
-                <mat-chip-list>
+                <mat-chip-list #chipList>
                     <mat-chip
                         *ngFor="let entry of item.entries"
                         [matTooltip]="entry.description | translate">
