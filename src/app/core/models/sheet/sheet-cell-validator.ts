@@ -93,7 +93,10 @@ export class SheetCellValidator {
                 // custom validator for Positive Integer cells
                 return (value, callback, sheetColumn) => {
                     // empty string is handled by required validator
-                    if (value === '') {
+                    if (
+                        _.isEmpty(value) &&
+                        !_.isNumber(value)
+                    ) {
                         callback(true);
                     } else {
                         callback((

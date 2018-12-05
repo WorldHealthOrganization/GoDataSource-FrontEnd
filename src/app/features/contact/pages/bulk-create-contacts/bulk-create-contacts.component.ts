@@ -372,19 +372,25 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     // collect data from table
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
                         .subscribe((data) => {
-                            // create contacts
-                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                            // no data to save ?
+                            if (_.isEmpty(data)) {
+                                // show error
+                                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                            } else {
+                                // create contacts
+                                this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
-                                    // navigate to listing page
-                                    this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
-                                });
+                                        // navigate to listing page
+                                        this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                    });
+                            }
                         });
                 }
             });
