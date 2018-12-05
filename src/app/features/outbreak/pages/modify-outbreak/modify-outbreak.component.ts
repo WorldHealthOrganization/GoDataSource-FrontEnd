@@ -140,8 +140,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
                 // update language tokens to get the translation of submitted questions and answers
                 this.i18nService.loadUserLanguage().subscribe();
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });

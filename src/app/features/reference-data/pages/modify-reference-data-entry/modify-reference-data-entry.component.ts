@@ -95,9 +95,6 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
                 this.entry = new ReferenceDataEntryModel(modifiedReferenceDataEntry);
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });

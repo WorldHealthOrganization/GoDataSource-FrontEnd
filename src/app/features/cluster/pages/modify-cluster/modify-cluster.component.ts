@@ -113,9 +113,6 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
             .subscribe((modifiedCluster: ClusterModel) => {
                 this.clusterData = new ClusterModel(modifiedCluster);
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
-
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });

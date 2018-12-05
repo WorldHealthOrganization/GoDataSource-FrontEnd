@@ -108,8 +108,6 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                             this.teamData = new TeamModel(modifiedTeam);
 
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
                         });
                 }
             });

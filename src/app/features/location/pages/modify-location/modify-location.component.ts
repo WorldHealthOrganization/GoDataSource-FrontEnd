@@ -124,8 +124,6 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
                 this.locationData = new LocationModel(modifiedLocation);
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });

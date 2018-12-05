@@ -101,7 +101,6 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                         .reloadAndPersistAuthUser()
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
-                            this.disableDirtyConfirm();
                             // update breadcrumbs
                             this.createBreadcrumbs();
                         });

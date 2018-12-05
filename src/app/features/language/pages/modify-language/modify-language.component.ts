@@ -87,8 +87,6 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
                 this.cacheService.remove(CacheKey.LANGUAGES);
 
                 this.languageData = new LanguageModel(modifiedLanguage);
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 this.createBreadcrumbs();
         });
     }

@@ -136,8 +136,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.contactData = new ContactModel(modifiedContact);
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update breadcrumb
                 this.createBreadcrumbs();
             });

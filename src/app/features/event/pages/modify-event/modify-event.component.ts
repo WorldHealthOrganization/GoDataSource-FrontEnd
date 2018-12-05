@@ -104,8 +104,6 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
                 this.eventData = new EventModel(modifiedEvent);
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });
