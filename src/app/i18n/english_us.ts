@@ -1946,7 +1946,7 @@ export const EnglishUsLang = {
         /**
          * Transmission Chain Fields
          */
-        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_FIRST_CONTACT_DATE': 'First Contact Date',
+        'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET': 'Earliest date of onset',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE': 'Root Case',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES': 'Number of Cases',
         'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE': 'Number of Alive Cases',
