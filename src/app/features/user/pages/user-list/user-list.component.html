@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button *ngIf="hasUserWriteAccess()" class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button *ngIf="hasUserWriteAccess()" mat-raised-button color="accent" [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>

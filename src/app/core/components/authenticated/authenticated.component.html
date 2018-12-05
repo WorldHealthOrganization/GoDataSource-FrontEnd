@@ -1,4 +1,4 @@
-<div class="authenticated" fxLayout="column" *ngIf="authUser">
+<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
 
     <mat-sidenav-container class="sidenav-container">
 
@@ -8,7 +8,7 @@
 
         <mat-sidenav-content>
 
-            <button class="sidenav-toggle" mat-raised-button color="primary" (click)="snav.toggle()">
+            <button class="sidenav-toggle" mat-raised-button color="accent" (click)="snav.toggle()">
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
 

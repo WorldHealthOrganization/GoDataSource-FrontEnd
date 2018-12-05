@@ -6,15 +6,14 @@
             <div *ngIf="hasReferenceDataWriteAccess()" class="topnav-actions">
                 <button
                     *ngIf="hasReferenceDataWriteAccess()"
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="['/reference-data', 'manage-icons', 'list']"
                     [queryParams]="{ categoryId: categoryId }">
                     {{'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON' | translate}}
                 </button>
 
-                <button class="button-primary" mat-raised-button color="primary" [routerLink]="'./create'">
+                <button mat-raised-button color="accent" [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>

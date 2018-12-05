@@ -1,0 +1,35 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+// define accent and primary colors
+$color-accent: #4db0a0;
+$color-primary: #5373af;
+
+// define primary palette
+$app-primary-palette-config: (
+    100: $color-primary,
+    500: $color-primary,
+    contrast: (
+        500: white
+    )
+);
+
+// define accent palette
+$app-accent-palette-config: (
+    100: $color-accent,
+    500: $color-accent,
+    contrast: (
+        500: white
+    )
+);
+
+// define theme
+$app-primary: mat-palette($app-primary-palette-config);
+$app-accent: mat-palette($app-accent-palette-config);
+$app-warn: mat-palette($mat-red);
+$app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+
+.app-theme {
+    @include angular-material-theme($app-theme);
+}

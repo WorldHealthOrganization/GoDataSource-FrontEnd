@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
                 <ng-container *app-selected-outbreak-is-active>
-                    <button *ngIf="hasEntityWriteAccess()" class="button-primary" mat-raised-button color="primary"
+                    <button *ngIf="hasEntityWriteAccess()" mat-raised-button color="accent"
                             [routerLink]="['/relationships', entityType, entityId, 'available-entities']">
                         {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_ADD_RELATIONSHIP' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
