@@ -128,7 +128,7 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
      * @param {string} value
      */
     makeVariableSuggestion(index: number, value: any) {
-        if (this.autoSuggestVariable) {
+        if (this.autoSuggestVariable && this.values[index].new) {
             this.values[index].variable = _.camelCase(value);
         }
     }
