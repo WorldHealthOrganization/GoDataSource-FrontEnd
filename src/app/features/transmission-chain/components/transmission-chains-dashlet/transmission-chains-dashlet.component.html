@@ -158,18 +158,18 @@
                         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE' | translate }}
                     </div>
 
-                    <!-- Node Color -->
+                    <!-- Node Label -->
                     <div
                         fxFlex fxLayout="column">
                         <div
                             fxFlex>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
                         </div>
 
                         <app-form-radio
-                            name="nodeColorCriteria"
-                            [(ngModel)]="colorCriteria.nodeColorCriteria"
-                            [options]="nodeColorCriteriaOptions$ | async">
+                            name="nodeLabelCriteria"
+                            [(ngModel)]="colorCriteria.nodeLabelCriteria"
+                            [options]="nodeLabelCriteriaOptions$ | async">
                         </app-form-radio>
                     </div>
 
@@ -188,6 +188,21 @@
                         </app-form-radio>
                     </div>
 
+                    <!-- Node Color -->
+                    <div
+                        fxFlex fxLayout="column">
+                        <div
+                            fxFlex>
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
+                        </div>
+
+                        <app-form-radio
+                            name="nodeColorCriteria"
+                            [(ngModel)]="colorCriteria.nodeColorCriteria"
+                            [options]="nodeColorCriteriaOptions$ | async">
+                        </app-form-radio>
+                    </div>
+
                     <!-- Node Icon -->
                     <div
                         fxFlex fxLayout="column">
@@ -202,21 +217,6 @@
                             [options]="nodeIconCriteriaOptions$ | async">
                         </app-form-radio>
                     </div>
-
-                    <!-- Node Label -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
-                        </div>
-
-                        <app-form-radio
-                            name="nodeLabelCriteria"
-                            [(ngModel)]="colorCriteria.nodeLabelCriteria"
-                            [options]="nodeLabelCriteriaOptions$ | async">
-                        </app-form-radio>
-                    </div>
                 </mat-card>
 
                 <!-- Edge Settings -->
@@ -226,21 +226,6 @@
                         fxFlex
                         class="settings-container-title">
                         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE' | translate }}
-                    </div>
-
-                    <!-- Edge Color -->
-                    <div
-                        fxFlex fxLayout="column">
-                        <div
-                            fxFlex>
-                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
-                        </div>
-
-                        <app-form-radio
-                            name="edgeColorCriteria"
-                            [(ngModel)]="colorCriteria.edgeColorCriteria"
-                            [options]="edgeColorCriteriaOptions$ | async">
-                        </app-form-radio>
                     </div>
 
                     <!-- Edge Label -->
@@ -255,6 +240,21 @@
                             name="edgeLabelCriteria"
                             [(ngModel)]="colorCriteria.edgeLabelCriteria"
                             [options]="edgeLabelCriteriaOptions$ | async">
+                        </app-form-radio>
+                    </div>
+
+                    <!-- Edge Color -->
+                    <div
+                        fxFlex fxLayout="column">
+                        <div
+                            fxFlex>
+                            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
+                        </div>
+
+                        <app-form-radio
+                            name="edgeColorCriteria"
+                            [(ngModel)]="colorCriteria.edgeColorCriteria"
+                            [options]="edgeColorCriteriaOptions$ | async">
                         </app-form-radio>
                     </div>
                 </mat-card>
