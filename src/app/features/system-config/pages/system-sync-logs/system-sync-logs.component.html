@@ -7,9 +7,8 @@
                 <!-- Delete sync logs -->
                 <button
                     *ngIf="hasSysConfigWriteAccess()"
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     (click)="deleteServerSyncLogs()">
                     {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
                 </button>

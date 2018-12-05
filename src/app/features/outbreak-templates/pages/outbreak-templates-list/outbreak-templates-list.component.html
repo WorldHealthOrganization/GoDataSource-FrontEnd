@@ -6,9 +6,8 @@
             <div class="topnav-actions">
                 <button
                     *ngIf="hasOutbreakTemplateWriteAccess()"
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="'./create'">
                     {{'LNG_COMMON_BUTTON_ADD'| translate}} <span class="xt-icon">addCircle</span>
                 </button>

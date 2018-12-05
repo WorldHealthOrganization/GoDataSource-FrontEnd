@@ -7,7 +7,7 @@
                 <ng-container *app-selected-outbreak-is-active>
                     <button
                         *ngIf="hasCaseWriteAccess()"
-                        mat-raised-button color="primary" class="button-primary"
+                        mat-raised-button color="accent"
                         [routerLink]="'./create'">
                         {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                     </button>
@@ -15,9 +15,8 @@
 
                 <button
                     *ngIf="!appliedListFilter"
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>

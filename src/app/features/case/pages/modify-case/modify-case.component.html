@@ -372,7 +372,7 @@
     <div class="form-actions">
         <div class="page-tabs-navbar-placeholder"></div>
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
 
@@ -384,20 +384,20 @@
         </ng-container>
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button color="accent"
                 [routerLink]="['/cases', caseData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
         <button *ngIf="hasContactWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button color="accent"
                 routerLink="/contacts/create"
                 [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
         </button>
         <button
             type="button"
-            mat-raised-button color="primary" class="button-primary"
+            mat-raised-button color="accent"
             [routerLink]="['/relationships', EntityType.CASE, caseData.id, 'share']">
             {{ 'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS' | translate }}
         </button>
