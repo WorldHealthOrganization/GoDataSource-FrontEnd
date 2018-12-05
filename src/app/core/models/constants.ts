@@ -277,6 +277,10 @@ export class Constants {
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
             value: 'gender'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
         }
     };
 
@@ -349,6 +353,10 @@ export class Constants {
         GENDER: {
             label: 'LNG_CASE_FIELD_LABEL_GENDER',
             value: 'gender'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
         }
     };
 
@@ -385,6 +393,10 @@ export class Constants {
         CONCATENATED_DETAILS: {
             label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_OPTION_CONCATENATED_DETAILS',
             value: 'concatenated_details'
+        },
+        OCCUPATION: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            value: 'occupation'
         }
     };
 

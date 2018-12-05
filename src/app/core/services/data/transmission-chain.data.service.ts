@@ -296,6 +296,13 @@ export class TransmissionChainDataService {
                                 nodeData.label = '';
                             }
                             // location
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // location
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
                             nodeData.label = '';
                             if (node.type !== EntityType.EVENT) {
