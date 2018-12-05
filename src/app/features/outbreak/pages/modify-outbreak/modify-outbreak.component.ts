@@ -5,7 +5,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable } from 'rxjs/Observable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -28,9 +27,7 @@ import { AnswerModel, QuestionModel } from '../../../../core/models/question.mod
 })
 export class ModifyOutbreakComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
     // authenticated user
     authUser: UserModel;
     // id of the outbreak to modify
@@ -48,7 +45,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute,
         private router: Router,
-        private genericDataService: GenericDataService,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
@@ -78,15 +74,7 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         this.outbreakId = this.outbreak.id;
 
         // update breadcrumbs
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
-                '.',
-                true,
-                {},
-                this.outbreak
-            )
-        );
+        this.createBreadcrumbs();
     }
 
     /**
@@ -146,20 +134,39 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedOutbreak: OutbreakModel) => {
+                this.outbreak = new OutbreakModel(modifiedOutbreak);
+
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
                 // update language tokens to get the translation of submitted questions and answers
                 this.i18nService.loadUserLanguage().subscribe();
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/outbreaks']);
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
     }
+
     /**
      * Check if we have write access to outbreaks
      * @returns {boolean}
      */
     hasOutbreakWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY',
+                '.',
+                true,
+                {},
+                this.outbreak
+            )
+        );
     }
 }

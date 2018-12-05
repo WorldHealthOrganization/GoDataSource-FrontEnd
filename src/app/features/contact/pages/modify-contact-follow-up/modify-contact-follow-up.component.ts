@@ -136,10 +136,6 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE');
-
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/contacts/follow-ups']);
             });
     }
 

@@ -56,7 +56,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newCategory: HelpCategoryModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
 
                     // navigate to listing page
@@ -64,7 +64,7 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
                     // update language tokens to get the translation of name and description
                     this.i18nService.loadUserLanguage().subscribe();
                     // navigate to categories list
-                    this.router.navigate(['/help/categories']);
+                    this.router.navigate([`/help/categories/${newCategory.id}/modify`]);
                 });
         }
     }

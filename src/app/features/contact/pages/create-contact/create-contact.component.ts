@@ -215,7 +215,7 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate([`/relationships/${this.entityType}/${this.entityId}`]);
+                            this.router.navigate([`/contacts/${contactData.id}/modify`]);
                         });
                 });
         }

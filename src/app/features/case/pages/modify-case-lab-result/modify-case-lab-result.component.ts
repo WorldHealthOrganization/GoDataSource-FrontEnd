@@ -30,9 +30,7 @@ import * as _ from 'lodash';
 })
 export class ModifyCaseLabResultComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     authUser: UserModel;
 
@@ -117,21 +115,6 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                             })
                             .subscribe((caseData: CaseModel) => {
                                 this.caseData = caseData;
-                                // If we're not coming from lab results list push a new breadcrumb
-                                if (!this.fromLabResultsList) {
-                                    this.breadcrumbs.push(
-                                        new BreadcrumbItemModel(caseData.name, `/cases/${params.caseId}/modify`),
-                                    );
-                                }
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
-                                        !this.fromLabResultsList ?
-                                            `/cases/${params.caseId}/lab-results` :
-                                            '/cases/lab-results'
-                                    )
-                                );
-
                                 // get relationship data
                                 this.labResultDataService
                                     .getLabResult(this.selectedOutbreak.id, params.caseId, params.labResultId)
@@ -146,16 +129,8 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                                     .subscribe((labResultData) => {
                                         this.labResultData = new LabResultModel(labResultData);
 
-                                        // add new breadcrumb: page title
-                                        this.breadcrumbs.push(
-                                            new BreadcrumbItemModel(
-                                                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
-                                                null,
-                                                true,
-                                                {},
-                                                this.labResultData
-                                            )
-                                        );
+                                        // update breadcrumb
+                                        this.createBreadcrumbs();
                                     });
 
                             });
@@ -184,12 +159,12 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedLabResult: LabResultModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_LAB_RESULT_ACTION_MODIFY_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
-                // navigate back to Case Relationships list
-                this.disableDirtyConfirm();
-                this.router.navigate([`/cases/${this.caseData.id}/lab-results`]);
+                this.labResultData = new LabResultModel(modifiedLabResult);
+
+                this.createBreadcrumbs();
             });
     }
 
@@ -201,5 +176,31 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
         return this.authUser.hasPermissions(PERMISSION.WRITE_CASE);
     }
 
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
+            // If we're not coming from lab results list push a new breadcrumb
+            !this.fromLabResultsList ?
+                new BreadcrumbItemModel(this.caseData.name, `/cases/${this.caseData.id}/modify`) :
+                null,
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
+                !this.fromLabResultsList ?
+                    `/cases/${this.caseData.id}/lab-results` :
+                    '/cases/lab-results'
+            ),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_CASE_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_CASE_LAB_RESULT_TITLE',
+                null,
+                true,
+                {},
+                this.labResultData
+            )
+        );
+    }
 
 }

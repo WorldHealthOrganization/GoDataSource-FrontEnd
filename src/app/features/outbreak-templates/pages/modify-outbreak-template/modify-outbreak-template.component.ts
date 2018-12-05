@@ -23,9 +23,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 })
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -64,15 +62,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                     .getOutbreakTemplate(this.outbreakTemplateId)
                     .subscribe(outbreakTemplateData => {
                         this.outbreakTemplate = outbreakTemplateData;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
-                                '.',
-                                true,
-                                {},
-                                this.outbreakTemplate
-                            )
-                        );
+                        this.createBreadcrumbs();
                     });
             });
     }
@@ -96,13 +86,14 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedOutbreakTemplate: OutbreakTemplateModel) => {
+                this.outbreakTemplate = modifiedOutbreakTemplate;
+
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
                 // update language tokens to get the translation of submitted questions and answers
                 this.i18nService.loadUserLanguage().subscribe();
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/outbreak-templates']);
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
     }
 
@@ -112,5 +103,19 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
      */
     hasOutbreakTemplateWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_SYS_CONFIG);
+    }
+
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
+                '.',
+                true,
+                {},
+                this.outbreakTemplate
+            )
+        );
     }
 }

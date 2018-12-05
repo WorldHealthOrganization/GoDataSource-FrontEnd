@@ -83,12 +83,11 @@ export class ModifyRoleComponent extends ViewModifyComponent implements OnInit {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((modifiedRole: UserRoleModel) => {
+                    this.userRole = new UserRoleModel(modifiedRole);
+
                     this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/user-roles']);
                 });
         }
     }

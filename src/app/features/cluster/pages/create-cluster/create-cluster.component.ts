@@ -65,12 +65,12 @@ export class CreateClusterComponent extends ConfirmOnFormChanges implements OnIn
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newCluser: ClusterModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/clusters']);
+                    this.router.navigate([`/clusters/${newCluser.id}/modify`]);
                 });
         }
     }
