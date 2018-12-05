@@ -353,7 +353,8 @@
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
-                    [readOnly]="viewOnly">
+                    [readOnly]="viewOnly"
+                    [minDate]="caseData.dateOfOnset">
                 </app-form-daterange-list>
 
             </mat-tab>

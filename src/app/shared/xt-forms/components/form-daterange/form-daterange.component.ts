@@ -18,12 +18,13 @@ import { Moment } from 'moment';
 })
 
 export class FormDaterangeComponent extends GroupBase<DateRangeModel> {
-
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
+
+    @Input() minDate: Moment;
 
     // start date
     private _startDateVisible: boolean = true;

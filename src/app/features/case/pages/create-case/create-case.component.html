@@ -335,7 +335,6 @@
                 <app-form-daterange-list
                     name="hospitalizationDates"
                     [(ngModel)]="caseData.hospitalizationDates"
-                    required="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
                 </app-form-daterange-list>
@@ -346,9 +345,9 @@
                 <app-form-daterange-list
                     name="isolationDates"
                     [(ngModel)]="caseData.isolationDates"
-                    required="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
-                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
+                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
+                    [minDate]="caseData.dateOfOnset">
                 </app-form-daterange-list>
 
                 <div class="stepper-wrapper">
