@@ -49,6 +49,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
+    resetFiltersData: any;
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -117,6 +118,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     };
 
     // default color criteria
+    resetColorCriteriaData: any;
     colorCriteria: any = {
         nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
@@ -378,15 +380,42 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     toggleSettings() {
         this.showSettings = !this.showSettings;
+
+        // get default filters
+        setTimeout(() => {
+            if (
+                this.showSettings &&
+                !this.resetFiltersData
+            ) {
+                this.resetFiltersData = _.cloneDeep(this.filters);
+                this.resetColorCriteriaData = _.cloneDeep(this.colorCriteria);
+            }
+        });
     }
 
     /**
      * refresh chain data based on filters
      */
     refreshChain() {
+        // refresh chart
         this.displayChainsOfTransmission();
+
         // close settings panel
         this.showSettings = false;
+    }
+
+    /**
+     * reset filters
+     */
+    resetFilters() {
+        // reset settings
+        this.filters = _.cloneDeep(this.resetFiltersData);
+        this.colorCriteria = _.cloneDeep(this.resetColorCriteriaData);
+
+        // close settings panel
+        setTimeout(() => {
+            this.refreshChain();
+        });
     }
 
     /**
