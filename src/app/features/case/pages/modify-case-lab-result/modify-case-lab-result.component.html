@@ -191,13 +191,13 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button color="accent"
                 [routerLink]=" ['/cases', caseData.id, 'lab-results', labResultId, 'modify' ]"
                 [queryParams]="{fromLabResultsList: fromLabResultsList}">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary">
+            <button mat-raised-button color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

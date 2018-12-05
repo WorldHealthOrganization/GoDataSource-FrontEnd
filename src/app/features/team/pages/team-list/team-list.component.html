@@ -8,17 +8,15 @@
             <ng-container
                 *ngIf="hasTeamWriteAccess()">
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="['/teams', 'create']">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
 
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>

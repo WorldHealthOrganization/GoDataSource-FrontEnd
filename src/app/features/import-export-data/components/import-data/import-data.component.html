@@ -76,8 +76,7 @@
             fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary"
+                color="accent"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()"
                 type="button">
@@ -208,8 +207,7 @@
                         <button
                             *ngIf="item.mappedOptions.length < importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes].length"
                             mat-raised-button
-                            color="primary"
-                            class="button-primary"
+                            color="accent"
                             (click)="addNewOptionMap(indexMapField)"
                             type="button">
                             <span class="xt-icon">addCircle</span>
@@ -227,8 +225,7 @@
                         mappedFields.length < importableObject.modelPropertiesKeyValue.length
                     "
                     mat-raised-button
-                    color="primary"
-                    class="button-primary"
+                    color="accent"
                     (click)="addNewFieldMap()"
                     type="button">
                     <span class="xt-icon">addCircle</span>
@@ -240,8 +237,7 @@
                 fxFlex fxLayout="row" fxLayoutAlign="end">
                 <button
                     mat-raised-button
-                    color="primary"
-                    class="button-primary"
+                    color="accent"
                     type="submit">
                     {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
                 </button>
@@ -286,8 +282,7 @@
             fxFlex fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary"
+                color="accent"
                 type="button"
                 (click)="tryAgain()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}

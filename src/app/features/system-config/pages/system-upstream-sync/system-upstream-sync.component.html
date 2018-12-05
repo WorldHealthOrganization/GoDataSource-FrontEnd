@@ -6,27 +6,24 @@
             <div class="topnav-actions">
                 <!-- Sync logs -->
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="['/system-config', 'system-sync-logs']">
                     {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON' | translate }}
                 </button>
 
                 <!-- Sync general settings -->
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     (click)="configureSyncSettings()">
                     {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON' | translate }}
                 </button>
 
                 <!-- Create upstream server -->
                 <button
-                    class="button-primary"
                     mat-raised-button
-                    color="primary"
+                    color="accent"
                     [routerLink]="['/system-config', 'system-upstream-sync', 'create']">
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>

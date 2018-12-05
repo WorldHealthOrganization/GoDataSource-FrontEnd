@@ -74,7 +74,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         ReferenceDataCategory.CERTAINTY_LEVEL,
         ReferenceDataCategory.EXPOSURE_TYPE,
         ReferenceDataCategory.EXPOSURE_FREQUENCY,
-        ReferenceDataCategory.EXPOSURE_DURATION
+        ReferenceDataCategory.EXPOSURE_DURATION,
+        ReferenceDataCategory.OCCUPATION
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
@@ -115,6 +116,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         exposureDurationId: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+        },
+        occupation: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            refDataCateg: ReferenceDataCategory.OCCUPATION
         }
     };
 
@@ -509,9 +514,19 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+        // gender translations
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(nodeLabelValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+            });
+        }
+        // occupation translations
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
             _.forEach(nodeLabelValues, (value, key) => {
                 // get gender transcriptions
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
