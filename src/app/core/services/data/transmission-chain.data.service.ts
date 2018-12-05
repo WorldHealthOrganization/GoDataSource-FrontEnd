@@ -207,7 +207,6 @@ export class TransmissionChainDataService {
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
                 _.forEach(firstChain.nodes, (node, key) => {
-                    console.log(node.model.id);
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
