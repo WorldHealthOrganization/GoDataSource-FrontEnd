@@ -167,35 +167,24 @@ export class RequestFilter {
             // remove filter
             this.remove(property);
         } else {
-            // fix Loopback V3 "eq" comparator not working in some cases
-            // but we still need to use eq when comparing with null values
-            // use eq for null values
-            if (value === null) {
+            // use regexp for case insensitive compare
+            if (caseInsensitive) {
                 this.where({
                     [property]: {
-                        eq: null
+                        regexp: '/^' +
+                            RequestFilter.escapeStringForRegex(value as string)
+                                .replace(/%/g, '.*')
+                                .replace(/\\\?/g, '.') +
+                            '$/i'
                     }
                 }, replace);
             } else {
-                // use regexp for case insensitive compare
-                if (caseInsensitive) {
-                    this.where({
-                        [property]: {
-                            regexp: '/^' +
-                                RequestFilter.escapeStringForRegex(value as string)
-                                    .replace(/%/g, '.*')
-                                    .replace(/\\\?/g, '.') +
-                                '$/i'
-                        }
-                    }, replace);
-                } else {
-                    // case sensitive search
-                    // we don't use "regex" ( ? and % ) special characters in this case
-                    // !!! changing this to regex breaks a few things !!!
-                    this.where({
-                        [property]: value
-                    }, replace);
-                }
+                // case sensitive search
+                // we don't use "regex" ( ? and % ) special characters in this case
+                // !!! changing this to regex breaks a few things !!!
+                this.where({
+                    [property]: value
+                }, replace);
             }
         }
 

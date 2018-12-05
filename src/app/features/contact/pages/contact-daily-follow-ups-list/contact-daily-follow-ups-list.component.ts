@@ -72,6 +72,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
     teamsList$: Observable<TeamModel[]>;
     teamsListLoaded: TeamModel[];
+    teamsListLoadedForHeaderSearch: LabelValuePair[];
+    teamIdFilterValue: string = 'all';
 
     // print daily Follow-ups
     printDailyFollowUpsUrl: string;
@@ -101,7 +103,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     contactData: ContactModel;
 
     @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
-    followUpDateValue: string;
 
     constructor(
         private authDataService: AuthDataService,
@@ -143,7 +144,25 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         // loading an array is instantaneous
         this.teamsList$ = this.teamDataService.getTeamsList().share();
         this.teamsList$.subscribe((teamsList) => {
+            // teams loaded used by quick team change
             this.teamsListLoaded = teamsList;
+
+            // format search options
+            this.teamsListLoadedForHeaderSearch = _.map(this.teamsListLoaded, (team: TeamModel) => {
+                return new LabelValuePair(
+                    team.name,
+                    team.id
+                );
+            });
+
+            // add all option
+            this.teamsListLoadedForHeaderSearch = [
+                new LabelValuePair(
+                    'LNG_COMMON_LABEL_ALL',
+                    this.teamIdFilterValue
+                ),
+                ...this.teamsListLoadedForHeaderSearch
+            ];
         });
 
         // get the authenticated user
@@ -987,5 +1006,30 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 // this might not be the best idea...maybe we can replace / remove it
                 this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
             });
+    }
+
+    /**
+     * Filter by team
+     */
+    filterByTeam(data: LabelValuePair) {
+        // nothing to retrieve ?
+        if (!data) {
+            // no team
+            this.queryBuilder.filter.where({
+                teamId: {
+                    eq: null
+                }
+            });
+
+            // refresh list
+            this.needsRefreshList();
+        } else {
+            // retrieve everything?
+            if (data.value === this.teamIdFilterValue) {
+                this.filterBySelectField('teamId', []);
+            } else {
+                this.filterBySelectField('teamId', data);
+            }
+        }
     }
 }
