@@ -160,7 +160,6 @@ export class TransmissionChainsListComponent extends ListComponent implements On
             'firstContactDate',
             'noCases',
             'noAliveCases',
-            'length',
             'duration',
             'active'
         ];
