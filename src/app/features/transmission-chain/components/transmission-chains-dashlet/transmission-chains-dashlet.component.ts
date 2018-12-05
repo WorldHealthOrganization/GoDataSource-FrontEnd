@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -33,7 +34,7 @@ import { Moment } from 'moment';
     templateUrl: './transmission-chains-dashlet.component.html',
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
-export class TransmissionChainsDashletComponent implements OnInit {
+export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
@@ -49,6 +50,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
+    resetFiltersData: any;
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -122,6 +124,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     };
 
     // default color criteria
+    resetColorCriteriaData: any;
     colorCriteria: any = {
         nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
@@ -151,6 +154,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
         edgeColor: {},
         nodeLabel: 'name'
     };
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -222,7 +228,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.outbreakDataService
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
+                this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
@@ -248,6 +260,14 @@ export class TransmissionChainsDashletComponent implements OnInit {
                         this.displayChainsOfTransmission();
                     });
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -383,15 +403,42 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     toggleSettings() {
         this.showSettings = !this.showSettings;
+
+        // get default filters
+        setTimeout(() => {
+            if (
+                this.showSettings &&
+                !this.resetFiltersData
+            ) {
+                this.resetFiltersData = _.cloneDeep(this.filters);
+                this.resetColorCriteriaData = _.cloneDeep(this.colorCriteria);
+            }
+        });
     }
 
     /**
      * refresh chain data based on filters
      */
     refreshChain() {
+        // refresh chart
         this.displayChainsOfTransmission();
+
         // close settings panel
         this.showSettings = false;
+    }
+
+    /**
+     * reset filters
+     */
+    resetFilters() {
+        // reset settings
+        this.filters = _.cloneDeep(this.resetFiltersData);
+        this.colorCriteria = _.cloneDeep(this.resetColorCriteriaData);
+
+        // close settings panel
+        setTimeout(() => {
+            this.refreshChain();
+        });
     }
 
     /**
