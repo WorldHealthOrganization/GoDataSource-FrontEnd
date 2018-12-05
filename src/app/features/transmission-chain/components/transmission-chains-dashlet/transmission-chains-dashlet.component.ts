@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -33,7 +34,7 @@ import { Moment } from 'moment';
     templateUrl: './transmission-chains-dashlet.component.html',
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
-export class TransmissionChainsDashletComponent implements OnInit {
+export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
@@ -149,6 +150,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
         nodeLabel: 'name'
     };
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private transmissionChainDataService: TransmissionChainDataService,
@@ -219,7 +223,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.outbreakDataService
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
+                this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
@@ -245,6 +255,14 @@ export class TransmissionChainsDashletComponent implements OnInit {
                         this.displayChainsOfTransmission();
                     });
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
