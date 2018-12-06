@@ -610,7 +610,7 @@ export class RequestFilter {
      */
     generateFirstCondition(stringified: boolean = false, includeWhere: boolean = false ) {
         let returnCondition: any;
-        const condition = this.isEmpty() ?
+        const condition = this.isEmpty() || this.conditions.length < 1 ?
             {} : this.conditions[0];
         // include or not the 'where' property
         if (includeWhere) {
