@@ -108,6 +108,12 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
+        <button
+            type="button"
+            mat-raised-button color="accent"
+            [routerLink]="['/relationships', EntityType.EVENT, eventId, 'share']">
+            {{ 'LNG_COMMON_BUTTON_SHARE_RELATIONSHIPS' | translate }}
+        </button>
         <button mat-raised-button type="button" [routerLink]="['/relationships', EntityType.EVENT, eventData.id]">
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
