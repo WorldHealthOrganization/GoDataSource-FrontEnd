@@ -49,6 +49,13 @@ export class RequestFilter {
     }
 
     /**
+     * Get Flags
+     */
+    getFlags(): { [key: string]: any } {
+        return _.cloneDeep(this.flags);
+    }
+
+    /**
      * Filter by a text field
      * @param {string} property
      * @param {string} value

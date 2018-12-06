@@ -212,7 +212,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
             // location
             if (this.globalFilterLocationId) {
-                qb.addChildQueryBuilder('person').filter.byEquality(
+                qb.addChildQueryBuilder('person').includeChildQueryWhereKey().filter.byEquality(
                     'addresses.parentLocationIdFilter',
                     this.globalFilterLocationId
                 );

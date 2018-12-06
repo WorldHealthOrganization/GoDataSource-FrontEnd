@@ -110,7 +110,16 @@ export class TransmissionChainDataService {
                 }
             });
             const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
-            filter.where = {...filter.where, ...filterDate.where};
+            filter = {...filter, ...filterDate};
+        }
+
+        // add flags
+        const flags = queryBuilder.filter.getFlags()
+        if (!_.isEmpty(flags)) {
+            filter = {
+                ...filter,
+                ...flags
+            };
         }
 
         filter = JSON.stringify(filter);

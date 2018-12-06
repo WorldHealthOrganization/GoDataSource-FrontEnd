@@ -346,8 +346,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 }
             }
 
-            // configure
+            // add flags
             const rQB = new RequestQueryBuilder();
+            if (this.filters.showContacts) {
+                rQB.filter.flag('includeContacts', 1);
+            }
+            if (this.filters.showEvents) {
+                rQB.filter.flag('includeEvents', 1);
+            }
+
+            // configure
             if (!requestQueryBuilder.filter.isEmpty()) {
                 rQB.filter.where({
                     person: {
