@@ -42,7 +42,8 @@
                                 tooltip="LNG_UPSTREAM_SERVER_FIELD_LABEL_URL_DESCRIPTION"
                                 required="true"
                                 app-unique-validator="url$"
-                                [additionalControlsToCheck]="duplicateUrls">
+                                [additionalControlsToCheck]="duplicateUrls"
+                                (blur)="formatUrl($event)">
                             </app-form-input>
                         </div>
 
