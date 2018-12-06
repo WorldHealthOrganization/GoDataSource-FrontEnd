@@ -72,7 +72,7 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
     refreshData() {
         // get the results for independent transmission chains
         if (this.outbreakId) {
-            // add global filters
+            // configure
             const qb = new RequestQueryBuilder();
 
             // change the way we build query
@@ -88,10 +88,11 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
 
             // location
             if (this.globalFilterLocationId) {
-                qb.include('people').queryBuilder.filter
-                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+                qb.addChildQueryBuilder('person').includeChildQueryWhereKey().filter.byEquality(
+                    'addresses.parentLocationIdFilter',
+                    this.globalFilterLocationId
+                );
             }
-
             // release previous subscriber
             if (this.previousSubscriber) {
                 this.previousSubscriber.unsubscribe();

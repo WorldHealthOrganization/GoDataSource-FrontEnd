@@ -4,8 +4,8 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs/Subscription';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-independent-transmission-chains-dashlet',
@@ -68,17 +68,26 @@ export class IndependentTransmissionChainsDashletComponent extends DashletCompon
     refreshData() {
         // get the results for independent transmission chains
         if (this.outbreakId) {
-            // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                null
-            );
+            // configure
+            const qb = new RequestQueryBuilder();
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byEquality(
+                    'endDate',
+                    this.globalFilterDate.format('YYYY-MM-DD')
+                );
+            }
 
             // location
             if (this.globalFilterLocationId) {
-                qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CASE)
-                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+                qb.addChildQueryBuilder('person').includeChildQueryWhereKey().filter.byEquality(
+                    'addresses.parentLocationIdFilter',
+                    this.globalFilterLocationId
+                );
             }
 
             // release previous subscriber

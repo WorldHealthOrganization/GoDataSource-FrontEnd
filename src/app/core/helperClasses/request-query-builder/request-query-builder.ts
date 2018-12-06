@@ -22,6 +22,7 @@ export class RequestQueryBuilder {
     public childrenQueryBuilders: {
         [qbFilterKey: string]: RequestQueryBuilder
     } = {};
+    private childrenQueryAddWhere: boolean = false;
 
     /**
      * #TODO Replace usage with RequestPaginator
@@ -81,6 +82,24 @@ export class RequestQueryBuilder {
      */
     excludeDeleted() {
         this.deleted = false;
+        return this;
+    }
+
+    /**
+     * Include child query where key
+     * @returns {RequestQueryBuilder}
+     */
+    includeChildQueryWhereKey() {
+        this.childrenQueryAddWhere = true;
+        return this;
+    }
+
+    /**
+     * Exclude child query where key
+     * @returns {RequestQueryBuilder}
+     */
+    excludeChildQueryWhereKey() {
+        this.childrenQueryAddWhere = false;
         return this;
     }
 
@@ -163,7 +182,11 @@ export class RequestQueryBuilder {
         if (!_.isEmpty(this.childrenQueryBuilders)) {
             _.each(this.childrenQueryBuilders, (qb: RequestQueryBuilder, qbKey: string) => {
                 if (!qb.isEmpty()) {
-                    filter[qbKey] = qb.filter.generateCondition();
+                    _.set(
+                        filter,
+                        `[${qbKey}]` + (qb.childrenQueryAddWhere ? '[where]' : ''),
+                        qb.filter.generateCondition()
+                    );
                 }
             });
         }
