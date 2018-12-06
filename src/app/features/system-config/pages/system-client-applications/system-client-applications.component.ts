@@ -284,7 +284,6 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                 ' - ' +
                 moment().format('YYYY-MM-DD'),
             allowedExportTypes: [
-                ExportDataExtension.JSON,
                 ExportDataExtension.QR
             ],
             allowedExportTypesKey: 'type',
