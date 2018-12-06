@@ -17,6 +17,10 @@ import { Moment } from 'moment';
 
 @Injectable()
 export class TransmissionChainDataService {
+    // used to group similar request so we don't make the same request multiple times
+    private getCountIndependentTransmissionChainsShared: {
+        [filter: string]: Observable<any>
+    } = {};
 
     constructor(
         private http: HttpClient,
@@ -158,11 +162,22 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricIndependentTransmissionChainsModel> {
+        // construct query
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
-            MetricIndependentTransmissionChainsModel
-        );
+
+        // check if we didn't create a request already
+        if (!this.getCountIndependentTransmissionChainsShared[filter]) {
+            this.getCountIndependentTransmissionChainsShared[filter] = this.modelHelper.mapObservableToModel(
+                this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
+                MetricIndependentTransmissionChainsModel
+            ).do(() => {
+                // cleanup
+                delete this.getCountIndependentTransmissionChainsShared[filter];
+            }).share();
+        }
+
+        // execute request
+        return this.getCountIndependentTransmissionChainsShared[filter];
     }
 
     /**
@@ -206,7 +221,7 @@ export class TransmissionChainDataService {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, (node, key) => {
+                _.forEach(firstChain.nodes, (node) => {
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
