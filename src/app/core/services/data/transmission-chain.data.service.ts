@@ -114,7 +114,7 @@ export class TransmissionChainDataService {
         }
 
         // add flags
-        const flags = queryBuilder.filter.getFlags()
+        const flags = queryBuilder.filter.getFlags();
         if (!_.isEmpty(flags)) {
             filter = {
                 ...filter,
