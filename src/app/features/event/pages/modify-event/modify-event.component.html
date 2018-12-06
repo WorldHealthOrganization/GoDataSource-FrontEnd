@@ -109,6 +109,7 @@
         </ng-container>
 
         <button
+            *ngIf="hasEventWriteAccess()"
             type="button"
             mat-raised-button color="accent"
             [routerLink]="['/relationships', EntityType.EVENT, eventId, 'share']">
