@@ -65,15 +65,17 @@
 
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip
-                        *ngFor="let entry of item.entries"
-                        [matTooltip]="entry.description | translate">
-                        <div
-                            *ngIf="entry.colorCode"
-                            class="ref-data-chip-bg-color"
-                            [style.background-color]="entry.colorCode"></div>
-                        {{ entry.value | translate }}
-                    </mat-chip>
+                    <ng-container *ngFor="let entry of item.entries">
+                        <mat-chip
+                            *ngIf="entry.active"
+                            [matTooltip]="entry.description | translate">
+                            <div
+                                *ngIf="entry.colorCode"
+                                class="ref-data-chip-bg-color"
+                                [style.background-color]="entry.colorCode"></div>
+                            {{ entry.value | translate }}
+                        </mat-chip>
+                    </ng-container>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>
