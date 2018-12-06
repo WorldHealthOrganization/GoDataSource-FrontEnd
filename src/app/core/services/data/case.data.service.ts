@@ -320,5 +320,6 @@ export class CaseDataService {
     convertToContact(outbreakId: string, caseId: string): Observable<any> {
         return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/convert-to-contact`, {});
     }
+
 }
 
