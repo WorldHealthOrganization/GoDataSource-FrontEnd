@@ -81,7 +81,10 @@ export class SheetCellValidator {
             case SheetCellValidationType.REQUIRED:
                 // custom validator for Required cells
                 return (value, callback) => {
-                    if (value && value.length > 0) {
+                    if (
+                        value &&
+                        value.length > 0
+                    ) {
                         callback(true);
                         return;
                     }
@@ -93,7 +96,10 @@ export class SheetCellValidator {
                 // custom validator for Positive Integer cells
                 return (value, callback, sheetColumn) => {
                     // empty string is handled by required validator
-                    if (value === '') {
+                    if (
+                        _.isEmpty(value) &&
+                        !_.isNumber(value)
+                    ) {
                         callback(true);
                     } else {
                         callback((

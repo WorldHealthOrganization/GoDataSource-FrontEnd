@@ -27,7 +27,9 @@
                     [colWidths]="150"
                     [startRows]="20"
                     [minSpareRows]="1"
-                    [beforeValidate]="beforeValidateSheet">
+                    [beforeValidate]="beforeValidateSheet"
+                    [afterRemoveRow]="afterRemoveRow"
+                    [afterChange]="afterChange">
 
                     <ng-container *ngFor="let column of sheetColumns">
                         <!-- Text column -->

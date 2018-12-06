@@ -281,14 +281,71 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * 'Handsontable' hook before running validation on a cell
      */
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
-        if (
-            value === null &&
-            sheetCore.isEmptyRow(row)
-        ) {
+        // determine if row is empty
+        const columnValues: any[] = sheetCore.getDataAtRow(row);
+        columnValues[column] = value;
+
+        // isEmptyRow doesn't work since values is changed after beforeValidateSheet
+        if (_.isEmpty(_.filter(columnValues, (v) => v !== null && v !== ''))) {
             // mark this cell as being on an empty row, so we skip validation for it
             return SheetCellValidator.EMPTY_ROW_CELL_VALUE;
         } else {
             return value;
+        }
+    }
+
+    /**
+     * After removing row
+     */
+    afterRemoveRow(sheetCore: Handsontable, row: number) {
+        // determine if row is empty
+        const countedRows: number = sheetCore.countRows();
+        while (row < countedRows) {
+            // validate row
+            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                _.each(
+                    sheetCore.getCellMetaAtRow(row),
+                    (column: {
+                        valid?: boolean
+                    }) => {
+                        if (column.valid === false) {
+                            column.valid = true;
+                        }
+                    }
+                );
+            }
+
+            // check next row
+            row++;
+        }
+    }
+
+    /**
+     * After changes
+     */
+    afterChange(
+        sheetCore: Handsontable,
+        changes: any[],
+        source: string
+    ) {
+        if (source === 'edit') {
+            const row: number = changes[0][0];
+            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                // remove validations
+                _.each(
+                    sheetCore.getCellMetaAtRow(row),
+                    (column: {
+                        valid?: boolean
+                    }) => {
+                        if (column.valid === false) {
+                            column.valid = true;
+                        }
+                    }
+                );
+
+                // refresh
+                sheetCore.render();
+            }
         }
     }
 
@@ -372,19 +429,25 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                     // collect data from table
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
                         .subscribe((data) => {
-                            // create contacts
-                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                            // no data to save ?
+                            if (_.isEmpty(data)) {
+                                // show error
+                                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                            } else {
+                                // create contacts
+                                this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
+                                    .catch((err) => {
+                                        this.snackbarService.showError(err.message);
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
-                                    // navigate to listing page
-                                    this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
-                                });
+                                        // navigate to listing page
+                                        this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                    });
+                            }
                         });
                 }
             });
