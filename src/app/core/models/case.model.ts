@@ -58,6 +58,8 @@ export class CaseModel {
         endDate: string
     }[];
 
+    alerted: boolean = false;
+
     constructor(data = null) {
         this.id = _.get(data, 'id');
         this.firstName = _.get(data, 'firstName');

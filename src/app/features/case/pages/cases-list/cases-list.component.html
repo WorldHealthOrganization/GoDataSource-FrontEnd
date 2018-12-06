@@ -216,7 +216,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.lastName }}
             </mat-cell>
         </ng-container>
@@ -238,7 +238,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.firstName }}
             </mat-cell>
         </ng-container>
@@ -264,7 +264,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
                     [value]="item.classification">
@@ -291,7 +291,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 <app-age-label [age]="item.age"></app-age-label>
             </mat-cell>
         </ng-container>
@@ -317,7 +317,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.gender | translate }}
             </mat-cell>
         </ng-container>
@@ -337,7 +337,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.dateOfOnset | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -362,7 +362,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
             </mat-cell>
         </ng-container>
@@ -386,7 +386,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)">
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.wasContact"></app-yes-no-label>
             </mat-cell>
         </ng-container>

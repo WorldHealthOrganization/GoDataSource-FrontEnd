@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -30,6 +30,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
+import { Subscription } from 'rxjs/Subscription';
+import { EntityModel } from '../../../../core/models/entity.model';
 import { tap } from 'rxjs/operators';
 
 @Component({
@@ -38,7 +40,7 @@ import { tap } from 'rxjs/operators';
     templateUrl: './cases-list.component.html',
     styleUrls: ['./cases-list.component.less']
 })
-export class CasesListComponent extends ListComponent implements OnInit {
+export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
@@ -115,6 +117,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
     ];
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
@@ -166,7 +171,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -199,6 +204,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                                     });
                                 });
                         });
+
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -211,6 +217,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -443,8 +457,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Cases
-            this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+            this.casesList$ = this.caseDataService
+                .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
+                .map((cases: CaseModel[]) => {
+                    return EntityModel.determineAlertness(
+                        this.selectedOutbreak.caseInvestigationTemplate,
+                        cases
+                    );
+                }).pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
