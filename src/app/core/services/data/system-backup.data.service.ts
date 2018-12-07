@@ -29,13 +29,22 @@ export class SystemBackupDataService {
      * Retrieve the list of backups
      */
     getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
-        // queryBuilder.include(`user`);
+        queryBuilder.include(`user`);
 
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`backups?filter=${filter}`),
             BackupModel
         );
+    }
+
+    /**
+     * Get total number of entries based on the applied filter
+     * @returns {Observable<any>}
+     */
+    getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`backups/count?filter=${filter}`);
     }
 
     /**

@@ -183,6 +183,22 @@
                 </mat-cell>
             </ng-container>
 
+            <!-- Created by user -->
+            <ng-container matColumnDef="user">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_CREATED_BY' | translate}}</div>
+                        <div class="column-filter">
+                            <!--Placeholder-->
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.user? item.user.firstName + ' ' + item.user.lastName : ''}}
+                </mat-cell>
+            </ng-container>
+
             <!-- Error -->
             <ng-container matColumnDef="error">
                 <mat-header-cell *matHeaderCellDef>
@@ -264,4 +280,11 @@
         class="wait-for-backup">
         <mat-spinner></mat-spinner>
     </div>
+
+    <mat-paginator
+        [length]="(backupsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>

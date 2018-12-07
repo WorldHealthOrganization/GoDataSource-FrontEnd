@@ -46,6 +46,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
 
     // backups list
     backupsList$: Observable<BackupModel[]>;
+    backupsListCount$: Observable<any>;
 
     // module list
     backupModulesList$: Observable<any[]>;
@@ -127,7 +128,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
             }).subscribe((mappedOutbreaks: LabelValuePair[]) => {
                 this.mappedOutbreaks = mappedOutbreaks;
             });
-
+        // initialize pagination
+        this.initPaginator();
         // retrieve backups
         this.needsRefreshList(true);
     }
@@ -161,6 +163,15 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).share();
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -171,6 +182,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
             'date',
             'status',
             'error',
+            'user',
             'actions'
         ];
     }
