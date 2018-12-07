@@ -29,6 +29,8 @@ export class SystemBackupDataService {
      * Retrieve the list of backups
      */
     getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
+        // queryBuilder.include(`user`);
+
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`backups?filter=${filter}`),
@@ -38,7 +40,7 @@ export class SystemBackupDataService {
 
     /**
      * Delete an existing backup
-     * @param {string} caseId
+     * @param {string} backupId
      * @returns {Observable<any>}
      */
     deleteBackup(backupId: string): Observable<any> {
