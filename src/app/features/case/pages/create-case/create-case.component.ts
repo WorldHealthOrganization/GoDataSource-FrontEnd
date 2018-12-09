@@ -91,6 +91,9 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                     mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
                 };
 
+                // set visual id for case
+                this.caseData.visualId = this.visualIDTranslateData.mask;
+
                 // set visual ID validator
                 this.caseIdMaskValidator = Observable.create((observer) => {
                     this.outbreakDataService.generateVisualIDCheckValidity(
