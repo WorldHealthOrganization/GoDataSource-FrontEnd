@@ -73,9 +73,18 @@ export class CasesDeceasedDashletComponent extends DashletComponent implements O
         if (this.outbreakId) {
             // add global filters
             const qb = this.getGlobalFilterQB(
-                'dateDeceased',
+                null,
                 'addresses.parentLocationIdFilter'
             );
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateDeceased', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // release previous subscriber
             if (this.previousSubscriber) {

@@ -106,12 +106,16 @@ export class TransmissionChainsListComponent extends ListComponent implements On
                 // case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
                 default:
                     // date
-                    qb = this.listFilterDataService.getGlobalFilterQB(
-                        'contactDate',
-                        globalFilters.date,
-                        null,
-                        null
-                    );
+                    qb = new RequestQueryBuilder();
+
+                    // date
+                    if (globalFilters.date) {
+                        qb.filter.byDateRange(
+                            'contactDate', {
+                                endDate: globalFilters.date.endOf('day').format()
+                            }
+                        );
+                    }
 
                     // location
                     if (globalFilters.locationId) {

@@ -73,9 +73,18 @@ export class CasesRefusingTreatmentDashletComponent extends DashletComponent imp
         if (this.outbreakId) {
             // add global filters
             const qb = this.getGlobalFilterQB(
-                'dateOfOnset',
+                null,
                 'addresses.parentLocationIdFilter'
             );
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateOfOnset', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // release previous subscriber
             if (this.previousSubscriber) {

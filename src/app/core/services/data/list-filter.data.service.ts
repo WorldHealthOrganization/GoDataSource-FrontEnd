@@ -53,17 +53,17 @@ export class ListFilterDataService {
                 location
             );
 
-            // no date provided, then we need to set the default one
-            // filter by day - default - yesterday
-            if (!date) {
-                date = moment().add(-1, 'days');
+            // date
+            if (date) {
+                qb.filter
+                    .byEquality(
+                        'startDate',
+                        moment(date).startOf('day').format()
+                    ).byEquality(
+                        'endDate',
+                        moment(date).endOf('day').format()
+                    );
             }
-
-            // date condition
-            qb.filter.byEquality(
-                'date',
-                moment(date).format('YYYY-MM-DD')
-            );
 
             // change the way we build query
             qb.filter.firstLevelConditions();
@@ -216,20 +216,23 @@ export class ListFilterDataService {
     filterCasesLessThanContacts(date, location, noLessContacts): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                date,
-                null,
-                null
-            );
+            const qb = new RequestQueryBuilder();
 
             // change the way we build query
             qb.filter.firstLevelConditions();
 
+            // date
+            if (date) {
+                qb.filter.byDateRange(
+                    'contactDate', {
+                        endDate: date.endOf('day').format()
+                    }
+                );
+            }
+
             // location
             if (location) {
                 qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CONTACT)
                     .byEquality('addresses.parentLocationIdFilter', location);
             }
 
@@ -284,8 +287,7 @@ export class ListFilterDataService {
 
             // location
             if (location) {
-                qb.include('contact').queryBuilder.filter
-                    .byEquality('addresses.parentLocationIdFilter', location);
+                qb.filter.byEquality('addresses.parentLocationIdFilter', location);
             }
 
             return this.followUpDataService
@@ -343,7 +345,6 @@ export class ListFilterDataService {
             // location
             if (location) {
                 qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CASE)
                     .byEquality('addresses.parentLocationIdFilter', location);
             }
 

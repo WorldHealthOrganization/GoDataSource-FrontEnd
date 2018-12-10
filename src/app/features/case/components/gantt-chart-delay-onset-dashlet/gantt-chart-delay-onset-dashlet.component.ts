@@ -218,9 +218,10 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
 
             // date
             if (this.globalFilterDate) {
-                qb.filter.byEquality(
-                    'dateOfOnset',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                qb.filter.byDateRange(
+                    'dateOfOnset', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
                 );
             }
 
