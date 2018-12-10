@@ -112,7 +112,6 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
             // location
             if (this.globalFilterLocationId) {
                 qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CONTACT)
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 

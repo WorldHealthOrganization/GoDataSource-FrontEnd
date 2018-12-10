@@ -233,7 +233,6 @@ export class ListFilterDataService {
             // location
             if (location) {
                 qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CONTACT)
                     .byEquality('addresses.parentLocationIdFilter', location);
             }
 
