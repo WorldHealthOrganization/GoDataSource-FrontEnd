@@ -1,11 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
-import { PERMISSION } from '../../../../core/models/permission.model';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as moment from 'moment';
 import * as _ from 'lodash';
@@ -15,6 +12,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -31,9 +30,6 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     // selected outbreak ID
     outbreakId: string;
 
-    // authenticated user
-    authUser: UserModel;
-
     // available side filters
     availableSideFilters: FilterModel[] = [];
 
@@ -41,37 +37,22 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     globalFilterLocationId: string;
     loadingDialog: LoadingDialogModel;
 
+    @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
+
     constructor(
         private router: Router,
-        private authDataService: AuthDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        protected snackbarService: SnackbarService
     ) {
         super();
     }
 
     ngOnInit() {
-        this.authUser = this.authDataService.getAuthenticatedUser();
         // initialize Side Filters
         this.initializeSideFilters();
-    }
-
-    /**
-     * Check if the user has read access to cases
-     * @returns {boolean}
-     */
-    hasReadCasePermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_CASE);
-    }
-
-    /**
-     * Check if the user has read report permission
-     * @returns {boolean}
-     */
-    hasReadReportPermissions(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.READ_REPORT);
     }
 
     /**
@@ -116,16 +97,24 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      * generate Gantt chart report - image will be exported as pdf
      */
     generateGanttChartReport() {
-        this.showLoadingDialog();
-        this.domService
-            .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
-            .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
-                        this.closeLoadingDialog();
-                    });
-            });
+        // check if we have data to export
+        if (
+            !this.ganttChart ||
+            !this.ganttChart.hasData()
+        ) {
+            this.snackbarService.showError('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
+        } else {
+            this.showLoadingDialog();
+            this.domService
+                .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
+                .subscribe((pngBase64) => {
+                    this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
+                        .subscribe((blob) => {
+                            this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
+                            this.closeLoadingDialog();
+                        });
+                });
+        }
     }
 
     /**

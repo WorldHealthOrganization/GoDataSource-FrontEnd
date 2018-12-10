@@ -25,15 +25,15 @@ export class FollowUpsDataService {
 
     /**
      * Generate followups for contacts
-     * @returns {Observable<ContactFollowUpsModel[]>}
+     * @returns {Observable<ContactFollowUpsModel>}
      */
     generateFollowUps(
         outbreakId: string,
         startDate: any,
         endDate: any,
         targeted: boolean
-    ): Observable<ContactFollowUpsModel[]> {
-        return this.modelHelper.mapObservableListToModel(
+    ): Observable<ContactFollowUpsModel> {
+        return this.modelHelper.mapObservableToModel(
             this.http.post(
                 `outbreaks/${outbreakId}/generate-followups`, {
                     startDate: startDate,

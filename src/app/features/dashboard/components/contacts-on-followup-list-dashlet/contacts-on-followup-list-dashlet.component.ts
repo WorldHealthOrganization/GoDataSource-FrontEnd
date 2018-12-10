@@ -81,10 +81,10 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
                 qb.filter
                     .byEquality(
                         'startDate',
-                        this.globalFilterDate.startOf('day').format()
+                        this.globalFilterDate.startOf('day').toISOString()
                     ).byEquality(
                         'endDate',
-                        this.globalFilterDate.endOf('day').format()
+                        this.globalFilterDate.endOf('day').toISOString()
                     );
             }
 

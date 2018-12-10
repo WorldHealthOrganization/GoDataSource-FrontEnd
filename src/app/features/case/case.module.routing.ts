@@ -1,13 +1,10 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponent, ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { GanttChartComponent } from './pages/gantt-chart/gantt-chart.component';
-import { ModulePath } from '../../core/enums/module-path.enum';
 import { PasswordChangeGuard } from '../../core/services/guards/password-change-guard.service';
 
 const routes: Routes = [
@@ -127,7 +124,10 @@ const routes: Routes = [
             PasswordChangeGuard
         ],
         data: {
-            permissions: [PERMISSION.READ_REPORT]
+            permissions: [
+                PERMISSION.READ_CASE,
+                PERMISSION.READ_REPORT
+            ]
         }
     }
 ];

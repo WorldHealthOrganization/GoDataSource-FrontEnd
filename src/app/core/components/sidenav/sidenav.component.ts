@@ -194,7 +194,10 @@ export class SidenavComponent implements OnInit {
                 new ChildNavItem(
                     'gantt-chart',
                     'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
-                    [PERMISSION.READ_REPORT],
+                    [
+                        PERMISSION.READ_CASE,
+                        PERMISSION.READ_REPORT
+                    ],
                     '/cases/gantt-chart',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )

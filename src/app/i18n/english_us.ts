@@ -1688,7 +1688,7 @@ export const EnglishUsLang = {
         'LNG_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION': '',
         'LNG_BACKUP_FIELD_LABEL_DATE': 'Date',
         'LNG_BACKUP_FIELD_LABEL_STATUS': 'Status',
-        'LNG_BACKUP_FIELD_LABEL_CREATED_BY': 'Created by',
+        'LNG_BACKUP_FIELD_LABEL_USER': 'User',
         'LNG_BACKUP_FIELD_LABEL_ERROR': 'Error',
 
         /**

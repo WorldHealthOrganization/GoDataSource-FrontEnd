@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { Observable } from 'rxjs/Observable';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
@@ -19,6 +19,8 @@ import * as FileSaver from 'file-saver';
 import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-dashboard',
@@ -27,7 +29,6 @@ import * as moment from 'moment';
     styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_DASHBOARD_TITLE', '.', true)
     ];
@@ -89,6 +90,8 @@ export class DashboardComponent implements OnInit {
     casesByClassificationAndLocationReportUrl: string = '';
     contactsFollowupSuccessRateReportUrl: string = '';
 
+    loadingDialog: LoadingDialogModel;
+
     // available side filters
     availableSideFilters: FilterModel[] = [];
 
@@ -103,7 +106,8 @@ export class DashboardComponent implements OnInit {
         private outbreakDataService: OutbreakDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -273,6 +277,7 @@ export class DashboardComponent implements OnInit {
      * generate EPI curve report - image will be exported as pdf
      */
     generateEpiCurveReport() {
+        this.showLoadingDialog();
         this.domService
             .getPNGBase64('app-epi-curve-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
@@ -287,6 +292,7 @@ export class DashboardComponent implements OnInit {
      * Generate KPIs report
      */
     generateKpisReport() {
+        this.showLoadingDialog();
         domtoimage.toPng(this.kpiSection.nativeElement)
             .then((dataUrl) => {
                 const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
@@ -294,20 +300,6 @@ export class DashboardComponent implements OnInit {
                 this.importExportDataService.exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                    });
-            });
-    }
-
-    /**
-     * generate Gantt chart report - image will be exported as pdf
-     */
-    generateGanttChartReport() {
-        this.domService
-            .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
-            .subscribe((pngBase64) => {
-                this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL');
                     });
             });
     }
@@ -327,6 +319,7 @@ export class DashboardComponent implements OnInit {
             blob,
             `${fileName}.${extension}`
         );
+        this.closeLoadingDialog();
     }
 
     /**
@@ -342,5 +335,78 @@ export class DashboardComponent implements OnInit {
         // set filters
         this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
         this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+    /**
+     * Cases by classification and location qb
+     */
+    qbCaseByClassification(): RequestQueryBuilder {
+        // initialization
+        const qb = new RequestQueryBuilder();
+
+        // date
+        if (this.globalFilterDate) {
+            qb.filter.byDateRange(
+                'dateOfOnset', {
+                    endDate: this.globalFilterDate.endOf('day').format()
+                }
+            );
+        }
+
+        // location
+        if (this.globalFilterLocationId) {
+            qb.filter.byEquality(
+                'addresses.parentLocationIdFilter',
+                this.globalFilterLocationId
+            );
+        }
+
+        // finished
+        return qb;
+    }
+
+    /**
+     * Contacts follow up success rate
+     */
+    qbContactsFollowUpSuccessRate(): RequestQueryBuilder {
+        // initialization
+        const qb = new RequestQueryBuilder();
+
+        // date
+        if (this.globalFilterDate) {
+            qb.filter.byDateRange(
+                'dateOfReporting', {
+                    endDate: this.globalFilterDate.endOf('day').format()
+                }
+            );
+        }
+
+        // location
+        if (this.globalFilterLocationId) {
+            qb.filter.byEquality(
+                'addresses.parentLocationIdFilter',
+                this.globalFilterLocationId
+            );
+        }
+
+        // finished
+        return qb;
     }
 }

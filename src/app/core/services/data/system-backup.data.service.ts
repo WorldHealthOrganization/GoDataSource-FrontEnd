@@ -44,9 +44,7 @@ export class SystemBackupDataService {
      * @returns {Observable<any>}
      */
     getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
-
         const whereFilter = queryBuilder.filter.generateCondition(true);
-
         return this.http.get(`backups/count?where=${whereFilter}`);
     }
 

@@ -249,4 +249,11 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
                 });
         }
     }
+
+    /**
+     * Check if graph has data
+     */
+    hasData(): boolean {
+        return _.get(this.ganttData, '[0].children.length', 0) > 0;
+    }
 }

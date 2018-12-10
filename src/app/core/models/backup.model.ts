@@ -19,6 +19,10 @@ export class BackupModel {
         this.status = _.get(data, 'status');
         this.error = _.get(data, 'error');
         this.userId = _.get(data, 'userId');
+
         this.user = _.get(data, 'user');
+        if (!_.isEmpty(this.user)) {
+            this.user = new UserModel(this.user);
+        }
     }
 }

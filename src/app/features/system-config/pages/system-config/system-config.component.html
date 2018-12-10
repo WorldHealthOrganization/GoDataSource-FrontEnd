@@ -192,7 +192,9 @@
             <ng-container matColumnDef="user">
                 <mat-header-cell *matHeaderCellDef>
                     <div class="table-header-cell">
-                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_CREATED_BY' | translate}}</div>
+                        <div mat-sort-header class="column-header">
+                            {{ 'LNG_BACKUP_FIELD_LABEL_USER' | translate }}
+                        </div>
                         <div class="column-filter">
                             <app-form-select
                                 name="usersFilter"
@@ -212,7 +214,7 @@
                 </mat-header-cell>
 
                 <mat-cell *matCellDef="let item">
-                    {{ item.user? item.user.firstName + ' ' + item.user.lastName : ''}}
+                    {{ item.user ? item.user.firstName + ' ' + item.user.lastName : ''}}
                 </mat-cell>
             </ng-container>
 

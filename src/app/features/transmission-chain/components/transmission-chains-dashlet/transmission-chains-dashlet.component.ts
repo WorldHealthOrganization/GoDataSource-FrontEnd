@@ -314,7 +314,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 // case location
                 if (!_.isEmpty(this.filters.locationId)) {
                     personRequestQueryBuilder.filter.byEquality(
-                        'addresses.locationId',
+                        'addresses.parentLocationIdFilter',
                         this.filters.locationId
                     );
                 }

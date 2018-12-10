@@ -81,6 +81,7 @@ export class ExportButtonComponent {
     exportFinishedCallback(answer: DialogAnswer) {
         this.exportFinished.emit(answer);
     }
+
     /**
      * Export start handler
      */

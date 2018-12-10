@@ -58,10 +58,10 @@ export class ListFilterDataService {
                 qb.filter
                     .byEquality(
                         'startDate',
-                        moment(date).startOf('day').format()
+                        moment(date).startOf('day').toISOString()
                     ).byEquality(
                         'endDate',
-                        moment(date).endOf('day').format()
+                        moment(date).endOf('day').toISOString()
                     );
             }
 

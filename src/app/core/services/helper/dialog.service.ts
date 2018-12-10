@@ -30,7 +30,6 @@ export enum ExportDataExtension {
 
 @Injectable()
 export class DialogService {
-
     /**
      * Constructor
      * @param dialog
@@ -351,6 +350,7 @@ export class DialogService {
             LoadingDialogComponent,
             LoadingDialogComponent.DEFAULT_CONFIG
         );
+
         // finished creating dialog
         return new LoadingDialogModel(
             Subscriber.create(() => {
