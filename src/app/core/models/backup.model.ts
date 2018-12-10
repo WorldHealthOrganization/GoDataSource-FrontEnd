@@ -8,6 +8,7 @@ export class BackupModel {
     date: string;
     status: string;
     error: string;
+    userId: string;
     user: UserModel;
 
     constructor(data = null) {
@@ -17,6 +18,7 @@ export class BackupModel {
         this.date = _.get(data, 'date');
         this.status = _.get(data, 'status');
         this.error = _.get(data, 'error');
+        this.userId = _.get(data, 'userId');
         this.user = _.get(data, 'user');
     }
 }
