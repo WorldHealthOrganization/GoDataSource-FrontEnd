@@ -32,8 +32,6 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     // authenticated user
     authUser: UserModel;
 
-    serverToday: Moment = null;
-
     // available side filters
     availableSideFilters: FilterModel[] = [];
 

@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 
 const routes: Routes = [
-    // Events list
+    // Gantt Chart
     {
         path: '',
         component: fromPages.GanttChartComponent
