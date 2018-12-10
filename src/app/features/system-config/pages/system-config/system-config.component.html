@@ -67,6 +67,11 @@
     </ng-container>
 </app-topnav>
 
+<!--Total number of records from the list-->
+<app-total-number-of-records
+    [value]="(backupsListCount$ | async)?.count">
+</app-total-number-of-records>
+
 <mat-card class="page-section page-content">
     <!-- Backups -->
     <ng-container
@@ -183,6 +188,34 @@
                 </mat-cell>
             </ng-container>
 
+            <!-- Created by user -->
+            <ng-container matColumnDef="user">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_CREATED_BY' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="usersFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [options]="usersList$ | async"
+                                multiple="true"
+                                (optionChanged)="filterBySelectField('userId', $event, 'id')"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                app-reset-input-on-side-filter
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.user? item.user.firstName + ' ' + item.user.lastName : ''}}
+                </mat-cell>
+            </ng-container>
+
             <!-- Error -->
             <ng-container matColumnDef="error">
                 <mat-header-cell *matHeaderCellDef>
@@ -264,4 +297,11 @@
         class="wait-for-backup">
         <mat-spinner></mat-spinner>
     </div>
+
+    <mat-paginator
+        [length]="(backupsListCount$ | async)?.count"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="changePage($event)">
+    </mat-paginator>
 </mat-card>

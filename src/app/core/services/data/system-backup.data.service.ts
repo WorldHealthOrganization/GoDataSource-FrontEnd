@@ -29,6 +29,9 @@ export class SystemBackupDataService {
      * Retrieve the list of backups
      */
     getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
+        // include user data
+        queryBuilder.include(`user`);
+
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`backups?filter=${filter}`),
@@ -37,8 +40,19 @@ export class SystemBackupDataService {
     }
 
     /**
+     * Get total number of entries based on the applied filter
+     * @returns {Observable<any>}
+     */
+    getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+
+        const whereFilter = queryBuilder.filter.generateCondition(true);
+
+        return this.http.get(`backups/count?where=${whereFilter}`);
+    }
+
+    /**
      * Delete an existing backup
-     * @param {string} caseId
+     * @param {string} backupId
      * @returns {Observable<any>}
      */
     deleteBackup(backupId: string): Observable<any> {
