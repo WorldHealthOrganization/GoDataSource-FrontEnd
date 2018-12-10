@@ -11,7 +11,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
@@ -56,6 +56,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     allowedExportTypes: ExportDataExtension[] = [
         ExportDataExtension.JSON
     ];
+
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private authDataService: AuthDataService,
@@ -198,6 +200,22 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             // redirect
             this.locationFilter.clear();
             this.router.navigate(['/locations', data.id, 'children']);
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

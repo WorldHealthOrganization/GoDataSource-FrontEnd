@@ -278,10 +278,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.selectedOutbreak) {
             // create queryBuilder for filters
             const requestQueryBuilder = new RequestQueryBuilder();
+            requestQueryBuilder.filter.firstLevelConditions();
+
+            // do we have person filters?
             if (this.filters) {
+                // include custom person builder that will handle these filters
+                const personRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('person');
+
                 // occupation
                 if (!_.isEmpty(this.filters.occupation)) {
-                    requestQueryBuilder.filter.byEquality(
+                    personRequestQueryBuilder.filter.byEquality(
                         'occupation',
                         this.filters.occupation
                     );
@@ -289,7 +295,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // gender
                 if (!_.isEmpty(this.filters.gender)) {
-                    requestQueryBuilder.filter.bySelect(
+                    personRequestQueryBuilder.filter.bySelect(
                         'gender',
                         this.filters.gender,
                         true,
@@ -299,7 +305,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // case classification
                 if (!_.isEmpty(this.filters.classification)) {
-                    requestQueryBuilder.filter.byEquality(
+                    personRequestQueryBuilder.filter.byEquality(
                         'classification',
                         this.filters.classification
                     );
@@ -307,7 +313,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // case location
                 if (!_.isEmpty(this.filters.locationId)) {
-                    requestQueryBuilder.filter.byEquality(
+                    personRequestQueryBuilder.filter.byEquality(
                         'addresses.locationId',
                         this.filters.locationId
                     );
@@ -315,7 +321,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // firstName
                 if (!_.isEmpty(this.filters.firstName)) {
-                    requestQueryBuilder.filter.byText(
+                    personRequestQueryBuilder.filter.byText(
                         'firstName',
                         this.filters.firstName
                     );
@@ -323,7 +329,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // lastName
                 if (!_.isEmpty(this.filters.lastName)) {
-                    requestQueryBuilder.filter.byText(
+                    personRequestQueryBuilder.filter.byText(
                         'lastName',
                         this.filters.lastName
                     );
@@ -331,7 +337,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // age
                 if (!_.isEmpty(this.filters.age)) {
-                    requestQueryBuilder.filter.byAgeRange(
+                    personRequestQueryBuilder.filter.byAgeRange(
                         'age',
                         this.filters.age
                     );
@@ -339,39 +345,54 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
                 // date of reporting
                 if (!_.isEmpty(this.filters.date)) {
-                    requestQueryBuilder.filter.byDateRange(
+                    personRequestQueryBuilder.filter.byDateRange(
                         'dateOfReporting',
                         this.filters.date
                     );
                 }
             }
 
-            // add flags
-            const rQB = new RequestQueryBuilder();
-            if (this.filters.showContacts) {
-                rQB.filter.flag('includeContacts', 1);
-            }
-            if (this.filters.showEvents) {
-                rQB.filter.flag('includeEvents', 1);
+            // do we have chainIncludesPerson filters ?
+            if (this.personId) {
+                // include custom person builder that will handle these filters
+                const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+                chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+                    'id',
+                    this.personId
+                );
             }
 
-            // configure
-            if (!requestQueryBuilder.filter.isEmpty()) {
-                rQB.filter.where({
-                    person: {
-                        where: requestQueryBuilder.filter.generateCondition()
-                    }
-                });
+            // add filter for size ( under where )
+            if (this.sizeOfChainsFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'size',
+                    _.parseInt(this.sizeOfChainsFilter)
+                );
+            }
+
+            // global date - see state in time
+            if (this.dateGlobalFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'endDate',
+                    moment(this.dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                );
+            }
+
+            // add flags
+            if (this.filters.showContacts) {
+                requestQueryBuilder.filter.flag('includeContacts', 1);
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
-                if (!_.isEmpty(chains)) {
-                   this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
-                } else {
-                    this.graphElements = [];
-                }
-            });
+            this.transmissionChainDataService
+                .getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder)
+                .subscribe((chains) => {
+                    if (!_.isEmpty(chains)) {
+                       this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
+                    } else {
+                        this.graphElements = [];
+                    }
+                });
         }
     }
 
@@ -612,9 +633,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     getPng64(splitFactor: number) {
           return this.cytoscapeChild.getPng64(splitFactor);
     }
-
-
-
 }
 
 

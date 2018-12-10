@@ -25,7 +25,9 @@
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
                         [url]="printDailyFollowUpsUrl"
                         [fileName]="followUpsPrintDailyFileName"
-                        [fileType]="printDailyFollowUpsFileType">
+                        [fileType]="printDailyFollowUpsFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
                     <button
@@ -45,7 +47,9 @@
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
                         [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>

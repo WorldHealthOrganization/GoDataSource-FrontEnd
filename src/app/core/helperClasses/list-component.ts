@@ -465,9 +465,6 @@ export abstract class ListComponent {
     clearQueryBuilder() {
         // clear query filters
         this.queryBuilder.clear();
-
-        // apply list filters which is mandatory
-        this.mergeListFilterToMainFilter();
     }
 
     /**

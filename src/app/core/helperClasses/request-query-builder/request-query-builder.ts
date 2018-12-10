@@ -5,7 +5,9 @@ import { RequestPaginator } from './request-paginator';
 
 export class RequestQueryBuilder {
     // Relations to include
-    public includedRelations: any = {};
+    public includedRelations: {
+        [relationName: string]: RequestRelationBuilder
+    } = {};
     // Where conditions
     public filter: RequestFilter = new RequestFilter();
     // Order fields
@@ -22,7 +24,6 @@ export class RequestQueryBuilder {
     public childrenQueryBuilders: {
         [qbFilterKey: string]: RequestQueryBuilder
     } = {};
-    private childrenQueryAddWhere: boolean = false;
 
     /**
      * #TODO Replace usage with RequestPaginator
@@ -39,21 +40,28 @@ export class RequestQueryBuilder {
     /**
      * Include a relation
      * @param {string} relationName
+     * @param {boolean} needsIncludeData Set this to true in case you want to keep data ( it is enough to have just one include for the same relation that need to keep data )
      * @returns {RequestRelationBuilder}
      */
-    include(relationName: string): RequestRelationBuilder {
-        // check if relation already exists
-        const relation: RequestRelationBuilder = this.includedRelations[relationName];
-
-        if (relation) {
-            return relation;
-        } else {
+    include(
+        relationName: string,
+        needsIncludeData: boolean = false
+    ): RequestRelationBuilder {
+        if (!this.includedRelations[relationName]) {
             // add new relation
             // tslint:disable-next-line:no-use-before-declare
             this.includedRelations[relationName] = new RequestRelationBuilder(relationName);
-
-            return this.includedRelations[relationName];
         }
+
+        // do we need to keep data ?
+        if (needsIncludeData) {
+            this.includedRelations[relationName].justFilter = false;
+        } else {
+            // OTHERWISE let it how it was..don't change it to true...
+        }
+
+        // finished
+        return this.includedRelations[relationName];
     }
 
     /**
@@ -86,24 +94,6 @@ export class RequestQueryBuilder {
     }
 
     /**
-     * Include child query where key
-     * @returns {RequestQueryBuilder}
-     */
-    includeChildQueryWhereKey() {
-        this.childrenQueryAddWhere = true;
-        return this;
-    }
-
-    /**
-     * Exclude child query where key
-     * @returns {RequestQueryBuilder}
-     */
-    excludeChildQueryWhereKey() {
-        this.childrenQueryAddWhere = false;
-        return this;
-    }
-
-    /**
      * Remove child query builder
      * @param qbFilterKey
      */
@@ -117,7 +107,7 @@ export class RequestQueryBuilder {
     addChildQueryBuilder(
         qbFilterKey: string,
         replace: boolean = false
-    ) {
+    ): RequestQueryBuilder {
         // replace ?
         if (replace) {
             this.removeChildQueryBuilder(qbFilterKey);
@@ -184,7 +174,7 @@ export class RequestQueryBuilder {
                 if (!qb.isEmpty()) {
                     _.set(
                         filter,
-                        `[${qbKey}]` + (qb.childrenQueryAddWhere ? '[where]' : ''),
+                        `[where][${qbKey}]`,
                         qb.filter.generateCondition()
                     );
                 }
@@ -202,8 +192,16 @@ export class RequestQueryBuilder {
      * @returns {RequestQueryBuilder}
      */
     merge(queryBuilder: RequestQueryBuilder) {
-        // merge includes
-        this.includedRelations = {...this.includedRelations, ...queryBuilder.includedRelations};
+        // merge includes keeping in mind that some of their properties need to remain how they were set previously
+        _.each(queryBuilder.includedRelations, (requestRelationBuilder: RequestRelationBuilder, relationName: string) => {
+            // add relation if necessary so we don't modify the input
+            if (this.includedRelations[relationName] === undefined) {
+                this.include(relationName);
+            }
+
+            // merge data
+            this.includedRelations[relationName].merge(requestRelationBuilder);
+        });
 
         // merge fields
         this.fields(...queryBuilder.fieldsInResponse);
@@ -215,11 +213,19 @@ export class RequestQueryBuilder {
         } else if (queryBuilder.filter.isEmpty()) {
             // do nothing; there is no filter to merge with
         } else {
-            // merge the two filters
-            const mergedFilter = new RequestFilter();
-            mergedFilter.where(this.filter.generateCondition());
-            mergedFilter.where(queryBuilder.filter.generateCondition());
-            this.filter = mergedFilter;
+            // merge conditions - New
+            const newWhere = queryBuilder.filter.generateCondition(false, true);
+            if (!_.isEmpty(newWhere)) {
+                this.filter.where(newWhere);
+            }
+
+            // merge flags - New
+            const newFlags = queryBuilder.filter.getFlags();
+            if (!_.isEmpty(newFlags)) {
+                _.each(newFlags, (flagData: any, flagKey: string) => {
+                    this.filter.flag(flagKey, flagData);
+                });
+            }
         }
 
         // merge "order" criterias
@@ -263,6 +269,31 @@ export class RequestQueryBuilder {
     }
 
     /**
+     * Check if any of this query builder filters have conditions
+     */
+    doAnyOfTheFiltersHaveConditions(): boolean {
+        // check main filter & included filters
+        const includeCheck = (qb: RequestQueryBuilder): boolean => {
+            // check the main filter
+            if (!qb.filter.isEmpty()) {
+                return true;
+            }
+
+            // check include
+            let relName: string;
+            for (relName in qb.includedRelations) {
+                const qbChild: RequestRelationBuilder = qb.includedRelations[relName];
+                if (includeCheck(qbChild.queryBuilder)) {
+                    return true;
+                }
+            }
+        };
+
+        // check
+        return includeCheck(this);
+    }
+
+    /**
      * Clear children query builders
      */
     clearChildrenQueryBuilders() {
@@ -283,6 +314,7 @@ export class RequestQueryBuilder {
 
 export class RequestRelationBuilder {
     public filterParent: boolean = true;
+    public justFilter: boolean = true;
 
     constructor(
         // relation name
@@ -304,8 +336,27 @@ export class RequestRelationBuilder {
             relation: this.name,
             scope: {
                 ...this.queryBuilder.buildQuery(false),
-                filterParent: this.filterParent
+                filterParent: this.queryBuilder.doAnyOfTheFiltersHaveConditions() ? this.filterParent : false,
+                justFilter: this.justFilter
             }
         };
+    }
+
+    /**
+     * Merge two request relation builders
+     * @param requestRelationBuilder
+     */
+    merge(requestRelationBuilder: RequestRelationBuilder) {
+        // can merge ?
+        if (this.name !== requestRelationBuilder.name) {
+            return;
+        }
+
+        // set flags
+        this.justFilter = this.justFilter ? requestRelationBuilder.justFilter : false;
+        this.filterParent = this.filterParent ? true : requestRelationBuilder.filterParent;
+
+        // merge query builders
+        this.queryBuilder.merge(requestRelationBuilder.queryBuilder);
     }
 }

@@ -30,7 +30,9 @@
                         [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
                         url="reference-data/export"
-                        [fileName]="referenceDataExporFileName">
+                        [fileName]="referenceDataExporFileName"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>

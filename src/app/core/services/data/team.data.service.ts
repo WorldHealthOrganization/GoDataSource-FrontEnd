@@ -22,8 +22,8 @@ export class TeamDataService {
     getTeamsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<TeamModel[]> {
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
-        qb.include('locations');
-        qb.include('members');
+        qb.include('locations', true);
+        qb.include('members', true);
 
         qb.merge(queryBuilder);
 

@@ -10,7 +10,6 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
-import { Moment } from 'moment';
 import * as moment from 'moment';
 
 @Injectable()
@@ -110,6 +109,11 @@ export class CaseDataService {
         return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
     }
 
+    /**
+     * Count Cases grouped by Classification
+     * @param outbreakId
+     * @param queryBuilder
+     */
     getCasesGroupedByClassification(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
         const filter = queryBuilder.buildQuery();
         return this.http.get(`outbreaks/${outbreakId}/cases/per-classification/count?filter=${filter}`);

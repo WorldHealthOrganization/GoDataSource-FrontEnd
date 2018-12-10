@@ -236,7 +236,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', true);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId
@@ -264,7 +264,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', false);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId

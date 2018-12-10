@@ -153,13 +153,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
      * Re(load) the Outbreaks list
      */
     refreshList() {
-        // include related locations in response
-        const qb = new RequestQueryBuilder();
-        qb.merge(this.queryBuilder);
-        qb.include('locations');
-
         // retrieve the list of Outbreaks
-        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(qb)
+        this.outbreaksList$ = this.outbreakDataService.getOutbreaksList(this.queryBuilder)
             .pipe(tap(this.checkEmptyList.bind(this)));
     }
 

@@ -11,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -119,6 +119,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
     // subscribers
     outbreakSubscriber: Subscription;
+
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private caseDataService: CaseDataService,
@@ -626,7 +628,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
     }
 
@@ -641,7 +645,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
-                fileType: ExportDataExtension.ZIP
+                fileType: ExportDataExtension.ZIP,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
     }
@@ -675,8 +681,26 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 extraAPIData: {
                     cases: selectedRecords
                 },
-                isPOST: true
+                isPOST: true,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

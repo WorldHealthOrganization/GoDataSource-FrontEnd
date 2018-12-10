@@ -1,9 +1,9 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
-import { DialogField } from '../dialog/dialog.component';
+import { DialogAnswer, DialogField } from '../dialog/dialog.component';
 
 @Component({
     selector: 'app-export-button',
@@ -43,6 +43,9 @@ export class ExportButtonComponent {
     @Input() fileType: ExportDataExtension;
     @Input() allowedExportTypes: ExportDataExtension[];
 
+    @Output() exportStart = new EventEmitter<void>();
+    @Output() exportFinished = new EventEmitter<DialogAnswer>();
+
     constructor(
         private dialogService: DialogService = null
     ) {}
@@ -65,7 +68,23 @@ export class ExportButtonComponent {
             queryBuilderClearOthers: this.queryBuilderClearOthers,
             isPOST: this.isPOST,
             extraAPIData: this.extraAPIData,
-            extraDialogFields: this.extraDialogFields
+            extraDialogFields: this.extraDialogFields,
+            exportStart: () => { this.exportStartCallback(); },
+            exportFinished: (answer) => { this.exportFinishedCallback(answer); }
         });
+    }
+
+    /**
+     * Export finished handler
+     * @param answer
+     */
+    exportFinishedCallback(answer: DialogAnswer) {
+        this.exportFinished.emit(answer);
+    }
+    /**
+     * Export start handler
+     */
+    exportStartCallback() {
+        this.exportStart.emit();
     }
 }

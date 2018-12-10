@@ -8,7 +8,7 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -17,8 +17,8 @@ import { Moment } from 'moment';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogField } from '../../../../shared/components';
+import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
@@ -77,6 +77,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
     ExportDataExtension = ExportDataExtension;
     ReferenceDataCategory = ReferenceDataCategory;
 
+    loadingDialog: LoadingDialogModel;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -84,7 +86,8 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
         protected snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super(
             snackbarService
@@ -262,6 +265,22 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
                     // display data
                     this.displayLoading = false;
                 });
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

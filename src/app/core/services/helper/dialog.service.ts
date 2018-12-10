@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import {
     DialogAnswer, DialogAnswerButton,
     DialogComponent,
@@ -13,6 +13,8 @@ import { SnackbarService } from './snackbar.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
+import { Subscriber } from 'rxjs/Subscriber';
+import { LoadingDialogComponent, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 
 export enum ExportDataExtension {
     CSV = 'csv',
@@ -338,5 +340,23 @@ export class DialogService {
             componentOrTemplateRef,
             config
         ).afterClosed();
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog(): LoadingDialogModel {
+        // display dialog
+        const dialog: MatDialogRef<LoadingDialogComponent> = this.dialog.open(
+            LoadingDialogComponent,
+            LoadingDialogComponent.DEFAULT_CONFIG
+        );
+        // finished creating dialog
+        return new LoadingDialogModel(
+            Subscriber.create(() => {
+                // close dialog
+                dialog.close();
+            })
+        );
     }
 }

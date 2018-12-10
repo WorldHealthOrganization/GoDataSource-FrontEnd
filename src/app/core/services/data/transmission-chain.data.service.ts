@@ -14,14 +14,10 @@ import * as moment from 'moment';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { Moment } from 'moment';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class TransmissionChainDataService {
-    // used to group similar request so we don't make the same request multiple times
-    private getCountIndependentTransmissionChainsShared: {
-        [filter: string]: Observable<any>
-    } = {};
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -69,61 +65,10 @@ export class TransmissionChainDataService {
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
-        size: number = null,
-        personId: string = null,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        dateGlobalFilter: string | Moment = null
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-        // generate filter for person fields
-        let filter = queryBuilder.filter.generateFirstCondition(false, false);
-
-        // add filter for size ( under where )
-        if (size) {
-            const rQBSize = new RequestQueryBuilder();
-            rQBSize.filter.where({
-                size: Number(size)
-            });
-            filter.where = rQBSize.filter.generateFirstCondition(false, false);
-        }
-
-        // add filter for person ( under filter ) - view the chain of a person
-        if (personId) {
-            const rQBPersonId = new RequestQueryBuilder();
-            rQBPersonId.filter.where({
-                chainIncludesPerson: {
-                    where: {
-                        id: personId
-                    }
-                }
-            });
-            const filterPerson = rQBPersonId.filter.generateFirstCondition(false, false);
-            // merge conditions from person filter with those from chainInculdesPerson
-            filter = {...filter, ...filterPerson};
-        }
-
-        // global date - see state in time
-        if (dateGlobalFilter) {
-            const rQBGlobalDate = new RequestQueryBuilder();
-            rQBGlobalDate.filter.where({
-                where: {
-                    endDate: moment(dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
-                }
-            });
-            const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
-            filter = {...filter, ...filterDate};
-        }
-
-        // add flags
-        const flags = queryBuilder.filter.getFlags();
-        if (!_.isEmpty(flags)) {
-            filter = {
-                ...filter,
-                ...flags
-            };
-        }
-
-        filter = JSON.stringify(filter);
-
+        // generate filter
+        const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainDataToModel);
@@ -175,18 +120,16 @@ export class TransmissionChainDataService {
         const filter = queryBuilder.buildQuery();
 
         // check if we didn't create a request already
-        if (!this.getCountIndependentTransmissionChainsShared[filter]) {
-            this.getCountIndependentTransmissionChainsShared[filter] = this.modelHelper.mapObservableToModel(
-                this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
-                MetricIndependentTransmissionChainsModel
-            ).do(() => {
-                // cleanup
-                delete this.getCountIndependentTransmissionChainsShared[filter];
-            }).share();
-        }
-
-        // execute request
-        return this.getCountIndependentTransmissionChainsShared[filter];
+        return FilteredRequestCache.get(
+            'getCountIndependentTransmissionChains',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableToModel(
+                    this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
+                    MetricIndependentTransmissionChainsModel
+                );
+            }
+        );
     }
 
     /**

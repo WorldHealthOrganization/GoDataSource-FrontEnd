@@ -574,7 +574,10 @@ export class RequestFilter {
      * @param {boolean} stringified
      * @returns {{}}
      */
-    generateCondition(stringified: boolean = false) {
+    generateCondition(
+        stringified: boolean = false,
+        ignoreFlags: boolean = false
+    ) {
         // first level conditions ?
         let condition;
         if (this.generateConditionsOnFirstLevel) {
@@ -593,10 +596,12 @@ export class RequestFilter {
         }
 
         // append flags
-        condition = Object.assign(
-            condition,
-            this.flags
-        );
+        if (!ignoreFlags) {
+            condition = Object.assign(
+                condition,
+                this.flags
+            );
+        }
 
         return stringified ? JSON.stringify(condition) : condition;
     }

@@ -55,7 +55,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case.lastName | translate}}
+                {{ item.case?.lastName | translate}}
             </mat-cell>
         </ng-container>
 
@@ -78,7 +78,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.case.firstName | translate}}
+                {{ item.case?.firstName | translate}}
             </mat-cell>
         </ng-container>
 

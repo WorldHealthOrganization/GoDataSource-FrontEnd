@@ -39,11 +39,13 @@ import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-cont
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-number-of-records.component';
+import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
 export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
+export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
 
 // export the list of all components
@@ -104,6 +106,7 @@ export const components: any[] = [
     // dialogs
     DialogComponent,
     ModifyContactFollowUpQuestionnaireDialogComponent,
+    LoadingDialogComponent,
 
     // general
     ExportButtonComponent

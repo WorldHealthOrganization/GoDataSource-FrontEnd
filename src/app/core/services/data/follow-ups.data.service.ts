@@ -50,10 +50,14 @@ export class FollowUpsDataService {
      * @param {string} outbreakId
      * @returns {Observable<FollowUpModel[]>}
      */
-    getFollowUpsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<FollowUpModel[]> {
+    getFollowUpsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        needsContactData: boolean = true
+    ): Observable<FollowUpModel[]> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', needsContactData);
         qb.merge(queryBuilder);
 
         // construct query
@@ -97,7 +101,7 @@ export class FollowUpsDataService {
     getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', true);
         qb.filter.where({
             id: followUpId
         });

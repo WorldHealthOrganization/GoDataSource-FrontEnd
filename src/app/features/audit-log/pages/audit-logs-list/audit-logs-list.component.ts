@@ -157,7 +157,7 @@ export class AuditLogsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         // include user details
-        this.queryBuilder.include('user');
+        this.queryBuilder.include('user', true);
 
         // default sort by time descending
         if (this.queryBuilder.sort.isEmpty()) {

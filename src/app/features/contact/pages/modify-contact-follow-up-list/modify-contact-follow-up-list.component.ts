@@ -86,9 +86,6 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
                             const followUpsIds: string[] = JSON.parse(queryParams.followUpsIds);
                             const qb: RequestQueryBuilder = new RequestQueryBuilder();
 
-                            // bring contact information as well
-                            qb.include('contact');
-
                             // bring specific follow-ups
                             qb.filter.bySelect(
                                 'id',

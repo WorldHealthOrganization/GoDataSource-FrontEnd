@@ -22,7 +22,9 @@
                         [fileType]="ExportDataExtension.PDF"
                         [isPOST]="true"
                         [extraAPIData]="exportRangeExtraAPIData"
-                        [extraDialogFields]="exportRangeExtraDialogFields">
+                        [extraDialogFields]="exportRangeExtraDialogFields"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>

@@ -20,7 +20,9 @@
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
                         [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
                     <button

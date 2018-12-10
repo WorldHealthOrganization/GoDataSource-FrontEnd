@@ -88,7 +88,7 @@ export class NumberOfActiveChainsOfTransmissionComponent extends DashletComponen
 
             // location
             if (this.globalFilterLocationId) {
-                qb.addChildQueryBuilder('person').includeChildQueryWhereKey().filter.byEquality(
+                qb.addChildQueryBuilder('person').filter.byEquality(
                     'addresses.parentLocationIdFilter',
                     this.globalFilterLocationId
                 );

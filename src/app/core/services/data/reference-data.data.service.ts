@@ -116,7 +116,7 @@ export class ReferenceDataDataService {
     getEntry(entryId: string): Observable<ReferenceDataEntryModel> {
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
-        qb.include('category');
+        qb.include('category', true);
 
         const filter = qb.buildQuery();
 
