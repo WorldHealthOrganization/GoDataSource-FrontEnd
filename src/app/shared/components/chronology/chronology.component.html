@@ -1,16 +1,16 @@
-<mgl-timeline>
+<mgl-timeline [alternate]="false">
     <mgl-timeline-entry *ngFor="let entry of entries">
         <mgl-timeline-entry-header>
-            <div>{{entry.label | translate:entry.translateData}}</div>
+            {{ entry.date | dateDefault }}
         </mgl-timeline-entry-header>
-        <mgl-timeline-entry-content>
-        </mgl-timeline-entry-content>
+
         <mgl-timeline-entry-dot
             class="primary"
-            [size]="40">
+            [size]="14">
         </mgl-timeline-entry-dot>
+
         <mgl-timeline-entry-side>
-            {{entry.date | dateDefault}}
+            {{ entry.label | translate:entry.translateData }}
         </mgl-timeline-entry-side>
     </mgl-timeline-entry>
 </mgl-timeline>

@@ -83,7 +83,6 @@ export class ContactsPerCaseMedianDashletComponent extends DashletComponent impl
             // location
             if (this.globalFilterLocationId) {
                 qb.include('people').queryBuilder.filter
-                    .byEquality('type', EntityType.CASE)
                     .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 

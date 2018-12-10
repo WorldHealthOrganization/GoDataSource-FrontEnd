@@ -188,7 +188,7 @@ export class FollowUpsDataService {
     ): Observable<MetricContactsModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts/on-follow-up-list/count?filter=${filter}`),
             MetricContactsModel
         );
     }
