@@ -282,18 +282,6 @@ const routes: Routes = [
                 data: {
                     permissions: [PERMISSION.WRITE_HELP]
                 }
-            },
-            // Gantt Chart routes
-            {
-                path: ModulePath.GanttChart,
-                loadChildren: './features/gantt-chart/gantt-chart.module#GanttChartModule',
-                canActivate: [
-                    AuthGuard,
-                    PasswordChangeGuard
-                ],
-                data: {
-                    permissions: [PERMISSION.READ_REPORT]
-                }
             }
         ]
     },

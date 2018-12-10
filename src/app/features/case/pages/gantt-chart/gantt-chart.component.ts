@@ -13,7 +13,7 @@ import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
-import { LoadingDialogModel } from '../../../../shared/components';
+import { LoadingDialogModel } from '../../../../shared/components/index';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({

@@ -195,7 +195,7 @@ export class SidenavComponent implements OnInit {
                     'gantt-chart',
                     'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
                     [PERMISSION.READ_REPORT],
-                    '/gantt-chart',
+                    '/cases/gantt-chart',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
             )
             ]
