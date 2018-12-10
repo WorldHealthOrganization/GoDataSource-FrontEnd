@@ -10,6 +10,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs/Subscription';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-cases-less-contacts-dashlet',
@@ -94,13 +95,19 @@ export class CasesLessContactsDashletComponent extends DashletComponent implemen
         // get the results for contacts not seen
         if (this.outbreakId) {
             // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                null
-            );
+            const qb = new RequestQueryBuilder();
 
             // change the way we build query
             qb.filter.firstLevelConditions();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'contactDate', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // location
             if (this.globalFilterLocationId) {

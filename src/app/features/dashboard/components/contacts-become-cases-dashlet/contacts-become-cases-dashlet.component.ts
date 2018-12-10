@@ -80,9 +80,18 @@ export class ContactsBecomeCasesDashletComponent extends DashletComponent implem
         if (this.outbreakId) {
             // add global filters
             const qb = this.getGlobalFilterQB(
-                'dateBecomeCase',
+                null,
                 'addresses.parentLocationIdFilter'
             );
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateBecomeCase', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // do we need to include default condition ?
             if (!qb.filter.has('dateBecomeCase')) {

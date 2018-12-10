@@ -145,7 +145,6 @@ export class CasesHospitalizedPieChartDashletComponent implements OnInit, OnDest
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
                     'dateOfOnset', {
-                        startDate: this.globalFilterDate.startOf('day').format(),
                         endDate: this.globalFilterDate.endOf('day').format()
                     }
                 );

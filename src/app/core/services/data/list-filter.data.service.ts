@@ -216,15 +216,19 @@ export class ListFilterDataService {
     filterCasesLessThanContacts(date, location, noLessContacts): Observable<RequestQueryBuilder> {
         return this.handleFilteringOfLists((selectedOutbreak) => {
             // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                date,
-                null,
-                null
-            );
+            const qb = new RequestQueryBuilder();
 
             // change the way we build query
             qb.filter.firstLevelConditions();
+
+            // date
+            if (date) {
+                qb.filter.byDateRange(
+                    'contactDate', {
+                        endDate: date.endOf('day').format()
+                    }
+                );
+            }
 
             // location
             if (location) {

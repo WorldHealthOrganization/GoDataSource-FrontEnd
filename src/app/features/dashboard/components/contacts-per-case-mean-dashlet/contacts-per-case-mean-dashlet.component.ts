@@ -6,6 +6,7 @@ import { DashletComponent } from '../../helperClasses/dashlet-component';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs/Subscription';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-contacts-per-case-mean-dashlet',
@@ -68,10 +69,16 @@ export class ContactsPerCaseMeanDashletComponent extends DashletComponent implem
         // get contacts per case mean
         if (this.outbreakId) {
             // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                null
-            );
+            const qb = new RequestQueryBuilder();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'contactDate', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // location
             if (this.globalFilterLocationId) {
