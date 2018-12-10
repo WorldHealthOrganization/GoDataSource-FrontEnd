@@ -13,6 +13,8 @@ import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-gantt-chart',
@@ -37,14 +39,15 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
     globalFilterDate: Moment;
     globalFilterLocationId: string;
-
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private router: Router,
         private authDataService: AuthDataService,
         private domService: DomService,
         private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -113,12 +116,14 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      * generate Gantt chart report - image will be exported as pdf
      */
     generateGanttChartReport() {
+        this.showLoadingDialog();
         this.domService
             .getPNGBase64('app-gantt-chart-delay-onset-dashlet svg', '#tempCanvas')
             .subscribe((pngBase64) => {
                 this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
                     .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
+                        this.closeLoadingDialog();
                     });
             });
     }
@@ -140,4 +145,20 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         );
     }
 
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
 }

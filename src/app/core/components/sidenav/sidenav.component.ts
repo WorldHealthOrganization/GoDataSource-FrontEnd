@@ -190,17 +190,15 @@ export class SidenavComponent implements OnInit {
                     [PERMISSION.READ_CASE],
                     '/cases/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                )
+            ),
+                new ChildNavItem(
+                    'gantt-chart',
+                    'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
+                    [PERMISSION.READ_REPORT],
+                    '/gantt-chart',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+            )
             ]
-        ),
-        new NavItem(
-            'gantt-chart',
-            'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
-            'timelineChart',
-            [PERMISSION.READ_REPORT],
-            [],
-            '/gantt-chart',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
             'events',

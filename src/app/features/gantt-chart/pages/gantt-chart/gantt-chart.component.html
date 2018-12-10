@@ -1,25 +1,27 @@
 <app-topnav [activeOutbreakEditable]="true">
     <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
+            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-        <div class="topnav-actions">
+            <div class="topnav-actions">
 
-            <button mat-raised-button color="accent"
-                    [matMenuTriggerFor]="quickActionsMenu">
-                {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
-            </button>
+                <button mat-raised-button color="accent"
+                        [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
 
-            <mat-menu #quickActionsMenu="matMenu">
-                <ng-container>
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container>
 
-                    <button
-                        mat-menu-item
-                        (click)="generateGanttChartReport()">
-                        {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
-                    </button>
+                        <button
+                            mat-menu-item
+                            (click)="generateGanttChartReport()">
+                            {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
+                        </button>
 
-                </ng-container>
-            </mat-menu>
+                    </ng-container>
+                </mat-menu>
+            </div>
         </div>
     </ng-container>
 </app-topnav>
