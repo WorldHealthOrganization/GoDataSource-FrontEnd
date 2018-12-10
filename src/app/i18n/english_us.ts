@@ -920,6 +920,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS': 'Some fields are invalid!',
         'LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA': 'There is no data to be saved!',
         'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE': 'Contacts created!',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERRORS': 'Validation errors:',
+        'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG': ' - row {{row}}, column(s) \'{{columns}}\' are invalid',
 
         /**
          * Excel-like Sheet (widget)
@@ -2031,7 +2033,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE': 'Contact created!',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_LABEL': 'Onset:',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ONSET_APRROXIMATE_LABEL': '(approximate)',
-
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL': 'Show Events',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL': 'Show Contacts',
 
         /**
          * Side filter

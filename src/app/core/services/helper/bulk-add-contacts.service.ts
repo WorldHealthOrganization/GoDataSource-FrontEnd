@@ -7,6 +7,14 @@ import * as _ from 'lodash';
 import { SheetCellType } from '../../models/sheet/sheet-cell-type';
 import { I18nService } from './i18n.service';
 import 'rxjs/add/observable/forkJoin';
+import { GridSettings } from 'handsontable';
+
+export interface InvalidTableData {
+    isValid: boolean;
+    invalidColumns: {
+        [row: number]: GridSettings[]
+    };
+}
 
 @Injectable()
 export class BulkAddContactsService {
@@ -20,11 +28,44 @@ export class BulkAddContactsService {
      * Validate all table cells
      * @param sheetCore
      */
-    validateTable(sheetCore: Handsontable): Observable<boolean> {
-        return Observable.create((observer: Subscriber<boolean>) => {
+    validateTable(sheetCore: Handsontable): Observable<InvalidTableData> {
+        return Observable.create((observer: Subscriber<InvalidTableData>) => {
             // validate all cells
             sheetCore.validateCells((valid) => {
-                observer.next(valid);
+                // if not valid, then we need to determine what rows / columns are invalid
+                const invalidColumns: {
+                    [row: number]: GridSettings[]
+                } = {};
+                const countedRows: number = sheetCore.countRows();
+                let row: number = 0;
+                while (row < countedRows) {
+                    // validate row
+                    if (!sheetCore.isEmptyRow(row)) {
+                        _.each(
+                            sheetCore.getCellMetaAtRow(row),
+                            (column: GridSettings) => {
+                                if (column.valid === false) {
+                                    // initialize
+                                    if (invalidColumns[row] === undefined) {
+                                        invalidColumns[row] = [];
+                                    }
+
+                                    // add invalid column
+                                    invalidColumns[row].push(column);
+                                }
+                            }
+                        );
+                    }
+
+                    // check next row
+                    row++;
+                }
+
+                // send response back
+                observer.next({
+                    isValid: valid,
+                    invalidColumns: invalidColumns
+                });
                 observer.complete();
             });
         });

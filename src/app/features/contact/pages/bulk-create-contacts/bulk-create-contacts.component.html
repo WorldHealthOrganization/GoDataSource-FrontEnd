@@ -4,9 +4,22 @@
     </ng-container>
 </app-topnav>
 <form class="page-content form-section" (submit)="addContacts(sheetTable)">
-
     <div class="form-content">
         <mat-card class="page-section" fxLayout="column">
+            <ng-container
+                *ngIf="errorMessages && errorMessages.length > 0">
+                <div
+                    class="bulk-create-contacts-errors">
+                    <div
+                        class="bulk-create-contacts-errors-title">
+                        {{ 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERRORS' | translate }}
+                    </div>
+                    <div
+                        *ngFor="let err of errorMessages">
+                        {{ err.message | translate:err.data }}
+                    </div>
+                </div>
+            </ng-container>
 
             <div class="related-person" fxLayout="row" fxLayoutGap="20px">
                 <div>{{relatedEntityData?.type | translate}}</div>

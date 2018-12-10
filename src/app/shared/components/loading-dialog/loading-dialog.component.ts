@@ -1,9 +1,11 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Subscriber } from 'rxjs/Subscriber';
+
 export class LoadingDialogModel {
     constructor(
         private subscriber: Subscriber<void>
     ) {}
+
     /**
      * Close Dialog
      */
@@ -12,6 +14,7 @@ export class LoadingDialogModel {
         this.subscriber.complete();
     }
 }
+
 @Component({
     selector: 'app-loading-dialog',
     encapsulation: ViewEncapsulation.None,
@@ -26,5 +29,4 @@ export class LoadingDialogComponent {
         disableClose: true,
         hasBackdrop: true
     };
-    constructor() {}
 }

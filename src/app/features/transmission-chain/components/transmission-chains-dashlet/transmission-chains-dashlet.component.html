@@ -33,7 +33,7 @@
             <app-form-checkbox
                 fxFlex="150px"
                 name="showEvents"
-                label="Show Events"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
                 [(ngModel)]="filters.showEvents">
             </app-form-checkbox>
 
@@ -41,7 +41,7 @@
             <app-form-checkbox
                 fxFlex="150px"
                 name="showContacts"
-                label="Show Contacts"
+                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
                 [(ngModel)]="filters.showContacts">
             </app-form-checkbox>
         </div>

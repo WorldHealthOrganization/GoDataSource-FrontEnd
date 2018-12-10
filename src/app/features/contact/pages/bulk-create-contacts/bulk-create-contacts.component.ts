@@ -24,6 +24,8 @@ import { BulkAddContactsService } from '../../../../core/services/helper/bulk-ad
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { GridSettings } from 'handsontable';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -32,7 +34,6 @@ import { EntityModel } from '../../../../core/models/entity.model';
     styleUrls: ['./bulk-create-contacts.component.less']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
@@ -64,6 +65,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     Constants = Constants;
     SheetCellType = SheetCellType;
 
+    // error messages
+    errorMessages: {
+        message: string,
+        data: {
+            row: number,
+            columns: string
+        }
+    }[] = [];
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -73,7 +83,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private bulkAddContactsService: BulkAddContactsService
+        private bulkAddContactsService: BulkAddContactsService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -419,11 +430,43 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         const sheetCore: Handsontable = sheetTable.hotInstance;
 
         // validate sheet
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.bulkAddContactsService
             .validateTable(sheetCore)
-            .subscribe((isValid) => {
-                if (!isValid) {
+            .subscribe((response) => {
+                // we can't continue if we have errors
+                if (!response.isValid) {
+                    // map error messages if any?
+                    this.errorMessages = _.map(
+                        response.invalidColumns,
+                        (columns: GridSettings[], row: number) => {
+                            // initialize
+                            const data: {
+                                row: number,
+                                columns: string
+                            } = {
+                                row: _.parseInt(row) + 1,
+                                columns: ''
+                            };
+
+                            // merge columns into just one error message
+                            _.each(
+                                columns,
+                                (column: GridSettings) => {
+                                    data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
+                                }
+                            );
+
+                            // finished
+                            return {
+                                message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG',
+                                data: data
+                            };
+                        }
+                    );
+
                     // show error
+                    loadingDialog.close();
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
@@ -432,13 +475,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                             // no data to save ?
                             if (_.isEmpty(data)) {
                                 // show error
+                                loadingDialog.close();
                                 this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
                             } else {
                                 // create contacts
                                 this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
                                     .catch((err) => {
+                                        loadingDialog.close();
                                         this.snackbarService.showError(err.message);
-
                                         return ErrorObservable.create(err);
                                     })
                                     .subscribe(() => {
