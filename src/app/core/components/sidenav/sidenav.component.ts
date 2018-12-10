@@ -194,6 +194,15 @@ export class SidenavComponent implements OnInit {
             ]
         ),
         new NavItem(
+            'gantt-chart',
+            'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
+            'timelineChart',
+            [PERMISSION.READ_REPORT],
+            [],
+            '/gantt-chart',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
             'events',
             'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
             'event',

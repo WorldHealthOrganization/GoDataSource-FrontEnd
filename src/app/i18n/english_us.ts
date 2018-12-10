@@ -34,6 +34,7 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & Support',
         'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL': 'Dashboard',
         'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL': 'Chains of Transmission',
+        'LNG_LAYOUT_MENU_ITEM_GANTT_CHART': 'Gantt Chart',
         'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL': 'Selected Outbreak',
         'LNG_LAYOUT_LANGUAGE_LABEL': 'Language',
         'LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE': 'Language changed!',
@@ -1619,7 +1620,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_EPI_CURVE_SHOW_WEEKS_LABEL': 'Show Weeks',
-        'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_DAYS_LABEL': 'Show Days',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_MONTHS_LABEL': 'Show Months',
         'LNG_PAGE_DASHBOARD_GANTT_CHART_SHOW_WEEKS_LABEL': 'Show Weeks',
@@ -1634,7 +1634,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL': 'Epi Curve',
         'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL': 'KPIs',
         'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL': 'Reports',
-        'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
 
         /**
          * Case summary dashlet
@@ -1664,6 +1663,8 @@ export const EnglishUsLang = {
         /**
          * Gantt chart dashlet
          */
+        'LNG_PAGE_GANTT_CHART_REPORT_LABEL': 'Gantt Chart',
+        'LNG_PAGE_GANTT_CHART_TITLE': 'Delay between symptom onset and date of lab testing',
         'LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL': 'There is no data to build the chart',
 
         /**

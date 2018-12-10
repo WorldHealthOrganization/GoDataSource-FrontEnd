@@ -39,12 +39,6 @@
 
                             <button
                                 mat-menu-item
-                                (click)="generateGanttChartReport()">
-                                {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
                                 (click)="generateKpisReport()">
                                 {{'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL' | translate}}
                             </button>
@@ -136,17 +130,6 @@
                 [globalFilterDate]="globalFilterDate"
                 [globalFilterLocationId]="globalFilterLocationId">
             </app-epi-curve-dashlet>
-        </mat-card>
-
-        <mat-card class="page-section">
-            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE' | translate}}</div>
-
-            <!-- gantt chart -->
-            <app-gantt-chart-delay-onset-dashlet
-                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
-                [globalFilterDate]="globalFilterDate"
-                [globalFilterLocationId]="globalFilterLocationId">
-            </app-gantt-chart-delay-onset-dashlet>
         </mat-card>
 
         <!-- KPIs -->

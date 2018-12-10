@@ -21,6 +21,7 @@ export enum ModulePath {
     AuditLogModule = 'audit-log',
     CloudBackupModule = 'cloud-backup',
     LanguageModule = 'languages',
-    HelpModule = 'help'
+    HelpModule = 'help',
+    GanttChart = 'gantt-chart'
 
 }

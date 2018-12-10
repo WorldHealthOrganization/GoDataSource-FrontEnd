@@ -1,0 +1,49 @@
+<app-topnav [activeOutbreakEditable]="true">
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+        <div class="topnav-actions">
+
+            <button mat-raised-button color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
+            </button>
+
+            <mat-menu #quickActionsMenu="matMenu">
+                <ng-container>
+
+                    <button
+                        mat-menu-item
+                        (click)="generateGanttChartReport()">
+                        {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
+                    </button>
+
+                </ng-container>
+            </mat-menu>
+        </div>
+    </ng-container>
+</app-topnav>
+
+<!-- Side filters -->
+<app-side-filters
+    [filterOptions]="availableSideFilters"
+    (filtersCollected)="applySideFilters($event)"
+    [fixedFilters]="true">
+</app-side-filters>
+
+<div class="page-content">
+
+    <mat-card class="page-section">
+        <div class="other-kpi-header">{{'LNG_PAGE_GANTT_CHART_TITLE' | translate}}</div>
+
+        <!-- gantt chart -->
+        <app-gantt-chart-delay-onset-dashlet
+            *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
+            [globalFilterDate]="globalFilterDate"
+            [globalFilterLocationId]="globalFilterLocationId">
+        </app-gantt-chart-delay-onset-dashlet>
+    </mat-card>
+
+</div>
+
+<canvas id="tempCanvas"></canvas>

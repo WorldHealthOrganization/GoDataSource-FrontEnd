@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
