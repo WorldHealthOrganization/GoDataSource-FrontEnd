@@ -479,7 +479,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 flagIt: true
             }),
             new FilterModel({
-                fieldName: 'timeFilter',
+                fieldName: 'timeLastSeen',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
                 type: FilterType.DATE,
                 allowedComparators: [
