@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -18,7 +18,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as moment from 'moment';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { AppliedFilterModel, FilterComparator, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -35,6 +35,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { NgModel } from '@angular/forms';
 import * as FileSaver from 'file-saver';
+import { Subscription } from 'rxjs/Subscription';
 import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
 
@@ -44,7 +45,7 @@ import { tap } from 'rxjs/operators';
     templateUrl: './contact-daily-follow-ups-list.component.html',
     styleUrls: ['./contact-daily-follow-ups-list.component.less']
 })
-export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit {
+export class ContactDailyFollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // import constants into template
@@ -105,6 +106,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     loadingDialog: LoadingDialogModel;
 
     @ViewChild('followUpDate', {read: NgModel}) followUpDateElem: NgModel;
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private authDataService: AuthDataService,
@@ -187,8 +191,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                     this.initializeBreadcrumbs();
                 }
 
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
                 // subscribe to the Selected Outbreak
-                this.outbreakDataService
+                this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         // selected outbreak
@@ -228,6 +238,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
         // initialize side filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -425,7 +443,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             new FilterModel({
                 fieldName: 'date',
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-                type: FilterType.RANGE_DATE
+                type: FilterType.RANGE_DATE,
+                value: {
+                    startDate: moment(this.dateFilterDefaultValue).startOf('day').format(),
+                    endDate: moment(this.dateFilterDefaultValue).endOf('day').format()
+                }
             }),
             new FilterModel({
                 fieldName: 'teamId',
@@ -446,6 +468,24 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
                 type: FilterType.SELECT,
                 options$: this.dailyStatusTypeOptions$
+            }),
+            new FilterModel({
+                fieldName: 'weekNumber',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
+                type: FilterType.NUMBER,
+                allowedComparators: [
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
+                ],
+                flagIt: true
+            }),
+            new FilterModel({
+                fieldName: 'timeLastSeen',
+                fieldLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
+                type: FilterType.DATE,
+                allowedComparators: [
+                    _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], { value: FilterComparator.IS })
+                ],
+                flagIt: true
             })
         ];
 

@@ -7,6 +7,7 @@ import { Moment } from 'moment';
 // value types
 enum ValueType {
     STRING = 'string',
+    NUMBER = 'number',
     SELECT = 'select',
     RANGE_NUMBER = 'range_number',
     RANGE_DATE = 'range_date',
@@ -17,6 +18,7 @@ enum ValueType {
 // filter types
 export enum FilterType {
     TEXT = 'text',
+    NUMBER = 'number',
     SELECT = 'select',
     MULTISELECT = 'multiselect',
     RANGE_NUMBER = 'range_number',
@@ -107,6 +109,16 @@ export class FilterModel {
     // select multiple / single option(s)
     multipleOptions: boolean = true;
 
+    // overwrite allowed comparators
+    allowedComparators: {
+        label?: string,
+        value: FilterComparator,
+        valueType: ValueType
+    }[];
+
+    // flag where property instead of creating specific rules...
+    flagIt: boolean;
+
     /**
      * Constructor
      * @param data ( fieldName / fieldLabel / type are required )
@@ -126,7 +138,13 @@ export class FilterModel {
         required?: boolean,
         value?: any,
         multipleOptions?: boolean,
-        maxDate?: string | Moment
+        maxDate?: string | Moment,
+        allowedComparators?: {
+            label?: string,
+            value: FilterComparator,
+            valueType: ValueType
+        }[],
+        flagIt?: boolean
     }) {
         // set handler
         this.self = this;
@@ -141,11 +159,8 @@ export class FilterModel {
 
 // Model for Applied Filter
 export class AppliedFilterModel {
-    // can't remove filter
-    public readonly: boolean = false;
-
     // allowed comparators accordingly with filter type
-    public allowedComparators: {
+    public static allowedComparators: {
         [key: string]: {
             label?: string,
             value: FilterComparator,
@@ -165,6 +180,21 @@ export class AppliedFilterModel {
             label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS_TEXT',
             value: FilterComparator.CONTAINS_TEXT,
             valueType: ValueType.STRING
+        }],
+
+        // number
+        [FilterType.NUMBER]: [{
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_IS',
+            value: FilterComparator.IS,
+            valueType: ValueType.NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_LESS_OR_EQUAL',
+            value: FilterComparator.BEFORE,
+            valueType: ValueType.NUMBER
+        }, {
+            label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_GREATER_OR_EQUAL',
+            value: FilterComparator.AFTER,
+            valueType: ValueType.NUMBER
         }],
 
         // select
@@ -254,9 +284,13 @@ export class AppliedFilterModel {
         }]
     };
 
+    // can't remove filter
+    public readonly: boolean = false;
+
     // default comparators
     private defaultComparator = {
         [FilterType.TEXT]: FilterComparator.TEXT_STARTS_WITH,
+        [FilterType.NUMBER]: FilterComparator.IS,
         [FilterType.RANGE_NUMBER]: FilterComparator.BETWEEN,
         [FilterType.RANGE_AGE]: FilterComparator.BETWEEN,
         [FilterType.RANGE_DATE]: FilterComparator.BETWEEN,
@@ -278,9 +312,9 @@ export class AppliedFilterModel {
         // determine the default comparator
         this.comparator = this.defaultComparator[this.filter.type] ?
             this.defaultComparator[this.filter.type] : (
-                this.allowedComparators[this.filter.type] &&
-                this.allowedComparators[this.filter.type].length > 0 ?
-                    this.allowedComparators[this.filter.type][0].value :
+                AppliedFilterModel.allowedComparators[this.filter.type] &&
+                AppliedFilterModel.allowedComparators[this.filter.type].length > 0 ?
+                    AppliedFilterModel.allowedComparators[this.filter.type][0].value :
                     null
             );
 
@@ -337,8 +371,8 @@ export class AppliedFilterModel {
             this.filter &&
             this.comparator
         ) {
-            const prevVT = _.find(this.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
-            const currentVT = _.find(this.allowedComparators[this.filter.type], { value: this.comparator });
+            const prevVT = _.find(AppliedFilterModel.allowedComparators[this._previousFilter.type], { value: this._previousComparator });
+            const currentVT = _.find(AppliedFilterModel.allowedComparators[this.filter.type], { value: this.comparator });
             if (
                 prevVT &&
                 currentVT &&
@@ -364,7 +398,10 @@ export class AppliedFilterModel {
      * Check to see if we have at least 2 comparators, to know if we need to display the comparators dropdown
      */
     public get hasMoreThanOneComparator(): boolean {
-        return this.allowedComparators[this.filter.type] &&
-            this.allowedComparators[this.filter.type].length > 1;
+        return this.filter.allowedComparators ?
+            this.filter.allowedComparators.length > 1 : (
+                AppliedFilterModel.allowedComparators[this.filter.type] &&
+                AppliedFilterModel.allowedComparators[this.filter.type].length > 1
+            );
     }
 }
