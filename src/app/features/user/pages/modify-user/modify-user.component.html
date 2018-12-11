@@ -131,13 +131,13 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasUserWriteAccess()"
-                mat-raised-button color="primary" class="button-primary"
+                mat-raised-button color="accent"
                 [routerLink]="['/users', userId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
         <ng-container *ngIf="!viewOnly">
-            <button mat-raised-button color="primary" class="button-primary" type="submit">
+            <button mat-raised-button color="accent" type="submit">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

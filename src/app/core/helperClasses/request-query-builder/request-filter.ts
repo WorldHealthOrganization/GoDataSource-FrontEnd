@@ -49,6 +49,13 @@ export class RequestFilter {
     }
 
     /**
+     * Get Flags
+     */
+    getFlags(): { [key: string]: any } {
+        return _.cloneDeep(this.flags);
+    }
+
+    /**
      * Filter by a text field
      * @param {string} property
      * @param {string} value
@@ -167,35 +174,24 @@ export class RequestFilter {
             // remove filter
             this.remove(property);
         } else {
-            // fix Loopback V3 "eq" comparator not working in some cases
-            // but we still need to use eq when comparing with null values
-            // use eq for null values
-            if (value === null) {
+            // use regexp for case insensitive compare
+            if (caseInsensitive) {
                 this.where({
                     [property]: {
-                        eq: null
+                        regexp: '/^' +
+                            RequestFilter.escapeStringForRegex(value as string)
+                                .replace(/%/g, '.*')
+                                .replace(/\\\?/g, '.') +
+                            '$/i'
                     }
                 }, replace);
             } else {
-                // use regexp for case insensitive compare
-                if (caseInsensitive) {
-                    this.where({
-                        [property]: {
-                            regexp: '/^' +
-                                RequestFilter.escapeStringForRegex(value as string)
-                                    .replace(/%/g, '.*')
-                                    .replace(/\\\?/g, '.') +
-                                '$/i'
-                        }
-                    }, replace);
-                } else {
-                    // case sensitive search
-                    // we don't use "regex" ( ? and % ) special characters in this case
-                    // !!! changing this to regex breaks a few things !!!
-                    this.where({
-                        [property]: value
-                    }, replace);
-                }
+                // case sensitive search
+                // we don't use "regex" ( ? and % ) special characters in this case
+                // !!! changing this to regex breaks a few things !!!
+                this.where({
+                    [property]: value
+                }, replace);
             }
         }
 
@@ -578,7 +574,10 @@ export class RequestFilter {
      * @param {boolean} stringified
      * @returns {{}}
      */
-    generateCondition(stringified: boolean = false) {
+    generateCondition(
+        stringified: boolean = false,
+        ignoreFlags: boolean = false
+    ) {
         // first level conditions ?
         let condition;
         if (this.generateConditionsOnFirstLevel) {
@@ -597,10 +596,12 @@ export class RequestFilter {
         }
 
         // append flags
-        condition = Object.assign(
-            condition,
-            this.flags
-        );
+        if (!ignoreFlags) {
+            condition = Object.assign(
+                condition,
+                this.flags
+            );
+        }
 
         return stringified ? JSON.stringify(condition) : condition;
     }
@@ -614,7 +615,7 @@ export class RequestFilter {
      */
     generateFirstCondition(stringified: boolean = false, includeWhere: boolean = false ) {
         let returnCondition: any;
-        const condition = this.isEmpty() ?
+        const condition = this.isEmpty() || this.conditions.length < 1 ?
             {} : this.conditions[0];
         // include or not the 'where' property
         if (includeWhere) {

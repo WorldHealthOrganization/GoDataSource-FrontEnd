@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, ViewChild, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -26,6 +26,7 @@ import * as moment from 'moment';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { Moment } from 'moment';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-transmission-chains-dashlet',
@@ -33,7 +34,7 @@ import { Moment } from 'moment';
     templateUrl: './transmission-chains-dashlet.component.html',
     styleUrls: ['./transmission-chains-dashlet.component.less']
 })
-export class TransmissionChainsDashletComponent implements OnInit {
+export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     @ViewChild(CytoscapeGraphComponent) cytoscapeChild;
 
@@ -49,6 +50,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
     Constants = Constants;
     showSettings: boolean = false;
     filters: any = {};
+    resetFiltersData: any;
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
@@ -72,7 +74,8 @@ export class TransmissionChainsDashletComponent implements OnInit {
         ReferenceDataCategory.CERTAINTY_LEVEL,
         ReferenceDataCategory.EXPOSURE_TYPE,
         ReferenceDataCategory.EXPOSURE_FREQUENCY,
-        ReferenceDataCategory.EXPOSURE_DURATION
+        ReferenceDataCategory.EXPOSURE_DURATION,
+        ReferenceDataCategory.OCCUPATION
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
@@ -113,10 +116,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
         exposureDurationId: {
             label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+        },
+        occupation: {
+            label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            refDataCateg: ReferenceDataCategory.OCCUPATION
         }
     };
 
     // default color criteria
+    resetColorCriteriaData: any;
     colorCriteria: any = {
         nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
         nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
@@ -146,6 +154,9 @@ export class TransmissionChainsDashletComponent implements OnInit {
         edgeColor: {},
         nodeLabel: 'name'
     };
+
+    // subscribers
+    outbreakSubscriber: Subscription;
 
     constructor(
         private outbreakDataService: OutbreakDataService,
@@ -217,7 +228,13 @@ export class TransmissionChainsDashletComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe(() => {
-                this.outbreakDataService
+                // outbreak subscriber
+                if (this.outbreakSubscriber) {
+                    this.outbreakSubscriber.unsubscribe();
+                    this.outbreakSubscriber = null;
+                }
+
+                this.outbreakSubscriber = this.outbreakDataService
                     .getSelectedOutbreakSubject()
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.selectedOutbreak = selectedOutbreak;
@@ -245,6 +262,14 @@ export class TransmissionChainsDashletComponent implements OnInit {
             });
     }
 
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
+    }
+
     /**
      * Display chains of transmission
      */
@@ -253,10 +278,16 @@ export class TransmissionChainsDashletComponent implements OnInit {
         if (this.selectedOutbreak) {
             // create queryBuilder for filters
             const requestQueryBuilder = new RequestQueryBuilder();
+            requestQueryBuilder.filter.firstLevelConditions();
+
+            // do we have person filters?
             if (this.filters) {
+                // include custom person builder that will handle these filters
+                const personRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('person');
+
                 // occupation
                 if (!_.isEmpty(this.filters.occupation)) {
-                    requestQueryBuilder.filter.byEquality(
+                    personRequestQueryBuilder.filter.byEquality(
                         'occupation',
                         this.filters.occupation
                     );
@@ -264,7 +295,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // gender
                 if (!_.isEmpty(this.filters.gender)) {
-                    requestQueryBuilder.filter.bySelect(
+                    personRequestQueryBuilder.filter.bySelect(
                         'gender',
                         this.filters.gender,
                         true,
@@ -274,7 +305,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // case classification
                 if (!_.isEmpty(this.filters.classification)) {
-                    requestQueryBuilder.filter.byEquality(
+                    personRequestQueryBuilder.filter.byEquality(
                         'classification',
                         this.filters.classification
                     );
@@ -282,15 +313,15 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // case location
                 if (!_.isEmpty(this.filters.locationId)) {
-                    requestQueryBuilder.filter.byEquality(
-                        'addresses.locationId',
+                    personRequestQueryBuilder.filter.byEquality(
+                        'addresses.parentLocationIdFilter',
                         this.filters.locationId
                     );
                 }
 
                 // firstName
                 if (!_.isEmpty(this.filters.firstName)) {
-                    requestQueryBuilder.filter.byText(
+                    personRequestQueryBuilder.filter.byText(
                         'firstName',
                         this.filters.firstName
                     );
@@ -298,7 +329,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // lastName
                 if (!_.isEmpty(this.filters.lastName)) {
-                    requestQueryBuilder.filter.byText(
+                    personRequestQueryBuilder.filter.byText(
                         'lastName',
                         this.filters.lastName
                     );
@@ -306,7 +337,7 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // age
                 if (!_.isEmpty(this.filters.age)) {
-                    requestQueryBuilder.filter.byAgeRange(
+                    personRequestQueryBuilder.filter.byAgeRange(
                         'age',
                         this.filters.age
                     );
@@ -314,31 +345,54 @@ export class TransmissionChainsDashletComponent implements OnInit {
 
                 // date of reporting
                 if (!_.isEmpty(this.filters.date)) {
-                    requestQueryBuilder.filter.byDateRange(
+                    personRequestQueryBuilder.filter.byDateRange(
                         'dateOfReporting',
                         this.filters.date
                     );
                 }
             }
 
-            // configure
-            const rQB = new RequestQueryBuilder();
-            if (!requestQueryBuilder.filter.isEmpty()) {
-                rQB.filter.where({
-                    person: {
-                        where: requestQueryBuilder.filter.generateCondition()
-                    }
-                });
+            // do we have chainIncludesPerson filters ?
+            if (this.personId) {
+                // include custom person builder that will handle these filters
+                const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+                chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+                    'id',
+                    this.personId
+                );
+            }
+
+            // add filter for size ( under where )
+            if (this.sizeOfChainsFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'size',
+                    _.parseInt(this.sizeOfChainsFilter)
+                );
+            }
+
+            // global date - see state in time
+            if (this.dateGlobalFilter) {
+                requestQueryBuilder.filter.byEquality(
+                    'endDate',
+                    moment(this.dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+                );
+            }
+
+            // add flags
+            if (this.filters.showContacts) {
+                requestQueryBuilder.filter.flag('includeContacts', 1);
             }
 
             // get chain data and convert to graph nodes
-            this.transmissionChainDataService.getIndependentTransmissionChainData(this.selectedOutbreak.id, this.sizeOfChainsFilter, this.personId, rQB, this.dateGlobalFilter).subscribe((chains) => {
-                if (!_.isEmpty(chains)) {
-                   this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
-                } else {
-                    this.graphElements = [];
-                }
-            });
+            this.transmissionChainDataService
+                .getIndependentTransmissionChainData(this.selectedOutbreak.id, requestQueryBuilder)
+                .subscribe((chains) => {
+                    if (!_.isEmpty(chains)) {
+                       this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(chains, this.filters, this.legend, this.locationsList, this.selectedViewType);
+                    } else {
+                        this.graphElements = [];
+                    }
+                });
         }
     }
 
@@ -378,15 +432,42 @@ export class TransmissionChainsDashletComponent implements OnInit {
      */
     toggleSettings() {
         this.showSettings = !this.showSettings;
+
+        // get default filters
+        setTimeout(() => {
+            if (
+                this.showSettings &&
+                !this.resetFiltersData
+            ) {
+                this.resetFiltersData = _.cloneDeep(this.filters);
+                this.resetColorCriteriaData = _.cloneDeep(this.colorCriteria);
+            }
+        });
     }
 
     /**
      * refresh chain data based on filters
      */
     refreshChain() {
+        // refresh chart
         this.displayChainsOfTransmission();
+
         // close settings panel
         this.showSettings = false;
+    }
+
+    /**
+     * reset filters
+     */
+    resetFilters() {
+        // reset settings
+        this.filters = _.cloneDeep(this.resetFiltersData);
+        this.colorCriteria = _.cloneDeep(this.resetColorCriteriaData);
+
+        // close settings panel
+        setTimeout(() => {
+            this.refreshChain();
+        });
     }
 
     /**
@@ -462,9 +543,19 @@ export class TransmissionChainsDashletComponent implements OnInit {
         }
         // set node label to be displayed
         this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+        // gender translations
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             this.legend.nodeLabelValues = [];
             const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+            _.forEach(nodeLabelValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+            });
+        }
+        // occupation translations
+        if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+            this.legend.nodeLabelValues = [];
+            const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
             _.forEach(nodeLabelValues, (value, key) => {
                 // get gender transcriptions
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
@@ -542,9 +633,6 @@ export class TransmissionChainsDashletComponent implements OnInit {
     getPng64(splitFactor: number) {
           return this.cytoscapeChild.getPng64(splitFactor);
     }
-
-
-
 }
 
 

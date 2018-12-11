@@ -104,4 +104,12 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
                 });
         }
     }
+
+    /**
+     * Make url in proper format
+     * @param {string} url
+     */
+    formatUrl(url: string) {
+        this.upstreamServerData.url = url.replace(/\s/g, '');
+    }
 }

@@ -14,10 +14,10 @@ import * as moment from 'moment';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { Moment } from 'moment';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class TransmissionChainDataService {
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -65,52 +65,10 @@ export class TransmissionChainDataService {
      */
     getIndependentTransmissionChainData(
         outbreakId: string,
-        size: number = null,
-        personId: string = null,
-        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-        dateGlobalFilter: string | Moment = null
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<TransmissionChainModel[]> {
-        // generate filter for person fields
-        let filter = queryBuilder.filter.generateFirstCondition(false, false);
-
-        // add filter for size ( under where )
-        if (size) {
-            const rQBSize = new RequestQueryBuilder();
-            rQBSize.filter.where({
-                size: Number(size)
-            });
-            filter.where = rQBSize.filter.generateFirstCondition(false, false);
-        }
-
-        // add filter for person ( under filter ) - view the chain of a person
-        if (personId) {
-            const rQBPersonId = new RequestQueryBuilder();
-            rQBPersonId.filter.where({
-                chainIncludesPerson: {
-                    where: {
-                        id: personId
-                    }
-                }
-            });
-            const filterPerson = rQBPersonId.filter.generateFirstCondition(false, false);
-            // merge conditions from person filter with those from chainInculdesPerson
-            filter = {...filter, ...filterPerson};
-        }
-
-        // global date - see state in time
-        if (dateGlobalFilter) {
-            const rQBGlobalDate = new RequestQueryBuilder();
-            rQBGlobalDate.filter.where({
-                where: {
-                    endDate: moment(dateGlobalFilter).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
-                }
-            });
-            const filterDate = rQBGlobalDate.filter.generateFirstCondition(false, false);
-            filter.where = {...filter.where, ...filterDate.where};
-        }
-
-        filter = JSON.stringify(filter);
-
+        // generate filter
+        const filter = queryBuilder.buildQuery();
         return this.http.get(
             `outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`
         ).map(this.mapTransmissionChainDataToModel);
@@ -158,10 +116,19 @@ export class TransmissionChainDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricIndependentTransmissionChainsModel> {
+        // construct query
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
-            MetricIndependentTransmissionChainsModel
+
+        // check if we didn't create a request already
+        return FilteredRequestCache.get(
+            'getCountIndependentTransmissionChains',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableToModel(
+                    this.http.get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains/filtered-count?filter=${filter}`),
+                    MetricIndependentTransmissionChainsModel
+                );
+            }
         );
     }
 
@@ -206,7 +173,7 @@ export class TransmissionChainDataService {
             // will use firstChainData to load all the nodes
             const firstChain = chains[0];
             if (!_.isEmpty(firstChain.nodes)) {
-                _.forEach(firstChain.nodes, (node, key) => {
+                _.forEach(firstChain.nodes, (node) => {
                     let allowAdd = false;
                     const nodeProps = node.model;
                     // show nodes based on their type
@@ -292,6 +259,13 @@ export class TransmissionChainDataService {
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
+                            } else {
+                                nodeData.label = '';
+                            }
+                            // location
+                        } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+                            if (node.type !== EntityType.EVENT) {
+                                nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
                             } else {
                                 nodeData.label = '';
                             }

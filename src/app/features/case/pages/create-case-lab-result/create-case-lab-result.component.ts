@@ -130,12 +130,12 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newLabResult: LabResultModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate([`/cases/${this.caseId}/lab-results`]);
+                    this.router.navigate([`/cases/${this.caseId}/lab-results/${newLabResult.id}/modify`]);
                 });
         }
     }

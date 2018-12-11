@@ -7,14 +7,13 @@
         <div class="topnav-actions">
             <button
                 *ngIf="hasLocationWriteAccess()"
-                class="button-primary"
                 mat-raised-button
-                color="primary"
+                color="accent"
                 [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
                 {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
             </button>
 
-            <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+            <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                 {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
             </button>
 
@@ -25,7 +24,9 @@
                     [message]="'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE' | translate"
                     url="locations/hierarchical/export"
                     [fileName]="hierarchicalLocationsDataExportFileName"
-                    [allowedExportTypes]="allowedExportTypes">
+                    [allowedExportTypes]="allowedExportTypes"
+                    (exportStart)="showLoadingDialog()"
+                    (exportFinished)="closeLoadingDialog()">
                 </app-export-button>
 
                 <ng-container *ngIf="!parentId && !appliedListFilter && hasLocationWriteAccess()">
@@ -272,9 +273,8 @@
         *ngIf="parentId"
         class="form-actions">
         <button
-            class="button-primary"
             mat-raised-button
-            color="primary"
+            color="accent"
             [routerLink]="['/locations', parentId, 'view']"
             [queryParams]="{ backToCurrent: true }">
             {{'LNG_COMMON_BUTTON_VIEW' | translate}}
@@ -282,9 +282,8 @@
 
         <button
             *ngIf="hasLocationWriteAccess()"
-            class="button-primary"
             mat-raised-button
-            color="primary"
+            color="accent"
             [routerLink]="['/locations', parentId, 'modify']"
             [queryParams]="{ backToCurrent: true }">
             {{'LNG_COMMON_BUTTON_MODIFY' | translate}}

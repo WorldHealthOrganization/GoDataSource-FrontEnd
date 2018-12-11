@@ -5,6 +5,8 @@ import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
+import { AnswerModel, QuestionModel } from './question.model';
+import { Constants } from './constants';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -191,5 +193,70 @@ export class EntityModel {
             (value: CaseModel | ContactModel) => ageDobString(value.dob, value.age),
             (value) => new LabelValuePair(ageDobString(value.dob, value.age), value)
         );
+    }
+
+    /**
+     * Determine alertness
+     * @param entities
+     */
+    static determineAlertness(
+        template: QuestionModel[],
+        entities: CaseModel[]
+    ): CaseModel[] {
+        // map alert question answers to object for easy find
+        const alertQuestionAnswers: {
+            [question_variable: string]: {
+                [answer_value: string]: boolean
+            }
+        } = {};
+        const mapQuestions = (questions: QuestionModel[]) => {
+            // get alerted answers
+            _.each(questions, (question: QuestionModel) => {
+                // alert applies only to those questions that have option values
+                if (
+                    question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                    question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                ) {
+                    _.each(question.answers, (answer: AnswerModel) => {
+                        // answer alert ?
+                        if (answer.alert) {
+                            _.set(
+                                alertQuestionAnswers,
+                                `[${question.variable}][${answer.value}]`,
+                                true
+                            );
+                        }
+
+                        // go through all sub questions
+                        if (!_.isEmpty(answer.additionalQuestions)) {
+                            mapQuestions(answer.additionalQuestions);
+                        }
+                    });
+                }
+            });
+        };
+
+        // get alerted answers
+        mapQuestions(template);
+
+        // map alert value to cases
+        return _.map(entities, (caseData: CaseModel) => {
+            // check if we need to mark case as alerted because of questionnaire answers
+            caseData.alerted = false;
+            _.each(caseData.questionnaireAnswers, (answerKey: string, questionVariable: string) => {
+                // at least one alerted ?
+                if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
+                    // alerted
+                    caseData.alerted = true;
+
+                    // stop each
+                    return false;
+                }
+
+            });
+
+            // finished
+            return caseData;
+        });
     }
 }

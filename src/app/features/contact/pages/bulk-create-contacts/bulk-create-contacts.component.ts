@@ -24,6 +24,8 @@ import { BulkAddContactsService } from '../../../../core/services/helper/bulk-ad
 import { SheetCellValidator } from '../../../../core/models/sheet/sheet-cell-validator';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { GridSettings } from 'handsontable';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -32,7 +34,6 @@ import { EntityModel } from '../../../../core/models/entity.model';
     styleUrls: ['./bulk-create-contacts.component.less']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // selected outbreak ID
@@ -64,6 +65,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     Constants = Constants;
     SheetCellType = SheetCellType;
 
+    // error messages
+    errorMessages: {
+        message: string,
+        data: {
+            row: number,
+            columns: string
+        }
+    }[] = [];
+
     constructor(
         private router: Router,
         private route: ActivatedRoute,
@@ -73,7 +83,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private i18nService: I18nService,
-        private bulkAddContactsService: BulkAddContactsService
+        private bulkAddContactsService: BulkAddContactsService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -281,14 +292,71 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * 'Handsontable' hook before running validation on a cell
      */
     beforeValidateSheet(sheetCore: Handsontable, value: string, row: number, column: number) {
-        if (
-            value === null &&
-            sheetCore.isEmptyRow(row)
-        ) {
+        // determine if row is empty
+        const columnValues: any[] = sheetCore.getDataAtRow(row);
+        columnValues[column] = value;
+
+        // isEmptyRow doesn't work since values is changed after beforeValidateSheet
+        if (_.isEmpty(_.filter(columnValues, (v) => v !== null && v !== ''))) {
             // mark this cell as being on an empty row, so we skip validation for it
             return SheetCellValidator.EMPTY_ROW_CELL_VALUE;
         } else {
             return value;
+        }
+    }
+
+    /**
+     * After removing row
+     */
+    afterRemoveRow(sheetCore: Handsontable, row: number) {
+        // determine if row is empty
+        const countedRows: number = sheetCore.countRows();
+        while (row < countedRows) {
+            // validate row
+            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                _.each(
+                    sheetCore.getCellMetaAtRow(row),
+                    (column: {
+                        valid?: boolean
+                    }) => {
+                        if (column.valid === false) {
+                            column.valid = true;
+                        }
+                    }
+                );
+            }
+
+            // check next row
+            row++;
+        }
+    }
+
+    /**
+     * After changes
+     */
+    afterChange(
+        sheetCore: Handsontable,
+        changes: any[],
+        source: string
+    ) {
+        if (source === 'edit') {
+            const row: number = changes[0][0];
+            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                // remove validations
+                _.each(
+                    sheetCore.getCellMetaAtRow(row),
+                    (column: {
+                        valid?: boolean
+                    }) => {
+                        if (column.valid === false) {
+                            column.valid = true;
+                        }
+                    }
+                );
+
+                // refresh
+                sheetCore.render();
+            }
         }
     }
 
@@ -362,29 +430,68 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         const sheetCore: Handsontable = sheetTable.hotInstance;
 
         // validate sheet
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.bulkAddContactsService
             .validateTable(sheetCore)
-            .subscribe((isValid) => {
-                if (!isValid) {
+            .subscribe((response) => {
+                // we can't continue if we have errors
+                if (!response.isValid) {
+                    // map error messages if any?
+                    this.errorMessages = _.map(
+                        response.invalidColumns,
+                        (columns: GridSettings[], row: number) => {
+                            // initialize
+                            const data: {
+                                row: number,
+                                columns: string
+                            } = {
+                                row: _.parseInt(row) + 1,
+                                columns: ''
+                            };
+
+                            // merge columns into just one error message
+                            _.each(
+                                columns,
+                                (column: GridSettings) => {
+                                    data.columns += `${data.columns.length < 1 ? '' : ', '}${column.title}`;
+                                }
+                            );
+
+                            // finished
+                            return {
+                                message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG',
+                                data: data
+                            };
+                        }
+                    );
+
                     // show error
+                    loadingDialog.close();
                     this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
                 } else {
                     // collect data from table
                     this.bulkAddContactsService.getData(sheetCore, this.sheetColumns)
                         .subscribe((data) => {
-                            // create contacts
-                            this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
-                                .catch((err) => {
-                                    this.snackbarService.showError(err.message);
+                            // no data to save ?
+                            if (_.isEmpty(data)) {
+                                // show error
+                                loadingDialog.close();
+                                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                            } else {
+                                // create contacts
+                                this.contactDataService.bulkAddContacts(this.outbreakId, this.relatedEntityType, this.relatedEntityId, data)
+                                    .catch((err) => {
+                                        loadingDialog.close();
+                                        this.snackbarService.showError(err.message);
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
-                                    return ErrorObservable.create(err);
-                                })
-                                .subscribe(() => {
-                                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
-
-                                    // navigate to listing page
-                                    this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
-                                });
+                                        // navigate to listing page
+                                        this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
+                                    });
+                            }
                         });
                 }
             });

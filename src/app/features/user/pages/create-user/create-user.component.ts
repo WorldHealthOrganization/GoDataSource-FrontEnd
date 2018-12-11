@@ -76,12 +76,12 @@ export class CreateUserComponent extends ConfirmOnFormChanges implements OnInit 
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
+                .subscribe((newUser: UserModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
-                    this.router.navigate(['/users']);
+                    this.router.navigate([`/users/${newUser.id}/modify`]);
                 });
         }
     }

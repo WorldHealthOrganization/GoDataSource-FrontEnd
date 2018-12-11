@@ -5,7 +5,7 @@
 
             <div class="topnav-actions">
 
-                <button class="button-primary" mat-raised-button color="primary"
+                <button mat-raised-button color="accent"
                         [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
@@ -56,12 +56,12 @@
         <ng-container matColumnDef="firstContactDate">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_FIRST_CONTACT_DATE' | translate}}</div>
+                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_EARLIEST_DATE_OF_ONSET' | translate}}</div>
                 </div>
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item">
-                {{ item.firstRelationship?.contactDate | dateDefault }}
+                {{ item.earliestDateOfOnset | dateDefault }}
             </mat-cell>
         </ng-container>
 
@@ -102,19 +102,6 @@
 
             <mat-cell *matCellDef="let item">
                 {{ item.noAliveCases }}
-            </mat-cell>
-        </ng-container>
-
-        <!--Length -->
-        <ng-container matColumnDef="length">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_LENGTH' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.length }}
             </mat-cell>
         </ng-container>
 

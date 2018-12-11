@@ -9,6 +9,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LoadingDialogModel } from '../../../../shared/components';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-reference-data-categories-list',
@@ -30,11 +32,14 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
 
     referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
 
+    loadingDialog: LoadingDialogModel;
+
     constructor(
         private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         // load reference data
         this.referenceData$ = this.referenceDataDataService.getReferenceData();
@@ -71,5 +76,21 @@ export class ReferenceDataCategoriesListComponent implements OnInit {
      */
     hasReferenceDataWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_REFERENCE_DATA);
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

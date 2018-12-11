@@ -465,9 +465,6 @@ export abstract class ListComponent {
     clearQueryBuilder() {
         // clear query filters
         this.queryBuilder.clear();
-
-        // apply list filters which is mandatory
-        this.mergeListFilterToMainFilter();
     }
 
     /**
@@ -681,11 +678,22 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
                 // add condition for deceased cases
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
-                    'dateDeceased',
-                    globalFilters.date,
+                    null,
+                    null,
                     'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    this.appliedListFilterQueryBuilder.filter.byDateRange(
+                        'dateDeceased', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
+
+                // deceased
                 this.appliedListFilterQueryBuilder.filter.where({
                     deceased: true
                 }, true);
@@ -802,11 +810,20 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
                 // add condition for deceased cases
                 globalQb = this.listFilterDataService.getGlobalFilterQB(
-                    'dateOfOnset',
-                    globalFilters.date,
+                    null,
+                    null,
                     'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesPendingLabResult();
@@ -825,11 +842,20 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
                 // add condition for deceased cases
                 globalQb = this.listFilterDataService.getGlobalFilterQB(
-                    'dateOfOnset',
-                    globalFilters.date,
+                    null,
+                    null,
                     'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesRefusingTreatment();
@@ -877,11 +903,20 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
                 // add condition for deceased cases
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.getGlobalFilterQB(
-                    'dateBecomeCase',
-                    globalFilters.date,
+                    null,
+                    null,
                     'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    this.appliedListFilterQueryBuilder.filter.byDateRange(
+                        'dateBecomeCase', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
 
                 // do we need to include default condition ?
                 if (!this.appliedListFilterQueryBuilder.filter.has('dateBecomeCase')) {
@@ -1020,11 +1055,20 @@ export abstract class ListComponent {
             case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
                 // add condition for deceased cases
                 globalQb = this.listFilterDataService.getGlobalFilterQB(
-                    'dateOfOnset',
-                    globalFilters.date,
+                    null,
+                    null,
                     'addresses.parentLocationIdFilter',
                     globalFilters.locationId
                 );
+
+                // date
+                if (globalFilters.date) {
+                    globalQb.filter.byDateRange(
+                        'dateOfOnset', {
+                            endDate: globalFilters.date.endOf('day').format()
+                        }
+                    );
+                }
 
                 // get the correct query builder and merge with the existing one
                 this.appliedListFilterQueryBuilder = this.listFilterDataService.filterCasesNotIdentifiedThroughContacts();

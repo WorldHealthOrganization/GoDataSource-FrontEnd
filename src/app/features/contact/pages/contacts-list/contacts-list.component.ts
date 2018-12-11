@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -114,6 +114,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
         new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_DECEASED', 'dateDeceased')
     ];
+
+    loadingDialog: LoadingDialogModel;
 
     constructor(
         private contactDataService: ContactDataService,
@@ -578,7 +580,9 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
     }
 
@@ -612,8 +616,26 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 extraAPIData: {
                     cases: selectedRecords
                 },
-                isPOST: true
+                isPOST: true,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

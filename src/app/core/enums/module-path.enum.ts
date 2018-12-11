@@ -22,5 +22,4 @@ export enum ModulePath {
     CloudBackupModule = 'cloud-backup',
     LanguageModule = 'languages',
     HelpModule = 'help'
-
 }

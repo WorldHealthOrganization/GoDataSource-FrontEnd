@@ -25,9 +25,7 @@ import { Moment } from 'moment';
 })
 export class ModifyEventComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -81,15 +79,7 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
                             .getEvent(selectedOutbreak.id, this.eventId)
                             .subscribe(eventDataReturned => {
                                 this.eventData = new EventModel(eventDataReturned);
-                                this.breadcrumbs.push(
-                                    new BreadcrumbItemModel(
-                                        this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
-                                        '.',
-                                        true,
-                                        {},
-                                        this.eventData
-                                    )
-                                );
+                                this.createBreadcrumbs();
                             });
                     });
             });
@@ -110,12 +100,12 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
+            .subscribe((modifiedEvent: EventModel) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/events']);
+                this.eventData = new EventModel(modifiedEvent);
+                // update breadcrumbs
+                this.createBreadcrumbs();
             });
     }
 
@@ -125,5 +115,22 @@ export class ModifyEventComponent extends ViewModifyComponent implements OnInit 
      */
     hasEventWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_EVENT);
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_EVENT_TITLE' : 'LNG_PAGE_MODIFY_EVENT_TITLE',
+                '.',
+                true,
+                {},
+                this.eventData
+            )
+        );
     }
 }

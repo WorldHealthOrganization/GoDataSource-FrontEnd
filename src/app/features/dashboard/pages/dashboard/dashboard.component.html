@@ -6,7 +6,7 @@
 
                 <div class="topnav-actions">
 
-                    <button class="button-primary" mat-raised-button color="primary"
+                    <button mat-raised-button color="accent"
                             [matMenuTriggerFor]="quickActionsMenu">
                         {{'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL' | translate}} <span class="xt-icon">arrowDown</span>
                     </button>
@@ -19,7 +19,10 @@
                                 [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
                                 [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
                                 [url]="casesByClassificationAndLocationReportUrl"
-                                [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate">
+                                [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"
+                                (exportStart)="showLoadingDialog()"
+                                (exportFinished)="closeLoadingDialog()"
+                                [queryBuilder]="qbCaseByClassification()">
                             </app-export-button>
 
                             <app-export-button
@@ -28,19 +31,17 @@
                                 [label]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
                                 [message]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
                                 [url]="contactsFollowupSuccessRateReportUrl"
-                                [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate">
+                                [fileName]="'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL' | translate"
+                                (exportStart)="showLoadingDialog()"
+                                (exportFinished)="closeLoadingDialog()"
+                                [queryBuilder]="qbContactsFollowUpSuccessRate()">
                             </app-export-button>
 
                             <button
+                                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
                                 mat-menu-item
                                 (click)="generateEpiCurveReport()">
                                 {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}
-                            </button>
-
-                            <button
-                                mat-menu-item
-                                (click)="generateGanttChartReport()">
-                                {{'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL' | translate}}
                             </button>
 
                             <button
@@ -136,17 +137,6 @@
                 [globalFilterDate]="globalFilterDate"
                 [globalFilterLocationId]="globalFilterLocationId">
             </app-epi-curve-dashlet>
-        </mat-card>
-
-        <mat-card class="page-section">
-            <div class="other-kpi-header">{{'LNG_PAGE_DASHBOARD_GANTT_CHART_TITLE' | translate}}</div>
-
-            <!-- gantt chart -->
-            <app-gantt-chart-delay-onset-dashlet
-                *ngIf="hasReadCasePermissions() && hasReadReportPermissions()"
-                [globalFilterDate]="globalFilterDate"
-                [globalFilterLocationId]="globalFilterLocationId">
-            </app-gantt-chart-delay-onset-dashlet>
         </mat-card>
 
         <!-- KPIs -->

@@ -95,8 +95,7 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
 
             // location
             if (this.globalFilterLocationId) {
-                qb.include('contact').queryBuilder.filter
-                    .byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
+                qb.filter.byEquality('addresses.parentLocationIdFilter', this.globalFilterLocationId);
             }
 
             // release previous subscriber

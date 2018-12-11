@@ -7,6 +7,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Subscription } from 'rxjs/Subscription';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
     selector: 'app-new-chains-of-transmission-from-registered-contacts-dashlet',
@@ -74,10 +75,16 @@ export class NewChainsOfTransmissionFromRegisteredContactsDashletComponent exten
     refreshData() {
         if (this.outbreakId) {
             // add global filters
-            const qb = this.getGlobalFilterQB(
-                'contactDate',
-                null
-            );
+            const qb = new RequestQueryBuilder();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'contactDate', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // location
             if (this.globalFilterLocationId) {

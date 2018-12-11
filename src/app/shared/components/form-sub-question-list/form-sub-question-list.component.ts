@@ -182,4 +182,21 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
         // retrieve questions controls
         return this.groupForm.controls;
     }
+
+    /**
+     * Called when variable input lost focus
+     */
+    onBlurVariable(question: QuestionModel) {
+        // trim variable value after binding
+        setTimeout(() => {
+            if (question.new) {
+                // trim variable
+                // replace with new string reference only if necessary so we don't overburden the binding sistem
+                const newVariableValue: string = _.trim(question.variable);
+                if (question.variable !== newVariableValue) {
+                    question.variable = newVariableValue;
+                }
+            }
+        });
+    }
 }

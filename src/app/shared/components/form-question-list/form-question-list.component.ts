@@ -128,7 +128,7 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
      * @param {string} value
      */
     makeVariableSuggestion(index: number, value: any) {
-        if (this.autoSuggestVariable) {
+        if (this.autoSuggestVariable && this.values[index].new) {
             this.values[index].variable = _.camelCase(value);
         }
     }
@@ -199,5 +199,22 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
 
         // finished
         return controls;
+    }
+
+    /**
+     * Called when variable input lost focus
+     */
+    onBlurVariable(question: QuestionModel) {
+        // trim variable value after binding
+        setTimeout(() => {
+            if (question.new) {
+                // trim variable
+                // replace with new string reference only if necessary so we don't overburden the binding sistem
+                const newVariableValue: string = _.trim(question.variable);
+                if (question.variable !== newVariableValue) {
+                    question.variable = newVariableValue;
+                }
+            }
+        });
     }
 }

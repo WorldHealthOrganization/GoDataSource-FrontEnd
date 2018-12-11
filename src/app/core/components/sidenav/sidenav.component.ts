@@ -178,17 +178,27 @@ export class SidenavComponent implements OnInit {
             [PERMISSION.READ_CASE],
             [
                 new ChildNavItem(
-                'cases',
-                'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-                [PERMISSION.READ_CASE],
-                '/cases',
-                () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-            ),
+                    'cases',
+                    'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
+                    [PERMISSION.READ_CASE],
+                    '/cases',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
                 new ChildNavItem(
                     'lab-results',
                     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
                     [PERMISSION.READ_CASE],
                     '/cases/lab-results',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'gantt-chart',
+                    'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
+                    [
+                        PERMISSION.READ_CASE,
+                        PERMISSION.READ_REPORT
+                    ],
+                    '/cases/gantt-chart',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 )
             ]

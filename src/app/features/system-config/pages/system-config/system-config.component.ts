@@ -23,6 +23,7 @@ import * as moment from 'moment';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { tap } from 'rxjs/operators';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
     selector: 'app-system-config-main',
@@ -46,6 +47,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
 
     // backups list
     backupsList$: Observable<BackupModel[]>;
+    backupsListCount$: Observable<any>;
+    usersList$: Observable<UserModel[]>;
 
     // module list
     backupModulesList$: Observable<any[]>;
@@ -74,7 +77,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         protected snackbarService: SnackbarService,
         private genericDataService: GenericDataService,
         private i18nService: I18nService,
-        private outbreakDataService: OutbreakDataService
+        private outbreakDataService: OutbreakDataService,
+        private userDataService: UserDataService
     ) {
         super(
             snackbarService
@@ -99,6 +103,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
 
         // backup status list
         this.backupStatusList$ = this.genericDataService.getBackupStatusList();
+        // users list
+        this.usersList$ = this.userDataService.getUsersList();
 
         // retrieve collections
         this.genericDataService
@@ -127,7 +133,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
             }).subscribe((mappedOutbreaks: LabelValuePair[]) => {
                 this.mappedOutbreaks = mappedOutbreaks;
             });
-
+        // initialize pagination
+        this.initPaginator();
         // retrieve backups
         this.needsRefreshList(true);
     }
@@ -161,6 +168,15 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
     }
 
     /**
+     * Get total number of items, based on the applied filters
+     */
+    refreshListCount() {
+        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        this.backupsListCount$ = this.systemBackupDataService.getBackupListCount(countQueryBuilder).share();
+    }
+
+    /**
      * Get the list of table columns to be displayed
      * @returns {string[]}
      */
@@ -171,6 +187,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
             'date',
             'status',
             'error',
+            'user',
             'actions'
         ];
     }

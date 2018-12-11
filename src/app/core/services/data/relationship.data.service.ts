@@ -7,7 +7,6 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { MetricContactsPerCaseModel } from '../../models/metrics/metric-contacts-per-case.model';
 import { EntityType } from '../../models/entity-type';
 import { MetricCasesWithContactsModel } from '../../models/metrics/metric-cases-contacts.model';
-import * as _ from 'lodash';
 import { MetricCasesTransmissionChainsModel } from '../../models/metrics/metric-cases-transmission-chains.model';
 import { MetricNewCasesWithContactsModel } from '../../models/metric-new-cases-contacts.model';
 import { ReportCasesWithOnsetModel } from '../../models/report-cases-with-onset.model';
@@ -15,10 +14,10 @@ import { LabelValuePair } from '../../models/label-value-pair';
 import { Constants } from '../../models/constants';
 import * as moment from 'moment';
 import { EntityModel } from '../../models/entity.model';
+import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
 export class RelationshipDataService {
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService
@@ -120,7 +119,7 @@ export class RelationshipDataService {
 
         const qb = new RequestQueryBuilder();
         // include people in response
-        qb.include('people');
+        qb.include('people', true);
 
         qb.merge(queryBuilder);
 
@@ -184,10 +183,19 @@ export class RelationshipDataService {
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<MetricContactsPerCaseModel> {
+        // construct query
         const filter = queryBuilder.buildQuery();
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count?filter=${filter}`),
-            MetricContactsPerCaseModel
+
+        // check if we didn't create a request already
+        return FilteredRequestCache.get(
+            'getMetricsOfContactsPerCase',
+            filter,
+            () => {
+                return this.modelHelper.mapObservableToModel(
+                    this.http.get(`outbreaks/${outbreakId}/relationships/contacts-per-case/count?filter=${filter}`),
+                    MetricContactsPerCaseModel
+                );
+            }
         );
     }
 

@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
@@ -25,7 +25,9 @@
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
                         [url]="printDailyFollowUpsUrl"
                         [fileName]="followUpsPrintDailyFileName"
-                        [fileType]="printDailyFollowUpsFileType">
+                        [fileType]="printDailyFollowUpsFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
                     <button
@@ -45,7 +47,9 @@
                         [displayEncrypt]="true"
                         [displayAnonymize]="true"
                         [anonymizeFields]="anonymizeFields"
-                        [queryBuilder]="queryBuilder">
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -267,17 +271,15 @@
                     <div class="column-filter">
                         <app-form-select
                             name="teamIdFilter"
-                            ngModel
+                            [ngModel]="teamIdFilterValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            [options]="teamsListLoaded"
-                            (optionChanged)="filterBySelectField('teamId', $event, 'id')"
+                            [options]="teamsListLoadedForHeaderSearch"
+                            (optionChanged)="filterByTeam($event)"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
                             [displayInvisibleItems]="true"
                             [displayFilterIcon]="true"
-                            [multiple]="true"
-                            optionLabelKey="name"
-                            optionValueKey="id">
+                            [multiple]="false">
                         </app-form-select>
                     </div>
                 </div>

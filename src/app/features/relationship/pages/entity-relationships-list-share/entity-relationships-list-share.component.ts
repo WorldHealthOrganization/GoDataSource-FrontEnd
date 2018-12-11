@@ -235,7 +235,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', true);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId
@@ -263,7 +263,7 @@ export class EntityRelationshipsListShareComponent extends ListComponent impleme
             const qb = new RequestQueryBuilder();
             qb.merge(this.queryBuilder);
 
-            const peopleQueryBuilder = qb.include('people');
+            const peopleQueryBuilder = qb.include('people', false);
             peopleQueryBuilder.queryBuilder.filter.where({
                 id: {
                     neq: this.entityId

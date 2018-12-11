@@ -181,7 +181,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             const qb = new RequestQueryBuilder();
 
             // parent case relations
-            const relations = qb.include('relationships');
+            const relations = qb.include('relationships', true);
             relations.filterParent = false;
 
             // keep only relationships for which the current case is the target ( child case )
@@ -202,7 +202,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             });
 
             // case data
-            const people = relations.queryBuilder.include('people');
+            const people = relations.queryBuilder.include('people', true);
             people.filterParent = false;
 
             // ID
@@ -320,12 +320,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                 return ErrorObservable.create(err);
             })
-            .subscribe(() => {
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+            .subscribe((modifiedCase: CaseModel) => {
+                this.caseData = new CaseModel(modifiedCase);
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                this.router.navigate(['/cases']);
+                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+                this.retrieveCaseData();
             });
     }
 

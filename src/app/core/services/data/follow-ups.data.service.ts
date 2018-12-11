@@ -25,15 +25,15 @@ export class FollowUpsDataService {
 
     /**
      * Generate followups for contacts
-     * @returns {Observable<ContactFollowUpsModel[]>}
+     * @returns {Observable<ContactFollowUpsModel>}
      */
     generateFollowUps(
         outbreakId: string,
         startDate: any,
         endDate: any,
         targeted: boolean
-    ): Observable<ContactFollowUpsModel[]> {
-        return this.modelHelper.mapObservableListToModel(
+    ): Observable<ContactFollowUpsModel> {
+        return this.modelHelper.mapObservableToModel(
             this.http.post(
                 `outbreaks/${outbreakId}/generate-followups`, {
                     startDate: startDate,
@@ -50,10 +50,14 @@ export class FollowUpsDataService {
      * @param {string} outbreakId
      * @returns {Observable<FollowUpModel[]>}
      */
-    getFollowUpsList(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<FollowUpModel[]> {
+    getFollowUpsList(
+        outbreakId: string,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+        needsContactData: boolean = true
+    ): Observable<FollowUpModel[]> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', needsContactData);
         qb.merge(queryBuilder);
 
         // construct query
@@ -97,7 +101,7 @@ export class FollowUpsDataService {
     getFollowUp(outbreakId: string, contactId: string, followUpId: string): Observable<FollowUpModel> {
         // include contact in response
         const qb = new RequestQueryBuilder();
-        qb.include('contact');
+        qb.include('contact', true);
         qb.filter.where({
             id: followUpId
         });
@@ -184,7 +188,7 @@ export class FollowUpsDataService {
     ): Observable<MetricContactsModel> {
         const filter = queryBuilder.buildQuery();
         return this.modelHelper.mapObservableToModel(
-            this.http.get(`outbreaks/${outbreakId}/follow-ups/contacts/count?filter=${filter}`),
+            this.http.get(`outbreaks/${outbreakId}/contacts/on-follow-up-list/count?filter=${filter}`),
             MetricContactsModel
         );
     }

@@ -9,7 +9,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { PERMISSION } from '../../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogField, DialogFieldType, LoadingDialogModel } from '../../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
@@ -46,6 +46,8 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
 
     // constants
     UserSettings = UserSettings;
+
+    loadingDialog: LoadingDialogModel;
 
     /**
      * Constructor
@@ -283,10 +285,7 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
             fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
                 ' - ' +
                 moment().format('YYYY-MM-DD'),
-            allowedExportTypes: [
-                ExportDataExtension.JSON,
-                ExportDataExtension.QR
-            ],
+            fileType: ExportDataExtension.QR,
             allowedExportTypesKey: 'type',
             extraAPIData: {
                 data: {
@@ -304,7 +303,25 @@ export class SystemClientApplicationsComponent extends ListComponent implements 
                     fieldType: DialogFieldType.TEXT
                 })
             ],
-            fileExtension: 'png'
+            fileExtension: 'png',
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
     }
 }

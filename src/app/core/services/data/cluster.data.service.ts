@@ -128,9 +128,9 @@ export class ClusterDataService {
 
         const qb = new RequestQueryBuilder();
         // include relation for Events
-        qb.include('location');
+        qb.include('location', true);
         // include relation for Cases / Contacts
-        qb.include('locations');
+        qb.include('locations', true);
 
         qb.merge(queryBuilder);
 

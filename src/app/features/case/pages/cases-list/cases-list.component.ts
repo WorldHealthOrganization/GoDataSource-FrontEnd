@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { Observable } from 'rxjs/Observable';
@@ -11,7 +11,7 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { FilterType, FilterModel } from '../../../../shared/components/side-filters/model';
@@ -30,6 +30,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
+import { Subscription } from 'rxjs/Subscription';
+import { EntityModel } from '../../../../core/models/entity.model';
 import { tap } from 'rxjs/operators';
 
 @Component({
@@ -38,7 +40,7 @@ import { tap } from 'rxjs/operators';
     templateUrl: './cases-list.component.html',
     styleUrls: ['./cases-list.component.less']
 })
-export class CasesListComponent extends ListComponent implements OnInit {
+export class CasesListComponent extends ListComponent implements OnInit, OnDestroy {
 
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '.', true)
@@ -115,6 +117,11 @@ export class CasesListComponent extends ListComponent implements OnInit {
         new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused')
     ];
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
+    loadingDialog: LoadingDialogModel;
+
     constructor(
         private caseDataService: CaseDataService,
         private authDataService: AuthDataService,
@@ -166,7 +173,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
 
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -199,6 +206,7 @@ export class CasesListComponent extends ListComponent implements OnInit {
                                     });
                                 });
                         });
+
                     // initialize side filters
                     this.initializeSideFilters();
                 }
@@ -211,6 +219,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
@@ -443,8 +459,14 @@ export class CasesListComponent extends ListComponent implements OnInit {
     refreshList() {
         if (this.selectedOutbreak) {
             // retrieve the list of Cases
-            this.casesList$ = this.caseDataService.getCasesList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+            this.casesList$ = this.caseDataService
+                .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
+                .map((cases: CaseModel[]) => {
+                    return EntityModel.determineAlertness(
+                        this.selectedOutbreak.caseInvestigationTemplate,
+                        cases
+                    );
+                }).pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 
@@ -606,7 +628,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
             queryBuilder: qb,
             displayEncrypt: true,
             displayAnonymize: true,
-            anonymizeFields: this.anonymizeFields
+            anonymizeFields: this.anonymizeFields,
+            exportStart: () => { this.showLoadingDialog(); },
+            exportFinished: () => { this.closeLoadingDialog(); }
         });
     }
 
@@ -621,7 +645,9 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 message: 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_TITLE',
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/${caseModel.id}/export-empty-case-investigation`,
                 fileName: this.casesDataExportFileName,
-                fileType: ExportDataExtension.ZIP
+                fileType: ExportDataExtension.ZIP,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
         }
     }
@@ -655,8 +681,26 @@ export class CasesListComponent extends ListComponent implements OnInit {
                 extraAPIData: {
                     cases: selectedRecords
                 },
-                isPOST: true
+                isPOST: true,
+                exportStart: () => { this.showLoadingDialog(); },
+                exportFinished: () => { this.closeLoadingDialog(); }
             });
+        }
+    }
+
+    /**
+     * Display loading dialog
+     */
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
+    }
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
         }
     }
 }

@@ -73,9 +73,18 @@ export class CasesNotIdentifiedThroughContactsDashletComponent extends DashletCo
         if (this.outbreakId) {
             // add global filters
             const qb = this.getGlobalFilterQB(
-                'dateOfOnset',
+                null,
                 'addresses.parentLocationIdFilter'
             );
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                    'dateOfOnset', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
+                );
+            }
 
             // merge other conditions
             qb.merge(this.listFilterDataService.filterCasesNotIdentifiedThroughContacts());

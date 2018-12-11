@@ -86,12 +86,8 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                // navigate to listing page
-                this.disableDirtyConfirm();
                 // update language tokens to get the translation of name and description
                 this.i18nService.loadUserLanguage().subscribe();
-                // navigate to the list of categories
-                this.router.navigate(['/help/categories']);
             });
     }
 

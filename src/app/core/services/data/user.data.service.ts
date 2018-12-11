@@ -25,7 +25,7 @@ export class UserDataService {
 
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
-        qb.include('roles');
+        qb.include('roles', true);
 
         qb.merge(queryBuilder);
 
@@ -60,7 +60,7 @@ export class UserDataService {
 
         const qb = new RequestQueryBuilder();
         // include roles and permissions in response
-        qb.include('roles');
+        qb.include('roles', true);
 
         qb.merge(queryBuilder);
 

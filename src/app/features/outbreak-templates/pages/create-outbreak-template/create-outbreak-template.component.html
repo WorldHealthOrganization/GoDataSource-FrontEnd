@@ -112,7 +112,7 @@
                 </mat-card>
 
                 <div class="stepper-wrapper">
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
 
             </form>
@@ -129,7 +129,8 @@
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
                 <div class="stepper-wrapper">
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -144,7 +145,10 @@
                     [ngModel]="newOutbreakTemplate.contactFollowUpTemplate">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
-                <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                <div class="stepper-wrapper">
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                </div>
             </form>
         </mat-step>
 
@@ -159,7 +163,8 @@
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
                 <div class="stepper-wrapper">
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -174,7 +179,7 @@
             <br><br><br>
             <div class="stepper-wrapper">
                 <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button type="button" mat-raised-button color="primary" class="button-primary"
+                <button type="button" mat-raised-button color="accent"
                         (click)="createOutbreakTemplate([detailsForm, caseInvestigationForm, contactFollowUpForm, labResultsForm ])">
                     {{'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON' | translate}}
                 </button>

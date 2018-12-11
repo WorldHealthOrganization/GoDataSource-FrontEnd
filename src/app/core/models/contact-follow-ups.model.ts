@@ -1,12 +1,9 @@
 import * as _ from 'lodash';
-import { FollowUpModel } from './follow-up.model';
 
 export class ContactFollowUpsModel {
-    contactId: string;
-    followUps: FollowUpModel[];
+    count: number;
 
     constructor(data = null) {
-        this.contactId = _.get(data, 'contactId');
-        this.followUps = _.get(data, 'followUps', []);
+        this.count = _.get(data, 'count');
     }
 }

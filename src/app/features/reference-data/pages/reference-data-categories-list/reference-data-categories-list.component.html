@@ -4,7 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <button class="button-primary" mat-raised-button color="primary" [matMenuTriggerFor]="quickActionsMenu">
+                <button mat-raised-button color="accent" [matMenuTriggerFor]="quickActionsMenu">
                     {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
 
@@ -30,7 +30,9 @@
                         [label]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE' | translate"
                         url="reference-data/export"
-                        [fileName]="referenceDataExporFileName">
+                        [fileName]="referenceDataExporFileName"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
                 </mat-menu>
             </div>
@@ -65,15 +67,17 @@
 
             <mat-cell *matCellDef="let item" fxFlex>
                 <mat-chip-list>
-                    <mat-chip
-                        *ngFor="let entry of item.entries"
-                        [matTooltip]="entry.description | translate">
-                        <div
-                            *ngIf="entry.colorCode"
-                            class="ref-data-chip-bg-color"
-                            [style.background-color]="entry.colorCode"></div>
-                        {{ entry.value | translate }}
-                    </mat-chip>
+                    <ng-container *ngFor="let entry of item.entries">
+                        <mat-chip
+                            *ngIf="entry.active"
+                            [matTooltip]="entry.description | translate">
+                            <div
+                                *ngIf="entry.colorCode"
+                                class="ref-data-chip-bg-color"
+                                [style.background-color]="entry.colorCode"></div>
+                            {{ entry.value | translate }}
+                        </mat-chip>
+                    </ng-container>
                 </mat-chip-list>
             </mat-cell>
         </ng-container>

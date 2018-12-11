@@ -3,6 +3,9 @@ import { EntityModel } from './entity.model';
 import { CaseModel } from './case.model';
 import { RelationshipModel, RelationshipPersonModel } from './relationship.model';
 import { EntityType } from './entity-type';
+import * as moment from 'moment';
+import { Constants } from './constants';
+
 
 export class TransmissionChainRelation {
 
@@ -26,6 +29,10 @@ export class TransmissionChainModel {
     duration: number;
     // size of the chain ( no of cases )
     size: number;
+    // earliest date of onset
+    earliestDateOfOnset: string;
+    // root case
+    rootCaseOnset: CaseModel;
 
     constructor(chainData = null, nodesData = {}, relationshipsData = []) {
         this.active = _.get(chainData, 'active', false);
@@ -47,6 +54,13 @@ export class TransmissionChainModel {
                 ) {
                     // collect Case info, mapped by Case ID
                     this.casesMap[caseId] = new CaseModel(nodesData[caseId]);
+                    // compare with earliest date of onset and update
+                    if (!_.isEmpty(nodesData[caseId].dateOfOnset)) {
+                        if (moment(nodesData[caseId].dateOfOnset).isBefore(this.earliestDateOfOnset) || _.isEmpty(this.earliestDateOfOnset)) {
+                            this.earliestDateOfOnset = moment(nodesData[caseId].dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                            this.rootCaseOnset = new CaseModel(nodesData[caseId]);
+                        }
+                    }
                 }
             });
 
@@ -113,15 +127,16 @@ export class TransmissionChainModel {
 
     /**
      * Find the first Case in Chain
+     * Return the node with the first date of onset is available. If not, return the node from the first relationship based on contactDate
      * @returns {CaseModel | undefined} undefined if not found, otherwise CaseModel
      */
     get firstCase() {
+
         // get the 'source' Case of the first Case-Case Relationship
         const firstCasePerson: RelationshipPersonModel = _.find(_.get(this, 'firstRelationship.persons'), (person: RelationshipPersonModel) => {
             return person.source;
         });
-
         // return the corresponding CaseModel
-        return firstCasePerson ? this.casesMap[firstCasePerson.id] : undefined;
+        return this.rootCaseOnset ? this.rootCaseOnset : ( firstCasePerson ? this.casesMap[firstCasePerson.id] : undefined );
     }
 }

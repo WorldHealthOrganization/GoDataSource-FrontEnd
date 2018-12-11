@@ -76,18 +76,17 @@ export class ContactsOnFollowupListDashletComponent extends DashletComponent imp
                 'address.parentLocationIdFilter'
             );
 
-            // no date provided, then we need to set the default one
-            // filter by day - default - yesterday
-            let date = this.globalFilterDate;
-            if (!date) {
-                date = moment().add(-1, 'days');
+            // date
+            if (this.globalFilterDate) {
+                qb.filter
+                    .byEquality(
+                        'startDate',
+                        this.globalFilterDate.startOf('day').toISOString()
+                    ).byEquality(
+                        'endDate',
+                        this.globalFilterDate.endOf('day').toISOString()
+                    );
             }
-
-            // date condition
-            qb.filter.byEquality(
-                'date',
-                moment(date).format('YYYY-MM-DD')
-            );
 
             // change the way we build query
             qb.filter.firstLevelConditions();

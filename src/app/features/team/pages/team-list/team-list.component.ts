@@ -137,7 +137,8 @@ export class TeamListComponent extends ListComponent implements OnInit {
                     // retrieve follow-ups + contact details
                     this.followUpsDataService.getFollowUpsList(
                         this.selectedOutbreak.id,
-                        qb
+                        qb,
+                        false
                     ).subscribe((followUps: FollowUpModel[]) => {
                         if (followUps.length > 0) {
                             this.snackbarService.showError('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');

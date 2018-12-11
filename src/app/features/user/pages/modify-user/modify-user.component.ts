@@ -26,9 +26,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 })
 export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
     authUser: UserModel;
@@ -68,13 +66,7 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                     this.user = user;
 
                     // update breadcrumbs
-                    this.breadcrumbs.push(
-                        new BreadcrumbItemModel(
-                            this.user.name,
-                            null,
-                            true
-                        )
-                    );
+                    this.createBreadcrumbs();
                 });
         });
 
@@ -102,16 +94,15 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe(() => {
-
-                    // reload user auth data in case he's changing the active outbreaqk
+                .subscribe((modifiedUser: UserModel) => {
+                    this.user = new UserModel(modifiedUser);
+                    // reload user auth data in case he's changing the active outbreak
                     this.authDataService
                         .reloadAndPersistAuthUser()
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE');
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            this.router.navigate(['/users']);
+                            // update breadcrumbs
+                            this.createBreadcrumbs();
                         });
                 });
         }
@@ -130,5 +121,20 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
      */
     hasUserWriteAccess(): boolean {
         return this.authUser.hasPermissions(PERMISSION.WRITE_USER_ACCOUNT);
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [];
+        this.breadcrumbs.push(
+            new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'),
+            new BreadcrumbItemModel(
+                this.user.name,
+                null,
+                true
+            )
+        );
     }
 }

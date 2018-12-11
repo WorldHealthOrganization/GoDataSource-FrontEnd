@@ -94,7 +94,7 @@ export class SnackbarService {
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
 
         // get the error message for the received API Error Code
-        let apiErrorCode = _.get(err, 'code', defaultApiErrorCode);
+        let apiErrorCode = _.get(err, 'code', 'UNKNOWN_ERROR');
         // add language token prefix for API Error codes
         apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
 

@@ -196,37 +196,37 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
                 this.previousSubscriber = null;
             }
 
-            // query builder
+            // configure
             const qb = new RequestQueryBuilder();
-            if (this.globalFilterLocationId) {
+
+            // change the way we build query
+            qb.filter.firstLevelConditions();
+
+            // date
+            if (this.globalFilterDate) {
                 qb.filter.byEquality(
+                    'endDate',
+                    this.globalFilterDate.format('YYYY-MM-DD')
+                );
+            }
+
+            // location
+            if (this.globalFilterLocationId) {
+                qb.addChildQueryBuilder('person').filter.byEquality(
                     'addresses.parentLocationIdFilter',
                     this.globalFilterLocationId
                 );
             }
 
-            // configure
-            const rQB = new RequestQueryBuilder();
-            if (!qb.filter.isEmpty()) {
-                rQB.filter.where({
-                    person: {
-                        where: qb.filter.generateCondition()
-                    }
-                });
-            }
-
             // get chain data and convert to array of size and number
             this.displayLoading = true;
             this.previousSubscriber = this.transmissionChainDataService
-                .getIndependentTransmissionChainData(
+                .getCountIndependentTransmissionChains(
                     this.outbreakId,
-                    null,
-                    null,
-                    rQB,
-                    this.globalFilterDate
+                    qb
                 )
-                .subscribe((chains) => {
-                    this.setHistogramResults(chains);
+                .subscribe((response) => {
+                    this.setHistogramResults(response.chains ? response.chains : []);
                     this.displayLoading = false;
                 });
         }

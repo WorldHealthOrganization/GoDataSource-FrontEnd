@@ -167,7 +167,7 @@
                 </app-form-document-list>
 
                 <div class="stepper-wrapper">
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -185,7 +185,7 @@
 
                 <div class="stepper-wrapper">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -335,7 +335,6 @@
                 <app-form-daterange-list
                     name="hospitalizationDates"
                     [(ngModel)]="caseData.hospitalizationDates"
-                    required="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION">
                 </app-form-daterange-list>
@@ -346,14 +345,14 @@
                 <app-form-daterange-list
                     name="isolationDates"
                     [(ngModel)]="caseData.isolationDates"
-                    required="true"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
-                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION">
+                    toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
+                    [minDate]="caseData.dateOfOnset">
                 </app-form-daterange-list>
 
                 <div class="stepper-wrapper">
                     <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -371,7 +370,8 @@
                 </app-form-fill-questionnaire>
 
                 <div class="stepper-wrapper">
-                    <button mat-raised-button color="primary" class="button-primary" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
+                    <button matStepperPrevious mat-raised-button type="button">{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
+                    <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -382,7 +382,7 @@
             {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
             <div class="stepper-wrapper">
                 <button mat-raised-button type="button" matStepperPrevious>{{'LNG_STEPPER_BUTTON_BACK' | translate}}</button>
-                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="primary" (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
+                <button *app-selected-outbreak-is-active type="button" mat-raised-button color="accent" (click)="createNewCase([personalForm, addressForm, infectionForm, questionnaireForm])">
                     {{'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON' | translate}}
                 </button>
             </div>

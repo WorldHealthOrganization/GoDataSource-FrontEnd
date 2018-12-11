@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Moment } from 'moment';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber } from 'rxjs/Subscriber';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
 
 @Component({
     selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -218,9 +218,10 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
 
             // date
             if (this.globalFilterDate) {
-                qb.filter.byEquality(
-                    'dateOfOnset',
-                    this.globalFilterDate.format('YYYY-MM-DD')
+                qb.filter.byDateRange(
+                    'dateOfOnset', {
+                        endDate: this.globalFilterDate.endOf('day').format()
+                    }
                 );
             }
 
@@ -247,5 +248,12 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
                     });
                 });
         }
+    }
+
+    /**
+     * Check if graph has data
+     */
+    hasData(): boolean {
+        return _.get(this.ganttData, '[0].children.length', 0) > 0;
     }
 }

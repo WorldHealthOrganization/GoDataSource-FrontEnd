@@ -228,7 +228,8 @@
                     name="caseInvestigationTemplate"
                     [ngModel]="outbreak.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -241,7 +242,8 @@
                     name="contactFollowUpTemplate"
                     [ngModel]="outbreak.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -254,7 +256,8 @@
                     name="labResultsTemplate"
                     [ngModel]="outbreak.labResultsTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -266,16 +269,14 @@
         <button *ngIf="viewOnly && hasOutbreakWriteAccess()"
                 mat-raised-button
                 type="button"
-                color="primary"
-                class="button-primary"
+                color="accent"
                 [routerLink]="['/outbreaks', outbreakId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
         <ng-container *ngIf="!viewOnly">
             <button
                 mat-raised-button
-                color="primary"
-                class="button-primary">
+                color="accent">
                 {{'LNG_COMMON_BUTTON_SAVE' | translate}}
             </button>
             <button type="button"

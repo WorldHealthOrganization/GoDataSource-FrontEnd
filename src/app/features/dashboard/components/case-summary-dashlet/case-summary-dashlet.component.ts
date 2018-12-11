@@ -5,8 +5,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { MetricChartDataModel } from '../../../../core/models/metrics/metric-chart-data.model';
-import { CaseModel } from '../../../../core/models/case.model';
-import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { Moment } from 'moment';
@@ -14,6 +12,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Subscriber } from 'rxjs/Subscriber';
 import { Subscription } from 'rxjs/Subscription';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-case-summary-dashlet',
@@ -112,36 +111,22 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
 
     /**
      * Build chart data object
-     * @param {CaseModel[]} casesList
      * @returns {MetricChartDataModel[]}
      */
-    buildChartData(casesList: CaseModel[]) {
-        let caseSummaryResults: MetricChartDataModel[] = [];
-        _.forEach(casesList, (casePerson) => {
-            // ignore not a case classification
-            if (casePerson.classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
-                const caseSummaryResult: MetricChartDataModel = _.find(caseSummaryResults, {name: casePerson.classification});
-                if (caseSummaryResult) {
-                    caseSummaryResult.value++;
-                } else {
-                    if (!_.isEmpty(casePerson.classification)) {
-                        const caseSummaryResultNew: MetricChartDataModel = new MetricChartDataModel();
-                        caseSummaryResultNew.name = casePerson.classification;
-                        caseSummaryResultNew.value = 1;
-                        caseSummaryResults.push(caseSummaryResultNew);
-                    }
-                }
+    buildChartData(groupedCases: {
+        [classification: string]: {
+            caseIDs: string[],
+            count: number
+        }
+    }) {
+        return _.transform(groupedCases, (result, caseData: { count: number }, classification: string) => {
+            if (classification !== Constants.CASE_CLASSIFICATION.NOT_A_CASE) {
+                result.push(new MetricChartDataModel({
+                    name: this.i18nService.instant(classification),
+                    value: caseData.count
+                }));
             }
-        });
-
-        // translate the classification
-        caseSummaryResults = caseSummaryResults.map((result) => {
-            result.name = this.i18nService.instant(result.name);
-            return result;
-        });
-
-        // finished
-        return caseSummaryResults;
+        }, []);
     }
 
     /**
@@ -181,7 +166,6 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             if (this.globalFilterDate) {
                 qb.filter.byDateRange(
                     'dateOfOnset', {
-                        startDate: this.globalFilterDate.startOf('day').format(),
                         endDate: this.globalFilterDate.endOf('day').format()
                     }
                 );
@@ -198,9 +182,9 @@ export class CaseSummaryDashletComponent implements OnInit, OnDestroy {
             // retrieve data
             this.displayLoading = true;
             this.previousSubscriber = this.caseDataService
-                .getCasesList(this.outbreakId, qb)
-                .subscribe((casesList) => {
-                    this.caseSummaryResults = this.buildChartData(casesList);
+                .getCasesGroupedByClassification(this.outbreakId, qb)
+                .subscribe((groupedCases) => {
+                    this.caseSummaryResults = this.buildChartData(groupedCases.classification);
                     this.displayLoading = false;
                 });
         }
