@@ -606,15 +606,15 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
             // display export dialog
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE',
-                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                message: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE',
+                url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
                 fileName: this.contactsDataExportFileName,
                 fileType: ExportDataExtension.ZIP,
                 displayAnonymize: true,
                 anonymizeFields: anonymizeFields,
                 anonymizeFieldsKey: 'data',
                 extraAPIData: {
-                    cases: selectedRecords
+                    contacts: selectedRecords
                 },
                 isPOST: true,
                 exportStart: () => { this.showLoadingDialog(); },
