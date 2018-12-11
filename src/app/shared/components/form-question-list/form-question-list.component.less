@@ -20,6 +20,7 @@ app-form-question-list {
             padding: 10px 0;
             height: 40px;
             width: 40px;
+            box-sizing: border-box;
             text-align: center;
             background: #999999;
             color: #FDFDFD;
@@ -27,6 +28,20 @@ app-form-question-list {
 
         .question-answers {
             margin: 5px 10px 0 30px;
+        }
+    }
+
+    @media only screen and (max-width: 1480px) {
+        .app-form-question {
+            .question-wrapper {
+                .question-fields {
+                    flex-direction: column !important;
+
+                    >div {
+                        margin-right: 0 !important;
+                    }
+                }
+            }
         }
     }
 }
