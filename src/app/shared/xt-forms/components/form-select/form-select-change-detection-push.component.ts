@@ -31,16 +31,24 @@ export class FormSelectChangeDetectionPushComponent extends FormSelectComponent 
             i18nService
         );
 
+        // listen for changes
         this.registerOnChange(() => {
             this.markForCheck();
         });
     }
 
+    /**
+     * Write Value
+     * @param value
+     */
     writeValue(value: any) {
         super.writeValue(value);
         this.markForCheck();
     }
 
+    /**
+     * Handle changes
+     */
     markForCheck() {
         this.changeDetectorRef.markForCheck();
     }
