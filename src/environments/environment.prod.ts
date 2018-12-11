@@ -4,7 +4,7 @@ export const environment = {
     // API base URL
     apiUrl: '/api',
     // log messages on server?
-    enableApiLogging: true,
+    enableApiLogging: false,
     // log messages in browser's console?
     enableClientLogging: false
 };
