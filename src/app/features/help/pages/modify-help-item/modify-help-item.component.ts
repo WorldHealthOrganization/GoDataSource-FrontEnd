@@ -16,6 +16,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs/Observable';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -24,10 +25,7 @@ import 'rxjs/add/operator/switchMap';
     styleUrls: ['./modify-help-item.component.less']
 })
 export class ModifyHelpItemComponent extends ViewModifyComponent implements OnInit {
-
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
-    ];
+    breadcrumbs: BreadcrumbItemModel[] = [];
 
     helpItemData: HelpItemModel = new HelpItemModel();
     categoryId: string;
@@ -47,7 +45,8 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         private router: Router,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -66,41 +65,63 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                     .getHelpCategory(this.categoryId)
                     .subscribe((category) => {
                         this.selectedCategory = category;
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.selectedCategory.name,
-                                `/help/categories/${this.categoryId}/view`,
-                                false,
-                                {},
-                                {}
-                            )
-                        );
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
-                                `/help/categories/${this.categoryId}/items`,
-                                false,
-                                {},
-                                {}
-                            )
-                        );
-                        this.breadcrumbs.push(
-                            new BreadcrumbItemModel(
-                                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
-                                '.',
-                                true,
-                                {},
-                                {}
-                            )
-                        );
+                        this.createBreadcrumbs();
+
                         // get item
                         this.helpDataService
                             .getHelpItem(this.categoryId, this.itemId)
-                            .subscribe(helpItemData => {
-                                this.helpItemData = new HelpItemModel(helpItemData);
+                            .subscribe((helpItemData) => {
+                                this.helpItemData = helpItemData;
+
+                                // ngx isn't pristine at start when setting ng-model
+                                // so we need to hack it
+                                // wait for binding
+                                setTimeout(() => {
+                                    this.canDeactivateForms.forEach((form: NgForm) => {
+                                        if (form.controls['content']) {
+                                            form.controls['content'].markAsPristine();
+                                        }
+                                    });
+                                });
                             });
                     });
             });
+    }
+
+    /**
+     * Create breadcrumbs
+     */
+    createBreadcrumbs() {
+        this.breadcrumbs = [
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_HELP_CATEGORIES_TITLE',
+                '/help/categories'
+            ),
+
+            new BreadcrumbItemModel(
+                this.selectedCategory.name,
+                `/help/categories/${this.categoryId}/view`,
+                false,
+                {},
+                {}
+            ),
+
+            new BreadcrumbItemModel(
+                'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+                `/help/categories/${this.categoryId}/items`,
+                false,
+                {},
+                {}
+            ),
+
+            new BreadcrumbItemModel(
+                this.viewOnly ? 'LNG_PAGE_VIEW_HELP_ITEM_TITLE' : 'LNG_PAGE_MODIFY_HELP_ITEM_TITLE',
+                '.',
+                true,
+                {},
+                {}
+            )
+        ];
     }
 
     modifyHelpCategory(form: NgForm) {
@@ -111,22 +132,37 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         }
 
         // modify the help item
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.helpDataService
             .modifyHelpItem(this.categoryId, this.itemId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
-            .switchMap(() => {
+            .switchMap((helpItemData) => {
                 // update language tokens to get the translation of name and description
-                return this.i18nService.loadUserLanguage();
+                return this.i18nService.loadUserLanguage()
+                    .map(() => helpItemData);
             })
-            .subscribe(() => {
+            .subscribe((helpItemData) => {
+                // update model
+                this.helpItemData = helpItemData;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
 
                 // remove help items from cache
                 this.cacheService.remove(CacheKey.HELP_ITEMS);
+
+                // update breadcrumb
+                this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

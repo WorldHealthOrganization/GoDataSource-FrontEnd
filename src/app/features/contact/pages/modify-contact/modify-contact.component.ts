@@ -19,6 +19,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Moment } from 'moment';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-contact',
@@ -56,7 +57,8 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -124,10 +126,12 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
         }
 
         // modify the contact
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.contactDataService
             .modifyContact(this.outbreakId, this.contactId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((modifiedContact: ContactModel) => {
@@ -135,13 +139,16 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                 this.contactData = new ContactModel(modifiedContact);
 
                 // mark form as pristine
-                form.resetForm(form.value);
+                form.form.markAsPristine();
 
                 // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                 // update breadcrumb
                 this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
