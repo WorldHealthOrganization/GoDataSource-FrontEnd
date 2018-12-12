@@ -10,12 +10,10 @@ import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs/Subscription';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { CaseModel } from '../../../core/models/case.model';
-import { ContactModel } from '../../../core/models/contact.model';
-import { EventModel } from '../../../core/models/event.model';
 import { EntityModel } from '../../../core/models/entity.model';
-import { EntityType } from '../../../core/models/entity-type';
 import { Router } from '@angular/router';
+import { LoadingDialogModel } from '../index';
+import { DialogService } from '../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-global-entity-search',
@@ -31,6 +29,8 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
     // subscribers
     outbreakSubscriber: Subscription;
 
+    loadingDialog: LoadingDialogModel;
+
     // Side Nav
     @ViewChild('sideNav') sideNav: MatSidenav;
 
@@ -43,6 +43,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         private snackbarService: SnackbarService,
         private globalEntitySearchDataService: GlobalEntitySearchDataService,
         private outbreakDataService: OutbreakDataService,
+        private dialogService: DialogService,
         private router: Router
     ) {
     }
@@ -87,9 +88,11 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
         const fields: any = this.formHelper.getFields(form);
         if (!_.isEmpty(fields.globalSearchValue)) {
             if (this.selectedOutbreak.id) {
+                this.showLoadingDialog();
                 // search for the entity
                 this.globalEntitySearchDataService.searchEntity(this.selectedOutbreak.id, fields.globalSearchValue)
                     .catch((err) => {
+                        this.closeLoadingDialog();
                         this.snackbarService.showApiError(err);
 
                         return ErrorObservable.create(err);
@@ -98,7 +101,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                         if (!_.isEmpty(results)) {
                             const foundEntity = results[0];
                             // generate the link for the entity view
-                            const personLink = this.getPersonLink(foundEntity);
+                            const personLink = EntityModel.getPersonLink(foundEntity);
                             // navigate to the person view page
                             this.router.navigate([personLink]);
                             // empty search field
@@ -108,6 +111,7 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
                         } else {
                             this.snackbarService.showError('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
                         }
+                        this.closeLoadingDialog();
                     });
 
             }
@@ -115,20 +119,21 @@ export class GlobalEntitySearchComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Generates view link for entity based on type
-     * @param person
-     * @returns {string}
+     * Display loading dialog
      */
-    private getPersonLink(person) {
-        let entityTypeLink = '';
-        if (person instanceof CaseModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CASE);
-        } else if (person instanceof ContactModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CONTACT);
-        } else if (person instanceof EventModel) {
-            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.EVENT);
-        }
-
-        return `/${entityTypeLink}/${person.id}/view`;
+    showLoadingDialog() {
+        this.loadingDialog = this.dialogService.showLoadingDialog();
     }
+
+    /**
+     * Hide loading dialog
+     */
+    closeLoadingDialog() {
+        if (this.loadingDialog) {
+            this.loadingDialog.close();
+            this.loadingDialog = null;
+        }
+    }
+
+
 }
