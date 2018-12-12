@@ -71,7 +71,9 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                         this.helpDataService
                             .getHelpItem(this.categoryId, this.itemId)
                             .subscribe((helpItemData) => {
-                                this.helpItemData = helpItemData;
+                                // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
+                                // for help items this isn't really necessary, because get id isn't cached as it is for languages but still it is a good idea to clone it
+                                this.helpItemData = new HelpItemModel(helpItemData);
 
                                 // ngx-wig isn't pristine at start when setting ng-model
                                 // so we need to hack it
