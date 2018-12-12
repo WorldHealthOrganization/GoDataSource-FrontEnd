@@ -32,7 +32,6 @@
                                 [placeholder]="'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE' | translate"
                                 tooltip="LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE_DESCRIPTION"
                                 [options]="diseasesList$ | async"
-                                required="true"
                                 [clearable]="false"
                                 [disabled]="viewOnly">
                             </app-form-select>
@@ -131,7 +130,8 @@
                     name="caseInvestigationTemplate"
                     [ngModel]="outbreakTemplate.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -143,7 +143,8 @@
                     name="contactFollowUpTemplate"
                     [ngModel]="outbreakTemplate.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
 
@@ -156,7 +157,8 @@
                     name="labResultsTemplate"
                     [ngModel]="outbreakTemplate.labResultsTemplate"
                     [viewOnly]="viewOnly"
-                    [variableReadOnly]="true">
+                    [variableReadOnly]="true"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
             </mat-tab>
         </mat-tab-group>

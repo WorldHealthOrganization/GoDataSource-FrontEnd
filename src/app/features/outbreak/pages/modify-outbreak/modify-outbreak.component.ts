@@ -18,6 +18,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -134,12 +135,15 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe((modifiedOutbreak: OutbreakModel) => {
+            .switchMap((modifiedOutbreak) => {
+                // update language tokens to get the translation of submitted questions and answers
+                return this.i18nService.loadUserLanguage()
+                    .map(() => modifiedOutbreak);
+            })
+            .subscribe((modifiedOutbreak) => {
                 this.outbreak = new OutbreakModel(modifiedOutbreak);
 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                // update language tokens to get the translation of submitted questions and answers
-                this.i18nService.loadUserLanguage().subscribe();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });

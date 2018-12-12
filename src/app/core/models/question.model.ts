@@ -62,4 +62,19 @@ export class QuestionModel {
                 return new AnswerModel(lData);
             });
     }
+
+    /**
+     * Mark question as being new
+     */
+    markAsNew() {
+        // mark question as being new
+        this.new = true;
+
+        // mark sub questions as being new
+        _.each(this.answers, (answer) => {
+            _.each(answer.additionalQuestions, (question) => {
+                question.markAsNew();
+            });
+        });
+    }
 }

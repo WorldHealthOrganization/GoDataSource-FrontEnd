@@ -15,6 +15,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { Observable } from 'rxjs/Observable';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-modify-help-item',
@@ -117,14 +118,15 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
 
                 return ErrorObservable.create(err);
             })
+            .switchMap(() => {
+                // update language tokens to get the translation of name and description
+                return this.i18nService.loadUserLanguage();
+            })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE');
+
                 // remove help items from cache
                 this.cacheService.remove(CacheKey.HELP_ITEMS);
-                // navigate to listing page
-                this.disableDirtyConfirm();
-                // update language tokens to get the translation of name and description
-                this.i18nService.loadUserLanguage().subscribe();
             });
     }
 

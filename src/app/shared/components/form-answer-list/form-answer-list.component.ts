@@ -23,6 +23,8 @@ export class FormAnswerListComponent extends ListBase<AnswerModel> implements On
     @Input() viewOnly: boolean = false;
 
     @Input() variableReadOnly: boolean = false;
+    @Input() autoSuggestVariable: boolean = false;
+
     @Input() disableAdditionalQuestions: boolean = false;
     @Input() parentControls: {
         [name: string]: AbstractControl

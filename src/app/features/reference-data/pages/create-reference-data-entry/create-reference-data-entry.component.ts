@@ -11,6 +11,8 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { Observable } from 'rxjs/Observable';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
+import 'rxjs/add/operator/switchMap';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-create-reference-data-entry',
@@ -38,7 +40,8 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private iconDataService: IconDataService
+        private iconDataService: IconDataService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -85,13 +88,17 @@ export class CreateReferenceDataEntryComponent extends ConfirmOnFormChanges impl
             .createEntry(dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
                 return ErrorObservable.create(err);
             })
-            .subscribe((newReferenceDataEntry: ReferenceDataEntryModel) => {
+            .switchMap((newReferenceDataEntry) => {
+                // re-load language tokens
+                return this.i18nService.loadUserLanguage()
+                    .map(() => newReferenceDataEntry);
+            })
+            .subscribe((newReferenceDataEntry) => {
                 this.snackbarService.showSuccess('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE');
 
-                // navigate to listing page
+                // navigate to new item's modify page
                 this.disableDirtyConfirm();
                 this.router.navigate([`/reference-data/${this.categoryId}/${newReferenceDataEntry.id}/modify`]);
             });

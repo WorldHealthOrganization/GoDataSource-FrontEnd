@@ -125,7 +125,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="caseInvestigationTemplate"
-                    [ngModel]="newOutbreakTemplate.caseInvestigationTemplate">
+                    [ngModel]="newOutbreakTemplate.caseInvestigationTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save case investigation questionnaire -->
                 <div class="stepper-wrapper">
@@ -142,7 +143,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="contactFollowUpTemplate"
-                    [ngModel]="newOutbreakTemplate.contactFollowUpTemplate">
+                    [ngModel]="newOutbreakTemplate.contactFollowUpTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save contact followup questionnaire -->
                 <div class="stepper-wrapper">
@@ -159,7 +161,8 @@
                 <!-- questions list -->
                 <app-form-question-list
                     name="labResultsTemplate"
-                    [ngModel]="newOutbreakTemplate.labResultsTemplate">
+                    [ngModel]="newOutbreakTemplate.labResultsTemplate"
+                    [autoSuggestVariable]="true">
                 </app-form-question-list>
                 <!-- btn save lab results questionnaire -->
                 <div class="stepper-wrapper">

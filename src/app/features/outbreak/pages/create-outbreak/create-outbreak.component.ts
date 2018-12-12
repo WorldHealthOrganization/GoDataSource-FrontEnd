@@ -16,6 +16,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -102,10 +103,14 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     this.snackbarService.showError(err.message);
                     return ErrorObservable.create(err);
                 })
-                .subscribe((newOutbreak: OutbreakModel) => {
+                .switchMap((newOutbreak) => {
+                    // update language tokens to get the translation of submitted questions and answers
+                    return this.i18nService.loadUserLanguage()
+                        .map(() => newOutbreak);
+                })
+                .subscribe((newOutbreak) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
-                    // load language tokens so they will be available
-                    this.i18nService.loadUserLanguage().subscribe();
+
                     // navigate to listing page
                     this.disableDirtyConfirm();
                     // navigate to modify page of the new outbreak

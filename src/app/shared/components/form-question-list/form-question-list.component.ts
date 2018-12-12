@@ -28,12 +28,12 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 export class FormQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
     @Input() viewOnly: boolean = false;
     @Input() variableReadOnly: boolean = false;
+    @Input() autoSuggestVariable: boolean = false;
 
     @Input() scrollToQuestion: boolean = true;
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';
 
-    @Input() autoSuggestVariable: boolean = false;
 
     @ViewChildren(FormAnswerListComponent) answerLists: QueryList<FormAnswerListComponent>;
     additionalControlsToCheck: { [ name: string ]: AbstractControl };
@@ -99,7 +99,13 @@ export class FormQuestionListComponent extends ListBase<QuestionModel> implement
      * Duplicate form-question
      */
     duplicateQuestion(question: QuestionModel) {
-        super.clone(question);
+        // clone question object
+        const newQuestion = new QuestionModel(_.cloneDeep(question));
+        // mark question as being new
+        newQuestion.markAsNew();
+
+        // clone question
+        super.clone(newQuestion);
 
         if (this.scrollToQuestion) {
             this.domService.scrollItemIntoView(
