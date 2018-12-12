@@ -4,12 +4,11 @@ import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import 'rxjs/add/operator/mergeMap';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { UserModel } from '../../models/user.model';
-import { I18nService } from '../helper/i18n.service';
 import { LabelValuePair } from '../../models/label-value-pair';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/do';
 
 @Injectable()
 export class ReferenceDataDataService {
@@ -20,8 +19,7 @@ export class ReferenceDataDataService {
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
-        private cacheService: CacheService,
-        private i18nService: I18nService
+        private cacheService: CacheService
     ) {
         this.categoriesList$ = this.http.get(`reference-data/available-categories`).share();
 
@@ -129,19 +127,13 @@ export class ReferenceDataDataService {
     /**
      * Create a new Reference Data entry
      * @param entry
-     * @returns {Observable<UserModel[]>}
+     * @returns {Observable<any>}
      */
     createEntry(entry): Observable<any> {
         return this.http.post(`reference-data`, entry)
-            .mergeMap((response) => {
+            .do(() => {
                 // invalidate list cache
                 this.clearReferenceDataCache();
-
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage()
-                    .map(() => {
-                        return response;
-                    });
             });
     }
 
@@ -153,15 +145,9 @@ export class ReferenceDataDataService {
      */
     modifyEntry(entryId: string, entryData): Observable<any> {
         return this.http.put(`reference-data/${entryId}`, entryData)
-            .mergeMap((response) => {
+            .do(() => {
                 // invalidate list cache
                 this.clearReferenceDataCache();
-
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage()
-                    .map(() => {
-                        return response;
-                    });
             });
     }
 
@@ -172,12 +158,9 @@ export class ReferenceDataDataService {
      */
     deleteEntry(entryId: string): Observable<any> {
         return this.http.delete(`reference-data/${entryId}`)
-            .mergeMap(() => {
+            .do(() => {
                 // invalidate list cache
                 this.clearReferenceDataCache();
-
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage();
             });
     }
 

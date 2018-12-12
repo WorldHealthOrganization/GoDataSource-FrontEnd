@@ -15,6 +15,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable } from 'rxjs/Observable';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
+import 'rxjs/add/operator/switchMap';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -45,7 +47,8 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
-        private iconDataService: IconDataService
+        private iconDataService: IconDataService,
+        private i18nService: I18nService
     ) {
         super(route);
     }
@@ -59,7 +62,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
 
         // get the route params
         this.route.params
-            .subscribe((params: {categoryId, entryId}) => {
+            .subscribe((params: { categoryId, entryId }) => {
                 this.categoryId = params.categoryId;
                 this.entryId = params.entryId;
 
@@ -87,10 +90,14 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
             .modifyEntry(this.entryId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
                 return ErrorObservable.create(err);
             })
-            .subscribe((modifiedReferenceDataEntry: ReferenceDataEntryModel) => {
+            .switchMap((modifiedReferenceDataEntry) => {
+                // re-load language tokens
+                return this.i18nService.loadUserLanguage()
+                    .map(() => modifiedReferenceDataEntry);
+            })
+            .subscribe((modifiedReferenceDataEntry) => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
                 this.entry = new ReferenceDataEntryModel(modifiedReferenceDataEntry);
@@ -114,7 +121,7 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     createBreadcrumbs() {
         this.breadcrumbs = [];
         this.route.params
-            .subscribe((params: {categoryId, entryId}) => {
+            .subscribe((params: { categoryId, entryId }) => {
                 this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data'));
 
                 if (this.categoryName) {

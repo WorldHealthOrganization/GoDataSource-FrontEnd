@@ -10,9 +10,9 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-create-help-item',
@@ -98,18 +98,21 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
                 .createHelpItem(this.categoryId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
-
                     return ErrorObservable.create(err);
                 })
-                .subscribe((newHelpItem: HelpItemModel) => {
+                .switchMap((newHelpItem) => {
+                    // update language tokens to get the translation of name and description
+                    return this.i18nService.loadUserLanguage()
+                        .map(() => newHelpItem);
+                })
+                .subscribe((newHelpItem) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
+
                     // remove help items from cache
                     this.cacheService.remove(CacheKey.HELP_ITEMS);
-                    // navigate to listing page
+
+                    // navigate to new item's modify page
                     this.disableDirtyConfirm();
-                    // update language tokens to get the translation of name and description
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to categories list
                     this.router.navigate([`/help/categories/${this.categoryId}/items/${newHelpItem.id}/modify`]);
                 });
         }

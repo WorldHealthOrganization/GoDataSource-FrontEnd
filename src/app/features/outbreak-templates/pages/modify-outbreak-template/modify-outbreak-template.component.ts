@@ -15,6 +15,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -86,12 +87,15 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
             })
-            .subscribe((modifiedOutbreakTemplate: OutbreakTemplateModel) => {
-                this.outbreakTemplate = modifiedOutbreakTemplate;
+            .switchMap((modifiedOutbreakTemplate) => {
+                // update language tokens to get the translation of submitted questions and answers
+                return this.i18nService.loadUserLanguage()
+                    .map(() => modifiedOutbreakTemplate);
+            })
+            .subscribe((modifiedOutbreakTemplate) => {
+                this.outbreakTemplate = new OutbreakTemplateModel(modifiedOutbreakTemplate);
 
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                // update language tokens to get the translation of submitted questions and answers
-                this.i18nService.loadUserLanguage().subscribe();
                 // update breadcrumbs
                 this.createBreadcrumbs();
             });
