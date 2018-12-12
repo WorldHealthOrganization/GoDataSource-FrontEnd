@@ -143,6 +143,11 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
             .switchMap((helpItemData) => {
                 // update language tokens to get the translation of name and description
                 return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
                     .map(() => helpItemData);
             })
             .subscribe((helpItemData) => {

@@ -56,10 +56,13 @@ export class HelpDataService {
      * Modify an existing category
      * @param {string} categoryId
      * @param helpCategoryData
-     * @returns {Observable<any>}
+     * @returns {Observable<HelpCategoryModel>}
      */
-    modifyHelpCategory(categoryId: string, helpCategoryData): Observable<any> {
-        return this.http.put(`help-categories/${categoryId}`, helpCategoryData);
+    modifyHelpCategory(categoryId: string, helpCategoryData): Observable<HelpCategoryModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`help-categories/${categoryId}`, helpCategoryData),
+            HelpCategoryModel
+        );
     }
 
     /**
