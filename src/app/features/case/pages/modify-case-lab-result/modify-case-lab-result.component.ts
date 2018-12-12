@@ -196,13 +196,21 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_CASES_TITLE',
                 '/cases'
-            ),
+            )
+        ];
 
-            new BreadcrumbItemModel(
-                this.caseData.name,
-                `/cases/${this.caseData.id}/modify`
-            ),
+        // add case model only if necessary
+        if (!this.fromLabResultsList) {
+            this.breadcrumbs.push(
+                new BreadcrumbItemModel(
+                    this.caseData.name,
+                    `/cases/${this.caseData.id}/modify`
+                )
+            );
+        }
 
+        // add remaining breadcrumbs
+        this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE',
                 this.fromLabResultsList ?
@@ -217,7 +225,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
                 {},
                 this.labResultData
             )
-        ];
+        );
     }
 
 }
