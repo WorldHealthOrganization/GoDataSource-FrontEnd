@@ -112,6 +112,15 @@ export const EnglishUsLang = {
         'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL': 'Uncheck All',
 
         /**
+         * Column actions on List pages
+         */
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL': 'Expand All',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL': 'Collapse All',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND': 'Expand',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE': 'Collapse',
+        'LNG_LIST_PAGES_COLLAPSED_ITEMS_NUMBER': '{{value}} items',
+
+        /**
          * Dialogs
          */
         'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',

@@ -65,6 +65,33 @@ export abstract class ListComponent {
     visibleTableColumns: string[] = [];
 
     /**
+     * List of cells to be expanded for row/column
+     *  Example:
+     *      {
+     *          columnName: {
+     *              rowId1: true,
+     *              rowId2: false,
+     *              rowId3: true
+     *          }
+     *      }
+     */
+    expandCell: {
+        string?: {
+            string?: boolean
+        }[]
+    } = {};
+
+    /**
+     * Expand all cells for a certain column
+     *  Example:
+     *      {
+     *          columnName1: true,
+     *          columnName2: false
+     *      }
+     */
+    expandAllCellsForColumn: {string?: boolean} = {};
+
+    /**
      * Query builder
      * @type {RequestQueryBuilder}
      */
@@ -1213,5 +1240,49 @@ export abstract class ListComponent {
      */
     applySideColumnsChanged(visibleColumns: string[]) {
         this.visibleTableColumns = visibleColumns;
+    }
+
+    /**
+     * Check if a row's cell is expanded
+     * @param columnName
+     * @param rowId
+     */
+    public isCellExpanded(columnName: string, rowId: string): boolean {
+        // is the whole column marked to be expanded?
+        const columnExpanded = _.get(this.expandAllCellsForColumn, columnName);
+        // is cell marked to be expanded/collapsed?
+        const cellExpanded = _.get(this.expandCell, `${columnName}.${rowId}`);
+
+        // note that individual cell configuration overrides generic configuration
+        // e.g. if columnExpanded = true, but cellExpanded = false, then the cell is NOT expanded
+        return (
+            // expand the cell if it is marked individually
+            cellExpanded === true ||
+            // expand the cell if column is expanded and cell is NOT collapsed individually
+            (columnExpanded === true) && (cellExpanded !== false)
+        );
+    }
+
+    /**
+     * Expand/Collapse a cell individually
+     * @param columnName
+     * @param rowId
+     * @param expand Expand or Collapse the cell?
+     */
+    public toggleCell(columnName: string, rowId: string, expand: boolean) {
+        _.set(this.expandCell, `${columnName}.${rowId}`, expand);
+    }
+
+    /**
+     * Expand/Collapse all cells of a certain column
+     * @param columnName
+     * @param expand Expand or Collapse the cells?
+     */
+    public toggleColumn(columnName: string, expand: boolean) {
+        // remove individual cells configurations
+        delete this.expandCell[columnName];
+
+        // set column configuration
+        this.expandAllCellsForColumn[columnName] = expand;
     }
 }
