@@ -164,7 +164,7 @@ export class ModifyCaseLabResultComponent extends ViewModifyComponent implements
             })
             .subscribe((modifiedLabResult: LabResultModel) => {
                 // update model
-                this.labResultData = new LabResultModel(modifiedLabResult);
+                this.labResultData = modifiedLabResult;
 
                 // mark form as pristine
                 form.form.markAsPristine();
