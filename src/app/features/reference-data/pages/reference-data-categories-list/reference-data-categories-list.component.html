@@ -61,8 +61,8 @@
         <ng-container matColumnDef="entries">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column">
-                    <div fxLayout="row">
-                        <div class="column-header">{{'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES' | translate}}</div>
+                    <div class="column-header" fxLayout="row">
+                        <span>{{'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES' | translate}}</span>
 
                         <button
                             type="button"
@@ -71,7 +71,6 @@
                             [disableRipple]="true"
                             [matMenuTriggerFor]="columnActions"
                             color="accent"
-                            [disabled]="isEmptyList"
                         >
                             <span class="xt-icon">arrowDropdownCircle</span>
                         </button>
@@ -109,7 +108,6 @@
                         </button>
                     </ng-container>
 
-
                     <ng-container *ngIf="isCellExpanded('entries', item.id)">
                         <ng-container *ngFor="let entry of item.entries">
                             <mat-chip
@@ -122,7 +120,6 @@
                                 {{ entry.value | translate }}
                             </mat-chip>
                         </ng-container>
-
 
                         <button
                             type="button"
