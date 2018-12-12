@@ -443,6 +443,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
         'LNG_PAGE_CREATE_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID': 'Case ID is not unique!',
 
         /**
          * Modify Case page
