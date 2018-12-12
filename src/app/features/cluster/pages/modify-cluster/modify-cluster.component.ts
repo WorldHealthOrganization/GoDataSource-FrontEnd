@@ -13,6 +13,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-cluster',
@@ -38,7 +39,8 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         private clusterDataService: ClusterDataService,
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -103,26 +105,36 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
         }
 
         // modify the Cluster
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.clusterDataService
             .modifyCluster(this.selectedOutbreak.id, this.clusterId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((modifiedCluster: ClusterModel) => {
-                this.clusterData = new ClusterModel(modifiedCluster);
+                // update model
+                this.clusterData = modifiedCluster;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE');
-                // update breadcrumbs
+
+                // update breadcrumb
                 this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
     /**
      * Create breadcrumbs
      */
     createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
+        this.breadcrumbs = [
             new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'),
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
@@ -131,6 +143,6 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
                 {},
                 this.clusterData
             )
-        );
+        ];
     }
 }
