@@ -8,12 +8,13 @@ import * as _ from 'lodash';
 import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { FormSelectChangeDetectionPushComponent } from '../../../../shared/xt-forms/components/form-select/form-select-change-detection-push.component';
 
 export enum ImportDataExtension {
     CSV = '.csv',
@@ -845,6 +846,30 @@ export class ImportDataComponent implements OnInit {
             form,
             false
         )) {
+            // make items invalid
+            _.each((form as any)._directives, (model: NgModel) => {
+                if (
+                    model.valueAccessor &&
+                    model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
+                ) {
+                    model.valueAccessor.touch();
+                    model.valueAccessor.markForCheck();
+                }
+            });
+
+            // display error messages
+            setTimeout(() => {
+                // trigger change detection
+                _.each((form as any)._directives, (model: NgModel) => {
+                    if (
+                        model.valueAccessor &&
+                        model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
+                    ) {
+                        model.valueAccessor.markForCheck();
+                    }
+                });
+            });
+
             // invalid form
             return;
         }

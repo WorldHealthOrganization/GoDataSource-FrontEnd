@@ -66,20 +66,22 @@
                                     [name]="'filter[filters][' + i + '][comparator]'"
                                     [(ngModel)]="filter.comparator"
                                     [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
-                                    [options]="filter.allowedComparators[filter.filter.type]"
+                                    [options]="filter.filter.allowedComparators ? filter.filter.allowedComparators : AppliedFilterModel.allowedComparators[filter.filter.type]"
                                     [clearable]="false">
                                 </app-form-select>
 
                                 <!-- TEXT Filter -->
                                 <app-form-input
                                     *ngIf="
-                                        filter.filter?.type === FilterType.TEXT || (
+                                        filter.filter?.type === FilterType.TEXT ||
+                                        filter.filter?.type === FilterType.NUMBER || (
                                             filter.filter?.type === FilterType.ADDRESS &&
                                             filter.comparator === FilterComparator.CONTAINS
                                         )"
                                     [name]="'filter[filters][' + i + '][value]'"
                                     [(ngModel)]="filter.value"
-                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate">
+                                    [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD' | translate"
+                                    [type]="filter.filter?.type === FilterType.NUMBER ? 'number' : 'text'">
                                 </app-form-input>
 
                                 <!-- SELECT Filter -->

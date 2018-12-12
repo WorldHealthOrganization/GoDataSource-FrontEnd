@@ -14,6 +14,9 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { tap } from 'rxjs/operators';
+import 'rxjs/add/operator/switchMap';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
@@ -37,7 +40,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
         private referenceDataDataService: ReferenceDataDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private i18nService: I18nService
     ) {
         super(snackbarService);
     }
@@ -84,8 +88,11 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
                         .deleteEntry(entry.id)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
-
                             return ErrorObservable.create(err);
+                        })
+                        .switchMap(() => {
+                            // re-load language tokens
+                            return this.i18nService.loadUserLanguage();
                         })
                         .subscribe(() => {
                             this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
@@ -106,6 +113,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent imp
 
         return columns;
     }
+
     /**
      * Check if we have access to modify reference data
      * @returns {boolean}

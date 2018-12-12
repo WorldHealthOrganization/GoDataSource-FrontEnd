@@ -112,6 +112,15 @@ export const EnglishUsLang = {
         'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL': 'Uncheck All',
 
         /**
+         * Column actions on List pages
+         */
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL': 'Expand All',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL': 'Collapse All',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND': 'Expand',
+        'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE': 'Collapse',
+        'LNG_LIST_PAGES_COLLAPSED_ITEMS_NUMBER': '{{value}} items',
+
+        /**
          * Dialogs
          */
         'LNG_DIALOG_CONFIRM_BUTTON_YES': 'Yes',
@@ -882,8 +891,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
-        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER': 'Export dossier for selected contacts',
-        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE': 'Contacts dossier',
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER': 'Export dossier for selected contacts',
+        'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE': 'Contacts dossier',
         'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON': 'Import Contact Data',
         'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE': 'Convert to case',
         'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE': 'Contact restored!',
@@ -1036,6 +1045,8 @@ export const EnglishUsLang = {
         'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
         'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
         'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION': '',
+        'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER': 'Week number',
+        'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER': 'Time last seen',
 
         /**
          * Follow-ups list page

@@ -160,24 +160,25 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
-                'color': 'data(nodeNameColor)',
-                'label': 'data(label)',
                 'background-image': 'data(picture)',
-                'text-wrap': 'wrap',
-                'height': 30,
-                'width': 30,
                 'background-fit': 'cover',
                 'border-color': 'data(nodeColor)',
-                'border-width': 3
+                'border-width': 3,
+                'color': 'data(nodeNameColor)',
+                'label': 'data(label)',
+                'text-wrap': 'wrap',
+                'height': 40,
+                'width': 40
             }
         },
         {
             selector: 'edge',
             style: {
+                'curve-style': 'bezier',
                 'line-color': 'data(edgeColor)',
-                'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle',
                 'line-style': 'data(edgeStyle)',
+                'target-arrow-shape': 'triangle',
+                'target-arrow-color': 'data(edgeColor)',
                 'label': 'data(label)',
                 'text-rotation': 'autorotate',
                 'text-margin-y': '14px'
@@ -191,15 +192,15 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
             selector: 'node',
             style: {
                 'background-color': 'data(nodeColor)',
+                'background-image': 'data(picture)',
+                'background-fit': 'cover',
                 'color': 'data(nodeNameColor)',
                 'label': 'data(label)',
                 'text-wrap': 'wrap',
                 'display': 'data(displayTimeline)',
-                'background-image': 'data(picture)',
                 'height': 'data(height)',
                 'width': 'data(width)',
                 'shape': 'data(shape)',
-                'background-fit': 'cover',
                 'text-valign': 'data(labelPosition)',
                 'border-color': 'data(borderColor)',
                 'border-width': 1
@@ -208,10 +209,11 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
         {
             selector: 'edge',
             style: {
-                'line-color': 'data(edgeColor)',
-                'target-arrow-color': 'data(edgeColor)',
-                'target-arrow-shape': 'triangle',
+                'curve-style': 'bezier',
                 'line-style': 'data(edgeStyle)',
+                'line-color': 'data(edgeColor)',
+                'target-arrow-shape': 'triangle',
+                'target-arrow-color': 'data(edgeColor)',
                 'label': 'data(label)',
                 'text-rotation': 'autorotate',
                 'text-margin-y': '14px'

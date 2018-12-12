@@ -27,7 +27,6 @@ import { Moment } from 'moment';
     styleUrls: ['./modify-contact.component.less']
 })
 export class ModifyContactComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -129,11 +128,16 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
             .modifyContact(this.outbreakId, this.contactId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-
                 return ErrorObservable.create(err);
             })
             .subscribe((modifiedContact: ContactModel) => {
+                // update model
                 this.contactData = new ContactModel(modifiedContact);
+
+                // mark form as pristine
+                form.resetForm(form.value);
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE');
 
                 // update breadcrumb

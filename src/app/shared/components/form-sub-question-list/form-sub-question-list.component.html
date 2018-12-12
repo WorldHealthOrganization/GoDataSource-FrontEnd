@@ -9,84 +9,92 @@
         >
             <mat-card class="page-section question-card" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
                 <div class="app-form-question" fxFlex fxLayout="column">
-                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px" class="question-wrapper">
-
+                    <div fxLayout="row" fxLayoutGap="15px" class="question-wrapper">
                         <!-- question badge -->
-                        <div class="question-badge" fxFlex="40px">
-                            {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
+                        <div class="form-element-height" fxLayout="column" fxLayoutAlign="center" fxFlex="40px">
+                            <div class="question-badge">
+                                {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BADGE' | translate) + (i + 1) }}
+                            </div>
                         </div>
 
-                        <!-- question order -->
-                        <div fxFlex="70px">
-                            <app-form-input
-                                [name]="name + '[' + i + '][order]'"
-                                [(ngModel)]="values[i].order"
-                                type="number"
-                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
-                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
-                                [disabled]="viewOnly"
-                                (optionChanged)="onChange()">
-                            </app-form-input>
-                        </div>
+                        <div class="question-fields" fxFlex fxLayout="row" fxLayoutGap="15px">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
+                                <!-- question order -->
+                                <div fxFlex="70px">
+                                    <app-form-input
+                                        [name]="name + '[' + i + '][order]'"
+                                        [(ngModel)]="values[i].order"
+                                        type="number"
+                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
+                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
+                                        [disabled]="viewOnly"
+                                        (optionChanged)="onChange()">
+                                    </app-form-input>
+                                </div>
 
-                        <!-- question text -->
-                        <div fxFlex>
-                            <app-form-input
-                                [name]="name + '[' + i + '][text]'"
-                                [ngModel]="question.text | translate"
-                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
-                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
-                                required="true"
-                                [disabled]="viewOnly"
-                                (optionChanged)="onChangeBind(i, 'text', $event)"
-                                (initialized)="onInitializeBind(i, 'text', $event)">
-                            </app-form-input>
-                        </div>
+                                <!-- question text -->
+                                <div fxFlex>
+                                    <app-form-input
+                                        [name]="name + '[' + i + '][text]'"
+                                        [ngModel]="question.text | translate"
+                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
+                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
+                                        required="true"
+                                        [disabled]="viewOnly"
+                                        (optionChanged)="onChangeBind(i, 'text', $event)"
+                                        (initialized)="onInitializeBind(i, 'text', $event)"
+                                        (blur)="makeVariableSuggestion(i, $event)">
+                                    </app-form-input>
+                                </div>
 
-                        <!-- question variable -->
-                        <div fxFlex="150px">
-                            <app-form-input
-                                [name]="name + '[' + i + '][variable]'"
-                                [(ngModel)]="values[i].variable"
-                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
-                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
-                                [required]="true"
-                                [readonly]="!question.new && question.variable && variableReadOnly"
-                                [disabled]="viewOnly"
-                                (optionChanged)="onChange()"
-                                (blur)="onBlurVariable(values[i])"
-                                app-unique-validator="\]\[variable\]$"
-                                [additionalControlsToCheck]="parentControls">
-                            </app-form-input>
-                        </div>
+                                <!-- question variable -->
+                                <div fxFlex>
+                                    <app-form-input
+                                        [name]="name + '[' + i + '][variable]'"
+                                        [(ngModel)]="values[i].variable"
+                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
+                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
+                                        [required]="true"
+                                        [readonly]="!question.new && question.variable && variableReadOnly"
+                                        [disabled]="viewOnly"
+                                        (optionChanged)="onChange()"
+                                        (blur)="onBlurVariable(values[i])"
+                                        app-unique-validator="\]\[variable\]$"
+                                        [additionalControlsToCheck]="parentControls">
+                                    </app-form-input>
+                                </div>
+                            </div>
 
-                        <!-- question category -->
-                        <div fxFlex="250px">
-                            <app-form-select
-                                [name]="name + '[' + i + '][category]'"
-                                [(ngModel)]="values[i].category"
-                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
-                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION"
-                                required="true"
-                                [options]="questionCategoriesList$ | async"
-                                [disabled]="viewOnly || defaultQuestionCategory"
-                                (optionChanged)="onChange()">
-                            </app-form-select>
-                        </div>
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="15px">
+                                <!-- question category -->
+                                <div fxFlex>
+                                    <app-form-select
+                                        [name]="name + '[' + i + '][category]'"
+                                        [(ngModel)]="values[i].category"
+                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
+                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION"
+                                        required="true"
+                                        [options]="questionCategoriesList$ | async"
+                                        [disabled]="viewOnly || defaultQuestionCategory"
+                                        (optionChanged)="onChange()">
+                                    </app-form-select>
+                                </div>
 
-                        <!-- question - answer type -->
-                        <div fxFlex="200px">
-                            <app-form-select
-                                [name]="name + '[' + i + '][answerType]'"
-                                [(ngModel)]="values[i].answerType"
-                                [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
-                                tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
-                                required="true"
-                                [options]="answerTypesList$ | async"
-                                multiple="false"
-                                [disabled]="viewOnly"
-                                (optionChanged)="onChangeAnswerType(i)">
-                            </app-form-select>
+                                <!-- question - answer type -->
+                                <div fxFlex="200px">
+                                    <app-form-select
+                                        [name]="name + '[' + i + '][answerType]'"
+                                        [(ngModel)]="values[i].answerType"
+                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
+                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
+                                        required="true"
+                                        [options]="answerTypesList$ | async"
+                                        multiple="false"
+                                        [disabled]="viewOnly"
+                                        (optionChanged)="onChangeAnswerType(i)">
+                                    </app-form-select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- question actions -->

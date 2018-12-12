@@ -10,6 +10,7 @@ import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-create-help-category',
@@ -56,14 +57,16 @@ export class CreateHelpCategoryComponent extends ConfirmOnFormChanges {
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe((newCategory: HelpCategoryModel) => {
+                .switchMap((newCategory) => {
+                    // update language tokens to get the translation of name and description
+                    return this.i18nService.loadUserLanguage()
+                        .map(() => newCategory);
+                })
+                .subscribe((newCategory) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_HELP_CATEGORY_SUCCESS_MESSAGE');
 
-                    // navigate to listing page
+                    // navigate to new category's modify page
                     this.disableDirtyConfirm();
-                    // update language tokens to get the translation of name and description
-                    this.i18nService.loadUserLanguage().subscribe();
-                    // navigate to categories list
                     this.router.navigate([`/help/categories/${newCategory.id}/modify`]);
                 });
         }

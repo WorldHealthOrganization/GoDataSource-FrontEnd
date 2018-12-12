@@ -12,6 +12,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-modify-help-category',
@@ -80,14 +81,14 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
             .modifyHelpCategory(this.categoryId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-
                 return ErrorObservable.create(err);
+            })
+            .switchMap(() => {
+                // update language tokens to get the translation of name and description
+                return this.i18nService.loadUserLanguage();
             })
             .subscribe(() => {
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_HELP_CATEGORY_ACTION_MODIFY_HELP_CATEGORY_SUCCESS_MESSAGE');
-
-                // update language tokens to get the translation of name and description
-                this.i18nService.loadUserLanguage().subscribe();
             });
     }
 

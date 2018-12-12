@@ -41,6 +41,7 @@ import { FormContactQuickComponent } from './form-contact-quick/form-contact-qui
 import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-number-of-records.component';
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
+import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -111,5 +112,6 @@ export const components: any[] = [
     LoadingDialogComponent,
 
     // general
-    ExportButtonComponent
+    ExportButtonComponent,
+    NumberOfItemsLabelComponent
 ];
