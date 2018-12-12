@@ -13,7 +13,6 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
-import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class ListFilterDataService {

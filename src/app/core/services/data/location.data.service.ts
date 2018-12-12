@@ -190,13 +190,18 @@ export class LocationDataService {
      * Modify Location
      * @param {string} locationId
      * @param locationData
-     * @returns {Observable<any>}
+     * @returns {Observable<LocationModel>}
      */
-    modifyLocation(locationId: string, locationData): Observable<any> {
-        return this.http.put(`locations/${locationId}`, locationData).do(() => {
-            // refresh location cache
-            this.cacheService.remove(CacheKey.LOCATIONS);
-        });
+    modifyLocation(locationId: string, locationData): Observable<LocationModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http
+                .put(`locations/${locationId}`, locationData)
+                .do(() => {
+                    // refresh location cache
+                    this.cacheService.remove(CacheKey.LOCATIONS);
+                }),
+            LocationModel
+        );
     }
 
     /**

@@ -25,6 +25,7 @@ import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-case',
@@ -77,7 +78,8 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private genericDataService: GenericDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -313,18 +315,29 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
         }
 
         // modify the Case
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.caseDataService
             .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((modifiedCase: CaseModel) => {
-                this.caseData = new CaseModel(modifiedCase);
+                // update model
+                this.caseData = modifiedCase;
 
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+
+                // update breadcrumb
                 this.retrieveCaseData();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

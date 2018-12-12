@@ -84,10 +84,13 @@ export class UserDataService {
     /**
      * Modify an existing UserRole
      * @param {string} userId
-     * @returns {Observable<any>}
+     * @returns {Observable<UserModel>}
      */
-    modifyUser(userId: string, data: any): Observable<any> {
-        return this.http.patch(`users/${userId}`, data);
+    modifyUser(userId: string, data: any): Observable<UserModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.patch(`users/${userId}`, data),
+            UserModel
+        );
     }
 
     /**

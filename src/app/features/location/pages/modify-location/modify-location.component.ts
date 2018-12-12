@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,8 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { LocationBreadcrumbsComponent } from '../../../../shared/components/location-breadcrumbs/location-breadcrumbs.component';
 
 @Component({
     selector: 'app-modify-location',
@@ -25,8 +27,6 @@ import * as _ from 'lodash';
 export class ModifyLocationComponent extends ViewModifyComponent implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] =  [];
-    // locations breadcrumbs
-    public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
     locationId: string;
     locationData: LocationModel = new LocationModel();
@@ -36,6 +36,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
 
     backToCurrent: boolean = false;
 
+    @ViewChild('locationBreadcrumbs') locationBreadcrumbs: LocationBreadcrumbsComponent;
+
     constructor(
         private locationDataService: LocationDataService,
         private router: Router,
@@ -43,7 +45,8 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
         private formHelper: FormHelperService,
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private referenceDataDataService: ReferenceDataDataService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -58,23 +61,25 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             .subscribe((params: { backToCurrent }) => {
                 this.backToCurrent = params.backToCurrent;
             });
-        this.createBreadcrumbs();
 
-        if (this.locationId) {
-            this.locationDataService
-                .getLocation(this.locationId)
-                .catch((err) => {
-                    this.snackbarService.showError(err.message);
-                    this.disableDirtyConfirm();
-                    this.router.navigate(['/locations']);
-                    return ErrorObservable.create(err);
-                })
-                .subscribe((locationData: {}) => {
-                    // location data
-                    this.locationData = new LocationModel(locationData);
-                    this.createBreadcrumbs();
-                });
-        }
+        this.route.params
+            .subscribe((params: { locationId }) => {
+                this.locationId = params.locationId;
+
+                this.locationDataService
+                    .getLocation(this.locationId)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        this.disableDirtyConfirm();
+                        this.router.navigate(['/locations']);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe((locationData: {}) => {
+                        // location data
+                        this.locationData = new LocationModel(locationData);
+                        this.createBreadcrumbs();
+                    });
+            });
     }
 
     modifyLocation(form: NgForm) {
@@ -113,19 +118,32 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
             return;
         }
 
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.locationDataService
             .modifyLocation(this.locationId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
-
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .subscribe((modifiedLocation: LocationModel) => {
+                // update model
+                this.locationData = modifiedLocation;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE');
 
-                this.locationData = new LocationModel(modifiedLocation);
-                // update breadcrumbs
+                // update breadcrumb
                 this.createBreadcrumbs();
+
+                // refresh location breadcrumbs
+                this.locationBreadcrumbs.refreshBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -167,27 +185,12 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
      * Create breadcrumbs
      */
     createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
+        this.breadcrumbs = [
             new BreadcrumbItemModel(
                 'LNG_PAGE_LIST_LOCATIONS_TITLE',
                 '/locations'
-            ));
-        this.route.params
-            .subscribe((params: { locationId }) => {
-                this.locationId = params.locationId;
+            ),
 
-                // reset breadcrumbs
-                this.breadcrumbs = [
-                    new BreadcrumbItemModel(
-                        'LNG_PAGE_LIST_LOCATIONS_TITLE',
-                        '/locations'
-                    )
-                ];
-                this.locationBreadcrumbs = [];
-            });
-
-        this.breadcrumbs.push(
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_LOCATION_TITLE' : 'LNG_PAGE_MODIFY_LOCATION_TITLE',
                 '.',
@@ -195,6 +198,6 @@ export class ModifyLocationComponent extends ViewModifyComponent implements OnIn
                 {},
                 this.locationData
             )
-        );
+        ];
     }
 }

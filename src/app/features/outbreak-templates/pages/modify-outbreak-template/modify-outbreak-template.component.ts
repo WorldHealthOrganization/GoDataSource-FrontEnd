@@ -16,6 +16,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-outbreak-template',
@@ -23,7 +24,6 @@ import 'rxjs/add/operator/switchMap';
     styleUrls: ['./modify-outbreak-template.component.less']
 })
 export class ModifyOutbreakTemplateComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // authenticated user
@@ -43,7 +43,8 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private snackbarService: SnackbarService,
         private router: Router,
         private authDataService: AuthDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -81,23 +82,39 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         // modify the outbreak template
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakTemplateDataService
             .modifyOutbreakTemplate(this.outbreakTemplateId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .switchMap((modifiedOutbreakTemplate) => {
                 // update language tokens to get the translation of submitted questions and answers
                 return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
                     .map(() => modifiedOutbreakTemplate);
             })
             .subscribe((modifiedOutbreakTemplate) => {
-                this.outbreakTemplate = new OutbreakTemplateModel(modifiedOutbreakTemplate);
+                // update model
+                this.outbreakTemplate = modifiedOutbreakTemplate;
 
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                // update breadcrumbs
+
+                // update breadcrumb
                 this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 
@@ -110,8 +127,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
     }
 
     createBreadcrumbs() {
-        this.breadcrumbs = [];
-        this.breadcrumbs.push(
+        this.breadcrumbs = [
             new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'),
             new BreadcrumbItemModel(
                 this.viewOnly ? 'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE' : 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE',
@@ -120,6 +136,6 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 {},
                 this.outbreakTemplate
             )
-        );
+        ];
     }
 }

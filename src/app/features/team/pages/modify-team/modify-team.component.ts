@@ -94,20 +94,34 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
             return;
         }
 
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.checkTeamsInSameLocations(this.teamData.locationIds)
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+                loadingDialog.close();
+                return ErrorObservable.create(err);
+            })
             .subscribe((createTeam: boolean) => {
                 if (createTeam) {
                     this.teamDataService
                         .modifyTeam(this.teamId, dirtyFields)
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
-
+                            loadingDialog.close();
                             return ErrorObservable.create(err);
                         })
                         .subscribe((modifiedTeam: TeamModel) => {
-                            this.teamData = new TeamModel(modifiedTeam);
+                            // update model
+                            this.teamData = modifiedTeam;
 
+                            // mark form as pristine
+                            form.form.markAsPristine();
+
+                            // display message
                             this.snackbarService.showSuccess('LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE');
+
+                            // hide dialog
+                            loadingDialog.close();
                         });
                 }
             });
@@ -156,7 +170,7 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
 
         this.teamDataService.getTeamsList(qb).subscribe((teamsList) => {
             const teamsNames = [];
-            _.forEach(teamsList, (team, key) => {
+            _.forEach(teamsList, (team) => {
                 teamsNames.push(team.name);
             });
 
@@ -193,6 +207,10 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
                 }, true);
 
             this.teamDataService.getTeamsList(qb)
+                .catch((err) => {
+                    observer.error(err);
+                    return ErrorObservable.create(err);
+                })
                 .subscribe((teamsList) => {
                     if (teamsList.length > 0) {
                         const teamNames = _.map(teamsList, (team) => team.name);

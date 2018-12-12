@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -13,6 +13,7 @@ import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { MapServerModel } from '../../../core/models/map-server.model';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
+import { Subscription } from 'rxjs/Subscription';
 
 export class WorldMapPoint {
     constructor(
@@ -96,7 +97,7 @@ export class WorldMapPath {
     templateUrl: './world-map.component.html',
     styleUrls: ['./world-map.component.less']
 })
-export class WorldMapComponent implements OnInit {
+export class WorldMapComponent implements OnInit, OnDestroy {
     /**
      * Map fill size ( Default w: 100%, h: 400px )
      */
@@ -261,6 +262,9 @@ export class WorldMapComponent implements OnInit {
      */
     @Input() centerLocationZoom: number = 10;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     /**
      * Constructor
      */
@@ -273,7 +277,7 @@ export class WorldMapComponent implements OnInit {
      */
     ngOnInit() {
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 // no outbreak yet ?
@@ -296,6 +300,14 @@ export class WorldMapComponent implements OnInit {
                     });
                 }
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

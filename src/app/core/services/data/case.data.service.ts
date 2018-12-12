@@ -79,10 +79,13 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @param {string} caseId
      * @param caseData
-     * @returns {Observable<any>}
+     * @returns {Observable<CaseModel>}
      */
-    modifyCase(outbreakId: string, caseId: string, caseData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData);
+    modifyCase(outbreakId: string, caseId: string, caseData): Observable<CaseModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData),
+            CaseModel
+        );
     }
 
     /**

@@ -99,15 +99,18 @@ export class UserRoleDataService {
     /**
      * Modify an existing User Role
      * @param {string} roleId
-     * @returns {Observable<any>}
+     * @returns {Observable<UserRoleModel>}
      */
-    modifyRole(roleId: string, data: any): Observable<any> {
-        return this.http
-            .patch(`roles/${roleId}`, data)
-            .do(() => {
-                // invalidate the cache for Roles List
-                this.cacheService.remove(CacheKey.AUTH_ROLES);
-            });
+    modifyRole(roleId: string, data: any): Observable<UserRoleModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http
+                .patch(`roles/${roleId}`, data)
+                .do(() => {
+                    // invalidate the cache for Roles List
+                    this.cacheService.remove(CacheKey.AUTH_ROLES);
+                }),
+            UserRoleModel
+        );
     }
 
     /**

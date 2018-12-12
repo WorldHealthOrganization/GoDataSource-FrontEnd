@@ -137,7 +137,9 @@ export class DateValidatorDirective implements Validator {
                         );
                     } else {
                         // value from string
+                        (moment as any).suppressDeprecationWarnings = true;
                         compareWithDate = moment(compareItem.compareItemValue as string);
+                        (moment as any).suppressDeprecationWarnings = false;
                     }
                 }
 
