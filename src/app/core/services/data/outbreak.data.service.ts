@@ -110,18 +110,21 @@ export class OutbreakDataService {
     /**
      * Modify an existing Outbreak
      * @param {string} outbreakId
-     * @returns {Observable<any>}
+     * @returns {Observable<OutbreakModel>}
      */
-    modifyOutbreak(outbreakId: string, data: any): Observable<any> {
-        return this.http.patch(`outbreaks/${outbreakId}`, data)
-            .mergeMap((res) => {
-                // re-determine the selected Outbreak
-                return this.determineSelectedOutbreak()
-                    .map(() => {
-                        // preserve the output of the main request
-                        return res;
-                    });
-            });
+    modifyOutbreak(outbreakId: string, data: any): Observable<OutbreakModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.patch(`outbreaks/${outbreakId}`, data)
+                .mergeMap((res) => {
+                    // re-determine the selected Outbreak
+                    return this.determineSelectedOutbreak()
+                        .map(() => {
+                            // preserve the output of the main request
+                            return res;
+                        });
+                }),
+            OutbreakModel
+        );
     }
 
     /**
