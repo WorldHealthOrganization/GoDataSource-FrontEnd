@@ -159,7 +159,7 @@ export class RelationshipDataService {
      * @param {string} entityId
      * @param {string} relationshipId
      * @param relationshipData
-     * @returns {Observable<any>}
+     * @returns {Observable<RelationshipModel>}
      */
     modifyRelationship(
         outbreakId: string,
@@ -167,10 +167,13 @@ export class RelationshipDataService {
         entityId: string,
         relationshipId: string,
         relationshipData
-    ): Observable<any> {
-        return this.http.put(
-            `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
-            relationshipData
+    ): Observable<RelationshipModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(
+                `outbreaks/${outbreakId}/${this.getLinkPathFromEntityType(entityType)}/${entityId}/relationships/${relationshipId}`,
+                relationshipData
+            ),
+            RelationshipModel
         );
     }
 
