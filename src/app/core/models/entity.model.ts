@@ -259,4 +259,22 @@ export class EntityModel {
             return caseData;
         });
     }
+
+    /**
+     * Generates view link for entity based on type
+     * @param person
+     * @returns {string}
+     */
+    static getPersonLink(person) {
+        let entityTypeLink = '';
+        if (person instanceof CaseModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CASE);
+        } else if (person instanceof ContactModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CONTACT);
+        } else if (person instanceof EventModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.EVENT);
+        }
+
+        return `/${entityTypeLink}/${person.id}/view`;
+    }
 }
