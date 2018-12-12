@@ -73,7 +73,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
                             .subscribe((helpItemData) => {
                                 this.helpItemData = helpItemData;
 
-                                // ngx isn't pristine at start when setting ng-model
+                                // ngx-wig isn't pristine at start when setting ng-model
                                 // so we need to hack it
                                 // wait for binding
                                 setTimeout(() => {
@@ -124,7 +124,7 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
         ];
     }
 
-    modifyHelpCategory(form: NgForm) {
+    modifyHelpCategoryItem(form: NgForm) {
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
         if (!this.formHelper.validateForm(form)) {
