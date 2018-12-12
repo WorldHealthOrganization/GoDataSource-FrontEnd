@@ -100,7 +100,33 @@
         <ng-container matColumnDef="role">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</div>
+                    <div class="column-header" fxLayout="row">
+                        <span>{{'LNG_USER_FIELD_LABEL_ROLES' | translate}}</span>
+
+                        <button
+                            type="button"
+                            mat-icon-button
+                            class="column-actions-button"
+                            [disableRipple]="true"
+                            [matMenuTriggerFor]="columnActions"
+                            color="accent"
+                        >
+                            <span class="xt-icon">arrowDropdownCircle</span>
+                        </button>
+
+                        <mat-menu #columnActions="matMenu">
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('role', true)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate }}
+                            </button>
+                            <button
+                                mat-menu-item
+                                (click)="toggleColumn('role', false)">
+                                {{ 'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate }}
+                            </button>
+                        </mat-menu>
+                    </div>
                     <div class="column-filter">
                         <app-form-select
                             name="rolesFilter"
@@ -119,9 +145,35 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                <mat-chip-list>
-                    <mat-chip *ngFor="let role of item.roles" [matTooltip]="role.description">{{ role.name }}</mat-chip>
-                </mat-chip-list>
+                <ng-container *ngIf="!isCellExpanded('role', item.id)">
+                    <app-number-of-items-label
+                        [value]="item.roles?.length"
+                    ></app-number-of-items-label>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('role', item.id, true)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND' | translate}}
+                    </button>
+                </ng-container>
+
+                <ng-container *ngIf="isCellExpanded('role', item.id)">
+                    <mat-chip-list>
+                        <mat-chip *ngFor="let role of item.roles" [matTooltip]="role.description">{{ role.name }}</mat-chip>
+                    </mat-chip-list>
+
+                    <button
+                        type="button"
+                        mat-button
+                        color="accent"
+                        (click)="toggleCell('role', item.id, false)"
+                    >
+                        {{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE' | translate}}
+                    </button>
+                </ng-container>
             </mat-cell>
         </ng-container>
 
