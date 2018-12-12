@@ -33,6 +33,7 @@ import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 export class FormSubQuestionListComponent extends ListBase<QuestionModel> implements OnInit {
     @Input() viewOnly: boolean = false;
     @Input() variableReadOnly: boolean = false;
+    @Input() autoSuggestVariable: boolean = false;
 
     @Input() scrollToQuestion: boolean = true;
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
@@ -118,7 +119,13 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
      * Duplicate form-question
      */
     duplicateQuestion(question: QuestionModel) {
-        super.clone(question);
+        // clone question object
+        const newQuestion = new QuestionModel(_.cloneDeep(question));
+        // mark question as being new
+        newQuestion.markAsNew();
+
+        // clone question
+        super.clone(newQuestion);
 
         if (this.scrollToQuestion) {
             this.domService.scrollItemIntoView(
@@ -139,6 +146,17 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
 
         // value changed
         this.onChange();
+    }
+
+    /**
+     * Make a variable suggestion for user
+     * @param {number} index
+     * @param {string} value
+     */
+    makeVariableSuggestion(index: number, value: any) {
+        if (this.autoSuggestVariable && this.values[index].new) {
+            this.values[index].variable = _.camelCase(value);
+        }
     }
 
     /**
