@@ -12,10 +12,11 @@
                 {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
             </button>
 
+            <!-- global search entities by identifier -->
             <app-global-entity-search>
-
             </app-global-entity-search>
 
+            <!-- context help - display help items based on the page you are on -->
             <a *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"
                 target="_blank"
