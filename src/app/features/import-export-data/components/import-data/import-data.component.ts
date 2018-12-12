@@ -846,14 +846,28 @@ export class ImportDataComponent implements OnInit {
             form,
             false
         )) {
-            // trigger change detection
+            // make items invalid
             _.each((form as any)._directives, (model: NgModel) => {
                 if (
                     model.valueAccessor &&
                     model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
                 ) {
+                    model.valueAccessor.touch();
                     model.valueAccessor.markForCheck();
                 }
+            });
+
+            // display error messages
+            setTimeout(() => {
+                // trigger change detection
+                _.each((form as any)._directives, (model: NgModel) => {
+                    if (
+                        model.valueAccessor &&
+                        model.valueAccessor instanceof FormSelectChangeDetectionPushComponent
+                    ) {
+                        model.valueAccessor.markForCheck();
+                    }
+                });
             });
 
             // invalid form
