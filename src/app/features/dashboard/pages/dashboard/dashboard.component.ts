@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -21,6 +21,7 @@ import { Moment } from 'moment';
 import * as moment from 'moment';
 import { LoadingDialogModel } from '../../../../shared/components';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-dashboard',
@@ -28,7 +29,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.less']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_DASHBOARD_TITLE', '.', true)
     ];
@@ -100,6 +101,9 @@ export class DashboardComponent implements OnInit {
 
     @ViewChild('kpiSection') private kpiSection: ElementRef;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     constructor(
         private authDataService: AuthDataService,
         private userDataService: UserDataService,
@@ -115,7 +119,7 @@ export class DashboardComponent implements OnInit {
 
         this.initializeDashlets();
 
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 if (selectedOutbreak && selectedOutbreak.id) {
@@ -127,6 +131,14 @@ export class DashboardComponent implements OnInit {
 
         // initialize Side Filters
         this.initializeSideFilters();
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { TransmissionChainModel, TransmissionChainRelation } from '../../../../core/models/transmission-chain.model';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -18,6 +18,7 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -25,7 +26,7 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
     templateUrl: './transmission-chains-geo-map.component.html',
     styleUrls: ['./transmission-chains-geo-map.component.less']
 })
-export class TransmissionChainsGeoMapComponent implements OnInit {
+export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains'),
         new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE', '', true)
@@ -42,6 +43,9 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
     // constants
     ReferenceDataCategory = ReferenceDataCategory;
 
+    // subscribers
+    outbreakSubscriber: Subscription;
+
     constructor(
         private outbreakDataService: OutbreakDataService,
         private snackbarService: SnackbarService,
@@ -51,7 +55,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
 
     ngOnInit() {
         // subscribe to the Selected Outbreak Subject stream
-        this.outbreakDataService
+        this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
                 this.selectedOutbreak = selectedOutbreak;
@@ -59,6 +63,14 @@ export class TransmissionChainsGeoMapComponent implements OnInit {
                 // re-load the list when the Selected Outbreak is changed
                 this.reloadChains();
             });
+    }
+
+    ngOnDestroy() {
+        // outbreak subscriber
+        if (this.outbreakSubscriber) {
+            this.outbreakSubscriber.unsubscribe();
+            this.outbreakSubscriber = null;
+        }
     }
 
     /**
