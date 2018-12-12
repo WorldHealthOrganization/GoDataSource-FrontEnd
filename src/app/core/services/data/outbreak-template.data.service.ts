@@ -67,10 +67,7 @@ export class OutbreakTemplateDataService {
      */
     modifyOutbreakTemplate(outbreakTemplateId: string, data: any): Observable<OutbreakTemplateModel> {
         return this.modelHelper.mapObservableToModel(
-            this.http.put(`templates/${outbreakTemplateId}`, data)
-                .map((res) => {
-                    return res;
-                }),
+            this.http.put(`templates/${outbreakTemplateId}`, data),
             OutbreakTemplateModel
         );
     }
