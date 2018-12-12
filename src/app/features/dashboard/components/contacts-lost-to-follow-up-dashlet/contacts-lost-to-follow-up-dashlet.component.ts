@@ -77,21 +77,17 @@ export class ContactsLostToFollowUpDashletComponent extends DashletComponent imp
             // add global filters
             const qb = new RequestQueryBuilder();
 
-            // no date provided, then we need to set the default one
-            // filter by day - default - yesterday
-            let date = this.globalFilterDate;
-            if (!date) {
-                date = moment().add(-1, 'days');
-            }
-
-            // date condition
-            qb.filter.byEquality(
-                'date',
-                moment(date).format('YYYY-MM-DD')
-            );
-
             // change the way we build query
             qb.filter.firstLevelConditions();
+
+            // date
+            if (this.globalFilterDate) {
+                qb.filter.where({
+                    dateOfReporting: {
+                        lte: moment(this.globalFilterDate).toISOString()
+                    }
+                });
+            }
 
             // location
             if (this.globalFilterLocationId) {
