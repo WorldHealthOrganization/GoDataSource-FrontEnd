@@ -40,6 +40,7 @@ import { ColorListLegendComponent } from './color-list-legend/color-list-legend.
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-number-of-records.component';
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
+import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -58,6 +59,7 @@ export const components: any[] = [
     BreadcrumbsComponent,
     SideFiltersComponent,
     SideColumnsComponent,
+    GlobalEntitySearchComponent,
 
     // dashboard
     DashboardCustomMetricDashletComponent,

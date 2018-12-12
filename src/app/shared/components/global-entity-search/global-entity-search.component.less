@@ -1,0 +1,61 @@
+@import '~styles/common';
+
+app-global-entity-search {
+    // styles
+    .global-search {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        .page-overlay {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+        }
+
+        mat-sidenav-container {
+            position: absolute;
+            z-index: 10;
+
+            mat-sidenav {
+                margin-top: 10vh;
+                max-height: 80vh;
+                width: 300px;
+                padding: 15px;
+                height: auto;
+                bottom: unset !important;
+                overflow-x: hidden;
+
+                .buttons-container {
+                    display: flex;
+                    margin-top: 20px;
+
+                    .stretched-button {
+                        flex: 1 auto;
+                        font-weight: 600;
+                        border-radius: 5px;
+                    }
+                }
+            }
+        }
+
+        .sidenav-toggle {
+            background-color: white;
+            margin-top: 155px;
+            padding: 7px 5px;
+        }
+
+        .section {
+
+            &:not(:first-child) {
+                margin-top: 20px;
+            }
+
+            .title {
+                font-size: 22px;
+                padding-bottom: 10px;
+            }
+
+        }
+    }
+}

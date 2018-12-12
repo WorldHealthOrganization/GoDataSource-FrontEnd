@@ -2074,6 +2074,17 @@ export const EnglishUsLang = {
         'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
         'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON': 'Apply',
         'LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED': 'Please select at least one column',
+
+        /**
+         * Global Search
+         */
+        'LNG_GLOBAL_ENTITY_SEARCH_TITLE': 'Global Entity Search',
+        'LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL': 'Entity Identifier',
+        'LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION': '',
+        'LNG_GLOBAL_ENTITY_SEARCH_BUTTON': 'Search',
+        'LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE': 'No entity matched!',
+
+
         /**
          * Location auto-complete search
          */
