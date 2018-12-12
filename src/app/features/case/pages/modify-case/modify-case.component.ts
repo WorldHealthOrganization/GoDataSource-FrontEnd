@@ -325,7 +325,7 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             })
             .subscribe((modifiedCase: CaseModel) => {
                 // update model
-                this.caseData = new CaseModel(modifiedCase);
+                this.caseData = modifiedCase;
 
                 // mark form as pristine
                 form.form.markAsPristine();
