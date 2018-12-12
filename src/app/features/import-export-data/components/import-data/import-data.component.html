@@ -110,7 +110,7 @@
                 *ngFor="let item of mappedFields; trackBy: trackByFieldID; let indexMapField = index;">
                 <div
                     fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-select
+                    <app-form-select-change-detection-push
                         #sourceControl
                         [name]="'mapObject[' + item.id + '][source]'"
                         app-unique-validator="\]\[source\]$"
@@ -120,9 +120,9 @@
                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                         [options]="importableObject.fileHeadersKeyValue"
                         (optionChanged)="item.sourceField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);">
-                    </app-form-select>
+                    </app-form-select-change-detection-push>
 
-                    <app-form-select
+                    <app-form-select-change-detection-push
                         [name]="'mapObject[' + item.id + '][destination]'"
                         required="true"
                         [ngModel]="item.destinationField"
@@ -130,7 +130,7 @@
                         [options]="importableObject.modelPropertiesKeyValue"
                         (optionChanged)="item.destinationField = $event ? $event.value : $event; addMapOptionsIfNecessary(item);"
                         [disabled]="item.readonly">
-                    </app-form-select>
+                    </app-form-select-change-detection-push>
 
                     <div
                         *ngIf="item.isSourceArray || item.isDestinationArray"
@@ -138,14 +138,14 @@
                         <div
                             *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
                             fxFlex>
-                            <app-form-select
+                            <app-form-select-change-detection-push
                                 [name]="'mapObject[' + item.id + '][sourceDestinationLevel][' + levelIndex + ']'"
                                 required="true"
                                 [ngModel]="item.sourceDestinationLevel[levelIndex]"
                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                 [options]="possibleSourceDestinationLevels"
                                 (optionChanged)="item.sourceDestinationLevel[levelIndex] = $event ? $event.value : $event; sourceControl.control.updateValueAndValidity();">
-                            </app-form-select>
+                            </app-form-select-change-detection-push>
                         </div>
                     </div>
 
@@ -170,7 +170,7 @@
                     <div
                         *ngFor="let mappedOpt of item.mappedOptions; trackBy: trackByFieldID; let indexMapOption = index"
                         fxFlex fxLayout="row" fxLayoutGap="20px">
-                        <app-form-select
+                        <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][sourceOption]'"
                             app-unique-validator
                             [appUniqueValidatorExpression]="'\\[' + item.id + '\\]\\[options\\]\\[\\d+\\]\\[sourceOption\\]$'"
@@ -179,9 +179,9 @@
                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                             [options]="importableObject.distinctFileColumnValuesKeyValue[item.sourceFieldWithoutIndexes]"
                             (optionChanged)="mappedOpt.sourceOption = $event ? $event.value : $event;">
-                        </app-form-select>
+                        </app-form-select-change-detection-push>
 
-                        <app-form-select
+                        <app-form-select-change-detection-push
                             [name]="'mapObject[' + item.id + '][options][' + mappedOpt.id + '][destinationOption]'"
                             required="true"
                             [ngModel]="mappedOpt.destinationOption"
@@ -189,7 +189,7 @@
                             [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
                             optionValueKey="id"
                             (optionChanged)="mappedOpt.destinationOption = $event ? $event.value : $event;">
-                        </app-form-select>
+                        </app-form-select-change-detection-push>
 
                         <div fxFlex="70px">
                             <button
