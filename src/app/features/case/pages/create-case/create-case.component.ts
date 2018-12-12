@@ -127,7 +127,7 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.caseDataService
                 .createCase(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                    this.snackbarService.showError(err.message);
 
                     return ErrorObservable.create(err);
                 })
