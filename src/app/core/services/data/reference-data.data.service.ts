@@ -141,14 +141,17 @@ export class ReferenceDataDataService {
      * Modify an existing Reference Data entry
      * @param {string} entryId
      * @param entryData
-     * @returns {Observable<any>}
+     * @returns {Observable<ReferenceDataEntryModel>}
      */
-    modifyEntry(entryId: string, entryData): Observable<any> {
-        return this.http.put(`reference-data/${entryId}`, entryData)
-            .do(() => {
-                // invalidate list cache
-                this.clearReferenceDataCache();
-            });
+    modifyEntry(entryId: string, entryData): Observable<ReferenceDataEntryModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`reference-data/${entryId}`, entryData)
+                .do(() => {
+                    // invalidate list cache
+                    this.clearReferenceDataCache();
+                }),
+            ReferenceDataEntryModel
+        );
     }
 
     /**
