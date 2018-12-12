@@ -148,10 +148,13 @@ export class FollowUpsDataService {
      * @param {string} contactId
      * @param {string} followUpId
      * @param followUpData
-     * @returns {Observable<any>}
+     * @returns {Observable<FollowUpModel>}
      */
-    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData);
+    modifyFollowUp(outbreakId: string, contactId: string, followUpId: string, followUpData): Observable<FollowUpModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}/follow-ups/${followUpId}`, followUpData),
+            FollowUpModel
+        );
     }
 
     /**
