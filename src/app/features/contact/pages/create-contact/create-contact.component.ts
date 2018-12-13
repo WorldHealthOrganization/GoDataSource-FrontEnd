@@ -257,18 +257,18 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                         const possibleDuplicates: DialogField[] = [];
                         _.each(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                             // contact model
-                            const contactDate: ContactModel = duplicate.model as ContactModel;
+                            const contactData: ContactModel = duplicate.model as ContactModel;
 
                             // add link
                             possibleDuplicates.push(new DialogField({
                                 name: 'link',
                                 placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
-                                    contactDate,
+                                    contactData,
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                                 ),
                                 fieldType: DialogFieldType.LINK,
-                                routerLink: ['/contacts', contactDate.id, 'view'],
+                                routerLink: ['/contacts', contactData.id, 'view'],
                                 linkTarget: '_blank'
                             }));
                         });

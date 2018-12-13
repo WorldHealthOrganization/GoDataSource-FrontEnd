@@ -458,6 +458,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
         'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG': 'This case might already be in the system ( see possible matches bellow ). Do you still want to update this case or merge possible matches?',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE': 'Please select at least one record to merge with',
 
         /**
          * Date onset report list page

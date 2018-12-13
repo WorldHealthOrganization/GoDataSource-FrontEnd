@@ -177,18 +177,18 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
                         const possibleDuplicates: DialogField[] = [];
                         _.each(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
                             // case model
-                            const caseDate: CaseModel = duplicate.model as CaseModel;
+                            const caseData: CaseModel = duplicate.model as CaseModel;
 
                             // add link
                             possibleDuplicates.push(new DialogField({
                                 name: 'link',
                                 placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
-                                    caseDate,
+                                    caseData,
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                                     this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                                 ),
                                 fieldType: DialogFieldType.LINK,
-                                routerLink: ['/cases', caseDate.id, 'view'],
+                                routerLink: ['/cases', caseData.id, 'view'],
                                 linkTarget: '_blank'
                             }));
                         });
