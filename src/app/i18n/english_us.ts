@@ -441,6 +441,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
         'LNG_PAGE_CREATE_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG': 'This case might already be in the system ( see possible matches bellow ). Do you still want to create a new case?',
 
         /**
          * Modify Case page

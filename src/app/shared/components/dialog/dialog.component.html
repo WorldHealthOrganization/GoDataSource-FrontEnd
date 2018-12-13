@@ -127,6 +127,15 @@
                         [required]="field.required"
                         [disabled]="field.disabled">
                     </app-form-daterange>
+
+                    <!-- Link -->
+                    <a
+                        *ngIf="field.fieldType === DialogFieldType.LINK"
+                        [routerLink]="field.routerLink"
+                        [queryParams]="field.queryParams"
+                        [target]="field.linkTarget">
+                        {{ field.placeholder | translate }}
+                    </a>
                 </div>
             </ng-container>
         </div>
