@@ -48,7 +48,7 @@ export const EnglishUsLang = {
         'LNG_STEPPER_BUTTON_NEXT': 'Next',
         'LNG_STEPPER_BUTTON_BACK': 'Back',
         'LNG_STEPPER_FINAL_STEP_LABEL': 'Done',
-        'LNG_STEPPER_FINAL_STEP_TEXT': 'You are now done',
+        'LNG_STEPPER_FINAL_STEP_TEXT': 'Data entry is now complete. Hit "Create" to finish the process.',
 
         /**
          * Common labels
