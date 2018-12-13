@@ -18,7 +18,7 @@ import * as _ from 'lodash';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-case-relationship',
@@ -55,7 +55,8 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private formHelper: FormHelperService,
-        private labResultDataService: LabResultDataService
+        private labResultDataService: LabResultDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -123,15 +124,22 @@ export class CreateCaseLabResultComponent extends ConfirmOnFormChanges implement
             !_.isEmpty(dirtyFields)
         ) {
             // add new Lab Result
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.labResultDataService
                 .createLabResult(this.selectedOutbreak.id, this.caseId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
 
+                    // hide dialog
+                    loadingDialog.close();
+
                     return ErrorObservable.create(err);
                 })
                 .subscribe((newLabResult: LabResultModel) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_LAB_RESULT_ACTION_CREATE_CASE_LAB_RESULT_SUCCESS_MESSAGE');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();
