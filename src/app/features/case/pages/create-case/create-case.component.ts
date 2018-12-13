@@ -139,7 +139,11 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.caseDataService
                 .findDuplicates(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                    } else {
+                        this.snackbarService.showApiError(err);
+                    }
 
                     // hide dialog
                     loadingDialog.close();
