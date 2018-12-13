@@ -926,6 +926,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG': 'This contact might already be in the system ( see possible matches bellow ). Do you still want to update this contact or merge possible matches?',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE': 'Please select at least one record to merge with',
 
         /**
          * Bulk Add Contacts page

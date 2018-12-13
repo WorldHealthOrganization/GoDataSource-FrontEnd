@@ -124,10 +124,13 @@ export class ContactDataService {
      * @param {string} outbreakId
      * @param {string} contactId
      * @param contactData
-     * @returns {Observable<any>}
+     * @returns {Observable<ContactModel>}
      */
-    modifyContact(outbreakId: string, contactId: string, contactData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData);
+    modifyContact(outbreakId: string, contactId: string, contactData): Observable<ContactModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData),
+            ContactModel
+        );
     }
 
     /**
