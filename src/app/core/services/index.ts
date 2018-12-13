@@ -44,6 +44,7 @@ import { BulkAddContactsService } from './helper/bulk-add-contacts.service';
 import { AuditLogDataService } from './data/audit-log.data.service';
 import { HelpDataService } from './data/help.data.service';
 import { GlobalEntitySearchDataService } from './data/global-entity-search.data.service';
+import { DeviceDataService } from './data/device.data.service';
 
 // export the list of services
 export const services: any[] = [
@@ -82,6 +83,7 @@ export const services: any[] = [
     AuditLogDataService,
     HelpDataService,
     GlobalEntitySearchDataService,
+    DeviceDataService,
 
     // guard services
     AuthGuard,

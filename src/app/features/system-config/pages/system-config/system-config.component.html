@@ -60,6 +60,14 @@
                             [routerLink]="['/import-export-data', 'sync-package', 'import']">
                             {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
                         </button>
+
+                        <!-- Devices -->
+                        <button
+                            *ngIf="hasSysConfigWriteAccess()"
+                            mat-menu-item
+                            [routerLink]="['/system-config', 'system-devices']">
+                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_DEVICES' | translate }}
+                        </button>
                     </mat-menu>
                 </ng-container>
             </div>
