@@ -51,12 +51,14 @@
                             </app-form-location-dropdown>
                         </div>
 
-                        <app-form-textarea
-                            name="description"
-                            [(ngModel)]="newOutbreak.description"
-                            [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
-                            tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
-                        </app-form-textarea>
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-textarea
+                                name="description"
+                                [(ngModel)]="newOutbreak.description"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
 
                         <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                             <app-form-datepicker
