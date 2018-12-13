@@ -57,7 +57,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
             // current page title
             this.breadcrumbs.push(
                 new BreadcrumbItemModel(
-                    this.viewOnly ? 'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' : 'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
+                    'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
                     '.',
                     true,
                     {},
