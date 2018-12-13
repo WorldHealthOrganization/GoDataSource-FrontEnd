@@ -127,8 +127,11 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.caseDataService
                 .createCase(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err);
-
+                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                    } else {
+                        this.snackbarService.showApiError(err);
+                    }
                     return ErrorObservable.create(err);
                 })
                 .subscribe((newCase: CaseModel) => {

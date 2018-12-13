@@ -387,6 +387,8 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID': 'Visual ID',
         'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID_DESCRIPTION': 'ID should match: {{mask}}',
+        'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
+        'LNG_CASE_FIELD_LABEL_CASE_ID_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
@@ -441,6 +443,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
         'LNG_PAGE_CREATE_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID': 'Case ID is not unique!',
 
         /**
          * Modify Case page
