@@ -23,6 +23,11 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-create-contact',
@@ -62,7 +67,9 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
         private formHelper: FormHelperService,
         private relationshipDataService: RelationshipDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -179,44 +186,110 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
             !_.isEmpty(dirtyFields) &&
             !_.isEmpty(relationship)
         ) {
-            // add the new Contact
+            // check for duplicates
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.contactDataService
-                .createContact(this.outbreakId, dirtyFields)
+                .findDuplicates(this.outbreakId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
 
+                    // hide dialog
+                    loadingDialog.close();
+
                     return ErrorObservable.create(err);
                 })
-                .subscribe((contactData: ContactModel) => {
-                    this.relationshipDataService
-                        .createRelationship(
-                            this.outbreakId,
-                            EntityType.CONTACT,
-                            contactData.id,
-                            relationship
-                        )
-                        .catch((err) => {
-                            // display error message
-                            this.snackbarService.showApiError(err);
+                .subscribe((contactDuplicates: EntityDuplicatesModel) => {
+                    // add the new Contact
+                    const runCreateContact = () => {
+                        // add the new Contact
+                        this.contactDataService
+                            .createContact(this.outbreakId, dirtyFields)
+                            .catch((err) => {
+                                this.snackbarService.showApiError(err);
 
-                            // remove contact
-                            this.contactDataService
-                                .deleteContact(this.outbreakId, contactData.id)
-                                .catch((errDC) => {
-                                    return ErrorObservable.create(errDC);
-                                })
-                                .subscribe();
+                                // hide dialog
+                                loadingDialog.close();
 
-                            // finished
-                            return ErrorObservable.create(err);
-                        })
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((contactData: ContactModel) => {
+                                this.relationshipDataService
+                                    .createRelationship(
+                                        this.outbreakId,
+                                        EntityType.CONTACT,
+                                        contactData.id,
+                                        relationship
+                                    )
+                                    .catch((err) => {
+                                        // display error message
+                                        this.snackbarService.showApiError(err);
 
-                            // navigate to listing page
-                            this.disableDirtyConfirm();
-                            this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                        // remove contact
+                                        this.contactDataService
+                                            .deleteContact(this.outbreakId, contactData.id)
+                                            .catch((errDC) => {
+                                                return ErrorObservable.create(errDC);
+                                            })
+                                            .subscribe();
+
+                                        // hide dialog
+                                        loadingDialog.close();
+
+                                        // finished
+                                        return ErrorObservable.create(err);
+                                    })
+                                    .subscribe(() => {
+                                        this.snackbarService.showSuccess('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+
+                                        // hide dialog
+                                        loadingDialog.close();
+
+                                        // navigate to listing page
+                                        this.disableDirtyConfirm();
+                                        this.router.navigate([`/contacts/${contactData.id}/modify`]);
+                                    });
+                            });
+                    };
+
+                    // do we have duplicates ?
+                    if (contactDuplicates.duplicates.length > 0) {
+                        // construct list of possible duplicates
+                        const possibleDuplicates: DialogField[] = [];
+                        _.each(contactDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                            // contact model
+                            const contactDate: ContactModel = duplicate.model as ContactModel;
+
+                            // add link
+                            possibleDuplicates.push(new DialogField({
+                                name: 'link',
+                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                    contactDate,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/contacts', contactDate.id, 'view'],
+                                linkTarget: '_blank'
+                            }));
                         });
+
+                        // display dialog
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            customInput: true,
+                            fieldsList: possibleDuplicates,
+                        }))
+                            .subscribe((answer) => {
+                                if (answer.button === DialogAnswerButton.Yes) {
+                                    runCreateContact();
+                                } else {
+                                    // hide dialog
+                                    loadingDialog.close();
+                                }
+                            });
+                    } else {
+                        runCreateContact();
+                    }
                 });
         }
     }

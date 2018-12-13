@@ -9,6 +9,7 @@ import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { EntityModel } from '../../models/entity.model';
 import { EntityType } from '../../models/entity-type';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 
 @Injectable()
 export class ContactDataService {
@@ -95,6 +96,26 @@ export class ContactDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/movement`),
             AddressModel
+        );
+    }
+
+    /**
+     * Find contact duplicates
+     * @param outbreakId
+     * @param contactData
+     */
+    findDuplicates(
+        outbreakId: string,
+        contactData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/contacts/duplicates/find?filter=${filter}`,
+                contactData
+            ),
+            EntityDuplicatesModel
         );
     }
 

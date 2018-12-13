@@ -908,6 +908,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE': 'Contact created!',
+        'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG': 'This contact might already be in the system ( see possible matches bellow ). Do you still want to create a new contact?',
 
         /**
          * Modify Contact page
