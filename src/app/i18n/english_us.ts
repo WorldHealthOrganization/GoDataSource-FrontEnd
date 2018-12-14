@@ -1131,6 +1131,7 @@ export const EnglishUsLang = {
          */
         'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE': 'Place',
         'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE': 'Case',
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_RISK': 'Risk',
 
         /**
          * Range Follow-ups list page

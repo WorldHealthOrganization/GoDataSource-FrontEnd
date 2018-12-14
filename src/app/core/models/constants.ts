@@ -687,6 +687,10 @@ export class Constants {
         CASE: {
             label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE',
             value: 'case'
+        },
+        RISK: {
+            label: 'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_RISK',
+            value: 'riskLevel'
         }
     };
 
