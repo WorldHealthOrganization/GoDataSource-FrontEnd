@@ -50,11 +50,10 @@ export class ImportCaseDataComponent implements OnInit {
     };
 
     requiredDestinationFields = [
-        'riskLevel',
-        'dateOfReporting',
         'firstName',
-        'gender',
-        'classification'
+        'dateOfReporting',
+        'classification',
+        'dateOfOnset'
     ];
 
     /**
