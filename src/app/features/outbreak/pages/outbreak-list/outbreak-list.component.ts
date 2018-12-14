@@ -113,7 +113,8 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
             }),
             new VisibleColumnModel({
                 field: 'disease',
-                label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
+                label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'country',
