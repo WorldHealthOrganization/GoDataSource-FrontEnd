@@ -8,8 +8,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
     
 Install latest LTS versions of Node.js and npm on your machine (https://nodejs.org/download/).
 
-- Current Node.js version for development: 8.11.1
-- Current npm version for development: 5.6.0
+- Current Node.js version for development: 8.12.0
+- Current npm version for development: 6.4.1
     
 Install git on your machine
 - For Ubuntu:
@@ -18,20 +18,18 @@ Install git on your machine
    sudo apt-get update
    sudo apt-get install git
    ```
-
-Install Angular CLI v1.7.4 on your machine
-
-    sudo npm install -g @angular/cli@1.7.4
     
 ### Installation steps
     
 Get the code from GitHub
     
-    git clone https://mihai_ilie@bitbucket.org/clarisoft-technologies/go.data-front-end.git
+    git clone https://bitbucket.org/clarisoft-technologies/go.data-front-end.git
 
 Install 3rd-party packages
     
     npm install
+    
+### Running with dev environment
     
 Configure the application for dev environment
 
@@ -44,6 +42,24 @@ Run the application (it will start on port 4550; you can change this from the pa
     npm start
     	
 Open your browser on: http://localhost:4550
+
+### Running with production environment
+
+Configure the application for production environment
+
+    cp src/environments/environment.ts.default src/environments/environment.prod.ts
+    
+Update src/environments/environment.prod.ts as necessary  
+    	
+Create the production build
+    
+    npm run build
+    
+Note: If you get an error related to memory usage, create the production build as following
+
+    npm run build-high-memory
+    	
+This build will be served by the API. Check API documentation to get the path where the frontend build should be placed. 
     
 ## Development
     
@@ -64,6 +80,4 @@ Use the IDE of your choice (Webstorm recommended).
     - If the changes are good to be merged in master, the Reviewer will Approve the PR and then merge it in master
     - If the PR requires any changes, the Reviewer will add the comments and will inform the dev when the code review is finished
         - Dev must address all the comments in his PR, fix the code where necessary and REPLY to all comments, so the Reviewer knows that none of the comments were missed
-
-## [TODO] Deployment
-    
+  
