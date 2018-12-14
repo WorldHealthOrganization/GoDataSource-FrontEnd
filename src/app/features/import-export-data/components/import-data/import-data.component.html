@@ -248,7 +248,7 @@
     <!-- Import failed errors -->
     <div
         *ngIf="!displayLoading && importableObject && errMsgDetails"
-        fxFlex fxLayout="column" fxLayoutGap="30px"
+        fxFlex fxLayout="column" fxLayoutGap="5px"
         class="import-data-errors">
         <div
             class="import-data-errors-title">
@@ -274,7 +274,7 @@
                     {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE' | translate:{ recordNo: err.recordNo } }}
                 </span>
                 <span *ngSwitchDefault>
-                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED' | translate:{ recordNo: err.recordNo, fields: err.error && err.error.details && err.error.details.codes ? Object.keys(err.error.details.codes).join(', ') : [] } }}
+                    {{ 'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL' | translate:{ recordNo: err.recordNo, message: err.error ? err.error.message : err.message } }}
                 </span>
             </ng-container>
         </div>

@@ -2135,7 +2135,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
-        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL': 'Failed to import record {{recordNo}}: {{message}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK': 'Failed to import record {{recordNo}} because of outbreak invalid case id mask',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because address must have a place of residence',
