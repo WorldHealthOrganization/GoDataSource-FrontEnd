@@ -110,7 +110,10 @@ export class EntityModel {
             path,
             // no need to do something custom
             (value) => value,
-            (value) => new LabelValuePair(value, value)
+            (value) => new LabelValuePair(
+                moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+                value
+            )
         );
     }
 
