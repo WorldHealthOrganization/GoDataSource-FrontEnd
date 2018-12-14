@@ -266,6 +266,31 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Outcome -->
+        <ng-container matColumnDef="outcome">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_OUTCOME' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="outcomeFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="outcomeList$  | async"
+                            (optionChanged)="filterBySelectField('outcomeId', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.outcomeId | translate }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Age -->
         <ng-container matColumnDef="age">
             <mat-header-cell *matHeaderCellDef>
