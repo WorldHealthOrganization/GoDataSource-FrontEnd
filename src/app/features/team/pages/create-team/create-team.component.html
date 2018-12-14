@@ -37,18 +37,16 @@
                             (optionChanged)="usersChanged($event)">
                         </app-form-select>
 
-                        <div fxLayout="row">
-                            <app-form-location-dropdown
-                                fxFlex
-                                name="locationIds"
-                                [(ngModel)]="teamData.locationIds"
-                                [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
-                                tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
-                                [disabled]="false"
-                                [required]="true"
-                                [multiple]="true">
-                            </app-form-location-dropdown>
-                        </div>
+                        <app-form-location-dropdown
+                            fxFlex
+                            name="locationIds"
+                            [(ngModel)]="teamData.locationIds"
+                            [placeholder]="'LNG_TEAM_FIELD_LABEL_LOCATIONS' | translate"
+                            tooltip="LNG_TEAM_FIELD_LABEL_LOCATIONS_DESCRIPTION"
+                            [disabled]="false"
+                            [required]="true"
+                            [multiple]="true">
+                        </app-form-location-dropdown>
 
                     </div>
                 </mat-card>
