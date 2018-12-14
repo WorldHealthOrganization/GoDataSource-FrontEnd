@@ -7,3 +7,10 @@
 @page-right-margin: 145px;
 // font family
 @font-roboto: 'Roboto-Font';
+
+/* Media Queries */
+@desktop-min-size: 1300px;
+@mobile-max-size: 1299px;
+
+@desktop-devices: ~"only screen and (min-width: @{desktop-min-size})";
+@mobile-devices: ~"only screen and (max-width: @{mobile-max-size})";
