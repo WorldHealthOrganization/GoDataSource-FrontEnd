@@ -10,6 +10,7 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-language',
@@ -31,7 +32,8 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
         private languageDataService: LanguageDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -47,11 +49,13 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // add the new Event
+            // add the new Language
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.languageDataService
                 .createLanguage(dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .subscribe((newLanguage: LanguageModel) => {
@@ -59,6 +63,9 @@ export class CreateLanguageComponent extends ConfirmOnFormChanges {
 
                     // clear cache
                     this.cacheService.remove(CacheKey.LANGUAGES);
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();

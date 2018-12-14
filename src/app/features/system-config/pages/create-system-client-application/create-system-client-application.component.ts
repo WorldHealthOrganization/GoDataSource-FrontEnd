@@ -82,10 +82,12 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .subscribe((settings: SystemSettingsModel) => {
@@ -99,11 +101,15 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
                         })
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
+                            loadingDialog.close();
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+
+                            // hide dialog
+                            loadingDialog.close();
 
                             // navigate to listing page
                             this.disableDirtyConfirm();

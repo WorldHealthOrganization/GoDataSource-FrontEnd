@@ -10,6 +10,7 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-system-upstream-sync',
@@ -40,7 +41,8 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -73,10 +75,12 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .subscribe((settings: SystemSettingsModel) => {
@@ -90,11 +94,15 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
                         })
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
+                            loadingDialog.close();
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
                             // display success message
                             this.snackbarService.showSuccess('LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+
+                            // hide dialog
+                            loadingDialog.close();
 
                             // navigate to listing page
                             this.disableDirtyConfirm();

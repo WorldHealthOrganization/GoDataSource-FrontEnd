@@ -17,15 +17,19 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import * as moment from 'moment';
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { RelationshipModel } from '../../../../core/models/relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { EntityModel } from '../../../../core/models/entity.model';
 
 @Component({
     selector: 'app-modify-case',
@@ -314,30 +318,132 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
             delete dirtyFields.ageDob;
         }
 
-        // modify the Case
+        // check for duplicates
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+            .findDuplicates(this.selectedOutbreak.id, {
+                ...this.caseData,
+                ...dirtyFields
+            })
             .catch((err) => {
                 this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return ErrorObservable.create(err);
-            })
-            .subscribe((modifiedCase: CaseModel) => {
-                // update model
-                this.caseData = modifiedCase;
-
-                // mark form as pristine
-                form.form.markAsPristine();
-
-                // display message
-                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
-
-                // update breadcrumb
-                this.retrieveCaseData();
 
                 // hide dialog
                 loadingDialog.close();
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                // modify Case
+                const runModifyCase = (finishCallBack?: () => void) => {
+                    // modify the Case
+                    this.caseDataService
+                        .modifyCase(this.selectedOutbreak.id, this.caseId, dirtyFields)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe((modifiedCase: CaseModel) => {
+                            // update model
+                            this.caseData = modifiedCase;
+
+                            // mark form as pristine
+                            form.form.markAsPristine();
+
+                            // display message
+                            if (!finishCallBack) {
+                                this.snackbarService.showSuccess('LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE');
+
+                                // update breadcrumb
+                                this.retrieveCaseData();
+
+                                // hide dialog
+                                loadingDialog.close();
+                            } else {
+                                // finished
+                                finishCallBack();
+                            }
+                        });
+                };
+
+                // do we have duplicates ?
+                if (caseDuplicates.duplicates.length > 0) {
+                    // display dialog
+                    const showDialog = () => {
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            yesLabel: 'LNG_COMMON_BUTTON_MERGE',
+                            cancelLabel: 'LNG_COMMON_BUTTON_SAVE',
+                            customInput: true,
+                            fieldsList: [new DialogField({
+                                name: 'mergeWith',
+                                placeholder: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH',
+                                inputOptions: _.map(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                                    // case model
+                                    const caseData: CaseModel = duplicate.model as CaseModel;
+
+                                    // map
+                                    return new LabelValuePair((index + 1) + '. ' +
+                                        EntityModel.getNameWithDOBAge(
+                                            caseData,
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                            this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                        ),
+                                        caseData.id
+                                    );
+                                }),
+                                inputOptionsMultiple: true,
+                                required: false
+                            })],
+                        })).subscribe((answer) => {
+                            // just update ?
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                // make sure we have at least two ids selected ( 1 is the current case )
+                                if (
+                                    !answer.inputValue.value.mergeWith
+                                ) {
+                                    // display need to select at least one record to merge with
+                                    this.snackbarService.showError('LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE');
+
+                                    // display dialog again
+                                    showDialog();
+
+                                    // finished here
+                                    return;
+                                }
+
+                                // save data first, followed by redirecting to merge
+                                runModifyCase(() => {
+                                    // construct list of ids
+                                    const mergeIds: string[] = [
+                                        this.caseId,
+                                        ...answer.inputValue.value.mergeWith
+                                    ];
+
+                                    // hide dialog
+                                    loadingDialog.close();
+
+                                    // redirect to merge
+                                    this.router.navigate(
+                                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
+                                            queryParams: {
+                                                ids: JSON.stringify(mergeIds)
+                                            }
+                                        }
+                                    );
+                                });
+                            } else {
+                                runModifyCase();
+                            }
+                        });
+                    };
+
+                    // display dialog
+                    showDialog();
+                } else {
+                    runModifyCase();
+                }
             });
     }
 

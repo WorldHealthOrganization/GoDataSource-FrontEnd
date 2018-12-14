@@ -11,6 +11,7 @@ import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-c
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import * as moment from 'moment';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 
 @Injectable()
 export class CaseDataService {
@@ -61,6 +62,26 @@ export class CaseDataService {
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/movement`),
             AddressModel
+        );
+    }
+
+    /**
+     * Find case duplicates
+     * @param outbreakId
+     * @param caseData
+     */
+    findDuplicates(
+        outbreakId: string,
+        caseData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/cases/duplicates/find?filter=${filter}`,
+                caseData
+            ),
+            EntityDuplicatesModel
         );
     }
 

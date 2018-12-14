@@ -17,6 +17,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-outbreak',
@@ -46,7 +47,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private formHelper: FormHelperService,
         private i18nService: I18nService,
         private route: ActivatedRoute,
-        private outbreakTemplateDataService: OutbreakTemplateDataService
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -97,19 +99,29 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         ) {
             const outbreakData = new OutbreakModel(dirtyFields);
 
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.outbreakDataService
                 .createOutbreak(outbreakData)
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .switchMap((newOutbreak) => {
                     // update language tokens to get the translation of submitted questions and answers
                     return this.i18nService.loadUserLanguage()
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
                         .map(() => newOutbreak);
                 })
                 .subscribe((newOutbreak) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to listing page
                     this.disableDirtyConfirm();

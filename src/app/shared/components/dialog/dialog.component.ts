@@ -63,7 +63,8 @@ export enum DialogFieldType {
     TEXT = 'text',
     DATE_RANGE = 'date-range',
     DATE = 'date',
-    BOOLEAN = 'boolean'
+    BOOLEAN = 'boolean',
+    LINK = 'link'
 }
 
 export class DialogField {
@@ -80,6 +81,13 @@ export class DialogField {
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
 
+    // links
+    public routerLink: string | string[];
+    public queryParams: {
+        [key: string]: any
+    };
+    public linkTarget: string;
+
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -92,7 +100,14 @@ export class DialogField {
         value?: any,
         disabled?: boolean,
         description?: string,
-        fieldType?: DialogFieldType
+        fieldType?: DialogFieldType,
+
+        // link
+        routerLink?: string | string[],
+        queryParams?: {
+            [key: string]: any
+        },
+        linkTarget?: string
     }) {
         // set properties
         Object.assign(

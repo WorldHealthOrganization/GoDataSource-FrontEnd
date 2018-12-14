@@ -7,6 +7,7 @@ import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
 import { AnswerModel, QuestionModel } from './question.model';
 import { Constants } from './constants';
+import * as moment from 'moment';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -150,6 +151,56 @@ export class EntityModel {
     }
 
     /**
+     * Age String
+     * @param age
+     * @param yearsLabel
+     * @param monthsLabel
+     */
+    static getAgeString(
+        age,
+        yearsLabel: string,
+        monthsLabel: string
+    ): string {
+        return !age ?
+            '' : (
+                age.months > 0 ?
+                    `${age.months} ${monthsLabel}` : (
+                        age.years > 0 ?
+                            `${age.years} ${yearsLabel}` :
+                            ''
+                    )
+            );
+    }
+
+    /**
+     * Get name + date or age
+     * @param model
+     */
+    static getNameWithDOBAge(
+        model: CaseModel | ContactModel,
+        yearsLabel: string,
+        monthsLabel: string
+    ) {
+        // initialize
+        let name: string = model.name;
+
+        // add dob / age
+        if (model.dob) {
+            name += ' ( ' + moment(model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ' )';
+        } else if (
+            model.age && (
+                model.age.years > 0 ||
+                model.age.months > 0
+            )
+        ) {
+            name += ' ( ' + EntityModel.getAgeString(model.age, yearsLabel, monthsLabel) + ' )';
+        }
+
+        // finished
+        return name;
+    }
+
+    /**
      * Unique values
      * @param records
      */
@@ -165,23 +216,10 @@ export class EntityModel {
                 '';
         };
 
-        // convert age to string
-        const ageString = (age): string => {
-            return !age ?
-                '' : (
-                    age.months > 0 ?
-                        `${age.months} ${monthsLabel}` : (
-                            age.years > 0 ?
-                                `${age.years} ${yearsLabel}` :
-                                ''
-                        )
-                );
-        };
-
         // convert age dob to string
         const ageDobString = (dob, age): string => {
             dob = dobString(dob);
-            age = ageString(age);
+            age = EntityModel.getAgeString(age, yearsLabel, monthsLabel);
             return `${dob} ${age}`.trim();
         };
 
