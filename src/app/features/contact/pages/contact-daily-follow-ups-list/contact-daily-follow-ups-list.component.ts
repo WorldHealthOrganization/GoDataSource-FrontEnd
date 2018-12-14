@@ -644,7 +644,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                     }),
                     new FilterModel({
                         fieldName: 'visualId',
-                        fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                        fieldLabel: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
                         type: FilterType.TEXT,
                         relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
                         childQueryBuilderKey: 'case'

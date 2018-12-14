@@ -238,16 +238,16 @@
         </ng-container>
 
         <!-- Case Id -->
-        <ng-container matColumnDef="id">
+        <ng-container matColumnDef="visualId">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
-                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_ID' | translate}}</div>
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate}}</div>
                     <div class="column-filter">
                         <app-form-input
                             name="id"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                            (optionChanged)="filterByTextField('id', $event)"
+                            (optionChanged)="filterByTextField('visualId', $event)"
                             app-reset-input-on-side-filter
                             [displayFilterIcon]="true">
                         </app-form-input>
@@ -256,7 +256,7 @@
             </mat-header-cell>
 
             <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
-                {{ item.id }}
+                {{ item.visualId }}
             </mat-cell>
         </ng-container>
 

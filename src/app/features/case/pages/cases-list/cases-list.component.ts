@@ -249,8 +249,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
-                field: 'id',
-                label: 'LNG_CASE_FIELD_LABEL_ID'
+                field: 'visualId',
+                label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID'
             }),
             new VisibleColumnModel({
                 field: 'classification',
@@ -364,7 +364,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }),
             new FilterModel({
                 fieldName: 'visualId',
-                fieldLabel: 'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
+                fieldLabel: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
                 type: FilterType.TEXT,
                 sortable: true
             }),
