@@ -249,6 +249,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'id',
+                label: 'LNG_CASE_FIELD_LABEL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'classification',
                 label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION'
             }),
