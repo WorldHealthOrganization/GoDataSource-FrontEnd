@@ -222,6 +222,7 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
+                                required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
                                     [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
