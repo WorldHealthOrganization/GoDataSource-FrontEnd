@@ -4,6 +4,7 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
     {
@@ -59,6 +60,40 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.WRITE_SYS_CONFIG]
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // Devices
+    {
+        path: 'system-devices',
+        component: fromPages.SystemDevicesComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_SYS_CONFIG]
+        }
+    },
+    // Modify system device
+    {
+        path: 'system-devices/:deviceId/modify',
+        component: fromPages.ModifySystemDeviceComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.WRITE_SYS_CONFIG],
+            action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+    // view system device history
+    {
+        path: 'system-devices/:deviceId/history',
+        component: fromPages.ViewHistorySystemDeviceComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_SYS_CONFIG]
         },
         canDeactivate: [
             PageChangeConfirmationGuard
