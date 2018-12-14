@@ -14,6 +14,7 @@ import {
 } from './validate';
 import { ErrorMessage } from './error-message';
 import { ElementBaseFailure } from './element-base-failure';
+import { MatTooltip } from '@angular/material';
 
 /**
  * Base class to be extended by custom form controls
@@ -133,5 +134,21 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
         setTimeout(() => {
             this.getControl();
         });
+    }
+
+    /**
+     * Display tooltip on-click ( fix for mobile => matTooltip )
+     */
+    displayTooltip(
+        event: MouseEvent,
+        tooltip: MatTooltip
+    ) {
+        // don't propagate to parent
+        event.stopPropagation();
+
+        // display tooltip ( Devices - no hover ) - if not already visible from hover ( PC )
+        if (tooltip) {
+            tooltip.show();
+        }
     }
 }
