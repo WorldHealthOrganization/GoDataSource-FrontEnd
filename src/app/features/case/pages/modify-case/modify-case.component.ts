@@ -27,9 +27,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { Constants } from '../../../../core/models/constants';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
-import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'app-modify-case',
@@ -374,7 +375,6 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                         this.dialogService.showConfirm(new DialogConfiguration({
                             message: 'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
                             yesLabel: 'LNG_COMMON_BUTTON_MERGE',
-                            cancelLabel: 'LNG_COMMON_BUTTON_SAVE',
                             customInput: true,
                             fieldsList: [new DialogField({
                                 name: 'mergeWith',
@@ -396,6 +396,15 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                 inputOptionsMultiple: true,
                                 required: false
                             })],
+                            addDefaultButtons: true,
+                            buttons: [
+                                new DialogButton({
+                                    label: 'LNG_COMMON_BUTTON_SAVE',
+                                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                                    }
+                                })
+                            ]
                         })).subscribe((answer) => {
                             // just update ?
                             if (answer.button === DialogAnswerButton.Yes) {
@@ -433,8 +442,11 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
                                         }
                                     );
                                 });
-                            } else {
+                            } else if (answer.button === DialogAnswerButton.Extra_1) {
                                 runModifyCase();
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
                             }
                         });
                     };
