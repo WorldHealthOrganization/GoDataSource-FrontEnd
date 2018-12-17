@@ -10,11 +10,9 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import * as _ from 'lodash';
 import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SystemSyncDataService } from '../../../../core/services/data/system-sync.data.service';
 import { SystemSyncModel } from '../../../../core/models/system-sync.model';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
@@ -22,17 +20,17 @@ import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.mode
 import { Constants } from '../../../../core/models/constants';
 
 @Component({
-    selector: 'app-system-upstream-sync-list',
+    selector: 'app-upstream-servers-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './system-upstream-sync.component.html',
-    styleUrls: ['./system-upstream-sync.component.less']
+    templateUrl: './upstream-servers-list.component.html',
+    styleUrls: ['./upstream-servers-list.component.less']
 })
-export class SystemUpstreamSyncComponent extends ListComponent implements OnInit {
+export class UpstreamServersListComponent extends ListComponent implements OnInit {
     /**
      * Breadcrumbs
      */
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -58,7 +56,6 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
         private systemSettingsDataService: SystemSettingsDataService,
         protected snackbarService: SnackbarService,
         private dialogService: DialogService,
-        private genericDataService: GenericDataService,
         private systemSyncDataService: SystemSyncDataService,
         private systemSyncLogDataService: SystemSyncLogDataService
     ) {
@@ -183,7 +180,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                                     })
                                     .subscribe(() => {
                                         // display success message
-                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
+                                        this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                                         // refresh
                                         this.needsRefreshList(true);
@@ -195,50 +192,6 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                             }
                         });
                 }
-            });
-    }
-
-    /**
-     * Configure sync settings
-     */
-    configureSyncSettings() {
-        this.genericDataService
-            .getFilterYesNoOptions()
-            .subscribe((yesNoOptions: LabelValuePair[]) => {
-                const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-                this.dialogService.showInput(new DialogConfiguration({
-                    message: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE',
-                    yesLabel: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON',
-                    fieldsList: [
-                        new DialogField({
-                            name: 'triggerBackupBeforeSync',
-                            placeholder: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC',
-                            description: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
-                            inputOptions: yesNoOptionsFiltered,
-                            inputOptionsClearable: false,
-                            required: true,
-                            value: this.settings.sync.triggerBackupBeforeSync
-                        })
-                    ]
-                })).subscribe((answer: DialogAnswer) => {
-                    if (answer.button === DialogAnswerButton.Yes) {
-                        this.systemSettingsDataService
-                            .modifySystemSettings({
-                                sync: answer.inputValue.value
-                            })
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe(() => {
-                                // display success message
-                                this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
-
-                                // refresh settings
-                                this.needsRefreshList(true);
-                            });
-                    }
-                });
             });
     }
 
@@ -275,7 +228,7 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE');
                         });
                 } else {
                     // not found ?
@@ -308,13 +261,13 @@ export class SystemUpstreamSyncComponent extends ListComponent implements OnInit
                                 case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value:
                                 case Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS_WITH_WARNINGS.value:
                                     // display success message
-                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SUCCESS_MESSAGE');
+                                    this.snackbarService.showSuccess('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE');
                                     this.loading = false;
                                     break;
 
                                 // sync error ?
                                 case Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value:
-                                    this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_FAILED_MESSAGE');
+                                    this.snackbarService.showError('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE');
                                     this.loading = false;
                                     break;
 

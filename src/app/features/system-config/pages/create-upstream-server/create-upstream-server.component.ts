@@ -13,20 +13,20 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
-    selector: 'app-create-system-upstream-sync',
+    selector: 'app-create-upstream-server',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-system-upstream-sync.component.html',
-    styleUrls: ['./create-system-upstream-sync.component.less']
+    templateUrl: './create-upstream-server.component.html',
+    styleUrls: ['./create-upstream-server.component.less']
 })
-export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE',
-            '/system-config/system-upstream-sync'
+            'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE',
+            '/system-config/upstream-servers'
         ),
         new BreadcrumbItemModel(
-            'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE',
+            'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TITLE',
             '.',
             true
         )
@@ -99,14 +99,14 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
 
                             // hide dialog
                             loadingDialog.close();
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/system-config/system-upstream-sync']);
+                            this.router.navigate(['/system-config/upstream-servers']);
                         });
 
                 });

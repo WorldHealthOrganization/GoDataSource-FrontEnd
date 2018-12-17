@@ -4,9 +4,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <ng-container
-                    *ngIf="!waitForBackupIdToBeReady && !loading">
-
+                <ng-container *ngIf="!waitForBackupIdToBeReady && !loading">
                     <button
                         mat-raised-button
                         color="accent"
@@ -15,34 +13,27 @@
                     </button>
 
                     <mat-menu #quickActionsMenu="matMenu">
-                        <!-- Sync client applications -->
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/system-config', 'system-client-applications']">
-                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON' | translate }}
-                        </button>
-
-                        <!-- Sync upstream servers -->
-                        <button
-                            mat-menu-item
-                            [routerLink]="['/system-config', 'system-upstream-sync']">
-                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON' | translate }}
-                        </button>
-
-                        <ng-container
-                            *ngIf="hasSysConfigWriteAccess() && settings">
+                        <ng-container *ngIf="hasSysConfigWriteAccess() && settings">
                             <!-- Modify settings -->
                             <button
                                 mat-menu-item
                                 (click)="configureAutomaticBackupSettings()">
-                                {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
+                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON' | translate }}
                             </button>
 
                             <!-- Create backup -->
                             <button
                                 mat-menu-item
                                 (click)="backupData()">
-                                {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON' | translate }}
+                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_BUTTON' | translate }}
+                            </button>
+
+                            <!-- Import Sync Package -->
+                            <button
+                                *ngIf="hasSysConfigWriteAccess()"
+                                mat-menu-item
+                                [routerLink]="['/import-export-data', 'sync-package', 'import']">
+                                {{ 'LNG_PAGE_SYSTEM_BACKUPS_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
                             </button>
                         </ng-container>
 
@@ -50,23 +41,7 @@
                         <button
                             mat-menu-item
                             (click)="exportSyncPackage()">
-                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON' | translate }}
-                        </button>
-
-                        <!-- Import Sync Package -->
-                        <button
-                            *ngIf="hasSysConfigWriteAccess()"
-                            mat-menu-item
-                            [routerLink]="['/import-export-data', 'sync-package', 'import']">
-                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON' | translate }}
-                        </button>
-
-                        <!-- Devices -->
-                        <button
-                            *ngIf="hasSysConfigWriteAccess()"
-                            mat-menu-item
-                            [routerLink]="['/system-config', 'system-devices']">
-                            {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_DEVICES' | translate }}
+                            {{ 'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE_BUTTON' | translate }}
                         </button>
                     </mat-menu>
                 </ng-container>
@@ -99,7 +74,8 @@
             <ng-container matColumnDef="location">
                 <mat-header-cell *matHeaderCellDef>
                     <div class="table-header-cell">
-                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}</div>
+                        <div mat-sort-header class="column-header">{{'LNG_BACKUP_FIELD_LABEL_LOCATION' | translate}}
+                        </div>
                         <div class="column-filter">
                             <app-form-input
                                 name="locationFilter"
@@ -267,7 +243,7 @@
                                 <button
                                     mat-menu-item
                                     (click)="restoreBackup(item)">
-                                    {{ 'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP' | translate }}
+                                    {{ 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP' | translate }}
                                 </button>
 
                                 <mat-divider></mat-divider>

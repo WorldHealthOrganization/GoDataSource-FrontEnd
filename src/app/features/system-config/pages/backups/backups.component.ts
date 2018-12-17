@@ -19,24 +19,24 @@ import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { MatDialogRef } from '@angular/material';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as moment from 'moment';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { tap } from 'rxjs/operators';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import * as moment from 'moment';
 
 @Component({
-    selector: 'app-system-config-main',
+    selector: 'app-backups',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './system-config.component.html',
-    styleUrls: ['./system-config.component.less']
+    templateUrl: './backups.component.html',
+    styleUrls: ['./backups.component.less']
 })
-export class SystemConfigComponent extends ListComponent implements OnInit {
+export class BackupsComponent extends ListComponent implements OnInit {
     /**
      * Breadcrumbs
      */
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE', '.', true)
+        new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)
     ];
 
     // authenticated user
@@ -207,8 +207,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
      */
     initBackupDialog(): Observable<DialogAnswer> {
         return this.dialogService.showInput(new DialogConfiguration({
-            message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE',
-            yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON',
+            message: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_TITLE',
+            yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_CREATE_BACKUP_BUTTON',
             fieldsList: [
                 // location
                 new DialogField({
@@ -248,7 +248,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                     })
                     .subscribe(() => {
                         // display success message
-                        this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+                        this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
                         // refresh page
                         this.needsRefreshList(true);
@@ -272,7 +272,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // refresh page
                             this.needsRefreshList(true);
@@ -297,7 +297,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                 })
                 .subscribe(() => {
                     // display success message
-                    this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE');
+                    this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
 
                     // refresh page
                     this.loading = false;
@@ -331,7 +331,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
 
                                 // backup error ?
                                 case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
-                                    this.snackbarService.showError('LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
+                                    this.snackbarService.showError('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
                                     this.waitForBackupIdToBeReady = undefined;
                                     this.needsRefreshList(true);
                                     break;
@@ -351,14 +351,14 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         // display dialog
         this.dialogService.showConfirm(new DialogConfiguration({
             message: 'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE',
-            yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON',
+            yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON',
             yesCssClass: 'primary dialog-btn-margin-right-10px',
             cancelCssClass: 'danger dialog-btn-margin-right-10px',
             addDefaultButtons: true,
             buttons: [
                 new DialogButton({
                     cssClass: 'success',
-                    label: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON',
+                    label: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON',
                     clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
                         dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
                     }
@@ -378,7 +378,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                             })
                             .subscribe((newBackup: BackupModel) => {
                                 // display success message
-                                this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+                                this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
                                 // refresh page
                                 this.needsRefreshList(true);
@@ -405,8 +405,8 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
      */
     configureAutomaticBackupSettings() {
         return this.dialogService.showInput(new DialogConfiguration({
-            message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
-            yesLabel: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
+            message: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE',
+            yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON',
             fieldsList: [
                 // location
                 new DialogField({
@@ -460,7 +460,7 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
                     })
                     .subscribe(() => {
                         // display success message
-                        this.snackbarService.showSuccess('LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+                        this.snackbarService.showSuccess('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
                         // refresh settings
                         this.refreshSystemSettings();
@@ -476,9 +476,9 @@ export class SystemConfigComponent extends ListComponent implements OnInit {
         // display export dialog
         if (this.mappedOutbreaks) {
             this.dialogService.showExportDialog({
-                message: 'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE',
+                message: 'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE',
                 url: 'sync/database-snapshot',
-                fileName: this.i18nService.instant('LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE') +
+                fileName: this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') +
                     ' - ' +
                     moment().format('YYYY-MM-DD'),
                 fileType: ExportDataExtension.ZIP,

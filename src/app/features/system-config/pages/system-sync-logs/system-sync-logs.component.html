@@ -4,14 +4,29 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Delete sync logs -->
                 <button
-                    *ngIf="hasSysConfigWriteAccess()"
                     mat-raised-button
                     color="accent"
-                    (click)="deleteServerSyncLogs()">
-                    {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
                 </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container *ngIf="hasSysConfigWriteAccess()">
+                        <!-- Sync general settings -->
+                        <button
+                            mat-menu-item
+                            (click)="configureSyncSettings()">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON' | translate }}
+                        </button>
+                        <!-- Delete sync logs -->
+                        <button
+                            mat-menu-item
+                            (click)="deleteServerSyncLogs()">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_LOGS_BUTTON' | translate }}
+                        </button>
+                    </ng-container>
+                </mat-menu>
             </div>
         </div>
     </ng-container>

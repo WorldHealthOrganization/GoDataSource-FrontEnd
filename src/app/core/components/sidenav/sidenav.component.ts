@@ -65,12 +65,6 @@ export class SidenavComponent implements OnInit {
             [],
             [
                 new ChildNavItem(
-                    'system-config',
-                    'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
-                    '/system-config'
-                ),
-                new ChildNavItem(
                     'users',
                     'LNG_LAYOUT_MENU_ITEM_USERS_LABEL',
                     [PERMISSION.READ_USER_ACCOUNT],
@@ -105,6 +99,44 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/help/categories'
+                )
+            ]
+        ),
+        new NavItem(
+            'system-config',
+            'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
+            'settings',
+            [PERMISSION.READ_SYS_CONFIG],
+            [
+                new ChildNavItem(
+                    'upstream-servers',
+                    'LNG_LAYOUT_MENU_ITEM_UPSTREAM_SERVERS_LABEL',
+                    [],
+                    '/system-config/upstream-servers'
+                ),
+                new ChildNavItem(
+                    'client-applications',
+                    'LNG_LAYOUT_MENU_ITEM_CLIENT_APPLICATIONS_LABEL',
+                    [],
+                    '/system-config/client-applications'
+                ),
+                new ChildNavItem(
+                    'devices',
+                    'LNG_LAYOUT_MENU_ITEM_DEVICES_LABEL',
+                    [],
+                    '/system-config/devices'
+                ),
+                new ChildNavItem(
+                    'sync',
+                    'LNG_LAYOUT_MENU_ITEM_SYNC_LABEL',
+                    [],
+                    '/system-config/sync-logs'
+                ),
+                new ChildNavItem(
+                    'backups',
+                    'LNG_LAYOUT_MENU_ITEM_BACKUPS_LABEL',
+                    [],
+                    '/system-config/backups'
                 )
             ]
         ),

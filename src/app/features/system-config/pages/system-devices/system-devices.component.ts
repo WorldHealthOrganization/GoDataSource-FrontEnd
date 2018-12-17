@@ -25,7 +25,6 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
      * Breadcrumbs
      */
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE', '/system-config', false),
         new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
     ];
 
