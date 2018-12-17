@@ -76,10 +76,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     teamsListLoadedForHeaderSearch: LabelValuePair[];
     teamIdFilterValue: string = 'all';
 
-    // print daily Follow-ups
-    printDailyFollowUpsUrl: string;
-    followUpsPrintDailyFileName: string = moment().format('YYYY-MM-DD');
-    printDailyFollowUpsFileType: ExportDataExtension = ExportDataExtension.PDF;
     // export Follow-ups
     exportFollowUpsUrl: string;
     followUpsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -135,9 +131,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
-        this.followUpsPrintDailyFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE') +
-            ' - ' +
-            this.followUpsPrintDailyFileName;
 
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
@@ -206,14 +199,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
                         // export url
                         this.exportFollowUpsUrl = null;
-                        this.printDailyFollowUpsUrl = null;
 
                         if (
                             this.selectedOutbreak &&
                             this.selectedOutbreak.id
                         ) {
                             this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
-                            this.printDailyFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/follow-ups/export`;
 
                             // retrieve case data
                             if (this.caseId) {
@@ -252,14 +243,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Download the Daily Follow-ups Form
      */
     downloadDailyFollowUpsForm() {
-        if (this.selectedOutbreak && this.followUpDateElem.value) {
-            this.showLoadingDialog();
-            const isoDate = this.followUpDateElem.value.toISOString();
-            this.followUpsDataService.downloadDailyFollowUpsForm(this.selectedOutbreak.id, isoDate)
-                .subscribe((blob) => {
-                    this.downloadFile(blob, 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
-                    this.closeLoadingDialog();
-                });
+        if (this.selectedOutbreak) {
+            if (
+                this.followUpDateElem &&
+                this.followUpDateElem.value
+            ) {
+                this.showLoadingDialog();
+                const isoDate = this.followUpDateElem.value.toISOString();
+                this.followUpsDataService.downloadDailyFollowUpsForm(this.selectedOutbreak.id, isoDate)
+                    .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
+                        this.closeLoadingDialog();
+                    });
+            } else {
+                // display select date data
+                this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_NO_DATE_ERROR');
+            }
         }
     }
 
