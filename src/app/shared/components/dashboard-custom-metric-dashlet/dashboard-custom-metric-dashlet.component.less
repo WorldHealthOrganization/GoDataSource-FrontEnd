@@ -5,6 +5,15 @@
     line-height: @menu-item-height !important;
 }
 
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+    /* IE10+ specific styles go here */
+    .ie-header-class {
+        app-form-input {
+            min-width: 40px !important;
+        }
+    }
+}
+
 app-dashboard-custom-metric-dashlet {
     .dashboard-box {
         height: 170px;
