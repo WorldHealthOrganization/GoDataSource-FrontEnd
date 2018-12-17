@@ -25,6 +25,19 @@
                         (exportFinished)="closeLoadingDialog()">
                     </app-export-button>
 
+                    <app-export-button
+                        *ngIf="!appliedListFilter && exportContactsDailyFollowUpListUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE' | translate"
+                        [url]="exportContactsDailyFollowUpListUrl"
+                        [fileName]="exportContactsDailyFollowUpListFileName"
+                        [fileType]="exportContactsDailyFollowUpListFileType"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()"
+                        [queryBuilder]="queryBuilder">
+                    </app-export-button>
+
                     <button
                         *ngIf="!appliedListFilter"
                         mat-menu-item
