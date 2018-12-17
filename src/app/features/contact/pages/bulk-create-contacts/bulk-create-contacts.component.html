@@ -27,6 +27,11 @@
             </div>
 
             <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+                <input
+                    #inputForMakingFormDirty="ngModel"
+                    type="hidden"
+                    ngModel
+                    name="addContactsHidden"/>
 
                 <hot-table
                     #sheetTable
@@ -42,7 +47,7 @@
                     [minSpareRows]="1"
                     [beforeValidate]="beforeValidateSheet"
                     [afterRemoveRow]="afterRemoveRow"
-                    [afterChange]="afterChange">
+                    [afterChange]="afterChange(inputForMakingFormDirty)">
 
                     <ng-container *ngFor="let column of sheetColumns">
                         <!-- Text column -->

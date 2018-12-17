@@ -26,6 +26,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GridSettings } from 'handsontable';
+import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-bulk-create-contacts',
@@ -73,6 +74,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             columns: string
         }
     }[] = [];
+
+    afterChangeCallback: (
+        sheetCore: Handsontable,
+        changes: any[],
+        source: string
+    ) => void;
 
     constructor(
         private router: Router,
@@ -335,29 +342,52 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
      * After changes
      */
     afterChange(
+        inputForMakingFormDirty: NgModel
+    ): (
         sheetCore: Handsontable,
         changes: any[],
         source: string
-    ) {
-        if (source === 'edit') {
-            const row: number = changes[0][0];
-            if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
-                // remove validations
-                _.each(
-                    sheetCore.getCellMetaAtRow(row),
-                    (column: {
-                        valid?: boolean
-                    }) => {
-                        if (column.valid === false) {
-                            column.valid = true;
-                        }
-                    }
-                );
-
-                // refresh
-                sheetCore.render();
-            }
+    ) => void {
+        // return cached function
+        if (this.afterChangeCallback) {
+            return this.afterChangeCallback;
         }
+
+        // create functions
+        this.afterChangeCallback = (
+            sheetCore: Handsontable,
+            changes: any[],
+            source: string
+        ) => {
+            if (source === 'edit') {
+                // remove validations
+                const row: number = changes[0][0];
+                if (_.isEmpty(_.filter(sheetCore.getDataAtRow(row), (v) => v !== null && v !== ''))) {
+                    // remove validations
+                    _.each(
+                        sheetCore.getCellMetaAtRow(row),
+                        (column: {
+                            valid?: boolean
+                        }) => {
+                            if (column.valid === false) {
+                                column.valid = true;
+                            }
+                        }
+                    );
+
+                    // refresh
+                    sheetCore.render();
+                }
+
+                // make form dirty
+                if (!sheetCore.isEmptyRow(row)) {
+                    inputForMakingFormDirty.control.markAsDirty();
+                }
+            }
+        };
+
+        // return newly created function
+        return this.afterChangeCallback;
     }
 
     /**
@@ -489,6 +519,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                                         this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
                                         // navigate to listing page
+                                        this.disableDirtyConfirm();
+                                        loadingDialog.close();
                                         this.router.navigate(['/' + EntityModel.getLinkForEntityType(this.relatedEntityType), this.relatedEntityId, 'view']);
                                     });
                             }
