@@ -84,8 +84,29 @@ export class ImportExportDataService {
      */
     exportPOSTData(
         url: string,
-        data: any
+        data: any,
+        queryBuilder?: RequestQueryBuilder
     ): Observable<Blob>  {
+        // filter ?
+        if (
+            queryBuilder &&
+            !queryBuilder.isEmpty()
+        ) {
+            const filterData = queryBuilder.buildQuery(false);
+            if (_.isEmpty(data)) {
+                data = {
+                    filter: filterData
+                };
+            } else if (!data.filter) {
+                data.filter = filterData;
+            } else {
+                data.filter = _.merge(
+                    data.filter,
+                    filterData
+                );
+            }
+        }
+
         // execute export
         return this.http.post(
             url,
