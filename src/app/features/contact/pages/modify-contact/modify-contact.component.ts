@@ -21,11 +21,12 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { Moment } from 'moment';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
-import { DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField } from '../../../../shared/components';
 import * as _ from 'lodash';
 import { EntityModel } from '../../../../core/models/entity.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
     selector: 'app-modify-contact',
@@ -188,7 +189,6 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                         this.dialogService.showConfirm(new DialogConfiguration({
                             message: 'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
                             yesLabel: 'LNG_COMMON_BUTTON_MERGE',
-                            cancelLabel: 'LNG_COMMON_BUTTON_SAVE',
                             customInput: true,
                             fieldsList: [new DialogField({
                                 name: 'mergeWith',
@@ -210,6 +210,15 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                                 inputOptionsMultiple: true,
                                 required: false
                             })],
+                            addDefaultButtons: true,
+                            buttons: [
+                                new DialogButton({
+                                    label: 'LNG_COMMON_BUTTON_SAVE',
+                                    clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
+                                        dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
+                                    }
+                                })
+                            ]
                         })).subscribe((answer) => {
                             // just update ?
                             if (answer.button === DialogAnswerButton.Yes) {
@@ -247,8 +256,11 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                                         }
                                     );
                                 });
-                            } else {
+                            } else if (answer.button === DialogAnswerButton.Extra_1) {
                                 runModifyContact();
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
                             }
                         });
                     };
