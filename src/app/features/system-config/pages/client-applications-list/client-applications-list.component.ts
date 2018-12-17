@@ -22,12 +22,12 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
-    selector: 'app-system-upstream-sync-list',
+    selector: 'app-client-applications-list',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './system-client-applications.component.html',
-    styleUrls: ['./system-client-applications.component.less']
+    templateUrl: './client-applications-list.component.html',
+    styleUrls: ['./client-applications-list.component.less']
 })
-export class SystemClientApplicationsComponent extends ListComponent implements OnInit {
+export class ClientApplicationsListComponent extends ListComponent implements OnInit {
     /**
      * Breadcrumbs
      */

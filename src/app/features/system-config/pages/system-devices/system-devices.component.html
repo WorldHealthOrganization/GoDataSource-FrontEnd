@@ -140,30 +140,34 @@
 
                     <button
                         mat-menu-item
-                        [routerLink]="['.', item.id, 'modify']">
-                        {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                    </button>
-
-                    <button
-                        mat-menu-item
                         [routerLink]="['.', item.id, 'history']">
                         {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY' | translate }}
                     </button>
 
-                    <button
-                        mat-menu-item
-                        (click)="deleteDevice(item)">
-                        {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE' | translate }}
-                    </button>
-
                     <ng-container
-                        *ngIf="hasSysConfigWriteAccess()">
+                        *ngIf="hasSysConfigWriteAccess()"
+                    >
                         <button
                             mat-menu-item
+                            [routerLink]="['.', item.id, 'modify']">
+                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                        </button>
+
+                        <mat-divider></mat-divider>
+
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
                             (click)="wipeDevice(item)">
                             {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE' | translate }}
                         </button>
 
+                        <button
+                            mat-menu-item
+                            class="mat-menu-item-delete"
+                            (click)="deleteDevice(item)">
+                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE' | translate }}
+                        </button>
                     </ng-container>
                 </mat-menu>
             </mat-cell>

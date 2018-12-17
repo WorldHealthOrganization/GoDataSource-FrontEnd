@@ -7,97 +7,72 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 
 const routes: Routes = [
+    // Backups
     {
-        path: '',
-        component: fromPages.SystemConfigComponent
+        path: 'backups',
+        component: fromPages.BackupsComponent
     },
-
-    // Sync upstream servers
+    // Upstream Servers
     {
-        path: 'system-upstream-sync',
-        component: fromPages.SystemUpstreamSyncComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-    // Create System Upstream server
-    {
-        path: 'system-upstream-sync/create',
-        component: fromPages.CreateSystemUpstreamSyncComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
+        path: 'upstream-servers',
+        children: [
+            {
+                path: '',
+                component: fromPages.UpstreamServersListComponent
+            },
+            {
+                path: 'create',
+                component: fromPages.CreateUpstreamServerComponent
+            }
         ]
     },
-
-    // Sync sync logs
+    // Client Applications
     {
-        path: 'system-sync-logs',
-        component: fromPages.SystemSyncLogsComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-
-    // Client applications
-    {
-        path: 'system-client-applications',
-        component: fromPages.SystemClientApplicationsComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-    // Create System Client application
-    {
-        path: 'system-client-applications/create',
-        component: fromPages.CreateSystemClientApplicationComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
+        path: 'client-applications',
+        children: [
+            {
+                path: '',
+                component: fromPages.ClientApplicationsListComponent
+            },
+            {
+                path: 'create',
+                component: fromPages.CreateClientApplicationComponent
+            }
         ]
     },
-    // Devices
+    // System Devices
     {
-        path: 'system-devices',
-        component: fromPages.SystemDevicesComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        }
-    },
-    // Modify system device
-    {
-        path: 'system-devices/:deviceId/modify',
-        component: fromPages.ModifySystemDeviceComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.WRITE_SYS_CONFIG],
-            action: ViewModifyComponentAction.MODIFY
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
+        path: 'devices',
+        children: [
+            {
+                path: '',
+                component: fromPages.SystemDevicesComponent
+            },
+            {
+                path: ':deviceId/modify',
+                component: fromPages.ModifySystemDeviceComponent,
+                canActivate: [AuthGuard],
+                data: {
+                    permissions: [PERMISSION.WRITE_SYS_CONFIG],
+                    action: ViewModifyComponentAction.MODIFY
+                },
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            },
+            {
+                path: ':deviceId/history',
+                component: fromPages.ViewHistorySystemDeviceComponent,
+                canDeactivate: [
+                    PageChangeConfirmationGuard
+                ]
+            }
         ]
     },
-    // view system device history
+    // Sync
     {
-        path: 'system-devices/:deviceId/history',
-        component: fromPages.ViewHistorySystemDeviceComponent,
-        canActivate: [AuthGuard],
-        data: {
-            permissions: [PERMISSION.READ_SYS_CONFIG]
-        },
-        canDeactivate: [
-            PageChangeConfirmationGuard
-        ]
+        path: 'sync-logs',
+        component: fromPages.SystemSyncLogsComponent
     }
 ];
 

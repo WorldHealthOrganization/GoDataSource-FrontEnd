@@ -4,11 +4,11 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Create client application -->
                 <button
-                    mat-raised-button
-                    color="accent"
-                    [routerLink]="['/system-config', 'system-client-applications', 'create']">
+                    *ngIf="hasSysConfigWriteAccess()"
+                    mat-raised-button color="accent"
+                    [routerLink]="'./create'"
+                >
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>

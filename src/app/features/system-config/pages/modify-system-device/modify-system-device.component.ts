@@ -50,8 +50,7 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
         if (this.deviceData) {
             // initialize breadcrumbs
             this.breadcrumbs = [
-                new BreadcrumbItemModel('LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE', '/system-config', false),
-                new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/system-devices', false)
+                new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices', false)
             ];
 
             // current page title

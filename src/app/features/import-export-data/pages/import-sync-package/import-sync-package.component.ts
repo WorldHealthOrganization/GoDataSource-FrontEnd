@@ -14,7 +14,7 @@ export class ImportSyncPackageComponent {
     breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_BACKUP_MODULE_LABEL_SYSTEM_CONFIGURATION',
-            '/system-config'
+            '/system-config/backups'
         ),
         new BreadcrumbItemModel(
             'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE',
@@ -40,6 +40,6 @@ export class ImportSyncPackageComponent {
     ) {}
 
     finished() {
-        this.router.navigate(['/system-config']);
+        this.router.navigate(['/system-config/backups']);
     }
 }

@@ -10,7 +10,7 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -68,7 +68,7 @@
                                         mat-raised-button
                                         color="primary"
                                         (click)="generateKey('credentials[clientId]')">
-                                        {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
+                                        {{'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
                                     </button>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                                         mat-raised-button
                                         color="primary"
                                         (click)="generateKey('credentials[clientSecret]')">
-                                        {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
+                                        {{'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_GENERATE_KEY_BUTTON' | translate}}
                                     </button>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                 <button
                     type="button" mat-raised-button color="accent"
                     (click)="createNewApplicationClient([detailsForm])">
-                    {{'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>
