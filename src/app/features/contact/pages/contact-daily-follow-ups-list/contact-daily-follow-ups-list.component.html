@@ -18,18 +18,6 @@
                         </button>
                     </ng-container>
 
-                    <app-export-button
-                        *ngIf="printDailyFollowUpsUrl"
-                        [menuItem]="true"
-                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON' | translate"
-                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE' | translate"
-                        [url]="printDailyFollowUpsUrl"
-                        [fileName]="followUpsPrintDailyFileName"
-                        [fileType]="printDailyFollowUpsFileType"
-                        (exportStart)="showLoadingDialog()"
-                        (exportFinished)="closeLoadingDialog()">
-                    </app-export-button>
-
                     <button
                         mat-menu-item
                         (click)="downloadDailyFollowUpsForm()">

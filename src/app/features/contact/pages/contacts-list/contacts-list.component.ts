@@ -84,6 +84,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     // available side filters
     availableSideFilters: FilterModel[];
 
+    // print daily Follow-ups
+    exportContactsDailyFollowUpListUrl: string;
+    exportContactsDailyFollowUpListFileName: string;
+    exportContactsDailyFollowUpListFileType: ExportDataExtension = ExportDataExtension.PDF;
+
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
     allowedExportTypes: ExportDataExtension[] = [
@@ -142,6 +147,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             ' - ' +
             this.contactsDataExportFileName;
 
+        // file name
+        this.exportContactsDailyFollowUpListFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE') +
+            ' - ' +
+            moment().format('YYYY-MM-DD');
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -176,11 +186,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
 
                 // export contacts url
                 this.exportContactsUrl = null;
+                this.exportContactsDailyFollowUpListUrl = null;
                 if (
                     this.selectedOutbreak &&
                     this.selectedOutbreak.id
                 ) {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
+                    this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
                 }
 
                 // get grouped contacts by risk level
