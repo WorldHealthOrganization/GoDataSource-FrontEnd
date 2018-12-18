@@ -94,6 +94,7 @@ export class FormAddressComponent extends GroupBase<AddressModel> implements OnI
      */
     locationChanged(data: LocationAutoItem) {
         if (
+            data &&
             data.geoLocation &&
             data.geoLocation.lat &&
             data.geoLocation.lng

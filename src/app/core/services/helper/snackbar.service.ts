@@ -8,7 +8,7 @@ import { I18nService } from './i18n.service';
 export class SnackbarService {
 
     // amount of time (in ms) to wait before automatically closing the snackbar
-    private duration = 4500;
+    static DURATION = 4500;
 
     constructor(
         private snackbar: MatSnackBar,
@@ -21,7 +21,12 @@ export class SnackbarService {
      * @param translateData
      * @param duration
      */
-    showSuccess(messageToken, translateData = {}, duration = this.duration) {
+    showSuccess(
+        messageToken,
+        translateData = {},
+        duration = SnackbarService.DURATION,
+        html: boolean = false
+    ) {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
@@ -29,7 +34,8 @@ export class SnackbarService {
                 this.snackbar.openFromComponent(SnackbarComponent, {
                     panelClass: 'success',
                     data: {
-                        message: message
+                        message: message,
+                        html: html
                     },
                     duration: duration,
                     horizontalPosition: 'center',
@@ -44,7 +50,12 @@ export class SnackbarService {
      * @param translateData
      * @param duration
      */
-    showError(messageToken, translateData = {}, duration = this.duration) {
+    showError(
+        messageToken,
+        translateData = {},
+        duration = SnackbarService.DURATION,
+        html: boolean = false
+    ) {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
@@ -52,7 +63,8 @@ export class SnackbarService {
                 this.snackbar.openFromComponent(SnackbarComponent, {
                     panelClass: 'error',
                     data: {
-                        message: message
+                        message: message,
+                        html: html
                     },
                     duration: duration,
                     horizontalPosition: 'center',
@@ -67,7 +79,11 @@ export class SnackbarService {
      * @param translateData
      * @returns {MatSnackBarRef<SnackbarComponent>}
      */
-    showNotice(messageToken, translateData = {}) {
+    showNotice(
+        messageToken,
+        translateData = {},
+        html: boolean = false
+    ) {
         return this.i18nService
             .get(messageToken, translateData)
             .subscribe((message) => {
@@ -75,7 +91,8 @@ export class SnackbarService {
                 this.snackbar.openFromComponent(SnackbarComponent, {
                     panelClass: 'notice',
                     data: {
-                        message: message
+                        message: message,
+                        html: html
                     },
                     horizontalPosition: 'center',
                     verticalPosition: 'top'
@@ -90,7 +107,12 @@ export class SnackbarService {
      * @param {number} duration
      * @returns {Subscription}
      */
-    showApiError(err, translateData = {}, duration = this.duration) {
+    showApiError(
+        err,
+        translateData = {},
+        duration = SnackbarService.DURATION,
+        html: boolean = false
+    ) {
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
 
         // get the error message for the received API Error Code
@@ -106,11 +128,21 @@ export class SnackbarService {
                     return this.i18nService
                         .get(defaultApiErrorCode)
                         .subscribe((defaultErrorMessage) => {
-                            this.showError(defaultErrorMessage, duration);
+                            this.showError(
+                                defaultErrorMessage,
+                                translateData,
+                                duration,
+                                html
+                            );
                         });
                 } else {
                     // show the error message
-                    this.showError(apiErrorMessage, duration);
+                    this.showError(
+                        apiErrorMessage,
+                        translateData,
+                        duration,
+                        html
+                    );
                 }
             });
     }

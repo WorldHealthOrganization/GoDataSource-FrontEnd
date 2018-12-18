@@ -134,31 +134,90 @@ export class FormHelperService {
         if (!form.valid) {
             // determine fields that are invalid
             let fields: string = '';
-            _.each(form.controls, (ctrl: FormControl, name: string) => {
-                // invalid controls
-                if (
-                    ctrl.invalid &&
-                    !_.isEmpty(name)
-                ) {
-                    // determine directive
-                    const directive = _.find((form as any)._directives, { name: name });
+            const checkControlsForInvalidStatus = (
+                controlsForm: NgForm,
+                rowInfo: string = ''
+            ) => {
+                // check controls validity
+                let invalidDataRow: string = '';
+                const mustCheckForms: {
+                    controlsForm: NgForm,
+                    rowInfo: string
+                }[] = [];
+                _.each(controlsForm.controls, (ctrl: AbstractControl, name: string) => {
+                    // invalid controls
                     if (
-                        directive &&
-                        directive.valueAccessor &&
-                        directive.valueAccessor.placeholder
+                        ctrl.invalid &&
+                        !_.isEmpty(name)
                     ) {
-                        // most of the time this is already translated, but we need to make sure
-                        fields += (_.isEmpty(fields) ? '' : ', ') +
-                            this.i18nService.instant(directive.valueAccessor.placeholder);
+                        // determine directive
+                        const directive = _.find((controlsForm as any)._directives, { name: name });
+                        if (
+                            directive &&
+                            directive.valueAccessor
+                        ) {
+                            // do we have placeholder ?
+                            if (directive.valueAccessor.placeholder) {
+                                // most of the time this is already translated, but we need to make sure
+                                invalidDataRow += (_.isEmpty(invalidDataRow) ? '' : ', ') +
+                                    this.i18nService.instant(directive.valueAccessor.placeholder);
+                            } else {
+                                // maybe this is a group ( list / group )
+                                if (
+                                    directive.valueAccessor.groupForm &&
+                                    directive.valueAccessor.groupForm.controls
+                                ) {
+                                    // determine row indexes
+                                    const rowIndexes = _.map(name.match(/\[\d+\]/g), (v: string) => v.replace(/\[|\]/g, '')).join(' => ');
+
+                                    // determine child fields that are invalid
+                                    // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
+                                    mustCheckForms.push({
+                                        controlsForm: directive.valueAccessor.groupForm,
+                                        rowInfo: this.i18nService.instant(
+                                            'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW', {
+                                                path: rowIndexes
+                                            }
+                                        )
+                                    });
+                                }
+                            }
+                        }
                     }
+                });
+
+                // add invalid values to fields
+                if (!_.isEmpty(invalidDataRow)) {
+                    fields += '<br />- ' + (
+                        rowInfo ?
+                            `${rowInfo} => ` :
+                            ''
+                    ) + invalidDataRow;
                 }
-            });
+
+                // validate remaining form children
+                _.each(mustCheckForms, (data: {
+                    controlsForm: NgForm,
+                    rowInfo: string
+                }) => {
+                    checkControlsForInvalidStatus(
+                        data.controlsForm,
+                        data.rowInfo
+                    );
+                });
+            };
+
+            // determine form invalid fields
+            checkControlsForInvalidStatus(form);
 
             // display error message
             this.snackbarService.showError(
-                _.isEmpty(fields) ? 'LNG_FORM_ERROR_FORM_INVALID' : 'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS', {
+                _.isEmpty(fields) ? 'LNG_FORM_ERROR_FORM_INVALID' : 'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS',
+                {
                     fields: fields
-                }
+                },
+                SnackbarService.DURATION,
+                true
             );
 
             // finished
