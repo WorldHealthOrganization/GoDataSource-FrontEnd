@@ -212,6 +212,31 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Geographical Level  -->
+                <ng-container matColumnDef="geographicalLevelId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL" | translate }}</div>
+                            <div class="column-filter">
+                                <app-form-select
+                                    name="geographicalLevelFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                    [options]="geographicalLevelsList$ | async"
+                                    multiple="true"
+                                    (optionChanged)="filterBySelectField('geographicalLevelId', $event)"
+                                    [allowSelectionOfDisabledItems]="true"
+                                    [displayInvisibleItems]="true"
+                                    [displayFilterIcon]="true">
+                                </app-form-select>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        {{ item.geographicalLevelId | translate }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Inline Actions -->
                 <ng-container matColumnDef="actions">
                     <mat-header-cell *matHeaderCellDef fxFlex="70px"></mat-header-cell>
