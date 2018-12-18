@@ -29,7 +29,11 @@
         *ngIf="!loading">
         <!-- Filters -->
         <div class="reset-filters">
-            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+            <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="needsRefreshList(true)">
                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
             </button>
         </div>
