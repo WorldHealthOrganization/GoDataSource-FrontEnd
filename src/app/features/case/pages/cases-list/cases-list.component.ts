@@ -607,6 +607,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             });
     }
 
+
+
+    /**
+     * Filter by Not a Case classification
+     * @param value
+     */
+    filterByNotACaseField(value: boolean | null | undefined) {
+        if (value === true) {
+            // show cases that are NOT classified as Not a Case
+
+        }
+
+        if (value === false) {
+            // show cases classified as Not a Case
+
+        }
+
+        // remove filter
+
+
+        // refresh list
+        this.needsRefreshList();
+    }
+
     /**
      * Export selected records
      */
