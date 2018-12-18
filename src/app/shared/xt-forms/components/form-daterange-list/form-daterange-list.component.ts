@@ -23,6 +23,8 @@ export class FormDaterangeListComponent extends ListBase<DateRangeModel> impleme
     @Input() required: boolean = false;
     @Input() readOnly: boolean = false;
 
+    @Input() componentTitle: string;
+
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
 

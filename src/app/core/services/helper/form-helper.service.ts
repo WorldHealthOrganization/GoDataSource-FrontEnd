@@ -176,7 +176,9 @@ export class FormHelperService {
                                     // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
                                     mustCheckForms.push({
                                         controlsForm: directive.valueAccessor.groupForm,
-                                        prefix: directive.valueAccessor.componentTitle ? this.i18nService.instant(directive.valueAccessor.componentTitle) : '',
+                                        prefix: (prefix ? `${prefix} => ` : '') + (
+                                            directive.valueAccessor.componentTitle ? this.i18nService.instant(directive.valueAccessor.componentTitle) : ''
+                                        ),
                                         rowInfo: this.i18nService.instant(
                                             'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW', {
                                                 path: rowIndexes

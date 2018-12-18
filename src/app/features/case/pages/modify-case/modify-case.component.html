@@ -340,7 +340,8 @@
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
-                    [readOnly]="viewOnly">
+                    [readOnly]="viewOnly"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate">
                 </app-form-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES'| translate}}</div>
@@ -353,7 +354,8 @@
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
                     [readOnly]="viewOnly"
-                    [minDate]="caseData.dateOfOnset">
+                    [minDate]="caseData.dateOfOnset"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate">
                 </app-form-daterange-list>
 
             </mat-tab>
