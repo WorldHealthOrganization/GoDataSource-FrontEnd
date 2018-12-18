@@ -275,6 +275,10 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),
             new VisibleColumnModel({
+                field: 'notACase',
+                label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_CASE_FIELD_LABEL_DELETED'
             }),
@@ -607,25 +611,41 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             });
     }
 
+    /**
+     * Filter by Classification field
+     * @param values
+     */
+    filterByClassificationField(values) {
+        // create condition
+        const condition = {classification: {inq: values}};
 
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(condition);
+
+        // add new filter
+        this.filterBySelectField('classification', values, 'value', false);
+    }
 
     /**
      * Filter by Not a Case classification
      * @param value
      */
-    filterByNotACaseField(value: boolean | null | undefined) {
+    filterByNotACaseField(value: boolean | string) {
+        // create condition
+        const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+        const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(trueCondition);
+        this.queryBuilder.filter.removeExactCondition(falseCondition);
+
         if (value === true) {
             // show cases that are NOT classified as Not a Case
-
-        }
-
-        if (value === false) {
+            this.queryBuilder.filter.where(trueCondition);
+        } else if (value === false) {
             // show cases classified as Not a Case
-
+            this.queryBuilder.filter.where(falseCondition);
         }
-
-        // remove filter
-
 
         // refresh list
         this.needsRefreshList();

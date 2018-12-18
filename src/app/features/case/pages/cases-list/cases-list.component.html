@@ -271,7 +271,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterBySelectField('classification', $event)"
+                            (optionChanged)="filterByClassificationField($event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -397,15 +397,15 @@
                             [options]="yesNoOptionsList$ | async"
                             (optionChanged)="filterByNotACaseField($event.value)"
                             app-reset-input-on-side-filter
-                            [allowSelectionOfDisabledItems]="true"
-                            [displayFilterIcon]="true"
                             [clearable]="false">
                         </app-form-select>
                     </div>
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
-                <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
+                <app-yes-no-label
+                    [value]="item.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE"
+                ></app-yes-no-label>
             </mat-cell>
         </ng-container>
 
