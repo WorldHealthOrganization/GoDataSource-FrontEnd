@@ -36,6 +36,8 @@ interface UploaderData {
 export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnInit {
     @Input() disabled: boolean = false;
 
+    @Input() componentTitle: string;
+
     questionsGroupedByCategory: {
         category: string,
         questions: QuestionModel[],

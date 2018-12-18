@@ -365,7 +365,8 @@
                     name="questionnaireAnswers"
                     [ngModel]="caseData.questionnaireAnswers"
                     [questions]="selectedOutbreak.caseInvestigationTemplate"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
         </mat-tab-group>
@@ -386,12 +387,14 @@
         </ng-container>
 
         <button *ngIf="viewOnly && hasCaseWriteAccess()"
+                type="button"
                 mat-raised-button color="accent"
                 [routerLink]="['/cases', caseData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
         <button *ngIf="hasContactWriteAccess()"
+                type="button"
                 mat-raised-button color="accent"
                 routerLink="/contacts/create"
                 [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
