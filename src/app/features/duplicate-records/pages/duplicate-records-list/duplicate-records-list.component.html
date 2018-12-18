@@ -13,12 +13,14 @@
 </app-total-number-of-records>
 
 <mat-card class="page-section page-content">
-    <div class="top-section-wrapper">
-        <div class="reset-filters">
-            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div>
+    <div class="reset-filters">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
     </div>
 
     <!-- Loading data data -->
