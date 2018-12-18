@@ -319,14 +319,33 @@ export class OutbreakListComponent extends ListComponent implements OnInit {
                             delete outbreak.id;
                             // set the name for the cloned outbreak
                             outbreak.name = answer.inputValue.value.clonedOutbreakName;
+
+                            // show loading
+                            const loadingDialog = this.dialogService.showLoadingDialog();
                             this.outbreakDataService.createOutbreak(outbreak)
                                 .catch((err) => {
                                     this.snackbarService.showError(err.message);
+                                    loadingDialog.close();
                                     return ErrorObservable.create(err);
                                 })
-                                .subscribe((clonedOutbreak: OutbreakModel) => {
+                                .switchMap((clonedOutbreak) => {
+                                    // update language tokens to get the translation of submitted questions and answers
+                                    return this.i18nService.loadUserLanguage()
+                                        .catch((err) => {
+                                            this.snackbarService.showError(err.message);
+                                            loadingDialog.close();
+                                            return ErrorObservable.create(err);
+                                        })
+                                        .map(() => clonedOutbreak);
+                                })
+                                .subscribe((clonedOutbreak) => {
                                     this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
-                                    this.router.navigate([`outbreaks/${clonedOutbreak.id}/modify`]);
+
+                                    // hide dialog
+                                    loadingDialog.close();
+
+                                    // navigate to modify page of the new outbreak
+                                    this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
                             });
                         }
                     });

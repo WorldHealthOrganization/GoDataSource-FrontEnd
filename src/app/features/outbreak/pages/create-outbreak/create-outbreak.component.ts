@@ -123,9 +123,8 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     // hide dialog
                     loadingDialog.close();
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
                     // navigate to modify page of the new outbreak
+                    this.disableDirtyConfirm();
                     this.router.navigate([`/outbreaks/${newOutbreak.id}/modify`]);
                 });
         }
