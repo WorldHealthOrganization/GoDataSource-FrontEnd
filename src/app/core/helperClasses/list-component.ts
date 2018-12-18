@@ -405,9 +405,10 @@ export abstract class ListComponent {
      * @param {string} property
      * @param {any | any[]} values
      * @param {string} valueKey
+     * @param {boolean} replace
      */
-    filterBySelectField(property: string, values: any | any[], valueKey: string = 'value') {
-        this.queryBuilder.filter.bySelect(property, values, true, valueKey);
+    filterBySelectField(property: string, values: any | any[], valueKey: string = 'value', replace: boolean = true) {
+        this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
 
         // refresh list
         this.needsRefreshList();

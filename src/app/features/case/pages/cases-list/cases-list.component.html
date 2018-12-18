@@ -118,10 +118,18 @@
 <mat-card class="page-section page-content">
     <div class="reset-filters">
         <!-- Reset Filters -->
-        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="resetFiltersToSideFilters()">
             {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
         </button>
-        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+        <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="needsRefreshList(true)">
             {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
         </button>
     </div>
@@ -271,7 +279,7 @@
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
                             [options]="caseClassificationsList$ | async"
-                            (optionChanged)="filterBySelectField('classification', $event)"
+                            (optionChanged)="filterByClassificationField($event)"
                             multiple="true"
                             app-reset-input-on-side-filter
                             [allowSelectionOfDisabledItems]="true"
@@ -381,6 +389,31 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
                 {{ item.dateOfOnset | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Not a Case classification -->
+        <ng-container matColumnDef="notACase">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{'LNG_CASE_FIELD_LABEL_NOT_A_CASE' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="notACaseFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByNotACaseField($event.value)"
+                            app-reset-input-on-side-filter
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                <app-yes-no-label
+                    [value]="item.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE"
+                ></app-yes-no-label>
             </mat-cell>
         </ng-container>
 

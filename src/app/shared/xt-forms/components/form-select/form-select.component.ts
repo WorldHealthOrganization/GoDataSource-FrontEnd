@@ -106,12 +106,14 @@ export class FormSelectComponent extends ElementBase<string | string[]> implemen
      * Create options for select-trigger
      */
     private initSelectedOptions() {
-        const selectedOptionsIds = this.value || _.isNumber(this.value) ? (
+        // option ids
+        const selectedOptionsIds = this.value !== null && this.value !== undefined ? (
             _.isArray(this.value) ?
                 this.value :
                 [this.value]
         ) : [];
 
+        // determine selected options
         this.selectedOptions = _.isEmpty(this.options) ?
             [] :
             _.transform(selectedOptionsIds, (result, selectedValue) => {

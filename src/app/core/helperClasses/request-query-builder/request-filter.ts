@@ -408,8 +408,15 @@ export class RequestFilter {
         }
 
         if (_.isEmpty(values)) {
-            // remove filter
-            this.remove(property);
+            if (replace) {
+                // remove filter
+                this.remove(property);
+            } else {
+                // remove only conditions with exact operator
+                this.removeExactCondition({
+                    [property]: {inq: []}
+                });
+            }
         } else {
             // filter with 'inq' criteria (aka "where in")
             this.where({
@@ -459,10 +466,23 @@ export class RequestFilter {
      * @param {string} property
      * @returns {RequestFilter}
      */
-    remove(property: string) {
+    remove(property: string, operator: string = null) {
         this.conditions = _.filter(this.conditions, (condition) => {
             const prop = Object.keys(condition)[0];
-            return prop !== property;
+
+            if (
+                prop.length > 0 &&
+                // remove only some conditions with a given operator?
+                operator !== null
+            ) {
+                // get the operator
+                const op = Object.keys(condition[property])[0];
+
+                return prop !== property || op !== operator;
+            } else {
+                // remove all conditions on property
+                return prop !== property;
+            }
         });
 
         return this;
@@ -497,6 +517,29 @@ export class RequestFilter {
         }
 
         return this;
+    }
+
+    /**
+     * Remove a specific condition with a specific operator on a property
+     * Note: Currently, This method could be applied on simple properties only
+     * @param condition
+     * @returns {RequestFilter}
+     */
+    removeExactCondition(condition: any) {
+        // sanitize condition
+        condition = condition || {};
+
+        // get the property that the condition applies to
+        const property = Object.keys(condition)[0];
+
+        if (property.length > 0) {
+            // get the operator
+            const operator = Object.keys(condition[property])[0];
+
+            if (operator) {
+                this.remove(property, operator);
+            }
+        }
     }
 
     /**

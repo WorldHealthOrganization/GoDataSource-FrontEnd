@@ -144,6 +144,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     ngOnInit() {
+        // #TODO should move this logic in list-component?
+        this.resetFiltersAddDefault();
+
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
             ' - ' +
@@ -223,6 +226,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
         this.initializeSideTableColumns();
     }
 
+    resetFiltersAddDefault() {
+        // by default do not display cases classified as Not a Case
+        this.filterByNotACaseField(false);
+    }
+
     ngOnDestroy() {
         // outbreak subscriber
         if (this.outbreakSubscriber) {
@@ -275,12 +283,19 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET'
             }),
             new VisibleColumnModel({
-                field: 'deleted',
-                label: 'LNG_CASE_FIELD_LABEL_DELETED'
+                field: 'notACase',
+                label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'wasContact',
-                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+                visible: false
+            }),
+            new VisibleColumnModel({
+                field: 'deleted',
+                label: 'LNG_CASE_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',
@@ -605,6 +620,46 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                         });
                 }
             });
+    }
+
+    /**
+     * Filter by Classification field
+     * @param values
+     */
+    filterByClassificationField(values) {
+        // create condition
+        const condition = {classification: {inq: values}};
+
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(condition);
+
+        // add new filter
+        this.filterBySelectField('classification', values, 'value', false);
+    }
+
+    /**
+     * Filter by Not a Case classification
+     * @param value
+     */
+    filterByNotACaseField(value: boolean | string) {
+        // create condition
+        const trueCondition = {classification: {eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+        const falseCondition = {classification: {neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE}};
+
+        // remove existing filter
+        this.queryBuilder.filter.removeExactCondition(trueCondition);
+        this.queryBuilder.filter.removeExactCondition(falseCondition);
+
+        if (value === true) {
+            // show cases that are NOT classified as Not a Case
+            this.queryBuilder.filter.where(trueCondition);
+        } else if (value === false) {
+            // show cases classified as Not a Case
+            this.queryBuilder.filter.where(falseCondition);
+        }
+
+        // refresh list
+        this.needsRefreshList();
     }
 
     /**
