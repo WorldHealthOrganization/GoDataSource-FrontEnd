@@ -412,6 +412,7 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_ADDRESSES': 'Addresses',
         'LNG_CASE_FIELD_LABEL_ADDRESS': 'Address',
         'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
+        'LNG_CASE_FIELD_LABEL_NOT_A_CASE': 'Not a Case',
 
         /**
          * Cases list page
