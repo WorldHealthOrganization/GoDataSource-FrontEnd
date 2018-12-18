@@ -134,6 +134,7 @@ export class FormHelperService {
         if (!form.valid) {
             // determine fields that are invalid
             let fields: string = '';
+            const splitter: string = this.i18nService.instant('LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_SPLITTER');
             const checkControlsForInvalidStatus = (
                 controlsForm: NgForm,
                 prefix: string = '',
@@ -176,7 +177,7 @@ export class FormHelperService {
                                     // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
                                     mustCheckForms.push({
                                         controlsForm: directive.valueAccessor.groupForm,
-                                        prefix: (prefix ? `${prefix} => ` : '') + (
+                                        prefix: (prefix ? `${prefix} ${splitter} ` : '') + (
                                             directive.valueAccessor.componentTitle ? this.i18nService.instant(directive.valueAccessor.componentTitle) : ''
                                         ),
                                         rowInfo: this.i18nService.instant(
@@ -199,7 +200,7 @@ export class FormHelperService {
                                 ''
                         ) + (
                             rowInfo ?
-                                `${rowInfo} => ` :
+                                `${rowInfo} ${splitter} ` :
                                 ''
                         ) +
                         invalidDataRow;
