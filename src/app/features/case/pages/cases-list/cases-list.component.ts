@@ -276,15 +276,18 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             }),
             new VisibleColumnModel({
                 field: 'notACase',
-                label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE'
+                label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'deleted',
-                label: 'LNG_CASE_FIELD_LABEL_DELETED'
+                label: 'LNG_CASE_FIELD_LABEL_DELETED',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'wasContact',
-                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+                label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+                visible: false
             }),
             new VisibleColumnModel({
                 field: 'actions',
