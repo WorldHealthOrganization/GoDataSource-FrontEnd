@@ -25,6 +25,7 @@
     var icons;
     if (!supportsProperty('fontFeatureSettings')) {
         icons = {
+            'supervisor': '&#xe920;',
             'arrowDropdownCircle': '&#xe91f;',
             'visibilityOf': '&#xe91d;',
             'visibility': '&#xe91e;',

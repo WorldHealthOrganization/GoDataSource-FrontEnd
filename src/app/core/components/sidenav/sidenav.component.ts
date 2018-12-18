@@ -61,7 +61,7 @@ export class SidenavComponent implements OnInit {
         new NavItem(
             'admin-group',
             'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL',
-            'settings',
+            'supervisor',
             [],
             [
                 new ChildNavItem(

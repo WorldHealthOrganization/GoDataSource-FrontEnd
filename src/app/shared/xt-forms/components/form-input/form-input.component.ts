@@ -61,6 +61,7 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
     @Input() displayFilterIcon: boolean = false;
 
     @Input() maxlength: number;
+    @Input() minlength: number;
 
     @Input() step: number = 1;
     @Input() min: number;

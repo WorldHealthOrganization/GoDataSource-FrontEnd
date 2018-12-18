@@ -98,6 +98,8 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
                 .subscribe((modifiedUser: UserModel) => {
                     // update model
                     this.user = modifiedUser;
+                    // reset password confirm model
+                    this.passwordConfirmModel = undefined;
 
                     // reload user auth data in case he's changing the active outbreak
                     this.authDataService
