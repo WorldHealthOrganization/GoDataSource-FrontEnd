@@ -286,7 +286,8 @@ export class DialogService {
                             _.merge(
                                 answer.inputValue.value,
                                 data.extraAPIData
-                            )
+                            ),
+                            qb
                         ) :
                         this.importExportDataService.exportData(
                             data.url,

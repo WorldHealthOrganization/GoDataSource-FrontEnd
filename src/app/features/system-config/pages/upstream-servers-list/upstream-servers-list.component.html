@@ -4,27 +4,11 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
-                <!-- Sync logs -->
                 <button
-                    mat-raised-button
-                    color="accent"
-                    [routerLink]="['/system-config', 'system-sync-logs']">
-                    {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON' | translate }}
-                </button>
-
-                <!-- Sync general settings -->
-                <button
-                    mat-raised-button
-                    color="accent"
-                    (click)="configureSyncSettings()">
-                    {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON' | translate }}
-                </button>
-
-                <!-- Create upstream server -->
-                <button
-                    mat-raised-button
-                    color="accent"
-                    [routerLink]="['/system-config', 'system-upstream-sync', 'create']">
+                    *ngIf="hasSysConfigWriteAccess()"
+                    mat-raised-button color="accent"
+                    [routerLink]="'./create'"
+                >
                     {{'LNG_COMMON_BUTTON_ADD' | translate}} <span class="xt-icon">addCircle</span>
                 </button>
             </div>
@@ -170,13 +154,13 @@
                             <button
                                 mat-menu-item
                                 (click)="startSync(item)">
-                                {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_START_SYNC' | translate }}
+                                {{ 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC' | translate }}
                             </button>
 
                             <button
                                 mat-menu-item
                                 (click)="toggleSyncEnableFlag(item)">
-                                {{ (item.syncEnabled ? 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DISABLE_SYNC' : 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_ENABLE_SYNC') | translate }}
+                                {{ (item.syncEnabled ? 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC' : 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC') | translate }}
                             </button>
 
                             <button

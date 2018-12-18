@@ -27,6 +27,7 @@ export class LoadingDialogComponent {
         autoFocus: false,
         closeOnNavigation: false,
         disableClose: true,
-        hasBackdrop: true
+        hasBackdrop: true,
+        panelClass: 'dialog-loading-progress'
     };
 }

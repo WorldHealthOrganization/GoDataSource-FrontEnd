@@ -94,8 +94,8 @@
                             <app-form-input
                                 name="visualId"
                                 [(ngModel)]="caseData.visualId"
-                                [placeholder]="'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID' | translate"
-                                tooltip="LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID_DESCRIPTION"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
                                 [tooltipTranslateData]="visualIDTranslateData"
                                 [maxlength]="selectedOutbreak?.caseIdMask?.length"
                                 [disabled]="viewOnly"
@@ -137,8 +137,7 @@
                                 [maxDate]="serverToday"
                                 app-date-validator
                                 [dateSameOrBefore]="[
-                                    serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                    serverToday
                                 ]">
                             </app-form-datepicker>
 
@@ -222,9 +221,10 @@
                                 [disabled]="viewOnly"
                                 [maxDate]="serverToday"
                                 app-date-validator
+                                required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate]
+                                    'dateDeceased'
                                 ]"
                                 [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
                             </app-form-datepicker>
@@ -258,8 +258,8 @@
                                 app-date-validator
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    [caseData.dateDeceased, 'LNG_CASE_FIELD_LABEL_DATE_DECEASED' | translate],
-                                    [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
+                                    'dateDeceased',
+                                    'dateOfOnset'
                                 ]">
                             </app-form-datepicker>
                         </div>
@@ -271,7 +271,7 @@
                 <mat-card class="page-section">
                     <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                         <app-form-select
-                            name="outcome"
+                            name="outcomeId"
                             [(ngModel)]="caseData.outcomeId"
                             [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
                             tooltip="LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION"
@@ -321,10 +321,9 @@
                                 app-date-validator
                                 [dateSameOrBefore]="serverToday"
                                 [dateSameOrAfter]="[
-                                        [caseData.dateOfReporting, 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING' | translate],
-                                        [caseData.dateOfInfection, 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION' | translate],
-                                        [caseData.dateOfOnset, 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET' | translate]
-                                    ]">
+                                    'dateOfInfection',
+                                    'dateOfOnset'
+                                ]">
                             </app-form-datepicker>
                         </div>
 

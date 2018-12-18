@@ -111,10 +111,13 @@ export class LabResultDataService {
      * @param {string} caseId
      * @param {string} labResultId
      * @param labResultData
-     * @returns {Observable<any>}
+     * @returns {Observable<LabResultModel>}
      */
-    modifyLabResult(outbreakId: string, caseId: string, labResultId: string, labResultData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`, labResultData);
+    modifyLabResult(outbreakId: string, caseId: string, labResultId: string, labResultData): Observable<LabResultModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/cases/${caseId}/lab-results/${labResultId}`, labResultData),
+            LabResultModel
+        );
     }
 
     /**

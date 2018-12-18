@@ -17,6 +17,11 @@ import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-chan
 import { Moment } from 'moment';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
+import { EntityModel } from '../../../../core/models/entity.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-create-case',
@@ -56,7 +61,9 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private genericDataService: GenericDataService
+        private genericDataService: GenericDataService,
+        private dialogService: DialogService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -107,6 +114,10 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             });
     }
 
+    /**
+     * Create new Case
+     * @param stepForms
+     */
     createNewCase(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
@@ -123,20 +134,86 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
-            // add the new Case
+            // check for duplicates
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.caseDataService
-                .createCase(this.selectedOutbreak.id, dirtyFields)
+                .findDuplicates(this.selectedOutbreak.id, dirtyFields)
                 .catch((err) => {
-                    this.snackbarService.showApiError(err);
+                    if (_.includes(_.get(err, 'details.codes.id'), `uniqueness`)) {
+                        this.snackbarService.showError('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+                    } else {
+                        this.snackbarService.showApiError(err);
+                    }
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     return ErrorObservable.create(err);
                 })
-                .subscribe((newCase: CaseModel) => {
-                    this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+                .subscribe((caseDuplicates: EntityDuplicatesModel) => {
+                    // add the new Case
+                    const runCreateCase = () => {
+                        this.caseDataService
+                            .createCase(this.selectedOutbreak.id, dirtyFields)
+                            .catch((err) => {
+                                this.snackbarService.showApiError(err);
 
-                    // navigate to listing page
-                    this.disableDirtyConfirm();
-                    this.router.navigate([`/cases/${newCase.id}/modify`]);
+                                // hide dialog
+                                loadingDialog.close();
+
+                                return ErrorObservable.create(err);
+                            })
+                            .subscribe((newCase: CaseModel) => {
+                                this.snackbarService.showSuccess('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+
+                                // hide dialog
+                                loadingDialog.close();
+
+                                // navigate to listing page
+                                this.disableDirtyConfirm();
+                                this.router.navigate([`/cases/${newCase.id}/modify`]);
+                            });
+                    };
+
+                    // do we have duplicates ?
+                    if (caseDuplicates.duplicates.length > 0) {
+                        // construct list of possible duplicates
+                        const possibleDuplicates: DialogField[] = [];
+                        _.each(caseDuplicates.duplicates, (duplicate: EntityModel, index: number) => {
+                            // case model
+                            const caseData: CaseModel = duplicate.model as CaseModel;
+
+                            // add link
+                            possibleDuplicates.push(new DialogField({
+                                name: 'link',
+                                placeholder: (index + 1 ) + '. ' + EntityModel.getNameWithDOBAge(
+                                    caseData,
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                                ),
+                                fieldType: DialogFieldType.LINK,
+                                routerLink: ['/cases', caseData.id, 'view'],
+                                linkTarget: '_blank'
+                            }));
+                        });
+
+                        // display dialog
+                        this.dialogService.showConfirm(new DialogConfiguration({
+                            message: 'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                            customInput: true,
+                            fieldsList: possibleDuplicates,
+                        }))
+                        .subscribe((answer) => {
+                            if (answer.button === DialogAnswerButton.Yes) {
+                                runCreateCase();
+                            } else {
+                                // hide dialog
+                                loadingDialog.close();
+                            }
+                        });
+                    } else {
+                        runCreateCase();
+                    }
                 });
         }
     }

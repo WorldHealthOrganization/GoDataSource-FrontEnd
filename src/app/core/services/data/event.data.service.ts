@@ -73,10 +73,13 @@ export class EventDataService {
      * @param {string} outbreakId
      * @param {string} eventId
      * @param eventData
-     * @returns {Observable<any>}
+     * @returns {Observable<EventModel>}
      */
-    modifyEvent(outbreakId: string, eventId: string, eventData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData);
+    modifyEvent(outbreakId: string, eventId: string, eventData): Observable<EventModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/events/${eventId}`, eventData),
+            EventModel
+        );
     }
 
     /**

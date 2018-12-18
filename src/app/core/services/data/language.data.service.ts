@@ -124,10 +124,13 @@ export class LanguageDataService {
      * Modify Language
      * @param {string} languageId
      * @param languageData
-     * @returns {Observable<any>}
+     * @returns {Observable<LanguageModel>}
      */
-    modifyLanguage(languageId: string, languageData): Observable<any> {
-        return this.http.put(`languages/${languageId}`, languageData);
+    modifyLanguage(languageId: string, languageData): Observable<LanguageModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`languages/${languageId}`, languageData),
+            LanguageModel
+        );
     }
 }
 

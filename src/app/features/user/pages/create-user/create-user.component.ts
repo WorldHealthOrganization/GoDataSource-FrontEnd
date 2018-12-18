@@ -10,7 +10,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { UserModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { PERMISSION } from '../../../../core/models/permission.model';

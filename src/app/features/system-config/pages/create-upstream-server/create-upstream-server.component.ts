@@ -10,22 +10,23 @@ import { SystemSettingsModel } from '../../../../core/models/system-settings.mod
 import * as _ from 'lodash';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
-    selector: 'app-create-system-upstream-sync',
+    selector: 'app-create-upstream-server',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-system-upstream-sync.component.html',
-    styleUrls: ['./create-system-upstream-sync.component.less']
+    templateUrl: './create-upstream-server.component.html',
+    styleUrls: ['./create-upstream-server.component.less']
 })
-export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateUpstreamServerComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE',
-            '/system-config/system-upstream-sync'
+            'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE',
+            '/system-config/upstream-servers'
         ),
         new BreadcrumbItemModel(
-            'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE',
+            'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TITLE',
             '.',
             true
         )
@@ -40,7 +41,8 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
         private router: Router,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
-        private systemSettingsDataService: SystemSettingsDataService
+        private systemSettingsDataService: SystemSettingsDataService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -73,10 +75,12 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .subscribe((settings: SystemSettingsModel) => {
@@ -90,15 +94,19 @@ export class CreateSystemUpstreamSyncComponent extends ConfirmOnFormChanges impl
                         })
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
+                            loadingDialog.close();
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE');
+
+                            // hide dialog
+                            loadingDialog.close();
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/system-config/system-upstream-sync']);
+                            this.router.navigate(['/system-config/upstream-servers']);
                         });
 
                 });

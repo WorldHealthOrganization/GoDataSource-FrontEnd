@@ -36,40 +36,47 @@ export class LocationBreadcrumbsComponent implements OnInit {
             .subscribe((params: { parentId, locationId }) => {
                 // set parent
                 this.parentId = params.parentId;
+
                 // set location
                 this.locationId = params.locationId;
-                // reset breadcrumbs
-                this.locationBreadcrumbs = [];
 
-                // retrieve parents of this parent and create breadcrumbs if necessary
-                if (this.parentId) {
-                    // retrieve parent locations
-                    this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
-                        this.addBreadcrumbs(locationParents);
-                    });
-                } else {
-                    if (this.locationId) {
-                        this.locationDataService
-                            .getLocation(this.locationId)
-                            .catch((err) => {
-                                this.snackbarService.showError(err.message);
-                                this.router.navigate(['/locations']);
-                                return ErrorObservable.create(err);
-                            })
-                            .subscribe((locationData: {}) => {
-                                // location data
-                                this.locationData = new LocationModel(locationData);
-
-                                // retrieve parent locations
-                                if (this.locationData.parentLocationId) {
-                                    this.locationDataService.getHierarchicalParentListOfLocation(this.locationData.parentLocationId).subscribe((locationParents) => {
-                                        this.addBreadcrumbs(locationParents);
-                                    });
-                                }
-                            });
-                    }
-                }
+                // refresh breadcrumbs
+                this.refreshBreadcrumbs();
             });
+    }
+
+    refreshBreadcrumbs() {
+        // reset breadcrumbs
+        this.locationBreadcrumbs = [];
+
+        // retrieve parents of this parent and create breadcrumbs if necessary
+        if (this.parentId) {
+            // retrieve parent locations
+            this.locationDataService.getHierarchicalParentListOfLocation(this.parentId).subscribe((locationParents) => {
+                this.addBreadcrumbs(locationParents);
+            });
+        } else {
+            if (this.locationId) {
+                this.locationDataService
+                    .getLocation(this.locationId)
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        this.router.navigate(['/locations']);
+                        return ErrorObservable.create(err);
+                    })
+                    .subscribe((locationData) => {
+                        // location data
+                        this.locationData = new LocationModel(locationData);
+
+                        // retrieve parent locations
+                        if (this.locationData.parentLocationId) {
+                            this.locationDataService.getHierarchicalParentListOfLocation(this.locationData.parentLocationId).subscribe((locationParents) => {
+                                this.addBreadcrumbs(locationParents);
+                            });
+                        }
+                    });
+            }
+        }
     }
 
     /**

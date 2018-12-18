@@ -7,6 +7,7 @@ import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
 import { AnswerModel, QuestionModel } from './question.model';
 import { Constants } from './constants';
+import * as moment from 'moment';
 
 /**
  * Model representing a Case, a Contact or an Event
@@ -109,7 +110,10 @@ export class EntityModel {
             path,
             // no need to do something custom
             (value) => value,
-            (value) => new LabelValuePair(value, value)
+            (value) => new LabelValuePair(
+                moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+                value
+            )
         );
     }
 
@@ -150,6 +154,56 @@ export class EntityModel {
     }
 
     /**
+     * Age String
+     * @param age
+     * @param yearsLabel
+     * @param monthsLabel
+     */
+    static getAgeString(
+        age,
+        yearsLabel: string,
+        monthsLabel: string
+    ): string {
+        return !age ?
+            '' : (
+                age.months > 0 ?
+                    `${age.months} ${monthsLabel}` : (
+                        age.years > 0 ?
+                            `${age.years} ${yearsLabel}` :
+                            ''
+                    )
+            );
+    }
+
+    /**
+     * Get name + date or age
+     * @param model
+     */
+    static getNameWithDOBAge(
+        model: CaseModel | ContactModel,
+        yearsLabel: string,
+        monthsLabel: string
+    ) {
+        // initialize
+        let name: string = model.name;
+
+        // add dob / age
+        if (model.dob) {
+            name += ' ( ' + moment(model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ' )';
+        } else if (
+            model.age && (
+                model.age.years > 0 ||
+                model.age.months > 0
+            )
+        ) {
+            name += ' ( ' + EntityModel.getAgeString(model.age, yearsLabel, monthsLabel) + ' )';
+        }
+
+        // finished
+        return name;
+    }
+
+    /**
      * Unique values
      * @param records
      */
@@ -165,23 +219,10 @@ export class EntityModel {
                 '';
         };
 
-        // convert age to string
-        const ageString = (age): string => {
-            return !age ?
-                '' : (
-                    age.months > 0 ?
-                        `${age.months} ${monthsLabel}` : (
-                            age.years > 0 ?
-                                `${age.years} ${yearsLabel}` :
-                                ''
-                        )
-                );
-        };
-
         // convert age dob to string
         const ageDobString = (dob, age): string => {
             dob = dobString(dob);
-            age = ageString(age);
+            age = EntityModel.getAgeString(age, yearsLabel, monthsLabel);
             return `${dob} ${age}`.trim();
         };
 
@@ -258,5 +299,23 @@ export class EntityModel {
             // finished
             return caseData;
         });
+    }
+
+    /**
+     * Generates view link for entity based on type
+     * @param person
+     * @returns {string}
+     */
+    static getPersonLink(person) {
+        let entityTypeLink = '';
+        if (person instanceof CaseModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CASE);
+        } else if (person instanceof ContactModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.CONTACT);
+        } else if (person instanceof EventModel) {
+            entityTypeLink = EntityModel.getLinkForEntityType(EntityType.EVENT);
+        }
+
+        return `/${entityTypeLink}/${person.id}/view`;
     }
 }

@@ -97,10 +97,13 @@ export class ClusterDataService {
      * @param {string} outbreakId
      * @param {string} clusterId
      * @param clusterData
-     * @returns {Observable<any>}
+     * @returns {Observable<ClusterModel>}
      */
-    modifyCluster(outbreakId: string, clusterId: string, clusterData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/clusters/${clusterId}`, clusterData);
+    modifyCluster(outbreakId: string, clusterId: string, clusterData): Observable<ClusterModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/clusters/${clusterId}`, clusterData),
+            ClusterModel
+        );
     }
 
     /**

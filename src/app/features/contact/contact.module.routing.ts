@@ -56,7 +56,6 @@ const routes: Routes = [
             permissions: [PERMISSION.WRITE_CONTACT]
         },
         canDeactivate: [
-            // #TODO it's not working right now because we don't have a form on this page
             PageChangeConfirmationGuard
         ]
     },

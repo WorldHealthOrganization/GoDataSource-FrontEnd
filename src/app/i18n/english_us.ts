@@ -11,6 +11,11 @@ export const EnglishUsLang = {
         'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL': 'Admin',
         'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL': 'My profile',
         'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL': 'System Configuration',
+        'LNG_LAYOUT_MENU_ITEM_UPSTREAM_SERVERS_LABEL': 'Upstream Servers',
+        'LNG_LAYOUT_MENU_ITEM_CLIENT_APPLICATIONS_LABEL': 'Client Applications',
+        'LNG_LAYOUT_MENU_ITEM_DEVICES_LABEL': 'Devices',
+        'LNG_LAYOUT_MENU_ITEM_SYNC_LABEL': 'Sync',
+        'LNG_LAYOUT_MENU_ITEM_BACKUPS_LABEL': 'Backups',
         'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL': 'Audit Logs',
         'LNG_LAYOUT_MENU_ITEM_USERS_LABEL': 'Users',
         'LNG_LAYOUT_MENU_ITEM_ROLES_LABEL': 'Roles',
@@ -48,7 +53,7 @@ export const EnglishUsLang = {
         'LNG_STEPPER_BUTTON_NEXT': 'Next',
         'LNG_STEPPER_BUTTON_BACK': 'Back',
         'LNG_STEPPER_FINAL_STEP_LABEL': 'Done',
-        'LNG_STEPPER_FINAL_STEP_TEXT': 'You are now done',
+        'LNG_STEPPER_FINAL_STEP_TEXT': 'Data entry is now complete. Hit "Create" to finish the process.',
 
         /**
          * Common labels
@@ -385,8 +390,10 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
-        'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID': 'Visual ID',
-        'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID_DESCRIPTION': 'ID should match: {{mask}}',
+        'LNG_CASE_FIELD_LABEL_VISUAL_ID': 'Visual ID',
+        'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION': 'ID should match: {{mask}}',
+        'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
+        'LNG_CASE_FIELD_LABEL_CASE_ID_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
@@ -441,6 +448,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON': 'Create case',
         'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE': 'Case created!',
         'LNG_PAGE_CREATE_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
+        'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG': 'This case might already be in the system ( see possible matches bellow ). Do you still want to create a new case?',
+        'LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID': 'Case ID is not unique!',
 
         /**
          * Modify Case page
@@ -457,6 +466,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_MODIFY_CASE_INVALID_CASE_ID': 'Invalid case ID ( accepted: {{mask}} )',
         'LNG_PAGE_MODIFY_CASE_INVALID_CHILD_DATE_OF_ONSET': 'Parent date of onset ( {{date}} )',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG': 'This case might already be in the system ( see possible matches bellow ). Do you still want to update this case or merge possible matches?',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
+        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE': 'Please select at least one record to merge with',
 
         /**
          * Date onset report list page
@@ -890,6 +902,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON': 'Export Contact Data',
         'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE': 'Export Contact Data',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON': 'Print Daily Contact Follow-up Form',
+        'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE': 'Daily Contact Follow-up Form',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS': 'Export the selected contacts',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER': 'Export dossier for selected contacts',
         'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE': 'Contacts dossier',
@@ -907,6 +921,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE': 'Relationship',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON': 'Create contact',
         'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE': 'Contact created!',
+        'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG': 'This contact might already be in the system ( see possible matches bellow ). Do you still want to create a new contact?',
 
         /**
          * Modify Contact page
@@ -921,6 +936,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT': 'View Movement',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY': 'View Chronology',
         'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS': 'View Follow-ups',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG': 'This contact might already be in the system ( see possible matches bellow ). Do you still want to update this contact or merge possible matches?',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_LABEL_MERGE_WITH': 'Merge with?',
+        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_ACTION_MERGE_AT_LEAST_ONE_ERROR_MESSAGE': 'Please select at least one record to merge with',
 
         /**
          * Bulk Add Contacts page
@@ -1064,10 +1082,9 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS': 'Export the selected follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_BUTTON': 'Print daily Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_TITLE': 'Daily Follow-ups',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON': 'Print daily Follow-ups form',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME': 'Daily Follow-ups form',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON': 'Print Follow-up List',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME': 'Daily Follow-up List',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_NO_DATE_ERROR': 'Please select follow-up date',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
@@ -1120,6 +1137,7 @@ export const EnglishUsLang = {
          */
         'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_PLACE': 'Place',
         'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_CASE': 'Case',
+        'LNG_RANGE_FOLLOW_UP_FIELD_EXPORT_GROUP_BY_RISK': 'Risk',
 
         /**
          * Range Follow-ups list page
@@ -1574,7 +1592,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION': 'Case Investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP': 'Contact Follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS': 'Lab Results',
-        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak modified',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE': 'Outbreak template modified',
 
         /**
          * Form Range Fields
@@ -1739,37 +1757,7 @@ export const EnglishUsLang = {
         'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL': 'Full',
 
         /**
-         * System Config Main page
-         */
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_TITLE': 'System configurations',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_BUTTON': 'Backup data',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE_BUTTON': 'Create sync package',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_UPSTREAM_SERVERS_BUTTON': 'Upstream servers',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_SYNC_CLIENT_APPLICATIONS_BUTTON': 'Client applications',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic backup settings',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE': 'Automatic backup settings',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BUTTON': 'Backup',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON': 'Create Backup & Restore',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON': 'Restore',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE': 'Backup initialized',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Automatic backup settings changed',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_CREATE_BACKUP_DIALOG_FAILED_MESSAGE': 'Backup failed',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_ACTION_RESTORE_BACKUP': 'Restore backup',
-        'LNG_PAGE_MAIN_SYSTEM_CONFIG_EXPORT_SYNC_PACKAGE': 'Download sync package',
-
-        /**
-         * Sync settings fields
-         */
-        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
-        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
-
-        /**
-         * Upstream server fields
+         * Upstream Server fields
          */
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME': 'Name',
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_NAME_DESCRIPTION': '',
@@ -1792,29 +1780,90 @@ export const EnglishUsLang = {
         'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS_CLIENT_SECRET_DESCRIPTION': '',
 
         /**
-         * Sync Upstream Servers List page
+         * System Upstream Servers List page
          */
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_TITLE': 'Upstream servers',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Upstream server deleted!',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_BUTTON': 'Sync settings',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_LOGS_BUTTON': 'Sync logs',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_ENABLE_SYNC': 'Enable sync',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_DISABLE_SYNC': 'Disable sync',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE': 'Sync enabled flag changed',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_ACTION_START_SYNC': 'Start sync',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_SUCCESS_MESSAGE': 'Sync done',
-        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SYNC_SERVERS_SYNC_FAILED_MESSAGE': 'Sync failed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE': 'Upstream servers',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE': 'Upstream server deleted!',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC': 'Enable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC': 'Disable sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_TOGGLE_SYNC_ENABLED_SUCCESS_MESSAGE': 'Sync enabled flag changed',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC': 'Start sync',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_SUCCESS_MESSAGE': 'Sync done',
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_SYNC_FAILED_MESSAGE': 'Sync failed',
 
         /**
-         * Create Upstream Server Page
+         * Create System Upstream Server Page
          */
-        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TITLE': 'Create Upstream Server',
-        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create upstream server',
-        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE': 'Upstream server created',
-        'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TITLE': 'Create Upstream Server',
+        'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create upstream server',
+        'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_SUCCESS_MESSAGE': 'Upstream server created',
+        'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TAB_DETAILS_TITLE': 'Details',
+
+        /**
+         * System Backups page
+         */
+        'LNG_PAGE_SYSTEM_BACKUPS_TITLE': 'System Backups',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_BUTTON': 'Create Backup',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON': 'Automatic Backup settings',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_TITLE': 'Backup data',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_CREATE_BACKUP_BUTTON': 'Create Backup',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON': 'Create Backup and Restore',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON': 'Restore',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE': 'Backup initialized',
+        'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE': 'Backup failed',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE': 'Automatic backup settings',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Automatic backup settings changed',
+        'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP': 'Restore backup',
+        'LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE': 'Backup restored',
+        'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE': 'Backup removed',
+        'LNG_PAGE_SYSTEM_BACKUPS_IMPORT_SYNC_PACKAGE_BUTTON': 'Import sync package',
+        'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE_BUTTON': 'Export sync package',
+        'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE': 'Download sync package',
+
+        /**
+         * Client Application fields
+         */
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME': 'Name',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS': 'Credentials',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID': 'Credentials Client ID',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET': 'Credentials Client Secret',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE': 'Active',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
+        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+
+        /**
+         * System Client Applications List page
+         */
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE': 'Client applications',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Client application deleted!',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE': 'Download Configuration File',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE': 'Download Configuration File',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME': 'Config file',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE': 'Active flag changed',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL': 'Url',
+
+        /**
+         * Create System Client Application Page
+         */
+        'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE': 'Create Client Application',
+        'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
+        'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
+        'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
+        'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
+
+        /**
+         * Sync settings fields
+         */
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC': 'Trigger backup before sync',
+        'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION': '',
 
         /**
          * Sync Logs fields
@@ -1840,44 +1889,41 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR': 'View Error details',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE': 'Remove sync logs',
         'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_DELETE_BUTTON': 'Delete',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_TITLE': 'Sync settings',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON': 'Save',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE': 'Sync settings changed',
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_BUTTON': 'Sync settings',
 
         /**
-         * Client Application fields
+         * Device fields
          */
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME': 'Name',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME_DESCRIPTION': '',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS': 'Credentials',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID': 'Credentials Client ID',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_ID_DESCRIPTION': '',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET': 'Credentials Client Secret',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CLIENT_SECRET_DESCRIPTION': '',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE': 'Active',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE_DESCRIPTION': '',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS': 'Outbreaks',
-        'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_NAME': 'Name',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_NAME_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID': 'Physical Device Id',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION': 'Description',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM': 'Operating System',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER': 'Manufacturer',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL': 'Model',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS': 'Status',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS_DESCRIPTION': '',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN': 'Last Seen',
+        'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN_DESCRIPTION': '',
 
         /**
-         * Sync Client Applications List page
+         * System Devices pages
          */
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE': 'Client applications',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE': 'Client application deleted!',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE': 'Download Configuration File',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE': 'Download Configuration File',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME': 'Config file',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE': 'Active flag changed',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS': 'All outbreaks',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL': 'Url',
-
-        /**
-         * Create Client Application Page
-         */
-        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TITLE': 'Create Client Application',
-        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON': 'Create application client',
-        'LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE': 'Client application created',
-        'LNG_PAGE_CREATE_CLIENT_APPLICATION_TAB_DETAILS_TITLE': 'Details',
-        'LNG_PAGE_CREATE_CLIENT_APPLICATION_GENERATE_KEY_BUTTON': 'Generate',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY': 'View History',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE': 'Delete',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE': 'Wipe',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE': 'Devices',
+        'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE': 'Modify {{name}}',
+        'LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE': 'Device updated',
+        'LNG_PAGE_VIEW_SYSTEM_DEVICE_HISTORY_TITLE': 'Device Wipe History',
 
         /**
          * Audit Logs fields
@@ -2085,6 +2131,17 @@ export const EnglishUsLang = {
         'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE': 'Columns to display',
         'LNG_SIDE_COLUMNS_APPLY_FILTERS_BUTTON': 'Apply',
         'LNG_SIDE_COLUMNS_ERROR_NO_COLUMN_SELECTED': 'Please select at least one column',
+
+        /**
+         * Global Search
+         */
+        'LNG_GLOBAL_ENTITY_SEARCH_TITLE': 'Global Entity Search',
+        'LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL': 'Entity Identifier',
+        'LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION': '',
+        'LNG_GLOBAL_ENTITY_SEARCH_BUTTON': 'Search',
+        'LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE': 'No entity matched!',
+
+
         /**
          * Location auto-complete search
          */
@@ -2121,7 +2178,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid response received from server',
         'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_HEADERS': 'We couldn\'t detect any header columns',
         'LNG_PAGE_IMPORT_DATA_ERROR_SOME_RECORDS_NOT_IMPORTED': 'Some of the records weren\'t imported',
-        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED': 'Failed to import record {{recordNo}} because of: {{fields}}',
+        'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_GENERAL': 'Failed to import record {{recordNo}}: {{message}}',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_NOT_IMPORTED_DUPLICATE': 'Failed to import record {{recordNo}} because it is a duplicate',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_INVALID_VISUAL_ID_MASK': 'Failed to import record {{recordNo}} because of outbreak invalid case id mask',
         'LNG_PAGE_IMPORT_DATA_ERROR_RECORD_ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE': 'Failed to import record {{recordNo}} because address must have a place of residence',

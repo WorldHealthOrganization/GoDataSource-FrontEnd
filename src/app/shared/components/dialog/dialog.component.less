@@ -1,16 +1,32 @@
 @import '~styles/common';
 
-app-dialog {
-    .mat-dialog-container {
-        padding: 24px 9px 9px 24px;
-        // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
-        max-height: 95vh !important;
-    }
+.mat-dialog-container {
+    padding: 24px 9px 9px 24px;
+    // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
+    max-height: 95vh !important;
+}
 
+app-dialog {
     .dialog-main {
         font-family: @font-roboto;
         font-size: 14px;
         color: #8e8e8e;
+
+        a {
+            color: #0071e1;
+            margin: 3px;
+            font-weight: bold;
+            text-decoration: none;
+
+            &:active {
+                color: #0071e1;
+                text-decoration: none;
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
 
         .dialog-main-msg {
             font-size: 20px;

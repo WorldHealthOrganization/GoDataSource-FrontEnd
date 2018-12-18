@@ -11,6 +11,7 @@ import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-c
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import * as moment from 'moment';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 
 @Injectable()
 export class CaseDataService {
@@ -65,6 +66,26 @@ export class CaseDataService {
     }
 
     /**
+     * Find case duplicates
+     * @param outbreakId
+     * @param caseData
+     */
+    findDuplicates(
+        outbreakId: string,
+        caseData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/cases/duplicates/find?filter=${filter}`,
+                caseData
+            ),
+            EntityDuplicatesModel
+        );
+    }
+
+    /**
      * Add a new Case for an Outbreak
      * @param {string} outbreakId
      * @param caseData
@@ -79,10 +100,13 @@ export class CaseDataService {
      * @param {string} outbreakId
      * @param {string} caseId
      * @param caseData
-     * @returns {Observable<any>}
+     * @returns {Observable<CaseModel>}
      */
-    modifyCase(outbreakId: string, caseId: string, caseData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData);
+    modifyCase(outbreakId: string, caseId: string, caseData): Observable<CaseModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData),
+            CaseModel
+        );
     }
 
     /**

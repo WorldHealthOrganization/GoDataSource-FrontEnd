@@ -10,7 +10,7 @@
         <!-- Details step -->
         <mat-step [stepControl]="detailsForm">
             <form #detailsForm="ngForm">
-                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_TAB_DETAILS_TITLE'| translate}}</ng-template>
+                <ng-template matStepLabel>{{'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TAB_DETAILS_TITLE'| translate}}</ng-template>
 
                 <!-- Details section -->
                 <mat-card class="page-section">
@@ -125,7 +125,7 @@
                 <button
                     type="button" mat-raised-button color="accent"
                     (click)="createNewUpstreamServer([detailsForm])">
-                    {{'LNG_PAGE_CREATE_UPSTREAM_SYNC_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
+                    {{'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_ACTION_CREATE_UPSTREAM_SERVER_BUTTON' | translate}}
                 </button>
             </div>
         </mat-step>

@@ -50,15 +50,10 @@ export class ImportContactDataComponent implements OnInit {
 
     requiredDestinationFields = [
         'firstName',
-        'gender',
         'dateOfReporting',
         'relationship.persons[].id',
         'relationship.contactDate',
-        'relationship.contactDateEstimated',
-        'relationship.certaintyLevelId',
-        'relationship.exposureTypeId',
-        'relationship.exposureFrequencyId',
-        'relationship.exposureDurationId'
+        'relationship.certaintyLevelId'
     ];
 
     /**

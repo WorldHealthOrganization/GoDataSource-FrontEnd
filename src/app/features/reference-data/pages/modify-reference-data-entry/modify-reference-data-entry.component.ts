@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -17,6 +17,7 @@ import { IconModel } from '../../../../core/models/icon.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
 import 'rxjs/add/operator/switchMap';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-reference-data-entry',
@@ -25,7 +26,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
     styleUrls: ['./modify-reference-data-entry.component.less']
 })
 export class ModifyReferenceDataEntryComponent extends ViewModifyComponent implements OnInit {
-
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     categoryId: string;
@@ -41,14 +41,14 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
     changeIcon: boolean = false;
 
     constructor(
-        private router: Router,
         protected route: ActivatedRoute,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
         private iconDataService: IconDataService,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private dialogService: DialogService
     ) {
         super(route);
     }
@@ -86,24 +86,39 @@ export class ModifyReferenceDataEntryComponent extends ViewModifyComponent imple
         }
 
         // get selected outbreak
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.referenceDataDataService
             .modifyEntry(this.entryId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .switchMap((modifiedReferenceDataEntry) => {
                 // re-load language tokens
                 return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showError(err.message);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
                     .map(() => modifiedReferenceDataEntry);
             })
             .subscribe((modifiedReferenceDataEntry) => {
+                // update model
+                this.entry = modifiedReferenceDataEntry;
+
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE');
 
-                this.entry = new ReferenceDataEntryModel(modifiedReferenceDataEntry);
-
-                // update breadcrumbs
+                // update breadcrumb
                 this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

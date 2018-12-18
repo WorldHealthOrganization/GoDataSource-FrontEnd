@@ -322,7 +322,7 @@
                         <button *ngIf="!item.deleted"
                                 mat-menu-item
                                 [routerLink]="['/cases', item.personId, 'lab-results', item.id, 'view']"
-                                [queryParams]="{fromLabResultsList: true}">
+                                [queryParams]="{ fromLabResultsList: true }">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
 
@@ -330,7 +330,7 @@
                             <button *ngIf="hasLabResultWriteAccess() && !item.deleted"
                                     mat-menu-item
                                     [routerLink]="['/cases', item.personId, 'lab-results', item.id, 'modify']"
-                                    [queryParams]="{fromLabResultsList: true}">
+                                    [queryParams]="{ fromLabResultsList: true }">
                                 {{'LNG_PAGE_ACTION_MODIFY' | translate}}
                             </button>
 

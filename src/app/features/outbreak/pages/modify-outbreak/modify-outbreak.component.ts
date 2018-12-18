@@ -19,6 +19,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-modify-outbreak',
@@ -50,7 +51,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         private snackbarService: SnackbarService,
         private i18nService: I18nService,
         private formHelper: FormHelperService,
-        private authDataService: AuthDataService
+        private authDataService: AuthDataService,
+        private dialogService: DialogService
     ) {
         super(route);
 
@@ -129,23 +131,39 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         this.cleanQuestionnaireNewFlag(dirtyFields);
 
         // modify the outbreak
+        const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
             .modifyOutbreak(this.outbreakId, dirtyFields)
             .catch((err) => {
                 this.snackbarService.showError(err.message);
+                loadingDialog.close();
                 return ErrorObservable.create(err);
             })
             .switchMap((modifiedOutbreak) => {
                 // update language tokens to get the translation of submitted questions and answers
                 return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+                        loadingDialog.close();
+                        return ErrorObservable.create(err);
+                    })
                     .map(() => modifiedOutbreak);
             })
             .subscribe((modifiedOutbreak) => {
-                this.outbreak = new OutbreakModel(modifiedOutbreak);
+                // update model
+                this.outbreak = modifiedOutbreak;
 
+                // mark form as pristine
+                form.form.markAsPristine();
+
+                // display message
                 this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
-                // update breadcrumbs
+
+                // update breadcrumb
                 this.createBreadcrumbs();
+
+                // hide dialog
+                loadingDialog.close();
             });
     }
 

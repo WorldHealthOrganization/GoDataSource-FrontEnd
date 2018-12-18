@@ -9,6 +9,7 @@ import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { EntityModel } from '../../models/entity.model';
 import { EntityType } from '../../models/entity-type';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 
 @Injectable()
 export class ContactDataService {
@@ -99,14 +100,37 @@ export class ContactDataService {
     }
 
     /**
+     * Find contact duplicates
+     * @param outbreakId
+     * @param contactData
+     */
+    findDuplicates(
+        outbreakId: string,
+        contactData: any,
+        queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    ): Observable<EntityDuplicatesModel> {
+        const filter = queryBuilder.buildQuery();
+        return this.modelHelper.mapObservableToModel(
+            this.http.post(
+                `outbreaks/${outbreakId}/contacts/duplicates/find?filter=${filter}`,
+                contactData
+            ),
+            EntityDuplicatesModel
+        );
+    }
+
+    /**
      * Modify an existing Contact of an Outbreak
      * @param {string} outbreakId
      * @param {string} contactId
      * @param contactData
-     * @returns {Observable<any>}
+     * @returns {Observable<ContactModel>}
      */
-    modifyContact(outbreakId: string, contactId: string, contactData): Observable<any> {
-        return this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData);
+    modifyContact(outbreakId: string, contactId: string, contactData): Observable<ContactModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.put(`outbreaks/${outbreakId}/contacts/${contactId}`, contactData),
+            ContactModel
+        );
     }
 
     /**

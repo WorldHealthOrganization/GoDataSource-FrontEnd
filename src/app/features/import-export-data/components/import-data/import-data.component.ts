@@ -245,8 +245,10 @@ export class ImportDataComponent implements OnInit {
         details: {
             failed: {
                 recordNo: number,
+                message: string,
                 error: {
                     code: number,
+                    message: string,
                     details: {
                         codes: {
                             [property: string]: any

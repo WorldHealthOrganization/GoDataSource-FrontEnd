@@ -8,11 +8,12 @@ import * as _ from 'lodash';
     styleUrls: ['./number-of-items-label.component.less']
 })
 export class NumberOfItemsLabelComponent {
+
     @Input() value: number;
 
     get translationData() {
-        let numericValue = Number(this.value);
-        numericValue = !_.isNaN(this.value) ? this.value : 0;
+        let numericValue = Number(this.value || 0);
+        numericValue = !_.isNaN(numericValue) ? numericValue : 0;
 
         return {
             value: numericValue

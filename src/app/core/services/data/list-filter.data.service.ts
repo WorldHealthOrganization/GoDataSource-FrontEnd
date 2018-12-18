@@ -13,7 +13,6 @@ import * as _ from 'lodash';
 import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { Moment } from 'moment';
 import { ContactDataService } from './contact.data.service';
-import { EntityType } from '../../models/entity-type';
 
 @Injectable()
 export class ListFilterDataService {
@@ -270,20 +269,17 @@ export class ListFilterDataService {
             // add global filters
             const qb = new RequestQueryBuilder();
 
-            // no date provided, then wqe need to set teh default one
-            // filter by day - default - yesterday
-            if (!date) {
-                date = moment().add(-1, 'days');
-            }
-
-            // date condition
-            qb.filter.byEquality(
-                'date',
-                moment(date).format('YYYY-MM-DD')
-            );
-
             // change the way we build query
             qb.filter.firstLevelConditions();
+
+            // date
+            if (date) {
+                qb.filter.where({
+                    dateOfReporting: {
+                        lte: moment(date).toISOString()
+                    }
+                });
+            }
 
             // location
             if (location) {

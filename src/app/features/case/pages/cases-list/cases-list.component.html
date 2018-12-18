@@ -109,29 +109,21 @@
 
     <app-counted-items-list
         *ngIf="!appliedListFilter"
+        fxFlex
         [items]="countedCasesGroupedByClassification$ | async"
         (optionChanged)="filterBySelectField('id', $event.ids, null)">
     </app-counted-items-list>
 </div>
 
 <mat-card class="page-section page-content">
-    <div class="top-section-wrapper">
-        <!--List Color Legend-->
-        <div>
-            <app-color-list-legend
-                [referenceDataCategory]="ReferenceDataCategory.CASE_CLASSIFICATION">
-            </app-color-list-legend>
-        </div>
-
-        <div class="reset-filters">
-            <!-- Reset Filters -->
-            <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
-            <button type="button" mat-raised-button (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div>
+    <div class="reset-filters">
+        <!-- Reset Filters -->
+        <button type="button" mat-raised-button (click)="resetFiltersToSideFilters()">
+            {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
+        </button>
+        <button type="button" mat-raised-button (click)="needsRefreshList(true)">
+            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+        </button>
     </div>
 
     <mat-table #table [dataSource]="casesList$ | async" matSort (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
@@ -245,6 +237,29 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Case Visual Id -->
+        <ng-container matColumnDef="visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column" >
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_VISUAL_ID' | translate}}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="visualId"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                            (optionChanged)="filterByTextField('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.visualId }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Classification -->
         <ng-container matColumnDef="classification">
             <mat-header-cell *matHeaderCellDef>
@@ -271,6 +286,31 @@
                     [category]="ReferenceDataCategory.CASE_CLASSIFICATION"
                     [value]="item.classification">
                 </app-reference-data-label>
+            </mat-cell>
+        </ng-container>
+
+        <!-- Outcome -->
+        <ng-container matColumnDef="outcome">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{'LNG_CASE_FIELD_LABEL_OUTCOME' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="outcomeFilter"
+                            [ngModel]="false"
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="outcomeList$  | async"
+                            (optionChanged)="filterBySelectField('outcomeId', $event)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item" [style.color]="getCaseClassificationColor(item)" [class.record-alert]="item.alerted">
+                {{ item.outcomeId | translate }}
             </mat-cell>
         </ng-container>
 

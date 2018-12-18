@@ -21,20 +21,20 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { PERMISSION } from '../../../../core/models/permission.model';
 
 @Component({
-    selector: 'app-create-system-upstream-sync',
+    selector: 'app-create-client-application',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './create-system-client-application.component.html',
-    styleUrls: ['./create-system-client-application.component.less']
+    templateUrl: './create-client-application.component.html',
+    styleUrls: ['./create-client-application.component.less']
 })
-export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges implements OnInit {
+export class CreateClientApplicationComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumb header
     public breadcrumbs: BreadcrumbItemModel[] = [
         new BreadcrumbItemModel(
             'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE',
-            '/system-config/system-client-applications'
+            '/system-config/client-applications'
         ),
         new BreadcrumbItemModel(
-            'LNG_PAGE_CREATE_CLIENT_APPLICATION_TITLE',
+            'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE',
             '.',
             true
         )
@@ -82,10 +82,12 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
             this.formHelper.isFormsSetValid(stepForms) &&
             !_.isEmpty(dirtyFields)
         ) {
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.systemSettingsDataService
                 .getSystemSettings()
                 .catch((err) => {
                     this.snackbarService.showError(err.message);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .subscribe((settings: SystemSettingsModel) => {
@@ -99,15 +101,19 @@ export class CreateSystemClientApplicationComponent extends ConfirmOnFormChanges
                         })
                         .catch((err) => {
                             this.snackbarService.showError(err.message);
+                            loadingDialog.close();
                             return ErrorObservable.create(err);
                         })
                         .subscribe(() => {
                             // display success message
-                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+                            this.snackbarService.showSuccess('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+
+                            // hide dialog
+                            loadingDialog.close();
 
                             // navigate to listing page
                             this.disableDirtyConfirm();
-                            this.router.navigate(['/system-config/system-client-applications']);
+                            this.router.navigate(['/system-config/client-applications']);
                         });
 
                 });

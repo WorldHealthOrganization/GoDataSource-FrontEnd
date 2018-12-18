@@ -13,6 +13,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import 'rxjs/add/operator/switchMap';
+import { DialogService } from '../../../../core/services/helper/dialog.service';
 
 @Component({
     selector: 'app-create-help-item',
@@ -37,7 +38,8 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
         private formHelper: FormHelperService,
         private i18nService: I18nService,
         private route: ActivatedRoute,
-        private cacheService: CacheService
+        private cacheService: CacheService,
+        private dialogService: DialogService
     ) {
         super();
     }
@@ -94,15 +96,22 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
             !_.isEmpty(dirtyFields)
         ) {
             // add the new category
+            const loadingDialog = this.dialogService.showLoadingDialog();
             this.helpDataService
                 .createHelpItem(this.categoryId, dirtyFields)
                 .catch((err) => {
                     this.snackbarService.showApiError(err);
+                    loadingDialog.close();
                     return ErrorObservable.create(err);
                 })
                 .switchMap((newHelpItem) => {
                     // update language tokens to get the translation of name and description
                     return this.i18nService.loadUserLanguage()
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            loadingDialog.close();
+                            return ErrorObservable.create(err);
+                        })
                         .map(() => newHelpItem);
                 })
                 .subscribe((newHelpItem) => {
@@ -110,6 +119,9 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
 
                     // remove help items from cache
                     this.cacheService.remove(CacheKey.HELP_ITEMS);
+
+                    // hide dialog
+                    loadingDialog.close();
 
                     // navigate to new item's modify page
                     this.disableDirtyConfirm();

@@ -18,40 +18,44 @@
             <ng-content select="[dynamic-section]"></ng-content>
         </mat-list-item>
 
-        <ng-container *ngIf="showSelectedOutbreakDropdown()">
+        <div class="topnav-static-actions" fxLayout="row">
+            <ng-container *ngIf="showSelectedOutbreakDropdown()">
+                <mat-divider [vertical]="true"></mat-divider>
+
+                <mat-list-item>
+                    <app-form-select
+                        name="activeOutbreak"
+                        [(ngModel)]="selectedOutbreak.id"
+                        [placeholder]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
+                        [disabled]="!activeOutbreakEditable"
+                        [options]="outbreaksList"
+                        optionLabelKey="name"
+                        optionValueKey="id"
+                        optionTooltipKey="description"
+                        (optionChanged)="selectOutbreak($event)"
+                        [clearable]="false">
+                    </app-form-select>
+                </mat-list-item>
+            </ng-container>
+
             <mat-divider [vertical]="true"></mat-divider>
 
             <mat-list-item>
                 <app-form-select
-                    name="activeOutbreak"
-                    [(ngModel)]="selectedOutbreak.id"
-                    [placeholder]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
-                    [disabled]="!activeOutbreakEditable"
-                    [options]="outbreaksList"
+                    name="language"
+                    [(ngModel)]="selectedLanguageId"
+                    [placeholder]="'LNG_LAYOUT_LANGUAGE_LABEL' | translate"
+                    [options]="languagesList$ | async"
                     optionLabelKey="name"
                     optionValueKey="id"
-                    optionTooltipKey="description"
-                    (optionChanged)="selectOutbreak($event)"
+                    (optionChanged)="selectLanguage($event)"
                     [clearable]="false">
                 </app-form-select>
             </mat-list-item>
-        </ng-container>
-
-        <mat-divider [vertical]="true"></mat-divider>
-
-        <mat-list-item>
-            <app-form-select
-                name="language"
-                [(ngModel)]="selectedLanguageId"
-                [placeholder]="'LNG_LAYOUT_LANGUAGE_LABEL' | translate"
-                [options]="languagesList$ | async"
-                optionLabelKey="name"
-                optionValueKey="id"
-                (optionChanged)="selectLanguage($event)"
-                [clearable]="false">
-            </app-form-select>
-        </mat-list-item>
+        </div>
 
     </mat-list>
 
 </mat-toolbar>
+
+<div class="topnav-static-actions-placeholder"></div>
