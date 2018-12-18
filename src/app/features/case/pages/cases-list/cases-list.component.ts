@@ -144,6 +144,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     }
 
     ngOnInit() {
+        // #TODO should move this logic in list-component?
+        this.resetFiltersAddDefault();
+
         // add page title
         this.casesDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE') +
             ' - ' +
@@ -221,6 +224,11 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // initialize Side Table Columns
         this.initializeSideTableColumns();
+    }
+
+    resetFiltersAddDefault() {
+        // by default do not display cases classified as Not a Case
+        this.filterByNotACaseField(false);
     }
 
     ngOnDestroy() {
