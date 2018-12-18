@@ -18,6 +18,10 @@
     .ng-select-container {
         min-height: 45.5px;
 
+        @media @ie11-only {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+        }
+
         @angular-material-line-height: 1.125;
         .ng-value-container {
             line-height: @angular-material-line-height !important;

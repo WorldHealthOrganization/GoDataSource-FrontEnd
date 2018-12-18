@@ -1,3 +1,5 @@
+@import '~styles/common';
+
 /* Angular Material overrides */
 @menu-item-height: 30px;
 .dashlet-menu-item {
@@ -5,8 +7,7 @@
     line-height: @menu-item-height !important;
 }
 
-@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
-    /* IE10+ specific styles go here */
+@media @ie11-only {
     .ie-header-class {
         app-form-input {
             min-width: 40px !important;
