@@ -3,12 +3,14 @@ import 'rxjs/add/operator/map';
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { SnackbarService } from './snackbar.service';
+import { I18nService } from './i18n.service';
 
 @Injectable()
 export class FormHelperService {
 
     constructor(
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {}
 
     /**
@@ -130,7 +132,36 @@ export class FormHelperService {
     ) {
         // display invalid error if form is invalid
         if (!form.valid) {
-            this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+            // determine fields that are invalid
+            let fields: string = '';
+            _.each(form.controls, (ctrl: FormControl, name: string) => {
+                // invalid controls
+                if (
+                    ctrl.invalid &&
+                    !_.isEmpty(name)
+                ) {
+                    // determine directive
+                    const directive = _.find((form as any)._directives, { name: name });
+                    if (
+                        directive &&
+                        directive.valueAccessor &&
+                        directive.valueAccessor.placeholder
+                    ) {
+                        // most of the time this is already translated, but we need to make sure
+                        fields += (_.isEmpty(fields) ? '' : ', ') +
+                            this.i18nService.instant(directive.valueAccessor.placeholder);
+                    }
+                }
+            });
+
+            // display error message
+            this.snackbarService.showError(
+                _.isEmpty(fields) ? 'LNG_FORM_ERROR_FORM_INVALID' : 'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS', {
+                    fields: fields
+                }
+            );
+
+            // finished
             return false;
         }
 
