@@ -136,12 +136,14 @@ export class FormHelperService {
             let fields: string = '';
             const checkControlsForInvalidStatus = (
                 controlsForm: NgForm,
+                prefix: string = '',
                 rowInfo: string = ''
             ) => {
                 // check controls validity
                 let invalidDataRow: string = '';
                 const mustCheckForms: {
                     controlsForm: NgForm,
+                    prefix: string,
                     rowInfo: string
                 }[] = [];
                 _.each(controlsForm.controls, (ctrl: AbstractControl, name: string) => {
@@ -174,6 +176,7 @@ export class FormHelperService {
                                     // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
                                     mustCheckForms.push({
                                         controlsForm: directive.valueAccessor.groupForm,
+                                        prefix: directive.valueAccessor.componentTitle ? this.i18nService.instant(directive.valueAccessor.componentTitle) : '',
                                         rowInfo: this.i18nService.instant(
                                             'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW', {
                                                 path: rowIndexes
@@ -189,19 +192,26 @@ export class FormHelperService {
                 // add invalid values to fields
                 if (!_.isEmpty(invalidDataRow)) {
                     fields += '<br />- ' + (
-                        rowInfo ?
-                            `${rowInfo} => ` :
-                            ''
-                    ) + invalidDataRow;
+                            prefix ?
+                                `${prefix} ` :
+                                ''
+                        ) + (
+                            rowInfo ?
+                                `${rowInfo} => ` :
+                                ''
+                        ) +
+                        invalidDataRow;
                 }
 
                 // validate remaining form children
                 _.each(mustCheckForms, (data: {
                     controlsForm: NgForm,
+                    prefix: string,
                     rowInfo: string
                 }) => {
                     checkControlsForInvalidStatus(
                         data.controlsForm,
+                        data.prefix,
                         data.rowInfo
                     );
                 });
