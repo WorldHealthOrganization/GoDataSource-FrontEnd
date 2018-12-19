@@ -54,6 +54,7 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
     casesList$: Observable<CaseModel[]>;
     casesListCount$: Observable<any>;
 
+    caseClassifications$: Observable<any>;
     // cases grouped by classification
     countedCasesGroupedByClassification$: Observable<any>;
 
@@ -157,13 +158,13 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
-        const caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
-        this.caseClassificationsList$ = caseClassifications$.map((data: ReferenceDataCategoryModel) => {
+        this.caseClassifications$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION).share();
+        this.caseClassificationsList$ = this.caseClassifications$.map((data: ReferenceDataCategoryModel) => {
             return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
                 new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
             );
         });
-        caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
+        this.caseClassifications$.subscribe((caseClassificationCategory: ReferenceDataCategoryModel) => {
             this.caseClassificationsListMap = _.transform(
                 caseClassificationCategory.entries,
                 (result, entry: ReferenceDataEntryModel) => {
@@ -193,24 +194,8 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
 
                     this.clustersListAsLabelValuePair$ = this.clusterDataService.getClusterListAsLabelValue(this.selectedOutbreak.id);
 
-                    this.countedCasesGroupedByClassification$ = caseClassifications$
-                        .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
-                            return this.caseDataService
-                                .getCasesGroupedByClassification(this.selectedOutbreak.id)
-                                .map((data) => {
-                                    return _.map(data ? data.classification : [], (item, itemId) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
-                                        return new CountedItemsListItem(
-                                            item.count,
-                                            itemId,
-                                            item.caseIDs,
-                                            refItem ?
-                                                refItem.getColorCode() :
-                                                Constants.DEFAULT_COLOR_REF_DATA
-                                        );
-                                    });
-                                });
-                        });
+                    // get cases grouped by classification
+                    this.getCasesGroupedByClassification();
 
                     // initialize side filters
                     this.initializeSideFilters();
@@ -487,6 +472,9 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             this.casesList$ = this.caseDataService
                 .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
                 .map((cases: CaseModel[]) => {
+                    // refresh badges list with applied filter
+                    this.getCasesGroupedByClassification();
+
                     return EntityModel.determineAlertness(
                         this.selectedOutbreak.caseInvestigationTemplate,
                         cases
@@ -505,6 +493,30 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
             countQueryBuilder.paginator.clear();
             this.casesListCount$ = this.caseDataService.getCasesCount(this.selectedOutbreak.id, countQueryBuilder).share();
         }
+    }
+
+    /**
+     * Get cases grouped by classification with needed filter
+     */
+    getCasesGroupedByClassification() {
+        this.countedCasesGroupedByClassification$ = this.caseClassifications$
+            .mergeMap((refClassificationData: ReferenceDataCategoryModel) => {
+                return this.caseDataService
+                    .getCasesGroupedByClassification(this.selectedOutbreak.id, this.queryBuilder)
+                    .map((data) => {
+                        return _.map(data ? data.classification : [], (item, itemId) => {
+                            const refItem: ReferenceDataEntryModel = _.find(refClassificationData.entries, {id: itemId});
+                            return new CountedItemsListItem(
+                                item.count,
+                                itemId,
+                                item.caseIDs,
+                                refItem ?
+                                    refItem.getColorCode() :
+                                    Constants.DEFAULT_COLOR_REF_DATA
+                            );
+                        });
+                    });
+            });
     }
 
     /**
