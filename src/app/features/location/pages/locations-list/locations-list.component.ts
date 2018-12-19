@@ -21,6 +21,8 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
 import { tap } from 'rxjs/operators';
+import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 
 @Component({
     selector: 'app-locations-list',
@@ -59,6 +61,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     loadingDialog: LoadingDialogModel;
 
+    geographicalLevelsList$: Observable<any[]>;
+
     constructor(
         private authDataService: AuthDataService,
         private locationDataService: LocationDataService,
@@ -67,7 +71,8 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         private dialogService: DialogService,
         protected snackbarService: SnackbarService,
         private router: Router,
-        private i18nService: I18nService
+        private i18nService: I18nService,
+        private referenceDataDataService: ReferenceDataDataService
     ) {
         super(
             snackbarService
@@ -83,6 +88,9 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
         // lists
         this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+
+        // geographical level list
+        this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
 
         // reload data
         this.route.params
@@ -127,6 +135,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             'latLng',
             'active',
             'populationDensity',
+            'geographicalLevelId',
             'actions'
         ];
 

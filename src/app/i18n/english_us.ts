@@ -1614,6 +1614,7 @@ export const EnglishUsLang = {
          * Dashboard Page
          */
         'LNG_PAGE_DASHBOARD_TITLE': 'Dashboard',
+        'LNG_PAGE_DASHBOARD_NO_OUTBREAKS_MESSAGE': 'There is no data to be displayed because there are no Outbreaks in the system.',
         'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE': 'Cases KPIs',
         'LNG_PAGE_DASHBOARD_CONTACTS_KPI_TITLE': 'Contacts KPIs',
         'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE': 'Chains of Transmission KPIs',

@@ -85,6 +85,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     selectedOutbreak: OutbreakModel;
 
+    // flag if there aren't any outbreaks in the system
+    noOutbreaksInSystem: boolean = false;
+
     // constants
     ExportDataExtension = ExportDataExtension;
 
@@ -118,6 +121,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.authUser = this.authDataService.getAuthenticatedUser();
 
         this.initializeDashlets();
+
+        // get Outbreaks list to check if there are any in the system
+        this.outbreakDataService.getOutbreaksList()
+            .subscribe((outbreaksList) => {
+                this.noOutbreaksInSystem = outbreaksList.length === 0;
+            });
 
         this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
