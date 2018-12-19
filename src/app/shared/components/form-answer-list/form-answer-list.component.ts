@@ -22,6 +22,8 @@ import * as _ from 'lodash';
 export class FormAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
 
+    @Input() componentTitle: string;
+
     @Input() variableReadOnly: boolean = false;
     @Input() autoSuggestVariable: boolean = false;
 

@@ -171,7 +171,11 @@ export class FormHelperService {
                                     directive.valueAccessor.groupForm.controls
                                 ) {
                                     // determine row indexes
-                                    const rowIndexes = _.map(name.match(/\[\d+\]/g), (v: string) => v.replace(/\[|\]/g, '')).join(' => ');
+                                    const rowIndexes = _.chain(name.match(/\[\d+\]/g))
+                                        .map((v: string) => v.replace(/\[|\]/g, ''))
+                                        .map((v: string) => _.parseInt(v) + 1)
+                                        .value()
+                                        .join(splitter);
 
                                     // determine child fields that are invalid
                                     // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
@@ -200,7 +204,7 @@ export class FormHelperService {
                                 ''
                         ) + (
                             rowInfo ?
-                                `${rowInfo}${splitter}` :
+                                `${rowInfo}${splitter} ` :
                                 ''
                         ) +
                         invalidDataRow;
