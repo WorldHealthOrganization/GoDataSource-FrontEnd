@@ -2,6 +2,30 @@
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+            <div class="topnav-actions">
+
+                <button
+                    *ngIf="!appliedListFilter"
+                    mat-raised-button
+                    color="accent"
+                    [matMenuTriggerFor]="quickActionsMenu">
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}} <span class="xt-icon">arrowDown</span>
+                </button>
+
+                <mat-menu #quickActionsMenu="matMenu">
+                    <ng-container *app-selected-outbreak-is-active>
+                        <ng-container *ngIf="hasLabResultWriteAccess()">
+                            <button
+                                mat-menu-item
+                                [routerLink]="['/import-export-data', 'case-lab-data', 'import']">
+                                {{'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON' | translate}}
+                            </button>
+                        </ng-container>
+                    </ng-container>
+                </mat-menu>
+            </div>
+
         </div>
     </ng-container>
 </app-topnav>
