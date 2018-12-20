@@ -13,6 +13,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { DeviceModel } from '../../../../core/models/device.model';
+import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 
 @Component({
     selector: 'app-system-devices-list',
@@ -136,18 +137,26 @@ export class SystemDevicesComponent extends ListComponent implements OnInit {
       * @param {DeviceModel} device
      */
     deleteDevice(device: DeviceModel) {
-        this.showLoadingDialog();
-        this.deviceDataService
-            .deleteDevice(device.id)
-            .catch((err) => {
-                this.snackbarService.showApiError(err);
-                this.closeLoadingDialog();
-                return ErrorObservable.create(err);
-            })
-            .subscribe( () => {
-               this.needsRefreshList();
-               this.closeLoadingDialog();
+        this.dialogService.showConfirm(`LNG_DIALOG_CONFIRM_DELETE_DEVICE`, device)
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    this.showLoadingDialog();
+                    this.deviceDataService
+                        .deleteDevice(device.id)
+                        .catch((err) => {
+                            this.snackbarService.showApiError(err);
+                            this.closeLoadingDialog();
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe( () => {
+                            this.snackbarService.showSuccess(`LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE`);
+
+                            this.needsRefreshList();
+                            this.closeLoadingDialog();
+                        });
+                }
             });
+
     }
 
     /**
