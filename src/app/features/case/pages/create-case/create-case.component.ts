@@ -122,6 +122,11 @@ export class CreateCaseComponent extends ConfirmOnFormChanges implements OnInit 
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
+        // remove id if empty string since loopback doesn't know how to handle this
+        if (_.isEmpty(dirtyFields.id)) {
+            delete dirtyFields.id;
+        }
+
         // add age & dob information
         if (dirtyFields.ageDob) {
             dirtyFields.age = dirtyFields.ageDob.age;
