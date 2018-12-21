@@ -553,6 +553,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result restored',
+        'LNG_PAGE_LIST_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Case Lab results list page
@@ -560,7 +561,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT': 'Add',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
-        'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Create Case Lab result page
