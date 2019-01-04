@@ -154,13 +154,14 @@
                             </app-form-slide-toggle>
                         </div>
 
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
-                        </app-form-textarea>
-
+                        <div fxLayout="row" fxFlex>
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="caseData.riskReason"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 

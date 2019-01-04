@@ -5,18 +5,19 @@
         <div *ngFor="let daterange of values; let i = index" fxFlex fxLayout="row"
              fxLayoutAlign="start center">
             <mat-card class="page-section" fxFlex fxLayout="row" fxLayoutAlign="space-between center">
-                <app-form-daterange
-                    [name]="name + '[' + i + ']'"
-                    [ngModel]="values[i]"
-                    (changed)="onChange(false)"
-                    [required]="required"
-                    (groupValidated)="validateGroup()"
-                    [disabled]="disabled"
-                    [fromTooltip]="fromTooltip"
-                    [toTooltip]="toTooltip"
-                    [minDate]="minDate">
-                </app-form-daterange>
-
+                <div fxFlex fxLayout="row">
+                    <app-form-daterange
+                        [name]="name + '[' + i + ']'"
+                        [ngModel]="values[i]"
+                        (changed)="onChange(false)"
+                        [required]="required"
+                        (groupValidated)="validateGroup()"
+                        [disabled]="disabled"
+                        [fromTooltip]="fromTooltip"
+                        [toTooltip]="toTooltip"
+                        [minDate]="minDate">
+                    </app-form-daterange>
+                </div>
             </mat-card>
 
             <button *ngIf="!readOnly" type="button" mat-icon-button (click)="delete(i)">
