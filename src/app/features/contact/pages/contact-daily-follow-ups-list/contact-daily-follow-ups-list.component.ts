@@ -106,6 +106,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // subscribers
     outbreakSubscriber: Subscription;
 
+    periodOfFollowup: number;
+
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -215,6 +217,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                             if (this.contactId) {
                                 this.retrieveContactData();
                             }
+
+                            this.periodOfFollowup = selectedOutbreak.periodOfFollowup;
                         }
 
                         // initialize pagination
@@ -387,6 +391,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfFollowUpEnd',
+                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
+            }),
+            new VisibleColumnModel({
+                field: 'dayOfFollowUp',
+                label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
                 field: 'area',
@@ -1076,6 +1088,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 this.filterBySelectField('teamId', data);
             }
         }
+    }
+
+    /**
+     * Calculate the date of the end of follow-up
+     * @param {string} dateOfLastContact
+     * @returns {moment.Moment}
+     */
+    getDateOfEndOfFollowUp(dateOfLastContact: string) {
+        return moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT ).add(this.periodOfFollowup, 'days');
+    }
+
+    /**
+     * return day of follow-up
+     * @param {string} dateOfLastContact
+     * @returns {number}
+     */
+    getDayOfFollowUp(dateOfLastContact: string) {
+        const startDate = moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT );
+        const endDate = moment( this.followUpDateElem.value.toISOString(), Constants.DEFAULT_DATE_DISPLAY_FORMAT );
+        return endDate.diff(startDate, 'days', false);
+
     }
 
     /**
