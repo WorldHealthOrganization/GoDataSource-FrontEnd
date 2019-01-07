@@ -233,7 +233,9 @@
                                 required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased'
+                                    'dateDeceased',
+                                    'dateOfOutcome'
+
                                 ]"
                                 [dateSameOrAfter]="[
                                     'dateOfInfection'
@@ -293,7 +295,10 @@
                             tooltip="LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION"
                             [maxDate]="serverToday"
                             app-date-validator
-                            [dateSameOrBefore]="serverToday">
+                            [dateSameOrBefore]="serverToday"
+                            [dateSameOrAfter]="[
+                                'dateOfOnset'
+                            ]">
                         </app-form-datepicker>
 
                         <div fxFlex><!-- placeholder --></div>
