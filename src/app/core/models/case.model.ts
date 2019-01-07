@@ -96,12 +96,12 @@ export class CaseModel {
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
 
         // hospitalization
-        // #TODO
         const hospitalizationLocations = _.get(data, 'hospitalizationLocations');
         this.hospitalizationDates = _.get(data, 'hospitalizationDates', [])
             .map((hospitalizationData) => {
                 return new CaseCenterDateRangeModel(hospitalizationData, hospitalizationLocations);
             });
+
         // isolation
         const isolationLocations = _.get(data, 'isolationLocations');
         this.isolationDates = _.get(data, 'isolationDates', [])
