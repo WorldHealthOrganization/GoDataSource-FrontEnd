@@ -26,13 +26,20 @@ export class CaseDataService {
     /**
      * Retrieve the list of Cases for an Outbreak
      * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
      * @returns {Observable<CaseModel[]>}
      */
     getCasesList(
         outbreakId: string,
         queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
     ): Observable<CaseModel[]> {
-        const filter = queryBuilder.buildQuery();
+        // include some relations by default
+        const qb = new RequestQueryBuilder();
+        qb.include('hospitalizationLocations', true);
+        qb.include('isolationLocations', true);
+        qb.merge(queryBuilder);
+
+        const filter = qb.buildQuery();
         return this.modelHelper.mapObservableListToModel(
             this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
             CaseModel

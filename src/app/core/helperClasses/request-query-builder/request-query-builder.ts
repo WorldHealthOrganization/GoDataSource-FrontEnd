@@ -196,11 +196,11 @@ export class RequestQueryBuilder {
         _.each(queryBuilder.includedRelations, (requestRelationBuilder: RequestRelationBuilder, relationName: string) => {
             // add relation if necessary so we don't modify the input
             if (this.includedRelations[relationName] === undefined) {
-                this.include(relationName);
+                this.includedRelations[relationName] = _.cloneDeep(queryBuilder.includedRelations[relationName]);
+            } else {
+                // merge data
+                this.includedRelations[relationName].merge(requestRelationBuilder);
             }
-
-            // merge data
-            this.includedRelations[relationName].merge(requestRelationBuilder);
         });
 
         // merge fields

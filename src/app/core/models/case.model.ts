@@ -5,6 +5,7 @@ import { DateRangeModel } from './date-range.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
+import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 
 export class CaseModel {
     id: string;
@@ -27,8 +28,8 @@ export class CaseModel {
     deceased: boolean;
     safeBurial: boolean;
     dateDeceased: string;
-    hospitalizationDates: DateRangeModel[];
-    isolationDates: DateRangeModel[];
+    hospitalizationDates: CaseCenterDateRangeModel[];
+    isolationDates: CaseCenterDateRangeModel[];
     incubationDates: DateRangeModel[];
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
@@ -93,8 +94,21 @@ export class CaseModel {
         this.dateDeceased = _.get(data, 'dateDeceased');
         this.safeBurial = _.get(data, 'safeBurial');
         this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
-        this.hospitalizationDates = _.get(data, 'hospitalizationDates', []);
-        this.isolationDates = _.get(data, 'isolationDates', []);
+
+        // hospitalization
+        // #TODO
+        const hospitalizationLocations = _.get(data, 'hospitalizationLocations');
+        this.hospitalizationDates = _.get(data, 'hospitalizationDates', [])
+            .map((hospitalizationData) => {
+                return new CaseCenterDateRangeModel(hospitalizationData, hospitalizationLocations);
+            });
+        // isolation
+        const isolationLocations = _.get(data, 'isolationLocations');
+        this.isolationDates = _.get(data, 'isolationDates', [])
+            .map((isolationData) => {
+                return new CaseCenterDateRangeModel(isolationData, isolationLocations);
+            });
+
         this.incubationDates = _.get(data, 'incubationDates', []);
         this.dateOfReporting = _.get(data, 'dateOfReporting');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');

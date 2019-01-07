@@ -379,7 +379,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         _.each(this.mergeRecords, (ent: EntityModel) => {
             _.each((ent.model as CaseModel).hospitalizationDates, (date: DateRangeModel) => {
                 if (date.startDate || date.endDate) {
-                    this.caseData.hospitalizationDates.push(date);
+                    this.caseData.hospitalizationDates.push(date as any);
                 }
             });
         });
@@ -394,7 +394,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         _.each(this.mergeRecords, (ent: EntityModel) => {
             _.each((ent.model as CaseModel).isolationDates, (date: DateRangeModel) => {
                 if (date.startDate || date.endDate) {
-                    this.caseData.isolationDates.push(date);
+                    this.caseData.isolationDates.push(date as any);
                 }
             });
         });

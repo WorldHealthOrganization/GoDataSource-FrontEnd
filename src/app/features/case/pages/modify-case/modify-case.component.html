@@ -334,28 +334,28 @@
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate}}</div>
                 <!-- Hospitalization Dates section -->
-
-                <app-form-daterange-list
+                <app-form-case-center-daterange-list
                     name="hospitalizationDates"
-                    [(ngModel)]="caseData.hospitalizationDates"
+                    [ngModel]="caseData.hospitalizationDates"
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
-                    [readOnly]="viewOnly">
-                </app-form-daterange-list>
+                    centerNameLabel="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME"
+                    centerNameTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME_DESCRIPTION"
+                ></app-form-case-center-daterange-list>
 
                 <div class="section-title">{{'LNG_CASE_FIELD_LABEL_ISOLATION_DATES'| translate}}</div>
                 <!-- Isolation Dates section -->
-
-                <app-form-daterange-list
+                <app-form-case-center-daterange-list
                     name="isolationDates"
-                    [(ngModel)]="caseData.isolationDates"
+                    [ngModel]="caseData.isolationDates"
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
-                    [readOnly]="viewOnly"
-                    [minDate]="caseData.dateOfOnset">
-                </app-form-daterange-list>
+                    centerNameLabel="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME"
+                    centerNameTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME_DESCRIPTION"
+                    [minDate]="caseData.dateOfOnset"
+                ></app-form-case-center-daterange-list>
 
             </mat-tab>
 
