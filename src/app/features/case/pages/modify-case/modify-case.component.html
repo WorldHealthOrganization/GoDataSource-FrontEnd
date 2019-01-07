@@ -225,7 +225,8 @@
                                 required="true"
                                 [dateSameOrBefore]="[
                                     serverToday,
-                                    'dateDeceased'
+                                    'dateDeceased',
+                                    'dateOfOutcome'
                                 ]"
                                 [dateSameOrAfter]="dateOnsetSameOrAfterDates()">
                             </app-form-datepicker>
@@ -287,7 +288,10 @@
                             [disabled]="viewOnly"
                             [maxDate]="serverToday"
                             app-date-validator
-                            [dateSameOrBefore]="serverToday">
+                            [dateSameOrBefore]="serverToday"
+                            [dateSameOrAfter]="[
+                                'dateOfOnset'
+                            ]">
                         </app-form-datepicker>
 
                         <div fxFlex><!-- placeholder --></div>
