@@ -42,10 +42,13 @@ export class FormCaseCenterDaterangeComponent extends GroupBase<CaseCenterDateRa
     }
 
     /**
-     * Address Model
+     * CenterDateRange Model
      */
     get centerDateRange(): CaseCenterDateRangeModel {
         return this.value ? this.value : {} as CaseCenterDateRangeModel;
+    }
+    set centerDateRange(value: CaseCenterDateRangeModel) {
+        this.value = value;
     }
 
     /**
