@@ -16,10 +16,10 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { DocumentModel } from '../../../../core/models/document.model';
 import * as moment from 'moment';
 import { Constants } from '../../../../core/models/constants';
-import { DateRangeModel } from '../../../../core/models/date-range.model';
 import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 @Component({
     selector: 'app-case-merge-duplicate-records',
@@ -377,7 +377,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         // merge all hospitalization dates
         this.caseData.hospitalizationDates = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).hospitalizationDates, (date: DateRangeModel) => {
+            _.each((ent.model as CaseModel).hospitalizationDates, (date: CaseCenterDateRangeModel) => {
                 if (date.startDate || date.endDate) {
                     this.caseData.hospitalizationDates.push(date);
                 }
@@ -392,7 +392,7 @@ export class CaseMergeDuplicateRecordsComponent extends ConfirmOnFormChanges imp
         // merge all isolation dates
         this.caseData.isolationDates = [];
         _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as CaseModel).isolationDates, (date: DateRangeModel) => {
+            _.each((ent.model as CaseModel).isolationDates, (date: CaseCenterDateRangeModel) => {
                 if (date.startDate || date.endDate) {
                     this.caseData.isolationDates.push(date);
                 }
