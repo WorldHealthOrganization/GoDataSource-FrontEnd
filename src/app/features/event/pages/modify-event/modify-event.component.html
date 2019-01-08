@@ -92,7 +92,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="hasEventWriteAccess() && viewOnly"
-                mat-raised-button color="accent"
+                mat-raised-button type="button" color="accent"
                 [routerLink]="['/events', eventId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT'| translate}}
         </button>
@@ -105,8 +105,9 @@
             <button type="button" [routerLink]="'/events'" mat-raised-button>
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
-            <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
 
         <button
             *ngIf="hasEventWriteAccess()"
@@ -119,6 +120,4 @@
             {{ 'LNG_COMMON_BUTTON_RELATIONSHIPS' | translate }}
         </button>
     </div>
-
-
 </form>

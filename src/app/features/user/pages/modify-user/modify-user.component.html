@@ -131,7 +131,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasUserWriteAccess()"
-                mat-raised-button color="accent"
+                mat-raised-button type="button" color="accent"
                 [routerLink]="['/users', userId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>

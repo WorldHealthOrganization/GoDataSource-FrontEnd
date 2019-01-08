@@ -67,6 +67,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     countedContactsByRiskLevel$: Observable<any[]>;
 
     // risk level
+    riskLevelRefData$: Observable<ReferenceDataCategoryModel>;
     riskLevelsList$: Observable<any[]>;
     riskLevelsListMap: { [id: string]: ReferenceDataEntryModel };
 
@@ -158,13 +159,13 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).share();
         this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
 
-        const riskLevel$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
-        this.riskLevelsList$ = riskLevel$.map((data: ReferenceDataCategoryModel) => {
+        this.riskLevelRefData$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL).share();
+        this.riskLevelsList$ = this.riskLevelRefData$.map((data: ReferenceDataCategoryModel) => {
             return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
                 new LabelValuePair(entry.value, entry.id, null, null, entry.iconUrl)
             );
         });
-        riskLevel$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
+        this.riskLevelRefData$.subscribe((riskCategory: ReferenceDataCategoryModel) => {
             this.riskLevelsListMap = _.transform(
                 riskCategory.entries,
                 (result, entry: ReferenceDataEntryModel) => {
@@ -194,28 +195,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                     this.exportContactsUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/export`;
                     this.exportContactsDailyFollowUpListUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`;
                 }
-
-                // get grouped contacts by risk level
-                if (this.selectedOutbreak) {
-                    this.countedContactsByRiskLevel$ = riskLevel$
-                        .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
-                            return this.contactDataService
-                                .getContactsGroupedByRiskLevel(this.selectedOutbreak.id)
-                                .map((data: RiskLevelGroupModel) => {
-                                    return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
-                                        const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
-                                        return new CountedItemsListItem(
-                                            item.count,
-                                            itemId,
-                                            item.contactIDs,
-                                            refItem ?
-                                                refItem.getColorCode() :
-                                                Constants.DEFAULT_COLOR_REF_DATA
-                                        );
-                                    });
-                                });
-                        });
-                }
+                // get contacts grouped by risk level
+                this.getContactsGroupedByRiskLevel();
 
                 // initialize pagination
                 this.initPaginator();
@@ -433,6 +414,8 @@ export class ContactsListComponent extends ListComponent implements OnInit {
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // refresh list of contacts grouped by risk level
+            this.getContactsGroupedByRiskLevel();
             // retrieve the list of Contacts
             this.contactsList$ = this.contactDataService.getContactsList(this.selectedOutbreak.id, this.queryBuilder)
                 .pipe(tap(this.checkEmptyList.bind(this)));
@@ -448,6 +431,32 @@ export class ContactsListComponent extends ListComponent implements OnInit {
             const countQueryBuilder = _.cloneDeep(this.queryBuilder);
             countQueryBuilder.paginator.clear();
             this.contactsListCount$ = this.contactDataService.getContactsCount(this.selectedOutbreak.id, countQueryBuilder).share();
+        }
+    }
+
+    /**
+     * Get contacts grouped by risk level
+     */
+    getContactsGroupedByRiskLevel() {
+        if (this.selectedOutbreak) {
+            this.countedContactsByRiskLevel$ = this.riskLevelRefData$
+                .mergeMap((refRiskLevel: ReferenceDataCategoryModel) => {
+                    return this.contactDataService
+                        .getContactsGroupedByRiskLevel(this.selectedOutbreak.id, this.queryBuilder)
+                        .map((data: RiskLevelGroupModel) => {
+                            return _.map(data ? data.riskLevels : [], (item: RiskLevelModel, itemId) => {
+                                const refItem: ReferenceDataEntryModel = _.find(refRiskLevel.entries, {id: itemId});
+                                return new CountedItemsListItem(
+                                    item.count,
+                                    itemId,
+                                    item.contactIDs,
+                                    refItem ?
+                                        refItem.getColorCode() :
+                                        Constants.DEFAULT_COLOR_REF_DATA
+                                );
+                            });
+                        });
+                });
         }
     }
 

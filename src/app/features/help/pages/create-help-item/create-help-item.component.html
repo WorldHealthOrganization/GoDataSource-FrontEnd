@@ -47,6 +47,15 @@
                             </app-form-textarea>
                         </div>
 
+                        <div fxLayout="row" fxLayoutGap="20px">
+                            <app-form-input
+                                name="page"
+                                [ngModel]="helpItemData.page"
+                                [placeholder]="'LNG_HELP_ITEM_FIELD_LABEL_PAGE' | translate"
+                                tooltip="LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION"
+                                maxlength="200">
+                            </app-form-input>
+                        </div>
                     </div>
                 </mat-card>
 

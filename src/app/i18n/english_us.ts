@@ -132,6 +132,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_CONFIRM_FIELD_LABEL': 'Value',
         'LNG_DIALOG_CONFIRM_DELETE_CASE': 'Are you sure you want to delete this case: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_DELETE_DEVICE': 'Are you sure you want to delete this device: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER': 'Are you sure you want to delete this upstream server: "{{name}}"?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG': 'Are you sure you want to delete this log?',
         'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SYNC_CONFIRMATION': 'Are you sure you want to sync with upstream server: "{{name}}"?',
@@ -393,10 +394,10 @@ export const EnglishUsLang = {
         'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_LAST_NAME': 'Last Name',
         'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION': '',
-        'LNG_CASE_FIELD_LABEL_VISUAL_ID': 'Visual ID',
-        'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION': 'ID should match: {{mask}}',
-        'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
-        'LNG_CASE_FIELD_LABEL_CASE_ID_DESCRIPTION': '',
+        'LNG_CASE_FIELD_LABEL_VISUAL_ID': 'Case ID',
+        'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION': 'Case ID should match: {{mask}}',
+        'LNG_CASE_FIELD_LABEL_CASE_UID': 'Case UID',
+        'LNG_CASE_FIELD_LABEL_CASE_UID_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED': 'Date of Decease',
         'LNG_CASE_FIELD_LABEL_DATE_DECEASED_DESCRIPTION': '',
         'LNG_CASE_FIELD_LABEL_AGE_BUTTON': 'Age',
@@ -555,6 +556,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
         'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE': 'Lab result restored',
+        'LNG_PAGE_LIST_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Case Lab results list page
@@ -562,7 +564,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_TITLE': 'Lab results',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_ADD_LAB_RESULT': 'Add',
         'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE': 'Lab result deleted!',
-        'LNG_PAGE_LIST_CASE_LAB_RESULTS_IMPORT_BUTTON': 'Import Lab data',
 
         /**
          * Create Case Lab result page
@@ -1927,6 +1928,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE': 'Delete',
         'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE': 'Wipe',
         'LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE': 'Devices',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE': 'Device deleted',
         'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE': 'Modify {{name}}',
         'LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE': 'Device updated',
         'LNG_PAGE_VIEW_SYSTEM_DEVICE_HISTORY_TITLE': 'Device Wipe History',

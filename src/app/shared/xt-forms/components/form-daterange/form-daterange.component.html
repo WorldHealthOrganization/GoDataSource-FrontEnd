@@ -7,7 +7,7 @@
         fxLayout="row">
         <div
             *ngIf="startDateVisible"
-            fxFlex>
+            fxFlex fxLayout="row">
                 <app-form-datepicker
                     [name]="name + '[startDate]'"
                     [(ngModel)]="dateRange.startDate"
@@ -33,7 +33,7 @@
 
         <div
             *ngIf="endDateVisible"
-            fxFlex>
+            fxFlex fxLayout="row">
             <app-form-datepicker
                 [name]="name + '[endDate]'"
                 [(ngModel)]="dateRange.endDate"

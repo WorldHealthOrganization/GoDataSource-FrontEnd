@@ -102,8 +102,8 @@
                                 <app-form-input
                                     name="id"
                                     [(ngModel)]="caseData.id"
-                                    [placeholder]="'LNG_CASE_FIELD_LABEL_CASE_ID' | translate"
-                                    tooltip="LNG_CASE_FIELD_LABEL_CASE_ID_DESCRIPTION">
+                                    [placeholder]="'LNG_CASE_FIELD_LABEL_CASE_UID' | translate"
+                                    tooltip="LNG_CASE_FIELD_LABEL_CASE_UID_DESCRIPTION">
                                 </app-form-input>
                             </div>
                             <div fxFlex><!-- placeholder --></div>
@@ -154,13 +154,14 @@
                             </app-form-slide-toggle>
                         </div>
 
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
-                        </app-form-textarea>
-
+                        <div fxLayout="row" fxFlex>
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="caseData.riskReason"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 

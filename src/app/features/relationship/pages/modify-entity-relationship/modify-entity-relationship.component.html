@@ -31,7 +31,7 @@
         <div class="page-tabs-navbar-placeholder"></div>
 
         <button *ngIf="viewOnly && hasContactWriteAccess()"
-                mat-raised-button color="accent"
+                mat-raised-button type="button" color="accent"
                 [routerLink]="['/relationships', entityType, entityId, relationshipId, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
@@ -45,6 +45,4 @@
             </button>
         </ng-container>
     </div>
-
-
 </form>

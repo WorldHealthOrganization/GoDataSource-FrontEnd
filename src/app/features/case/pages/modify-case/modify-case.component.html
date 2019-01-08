@@ -158,14 +158,15 @@
                             </app-form-slide-toggle>
                         </div>
 
-                        <app-form-textarea
-                            name="riskReason"
-                            [(ngModel)]="caseData.riskReason"
-                            [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
-                            tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                            [disabled]="viewOnly">
-                        </app-form-textarea>
-
+                        <div fxLayout="row" fxFlex>
+                            <app-form-textarea
+                                name="riskReason"
+                                [(ngModel)]="caseData.riskReason"
+                                [placeholder]="'LNG_CASE_FIELD_LABEL_RISK_REASON' | translate"
+                                tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+                                [disabled]="viewOnly">
+                            </app-form-textarea>
+                        </div>
                     </div>
                 </mat-card>
 
@@ -267,7 +268,7 @@
                     </div>
                 </mat-card>
 
-                <!--Outcome section-->
+                <!-- Outcome section -->
                 <mat-card class="page-section">
                     <div fxLayout="row" fxLayoutGap="20px" fxFlex>
                         <app-form-select
@@ -386,20 +387,23 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                type="button"
-                mat-raised-button color="accent"
-                [routerLink]="['/cases', caseData.id, 'modify']">
+        <button
+            *ngIf="viewOnly && hasCaseWriteAccess()"
+            type="button"
+            mat-raised-button color="accent"
+            [routerLink]="['/cases', caseData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
-        <button *ngIf="hasContactWriteAccess()"
-                type="button"
-                mat-raised-button color="accent"
-                routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
+        <button
+            *ngIf="hasContactWriteAccess()"
+            type="button"
+            mat-raised-button color="accent"
+            routerLink="/contacts/create"
+            [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
         </button>
+
         <button
             type="button"
             mat-raised-button color="accent"
@@ -425,6 +429,4 @@
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>
-
-
 </form>

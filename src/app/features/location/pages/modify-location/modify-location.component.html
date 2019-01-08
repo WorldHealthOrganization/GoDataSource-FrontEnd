@@ -141,6 +141,7 @@
                 *ngIf="hasLocationWriteAccess()"
                 mat-raised-button
                 color="accent"
+                type="button"
                 [routerLink]="['/locations', locationId, 'modify']">
                 {{'LNG_COMMON_BUTTON_EDIT'| translate}}
             </button>

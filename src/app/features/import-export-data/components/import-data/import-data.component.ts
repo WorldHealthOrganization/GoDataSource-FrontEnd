@@ -501,8 +501,20 @@ export class ImportDataComponent implements OnInit {
                         const pushNewMapField = (
                             destination: string,
                             source: string
-                        ): ImportableMapField => {
-                            // allow duplicate maps that need to be solved by user
+                        ): ImportableMapField | null => {
+                            // check identical maps...
+                            const itemExistsAlready = _.find(this.mappedFields, {
+                                destinationField: destination,
+                                sourceField: source
+                            }) !== undefined;
+
+                            // ignore identical maps
+                            if (itemExistsAlready) {
+                                return null;
+                            }
+
+                            // allow other kinda.. duplicate maps that need to be solved by user
+                            // this should work for options mapping..in case you want to map different options from different properties
                             // NOTHING
 
                             // create new possible map item
@@ -553,10 +565,16 @@ export class ImportDataComponent implements OnInit {
                                         if (
                                             (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                                         ) {
-                                            pushNewMapField(
+                                            // create object
+                                            const pushedItem = pushNewMapField(
                                                 `${parentPath}.${property}`,
                                                 mappedHeaderObj.value
-                                            ).sourceDestinationLevel[0] = supportedLevel.value;
+                                            );
+
+                                            // did we succeed in creating the new object?
+                                            if (pushedItem) {
+                                                pushedItem.sourceDestinationLevel[0] = supportedLevel.value;
+                                            }
                                         } else {
                                             // there is no point going further
                                             return false;
