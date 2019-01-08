@@ -140,6 +140,21 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
     }
 
     /**
+     * Alternative name
+     */
+    private _alternativeName: string;
+    @Input() set alternativeName(value: string) {
+        this._alternativeName = value;
+    }
+
+    /**
+     * Alternative name
+     */
+    get alternativeName(): string {
+        return this._alternativeName ? this._alternativeName : this.name;
+    }
+
+    /**
      * Constructor
      */
     constructor(

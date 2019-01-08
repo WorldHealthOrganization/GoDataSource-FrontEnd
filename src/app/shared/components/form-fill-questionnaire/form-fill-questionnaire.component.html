@@ -40,6 +40,7 @@
                                         <app-form-input
                                             *ngIf="question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value || question.answerType === Constants.ANSWER_TYPES.NUMERIC.value"
                                             [name]="name + '[' + question.variable + ']'"
+                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                             [(ngModel)]="value[question.variable]"
                                             [placeholder]="'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER' | translate"
                                             [required]="question.required"
@@ -52,6 +53,7 @@
                                         <app-form-datepicker
                                             *ngIf="question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value"
                                             [name]="name + '[' + question.variable + ']'"
+                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                             [(ngModel)]="value[question.variable]"
                                             [placeholder]="'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE' | translate"
                                             [required]="question.required"
@@ -64,6 +66,7 @@
                                         <app-form-select
                                             *ngIf="question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value || question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value"
                                             [name]="name + '[' + question.variable + ']'"
+                                            [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                             [(ngModel)]="value[question.variable]"
                                             [placeholder]="(question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ? 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER' : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS') | translate"
                                             [required]="question.required"
@@ -171,12 +174,14 @@
                                     *ngFor="let answer of subQuestionsAnswer(question, value[question.variable])">
                                     <app-form-fill-questionnaire
                                         [name]="name"
+                                        [alternativeName]="alternativeName + '[' + questionIndex + ']'"
                                         [ngModel]="value"
                                         [questions]="additionalQuestions[question.variable][answer]"
                                         [disabled]="disabled"
                                         [hideCategories]="true"
                                         (changed)="onChange(false)"
-                                        (groupValidated)="validateGroup()">
+                                        (groupValidated)="validateGroup()"
+                                        [componentTitle]="'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE' | translate">
                                     </app-form-fill-questionnaire>
                                 </div>
                             </div>

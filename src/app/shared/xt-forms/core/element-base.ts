@@ -1,4 +1,4 @@
-import { AfterViewInit } from '@angular/core';
+import { AfterViewInit, Input } from '@angular/core';
 import { AbstractControl, ControlContainer } from '@angular/forms';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
@@ -26,6 +26,9 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
     public control: AbstractControl;
 
     public validationResult = null;
+
+    // alternative name used for specifying indexes for questionnaire inputs and other places
+    @Input() alternativeName: string;
 
     protected constructor(
         protected controlContainer: ControlContainer,

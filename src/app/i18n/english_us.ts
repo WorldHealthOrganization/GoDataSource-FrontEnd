@@ -320,6 +320,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_BUTTON_REMOVE': 'Remove',
         'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE': 'Error uploading file',
+        'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE': 'sub-question',
 
         /**
          * Entity Fields

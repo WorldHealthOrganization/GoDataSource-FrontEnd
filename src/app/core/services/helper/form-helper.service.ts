@@ -157,7 +157,8 @@ export class FormHelperService {
                             directive.valueAccessor
                         ) {
                             // determine row indexes
-                            const rowIndexes = _.chain(name.match(/\[\d+\]/g))
+                            const nameWithIndexes: string = directive.valueAccessor.alternativeName ? directive.valueAccessor.alternativeName : name;
+                            const rowIndexes = _.chain(nameWithIndexes.match(/\[\d+\]/g))
                                 .map((v: string) => v.replace(/\[|\]/g, ''))
                                 .map((v: string) => _.parseInt(v) + 1)
                                 .value();
