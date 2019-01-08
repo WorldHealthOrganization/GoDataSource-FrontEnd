@@ -35,6 +35,8 @@ export class FormSubQuestionListComponent extends ListBase<QuestionModel> implem
     @Input() variableReadOnly: boolean = false;
     @Input() autoSuggestVariable: boolean = false;
 
+    @Input() componentTitle: string;
+
     @Input() scrollToQuestion: boolean = true;
     @Input() scrollToQuestionSelector: string = 'app-form-question-list';
     @Input() scrollToQuestionBlock: string = 'end';

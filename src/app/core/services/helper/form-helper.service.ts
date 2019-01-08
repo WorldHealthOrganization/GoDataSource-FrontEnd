@@ -134,18 +134,15 @@ export class FormHelperService {
         if (!form.valid) {
             // determine fields that are invalid
             let fields: string = '';
-            const splitter: string = this.i18nService.instant('LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_SPLITTER');
             const checkControlsForInvalidStatus = (
                 controlsForm: NgForm,
-                prefix: string = '',
-                rowInfo: string = ''
+                prefixes: string[] = []
             ) => {
                 // check controls validity
-                let invalidDataRow: string = '';
+                let lastControlRowIndexes: number[];
                 const mustCheckForms: {
                     controlsForm: NgForm,
-                    prefix: string,
-                    rowInfo: string
+                    prefixes: string[]
                 }[] = [];
                 _.each(controlsForm.controls, (ctrl: AbstractControl, name: string) => {
                     // invalid controls
@@ -159,67 +156,86 @@ export class FormHelperService {
                             directive &&
                             directive.valueAccessor
                         ) {
+                            // determine row indexes
+                            const rowIndexes = _.chain(name.match(/\[\d+\]/g))
+                                .map((v: string) => v.replace(/\[|\]/g, ''))
+                                .map((v: string) => _.parseInt(v) + 1)
+                                .value();
+
                             // do we have placeholder ?
                             if (directive.valueAccessor.placeholder) {
-                                // most of the time this is already translated, but we need to make sure
-                                invalidDataRow += (_.isEmpty(invalidDataRow) ? '' : ', ') +
-                                    this.i18nService.instant(directive.valueAccessor.placeholder);
-                            } else {
-                                // maybe this is a group ( list / group )
-                                if (
-                                    directive.valueAccessor.groupForm &&
-                                    directive.valueAccessor.groupForm.controls
-                                ) {
-                                    // determine row indexes
-                                    const rowIndexes = _.chain(name.match(/\[\d+\]/g))
-                                        .map((v: string) => v.replace(/\[|\]/g, ''))
-                                        .map((v: string) => _.parseInt(v) + 1)
-                                        .value()
-                                        .join(splitter);
+                                // same row as previous one, if not we need to display data on a new row ?
+                                let firstField: boolean = false;
+                                if (!_.isEqual(rowIndexes, lastControlRowIndexes)) {
+                                    // add new error row
+                                    fields += '<br />- ';
 
-                                    // determine child fields that are invalid
-                                    // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
-                                    mustCheckForms.push({
-                                        controlsForm: directive.valueAccessor.groupForm,
-                                        prefix: (prefix ? `${prefix}${splitter}` : '') + (
-                                            directive.valueAccessor.componentTitle ? this.i18nService.instant(directive.valueAccessor.componentTitle) : ''
-                                        ),
-                                        rowInfo: this.i18nService.instant(
+                                    // reset first field label for this row
+                                    firstField = true;
+
+                                    // add prefixes
+                                    let addedItemNo: boolean = false;
+                                    _.each(rowIndexes, (rowIndex: number, index: number) => {
+                                        // do we have a prefix for this item ?
+                                        let prefix: string = '';
+                                        if (!_.isEmpty(prefixes[index])) {
+                                            prefix = ` ${prefixes[index]}`;
+                                        }
+
+                                        // add prefix
+                                        fields += prefix + ' ' + this.i18nService.instant(
                                             'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW', {
-                                                path: rowIndexes
+                                                item: rowIndex
                                             }
-                                        )
+                                        );
+
+                                        // now we have item numbers
+                                        addedItemNo = true;
                                     });
+
+                                    // do we need to add : after item numbers ?
+                                    if (addedItemNo) {
+                                        fields += ': ';
+                                    }
                                 }
+
+                                // determine field label
+                                const fieldLabel: string = this.i18nService.instant(directive.valueAccessor.placeholder);
+
+                                // add field label to list of errors
+                                fields += firstField ? fieldLabel : `, ${fieldLabel}`;
+
+                                // set the new rows
+                                lastControlRowIndexes = rowIndexes;
+                            } else if (
+                                directive.valueAccessor.groupForm &&
+                                directive.valueAccessor.groupForm.controls
+                            ) {
+                                // merge old & new prefixes
+                                const newPrefixes: string[] = _.clone(prefixes);
+                                if (directive.valueAccessor.componentTitle) {
+                                    newPrefixes.push(this.i18nService.instant(directive.valueAccessor.componentTitle));
+                                }
+
+                                // determine child fields that are invalid
+                                // using mustCheckForms to keep input order, otherwise addresses error messages will appear before firstname errors..
+                                mustCheckForms.push({
+                                    controlsForm: directive.valueAccessor.groupForm,
+                                    prefixes: newPrefixes
+                                });
                             }
                         }
                     }
                 });
 
-                // add invalid values to fields
-                if (!_.isEmpty(invalidDataRow)) {
-                    fields += '<br />- ' + (
-                            prefix ?
-                                `${prefix} ` :
-                                ''
-                        ) + (
-                            rowInfo ?
-                                `${rowInfo}${splitter} ` :
-                                ''
-                        ) +
-                        invalidDataRow;
-                }
-
                 // validate remaining form children
                 _.each(mustCheckForms, (data: {
                     controlsForm: NgForm,
-                    prefix: string,
-                    rowInfo: string
+                    prefixes: string[]
                 }) => {
                     checkControlsForInvalidStatus(
                         data.controlsForm,
-                        data.prefix,
-                        data.rowInfo
+                        data.prefixes
                     );
                 });
             };
@@ -233,7 +249,7 @@ export class FormHelperService {
                 {
                     fields: fields
                 },
-                SnackbarService.DURATION,
+                _.isEmpty(fields) ? SnackbarService.DURATION : SnackbarService.DURATION_LONG,
                 true
             );
 

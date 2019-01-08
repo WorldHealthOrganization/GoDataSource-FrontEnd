@@ -8,7 +8,8 @@ import { I18nService } from './i18n.service';
 export class SnackbarService {
 
     // amount of time (in ms) to wait before automatically closing the snackbar
-    static DURATION = 4500;
+    static DURATION: number = 4500;
+    static DURATION_LONG: number = 8000;
 
     constructor(
         private snackbar: MatSnackBar,

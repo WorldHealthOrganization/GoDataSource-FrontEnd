@@ -20,6 +20,8 @@ import { AnswerModel } from '../../../core/models/question.model';
 export class FormSubAnswerListComponent extends ListBase<AnswerModel> implements OnInit {
     @Input() viewOnly: boolean = false;
 
+    @Input() componentTitle: string;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
