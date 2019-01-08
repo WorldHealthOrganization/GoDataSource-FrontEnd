@@ -106,8 +106,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // subscribers
     outbreakSubscriber: Subscription;
 
-    periodOfFollowup: number;
-
     constructor(
         private authDataService: AuthDataService,
         private outbreakDataService: OutbreakDataService,
@@ -218,7 +216,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                                 this.retrieveContactData();
                             }
 
-                            this.periodOfFollowup = selectedOutbreak.periodOfFollowup;
                         }
 
                         // initialize pagination
@@ -1096,19 +1093,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * @returns {moment.Moment}
      */
     getDateOfEndOfFollowUp(dateOfLastContact: string) {
-        return moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT ).add(this.periodOfFollowup, 'days');
-    }
-
-    /**
-     * return day of follow-up
-     * @param {string} dateOfLastContact
-     * @returns {number}
-     */
-    getDayOfFollowUp(dateOfLastContact: string) {
-        const startDate = moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT );
-        const endDate = moment( this.followUpDateElem.value.toISOString(), Constants.DEFAULT_DATE_DISPLAY_FORMAT );
-        return endDate.diff(startDate, 'days', false);
-
+        return moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT ).add(this.selectedOutbreak.periodOfFollowup, 'days');
     }
 
     /**

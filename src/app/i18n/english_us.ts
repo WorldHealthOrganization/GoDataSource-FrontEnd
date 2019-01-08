@@ -891,7 +891,7 @@ export const EnglishUsLang = {
         'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS': 'Questionnaire Answers',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP': 'Relationship',
         'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS': 'Persons',
-        'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP': 'Date of Follow-up End',
+        'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP': 'Follow-up end date',
         'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP': 'Day of Follow-up',
 
         /**

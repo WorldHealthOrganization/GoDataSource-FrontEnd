@@ -16,6 +16,7 @@ export class FollowUpModel {
     outbreakId: string;
     statusId: string;
     teamId: string;
+    index: number;
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -32,6 +33,7 @@ export class FollowUpModel {
         this.contact = new ContactModel(this.contact);
 
         this.teamId = _.get(data, 'teamId');
+        this.index = _.get(data, 'index');
 
         this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     }
