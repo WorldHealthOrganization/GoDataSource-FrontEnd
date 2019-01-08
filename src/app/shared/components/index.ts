@@ -42,6 +42,8 @@ import { TotalNumberOfRecordsComponent } from './total-number-of-records/total-n
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
+import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
+import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -113,5 +115,7 @@ export const components: any[] = [
 
     // general
     ExportButtonComponent,
-    NumberOfItemsLabelComponent
+    NumberOfItemsLabelComponent,
+    FormCaseCenterDaterangeComponent,
+    FormCaseCenterDaterangeListComponent,
 ];
