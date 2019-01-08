@@ -295,6 +295,7 @@ export const EnglishUsLang = {
         'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION': '',
         'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT': 'Add another document',
         'LNG_DOCUMENT_LABEL_NO_DOCUMENTS': 'No documents',
+        'LNG_DOCUMENT_LABEL_DOCUMENTS': 'Documents',
 
         /**
          * Input Fields
@@ -1109,6 +1110,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE': 'Save',
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
         /**
          * Create Follow-up page
