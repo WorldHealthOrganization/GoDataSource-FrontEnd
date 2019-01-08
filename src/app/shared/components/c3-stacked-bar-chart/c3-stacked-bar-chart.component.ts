@@ -13,11 +13,14 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     @Input() chartDataColumns;
     @Input() chartDataCategories;
     @Input() showLabels: boolean = false;
-    @Input() maxTickCulling: number = 1;
+    // @Input() maxTickCulling: number = 1;
     @Input() xLabel: string = '';
     @Input() yLabel: string = '';
     @Input() colorPattern: string[] = [];
     chart: any;
+
+    maxTickCulling: number = 1;
+    allowZoom = true;
 
     ngOnInit() {
         // render c3 object
@@ -32,12 +35,57 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     /**
      * generate the chart
      */
-    render() {
+    render(domainSet = null) {
+        console.log('render');
         this.chart = c3.generate({
+            onrendered: () => {
+                if (domainSet) {
+                    this.allowZoom = true;
+                   console.log('zoom on domain');
+                   console.log(domainSet);
+                   this.chart.zoom(domainSet);
+                }
+            },
             bindto: '#chart',
             zoom: {
                 enabled: true,
-                rescale: false
+                rescale: true,
+                onzoom: (domain) => {
+                    console.log('on zoom');
+
+                    if (domain && this.allowZoom) {
+
+                        const domainDiff = domain[1] - domain[0];
+                        const initialMaxTickCulling = this.maxTickCulling;
+                        console.log(domainDiff);
+
+                        if (domainDiff < 20) {
+                            this.maxTickCulling = 1;
+                        } else if (domainDiff < 80 ) {
+                            this.maxTickCulling = 2;
+                        } else if (domainDiff < 200 ) {
+                            this.maxTickCulling = 3;
+                        } else {
+                            this.maxTickCulling = 7;
+                        }
+
+                        if (initialMaxTickCulling !== this.maxTickCulling) {
+                            this.allowZoom = false;
+                            console.log('update culling');
+
+                          this.chart = this.chart.destroy();
+ //                          this.chart.flush();
+                           this.render(domain);
+                           // this.chart.zoom(domain);
+
+                        }
+                    }
+
+
+
+                    console.log(this.maxTickCulling);
+                    console.log(domain);
+                }
             },
             interaction: {
                 enabled: false
@@ -69,14 +117,13 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
                     },
                     type: 'category',
                     categories: this.chartDataCategories,
-                    extent: [1, 10],
                     tick: {
                         width: 100,
                         culling: {
                             max: this.maxTickCulling
                         },
                         rotate: 70
-                    },
+                    }
                 },
                 y: {
                     inner: true,
@@ -107,5 +154,10 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
                 pattern: this.colorPattern
             }
         });
+
+        console.log("zoom on domain end ");
+        console.log(domainSet);
+   //     this.chart.zoom(domainSet);
+
     }
 }

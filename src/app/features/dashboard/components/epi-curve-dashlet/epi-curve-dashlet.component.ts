@@ -179,11 +179,6 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
      */
     changeView(viewType) {
         this.viewType = viewType;
-        if (this.viewType === Constants.EPI_CURVE_VIEW_TYPE.WEEK.value) {
-            // this.maxTickCulling = this.chartDataCategories.length / 3;
-        } else if (this.viewType === Constants.EPI_CURVE_VIEW_TYPE.DAY.value) {
-            this.maxTickCulling = this.chartDataCategories.length / 3;
-        }
 
         // re-render chart
         this.refreshDataCaller.call();
@@ -242,6 +237,13 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
                     _.each(chartDataObject, (data) => {
                         this.chartData.push(data);
                     });
+
+                    // set the number of ticks to display
+                    if (this.viewType === Constants.EPI_CURVE_VIEW_TYPE.DAY.value) {
+                        this.maxTickCulling = this.chartDataCategories.length / 2;
+                    } else {
+                        this.maxTickCulling = 1;
+                    }
 
                     // finished
                     this.displayLoading = false;
