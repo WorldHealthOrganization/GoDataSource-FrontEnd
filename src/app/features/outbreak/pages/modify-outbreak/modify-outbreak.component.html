@@ -217,7 +217,8 @@
                     nameTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
                     [urlPlaceholder]="'LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL' | translate"
                     urlTooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
-                    [required]="true">
+                    [required]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS' | translate">
                 </app-form-name-url-list>
             </mat-tab>
 
@@ -231,7 +232,8 @@
                     [ngModel]="outbreak.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TAB_CASE_INVESTIGATION' | translate">
                 </app-form-question-list>
             </mat-tab>
 
@@ -245,7 +247,8 @@
                     [ngModel]="outbreak.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TAB_CONTACT_FOLLOWUP' | translate">
                 </app-form-question-list>
             </mat-tab>
 
@@ -259,7 +262,8 @@
                     [ngModel]="outbreak.labResultsTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TAB_LAB_RESULTS' | translate">
                 </app-form-question-list>
             </mat-tab>
 

@@ -131,7 +131,8 @@
                     [ngModel]="outbreakTemplate.caseInvestigationTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION' | translate">
                 </app-form-question-list>
             </mat-tab>
 
@@ -144,7 +145,8 @@
                     [ngModel]="outbreakTemplate.contactFollowUpTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP' | translate">
                 </app-form-question-list>
             </mat-tab>
 
@@ -158,7 +160,8 @@
                     [ngModel]="outbreakTemplate.labResultsTemplate"
                     [viewOnly]="viewOnly"
                     [variableReadOnly]="true"
-                    [autoSuggestVariable]="true">
+                    [autoSuggestVariable]="true"
+                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS' | translate">
                 </app-form-question-list>
             </mat-tab>
         </mat-tab-group>

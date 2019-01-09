@@ -36,6 +36,8 @@ interface UploaderData {
 export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnInit {
     @Input() disabled: boolean = false;
 
+    @Input() componentTitle: string;
+
     questionsGroupedByCategory: {
         category: string,
         questions: QuestionModel[],
@@ -135,6 +137,21 @@ export class FormFillQuestionnaireComponent extends GroupBase<{}> implements OnI
 
         // initialize uploader
         this.initializeUploader();
+    }
+
+    /**
+     * Alternative name
+     */
+    private _alternativeName: string;
+    @Input() set alternativeName(value: string) {
+        this._alternativeName = value;
+    }
+
+    /**
+     * Alternative name
+     */
+    get alternativeName(): string {
+        return this._alternativeName ? this._alternativeName : this.name;
     }
 
     /**

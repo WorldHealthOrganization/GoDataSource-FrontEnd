@@ -344,6 +344,7 @@
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_TO_DESCRIPTION"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES' | translate"
                     centerNameLabel="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_HOSPITALIZATION_DATES_CENTER_NAME_DESCRIPTION"
                 ></app-form-case-center-daterange-list>
@@ -356,11 +357,11 @@
                     [disabled]="viewOnly"
                     fromTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_FROM_DESCRIPTION"
                     toTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_TO_DESCRIPTION"
+                    [minDate]="caseData.dateOfOnset"
+                    [componentTitle]="'LNG_CASE_FIELD_LABEL_ISOLATION_DATES' | translate"
                     centerNameLabel="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME"
                     centerNameTooltip="LNG_CASE_FIELD_LABEL_ISOLATION_DATES_CENTER_NAME_DESCRIPTION"
-                    [minDate]="caseData.dateOfOnset"
                 ></app-form-case-center-daterange-list>
-
             </mat-tab>
 
             <mat-tab [label]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
@@ -368,7 +369,8 @@
                     name="questionnaireAnswers"
                     [ngModel]="caseData.questionnaireAnswers"
                     [questions]="selectedOutbreak.caseInvestigationTemplate"
-                    [disabled]="viewOnly">
+                    [disabled]="viewOnly"
+                    [componentTitle]="'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE' | translate">
                 </app-form-fill-questionnaire>
             </mat-tab>
         </mat-tab-group>
@@ -388,18 +390,23 @@
             <div class="page-tabs-navbar-placeholder"></div>
         </ng-container>
 
-        <button *ngIf="viewOnly && hasCaseWriteAccess()"
-                mat-raised-button type="button" color="accent"
-                [routerLink]="['/cases', caseData.id, 'modify']">
+        <button
+            *ngIf="viewOnly && hasCaseWriteAccess()"
+            type="button"
+            mat-raised-button color="accent"
+            [routerLink]="['/cases', caseData.id, 'modify']">
             {{'LNG_COMMON_BUTTON_EDIT' | translate}}
         </button>
 
-        <button *ngIf="hasContactWriteAccess()"
-                mat-raised-button type="button" color="accent"
-                routerLink="/contacts/create"
-                [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
+        <button
+            *ngIf="hasContactWriteAccess()"
+            type="button"
+            mat-raised-button color="accent"
+            routerLink="/contacts/create"
+            [queryParams]="{ entityType: EntityType.CASE, entityId: caseData.id }">
             {{'LNG_PAGE_ACTION_ADD_CONTACT' | translate}}
         </button>
+
         <button
             type="button"
             mat-raised-button color="accent"
@@ -425,6 +432,4 @@
             {{ 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS' | translate }}
         </button>
     </div>
-
-
 </form>

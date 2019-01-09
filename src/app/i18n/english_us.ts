@@ -214,6 +214,8 @@ export const EnglishUsLang = {
          * Form Errors, Warnings and Success messages
          */
         'LNG_FORM_ERROR_FORM_INVALID': 'The form is invalid!',
+        'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS': 'The following fields are invalid: {{fields}}',
+        'LNG_FORM_ERROR_FORM_INVALID_WITH_FIELDS_ROW': 'item {{item}}',
         'LNG_FORM_WARNING_NO_CHANGES': 'There are no changes to be saved!',
 
         /**
@@ -293,6 +295,7 @@ export const EnglishUsLang = {
         'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION': '',
         'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT': 'Add another document',
         'LNG_DOCUMENT_LABEL_NO_DOCUMENTS': 'No documents',
+        'LNG_DOCUMENT_LABEL_DOCUMENTS': 'Documents',
 
         /**
          * Input Fields
@@ -318,6 +321,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_BUTTON_REMOVE': 'Remove',
         'LNG_QUESTIONNAIRE_LABEL_CHOOSE_FILE': 'Choose file',
         'LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE': 'Error uploading file',
+        'LNG_QUESTIONNAIRE_SUB_QUESTIONS_TITLE': 'sub-question',
 
         /**
          * Entity Fields
@@ -1106,6 +1110,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE': 'Save',
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_CANCEL': 'Cancel',
         'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_BUTTON_SAVE_SUCCESS_MESSAGE': 'Follow-up saved!',
+        'LNG_DIALOG_MODIFY_FOLLOW_UP_QUESTIONNAIRE_TITLE': 'Questionnaire',
 
         /**
          * Create Follow-up page
@@ -1456,6 +1461,7 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED': 'Required?',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_ALERT_REQUIRED': 'Required',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW': 'Add Answer',
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_TITLE': 'Answer',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE': 'A',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL': 'Answer Label',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION': '',

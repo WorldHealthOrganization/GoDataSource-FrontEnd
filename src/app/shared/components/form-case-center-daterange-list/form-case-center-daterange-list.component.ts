@@ -22,12 +22,13 @@ import * as _ from 'lodash';
 export class FormCaseCenterDaterangeListComponent extends ListBase<CaseCenterDateRangeModel> implements OnInit, GroupFilteredValue<any[]> {
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
-    @Input() readOnly: boolean = false;
 
     @Input() fromTooltip: string;
     @Input() toTooltip: string;
     @Input() centerNameLabel: string;
     @Input() centerNameTooltip: string;
+
+    @Input() componentTitle: string;
 
     @Input() minDate: Moment;
 

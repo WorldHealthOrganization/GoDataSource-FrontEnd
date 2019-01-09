@@ -24,6 +24,8 @@ export class FormDocumentComponent extends GroupBase<DocumentModel> implements O
 
     documentTypesList$: Observable<any[]>;
 
+    @Input() componentTitle: string;
+
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,

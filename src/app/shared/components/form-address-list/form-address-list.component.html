@@ -12,7 +12,8 @@
                     (changed)="onChange(false)"
                     [required]="required"
                     [disabled]="disabled"
-                    (groupValidated)="validateGroup()">
+                    (groupValidated)="validateGroup()"
+                    [componentTitle]="'LNG_ENTITY_FIELD_LABEL_ADDRESS' | translate">
                 </app-form-address>
             </mat-card>
 
