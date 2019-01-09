@@ -19,4 +19,33 @@ app-c3-stacked-bar-chart {
         fill: #fff
     }
 
+    /* manipulate the number of ticks displayed */
+    .c3-axis-x-5n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-5n .tick:nth-child(5n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-3n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-3n .tick:nth-child(3n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-2n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-2n .tick:nth-child(2n) text {
+        display: block !important;
+    }
+
+    .c3-axis-x-n .tick text {
+        display: none !important;
+    }
+    .c3-axis-x-n .tick:nth-child(n) text {
+        display: block !important;
+    }
+
 }
