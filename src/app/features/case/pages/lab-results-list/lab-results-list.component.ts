@@ -32,7 +32,6 @@ import { tap } from 'rxjs/operators';
 export class LabResultsListComponent extends ListComponent implements OnInit {
 
     breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
         new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '.', true),
     ];
     // lab results list
