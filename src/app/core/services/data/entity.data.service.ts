@@ -214,6 +214,10 @@ export class EntityDataService {
                 ageValue = ageMonths;
             }
             lightObject.push(new LabelValuePair(
+                'LNG_CONTACT_FIELD_LABEL_AGE',
+                `${ageValue} ${ageUnit}`
+            ));
+            lightObject.push(new LabelValuePair(
                 'LNG_CONTACT_FIELD_LABEL_GENDER',
                 entity.gender
             ));

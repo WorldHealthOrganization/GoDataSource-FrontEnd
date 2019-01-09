@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -157,6 +157,11 @@ export class TransmissionChainsGraphComponent implements OnInit {
      */
     onEditModeChange(editMode: boolean) {
         this.editMode = editMode;
+
+        if (!editMode) {
+            // reset selected nodes
+            this.resetNodes();
+        }
     }
 
     onNodeTap(entity: GraphNodeModel) {
@@ -181,8 +186,17 @@ export class TransmissionChainsGraphComponent implements OnInit {
                     });
                 } else {
                     // show node information
-                    const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
-                    this.dialogService.showDataDialog(dialogData);
+                    this.dialogService.showCustomDialog(
+                        ViewCotNodeDialogComponent,
+                        {
+                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    entity: entityData
+                                }
+                            }
+                        }
+                    );
                 }
             });
     }

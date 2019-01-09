@@ -1,0 +1,19 @@
+<div fxLayout="column">
+    <div class="dialog-label-value">
+        <span>A</span>
+        <span>B</span>
+    </div>
+    <div class="dialog-label-value">
+        <div>C</div>
+        <div>D</div>
+    </div>
+
+    <div fxLayout="row" fxLayoutAlign="end">
+        <button
+            mat-button
+            (click)="closeDialog()"
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>
