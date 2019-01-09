@@ -13,14 +13,12 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     @Input() chartDataColumns;
     @Input() chartDataCategories;
     @Input() showLabels: boolean = false;
-    // @Input() maxTickCulling: number = 1;
     @Input() xLabel: string = '';
     @Input() yLabel: string = '';
     @Input() colorPattern: string[] = [];
     chart: any;
 
     maxTickCulling: number = 1;
-    allowZoom = true;
 
     ngOnInit() {
         // render c3 object
@@ -35,56 +33,21 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
     /**
      * generate the chart
      */
-    render(domainSet = null) {
-        console.log('render');
+    render() {
         this.chart = c3.generate({
-            onrendered: () => {
-                if (domainSet) {
-                    this.allowZoom = true;
-                   console.log('zoom on domain');
-                   console.log(domainSet);
-                   this.chart.zoom(domainSet);
-                }
-            },
             bindto: '#chart',
+            onrendered: () => {
+                this.configureNumberOfTicks(this.chartDataCategories.length);
+            },
             zoom: {
                 enabled: true,
-                rescale: true,
+                rescale: false,
                 onzoom: (domain) => {
-                    console.log('on zoom');
-
-                    if (domain && this.allowZoom) {
-
+                    // display the ticks based on the domain zoomed
+                    if (domain) {
                         const domainDiff = domain[1] - domain[0];
-                        const initialMaxTickCulling = this.maxTickCulling;
-                        console.log(domainDiff);
-
-                        if (domainDiff < 20) {
-                            this.maxTickCulling = 1;
-                        } else if (domainDiff < 80 ) {
-                            this.maxTickCulling = 2;
-                        } else if (domainDiff < 200 ) {
-                            this.maxTickCulling = 3;
-                        } else {
-                            this.maxTickCulling = 7;
-                        }
-
-                        if (initialMaxTickCulling !== this.maxTickCulling) {
-                            this.allowZoom = false;
-                            console.log('update culling');
-
-                          this.chart = this.chart.destroy();
- //                          this.chart.flush();
-                           this.render(domain);
-                           // this.chart.zoom(domain);
-
-                        }
+                        this.configureNumberOfTicks(domainDiff);
                     }
-
-
-
-                    console.log(this.maxTickCulling);
-                    console.log(domain);
                 }
             },
             interaction: {
@@ -155,9 +118,37 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges {
             }
         });
 
-        console.log("zoom on domain end ");
-        console.log(domainSet);
-   //     this.chart.zoom(domainSet);
-
     }
+
+    /**
+     * configure the number of ticks to be displayed
+     * @param {number} elementsDisplayedNo
+     */
+    configureNumberOfTicks(elementsDisplayedNo: number) {
+        const elements: any = document.getElementsByClassName('c3-axis-x');
+        const element: any = elements[0];
+
+        if (elementsDisplayedNo < 70) {
+            element.classList.add('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-5n');
+        } else if (elementsDisplayedNo < 150 ) {
+            element.classList.add('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-5n');
+        } else if (elementsDisplayedNo < 250 ) {
+            element.classList.add('c3-axis-x-3n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-5n');
+        } else {
+            element.classList.add('c3-axis-x-5n');
+            element.classList.remove('c3-axis-x-n');
+            element.classList.remove('c3-axis-x-2n');
+            element.classList.remove('c3-axis-x-3n');
+        }
+    }
+
 }
