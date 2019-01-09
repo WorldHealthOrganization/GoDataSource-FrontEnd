@@ -788,7 +788,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             // retrieve the list of Follow Ups
             this.followUpsList$ = this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-                .pipe(tap(this.checkEmptyList.bind(this)));
+                .map((followUps: FollowUpModel[]) => {
+                    return FollowUpModel.determineAlertness(
+                        this.selectedOutbreak.contactFollowUpTemplate,
+                        followUps
+                    );
+                }).pipe(tap(this.checkEmptyList.bind(this)));
         }
     }
 

@@ -182,7 +182,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.lastName }}
             </mat-cell>
         </ng-container>
@@ -204,7 +204,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.firstName }}
             </mat-cell>
         </ng-container>
@@ -224,7 +224,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -241,7 +241,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -258,7 +258,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.index }}
             </mat-cell>
         </ng-container>
@@ -273,7 +273,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.location?.name }}
             </mat-cell>
         </ng-container>
@@ -288,7 +288,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.fullAddress }}
             </mat-cell>
         </ng-container>
@@ -314,7 +314,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
                     name="teamId"
                     [ngModel]="item.teamId"
@@ -348,7 +348,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS"
                     [value]="item.statusId">
@@ -376,7 +376,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
             </mat-cell>
         </ng-container>

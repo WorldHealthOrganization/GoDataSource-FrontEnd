@@ -5,7 +5,7 @@ import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
-import { AnswerModel, QuestionModel } from './question.model';
+import { QuestionModel } from './question.model';
 import { Constants } from './constants';
 import * as moment from 'moment';
 
@@ -238,7 +238,6 @@ export class EntityModel {
 
     /**
      * Determine alertness
-     * @param entities
      */
     static determineAlertness(
         template: QuestionModel[],
