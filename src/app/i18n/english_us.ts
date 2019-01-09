@@ -1162,6 +1162,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON': 'Export Data',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE': 'Export Data',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON': 'Group by',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' : 'Date of the end of the follow-up',
 
         /**
          * Event fields

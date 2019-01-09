@@ -91,6 +91,18 @@
                     {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
                 </div>
 
+                <!--Date of last contact-->
+                <div fxFlex="240px"
+                     class="follow-up-range-date-header">
+                    {{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}
+                </div>
+
+                <!--Date of the end of the follow-up-->
+                <div fxFlex="240px"
+                     class="follow-up-range-date-header">
+                    {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate}}
+                </div>
+
                 <!-- Statuses -->
                 <div
                     *ngFor="let date of daysToDisplay"
@@ -127,6 +139,20 @@
                             [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
                             {{ contactFollowUpData.contact.name }}
                         </a>
+                    </div>
+
+                    <!--Date of last contact-->
+                    <div
+                        fxFlex="240px"
+                        class="follow-up-range-column-data follow-up-range-name-column-data">
+                        {{contactFollowUpData.contact.dateOfLastContact | dateDefault}}
+                    </div>
+
+                    <!--Date of the end of the follow-up-->
+                    <div
+                        fxFlex="240px"
+                        class="follow-up-range-column-data follow-up-range-name-column-data">
+                         {{contactFollowUpData.contact.followUp.endDate | dateDefault}}
                     </div>
 
                     <!-- Statuses -->
