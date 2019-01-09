@@ -34,7 +34,6 @@ import { CaseDataService } from '../../../../core/services/data/case.data.servic
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { NgModel } from '@angular/forms';
-import * as FileSaver from 'file-saver';
 import { Subscription } from 'rxjs/Subscription';
 import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
@@ -51,6 +50,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // import constants into template
     Constants = Constants;
     UserSettings = UserSettings;
+    ExportDataExtension = ExportDataExtension;
 
     // authenticated user
     authUser: UserModel;
@@ -93,6 +93,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         new LabelValuePair('LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
     ];
 
+    // print follow-ups
+    printFollowUpsUrl: string;
+    printFollowUpsFileName: string;
+    printFollowUpsDialogFields: DialogField[] = [];
+
     caseId: string;
     caseData: CaseModel;
 
@@ -131,6 +136,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
         this.followUpsDataExportFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') +
             ' - ' +
             this.followUpsDataExportFileName;
+
+        // print follow-ups file name
+        this.printFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME') + '.pdf';
 
         // daily status types
         this.dailyStatusTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS);
@@ -199,12 +207,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
                         // export url
                         this.exportFollowUpsUrl = null;
+                        this.printFollowUpsUrl = null;
 
                         if (
                             this.selectedOutbreak &&
                             this.selectedOutbreak.id
                         ) {
                             this.exportFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`;
+                            this.printFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/daily-followup-form/export`;
 
                             // retrieve case data
                             if (this.caseId) {
@@ -237,46 +247,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             this.outbreakSubscriber.unsubscribe();
             this.outbreakSubscriber = null;
         }
-    }
-
-    /**
-     * Download the Daily Follow-ups Form
-     */
-    downloadDailyFollowUpsForm() {
-        if (this.selectedOutbreak) {
-            if (
-                this.followUpDateElem &&
-                this.followUpDateElem.value
-            ) {
-                this.showLoadingDialog();
-                const isoDate = this.followUpDateElem.value.toISOString();
-                this.followUpsDataService.downloadDailyFollowUpsForm(this.selectedOutbreak.id, isoDate)
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME');
-                        this.closeLoadingDialog();
-                    });
-            } else {
-                // display select date data
-                this.snackbarService.showError('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_NO_DATE_ERROR');
-            }
-        }
-    }
-
-    /**
-     * Download File
-     * @param blob
-     * @param fileNameToken
-     */
-    private downloadFile(
-        blob,
-        fileNameToken,
-        extension: string = 'pdf'
-    ) {
-        const fileName = this.i18nService.instant(fileNameToken);
-        FileSaver.saveAs(
-            blob,
-            `${fileName}.${extension}`
-        );
     }
 
     /**
@@ -350,12 +320,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     initializeHeaderFilters() {
         this.dateFilterDefaultValue = moment();
-        this.queryBuilder.filter.byDateRange(
-            'date', {
-                startDate: moment(this.dateFilterDefaultValue).startOf('day'),
-                endDate: moment(this.dateFilterDefaultValue).endOf('day')
-            }
-        );
+        this.filterByFollowUpDate(this.dateFilterDefaultValue);
     }
 
     /**
@@ -1092,5 +1057,35 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             this.loadingDialog.close();
             this.loadingDialog = null;
         }
+    }
+
+    /**
+     * Filter by follow-up date
+     * @param value
+     */
+    filterByFollowUpDate(value: Moment) {
+        // send filter further
+        this.filterByDateField('date', value);
+
+        // refresh dialog fields
+        this.genericDataService
+            .getRangeFollowUpGroupByOptions(true)
+            .subscribe((options) => {
+                this.printFollowUpsDialogFields = [
+                    new DialogField({
+                        name: 'date',
+                        required: true,
+                        value: value ? moment(value).toISOString() : value,
+                        fieldType: DialogFieldType.DATE
+                    }),
+                    new DialogField({
+                        name: 'groupBy',
+                        placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                        inputOptions: options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        required: true
+                    })
+                ];
+            });
     }
 }

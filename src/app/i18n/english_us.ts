@@ -1097,12 +1097,13 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE': 'Export Contact Follow-up Data',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON': 'Print Follow-up List',
+        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE': 'Print Follow-up List',
         'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME': 'Daily Follow-up List',
-        'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_NO_DATE_ERROR': 'Please select follow-up date',
         'LNG_PAGE_LIST_FOLLOW_UPS_MODIFY_FUTURE_FOLLOW_UPS': 'You aren\'t allowed to modify future follow-ups',
         'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Case',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE': 'Modify Questionnaire',
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE': 'Team changed!',
+        'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON': 'Group by',
 
         /**
          * Follow-ups list page => Questionnaire dialog
