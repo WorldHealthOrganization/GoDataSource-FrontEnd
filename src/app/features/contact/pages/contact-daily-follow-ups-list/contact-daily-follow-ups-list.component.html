@@ -229,6 +229,40 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Date of the End of Follow-up -->
+        <ng-container matColumnDef="dateOfFollowUpEnd">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP' | translate }}</div>
+                    <div class="column-filter">
+                        <div class="column-filter">
+                            <!-- placeholder -->
+                        </div>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.contact?.followUp.endDate | dateDefault }}
+            </mat-cell>
+        </ng-container>
+
+        <!--Day of Follow-up -->
+        <ng-container matColumnDef="dayOfFollowUp">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">{{ 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP' | translate }}</div>
+                    <div class="column-filter">
+                        <div class="column-filter">
+                            <!-- placeholder -->
+                        </div>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                {{ item.index }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Area -->
         <ng-container matColumnDef="area">
             <mat-header-cell *matHeaderCellDef>

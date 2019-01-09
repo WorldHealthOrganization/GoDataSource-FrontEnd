@@ -215,6 +215,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                             if (this.contactId) {
                                 this.retrieveContactData();
                             }
+
                         }
 
                         // initialize pagination
@@ -387,6 +388,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
+            }),
+            new VisibleColumnModel({
+                field: 'dateOfFollowUpEnd',
+                label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP'
+            }),
+            new VisibleColumnModel({
+                field: 'dayOfFollowUp',
+                label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
             }),
             new VisibleColumnModel({
                 field: 'area',
