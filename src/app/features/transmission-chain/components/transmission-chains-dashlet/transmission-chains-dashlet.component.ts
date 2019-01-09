@@ -43,6 +43,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Input() selectedEntityType: EntityType = null;
 
     @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
+    @Output() changeEditMode = new EventEmitter<boolean>();
 
     selectedOutbreak: OutbreakModel;
     graphElements: any;
@@ -623,6 +624,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
     onChangeGlobalDate() {
         this.displayChainsOfTransmission();
+    }
+
+    onEditModeChange(editMode: boolean) {
+        this.changeEditMode.emit(editMode);
     }
 
     /**

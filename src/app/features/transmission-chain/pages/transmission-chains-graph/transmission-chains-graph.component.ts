@@ -59,6 +59,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
 
+    // Edit or View mode?
+    editMode: boolean = false;
     // new relationship model
     newRelationship = new RelationshipModel();
     // new contact model
@@ -149,6 +151,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
+    /**
+     * Switch between View and Edit mode (when clicking nodes)
+     * @param editMode
+     */
+    onEditModeChange(editMode: boolean) {
+        this.editMode = editMode;
+    }
+
     onNodeTap(entity: GraphNodeModel) {
         // retrieve entity info
         this.entityDataService
@@ -159,15 +169,21 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                // add node to selected persons list
-                this.selectedNodes.addNode(entityData);
+                if (this.editMode) {
+                    // add node to selected persons list
+                    this.selectedNodes.addNode(entityData);
 
-                // focus boxes
-                setTimeout(() => {
-                    this.domService.scrollItemIntoView(
-                        '.selected-node-details'
-                    );
-                });
+                    // focus boxes
+                    setTimeout(() => {
+                        this.domService.scrollItemIntoView(
+                            '.selected-node-details'
+                        );
+                    });
+                } else {
+                    // show node information
+                    const dialogData = this.entityDataService.getLightObjectDisplay(entityData);
+                    this.dialogService.showDataDialog(dialogData);
+                }
             });
     }
 
