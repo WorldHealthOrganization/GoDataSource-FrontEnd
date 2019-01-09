@@ -26,7 +26,6 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
     chartDataCategories: any = [];
     chartDataColumns: any = [];
     viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
-    maxTickCulling: number = 1;
     mapCaseClassifications: any = {};
     colorPattern: string[] = [];
 
@@ -237,13 +236,6 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
                     _.each(chartDataObject, (data) => {
                         this.chartData.push(data);
                     });
-
-                    // set the number of ticks to display
-                    if (this.viewType === Constants.EPI_CURVE_VIEW_TYPE.DAY.value) {
-                        this.maxTickCulling = this.chartDataCategories.length / 2;
-                    } else {
-                        this.maxTickCulling = 1;
-                    }
 
                     // finished
                     this.displayLoading = false;
