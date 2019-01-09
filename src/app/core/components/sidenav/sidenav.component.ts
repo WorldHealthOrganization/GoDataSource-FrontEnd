@@ -289,6 +289,7 @@ export class SidenavComponent implements OnInit {
                     [PERMISSION.READ_SYS_CONFIG],
                     '/help/categories'
                 )
+                // TODO Insert auditLogs here when needed
             ]
         ),
         new NavItem(
