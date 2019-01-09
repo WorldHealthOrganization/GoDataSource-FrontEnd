@@ -19,7 +19,7 @@
                     </ng-container>
 
                     <app-export-button
-                        *ngIf="printFollowUpsUrl"
+                        *ngIf="!appliedListFilter && printFollowUpsUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE' | translate"
@@ -33,7 +33,7 @@
                     </app-export-button>
 
                     <app-export-button
-                        *ngIf="exportFollowUpsUrl"
+                        *ngIf="!appliedListFilter && exportFollowUpsUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
