@@ -242,7 +242,7 @@
                 </div>
             </mat-header-cell>
             <mat-cell *matCellDef="let item">
-                {{ getDateOfEndOfFollowUp(item.contact?.dateOfLastContact) | dateDefault }}
+                {{ item.contact?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
 

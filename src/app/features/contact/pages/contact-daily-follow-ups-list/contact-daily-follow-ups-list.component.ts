@@ -1088,15 +1088,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
-     * Calculate the date of the end of follow-up
-     * @param {string} dateOfLastContact
-     * @returns {moment.Moment}
-     */
-    getDateOfEndOfFollowUp(dateOfLastContact: string) {
-        return moment( dateOfLastContact, Constants.DEFAULT_DATE_DISPLAY_FORMAT ).add(this.selectedOutbreak.periodOfFollowup, 'days');
-    }
-
-    /**
      * Display loading dialog
      */
     showLoadingDialog() {
