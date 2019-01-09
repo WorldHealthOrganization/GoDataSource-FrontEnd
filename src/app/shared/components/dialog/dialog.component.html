@@ -111,11 +111,12 @@
                     <app-form-datepicker
                         *ngIf="field.fieldType === DialogFieldType.DATE"
                         [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [ngModel]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
                         [tooltip]="field.description"
                         [required]="field.required"
                         [disabled]="field.disabled"
+                        (optionChanged)="setDateValue(field.name, $event)"
                         app-date-validator
                     ></app-form-datepicker>
 
