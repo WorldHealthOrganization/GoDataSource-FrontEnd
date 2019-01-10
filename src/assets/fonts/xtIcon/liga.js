@@ -58,6 +58,7 @@
             'add': '&#xe909;',
             'menu': '&#xe90a;',
             'home': '&#xe901;',
+            'lab': '&#xe9aa;',
           '0': 0
         };
         delete icons['0'];
