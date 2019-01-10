@@ -1,5 +1,6 @@
 // tslint:disable:no-use-before-declare
 import * as _ from 'lodash';
+import { Constants } from './constants';
 
 export class AnswerModel {
     label: string;
@@ -61,6 +62,57 @@ export class QuestionModel {
             (lData: any) => {
                 return new AnswerModel(lData);
             });
+    }
+
+    /**
+     * Determine questionnaire alerted answers from a template
+     * @param template
+     */
+    static determineAlertAnswers(
+        template: QuestionModel[]
+    ): {
+        [question_variable: string]: {
+            [answer_value: string]: boolean
+        }
+    } {
+        // map alert question answers to object for easy find
+        const alertQuestionAnswers: {
+            [question_variable: string]: {
+                [answer_value: string]: boolean
+            }
+        } = {};
+        const mapQuestions = (questions: QuestionModel[]) => {
+            // get alerted answers
+            _.each(questions, (question: QuestionModel) => {
+                // alert applies only to those questions that have option values
+                if (
+                    question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                    question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                ) {
+                    _.each(question.answers, (answer: AnswerModel) => {
+                        // answer alert ?
+                        if (answer.alert) {
+                            _.set(
+                                alertQuestionAnswers,
+                                `[${question.variable}][${answer.value}]`,
+                                true
+                            );
+                        }
+
+                        // go through all sub questions
+                        if (!_.isEmpty(answer.additionalQuestions)) {
+                            mapQuestions(answer.additionalQuestions);
+                        }
+                    });
+                }
+            });
+        };
+
+        // get alerted answers
+        mapQuestions(template);
+
+        // finished
+        return alertQuestionAnswers;
     }
 
     /**

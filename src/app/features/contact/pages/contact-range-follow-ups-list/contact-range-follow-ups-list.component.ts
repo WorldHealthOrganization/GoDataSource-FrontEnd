@@ -196,6 +196,12 @@ export class ContactRangeFollowUpsListComponent extends ListComponent implements
             this.followUpsDataService
                 .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
                 .subscribe((followUps: FollowUpModel[]) => {
+                    // determine follow-up questionnaire alertness
+                    followUps = FollowUpModel.determineAlertness(
+                        this.selectedOutbreak.contactFollowUpTemplate,
+                        followUps
+                    );
+
                     // group contact information
                     let minDate: Moment;
                     let maxDate: Moment;

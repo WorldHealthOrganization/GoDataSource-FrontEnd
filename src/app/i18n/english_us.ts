@@ -1168,6 +1168,8 @@ export const EnglishUsLang = {
          */
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE': 'Range Follow-ups',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_CLICK_TO_VIEW_FOLLOW_UP_LABEL': '* Click on a follow-up to view it',
+        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_QUESTIONNAIRE_ALERT_LABEL': '* Bell icon means that at least one questionnaire answer marked with alert flag was selected for that follow-up',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON': 'Export Data',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE': 'Export Data',
         'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON': 'Group by',
