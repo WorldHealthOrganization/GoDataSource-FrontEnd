@@ -139,6 +139,11 @@ export class LocationsListComponent extends ListComponent implements OnInit {
             new VisibleColumnModel({
                 field: 'geographicalLevelId',
                 label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
             })
         ];
     }
