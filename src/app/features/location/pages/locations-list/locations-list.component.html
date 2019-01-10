@@ -47,6 +47,12 @@
     </ng-container>
 </app-topnav>
 
+<app-side-columns
+    [tableColumnsUserSettingsKey]="UserSettings.LOCATION_FIELDS"
+    [tableColumns]="tableColumns"
+    (visibleColumnsChanged)="applySideColumnsChanged($event)">
+</app-side-columns>
+
 <div
     fxLayout="row" fxFlex fxLayoutAlign="space-between center">
     <!--Total number of records from the list-->
