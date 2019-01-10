@@ -262,7 +262,7 @@ export class SidenavComponent implements OnInit {
             'help',
             'LNG_LAYOUT_MENU_ITEM_HELP',
             'help',
-            [PERMISSION.WRITE_HELP],
+            [],
             [],
             '/help'
         ),
