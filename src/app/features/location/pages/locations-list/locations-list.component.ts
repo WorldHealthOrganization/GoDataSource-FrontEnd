@@ -7,7 +7,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { Observable } from 'rxjs/Observable';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
@@ -23,6 +23,7 @@ import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../sha
 import { tap } from 'rxjs/operators';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
 
 @Component({
     selector: 'app-locations-list',
@@ -50,6 +51,7 @@ export class LocationsListComponent extends ListComponent implements OnInit {
 
     // authenticated user
     authUser: UserModel;
+    UserSettings = UserSettings;
 
     @ViewChild('locationFilter') locationFilter: FormLocationDropdownComponent;
 
@@ -103,6 +105,47 @@ export class LocationsListComponent extends ListComponent implements OnInit {
                 // ...and re-load the list when parent location is changed
                 this.needsRefreshList(true);
             });
+
+        // initialize side table columns
+        this.initializeSideTableColumns();
+    }
+
+    /**
+     * Initialize Side Table Columns
+     */
+    initializeSideTableColumns() {
+        // default table columns
+        this.tableColumns = [
+            new VisibleColumnModel({
+                field: 'name',
+                label: 'LNG_LOCATION_FIELD_LABEL_NAME'
+            }),
+            new VisibleColumnModel({
+                field: 'synonyms',
+                label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
+            }),
+            new VisibleColumnModel({
+                field: 'latLng',
+                label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
+            }),
+            new VisibleColumnModel({
+                field: 'active',
+                label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE'
+            }),
+            new VisibleColumnModel({
+                field: 'populationDensity',
+                label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY'
+            }),
+            new VisibleColumnModel({
+                field: 'geographicalLevelId',
+                label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
+            }),
+            new VisibleColumnModel({
+                field: 'actions',
+                required: true,
+                excludeFromSave: true
+            })
+        ];
     }
 
     /**
@@ -121,26 +164,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
         const countQueryBuilder = _.cloneDeep(this.queryBuilder);
         countQueryBuilder.paginator.clear();
         this.locationsListCount$ = this.locationDataService.getLocationsCountByParent(this.parentId, countQueryBuilder).share();
-    }
-
-    /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // default columns that we should display
-        const columns = [
-            'name',
-            'synonyms',
-            'latLng',
-            'active',
-            'populationDensity',
-            'geographicalLevelId',
-            'actions'
-        ];
-
-        // finished
-        return columns;
     }
 
     /**
