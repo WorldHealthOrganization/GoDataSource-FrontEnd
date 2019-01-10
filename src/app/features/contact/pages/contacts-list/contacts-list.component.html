@@ -36,7 +36,8 @@
                         (exportStart)="showLoadingDialog()"
                         (exportFinished)="closeLoadingDialog()"
                         [queryBuilder]="queryBuilder"
-                        [isPOST]="true">
+                        [isPOST]="true"
+                        [extraDialogFields]="exportContactsDailyFollowUpListDialogFields">
                     </app-export-button>
 
                     <button

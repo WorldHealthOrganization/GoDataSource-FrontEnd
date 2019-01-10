@@ -18,14 +18,22 @@
                         </button>
                     </ng-container>
 
-                    <button
-                        mat-menu-item
-                        (click)="downloadDailyFollowUpsForm()">
-                        {{'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate}}
-                    </button>
+                    <app-export-button
+                        *ngIf="!appliedListFilter && printFollowUpsUrl"
+                        [menuItem]="true"
+                        [label]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_BUTTON' | translate"
+                        [message]="'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE' | translate"
+                        [url]="printFollowUpsUrl"
+                        [fileName]="printFollowUpsFileName"
+                        [fileType]="ExportDataExtension.PDF"
+                        [extraDialogFields]="printFollowUpsDialogFields"
+                        [queryBuilder]="queryBuilder"
+                        (exportStart)="showLoadingDialog()"
+                        (exportFinished)="closeLoadingDialog()">
+                    </app-export-button>
 
                     <app-export-button
-                        *ngIf="exportFollowUpsUrl"
+                        *ngIf="!appliedListFilter && exportFollowUpsUrl"
                         [menuItem]="true"
                         [label]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_BUTTON' | translate"
                         [message]="'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE' | translate"
@@ -90,7 +98,7 @@
                 name="dateFilter"
                 [ngModel]="dateFilterDefaultValue"
                 [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-                (optionChanged)="filterByDateField('date', $event)"
+                (optionChanged)="filterByFollowUpDate($event)"
                 app-reset-input-on-side-filter
                 [resetToPristineValue]="false">
             </app-form-datepicker>
@@ -182,7 +190,7 @@
                 </div>
             </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.lastName }}
             </mat-cell>
         </ng-container>
@@ -204,7 +212,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.firstName }}
             </mat-cell>
         </ng-container>
@@ -224,7 +232,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.dateOfLastContact | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -241,7 +249,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.followUp.endDate | dateDefault }}
             </mat-cell>
         </ng-container>
@@ -258,7 +266,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.index }}
             </mat-cell>
         </ng-container>
@@ -273,7 +281,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.location?.name }}
             </mat-cell>
         </ng-container>
@@ -288,7 +296,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.address?.fullAddress }}
             </mat-cell>
         </ng-container>
@@ -314,7 +322,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-form-select
                     name="teamId"
                     [ngModel]="item.teamId"
@@ -348,7 +356,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-reference-data-label
                     [category]="ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS"
                     [value]="item.statusId">
@@ -376,7 +384,7 @@
                     </div>
                 </div>
             </mat-header-cell>
-            <mat-cell *matCellDef="let item">
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
             </mat-cell>
         </ng-container>

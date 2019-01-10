@@ -197,21 +197,6 @@ export class FollowUpsDataService {
     }
 
     /**
-     * Download the Daily Follow-Ups Form file
-     * @param {string} outbreakId
-     * @param {string} date
-     * @returns {Observable<any>}
-     */
-    downloadDailyFollowUpsForm(outbreakId: string, date: string): Observable<any> {
-        return this.http.get(
-            `outbreaks/${outbreakId}/contacts/daily-followup-form/export?date=${date}`,
-            {
-                responseType: 'blob'
-            }
-        );
-    }
-
-    /**
      * Get metrics for contacts not seen
      * @param {string} outbreakId
      * @param {number} daysNotSeen

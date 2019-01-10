@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, LoadingDialogModel } from '../../../../shared/components';
+import { DialogAnswerButton, DialogField, LoadingDialogModel } from '../../../../shared/components';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -89,6 +89,7 @@ export class ContactsListComponent extends ListComponent implements OnInit {
     exportContactsDailyFollowUpListUrl: string;
     exportContactsDailyFollowUpListFileName: string;
     exportContactsDailyFollowUpListFileType: ExportDataExtension = ExportDataExtension.PDF;
+    exportContactsDailyFollowUpListDialogFields: DialogField[];
 
     exportContactsUrl: string;
     contactsDataExportFileName: string = moment().format('YYYY-MM-DD');
@@ -152,6 +153,21 @@ export class ContactsListComponent extends ListComponent implements OnInit {
         this.exportContactsDailyFollowUpListFileName = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE') +
             ' - ' +
             moment().format('YYYY-MM-DD');
+
+        // dialog fields for daily follow-ups print
+        this.genericDataService
+            .getRangeFollowUpGroupByOptions(true)
+            .subscribe((options) => {
+                this.exportContactsDailyFollowUpListDialogFields = [
+                    new DialogField({
+                        name: 'groupBy',
+                        placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_FOLLOW_UPS_GROUP_BY_BUTTON',
+                        inputOptions: options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        required: true
+                    })
+                ];
+            });
 
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
