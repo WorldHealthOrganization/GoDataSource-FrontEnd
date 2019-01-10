@@ -58,7 +58,13 @@ export class SidenavComponent implements OnInit {
                 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
                 [PERMISSION.READ_SYS_CONFIG],
                 '/cloud-backup'
-            )
+            ),
+            // new ChildNavItem(
+            //     'terms-of-use',
+            //     'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE',
+            //     [],
+            //     '/terms-of-use'
+            // )
         ]
     );
 
@@ -103,13 +109,6 @@ export class SidenavComponent implements OnInit {
                     'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
                     [PERMISSION.READ_CASE],
                     '/cases',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'lab-results',
-                    'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-                    [PERMISSION.READ_CASE],
-                    '/cases/lab-results',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
@@ -178,6 +177,16 @@ export class SidenavComponent implements OnInit {
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
         new NavItem(
+            'duplicated-records',
+            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
+            'fileCopy',
+            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
+            [],
+            [],
+            '/duplicated-records',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
             'clusters',
             'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
             'groupWork',
@@ -211,7 +220,7 @@ export class SidenavComponent implements OnInit {
                     '/transmission-chains/map',
                 ),
                 new ChildNavItem(
-                    'transmission-chains-map',
+                    'cases-count-map',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
                     [PERMISSION.READ_CASE],
                     '/transmission-chains/case-count-map',
@@ -329,16 +338,6 @@ export class SidenavComponent implements OnInit {
                     '/system-config/backups'
                 )
             ]
-        ),
-        new NavItem(
-            'duplicated-records',
-            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-            'fileCopy',
-            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
-            [],
-            [],
-            '/duplicated-records',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
     ];
 
