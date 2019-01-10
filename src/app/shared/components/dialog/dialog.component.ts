@@ -1,10 +1,11 @@
 import { Component, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -299,4 +300,15 @@ export class DialogComponent {
         dialogHandler.close(new DialogAnswer(DialogAnswerButton.Yes, dialogAnswerClone));
     }
 
+    /**
+     * Set date value
+     * @param fieldName
+     * @param value
+     */
+    setDateValue(
+        fieldName: string,
+        value: Moment
+    ) {
+        this.dialogAnswerInputValue.value[fieldName] = value ? moment(value).toISOString() : value;
+    }
 }
