@@ -576,7 +576,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
             });
         }
-        // populate nodeLabelValues with gender values as they need to be translated
+        // populate nodeLabelValues with gender / classification / outcome values as they need to be translated
         if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
             this.legend.genderValues = [];
             const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
@@ -595,7 +595,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.legend.outcomeValues = [];
             const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
             _.forEach(outcomeValues, (value, key) => {
-                // get gender transcriptions
+                // get outcome values transcriptions
                 this.legend.outcomeValues[value.value] = this.i18nService.instant(value.value);
             });
 
