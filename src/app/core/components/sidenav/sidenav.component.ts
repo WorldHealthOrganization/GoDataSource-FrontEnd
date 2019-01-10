@@ -30,6 +30,12 @@ export class SidenavComponent implements OnInit {
         [],
         [
             new ChildNavItem(
+                'logout',
+                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+                [],
+                '/auth/logout'
+            ),
+            new ChildNavItem(
                 'my-profile',
                 'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL',
                 [],
@@ -48,16 +54,208 @@ export class SidenavComponent implements OnInit {
                 '/account/set-security-questions'
             ),
             new ChildNavItem(
-                'logout',
-                'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
-                [],
-                '/auth/logout'
-            )
+                'cloud-backup',
+                'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
+                [PERMISSION.READ_SYS_CONFIG],
+                '/cloud-backup'
+            ),
+            // new ChildNavItem(
+            //     'terms-of-use',
+            //     'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE',
+            //     [],
+            //     '/terms-of-use'
+            // )
         ]
     );
 
     // Nav Items - main
     mainItems: any[] = [
+        new NavItem(
+            'dashboard',
+            'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL',
+            'barChart',
+            [],
+            [],
+            '/dashboard'
+        ),
+        new NavItem(
+            'outbreaks-group',
+            'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
+            'bug',
+            [],
+            [
+                new ChildNavItem(
+                    'outbreaks',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
+                    [PERMISSION.READ_OUTBREAK],
+                    '/outbreaks'
+                ),
+                new ChildNavItem(
+                    'outbreak-templates',
+                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/outbreak-templates'
+                )
+            ]
+        ),
+        new NavItem(
+            'cases-group',
+            'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
+            'addFolder',
+            [PERMISSION.READ_CASE],
+            [
+                new ChildNavItem(
+                    'cases',
+                    'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
+                    [PERMISSION.READ_CASE],
+                    '/cases',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'gantt-chart',
+                    'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
+                    [
+                        PERMISSION.READ_CASE,
+                        PERMISSION.READ_REPORT
+                    ],
+                    '/cases/gantt-chart',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                )
+            ]
+        ),
+        new NavItem(
+            `lab-results`,
+            'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
+            'lab',
+            [PERMISSION.READ_CASE],
+            [],
+            '/cases/lab-results',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            'contacts-group',
+            'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
+            'people',
+            [],
+            [
+                new ChildNavItem(
+                    'contacts',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
+                    [PERMISSION.READ_CONTACT],
+                    '/contacts',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'contact-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/follow-ups',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                ),
+                new ChildNavItem(
+                    'contact-range-follow-ups',
+                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+                    [
+                        PERMISSION.READ_CONTACT,
+                        PERMISSION.READ_FOLLOWUP
+                    ],
+                    '/contacts/range-follow-ups',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+                )
+            ]
+        ),
+        new NavItem(
+            'events',
+            'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
+            'event',
+            [PERMISSION.READ_EVENT],
+            [],
+            '/events',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            'duplicated-records',
+            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
+            'fileCopy',
+            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
+            [],
+            [],
+            '/duplicated-records',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            'clusters',
+            'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
+            'groupWork',
+            [PERMISSION.READ_OUTBREAK],
+            [],
+            '/clusters',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+            'data-visualisation',
+            'LNG_LAYOUT_MENU_ITEM_DATA_VISUALISATION',
+            'barChart',
+            [],
+            [
+                new ChildNavItem(
+                    'transmission-chains',
+                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
+                    [],
+                    '/transmission-chains',
+                ),
+                new ChildNavItem(
+                    'transmission-chains-list',
+                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL',
+                    [],
+                    '/transmission-chains/list',
+                ),
+                new ChildNavItem(
+                    'transmission-chains-geospatial-map',
+                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_GEO_MAP_LABEL',
+                    [PERMISSION.READ_CASE],
+                    '/transmission-chains/map',
+                ),
+                new ChildNavItem(
+                    'cases-count-map',
+                    'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
+                    [PERMISSION.READ_CASE],
+                    '/transmission-chains/case-count-map',
+                ),
+            ],
+            '',
+            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        {
+            separator: true
+        },
+        new NavItem(
+            'help',
+            'LNG_LAYOUT_MENU_ITEM_HELP',
+            'help',
+            [],
+            [],
+            '/help'
+        ),
+        new NavItem(
+            'reference-data',
+            'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
+            'language',
+            [PERMISSION.WRITE_REFERENCE_DATA],
+            [],
+            '/reference-data'
+        ),
+        new NavItem(
+            'locations',
+            'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL',
+            'location',
+            [PERMISSION.READ_SYS_CONFIG],
+            [],
+            '/locations'
+        ),
         new NavItem(
             'admin-group',
             'LNG_LAYOUT_MENU_ITEM_ADMIN_LABEL',
@@ -77,22 +275,22 @@ export class SidenavComponent implements OnInit {
                     '/user-roles'
                 ),
                 new ChildNavItem(
+                    'languages',
+                    'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
+                    [PERMISSION.READ_SYS_CONFIG],
+                    '/languages'
+                ),
+                new ChildNavItem(
                     'audit-log',
                     'LNG_LAYOUT_MENU_ITEM_AUDIT_LOG_LABEL',
                     [PERMISSION.READ_SYS_CONFIG],
                     '/audit-log'
                 ),
                 new ChildNavItem(
-                    'cloud-backup',
-                    'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP',
-                    [PERMISSION.READ_SYS_CONFIG],
-                    '/cloud-backup'
-                ),
-                new ChildNavItem(
-                    'languages',
-                    'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
-                    [PERMISSION.READ_SYS_CONFIG],
-                    '/languages'
+                    'teams',
+                    'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL',
+                    [PERMISSION.READ_TEAM],
+                    '/teams'
                 ),
                 new ChildNavItem(
                     'help-admin',
@@ -100,6 +298,7 @@ export class SidenavComponent implements OnInit {
                     [PERMISSION.READ_SYS_CONFIG],
                     '/help/categories'
                 )
+                // TODO Insert auditLogs here when needed
             ]
         ),
         new NavItem(
@@ -140,173 +339,6 @@ export class SidenavComponent implements OnInit {
                 )
             ]
         ),
-        new NavItem(
-            'outbreaks-group',
-            'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
-            'bug',
-            [],
-            [
-                new ChildNavItem(
-                    'outbreaks',
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAKS_LABEL',
-                    [PERMISSION.READ_OUTBREAK],
-                    '/outbreaks'
-                ),
-                new ChildNavItem(
-                    'outbreak-templates',
-                    'LNG_LAYOUT_MENU_ITEM_OUTBREAK_TEMPLATES_LABEL',
-                    [PERMISSION.READ_SYS_CONFIG],
-                    '/outbreak-templates'
-                )
-            ]
-        ),
-        new NavItem(
-            'dashboard',
-            'LNG_LAYOUT_MENU_ITEM_DASHBOARD_LABEL',
-            'barChart',
-            [],
-            [],
-            '/dashboard'
-        ),
-        new NavItem(
-            'contacts-group',
-            'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
-            'people',
-            [],
-            [
-                new ChildNavItem(
-                    'contacts',
-                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
-                    [PERMISSION.READ_CONTACT],
-                    '/contacts',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'contact-follow-ups',
-                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
-                    [
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_FOLLOWUP
-                    ],
-                    '/contacts/follow-ups',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'contact-range-follow-ups',
-                    'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
-                    [
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_FOLLOWUP
-                    ],
-                    '/contacts/range-follow-ups',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                )
-            ]
-        ),
-        new NavItem(
-            'cases-group',
-            'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-            'addFolder',
-            [PERMISSION.READ_CASE],
-            [
-                new ChildNavItem(
-                    'cases',
-                    'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-                    [PERMISSION.READ_CASE],
-                    '/cases',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'lab-results',
-                    'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
-                    [PERMISSION.READ_CASE],
-                    '/cases/lab-results',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                ),
-                new ChildNavItem(
-                    'gantt-chart',
-                    'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
-                    [
-                        PERMISSION.READ_CASE,
-                        PERMISSION.READ_REPORT
-                    ],
-                    '/cases/gantt-chart',
-                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-                )
-            ]
-        ),
-        new NavItem(
-            'events',
-            'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
-            'event',
-            [PERMISSION.READ_EVENT],
-            [],
-            '/events',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-        ),
-        new NavItem(
-            'clusters',
-            'LNG_LAYOUT_MENU_ITEM_CLUSTERS_LABEL',
-            'groupWork',
-            [PERMISSION.READ_OUTBREAK],
-            [],
-            '/clusters',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-        ),
-        new NavItem(
-            'duplicated-records',
-            'LNG_LAYOUT_MENU_ITEM_DUPLICATED_RECORDS_LABEL',
-            'fileCopy',
-            // there is a custom logic for this item's permissions (see method 'shouldDisplayItem')
-            [],
-            [],
-            '/duplicated-records',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-        ),
-        new NavItem(
-            'transmission-chains',
-            'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
-            'barChart',
-            [],
-            [],
-            '/transmission-chains',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-        ),
-        {
-            separator: true
-        },
-        new NavItem(
-            'reference-data',
-            'LNG_LAYOUT_MENU_ITEM_REFERENCE_DATA_LABEL',
-            'language',
-            [PERMISSION.WRITE_REFERENCE_DATA],
-            [],
-            '/reference-data'
-        ),
-        new NavItem(
-            'locations',
-            'LNG_LAYOUT_MENU_ITEM_LOCATIONS_LABEL',
-            'location',
-            [PERMISSION.READ_SYS_CONFIG],
-            [],
-            '/locations'
-        ),
-        new NavItem(
-            'teams',
-            'LNG_LAYOUT_MENU_ITEM_TEAMS_ASSIGNMENTS_LABEL',
-            'person_pin',
-            [PERMISSION.READ_TEAM],
-            [],
-            '/teams'
-        ),
-        new NavItem(
-            'help',
-            'LNG_LAYOUT_MENU_ITEM_HELP',
-            'help',
-            [],
-            [],
-            '/help'
-        )
     ];
 
     constructor(
