@@ -74,6 +74,14 @@
                         [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
                         [options]="occupationsList$ | async">
                     </app-form-select>
+
+                    <!-- outcome -->
+                    <app-form-select
+                        name="outcomeId"
+                        [(ngModel)]="filters.outcomeId"
+                        [placeholder]="'LNG_CASE_FIELD_LABEL_OUTCOME' | translate"
+                        [options]="outcomeList$ | async">
+                    </app-form-select>
                 </div>
 
                 <div

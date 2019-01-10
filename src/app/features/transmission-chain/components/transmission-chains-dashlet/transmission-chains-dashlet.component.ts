@@ -54,6 +54,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     genderList$: Observable<any[]>;
     caseClassificationsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
     locationsList: LocationModel[];
     personName: string = '';
     dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -75,7 +76,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         ReferenceDataCategory.EXPOSURE_TYPE,
         ReferenceDataCategory.EXPOSURE_FREQUENCY,
         ReferenceDataCategory.EXPOSURE_DURATION,
-        ReferenceDataCategory.OCCUPATION
+        ReferenceDataCategory.OCCUPATION,
+        ReferenceDataCategory.OUTCOME
     ];
     // reference data entries per category
     referenceDataEntries: any = [];
@@ -120,6 +122,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         occupation: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             refDataCateg: ReferenceDataCategory.OCCUPATION
+        },
+        outcomeId: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            refDataCateg: ReferenceDataCategory.OUTCOME
         }
     };
 
@@ -180,6 +186,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
         this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
         const locationQueryBuilder = new RequestQueryBuilder();
         locationQueryBuilder.fieldsInResponse = ['id', 'name'];
@@ -290,6 +297,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     personRequestQueryBuilder.filter.byEquality(
                         'occupation',
                         this.filters.occupation
+                    );
+                }
+
+                // outcome
+                if (!_.isEmpty(this.filters.outcomeId)) {
+                    personRequestQueryBuilder.filter.byEquality(
+                        'outcomeId',
+                        this.filters.outcomeId
                     );
                 }
 
@@ -575,6 +590,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             _.forEach(classificationValues, (value, key) => {
                 // get classification transcriptions
                 this.legend.classificationValues[value.value] = this.i18nService.instant(value.value);
+            });
+
+            this.legend.outcomeValues = [];
+            const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
+            _.forEach(outcomeValues, (value, key) => {
+                // get gender transcriptions
+                this.legend.outcomeValues[value.value] = this.i18nService.instant(value.value);
             });
 
         }

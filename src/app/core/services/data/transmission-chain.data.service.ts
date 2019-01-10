@@ -262,7 +262,7 @@ export class TransmissionChainDataService {
                             } else {
                                 nodeData.label = '';
                             }
-                            // location
+                            // occupation
                         } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
                             if (node.type !== EntityType.EVENT) {
                                 nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
@@ -305,6 +305,7 @@ export class TransmissionChainDataService {
                                 const lastName = node.model.lastName ? node.model.lastName : '';
                                 const firstName = node.model.firstName ? node.model.firstName : '';
                                 const gender = colorCriteria.genderValues[node.model.gender] ? colorCriteria.genderValues[node.model.gender] : '';
+                                const outcome = colorCriteria.outcomeValues[node.model.outcomeId] ? colorCriteria.outcomeValues[node.model.outcomeId] : '';
                                 const visualId = node.model.visualId ? '\n' + node.model.visualId : '';
                                 const age = !_.isEmpty(node.model.age) ?
                                     node.model.age.months > 0 ?
@@ -328,7 +329,7 @@ export class TransmissionChainDataService {
                                     '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ( node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '' ) :
                                     '';
                                 // concatenate results
-                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + locationName + onset;
+                                nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
                             } else {
                                 nodeData.label = '';
                             }

@@ -281,6 +281,10 @@ export class Constants {
         OCCUPATION: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             value: 'occupation'
+        },
+        OUTCOME: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            value: 'outcomeId'
         }
     };
 
@@ -357,6 +361,10 @@ export class Constants {
         OCCUPATION: {
             label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
             value: 'occupation'
+        },
+        OUTCOME: {
+            label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            value: 'outcomeId'
         }
     };
 
