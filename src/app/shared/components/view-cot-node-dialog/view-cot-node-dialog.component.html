@@ -1,12 +1,23 @@
-<div fxLayout="column">
-    <div class="dialog-label-value">
-        <span>A</span>
-        <span>B</span>
+<div fxLayout="column" fxLayoutGap="10px">
+    <!-- Specific model fields -->
+    <div *ngFor="let info of entityInfo" class="label-value">
+        <span>{{info.label | translate}}</span>
+        <span>{{info.value | translate}}</span>
     </div>
-    <div class="dialog-label-value">
-        <div>C</div>
-        <div>D</div>
-    </div>
+
+    <!-- Link to person resource -->
+    <a [href]="getResourceViewPageLink()" target="_blank">
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
+    </a>
+
+    <!-- Link to person chain -->
+    <a
+        *ngIf="entity.type !== EntityType.CONTACT"
+        [href]="getPersonChainLink()"
+        target="_blank"
+    >
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION' | translate}}
+    </a>
 
     <div fxLayout="row" fxLayoutAlign="end">
         <button
