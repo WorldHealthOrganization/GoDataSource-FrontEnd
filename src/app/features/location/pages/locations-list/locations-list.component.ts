@@ -162,26 +162,6 @@ export class LocationsListComponent extends ListComponent implements OnInit {
     }
 
     /**
-     * Get the list of table columns to be displayed
-     * @returns {string[]}
-     */
-    getTableColumns(): string[] {
-        // default columns that we should display
-        const columns = [
-            'name',
-            'synonyms',
-            'latLng',
-            'active',
-            'populationDensity',
-            'geographicalLevelId',
-            'actions'
-        ];
-
-        // finished
-        return columns;
-    }
-
-    /**
      * Delete location
      */
     deleteLocation(location: LocationModel) {
