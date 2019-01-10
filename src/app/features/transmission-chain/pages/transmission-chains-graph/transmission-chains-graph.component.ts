@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton } from '../../../../shared/components';
+import { DialogAnswerButton, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -59,6 +59,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
 
+    // Edit or View mode?
+    editMode: boolean = false;
     // new relationship model
     newRelationship = new RelationshipModel();
     // new contact model
@@ -149,6 +151,19 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
+    /**
+     * Switch between View and Edit mode (when clicking nodes)
+     * @param editMode
+     */
+    onEditModeChange(editMode: boolean) {
+        this.editMode = editMode;
+
+        if (!editMode) {
+            // reset selected nodes
+            this.resetNodes();
+        }
+    }
+
     onNodeTap(entity: GraphNodeModel) {
         // retrieve entity info
         this.entityDataService
@@ -159,15 +174,30 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 return ErrorObservable.create(err);
             })
             .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                // add node to selected persons list
-                this.selectedNodes.addNode(entityData);
+                if (this.editMode) {
+                    // add node to selected persons list
+                    this.selectedNodes.addNode(entityData);
 
-                // focus boxes
-                setTimeout(() => {
-                    this.domService.scrollItemIntoView(
-                        '.selected-node-details'
+                    // focus boxes
+                    setTimeout(() => {
+                        this.domService.scrollItemIntoView(
+                            '.selected-node-details'
+                        );
+                    });
+                } else {
+                    // show node information
+                    this.dialogService.showCustomDialog(
+                        ViewCotNodeDialogComponent,
+                        {
+                            ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+                            ...{
+                                data: {
+                                    entity: entityData
+                                }
+                            }
+                        }
                     );
-                });
+                }
             });
     }
 

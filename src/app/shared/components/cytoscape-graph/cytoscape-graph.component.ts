@@ -24,6 +24,7 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     @Output() nodeTapped = new EventEmitter<any>();
     @Output() edgeTapped = new EventEmitter<any>();
     @Output() viewTypeChanged = new EventEmitter<any>();
+    @Output() changeEditMode = new EventEmitter<boolean>();
 
     cy: any;
     container: string = 'cy';
@@ -34,7 +35,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     timelineViewType: string = 'horizontal';
     maxTimelineIndex: number = 0;
 
+    // show/hide legend?
     showLegend: boolean = true;
+    // toggle edit mode
+    editMode: boolean = false;
 
     /**
      *  layout cola - bubble view
@@ -393,6 +397,10 @@ export class CytoscapeGraphComponent implements OnChanges, OnInit {
     switchTimelineView(timelineViewType) {
         this.timelineViewType = timelineViewType;
         this.render();
+    }
+
+    toggleEditMode() {
+        this.changeEditMode.emit(this.editMode);
     }
 
     /**

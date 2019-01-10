@@ -44,6 +44,7 @@ import { GlobalEntitySearchComponent } from './global-entity-search/global-entit
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
+import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node-dialog.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -51,6 +52,7 @@ export * from './dialog/dialog.component';
 export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
+export * from './view-cot-node-dialog/view-cot-node-dialog.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -112,6 +114,7 @@ export const components: any[] = [
     DialogComponent,
     ModifyContactFollowUpQuestionnaireDialogComponent,
     LoadingDialogComponent,
+    ViewCotNodeDialogComponent,
 
     // general
     ExportButtonComponent,

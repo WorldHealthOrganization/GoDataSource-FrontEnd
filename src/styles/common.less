@@ -15,3 +15,44 @@
 @desktop-devices: ~"only screen and (min-width: @{desktop-min-size})";
 @mobile-devices: ~"only screen and (max-width: @{mobile-max-size})";
 @ie11-only: ~"all and (-ms-high-contrast: none)";
+
+/* mixins */
+.dialog-label-value() {
+    display: flex;
+    font-family: @font-roboto;
+    font-size: 16px;
+
+    >*:first-child {
+        font-weight: 400;
+        margin-right: 10px;
+        color: #8e8e8e;
+
+        &:after {
+            content: ':';
+        }
+    }
+}
+
+.dialog-simple-link() {
+    font-family: @font-roboto;
+    color: #0071e1;
+    margin: 3px;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:active {
+        color: #0071e1;
+        text-decoration: none;
+    }
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.small-dialog() {
+    // add max-height in vh so the modal will not exceed the viewport making impossible to click on the buttons or see all content
+    max-height: 95vh !important;
+    width: 500px !important;
+    max-width: 95vw !important;
+}
