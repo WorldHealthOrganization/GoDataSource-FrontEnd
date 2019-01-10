@@ -58,14 +58,20 @@ app-contact-range-follow-ups-list {
                     padding-right: 2px;
                     padding-left: 2px;
 
-                    .follow-up-range-date-column-data-bell {
-                        max-height: 8px;
-                        width: 100%;
-                        height: auto;
-                    }
-
                     .follow-up-range-date-column-data-info {
-                        cursor: pointer;
+                        border: 1px solid transparent;
+
+                        &:hover {
+                            cursor: pointer;
+                            border-color: #CCC;
+                        }
+
+                        .follow-up-range-date-column-data-bell {
+                            max-width: 10px;
+                            max-height: 10px;
+                            width: 100%;
+                            margin: 0 auto 1px auto;
+                        }
                     }
                 }
             }

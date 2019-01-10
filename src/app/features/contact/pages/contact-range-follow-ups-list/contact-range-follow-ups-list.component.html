@@ -114,7 +114,7 @@
                 <!-- Statuses -->
                 <div
                     *ngFor="let date of daysToDisplay"
-                    fxFlex="48px" fxLayoutAlign="center end"
+                    fxFlex="64px" fxLayoutAlign="center end"
                     class="follow-up-range-date-header follow-up-range-date-column-header">
                     <div>
                         {{ date | dateShort }}
@@ -165,24 +165,23 @@
                     <!-- Statuses -->
                     <div
                         *ngFor="let date of daysToDisplay"
-                        fxFlex="48px" fxLayout="row" fxLayoutGap="1px"
+                        fxFlex="64px" fxLayout="row" fxLayoutGap="1px"
                         class="follow-up-range-column-data follow-up-range-date-column-data">
                         <ng-container
                             *ngIf="contactFollowUpData.followUps[date]">
                             <ng-container
                                 *ngFor="let followUp of contactFollowUpData.followUps[date]">
                                 <div
-                                    fxFlex fxLayout="column" fxLayoutGap="2px"
+                                    fxFlex fxLayout="column"
                                     class="follow-up-range-date-column-data-info"
                                     [matTooltip]="'Contact: ' + contactFollowUpData.contact.name + ' / ' + 'Date: ' + date + ' / ' + (dailyStatuses[followUp.statusId]?.value | translate)"
                                     [routerLink]="['/contacts', followUp.personId, 'follow-ups', followUp.id, 'view' ]">
 
                                     <!-- FollowUp alerted icon -->
                                     <img
-                                        *ngIf="followUp.alerted"
                                         fxFlex
                                         class="follow-up-range-date-column-data-bell"
-                                        src="/assets/images/small-logo.png"/>
+                                        src="/assets/images/bell.png"/>
 
                                     <!-- FollowUp status -->
                                     <div
