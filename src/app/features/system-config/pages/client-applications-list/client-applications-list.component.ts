@@ -300,7 +300,7 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                     placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
                     required: true,
                     value: apiUrl,
-                    fieldType: DialogFieldType.TEXT
+                    fieldType: DialogFieldType.URL
                 })
             ],
             fileExtension: 'png',

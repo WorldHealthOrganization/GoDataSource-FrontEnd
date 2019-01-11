@@ -65,7 +65,8 @@ export enum DialogFieldType {
     DATE_RANGE = 'date-range',
     DATE = 'date',
     BOOLEAN = 'boolean',
-    LINK = 'link'
+    LINK = 'link',
+    URL = 'url'
 }
 
 export class DialogField {

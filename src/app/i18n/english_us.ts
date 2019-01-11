@@ -251,6 +251,7 @@ export const EnglishUsLang = {
         'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE': 'same or before',
         'LNG_FORM_VALIDATION_ERROR_AT_LEAST_ONE_REQUIRED': 'At least one field must be filled',
         'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC': 'Invalid data',
+        'LNG_FORM_VALIDATION_ERROR_FIELD_URL': 'URL contains wrong path',
 
         /**
          * API Errors
