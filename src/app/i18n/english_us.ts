@@ -12,5 +12,11 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
+
+        /**
+         * Form input validation errors
+         */
+        'LNG_FORM_VALIDATION_ERROR_FIELD_URL': 'Invalid URL, either it contains "localhost" or the path is not good',
+
     }
 };
