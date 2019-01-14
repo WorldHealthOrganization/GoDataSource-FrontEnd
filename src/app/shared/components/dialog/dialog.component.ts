@@ -6,6 +6,7 @@ import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 import { Moment } from 'moment';
+import { Observable } from 'rxjs/Observable';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -90,6 +91,11 @@ export class DialogField {
     };
     public linkTarget: string;
 
+    // url
+    urlAsyncValidator: (url: string) => Observable<boolean>;
+    urlAsyncErrorMsg: string;
+    urlAsyncErrorMsgData: any;
+
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -109,7 +115,12 @@ export class DialogField {
         queryParams?: {
             [key: string]: any
         },
-        linkTarget?: string
+        linkTarget?: string,
+
+        // url
+        urlAsyncValidator?: (url: string) => Observable<boolean>,
+        urlAsyncErrorMsg?: string,
+        urlAsyncErrorMsgData?: any
     }) {
         // set properties
         Object.assign(

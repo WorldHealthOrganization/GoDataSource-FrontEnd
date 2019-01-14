@@ -138,7 +138,7 @@
                         {{ field.placeholder | translate }}
                     </a>
 
-                    <!--Url-->
+                    <!-- Url -->
                     <app-form-input
                         *ngIf="field.fieldType === DialogFieldType.URL"
                         [name]="field.name"
@@ -146,11 +146,11 @@
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
                         [tooltip]="field.description"
                         [required]="field.required"
-                        app-required-one-or-other-validator
-                        app-url-validator
-
-                        [requiredOtherField]="field.requiredOneOfTwo"
-                        [disabled]="field.disabled">
+                        [disabled]="field.disabled"
+                        app-general-async-validator
+                        [asyncValidatorObservable]="field.urlAsyncValidator(dialogAnswerInputValue.value[field.name])"
+                        [asyncValidatorErrMsg]="field.urlAsyncErrorMsg"
+                        [asyncValidatorErrMsgTranslateData]="field.urlAsyncErrorMsgData">
                     </app-form-input>
                 </div>
             </ng-container>
