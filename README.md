@@ -81,3 +81,15 @@ Use the IDE of your choice (Webstorm recommended).
     - If the PR requires any changes, the Reviewer will add the comments and will inform the dev when the code review is finished
         - Dev must address all the comments in his PR, fix the code where necessary and REPLY to all comments, so the Reviewer knows that none of the comments were missed
   
+### Managing Language Translations
+
+1. Go.Data supports multiple languages, the base language being English-US.
+2. In development, we are adding support only for the English-US language.
+3. We must NOT have hardcoded strings in our application. All the strings that are being displayed in the UI must be translated.
+4. All the translations (aka Language Tokens) are stored in the API, and can be seen here: https://github.com/ClarisoftTechnologies/Go.Data-API/blob/master/server/config/languages/english_us.json
+5. For development purpose only, FrontEnd developers can add new Language Tokens in "**/src/app/i18n/english_us.ts**" file, so that the changes are reflected in the UI while developing.
+   - Note that the Language Tokens in previously mentioned file (english_us.ts) are overriding the values defined in the API.
+6. From time to time, we are cleaning up the "english_us.ts" file, moving all the tokens in the API code.
+7. **Before defining new Language Tokens in "english_us.ts" file, verify that there isn't already existing a similar token in the API language file (see item #4 from above), and that you are following the pattern.**. 
+   - Note that all the Language Tokens are grouped based on some criterias (scope, page).
+8. If you want to remove a Language Token that is not being used (anymore), just add a comment in "english_us.ts" and it will be taken into account when merging the file with the API translations (see item #6 from above).

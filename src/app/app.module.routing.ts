@@ -105,7 +105,10 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_CONTACT]
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CONTACT
+                    ]
                 }
             },
             // Case Module routes
@@ -117,7 +120,10 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_CASE]
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CASE
+                    ]
                 }
             },
             // Event Module routes
@@ -129,7 +135,10 @@ const routes: Routes = [
                     PasswordChangeGuard
                 ],
                 data: {
-                    permissions: [PERMISSION.READ_EVENT]
+                    permissions: [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_EVENT
+                    ]
                 }
             },
             // Duplicate records routes
@@ -142,9 +151,7 @@ const routes: Routes = [
                 ],
                 data: {
                     permissions: [
-                        PERMISSION.READ_CASE,
-                        PERMISSION.READ_CONTACT,
-                        PERMISSION.READ_EVENT
+                        PERMISSION.READ_OUTBREAK
                     ]
                 }
             },

@@ -102,12 +102,15 @@ export class SidenavComponent implements OnInit {
             'cases-group',
             'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
             'addFolder',
-            [PERMISSION.READ_CASE],
+            [],
             [
                 new ChildNavItem(
                     'cases',
                     'LNG_LAYOUT_MENU_ITEM_CASES_LABEL',
-                    [PERMISSION.READ_CASE],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CASE
+                    ],
                     '/cases',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
@@ -115,6 +118,7 @@ export class SidenavComponent implements OnInit {
                     'gantt-chart',
                     'LNG_LAYOUT_MENU_ITEM_GANTT_CHART',
                     [
+                        PERMISSION.READ_OUTBREAK,
                         PERMISSION.READ_CASE,
                         PERMISSION.READ_REPORT
                     ],
@@ -141,7 +145,10 @@ export class SidenavComponent implements OnInit {
                 new ChildNavItem(
                     'contacts',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
-                    [PERMISSION.READ_CONTACT],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CONTACT
+                    ],
                     '/contacts',
                     () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
@@ -149,6 +156,7 @@ export class SidenavComponent implements OnInit {
                     'contact-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',
                     [
+                        PERMISSION.READ_OUTBREAK,
                         PERMISSION.READ_CONTACT,
                         PERMISSION.READ_FOLLOWUP
                     ],
@@ -159,6 +167,7 @@ export class SidenavComponent implements OnInit {
                     'contact-range-follow-ups',
                     'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
                     [
+                        PERMISSION.READ_OUTBREAK,
                         PERMISSION.READ_CONTACT,
                         PERMISSION.READ_FOLLOWUP
                     ],
@@ -171,7 +180,10 @@ export class SidenavComponent implements OnInit {
             'events',
             'LNG_LAYOUT_MENU_ITEM_EVENTS_LABEL',
             'event',
-            [PERMISSION.READ_EVENT],
+            [
+                PERMISSION.READ_OUTBREAK,
+                PERMISSION.READ_EVENT
+            ],
             [],
             '/events',
             () => this.hasOutbreak.apply(this) // provide context to keep this functionality
@@ -204,30 +216,44 @@ export class SidenavComponent implements OnInit {
                 new ChildNavItem(
                     'transmission-chains',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LABEL',
-                    [],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT
+                    ],
                     '/transmission-chains',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'transmission-chains-list',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_LIST_LABEL',
-                    [],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_REPORT
+                    ],
                     '/transmission-chains/list',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'transmission-chains-geospatial-map',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_GEO_MAP_LABEL',
-                    [PERMISSION.READ_CASE],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CASE
+                    ],
                     '/transmission-chains/map',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
                 new ChildNavItem(
                     'cases-count-map',
                     'LNG_LAYOUT_MENU_ITEM_TRANSMISSION_CHAINS_COUNT_MAP_LABEL',
-                    [PERMISSION.READ_CASE],
+                    [
+                        PERMISSION.READ_OUTBREAK,
+                        PERMISSION.READ_CASE
+                    ],
                     '/transmission-chains/case-count-map',
+                    () => this.hasOutbreak.apply(this) // provide context to keep this functionality
                 ),
-            ],
-            '',
-            () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+            ]
         ),
         {
             separator: true
@@ -295,7 +321,7 @@ export class SidenavComponent implements OnInit {
                 new ChildNavItem(
                     'help-admin',
                     'LNG_LAYOUT_MENU_ITEM_HELP_ADMIN',
-                    [PERMISSION.READ_SYS_CONFIG],
+                    [PERMISSION.WRITE_HELP],
                     '/help/categories'
                 )
                 // TODO Insert auditLogs here when needed
@@ -305,36 +331,36 @@ export class SidenavComponent implements OnInit {
             'system-config',
             'LNG_LAYOUT_MENU_ITEM_SYSTEM_CONFIG_LABEL',
             'settings',
-            [PERMISSION.READ_SYS_CONFIG],
+            [],
             [
                 new ChildNavItem(
                     'upstream-servers',
                     'LNG_LAYOUT_MENU_ITEM_UPSTREAM_SERVERS_LABEL',
-                    [],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/upstream-servers'
                 ),
                 new ChildNavItem(
                     'client-applications',
                     'LNG_LAYOUT_MENU_ITEM_CLIENT_APPLICATIONS_LABEL',
-                    [],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/client-applications'
                 ),
                 new ChildNavItem(
                     'devices',
                     'LNG_LAYOUT_MENU_ITEM_DEVICES_LABEL',
-                    [],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/devices'
                 ),
                 new ChildNavItem(
                     'sync',
                     'LNG_LAYOUT_MENU_ITEM_SYNC_LABEL',
-                    [],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/sync-logs'
                 ),
                 new ChildNavItem(
                     'backups',
                     'LNG_LAYOUT_MENU_ITEM_BACKUPS_LABEL',
-                    [],
+                    [PERMISSION.READ_SYS_CONFIG],
                     '/system-config/backups'
                 )
             ]
@@ -385,8 +411,11 @@ export class SidenavComponent implements OnInit {
         switch (item.id) {
             case 'duplicated-records':
                 return (
-                    this.authUser.hasPermissions(PERMISSION.READ_CASE) ||
-                    this.authUser.hasPermissions(PERMISSION.READ_CONTACT)
+                    this.authUser.hasPermissions(PERMISSION.READ_OUTBREAK) && (
+                        this.authUser.hasPermissions(PERMISSION.READ_CASE) ||
+                        this.authUser.hasPermissions(PERMISSION.READ_CONTACT) ||
+                        this.authUser.hasPermissions(PERMISSION.READ_EVENT)
+                    )
                 );
 
             default:

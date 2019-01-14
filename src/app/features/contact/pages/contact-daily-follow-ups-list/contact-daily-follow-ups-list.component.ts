@@ -320,7 +320,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      * Initialize header filters
      */
     initializeHeaderFilters() {
-        this.dateFilterDefaultValue = moment();
+        this.dateFilterDefaultValue = moment().startOf('day');
         this.filterByFollowUpDate(this.dateFilterDefaultValue);
     }
 
