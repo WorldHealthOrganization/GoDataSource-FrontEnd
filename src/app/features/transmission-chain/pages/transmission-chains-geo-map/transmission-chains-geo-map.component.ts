@@ -19,6 +19,7 @@ import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Subscription } from 'rxjs/Subscription';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
     selector: 'app-transmission-chains-geo-map',
@@ -124,7 +125,7 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                             address.geoLocation.lng
                         ),
                         type: WorldMapMarkerType.CIRCLE,
-                        color: typeToColorMap[type] ? typeToColorMap[type] : '#000'
+                        color: typeToColorMap[type] ? typeToColorMap[type] : Constants.DEFAULT_COLOR_CHAINS
                     }));
 
                     // add marker to map list

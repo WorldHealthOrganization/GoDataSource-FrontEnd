@@ -12,5 +12,10 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
+
+        /**
+         * uiTransmissionChainsGeoMap
+         */
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL': 'Entity Type: '
     }
 };
