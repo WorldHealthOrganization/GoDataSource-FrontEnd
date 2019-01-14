@@ -11,6 +11,10 @@ export const EnglishUsLang = {
          * Example group
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
-
+        /**
+         * Terms of use page
+         */
+        'LNG_PAGE_TERMS_OF_USE_TITLE': 'Terms of use',
+        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'For full document with terms of use, access the link below'
     }
 };
