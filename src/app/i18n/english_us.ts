@@ -15,6 +15,6 @@ export const EnglishUsLang = {
          * Terms of use page
          */
         'LNG_PAGE_TERMS_OF_USE_TITLE': 'Terms of use',
-        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'For full document with terms of use, access the link below'
+        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'Access the link below for downloading the full document with terms of use'
     }
 };
