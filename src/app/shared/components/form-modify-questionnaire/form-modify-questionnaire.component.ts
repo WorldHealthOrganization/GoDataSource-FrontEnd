@@ -13,6 +13,12 @@ import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
+import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
+import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
+import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { GenericDataService } from '../../../core/services/data/generic.data.service';
+import { NgForm } from '@angular/forms';
+import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 
 /**
  * Used to initialize breadcrumbs
@@ -74,9 +80,24 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     questionIndexInEditMode: number = null;
 
     /**
+     * Question In Edit Mode Clone
+     */
+    questionInEditModeClone: QuestionModel;
+
+    /**
      * Saving data
      */
     savingData: boolean = false;
+
+    /**
+     * List of categories for a form-question
+     */
+    questionCategoriesInstantList: LabelValuePair[];
+
+    /**
+     * List of answer types
+     */
+    answerTypesInstantList: LabelValuePair[];
 
     /**
      * Breadcrumbs init
@@ -95,7 +116,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         protected route: ActivatedRoute,
         private authDataService: AuthDataService,
         private i18nService: I18nService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private referenceDataDataService: ReferenceDataDataService,
+        private genericDataService: GenericDataService,
+        private formHelper: FormHelperService
     ) {
         super();
     }
@@ -104,6 +128,18 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Initialized
      */
     ngOnInit() {
+        // retrieve reference options
+        this.referenceDataDataService
+            .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY)
+            .subscribe((questionCategoriesList) => {
+                this.questionCategoriesInstantList = questionCategoriesList;
+            });
+        this.genericDataService
+            .getAnswerTypesList()
+            .subscribe((answerTypesInstantList) => {
+                this.answerTypesInstantList = answerTypesInstantList;
+            });
+
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -432,6 +468,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     if (success) {
                         // no question in edit mode
                         this.questionIndexInEditMode = null;
+                        this.questionInEditModeClone = null;
                     } else {
                         // #TODO
                         // we can't rollback..so..what now ? try again, or disable questionnaire ?
@@ -457,8 +494,15 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * @param questionIndex
      */
     modifyQuestion(questionIndex: number) {
-        // set question edit mode
-        this.questionIndexInEditMode = questionIndex;
+        // make some validations just to be sure
+        if (
+            !_.isEmpty(this.questionnaireData) &&
+            !_.isEmpty(this.questionnaireData[questionIndex])
+        ) {
+            // set question edit mode
+            this.questionIndexInEditMode = questionIndex;
+            this.questionInEditModeClone = new QuestionModel(this.questionnaireData[questionIndex]);
+        }
     }
 
     /**
@@ -490,5 +534,32 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.emitUpdateQuestionnaire();
                 }
             });
+    }
+
+    /**
+     * Cancel question edit
+     */
+    cancelModifyQuestion() {
+        // check for changes and display popup
+        // need to implement viewModifyComponent so it checks if we try to change the page or close window etc..too
+        // #TODO
+
+        // cancel edit
+        this.questionIndexInEditMode = null;
+        this.questionInEditModeClone = null;
+    }
+
+    /**
+     * Save Question
+     */
+    saveModifyQuestion(form: NgForm) {
+        // validate form
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // save question
+        // #TODO
+        console.log(form);
     }
 }

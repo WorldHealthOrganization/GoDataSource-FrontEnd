@@ -108,6 +108,7 @@
                     class="modify-questionnaire-cell-style">
                     <button
                         mat-icon-button
+                        type="button"
                         [matMenuTriggerFor]="actionsMenu"
                         [disabled]="savingData || questionIndexInEditMode !== null">
                         <span class="xt-icon">moreVertical</span>
@@ -138,6 +139,7 @@
 
                         <button
                             mat-menu-item
+                            type="button"
                             (click)="viewQuestion(questionIndex)">
                             {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
                         </button>
@@ -160,6 +162,7 @@
 
                             <button
                                 mat-menu-item
+                                type="button"
                                 class="mat-menu-item-delete"
                                 (click)="deleteQuestion(questionIndex)">
                                 {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
@@ -171,9 +174,112 @@
 
             <!-- Edit Mode -->
             <div
-                *ngIf="questionIndex === questionIndexInEditMode"
-                fxFlex fxLayout="row">
-                Edit Mode
+                *ngIf="questionIndex === questionIndexInEditMode">
+                <div
+                    fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+                    <button
+                        type="button"
+                        mat-raised-button
+                        (click)="cancelModifyQuestion()">
+                        {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                    </button>
+
+                    <button
+                        type="submit"
+                        mat-raised-button
+                        color="accent"
+                        form="form">
+                        {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                    </button>
+                </div>
+                <mat-card
+                    class="modify-questionnaire-edit-question-card">
+                    <form
+                        #form="ngForm"
+                        id="form"
+                        fxFlex fxLayout="column"
+                        (submit)="saveModifyQuestion(form)">
+                        <div
+                            fxLayout="row"
+                            fxLayoutGap="5px">
+                            <!-- question order -->
+                            <div
+                                fxFlex="70px">
+                                <app-form-input
+                                    name="order"
+                                    [(ngModel)]="questionInEditModeClone.order"
+                                    type="number"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
+                                    [required]="false">
+                                </app-form-input>
+                            </div>
+
+                            <!-- question text -->
+                            <div
+                                fxFlex>
+                                <app-form-input
+                                    name="text"
+                                    [(ngModel)]="questionInEditModeClone.text"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
+                                    [required]="true">
+                                </app-form-input>
+                            </div>
+
+                            <!-- question variable -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-input
+                                    name="variable"
+                                    [(ngModel)]="questionInEditModeClone.variable"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
+                                    [required]="true"
+                                    [readonly]="!questionInEditModeClone.new && questionInEditModeClone.variable">
+                                </app-form-input>
+                            </div>
+
+                            <!-- question category -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="category"
+                                    [(ngModel)]="questionInEditModeClone.category"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION"
+                                    [required]="true"
+                                    [options]="questionCategoriesInstantList"
+                                    [clearable]="false">
+                                </app-form-select>
+                            </div>
+
+                            <!-- question - answer type -->
+                            <div
+                                fxFlex="200px">
+                                <app-form-select
+                                    name="answerType"
+                                    [(ngModel)]="questionInEditModeClone.answerType"
+                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
+                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
+                                    [required]="true"
+                                    [options]="answerTypesInstantList">
+                                </app-form-select>
+                            </div>
+
+                            <!-- question actions -->
+                            <div
+                                fxFlex="150px">
+                                <app-form-slide-toggle
+                                    name="required"
+                                    [(ngModel)]="questionInEditModeClone.required"
+                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
+                                    [required]="false">
+                                </app-form-slide-toggle>
+                            </div>
+                        </div>
+                    </form>
+                </mat-card>
             </div>
         </ng-container>
     </div>
