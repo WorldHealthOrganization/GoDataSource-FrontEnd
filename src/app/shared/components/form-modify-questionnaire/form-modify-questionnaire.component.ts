@@ -558,8 +558,14 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             return;
         }
 
+        // replace question with the one we just changed
+        this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
+
+        // stop edit
+        this.questionIndexInEditMode = null;
+        this.questionInEditModeClone = null;
+
         // save question
-        // #TODO
-        console.log(form);
+        this.emitUpdateQuestionnaire();
     }
 }
