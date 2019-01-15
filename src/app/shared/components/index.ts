@@ -45,6 +45,7 @@ import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-i
 import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
 import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node-dialog.component';
+import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -53,6 +54,7 @@ export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-fo
 export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
 export * from './view-cot-node-dialog/view-cot-node-dialog.component';
+export * from './form-modify-questionnaire/form-modify-questionnaire.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -88,6 +90,7 @@ export const components: any[] = [
     FormInputListComponent,
     FormNameUrlListComponent,
     FormLocationDropdownComponent,
+    FormModifyQuestionnaireComponent,
     FormFillQuestionnaireComponent,
     FormAgeComponent,
     FormAgeDobComponent,

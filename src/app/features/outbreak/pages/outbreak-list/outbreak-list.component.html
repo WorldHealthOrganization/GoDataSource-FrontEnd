@@ -300,6 +300,27 @@
                             {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
                         </button>
                     </ng-container>
+
+                    <mat-divider></mat-divider>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreaks', item.id, 'case-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreaks', item.id, 'contact-follow-up-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreaks', item.id, 'case-lab-results-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
+                    </button>
+
                 </mat-menu>
             </mat-cell>
         </ng-container>

@@ -12,5 +12,37 @@ export const EnglishUsLang = {
          */
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
+        /**
+         * uiOutbreakListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab Results form',
+
+        /**
+         * uiModifyOutbreakPage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
+        'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab form',
+
+        /**
+         * NEW GROUP
+         * uiModifyOutbreakQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_OUTBREAK_TITLE': '{{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CASE_TITLE': 'Case investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_FOLLOW_UP_TITLE': 'Contact follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_LAB_RESULT_TITLE': 'Lab Results',
+
+        /**
+         * uiOutbreakQuestionnaireTemplates
+         */
+        'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_UP': 'Move Up',
+        'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_DOWN': 'Move Down',
+
+        // some tokens might need to be removed
+        // - create & modify outbreak => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
+        // - before removing these tokens make sure they aren't used
     }
 };
