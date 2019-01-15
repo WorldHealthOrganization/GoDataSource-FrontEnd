@@ -122,7 +122,7 @@
                     </ng-container>
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE_BUTTON' | translate }}
                     </button>
 
                     <ng-container
@@ -130,14 +130,14 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                            {{'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE_BUTTON'| translate}}
                         </button>
 
                         <button
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="deleteOutbreakTemplate(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE_BUTTON' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>
