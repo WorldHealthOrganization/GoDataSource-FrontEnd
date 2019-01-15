@@ -1043,11 +1043,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
         this.followUpsDataService
-            .modifyFollowUp(
-                this.selectedOutbreak.id,
-                followUp.personId,
-                followUp.id,
-                { targeted: targeted})
+            .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted})
             .catch((err) => {
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
