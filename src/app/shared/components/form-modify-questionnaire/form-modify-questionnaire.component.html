@@ -1,7 +1,8 @@
 <div class="modify-questionnaire-table">
     <!-- Question list general actions -->
     <div
-        fxFlex fxLayout="row" fxLayoutAlign="end">
+        fxFlex fxLayout="row" fxLayoutAlign="end"
+        class="modify-questionnaire-table-question-actions-top">
         <button
             type="button"
             mat-raised-button color="accent"
@@ -190,8 +191,10 @@
                 *ngIf="questionIndex === questionIndexInEditMode"
                 class="modify-questionnaire-edit-question"
                 [id]="uniqueIDQuestion">
+                <!-- Question Actions -->
                 <div
-                    fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+                    fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                    class="modify-questionnaire-edit-question-card-buttons">
                     <button
                         type="button"
                         mat-raised-button
@@ -207,6 +210,8 @@
                         {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                     </button>
                 </div>
+
+                <!-- Question Form Data -->
                 <mat-card
                     class="modify-questionnaire-edit-question-card">
                     <form
@@ -308,7 +313,8 @@
 
                             <!-- Answers list general actions -->
                             <div
-                                fxFlex fxLayout="row" fxLayoutAlign="end">
+                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                class="modify-questionnaire-table-answer-actions-top">
                                 <button
                                     type="button"
                                     mat-raised-button color="accent"
@@ -481,7 +487,8 @@
                                     [id]="uniqueIDAnswer">
                                     <!-- Answer buttons -->
                                     <div
-                                        fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+                                        fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px"
+                                        class="modify-questionnaire-edit-question-answer-card-buttons">
                                         <button
                                             type="button"
                                             mat-raised-button
@@ -500,7 +507,7 @@
 
                                     <!-- Answer Data -->
                                     <mat-card
-                                        class="modify-questionnaire-edit-question-card">
+                                        class="modify-questionnaire-edit-question-answer-card">
                                         <!-- Edit Answer Form -->
                                         <div
                                             fxLayout="row"
@@ -575,10 +582,36 @@
                                     </mat-card>
                                 </div>
                             </ng-container>
+
+                            <!-- Answers list general actions -->
+                            <div
+                                fxFlex fxLayout="row" fxLayoutAlign="end"
+                                class="modify-questionnaire-table-answer-actions-bottom">
+                                <button
+                                    type="button"
+                                    mat-raised-button color="accent"
+                                    (click)="addNewAnswer()"
+                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null">
+                                    {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate}}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </mat-card>
             </div>
         </ng-container>
+    </div>
+
+    <!-- Question list general actions -->
+    <div
+        fxFlex fxLayout="row" fxLayoutAlign="end"
+        class="modify-questionnaire-table-question-actions-bottom">
+        <button
+            type="button"
+            mat-raised-button color="accent"
+            (click)="addNewQuestion()"
+            [disabled]="savingData || questionIndexInEditMode !== null">
+            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate}}
+        </button>
     </div>
 </div>

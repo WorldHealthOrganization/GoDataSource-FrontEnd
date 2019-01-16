@@ -1,6 +1,15 @@
 app-form-modify-questionnaire {
     @edit-form-distance: 70px;
     .modify-questionnaire-table {
+        .modify-questionnaire-table-question-actions-top,
+        .modify-questionnaire-table-answer-actions-top {
+            // nothing
+        }
+        .modify-questionnaire-table-question-actions-bottom,
+        .modify-questionnaire-table-answer-actions-bottom {
+            margin-top: 10px;
+        }
+
         .modify-questionnaire-cell-default {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -22,9 +31,16 @@ app-form-modify-questionnaire {
             margin-bottom: @edit-form-distance;
         }
 
-        .modify-questionnaire-edit-question-card {
+        @edit-card-sides-distance: 25px;
+        .modify-questionnaire-edit-question-card-buttons,
+        .modify-questionnaire-edit-question-answer-card-buttons {
+            margin: 0 @edit-card-sides-distance;
+        }
+
+        .modify-questionnaire-edit-question-card,
+        .modify-questionnaire-edit-question-answer-card {
             padding: 15px !important;
-            margin: 0 !important;
+            margin: 0 @edit-card-sides-distance !important;
         }
 
         .modify-questionnaire-edit-answer {

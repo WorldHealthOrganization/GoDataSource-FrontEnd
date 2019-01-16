@@ -54,8 +54,8 @@ export class FormModifyQuestionnaireUpdateData {
 export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
     // component unique id
     uniqueID: string = uuid();
-    uniqueIDQuestion: string = this.uniqueID + 'Question';
-    uniqueIDAnswer: string = this.uniqueID + 'Answer';
+    uniqueIDQuestion: string = `question-section-${this.uniqueID}`;
+    uniqueIDAnswer: string = `answer-section-${this.uniqueID}`;
 
     // constants
     answerTypes: any = Constants.ANSWER_TYPES;
@@ -884,7 +884,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // set focus on the new question
         this.domService.scrollItemIntoView(
-            `#${this.uniqueIDQuestion}`
+            `#${this.uniqueIDQuestion}`,
+            'nearest'
         );
     }
 
@@ -932,7 +933,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // set focus on the new answer
         this.domService.scrollItemIntoView(
-            `#${this.uniqueIDAnswer}`
+            `#${this.uniqueIDAnswer}`,
+            'nearest'
         );
     }
 }
