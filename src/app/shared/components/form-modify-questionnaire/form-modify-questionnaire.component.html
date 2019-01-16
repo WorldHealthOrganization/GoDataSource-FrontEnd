@@ -201,7 +201,8 @@
                     <button
                         type="button"
                         mat-raised-button
-                        (click)="cancelModifyQuestion()">
+                        (click)="cancelModifyQuestion()"
+                        [disabled]="questionAnswerIndexInEditMode !== null">
                         {{ 'LNG_COMMON_BUTTON_CANCEL'| translate }}
                     </button>
 
@@ -500,7 +501,8 @@
                                         <button
                                             type="button"
                                             mat-raised-button
-                                            (click)="cancelModifyAnswer()">
+                                            (click)="cancelModifyAnswer()"
+                                            [disabled]="childQuestionIsInEditMode">
                                             {{ 'LNG_COMMON_BUTTON_CANCEL'| translate }}
                                         </button>
 
