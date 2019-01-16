@@ -2,7 +2,7 @@
     <div
         fxFlex fxLayout="row">
 
-        <!-- Order -->
+        <!-- Question Order -->
         <div
             fxFlex="50px"
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
@@ -52,9 +52,9 @@
         </div>
     </div>
 
+    <!-- Question Data -->
     <div
         fxFlex fxLayout="column" fxLayoutGap="5px">
-
         <ng-container
             *ngFor="let question of questionnaireData; let questionIndex = index">
 
@@ -172,7 +172,7 @@
                 </div>
             </div>
 
-            <!-- Edit Mode -->
+            <!-- Question Edit Mode -->
             <div
                 *ngIf="questionIndex === questionIndexInEditMode">
                 <div
@@ -443,6 +443,18 @@
                                             </ng-container>
                                         </mat-menu>
                                     </div>
+                                </div>
+
+                                <!-- Answer Edit Mode -->
+                                <div
+                                    *ngIf="answerIndex === questionAnswerIndexInEditMode">
+                                    <mat-card
+                                        class="modify-questionnaire-edit-question-card">
+                                        <app-form-modify-questionnaire
+                                            [parent]="parent"
+                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions()">
+                                        </app-form-modify-questionnaire>
+                                    </mat-card>
                                 </div>
                             </ng-container>
                         </div>

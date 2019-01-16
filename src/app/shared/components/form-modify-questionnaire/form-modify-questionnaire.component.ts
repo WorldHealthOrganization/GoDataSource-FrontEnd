@@ -628,7 +628,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Modify Question Answer
      */
     modifyAnswer(answerIndex: number) {
-        // #TODO
+        // make some validations just to be sure
+        if (
+            !_.isEmpty(this.questionInEditModeClone) &&
+            !_.isEmpty(this.questionInEditModeClone.answers) &&
+            !_.isEmpty(this.questionInEditModeClone.answers[answerIndex])
+        ) {
+            // set answer edit mode
+            this.questionAnswerIndexInEditMode = answerIndex;
+            this.questionAnswerInEditModeClone = new AnswerModel(this.questionInEditModeClone.answers[answerIndex]);
+        }
     }
 
     /**
@@ -737,5 +746,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         ) {
             this.inputForMakingFormDirty.control.markAsDirty();
         }
+    }
+
+    /**
+     * Update Answer Additional Questions
+     */
+    updateAnswerAdditionalQuestions() {
+        // #TODO
+        // this.questionAnswerIndexInEditMode
     }
 }
