@@ -6,6 +6,7 @@
 
 <mat-card class="page-section page-content">
     <app-form-modify-questionnaire
+        #questionnaire
         [parent]="outbreak"
         (initBreadcrumbs)="createBreadcrumbs($event)"
         (updateQuestionnaire)="updateQuestionnaire($event)">

@@ -208,7 +208,7 @@
                         type="submit"
                         mat-raised-button
                         color="accent"
-                        form="form">
+                        form="questionForm">
                         {{ (displayChangeButton ? 'LNG_COMMON_BUTTON_CHANGE' : 'LNG_COMMON_BUTTON_SAVE') | translate }}
                     </button>
                 </div>
@@ -217,8 +217,8 @@
                 <mat-card
                     class="modify-questionnaire-edit-question-card">
                     <form
-                        #form="ngForm"
-                        id="form"
+                        #questionForm="ngForm"
+                        id="questionForm"
                         fxFlex fxLayout="column"
                         (submit)="saveModifyQuestion()">
                         <div

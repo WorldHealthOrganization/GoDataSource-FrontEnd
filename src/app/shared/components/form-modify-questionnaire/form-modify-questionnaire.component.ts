@@ -137,7 +137,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Form dirty
      */
-    @ViewChild('form') form: NgForm;
+    @ViewChild('questionForm') questionForm: NgForm;
 
     /**
      * Used to mark form dirty
@@ -794,8 +794,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     saveModifyQuestion() {
         // validate form
         if (
-            !this.form ||
-            !this.formHelper.validateForm(this.form)
+            !this.questionForm ||
+            !this.formHelper.validateForm(this.questionForm)
         ) {
             return;
         }
@@ -821,7 +821,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     markFormDirty() {
         if (
-            this.form &&
+            this.questionForm &&
             this.inputForMakingFormDirty
         ) {
             this.inputForMakingFormDirty.control.markAsDirty();

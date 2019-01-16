@@ -67,7 +67,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
 
     // Edit Outbreak Contact Follow-up Questionnaire
@@ -81,7 +84,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
             questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
 
     // Edit Outbreak Case Lab Results Questionnaire
@@ -95,7 +101,10 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
             questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
-        }
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
     },
 
     // Inconsistencies
