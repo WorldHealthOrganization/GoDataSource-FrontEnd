@@ -73,7 +73,7 @@ export class OutbreakQuestionnaireComponent implements OnInit {
      * Update Questionnaire data
      */
     updateQuestionnaire(questionnaireData: FormModifyQuestionnaireUpdateData) {
-        console.log(questionnaireData);
+        console.log('updateQuestionnaire', questionnaireData);
         setTimeout(() => {
             questionnaireData.finishSubscriber.next(true);
         }, 2000);

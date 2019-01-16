@@ -20,6 +20,7 @@ import { GenericDataService } from '../../../core/services/data/generic.data.ser
 import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { Constants } from '../../../core/models/constants';
+import { DomService } from '../../../core/services/helper/dom.service';
 
 /**
  * Used to initialize breadcrumbs
@@ -148,7 +149,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         private dialogService: DialogService,
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
-        private formHelper: FormHelperService
+        private formHelper: FormHelperService,
+        private domService: DomService
     ) {
         super();
     }
@@ -314,7 +316,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Sort questionnaire questions
      * @param questions
      */
-    private sortQuestionnaireQuestions(questions: QuestionModel[]): QuestionModel[] {
+    private sortQuestionnaireQuestions(
+        questions: QuestionModel[],
+        recursive: boolean = true
+    ): QuestionModel[] {
         // empty ?
         if (_.isEmpty(questions)) {
             return questions;
@@ -330,11 +335,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 );
 
                 // check answers for order
-                _.each(question.answers, (answer: AnswerModel) => {
-                    if (!_.isEmpty(answer.additionalQuestions)) {
-                        answer.additionalQuestions = this.sortQuestionnaireQuestions(answer.additionalQuestions);
-                    }
-                });
+                if (recursive) {
+                    _.each(question.answers, (answer: AnswerModel) => {
+                        if (!_.isEmpty(answer.additionalQuestions)) {
+                            answer.additionalQuestions = this.sortQuestionnaireQuestions(
+                                answer.additionalQuestions,
+                                recursive
+                            );
+                        }
+                    });
+                }
             }
         });
 
@@ -778,6 +788,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // replace question with the one we just changed
         this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
 
+        // sort questions
+        this.questionnaireData = this.sortQuestionnaireQuestions(this.questionnaireData);
+
+        // reset question order
+        this.setQuestionnaireQuestionsOrder(this.questionnaireData);
+
         // stop question edit
         this.resetQuestionEditMode();
 
@@ -803,7 +819,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     updateAnswerAdditionalQuestions(questionnaireData: FormModifyQuestionnaireUpdateData) {
         // #TODO
         // this.questionAnswerIndexInEditMode
-        console.log(questionnaireData);
+        console.log('updateAnswerAdditionalQuestions', questionnaireData);
     }
 
     /**
@@ -822,6 +838,63 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Update answer data - no save
      */
     updateAnswerData() {
+        // validate answer form without validating parent question...
+        // take in account that we could change a child question too...
+        // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
         // #TODO
+
+        // replace answer with the new one
+        this.questionInEditModeClone.answers[this.questionAnswerIndexInEditMode] = this.questionAnswerInEditModeClone;
+
+        // stop answer edit
+        this.resetQuestionAnswerEditMode();
+    }
+
+    /**
+     * Add a new question
+     */
+    addNewQuestion() {
+        // check if we need to initialize questionnaire
+        if (_.isEmpty(this.questionnaireData)) {
+            this.questionnaireData = [];
+        }
+
+        // push a new question
+        this.questionnaireData.push(new QuestionModel({
+            order: 99999
+        }));
+
+        // sort not needed since we always add questions at the end
+        // NOTHING
+
+        // set question order
+        this.setQuestionnaireQuestionsOrder(
+            this.questionnaireData,
+            false
+        );
+
+        // start modifying the new question
+        this.modifyQuestion(this.questionnaireData.length - 1);
+
+        // set focus on the new question
+        this.domService.scrollItemIntoView(
+            '.modify-questionnaire-edit-question'
+        );
+    }
+
+    /**
+     * Sanitize order value => convert string to int
+     */
+    setOrderValue(
+        object: QuestionModel | AnswerModel,
+        value: string | null
+    ) {
+        if (_.isString(value)) {
+            if (value.length > 0) {
+                object.order = parseFloat(value);
+            }
+        } else {
+            object.order = value as any;
+        }
     }
 }
