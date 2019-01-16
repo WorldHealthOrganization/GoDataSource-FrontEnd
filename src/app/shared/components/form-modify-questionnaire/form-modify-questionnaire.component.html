@@ -311,8 +311,8 @@
                             fxFlex fxLayout="column">
                             <!-- Dummy field used to make form dirty -->
                             <input
-                                #inputForMakingFormDirty="ngModel"
-                                name="inputForMakingFormDirty"
+                                #inputQuestionForMakingFormDirty="ngModel"
+                                name="inputQuestionForMakingFormDirty"
                                 ngModel
                                 type="hidden"/>
 
@@ -523,6 +523,13 @@
                                             [id]="uniqueIDAnswerForm"
                                             fxFlex fxLayout="column"
                                             (submit)="updateAnswerData()">
+                                            <!-- Dummy field used to make form dirty -->
+                                            <input
+                                                #inputAnswerForMakingFormDirty="ngModel"
+                                                name="inputAnswerForMakingFormDirty"
+                                                ngModel
+                                                type="hidden"/>
+
                                             <!-- Edit Answer Form -->
                                             <div
                                                 fxLayout="row"

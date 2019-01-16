@@ -152,9 +152,14 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     @ViewChild('answerForm') answerForm: NgForm;
 
     /**
-     * Used to mark form dirty
+     * Used to mark question form dirty
      */
-    @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty: NgModel;
+    @ViewChild('inputQuestionForMakingFormDirty') inputQuestionForMakingFormDirty: NgModel;
+
+    /**
+     * Used to mark answer form dirty
+     */
+    @ViewChild('inputAnswerForMakingFormDirty') inputAnswerForMakingFormDirty: NgModel;
 
     /**
      * Breadcrumbs init
@@ -605,7 +610,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         );
 
         // mark form as dirty
-        this.markFormDirty();
+        this.markQuestionFormDirty();
     }
 
     /**
@@ -777,7 +782,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     );
 
                     // mark form as dirty
-                    this.markFormDirty();
+                    this.markQuestionFormDirty();
                 }
             });
     }
@@ -884,14 +889,30 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
-     * Mark form dirty
+     * Mark question form dirty
      */
-    markFormDirty() {
+    markQuestionFormDirty() {
         if (
             this.questionForm &&
-            this.inputForMakingFormDirty
+            this.inputQuestionForMakingFormDirty
         ) {
-            this.inputForMakingFormDirty.control.markAsDirty();
+            this.inputQuestionForMakingFormDirty.control.markAsDirty();
+        }
+    }
+
+    /**
+     * Mark answer form dirty
+     */
+    markAnswerFormDirty() {
+        if (
+            this.answerForm &&
+            this.inputAnswerForMakingFormDirty
+        ) {
+            // mark answer form as dirty
+            this.inputAnswerForMakingFormDirty.control.markAsDirty();
+
+            // mark question form as dirty
+            this.markQuestionFormDirty();
         }
     }
 
@@ -899,10 +920,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Update Answer Additional Questions
      */
     updateAnswerAdditionalQuestions(questionnaireData: FormModifyQuestionnaireUpdateData) {
-        // #TODO
-        // this.questionAnswerIndexInEditMode
-        console.log('updateAnswerAdditionalQuestions', questionnaireData);
-        alert('Work in progress');
+        // update answer additional questions
+        this.questionAnswerInEditModeClone.additionalQuestions = questionnaireData.questionnaire;
+
+        // mark answer form as dirty
+        this.markAnswerFormDirty();
     }
 
     /**
@@ -970,6 +992,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // stop answer edit
         this.resetQuestionAnswerEditMode();
+
+        // mark main form as dirty
+        this.markQuestionFormDirty();
     }
 
     /**
@@ -1058,7 +1083,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         );
 
         // mark main form as dirty
-        this.markFormDirty();
+        this.markQuestionFormDirty();
     }
 
     /**
