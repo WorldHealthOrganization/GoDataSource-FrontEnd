@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../core/services/guards/page-change-confirmation-guard.service';
 import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -17,8 +17,9 @@ import { ReferenceDataCategory } from '../../../core/models/reference-data.model
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
+import { Constants } from '../../../core/models/constants';
 
 /**
  * Used to initialize breadcrumbs
@@ -49,6 +50,9 @@ export class FormModifyQuestionnaireUpdateData {
     styleUrls: ['./form-modify-questionnaire.component.less']
 })
 export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
+    // constants
+    answerTypes: any = Constants.ANSWER_TYPES;
+
     // authenticated user
     authUser: UserModel;
 
@@ -85,6 +89,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     questionInEditModeClone: QuestionModel;
 
     /**
+     * Question Answer In Edit Mode
+     */
+    questionAnswerIndexInEditMode: number = null;
+
+    /**
+     * Question Answer In Edit Mode Clone
+     */
+    questionAnswerInEditModeClone: AnswerModel;
+
+    /**
      * Saving data
      */
     savingData: boolean = false;
@@ -98,6 +112,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * List of answer types
      */
     answerTypesInstantList: LabelValuePair[];
+
+    /**
+     * Form dirty
+     */
+    @ViewChild('form') form: NgForm;
+
+    /**
+     * Used to mark form dirty
+     */
+    @ViewChild('inputForMakingFormDirty') inputForMakingFormDirty: NgModel;
 
     /**
      * Breadcrumbs init
@@ -295,11 +319,20 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // sort answer questions
         _.each(questions, (question: QuestionModel) => {
-            _.each(question.answers, (answer: AnswerModel) => {
-                if (!_.isEmpty(answer.additionalQuestions)) {
-                    answer.additionalQuestions = this.sortQuestionnaireQuestions(answer.additionalQuestions);
-                }
-            });
+            if (!_.isEmpty(question.answers)) {
+                // sort answers
+                question.answers = _.sortBy(
+                    question.answers,
+                    'order'
+                );
+
+                // check answers for order
+                _.each(question.answers, (answer: AnswerModel) => {
+                    if (!_.isEmpty(answer.additionalQuestions)) {
+                        answer.additionalQuestions = this.sortQuestionnaireQuestions(answer.additionalQuestions);
+                    }
+                });
+            }
         });
 
         // sort questions
@@ -318,21 +351,25 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         recursive: boolean = true
     ) {
         // sort answer questions
-        _.each(questions, (question: QuestionModel, index: number) => {
+        _.each(questions, (question: QuestionModel, questionIndex: number) => {
             // set question order
-            question.order = index + 1;
+            question.order = questionIndex + 1;
 
             // set additional questions index
-            if (recursive) {
-                _.each(question.answers, (answer: AnswerModel) => {
+            _.each(question.answers, (answer: AnswerModel, answerIndex: number) => {
+                // set answer order
+                answer.order = answerIndex + 1;
+
+                // continue bellow ?
+                if (recursive) {
                     if (!_.isEmpty(answer.additionalQuestions)) {
                         this.setQuestionnaireQuestionsOrder(
                             answer.additionalQuestions,
                             recursive
                         );
                     }
-                });
-            }
+                }
+            });
         });
     }
 
@@ -449,6 +486,81 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
+     * Move question answer above
+     * @param answerIndex
+     */
+    moveAnswerAbove(answerIndex: number) {
+        this.changeQuestionAnswerPosition(
+            answerIndex,
+            answerIndex - 1
+        );
+    }
+
+    /**
+     * Move question answer bellow
+     * @param answerIndex
+     */
+    moveAnswerBellow(answerIndex: number) {
+        this.changeQuestionAnswerPosition(
+            answerIndex,
+            answerIndex + 1
+        );
+    }
+
+    /**
+     * Change question position
+     */
+    private changeQuestionAnswerPosition(
+        currentAnswerPosition: number,
+        newAnswerPosition: number
+    ) {
+        // nothing to change ?
+        if (currentAnswerPosition === newAnswerPosition) {
+            return;
+        }
+
+        // answer are initialized ?
+        if (_.isEmpty(this.questionInEditModeClone.answers)) {
+            return;
+        }
+
+        // restrict min value
+        if (newAnswerPosition < 0) {
+            newAnswerPosition = 0;
+        }
+
+        // restrict max value
+        if (newAnswerPosition > this.questionInEditModeClone.answers.length) {
+            newAnswerPosition = this.questionInEditModeClone.answers.length;
+        }
+
+        // need to remove next item since a new one was added before this one meaning that the index has changed
+        const newPosBeforeCurrent: boolean = newAnswerPosition < currentAnswerPosition;
+
+        // push question to the new position
+        this.questionInEditModeClone.answers.splice(
+            newAnswerPosition + (newPosBeforeCurrent ? 0 : 1),
+            0,
+            this.questionInEditModeClone.answers[currentAnswerPosition]
+        );
+
+        // delete old position
+        this.questionInEditModeClone.answers.splice(
+            currentAnswerPosition + (newPosBeforeCurrent ? 1 : 0),
+            1
+        );
+
+        // update questions order
+        this.setQuestionnaireQuestionsOrder(
+            [this.questionInEditModeClone],
+            false
+        );
+
+        // mark form as dirty
+        this.markFormDirty();
+    }
+
+    /**
      * Save questionnaire
      */
     private emitUpdateQuestionnaire() {
@@ -490,6 +602,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
+     * View Question Answer
+     */
+    viewAnswer(answerIndex: number) {
+        // #TODO
+    }
+
+    /**
      * Modify Question
      * @param questionIndex
      */
@@ -506,10 +625,24 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
+     * Modify Question Answer
+     */
+    modifyAnswer(answerIndex: number) {
+        // #TODO
+    }
+
+    /**
      * Clone Question
      * @param questionIndex
      */
     cloneQuestion(questionIndex: number) {
+        // #TODO
+    }
+
+    /**
+     * Clone Question Answer
+     */
+    cloneAnswer(answerIndex: number) {
         // #TODO
     }
 
@@ -537,6 +670,28 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
+     * Delete Question Answer
+     */
+    deleteAnswer(answerIndex: number) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_QUESTION_ANSWER')
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete question
+                    this.questionInEditModeClone.answers.splice(answerIndex, 1);
+
+                    // update order
+                    this.setQuestionnaireQuestionsOrder(
+                        [this.questionInEditModeClone],
+                        false
+                    );
+
+                    // mark form as dirty
+                    this.markFormDirty();
+                }
+            });
+    }
+
+    /**
      * Cancel question edit
      */
     cancelModifyQuestion() {
@@ -552,9 +707,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Save Question
      */
-    saveModifyQuestion(form: NgForm) {
+    saveModifyQuestion() {
         // validate form
-        if (!this.formHelper.validateForm(form)) {
+        if (
+            !this.form ||
+            !this.formHelper.validateForm(this.form)
+        ) {
             return;
         }
 
@@ -567,5 +725,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // save question
         this.emitUpdateQuestionnaire();
+    }
+
+    /**
+     * Mark form dirty
+     */
+    markFormDirty() {
+        if (
+            this.form &&
+            this.inputForMakingFormDirty
+        ) {
+            this.inputForMakingFormDirty.control.markAsDirty();
+        }
     }
 }

@@ -58,7 +58,7 @@
         <ng-container
             *ngFor="let question of questionnaireData; let questionIndex = index">
 
-            <!-- Row Data -->
+            <!-- Question Row Data -->
             <div fxFlex fxLayout="row">
                 <!-- Order -->
                 <div
@@ -198,7 +198,7 @@
                         #form="ngForm"
                         id="form"
                         fxFlex fxLayout="column"
-                        (submit)="saveModifyQuestion(form)">
+                        (submit)="saveModifyQuestion()">
                         <div
                             fxLayout="row"
                             fxLayoutGap="5px">
@@ -277,6 +277,174 @@
                                     [required]="false">
                                 </app-form-slide-toggle>
                             </div>
+                        </div>
+
+                        <!-- question answers -->
+                        <div
+                            *ngIf="questionInEditModeClone.answerType === answerTypes.MULTIPLE_OPTIONS.value || questionInEditModeClone.answerType === answerTypes.SINGLE_SELECTION.value"
+                            fxFlex fxLayout="column">
+                            <!-- Dummy field used to make form dirty -->
+                            <input
+                                #inputForMakingFormDirty="ngModel"
+                                name="inputForMakingFormDirty"
+                                ngModel
+                                type="hidden"/>
+
+                            <!-- Answer Data -->
+                            <div
+                                fxFlex fxLayout="row">
+                                <!-- Answer Order -->
+                                <div
+                                    fxFlex="50px"
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    <!-- placeholder -->
+                                </div>
+
+                                <!-- Answer label -->
+                                <div
+                                    fxFlex
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate }}
+                                </div>
+
+                                <!-- Answer value -->
+                                <div
+                                    fxFlex
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate }}
+                                </div>
+
+                                <!-- Answer Additional Questions ? -->
+                                <div
+                                    fxFlex="100px"
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate }}
+                                </div>
+
+                                <!-- Answer Alert ? -->
+                                <div
+                                    fxFlex="100px"
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate }}
+                                </div>
+
+                                <!-- Actions -->
+                                <div
+                                    fxFlex="120px"
+                                    class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
+                                    <!-- placeholder -->
+                                </div>
+                            </div>
+
+                            <ng-container
+                                *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index">
+                                <!-- Answer Row Data -->
+                                <div fxFlex fxLayout="row">
+                                    <!-- Order -->
+                                    <div
+                                        fxFlex="50px"
+                                        class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                                        {{ ('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BADGE' | translate) + answer.order }}
+                                    </div>
+
+                                    <!-- Answer Label -->
+                                    <div
+                                        fxFlex
+                                        class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                                        {{ answer.label }}
+                                    </div>
+
+                                    <!-- Answer Value -->
+                                    <div
+                                        fxFlex
+                                        class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                                        {{ answer.value }}
+                                    </div>
+
+                                    <!-- Additional Questions ? -->
+                                    <div
+                                        fxFlex="100px"
+                                        class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                                        {{ (answer.additionalQuestionsShow ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                                    </div>
+
+                                    <!-- Answer Alert ? -->
+                                    <div
+                                        fxFlex="100px"
+                                        class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
+                                        {{ (answer.alert ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div
+                                        fxFlex="120px"
+                                        class="modify-questionnaire-cell-style">
+                                        <button
+                                            mat-icon-button
+                                            type="button"
+                                            [matMenuTriggerFor]="actionsMenu"
+                                            [disabled]="savingData || questionAnswerIndexInEditMode !== null">
+                                            <span class="xt-icon">moreVertical</span>
+                                        </button>
+
+                                        <mat-menu
+                                            #actionsMenu="matMenu"
+                                            class="table-max-sized-menu">
+
+                                            <ng-container
+                                                *ngIf="hasOutbreakWriteAccess()">
+                                                <button
+                                                    mat-menu-item
+                                                    type="button"
+                                                    (click)="moveAnswerAbove(answerIndex)">
+                                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_UP' | translate }}
+                                                </button>
+
+                                                <button
+                                                    mat-menu-item
+                                                    type="button"
+                                                    (click)="moveAnswerBellow(answerIndex)">
+                                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_DOWN' | translate }}
+                                                </button>
+
+                                                <mat-divider></mat-divider>
+                                            </ng-container>
+
+                                            <button
+                                                mat-menu-item
+                                                type="button"
+                                                (click)="viewAnswer(answerIndex)">
+                                                {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                                            </button>
+
+                                            <ng-container
+                                                *ngIf="hasOutbreakWriteAccess()">
+                                                <button
+                                                    mat-menu-item
+                                                    type="button"
+                                                    (click)="modifyAnswer(answerIndex)">
+                                                    {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                                                </button>
+
+                                                <button
+                                                    mat-menu-item
+                                                    type="button"
+                                                    (click)="cloneAnswer(answerIndex)">
+                                                    {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
+                                                </button>
+
+                                                <button
+                                                    mat-menu-item
+                                                    type="button"
+                                                    class="mat-menu-item-delete"
+                                                    (click)="deleteAnswer(answerIndex)">
+                                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                                </button>
+                                            </ng-container>
+                                        </mat-menu>
+                                    </div>
+                                </div>
+                            </ng-container>
                         </div>
                     </form>
                 </mat-card>

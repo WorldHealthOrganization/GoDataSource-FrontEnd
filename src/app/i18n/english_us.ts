@@ -40,6 +40,8 @@ export const EnglishUsLang = {
          */
         'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_UP': 'Move Up',
         'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_DOWN': 'Move Down',
+        'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_UP': 'Move Up',
+        'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_DOWN': 'Move Down',
 
         // some tokens might need to be removed
         // - create & modify outbreak => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore

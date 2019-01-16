@@ -6,12 +6,14 @@ export class AnswerModel {
     label: string;
     value: string;
     alert: boolean;
+    order: number = 1;
     additionalQuestions: QuestionModel[];
 
     constructor(data = null) {
         this.label = _.get(data, 'label');
         this.value = _.get(data, 'value');
         this.alert = _.get(data, 'alert');
+        this.order = _.get(data, 'order');
 
         this.additionalQuestions = _.map(
             _.get(data, 'additionalQuestions', null),
