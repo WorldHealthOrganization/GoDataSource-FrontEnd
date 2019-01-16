@@ -5,6 +5,10 @@ import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/b
 import { FormModifyQuestionnaireBreadcrumbsData, FormModifyQuestionnaireComponent, FormModifyQuestionnaireUpdateData } from '../../../../shared/components';
 import { OutbreakQestionnaireTypeEnum } from '../../../../core/enums/outbreak-qestionnaire-type.enum';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
     selector: 'app-outbreak-questionnaire',
@@ -17,7 +21,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // outbreak to modify
-    outbreak: OutbreakModel = new OutbreakModel();
+    outbreak: OutbreakModel;
 
     /**
      * Questionnaire
@@ -28,7 +32,10 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      * Constructor
      */
     constructor(
-        protected route: ActivatedRoute
+        protected route: ActivatedRoute,
+        private outbreakDataService: OutbreakDataService,
+        private snackbarService: SnackbarService,
+        private i18nService: I18nService
     ) {
         super();
     }
@@ -38,7 +45,14 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      */
     ngOnInit() {
         // get outbreak
-        this.outbreak = this.route.snapshot.data.outbreak;
+        this.route.params
+            .subscribe((params: { outbreakId }) => {
+                this.outbreakDataService
+                    .getOutbreak(params.outbreakId)
+                    .subscribe((outbreakData) => {
+                        this.outbreak = outbreakData;
+                    });
+            });
     }
 
     /**
@@ -88,9 +102,41 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      * Update Questionnaire data
      */
     updateQuestionnaire(questionnaireData: FormModifyQuestionnaireUpdateData) {
-        console.log('updateQuestionnaire', questionnaireData);
-        setTimeout(() => {
-            questionnaireData.finishSubscriber.next(true);
-        }, 2000);
+        this.outbreakDataService
+            .modifyOutbreak(questionnaireData.parent.id, {
+                [questionnaireData.type]: questionnaireData.questionnaire
+            })
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                // finished
+                questionnaireData.finishSubscriber.next(false);
+                questionnaireData.finishSubscriber.complete();
+
+                return ErrorObservable.create(err);
+            })
+            .switchMap((modifiedOutbreak) => {
+                // update language tokens to get the translation of submitted questions and answers
+                return this.i18nService.loadUserLanguage()
+                    .catch((err) => {
+                        this.snackbarService.showApiError(err);
+
+                        // finished
+                        questionnaireData.finishSubscriber.next(false);
+                        questionnaireData.finishSubscriber.complete();
+
+                        return ErrorObservable.create(err);
+                    })
+                    .map(() => modifiedOutbreak);
+            })
+            .subscribe(() => {
+                // display message
+                // #TODO
+                // this.snackbarService.showSuccess('LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE');
+
+                // finished
+                questionnaireData.finishSubscriber.next(true);
+                questionnaireData.finishSubscriber.complete();
+            });
     }
 }

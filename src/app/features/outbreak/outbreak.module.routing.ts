@@ -60,9 +60,6 @@ const routes: Routes = [
     {
         path: ':outbreakId/case-questionnaire',
         component: fromPages.OutbreakQuestionnaireComponent,
-        resolve: {
-            outbreak: OutbreakResolver
-        },
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
@@ -77,9 +74,6 @@ const routes: Routes = [
     {
         path: ':outbreakId/contact-follow-up-questionnaire',
         component: fromPages.OutbreakQuestionnaireComponent,
-        resolve: {
-            outbreak: OutbreakResolver
-        },
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],
@@ -94,9 +88,6 @@ const routes: Routes = [
     {
         path: ':outbreakId/case-lab-results-questionnaire',
         component: fromPages.OutbreakQuestionnaireComponent,
-        resolve: {
-            outbreak: OutbreakResolver
-        },
         canActivate: [AuthGuard],
         data: {
             permissions: [PERMISSION.READ_OUTBREAK],

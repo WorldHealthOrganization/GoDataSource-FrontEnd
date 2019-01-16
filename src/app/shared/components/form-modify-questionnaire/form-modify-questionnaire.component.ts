@@ -38,7 +38,7 @@ export class FormModifyQuestionnaireBreadcrumbsData {
  */
 export class FormModifyQuestionnaireUpdateData {
     constructor(
-        public outbreak: OutbreakModel | OutbreakTemplateModel,
+        public parent: OutbreakModel | OutbreakTemplateModel,
         public type: OutbreakQestionnaireTypeEnum,
         public questionnaire: QuestionModel[],
         public finishSubscriber: Subscriber<boolean>
