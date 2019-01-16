@@ -528,6 +528,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.questionnaireData,
             false
         );
+
+        // emit questionnaire save
+        this.emitUpdateQuestionnaire(false);
     }
 
     /**
@@ -608,24 +611,23 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Save questionnaire
      */
-    private emitUpdateQuestionnaire() {
+    private emitUpdateQuestionnaire(
+        blockWhileSaving: boolean = true
+    ) {
         // can we emit breadcrumb event ?
         if (
             !_.isEmpty(this.parent) &&
             !_.isEmpty(this.questionnaireType)
         ) {
             // call event
-            this.savingData = true;
+            this.savingData = blockWhileSaving;
             this.updateQuestionnaire.emit(new FormModifyQuestionnaireUpdateData(
                 this.parent,
                 this.questionnaireType,
                 this.questionnaireData,
                 Subscriber.create((success) => {
                     // success saving questionnaire ?
-                    if (success) {
-                        // no question in edit mode
-                        this.resetQuestionEditMode();
-                    } else {
+                    if (!success) {
                         // #TODO
                         // we can't rollback..so..what now ? try again, or disable questionnaire ?
                     }
@@ -753,7 +755,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     );
 
                     // save questionnaire
-                    this.emitUpdateQuestionnaire();
+                    this.emitUpdateQuestionnaire(false);
                 }
             });
     }
@@ -878,7 +880,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         this.resetQuestionEditMode();
 
         // save question
-        this.emitUpdateQuestionnaire();
+        this.emitUpdateQuestionnaire(false);
     }
 
     /**
@@ -1054,6 +1056,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             `#${this.uniqueIDAnswer}`,
             'nearest'
         );
+
+        // mark main form as dirty
+        this.markFormDirty();
     }
 
     /**
