@@ -1,4 +1,5 @@
 app-form-modify-questionnaire {
+    @edit-form-distance: 70px;
     .modify-questionnaire-table {
         .modify-questionnaire-cell-default {
             overflow: hidden;
@@ -16,9 +17,18 @@ app-form-modify-questionnaire {
             background-color: #DDD;
         }
 
+        .modify-questionnaire-edit-question {
+            margin-top: 5px;
+            margin-bottom: @edit-form-distance;
+        }
+
         .modify-questionnaire-edit-question-card {
             padding: 15px !important;
             margin: 0 !important;
+        }
+
+        .modify-questionnaire-edit-answer {
+            margin: 5px 5px @edit-form-distance 5px;
         }
     }
 }

@@ -99,6 +99,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     questionAnswerInEditModeClone: AnswerModel;
 
     /**
+     * Question Answer Dummy Parent - used for recursive questions ( additional questions )
+     */
+    questionAnswerDummyParent: OutbreakModel | OutbreakTemplateModel;
+
+    /**
      * Saving data
      */
     savingData: boolean = false;
@@ -221,62 +226,63 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.parent[this.questionnaireType],
                     (accumulator: QuestionModel[], question: QuestionModel) => {
                         accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
-                        accumulator.push(new QuestionModel(question));
+                        // #TODO - delete after
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
+                        // accumulator.push(new QuestionModel(question));
                     },
                     []
                 );
@@ -301,9 +307,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // translate data? since we need to have it in memory translated ?
             // what about language change ? should we hook that too - HANDLED ?
             this.initTranslateQuestionnaireQuestions();
-
-            console.log(this.parent[this.questionnaireType]);
-            console.log(this.questionnaireData);
         }
     }
 
@@ -579,8 +582,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     // success saving questionnaire ?
                     if (success) {
                         // no question in edit mode
-                        this.questionIndexInEditMode = null;
-                        this.questionInEditModeClone = null;
+                        this.resetQuestionEditMode();
                     } else {
                         // #TODO
                         // we can't rollback..so..what now ? try again, or disable questionnaire ?
@@ -637,6 +639,33 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // set answer edit mode
             this.questionAnswerIndexInEditMode = answerIndex;
             this.questionAnswerInEditModeClone = new AnswerModel(this.questionInEditModeClone.answers[answerIndex]);
+
+            // create object to overwrite main questionnaires
+            const overWriteData: {
+                [prop: string]: QuestionModel[]
+            } = {};
+            _.each(
+                Object.values(OutbreakQestionnaireTypeEnum),
+                (prop: string) => {
+                    overWriteData[prop] = [];
+                }
+            );
+
+            // set our questions
+            overWriteData[this.questionnaireType] = this.questionAnswerInEditModeClone.additionalQuestions;
+
+            // create dummy parent
+            const data = {
+                ...this.parent,
+                ...overWriteData
+            };
+            if (this.parent instanceof OutbreakTemplateModel) {
+                // outbreak template
+                this.questionAnswerDummyParent = new OutbreakTemplateModel(data);
+            } else {
+                // outbreak
+                this.questionAnswerDummyParent = new OutbreakModel(data);
+            }
         }
     }
 
@@ -708,9 +737,30 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // need to implement viewModifyComponent so it checks if we try to change the page or close window etc..too
         // #TODO
 
-        // cancel edit
+        // cancel question edit
+        this.resetQuestionEditMode();
+    }
+
+    /**
+     * Reset question edit mode
+     */
+    private resetQuestionEditMode() {
+        // reset answer edit mode
+        this.resetQuestionAnswerEditMode();
+
+        // reset question edit mode
         this.questionIndexInEditMode = null;
         this.questionInEditModeClone = null;
+    }
+
+    /**
+     * Reset question answer edit mode
+     */
+    private resetQuestionAnswerEditMode() {
+        // reset answer edit mode
+        this.questionAnswerIndexInEditMode = null;
+        this.questionAnswerInEditModeClone = null;
+        this.questionAnswerDummyParent = null;
     }
 
     /**
@@ -728,9 +778,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // replace question with the one we just changed
         this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
 
-        // stop edit
-        this.questionIndexInEditMode = null;
-        this.questionInEditModeClone = null;
+        // stop question edit
+        this.resetQuestionEditMode();
 
         // save question
         this.emitUpdateQuestionnaire();
@@ -751,8 +800,28 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Update Answer Additional Questions
      */
-    updateAnswerAdditionalQuestions() {
+    updateAnswerAdditionalQuestions(questionnaireData: FormModifyQuestionnaireUpdateData) {
         // #TODO
         // this.questionAnswerIndexInEditMode
+        console.log(questionnaireData);
+    }
+
+    /**
+     * Cancel Modify answer
+     */
+    cancelModifyAnswer() {
+        // check for changes and display popup
+        // need to implement viewModifyComponent so it checks if we try to change the page or close window etc..too
+        // #TODO
+
+        // cancel question edit
+        this.resetQuestionAnswerEditMode();
+    }
+
+    /**
+     * Update answer data - no save
+     */
+    updateAnswerData() {
+        // #TODO
     }
 }

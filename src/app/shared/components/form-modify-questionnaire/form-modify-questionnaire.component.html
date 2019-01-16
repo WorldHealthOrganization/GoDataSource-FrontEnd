@@ -54,7 +54,7 @@
 
     <!-- Question Data -->
     <div
-        fxFlex fxLayout="column" fxLayoutGap="5px">
+        fxFlex fxLayout="column">
         <ng-container
             *ngFor="let question of questionnaireData; let questionIndex = index">
 
@@ -174,7 +174,8 @@
 
             <!-- Question Edit Mode -->
             <div
-                *ngIf="questionIndex === questionIndexInEditMode">
+                *ngIf="questionIndex === questionIndexInEditMode"
+                class="modify-questionnaire-edit-question">
                 <div
                     fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
                     <button
@@ -447,12 +448,37 @@
 
                                 <!-- Answer Edit Mode -->
                                 <div
-                                    *ngIf="answerIndex === questionAnswerIndexInEditMode">
+                                    *ngIf="answerIndex === questionAnswerIndexInEditMode"
+                                    class="modify-questionnaire-edit-answer">
+                                    <!-- Answer buttons -->
+                                    <div
+                                        fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
+                                        <button
+                                            type="button"
+                                            mat-raised-button
+                                            (click)="cancelModifyAnswer()">
+                                            {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            mat-raised-button
+                                            color="accent"
+                                            (click)="updateAnswerData()">
+                                            {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                                        </button>
+                                    </div>
+
+                                    <!-- Answer Data -->
                                     <mat-card
                                         class="modify-questionnaire-edit-question-card">
+                                        <!-- Edit Answer Form -->
+                                        <!-- TODO -->
+
+                                        <!-- Additional answer questions -->
                                         <app-form-modify-questionnaire
-                                            [parent]="parent"
-                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions()">
+                                            [parent]="questionAnswerDummyParent"
+                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)">
                                         </app-form-modify-questionnaire>
                                     </mat-card>
                                 </div>
