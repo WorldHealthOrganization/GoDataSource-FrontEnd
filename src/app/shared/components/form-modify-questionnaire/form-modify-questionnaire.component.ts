@@ -800,6 +800,21 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                         this.resetQuestionEditMode();
                     }
                 });
+        } else {
+            // check if changes were made and display message that changes will be lost
+            if (this.questionForm.dirty) {
+                // made changes that will be lost if we cancel
+                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION')
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // cancel question edit
+                            this.resetQuestionEditMode();
+                        }
+                    });
+            } else {
+                // cancel question edit
+                this.resetQuestionEditMode();
+            }
         }
     }
 
@@ -907,6 +922,21 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                         this.resetQuestionAnswerEditMode();
                     }
                 });
+        } else {
+            // check if changes were made and display message that changes will be lost
+            if (this.questionForm.dirty) {
+                // made changes that will be lost if we cancel
+                this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER')
+                    .subscribe((answer: DialogAnswer) => {
+                        if (answer.button === DialogAnswerButton.Yes) {
+                            // cancel answer edit
+                            this.resetQuestionAnswerEditMode();
+                        }
+                    });
+            } else {
+                // cancel answer edit
+                this.resetQuestionAnswerEditMode();
+            }
         }
     }
 

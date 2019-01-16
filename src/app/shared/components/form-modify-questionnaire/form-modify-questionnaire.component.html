@@ -75,7 +75,8 @@
 
             <!-- Question Row Data -->
             <div
-                fxFlex fxLayout="row">
+                fxFlex fxLayout="row"
+                [class.question-in-edit-row]="questionIndex === questionIndexInEditMode">
                 <!-- Order -->
                 <div
                     fxFlex="50px"
@@ -379,7 +380,9 @@
                                 *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index"
                                 [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode">
                                 <!-- Answer Row Data -->
-                                <div fxFlex fxLayout="row">
+                                <div
+                                    fxFlex fxLayout="row"
+                                    [class.answer-in-edit-row]="answerIndex === questionAnswerIndexInEditMode">
                                     <!-- Order -->
                                     <div
                                         fxFlex="50px"
