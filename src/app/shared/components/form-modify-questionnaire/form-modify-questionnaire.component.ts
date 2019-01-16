@@ -21,6 +21,7 @@ import { NgForm, NgModel } from '@angular/forms';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { Constants } from '../../../core/models/constants';
 import { DomService } from '../../../core/services/helper/dom.service';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Used to initialize breadcrumbs
@@ -51,6 +52,11 @@ export class FormModifyQuestionnaireUpdateData {
     styleUrls: ['./form-modify-questionnaire.component.less']
 })
 export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
+    // component unique id
+    uniqueID: string = uuid();
+    uniqueIDQuestion: string = this.uniqueID + 'Question';
+    uniqueIDAnswer: string = this.uniqueID + 'Answer';
+
     // constants
     answerTypes: any = Constants.ANSWER_TYPES;
 
@@ -878,7 +884,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // set focus on the new question
         this.domService.scrollItemIntoView(
-            '.modify-questionnaire-edit-question'
+            `#${this.uniqueIDQuestion}`
         );
     }
 
@@ -896,5 +902,37 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         } else {
             object.order = value as any;
         }
+    }
+
+    /**
+     * Add new question answer
+     */
+    addNewAnswer() {
+        // check if we need to initialize answers
+        if (_.isEmpty(this.questionInEditModeClone.answers)) {
+            this.questionInEditModeClone.answers = [];
+        }
+
+        // push a new answer
+        this.questionInEditModeClone.answers.push(new AnswerModel({
+            order: 99999
+        }));
+
+        // sort not needed since we always add answers at the end
+        // NOTHING
+
+        // set question order
+        this.setQuestionnaireQuestionsOrder(
+            [this.questionInEditModeClone],
+            false
+        );
+
+        // start modifying the new answer
+        this.modifyAnswer(this.questionInEditModeClone.answers.length - 1);
+
+        // set focus on the new answer
+        this.domService.scrollItemIntoView(
+            `#${this.uniqueIDAnswer}`
+        );
     }
 }

@@ -1,5 +1,5 @@
 <div class="modify-questionnaire-table">
-    <!-- Question list general actions-->
+    <!-- Question list general actions -->
     <div
         fxFlex fxLayout="row" fxLayoutAlign="end">
         <button
@@ -11,6 +11,7 @@
         </button>
     </div>
 
+    <!-- Question list headers -->
     <div
         fxFlex fxLayout="row">
 
@@ -187,7 +188,8 @@
             <!-- Question Edit Mode -->
             <div
                 *ngIf="questionIndex === questionIndexInEditMode"
-                class="modify-questionnaire-edit-question">
+                class="modify-questionnaire-edit-question"
+                [id]="uniqueIDQuestion">
                 <div
                     fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
                     <button
@@ -304,7 +306,19 @@
                                 ngModel
                                 type="hidden"/>
 
-                            <!-- Answer Data -->
+                            <!-- Answers list general actions -->
+                            <div
+                                fxFlex fxLayout="row" fxLayoutAlign="end">
+                                <button
+                                    type="button"
+                                    mat-raised-button color="accent"
+                                    (click)="addNewAnswer()"
+                                    [disabled]="savingData || questionAnswerIndexInEditMode !== null">
+                                    {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate}}
+                                </button>
+                            </div>
+
+                            <!-- Answer Headers -->
                             <div
                                 fxFlex fxLayout="row">
                                 <!-- Answer Order -->
@@ -350,6 +364,7 @@
                                 </div>
                             </div>
 
+                            <!-- Answer Data -->
                             <ng-container
                                 *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index">
                                 <!-- Answer Row Data -->
@@ -462,7 +477,8 @@
                                 <!-- Answer Edit Mode -->
                                 <div
                                     *ngIf="answerIndex === questionAnswerIndexInEditMode"
-                                    class="modify-questionnaire-edit-answer">
+                                    class="modify-questionnaire-edit-answer"
+                                    [id]="uniqueIDAnswer">
                                     <!-- Answer buttons -->
                                     <div
                                         fxFlex fxLayout="row" fxLayoutAlign="end" fxLayoutGap="15px">
