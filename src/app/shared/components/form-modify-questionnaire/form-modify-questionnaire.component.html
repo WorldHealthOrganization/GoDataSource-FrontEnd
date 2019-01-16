@@ -208,7 +208,8 @@
                         type="submit"
                         mat-raised-button
                         color="accent"
-                        form="questionForm">
+                        form="questionForm"
+                        [disabled]="questionAnswerIndexInEditMode !== null">
                         {{ (displayChangeButton ? 'LNG_COMMON_BUTTON_CHANGE' : 'LNG_COMMON_BUTTON_SAVE') | translate }}
                     </button>
                 </div>
@@ -216,6 +217,7 @@
                 <!-- Question Form Data -->
                 <mat-card
                     class="modify-questionnaire-edit-question-card">
+                    <!-- Question Form -->
                     <form
                         #questionForm="ngForm"
                         id="questionForm"
@@ -500,10 +502,11 @@
                                         </button>
 
                                         <button
-                                            type="button"
+                                            type="submit"
                                             mat-raised-button
                                             color="accent"
-                                            (click)="updateAnswerData()">
+                                            form="answerForm"
+                                            [disabled]="childQuestionIsInEditMode">
                                             {{ 'LNG_COMMON_BUTTON_CHANGE' | translate }}
                                         </button>
                                     </div>
@@ -511,78 +514,86 @@
                                     <!-- Answer Data -->
                                     <mat-card
                                         class="modify-questionnaire-edit-question-answer-card">
-                                        <!-- Edit Answer Form -->
-                                        <div
-                                            fxLayout="row"
-                                            fxLayoutGap="5px">
-                                            <!-- answer order -->
+                                        <!-- Answer Form -->
+                                        <form
+                                            #answerForm="ngForm"
+                                            id="answerForm"
+                                            fxFlex fxLayout="column"
+                                            (submit)="updateAnswerData()">
+                                            <!-- Edit Answer Form -->
                                             <div
-                                                fxFlex="70px">
-                                                <app-form-input
-                                                    name="answerOrder"
-                                                    [ngModel]="questionAnswerInEditModeClone.order"
-                                                    type="number"
-                                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER' | translate"
-                                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION"
-                                                    [required]="false"
-                                                    (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)">
-                                                </app-form-input>
+                                                fxLayout="row"
+                                                fxLayoutGap="5px">
+                                                <!-- answer order -->
+                                                <div
+                                                    fxFlex="70px">
+                                                    <app-form-input
+                                                        name="answerOrder"
+                                                        [ngModel]="questionAnswerInEditModeClone.order"
+                                                        type="number"
+                                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION"
+                                                        [required]="false"
+                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)">
+                                                    </app-form-input>
+                                                </div>
+
+                                                <!-- answer label -->
+                                                <div
+                                                    fxFlex>
+                                                    <app-form-input
+                                                        name="answerLabel"
+                                                        [(ngModel)]="questionAnswerInEditModeClone.label"
+                                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
+                                                        required="true">
+                                                    </app-form-input>
+                                                </div>
+
+                                                <!-- answer value -->
+                                                <div
+                                                    fxFlex>
+                                                    <app-form-input
+                                                        name="answerValue"
+                                                        [(ngModel)]="questionAnswerInEditModeClone.value"
+                                                        [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
+                                                        tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
+                                                        required="true">
+                                                    </app-form-input>
+                                                </div>
+
+                                                <!-- answer additional questions -->
+                                                <div
+                                                    fxFlex="150px">
+                                                    <app-form-slide-toggle
+                                                        name="answerAdditionalQuestionsShow"
+                                                        [(ngModel)]="questionAnswerInEditModeClone.additionalQuestionsShow"
+                                                        [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
+                                                        required="false">
+                                                    </app-form-slide-toggle>
+                                                </div>
+
+                                                <!-- answer alert -->
+                                                <div
+                                                    fxFlex="150px">
+                                                    <app-form-slide-toggle
+                                                        name="answerAlert"
+                                                        [(ngModel)]="questionAnswerInEditModeClone.alert"
+                                                        [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
+                                                        required="false">
+                                                    </app-form-slide-toggle>
+                                                </div>
                                             </div>
 
-                                            <!-- answer label -->
-                                            <div
-                                                fxFlex>
-                                                <app-form-input
-                                                    name="answerLabel"
-                                                    [(ngModel)]="questionAnswerInEditModeClone.label"
-                                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
-                                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
-                                                    required="true">
-                                                </app-form-input>
-                                            </div>
-
-                                            <!-- answer value -->
-                                            <div
-                                                fxFlex>
-                                                <app-form-input
-                                                    name="answerValue"
-                                                    [(ngModel)]="questionAnswerInEditModeClone.value"
-                                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
-                                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
-                                                    required="true">
-                                                </app-form-input>
-                                            </div>
-
-                                            <!-- answer additional questions -->
-                                            <div
-                                                fxFlex="150px">
-                                                <app-form-slide-toggle
-                                                    name="answerAdditionalQuestionsShow"
-                                                    [(ngModel)]="questionAnswerInEditModeClone.additionalQuestionsShow"
-                                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
-                                                    required="false">
-                                                </app-form-slide-toggle>
-                                            </div>
-
-                                            <!-- answer alert -->
-                                            <div
-                                                fxFlex="150px">
-                                                <app-form-slide-toggle
-                                                    name="answerAlert"
-                                                    [(ngModel)]="questionAnswerInEditModeClone.alert"
-                                                    [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
-                                                    required="false">
-                                                </app-form-slide-toggle>
-                                            </div>
-                                        </div>
-
-                                        <!-- Additional answer questions -->
-                                        <app-form-modify-questionnaire
-                                            *ngIf="questionAnswerInEditModeClone.additionalQuestionsShow"
-                                            [parent]="questionAnswerDummyParent"
-                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)"
-                                            [displayChangeButton]="true">
-                                        </app-form-modify-questionnaire>
+                                            <!-- Additional answer questions -->
+                                            <app-form-modify-questionnaire
+                                                *ngIf="questionAnswerInEditModeClone.additionalQuestionsShow"
+                                                [parent]="questionAnswerDummyParent"
+                                                (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)"
+                                                [displayChangeButton]="true"
+                                                (questionEditModeChanged)="questionEditModeChangedHandler($event)">
+                                            </app-form-modify-questionnaire>
+                                        </form>
                                     </mat-card>
                                 </div>
                             </div>

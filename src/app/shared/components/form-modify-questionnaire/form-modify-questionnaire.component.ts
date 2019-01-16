@@ -135,9 +135,19 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     answerTypesInstantList: LabelValuePair[];
 
     /**
-     * Form dirty
+     * Child question is in edit mode ?
+     */
+    childQuestionIsInEditMode: boolean = false;
+
+    /**
+     * Edit Mode - Question Form
      */
     @ViewChild('questionForm') questionForm: NgForm;
+
+    /**
+     * Edit Mode - Question Answer Form
+     */
+    @ViewChild('answerForm') answerForm: NgForm;
 
     /**
      * Used to mark form dirty
@@ -153,6 +163,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Save outbreak questionnaire
      */
     @Output() updateQuestionnaire = new EventEmitter<FormModifyQuestionnaireUpdateData>();
+
+    /**
+     * triggered when edit mode has changed
+     */
+    @Output() questionEditModeChanged = new EventEmitter<boolean>();
 
     /**
      * Constructor
@@ -648,6 +663,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // set question edit mode
             this.questionIndexInEditMode = questionIndex;
             this.questionInEditModeClone = new QuestionModel(this.questionnaireData[questionIndex]);
+
+            // edit mode changed
+            this.questionEditModeChanged.emit(true);
         }
     }
 
@@ -776,6 +794,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // reset question edit mode
         this.questionIndexInEditMode = null;
         this.questionInEditModeClone = null;
+
+        // edit mode changed
+        this.questionEditModeChanged.emit(false);
     }
 
     /**
@@ -792,6 +813,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Save Question
      */
     saveModifyQuestion() {
+        // take in account that we could change a child question too...
+        // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
+        // #TODO
+
         // validate form
         if (
             !this.questionForm ||
@@ -853,10 +878,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Update answer data - no save
      */
     updateAnswerData() {
-        // validate answer form without validating parent question...
         // take in account that we could change a child question too...
         // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
         // #TODO
+
+        // validate answer form without validating parent question...
+        if (
+            !this.answerForm ||
+            !this.formHelper.validateForm(this.answerForm)
+        ) {
+            return;
+        }
 
         // replace answer with the new one
         this.questionInEditModeClone.answers[this.questionAnswerIndexInEditMode] = this.questionAnswerInEditModeClone;
@@ -945,5 +977,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             `#${this.uniqueIDAnswer}`,
             'nearest'
         );
+    }
+
+    /**
+     * Triggered when additional question edit mode has changed
+     */
+    questionEditModeChangedHandler(isInEditMode: boolean) {
+        this.childQuestionIsInEditMode = isInEditMode;
     }
 }
