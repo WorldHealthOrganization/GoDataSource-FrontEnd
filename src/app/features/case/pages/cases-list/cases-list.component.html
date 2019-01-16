@@ -475,7 +475,7 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE_BUTTON' | translate }}
+                            {{ 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
@@ -483,7 +483,7 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['.', item.id, 'modify']">
-                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE_BUTTON' | translate }}
+                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE' | translate }}
                                 </button>
 
                                 <button
@@ -498,7 +498,7 @@
                                     mat-menu-item
                                     class="mat-menu-item-delete"
                                     (click)="deleteCase(item)">
-                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE_BUTTON' | translate }}
+                                    {{ 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE' | translate }}
                                 </button>
                             </ng-container>
                         </ng-container>
@@ -569,7 +569,7 @@
                             mat-menu-item
                             class="mat-menu-item-restore"
                             (click)="restoreCase(item)">
-                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
+                            {{'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

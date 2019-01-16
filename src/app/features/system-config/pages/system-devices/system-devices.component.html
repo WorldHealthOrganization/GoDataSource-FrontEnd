@@ -154,7 +154,7 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY_DEVICE' | translate }}
                         </button>
 
                         <mat-divider></mat-divider>
@@ -163,14 +163,14 @@
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="wipeDevice(item)">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE' | translate }}
+                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_DEVICE' | translate }}
                         </button>
 
                         <button
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="deleteDevice(item)">
-                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_DEVICE' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>

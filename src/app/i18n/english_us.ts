@@ -15,25 +15,161 @@ export const EnglishUsLang = {
         /**
          * Outbreaks List Page
          */
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK_BUTTON': 'View Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK_BUTTON': 'Clone Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK_BUTTON': 'Modify Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK_BUTTON': 'Delete Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK_BUTTON': 'Restore Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK': 'View Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK': 'Clone Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK': 'Modify Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK': 'Delete Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK': 'Restore Outbreak',
 
         /**
          * Outbreak Template List Page
          */
 
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE_BUTTON': 'View Outbreak Template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE_BUTTON': 'Modify Outbreak Template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE_BUTTON': 'Delete Outbreak Template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE': 'View Outbreak Template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE': 'Modify Outbreak Template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE': 'Delete Outbreak Template',
 
         /**
          * Cases List Page
          */
-        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE_BUTTON': 'View Case',
-        'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE_BUTTON': 'Modify Case',
-        'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE_BUTTON': 'Delete Case',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE': 'View Case',
+        'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE': 'Modify Case',
+        'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete Case',
+        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE': 'Restore Case',
+
+        /**
+         * Case Lab Results List Page
+         */
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT': 'View lab result',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT': 'Modify lab result',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': 'Delete lab result',
+        'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT': 'Restore lab result',
+
+        /**
+         * Contacts List Page
+         */
+        'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT': 'View contact',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT': 'Modify contact',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT': 'Delete contact',
+        'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT': 'Restore contact',
+
+        /**
+         * FollowUps List Page
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP': 'View follow-up',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP': 'Modify follow-up',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP': 'Delete follow-up',
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP': 'Restore follow-up',
+
+        /**
+         * Events List Page
+         */
+        'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT': 'View event',
+        'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT': 'Modify event',
+        'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT': 'Delete event',
+        'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT': 'Restore event',
+
+        /**
+         * Clusters List Page
+         */
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER': 'View cluster',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER': 'Modify cluster',
+        'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER': 'Delete cluster',
+
+        /**
+         * Help Categories List Page
+         */
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_CATEGORY': 'View category',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_MODIFY_HELP_CATEGORY': 'Modify category',
+        'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_HELP_CATEGORY': 'Delete category',
+
+        /**
+         * Help Items List Page
+         */
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_APPROVE_ITEM': 'Approve item',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_VIEW_ITEM': 'View item',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_MODIFY_ITEM': 'Modify item',
+        'LNG_PAGE_LIST_HELP_ITEMS_ACTION_DELETE_ITEM': 'Delete item',
+
+        /**
+         * Global Help Page
+         */
+        'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_CATEGORY': 'View category',
+
+        /**
+         * Reference Data Categories List Page
+         */
+        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ACTION_VIEW_CATEGORY': 'View category',
+
+        /**
+         * Reference Data Category Entries List Page
+         */
+        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_VIEW_ENTRY': 'View item',
+        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_MODIFY_ENTRY': 'Modify item',
+        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_DELETE_ENTRY': 'Delete item',
+
+        /**
+         * Locations List Page
+         */
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION': 'View location',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION': 'Modify location',
+        'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION': 'Delete location',
+
+        /**
+         * List Users Page
+         */
+        'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER': 'View user',
+        'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER': 'Modify user',
+        'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER': 'Delete user',
+
+        /**
+         * List User Role Page
+         */
+        'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE': 'View role',
+        'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE': 'Modify role',
+        'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE': 'Delete role',
+
+        /**
+         * Languages List Page
+         */
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE': 'View language',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE': 'Modify language',
+        'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE': 'Delete language',
+
+        /**
+         * Teams List Page
+         */
+        'LNG_PAGE_LIST_USERS_ACTION_VIEW_TEAM': 'View team',
+        'LNG_PAGE_LIST_USERS_ACTION_MODIFY_TEAM': 'Modify team',
+        'LNG_PAGE_LIST_USERS_ACTION_DELETE_TEAM': 'View team',
+
+        /**
+         * System Upstream Servers List Page
+         */
+        'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER': 'Delete server',
+
+        /**
+         * Sync Client Applications List Page
+         */
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE_APP': 'Disable app',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE_APP': 'Enable app',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_APP': 'Delete app',
+
+        /**
+         * System Devices Pages
+         */
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY_DEVICE': 'Modify device',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_DEVICE': 'Wipe device',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_DEVICE': 'Delete device',
+
+        /**
+         * Sync Logs List Page
+         */
+        'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG': 'Delete log',
+
+        /**
+         * System Backups Page
+         */
+        'LNG_PAGE_LIST_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP': 'Delete backup'
     }
 };

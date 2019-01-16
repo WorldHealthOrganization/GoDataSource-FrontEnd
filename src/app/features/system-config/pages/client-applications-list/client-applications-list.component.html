@@ -117,14 +117,14 @@
                         <button
                             mat-menu-item
                             (click)="toggleActiveFlag(item)">
-                            {{ (item.active ? 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE' : 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE') | translate }}
+                            {{ (item.active ? 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE_APP' : 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE_APP') | translate }}
                         </button>
 
                         <button
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="deleteClientApplication(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_APP' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>

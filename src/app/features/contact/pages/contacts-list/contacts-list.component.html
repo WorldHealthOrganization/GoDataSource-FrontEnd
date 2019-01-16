@@ -413,7 +413,7 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
@@ -421,7 +421,7 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['.', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                    {{'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT'| translate}}
                                 </button>
 
                                 <button
@@ -436,7 +436,7 @@
                                     mat-menu-item
                                     class="mat-menu-item-delete"
                                     (click)="deleteContact(item)">
-                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                    {{ 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT' | translate }}
                                 </button>
                             </ng-container>
                         </ng-container>
@@ -485,7 +485,7 @@
                             *ngIf="item.deleted && hasContactWriteAccess()"
                             mat-menu-item class="mat-menu-item-restore"
                             (click)="restoreContact(item)">
-                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
+                            {{'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

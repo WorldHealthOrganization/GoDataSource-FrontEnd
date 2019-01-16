@@ -134,20 +134,20 @@
                     <button
                         mat-menu-item
                         [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_VIEW_ENTRY' | translate}}
                     </button>
 
                     <button
                         mat-menu-item
                         [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        {{'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_MODIFY_ENTRY' | translate}}
                     </button>
 
                     <button
                         *ngIf="!item.readonly"
                         mat-menu-item
                         (click)="deleteEntry(item)">
-                        {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                        {{'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_DELETE_ENTRY' | translate}}
                     </button>
                 </mat-menu>
 
