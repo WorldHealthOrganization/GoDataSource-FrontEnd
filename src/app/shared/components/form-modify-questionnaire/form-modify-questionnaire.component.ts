@@ -643,6 +643,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     viewQuestion(questionIndex: number) {
         // #TODO
+        alert('Work in progress');
     }
 
     /**
@@ -650,6 +651,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     viewAnswer(answerIndex: number) {
         // #TODO
+        alert('Work in progress');
     }
 
     /**
@@ -722,6 +724,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     cloneQuestion(questionIndex: number) {
         // #TODO
+        alert('Work in progress');
     }
 
     /**
@@ -729,6 +732,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     cloneAnswer(answerIndex: number) {
         // #TODO
+        alert('Work in progress');
     }
 
     /**
@@ -896,6 +900,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // #TODO
         // this.questionAnswerIndexInEditMode
         console.log('updateAnswerAdditionalQuestions', questionnaireData);
+        alert('Work in progress');
     }
 
     /**
