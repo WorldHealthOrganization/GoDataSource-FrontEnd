@@ -56,6 +56,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     uniqueID: string = uuid();
     uniqueIDQuestion: string = `question-section-${this.uniqueID}`;
     uniqueIDAnswer: string = `answer-section-${this.uniqueID}`;
+    uniqueIDQuestionForm: string = `question-form-${this.uniqueID}`;
+    uniqueIDAnswerForm: string = `answer-form-${this.uniqueID}`;
 
     // constants
     answerTypes: any = Constants.ANSWER_TYPES;
@@ -816,6 +818,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // take in account that we could change a child question too...
         // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
         // #TODO
+        // childQuestionIsInEditMode + answerForm
 
         // validate form
         if (
@@ -881,6 +884,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         // take in account that we could change a child question too...
         // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
         // #TODO
+        // childQuestionIsInEditMode
 
         // validate answer form without validating parent question...
         if (

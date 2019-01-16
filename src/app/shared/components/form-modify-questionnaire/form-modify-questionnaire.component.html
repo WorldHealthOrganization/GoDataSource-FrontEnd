@@ -208,7 +208,7 @@
                         type="submit"
                         mat-raised-button
                         color="accent"
-                        form="questionForm"
+                        [attr.form]="uniqueIDQuestionForm"
                         [disabled]="questionAnswerIndexInEditMode !== null">
                         {{ (displayChangeButton ? 'LNG_COMMON_BUTTON_CHANGE' : 'LNG_COMMON_BUTTON_SAVE') | translate }}
                     </button>
@@ -220,7 +220,7 @@
                     <!-- Question Form -->
                     <form
                         #questionForm="ngForm"
-                        id="questionForm"
+                        [id]="uniqueIDQuestionForm"
                         fxFlex fxLayout="column"
                         (submit)="saveModifyQuestion()">
                         <div
@@ -505,7 +505,7 @@
                                             type="submit"
                                             mat-raised-button
                                             color="accent"
-                                            form="answerForm"
+                                            [attr.form]="uniqueIDAnswerForm"
                                             [disabled]="childQuestionIsInEditMode">
                                             {{ 'LNG_COMMON_BUTTON_CHANGE' | translate }}
                                         </button>
@@ -517,7 +517,7 @@
                                         <!-- Answer Form -->
                                         <form
                                             #answerForm="ngForm"
-                                            id="answerForm"
+                                            [id]="uniqueIDAnswerForm"
                                             fxFlex fxLayout="column"
                                             (submit)="updateAnswerData()">
                                             <!-- Edit Answer Form -->
