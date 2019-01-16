@@ -179,7 +179,8 @@ export class TransmissionChainDataService {
                     // show nodes based on their type
                     if (node.type === EntityType.CONTACT && filters.showContacts) {
                         allowAdd = true;
-                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value ) {
                             if (!_.isEmpty(node.model.dateOfLastContact)) {
                                 nodeProps.dateTimeline = node.model.dateOfLastContact;
                             } else {
@@ -190,7 +191,8 @@ export class TransmissionChainDataService {
                         }
                     } else if (node.type === EntityType.EVENT && filters.showEvents) {
                         allowAdd = true;
-                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                        if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                                || selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
                             if (!_.isEmpty(node.model.data)) {
                                 nodeProps.dateTimeline = node.model.date;
                             } else {
@@ -204,7 +206,12 @@ export class TransmissionChainDataService {
                         if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
                             if (!_.isEmpty(node.model.dateOfOnset)) {
                                 nodeProps.dateTimeline = node.model.dateOfOnset;
-                                nodeProps.dateTimeline = node.model.dateOfOnset;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                            if (!_.isEmpty(node.model.dateOfLastContact)) {
+                                nodeProps.dateTimeline = node.model.dateOfLastContact;
                             } else {
                                 graphData.caseNodesWithoutDates.push(node.model.id);
                             }

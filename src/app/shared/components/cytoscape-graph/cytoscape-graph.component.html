@@ -50,7 +50,8 @@
             <div>
                 {{nodeNameColorItem | translate}}
             </div>
-            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value ">
                 - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
             </div>
         </div>
@@ -144,13 +145,17 @@
     </a>
 </div>
 
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
+<button *ngIf="( transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value )
+        && timelineViewType == 'horizontal'"
     mat-raised-button
     (click)="switchTimelineView('vertical')">
     {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
 </button>
 
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
+<button *ngIf="( transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value )
+            && timelineViewType == 'vertical'"
     mat-raised-button
     (click)="switchTimelineView('horizontal')">
     {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
