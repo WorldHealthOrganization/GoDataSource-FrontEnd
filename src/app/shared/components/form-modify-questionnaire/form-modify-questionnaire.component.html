@@ -8,7 +8,7 @@
             mat-raised-button color="accent"
             (click)="addNewQuestion()"
             [disabled]="savingData || questionIndexInEditMode !== null">
-            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate}}
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate }}
         </button>
     </div>
 
@@ -201,7 +201,7 @@
                         type="button"
                         mat-raised-button
                         (click)="cancelModifyQuestion()">
-                        {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                        {{ 'LNG_COMMON_BUTTON_CANCEL'| translate }}
                     </button>
 
                     <button
@@ -209,7 +209,7 @@
                         mat-raised-button
                         color="accent"
                         form="form">
-                        {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                        {{ (displayChangeButton ? 'LNG_COMMON_BUTTON_CHANGE' : 'LNG_COMMON_BUTTON_SAVE') | translate }}
                     </button>
                 </div>
 
@@ -322,7 +322,7 @@
                                     mat-raised-button color="accent"
                                     (click)="addNewAnswer()"
                                     [disabled]="savingData || questionAnswerIndexInEditMode !== null">
-                                    {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate}}
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate }}
                                 </button>
                             </div>
 
@@ -496,7 +496,7 @@
                                             type="button"
                                             mat-raised-button
                                             (click)="cancelModifyAnswer()">
-                                            {{'LNG_COMMON_BUTTON_CANCEL'| translate}}
+                                            {{ 'LNG_COMMON_BUTTON_CANCEL'| translate }}
                                         </button>
 
                                         <button
@@ -504,7 +504,7 @@
                                             mat-raised-button
                                             color="accent"
                                             (click)="updateAnswerData()">
-                                            {{'LNG_COMMON_BUTTON_CHANGE' | translate}}
+                                            {{ 'LNG_COMMON_BUTTON_CHANGE' | translate }}
                                         </button>
                                     </div>
 
@@ -580,7 +580,8 @@
                                         <app-form-modify-questionnaire
                                             *ngIf="questionAnswerInEditModeClone.additionalQuestionsShow"
                                             [parent]="questionAnswerDummyParent"
-                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)">
+                                            (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)"
+                                            [displayChangeButton]="true">
                                         </app-form-modify-questionnaire>
                                     </mat-card>
                                 </div>
@@ -595,7 +596,7 @@
                                     mat-raised-button color="accent"
                                     (click)="addNewAnswer()"
                                     [disabled]="savingData || questionAnswerIndexInEditMode !== null">
-                                    {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate}}
+                                    {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'| translate }}
                                 </button>
                             </div>
                         </div>
@@ -614,7 +615,7 @@
             mat-raised-button color="accent"
             (click)="addNewQuestion()"
             [disabled]="savingData || questionIndexInEditMode !== null">
-            {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate}}
+            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'| translate }}
         </button>
     </div>
 </div>

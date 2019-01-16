@@ -79,10 +79,19 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         return this._parent;
     }
 
-    // template used
+    /**
+     * Display change label instead of save ( used by additional questions )
+     */
+    @Input() displayChangeButton: boolean = false;
+
+    /**
+     * Template used ( case, follow-up, lab )
+     */
     questionnaireType: OutbreakQestionnaireTypeEnum;
 
-    // questionnaire data
+    /**
+     * Questionnaire questions
+     */
     questionnaireData: QuestionModel[];
 
     /**
