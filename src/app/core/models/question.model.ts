@@ -9,6 +9,9 @@ export class AnswerModel {
     order: number = 1;
     additionalQuestions: QuestionModel[];
 
+    // new flag - DON'T save this field
+    new: boolean;
+
     constructor(data = null) {
         this.label = _.get(data, 'label');
         this.value = _.get(data, 'value');

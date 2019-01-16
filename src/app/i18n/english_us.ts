@@ -43,7 +43,13 @@ export const EnglishUsLang = {
         'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_UP': 'Move Up',
         'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_DOWN': 'Move Down',
         'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER': 'Order',
-        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION': ''
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION': '',
+
+        /**
+         * uiDialogs
+         */
+        'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION': 'Since this is a new question, it will be removed if you cancel. Do you want to continue?',
+        'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER': 'Since this is a new answer, it will be removed if you cancel. Do you want to continue?',
 
         // some tokens might need to be removed
         // - create & modify outbreak => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore

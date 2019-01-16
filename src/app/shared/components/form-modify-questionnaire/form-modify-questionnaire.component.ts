@@ -665,6 +665,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // set question edit mode
             this.questionIndexInEditMode = questionIndex;
             this.questionInEditModeClone = new QuestionModel(this.questionnaireData[questionIndex]);
+            this.questionInEditModeClone.new = this.questionnaireData[questionIndex].new;
 
             // edit mode changed
             this.questionEditModeChanged.emit(true);
@@ -684,6 +685,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // set answer edit mode
             this.questionAnswerIndexInEditMode = answerIndex;
             this.questionAnswerInEditModeClone = new AnswerModel(this.questionInEditModeClone.answers[answerIndex]);
+            this.questionAnswerInEditModeClone.new = this.questionInEditModeClone.answers[answerIndex].new;
 
             // create object to overwrite main questionnaires
             const overWriteData: {
@@ -780,10 +782,25 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     cancelModifyQuestion() {
         // check for changes and display popup
         // need to implement viewModifyComponent so it checks if we try to change the page or close window etc..too
-        // #TODO
+        if (this.questionInEditModeClone.new) {
+            // new question, ask if he wants to revert back
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // delete question
+                        this.questionnaireData.splice(this.questionIndexInEditMode, 1);
 
-        // cancel question edit
-        this.resetQuestionEditMode();
+                        // update order
+                        this.setQuestionnaireQuestionsOrder(
+                            this.questionnaireData,
+                            false
+                        );
+
+                        // cancel question edit
+                        this.resetQuestionEditMode();
+                    }
+                });
+        }
     }
 
     /**
@@ -829,6 +846,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // replace question with the one we just changed
+        delete this.questionInEditModeClone.new;
         this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
 
         // sort questions
@@ -871,10 +889,25 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     cancelModifyAnswer() {
         // check for changes and display popup
         // need to implement viewModifyComponent so it checks if we try to change the page or close window etc..too
-        // #TODO
+        if (this.questionAnswerInEditModeClone.new) {
+            // new answer, ask if he wants to revert back
+            this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER')
+                .subscribe((answer: DialogAnswer) => {
+                    if (answer.button === DialogAnswerButton.Yes) {
+                        // delete question
+                        this.questionInEditModeClone.answers.splice(this.questionAnswerIndexInEditMode, 1);
 
-        // cancel question edit
-        this.resetQuestionAnswerEditMode();
+                        // update order
+                        this.setQuestionnaireQuestionsOrder(
+                            [this.questionInEditModeClone],
+                            false
+                        );
+
+                        // cancel answer edit
+                        this.resetQuestionAnswerEditMode();
+                    }
+                });
+        }
     }
 
     /**
@@ -895,6 +928,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // replace answer with the new one
+        delete this.questionAnswerInEditModeClone.new;
         this.questionInEditModeClone.answers[this.questionAnswerIndexInEditMode] = this.questionAnswerInEditModeClone;
 
         // stop answer edit
@@ -911,9 +945,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // push a new question
-        this.questionnaireData.push(new QuestionModel({
+        const question: QuestionModel = new QuestionModel({
             order: 99999
-        }));
+        });
+        question.new = true;
+        this.questionnaireData.push(question);
 
         // sort not needed since we always add questions at the end
         // NOTHING
@@ -960,9 +996,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // push a new answer
-        this.questionInEditModeClone.answers.push(new AnswerModel({
+        const answer: AnswerModel = new AnswerModel({
             order: 99999
-        }));
+        });
+        answer.new = true;
+        this.questionInEditModeClone.answers.push(answer);
 
         // sort not needed since we always add answers at the end
         // NOTHING
