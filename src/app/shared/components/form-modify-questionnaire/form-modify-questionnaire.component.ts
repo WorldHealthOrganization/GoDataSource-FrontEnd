@@ -678,6 +678,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // edit mode changed
             this.questionEditModeChanged.emit(true);
+
+            // set focus on the new question
+            this.domService.scrollItemIntoView(
+                `#${this.uniqueIDQuestion}`,
+                'nearest'
+            );
         }
     }
 
@@ -722,6 +728,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // outbreak
                 this.questionAnswerDummyParent = new OutbreakModel(data);
             }
+
+            // set focus on the new answer
+            this.domService.scrollItemIntoView(
+                `#${this.uniqueIDAnswer}`,
+                'nearest'
+            );
         }
     }
 
@@ -1024,12 +1036,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // start modifying the new question
         this.modifyQuestion(this.questionnaireData.length - 1);
-
-        // set focus on the new question
-        this.domService.scrollItemIntoView(
-            `#${this.uniqueIDQuestion}`,
-            'nearest'
-        );
     }
 
     /**
@@ -1075,12 +1081,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // start modifying the new answer
         this.modifyAnswer(this.questionInEditModeClone.answers.length - 1);
-
-        // set focus on the new answer
-        this.domService.scrollItemIntoView(
-            `#${this.uniqueIDAnswer}`,
-            'nearest'
-        );
 
         // mark main form as dirty
         this.markQuestionFormDirty();
