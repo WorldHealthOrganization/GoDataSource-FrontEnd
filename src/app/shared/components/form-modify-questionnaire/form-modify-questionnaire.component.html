@@ -69,11 +69,13 @@
     <!-- Question Data -->
     <div
         fxFlex fxLayout="column">
-        <ng-container
-            *ngFor="let question of questionnaireData; let questionIndex = index">
+        <div
+            *ngFor="let question of questionnaireData; let questionIndex = index"
+            [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode">
 
             <!-- Question Row Data -->
-            <div fxFlex fxLayout="row">
+            <div
+                fxFlex fxLayout="row">
                 <!-- Order -->
                 <div
                     fxFlex="50px"
@@ -371,8 +373,9 @@
                             </div>
 
                             <!-- Answer Data -->
-                            <ng-container
-                                *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index">
+                            <div
+                                *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index"
+                                [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode">
                                 <!-- Answer Row Data -->
                                 <div fxFlex fxLayout="row">
                                     <!-- Order -->
@@ -581,7 +584,7 @@
                                         </app-form-modify-questionnaire>
                                     </mat-card>
                                 </div>
-                            </ng-container>
+                            </div>
 
                             <!-- Answers list general actions -->
                             <div
@@ -599,7 +602,7 @@
                     </form>
                 </mat-card>
             </div>
-        </ng-container>
+        </div>
     </div>
 
     <!-- Question list general actions -->

@@ -1,5 +1,5 @@
 app-form-modify-questionnaire {
-    @edit-form-distance: 70px;
+    @edit-form-distance: 10px;
     .modify-questionnaire-table {
         .modify-questionnaire-table-question-actions-top,
         .modify-questionnaire-table-answer-actions-top {
@@ -8,6 +8,11 @@ app-form-modify-questionnaire {
         .modify-questionnaire-table-question-actions-bottom,
         .modify-questionnaire-table-answer-actions-bottom {
             margin-top: 10px;
+        }
+
+        .question-in-edit-mode,
+        .answer-in-edit-mode {
+            border: 3px solid #000;
         }
 
         .modify-questionnaire-cell-default {
