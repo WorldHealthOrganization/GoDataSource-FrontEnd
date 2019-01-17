@@ -6,12 +6,17 @@ export class AnswerModel {
     label: string;
     value: string;
     alert: boolean;
+    order: number = 1;
     additionalQuestions: QuestionModel[];
+
+    // new flag - DON'T save this field
+    new: boolean;
 
     constructor(data = null) {
         this.label = _.get(data, 'label');
         this.value = _.get(data, 'value');
         this.alert = _.get(data, 'alert');
+        this.order = _.get(data, 'order');
 
         this.additionalQuestions = _.map(
             _.get(data, 'additionalQuestions', null),
@@ -48,6 +53,7 @@ export class QuestionModel {
 
     // new flag - DON'T save this field
     new: boolean;
+    uuid: string;
 
     constructor(data = null) {
         this.text = _.get(data, 'text');

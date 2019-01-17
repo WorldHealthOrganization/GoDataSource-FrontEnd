@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
@@ -38,7 +37,6 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private snackbarService: SnackbarService,
         private router: Router,
-        private i18nService: I18nService,
         private dialogService: DialogService
     ) {
         super();
@@ -65,16 +63,6 @@ export class CreateOutbreakTemplateComponent extends ConfirmOnFormChanges implem
                     this.snackbarService.showError((err.message));
                     loadingDialog.close();
                     return ErrorObservable.create(err);
-                })
-                .switchMap((newOutbreakTemplate) => {
-                    // update language tokens to get the translation of submitted questions and answers
-                    return this.i18nService.loadUserLanguage()
-                        .catch((err) => {
-                            this.snackbarService.showError((err.message));
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
-                        .map(() => newOutbreakTemplate);
                 })
                 .subscribe((newOutbreakTemplate) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');

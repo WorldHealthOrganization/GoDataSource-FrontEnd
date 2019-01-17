@@ -4,7 +4,7 @@ import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { Observable } from 'rxjs/Observable';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { NgForm } from '@angular/forms';
@@ -14,7 +14,6 @@ import { SnackbarService } from '../../../../core/services/helper/snackbar.servi
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
@@ -41,9 +40,7 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private formHelper: FormHelperService,
         private snackbarService: SnackbarService,
-        private router: Router,
         private authDataService: AuthDataService,
-        private i18nService: I18nService,
         private dialogService: DialogService
     ) {
         super(route);
@@ -89,16 +86,6 @@ export class ModifyOutbreakTemplateComponent extends ViewModifyComponent impleme
                 this.snackbarService.showError(err.message);
                 loadingDialog.close();
                 return ErrorObservable.create(err);
-            })
-            .switchMap((modifiedOutbreakTemplate) => {
-                // update language tokens to get the translation of submitted questions and answers
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => modifiedOutbreakTemplate);
             })
             .subscribe((modifiedOutbreakTemplate) => {
                 // update model

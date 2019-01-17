@@ -1,0 +1,14 @@
+<app-topnav>
+    <ng-container dynamic-section>
+        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </ng-container>
+</app-topnav>
+
+<mat-card class="page-section page-content">
+    <app-form-modify-questionnaire
+        #questionnaire
+        [parent]="outbreakTemplate"
+        (initBreadcrumbs)="createBreadcrumbs($event)"
+        (updateQuestionnaire)="updateQuestionnaire($event)">
+    </app-form-modify-questionnaire>
+</mat-card>
