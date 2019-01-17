@@ -39,12 +39,22 @@
 
 <mat-card
     class="page-section page-content">
-    <div class="top-section-wrapper">
-        <!--List Color Legend-->
-        <div>
+    <div
+        fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="start"
+        class="top-section-wrapper">
+        <!-- Entity Type -->
+        <div fxFlex>
             <app-color-list-legend
                 [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL' | translate"
                 [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
+            </app-color-list-legend>
+        </div>
+
+        <!-- Certainty Level -->
+        <div fxFlex>
+            <app-color-list-legend
+                [title]="'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL' | translate"
+                [referenceDataCategory]="ReferenceDataCategory.CERTAINTY_LEVEL">
             </app-color-list-legend>
         </div>
     </div>
@@ -52,7 +62,7 @@
     <app-world-map
         *ngIf="markers.length > 0 || displayLoading"
         width="100%"
-        height="100%"
+        height="calc(100% - 60px)"
         [markers]="markers"
         [lines]="lines"
         [fitMapOnMarkersChange]="true"

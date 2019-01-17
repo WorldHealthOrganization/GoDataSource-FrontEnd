@@ -16,6 +16,7 @@ export const EnglishUsLang = {
         /**
          * uiTransmissionChainsGeoMap
          */
-        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL': 'Entity Type: '
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_ENTITY_TYPE_LABEL': 'Entity Type: ',
+        'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_CERTAINTY_LEVEL_LABEL': 'Certainty level: '
     }
 };

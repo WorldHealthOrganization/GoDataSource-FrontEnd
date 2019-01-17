@@ -85,15 +85,22 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
             // retrieve chin data & person colors
             return Observable.forkJoin([
                 this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
+                this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
                 this.transmissionChainDataService.getIndependentTransmissionChainsList(this.selectedOutbreak.id)
             ]).catch((err) => {
                 this.snackbarService.showError(err.message);
                 return ErrorObservable.create(err);
-            }).subscribe(([personTypes, chainsData]: [ReferenceDataCategoryModel, TransmissionChainModel[]]) => {
+            }).subscribe(([personTypes, certaintyLevels, chainsData]: [ReferenceDataCategoryModel, ReferenceDataCategoryModel, TransmissionChainModel[]]) => {
                 // map colors to types
                 const typeToColorMap = {};
                 _.each(personTypes.entries, (entry: ReferenceDataEntryModel) => {
                     typeToColorMap[entry.id] = entry.colorCode;
+                });
+
+                // map certainty level to color
+                const certaintyLevelToColorMap = {};
+                _.each(certaintyLevels.entries, (entry: ReferenceDataEntryModel) => {
+                    certaintyLevelToColorMap[entry.id] = entry.colorCode;
                 });
 
                 // reset data
@@ -179,7 +186,13 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                         }
                     });
 
+                    // map relationships
+                    const personsToRelationshipMap = {};
+                    console.log(chain.relationships);
+                    // _.each(chain.relationships, (relationship))
+
                     // connect markers
+                    console.log(chain);
                     _.each(chain.chainRelations, (rel: TransmissionChainRelation) => {
                         // check if we have markers for relation records
                         if (
@@ -190,7 +203,8 @@ export class TransmissionChainsGeoMapComponent implements OnInit, OnDestroy {
                                 points: [
                                     this.markers[markersMap[chainIndex][rel.entityIds[0]]].point,
                                     this.markers[markersMap[chainIndex][rel.entityIds[1]]].point
-                                ]
+                                ],
+                                // color: certaintyLevelToColorMap[type] ? certaintyLevelToColorMap[type] : Constants.DEFAULT_COLOR_CHAINS
                             }));
                         }
                     });
