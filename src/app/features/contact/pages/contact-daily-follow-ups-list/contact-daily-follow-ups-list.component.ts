@@ -37,6 +37,7 @@ import { NgModel } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
 import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -60,6 +61,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<any>;
+
+    // Daily follow ups grouped by teams
+    countedFollowUpsGroupedByTeams$: Observable<any>;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -228,6 +232,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
                         }
 
+                        this.getFollowUpsGroupedByTeams();
                         // initialize pagination
                         this.initPaginator();
                         // ...and re-load the list when the Selected Outbreak is changed
@@ -1101,5 +1106,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                     })
                 ];
             });
+    }
+
+    getFollowUpsGroupedByTeams() {
+        this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
+            .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id)
+            .map((data) => {
+                _.map(data.team, (team) => {
+                    return new CountedItemsListItem(
+                        team.count ? team.count : '1',
+                        team.team ? team.team.name : 'team',
+                        team.followUpIds
+                    );
+                });
+            });
+
     }
 }

@@ -264,5 +264,10 @@ export class FollowUpsDataService {
         );
     }
 
+    getCountedFollowUpsGroupedByTeams(outbreakId: string): Observable<any> {
+        return this.http.get(`/outbreaks/${outbreakId}/follow-ups/per-team/count`, {});
+    }
+
+
 }
 

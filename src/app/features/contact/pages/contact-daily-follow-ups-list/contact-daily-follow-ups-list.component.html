@@ -66,10 +66,20 @@
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
 
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(followUpsListCount$ | async)?.count">
-</app-total-number-of-records>
+<div fxLayout fxLayoutAlign="space-between end">
+
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(followUpsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+
+    <app-counted-items-list
+        fxFlex
+        [items]="countedFollowUpsGroupedByTeams$ | async">
+    </app-counted-items-list>
+
+</div>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
