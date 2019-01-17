@@ -53,6 +53,7 @@ export class QuestionModel {
 
     // new flag - DON'T save this field
     new: boolean;
+    uuid: string;
 
     constructor(data = null) {
         this.text = _.get(data, 'text');

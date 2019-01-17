@@ -48,6 +48,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CASE_TITLE': 'Case investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_FOLLOW_UP_TITLE': 'Contact follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_LAB_RESULT_TITLE': 'Lab Results',
+        'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE': 'Duplicate variable',
 
         /**
          * NEW GROUP
@@ -74,7 +75,12 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION': 'Since this is a new question, it will be removed if you cancel. Do you want to continue?',
         'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER': 'Since this is a new answer, it will be removed if you cancel. Do you want to continue?',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION': 'There are unsaved changes that will be lost if you continue',
-        'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue'
+        'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue',
+
+        /**
+         * uiFormInputValidationErrors
+         */
+        'LNG_FORM_VALIDATION_ERROR_GENERAL_HAS_PROPERTY': 'Property exists'
 
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore

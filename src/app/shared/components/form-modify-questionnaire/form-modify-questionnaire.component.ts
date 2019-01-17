@@ -97,6 +97,20 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     questionnaireData: QuestionModel[];
 
     /**
+     * Questionnaire question variables
+     */
+    questionVariables: {
+        [lowercaseVariable: string]: string
+    } = {};
+
+    /**
+     * Extra Question variables prepended to questionVariables
+     */
+    @Input() extraQuestionVariables: {
+        [lowercase_variable: string]: string
+    } = {};
+
+    /**
      * Question In Edit Mode
      */
     questionIndexInEditMode: number = null;
@@ -265,63 +279,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.parent[this.questionnaireType],
                     (accumulator: QuestionModel[], question: QuestionModel) => {
                         accumulator.push(new QuestionModel(question));
-                        // #TODO - delete after
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
-                        // accumulator.push(new QuestionModel(question));
                     },
                     []
                 );
@@ -346,6 +303,49 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // translate data? since we need to have it in memory translated ?
             // what about language change ? should we hook that too - HANDLED ?
             this.initTranslateQuestionnaireQuestions();
+        }
+
+        // get variables so we don't allow duplicates
+        this.determineQuestionnaireVariables();
+    }
+
+    /**
+     * Determine questionnaire variables
+     */
+    private determineQuestionnaireVariables() {
+        // init questionnaire variables
+        this.questionVariables = { ...this.extraQuestionVariables };
+
+        // add variables to array of variables
+        const getQuestionVariables = (questions: QuestionModel[]) => {
+            _.each(questions, (question: QuestionModel) => {
+                // add variable to list
+                if (question.variable) {
+                    this.questionVariables[question.variable.toLowerCase()] = question.uuid;
+                }
+
+                // search for child variables
+                _.each(question.answers, (answer: AnswerModel) => {
+                    // do we have questions ?
+                    if (!_.isEmpty(answer.additionalQuestions)) {
+                        getQuestionVariables(answer.additionalQuestions);
+                    }
+                });
+            });
+        };
+
+        // go through data and add questionnaire variables
+        if (!_.isEmpty(this.questionnaireData)) {
+            // start with main questions
+            getQuestionVariables(this.questionnaireData);
+        }
+
+        // append clone too since this is active information
+        if (
+            this.questionAnswerInEditModeClone &&
+            !_.isEmpty(this.questionAnswerInEditModeClone.additionalQuestions)
+        ) {
+            getQuestionVariables(this.questionAnswerInEditModeClone.additionalQuestions);
         }
     }
 
@@ -440,6 +440,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         _.each(questions, (question: QuestionModel) => {
             // translate question
             question.text = this.i18nService.instant(question.text);
+            question.uuid = uuid();
 
             // translate answers & sub questions
             _.each(question.answers, (answer: AnswerModel) => {
@@ -630,12 +631,18 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             !_.isEmpty(this.parent) &&
             !_.isEmpty(this.questionnaireType)
         ) {
+            // data clone
+            const questionnaireCloneData: QuestionModel[] = _.isEmpty(this.questionnaireData) ?
+                this.questionnaireData : _.map(this.questionnaireData, (question: QuestionModel) => {
+                    return new QuestionModel(question);
+                });
+
             // call event
             this.savingData = blockWhileSaving;
             this.updateQuestionnaire.emit(new FormModifyQuestionnaireUpdateData(
                 this.parent,
                 this.questionnaireType,
-                this.questionnaireData,
+                questionnaireCloneData,
                 Subscriber.create((success) => {
                     // success saving questionnaire ?
                     if (!success) {
@@ -664,6 +671,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.questionIndexInEditMode = questionIndex;
             this.questionInEditModeClone = new QuestionModel(this.questionnaireData[questionIndex]);
             this.questionInEditModeClone.new = this.questionnaireData[questionIndex].new;
+            this.questionInEditModeClone.uuid = this.questionnaireData[questionIndex].uuid;
 
             // edit mode changed
             this.questionEditModeChanged.emit(true);
@@ -873,6 +881,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // replace question with the one we just changed
+        const isNew: boolean = this.questionInEditModeClone.new;
         delete this.questionInEditModeClone.new;
         this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
 
@@ -881,6 +890,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // reset question order
         this.setQuestionnaireQuestionsOrder(this.questionnaireData);
+
+        // get variables so we don't allow duplicates
+        if (isNew) {
+            this.determineQuestionnaireVariables();
+        }
 
         // stop question edit
         this.resetQuestionEditMode();
@@ -923,6 +937,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     updateAnswerAdditionalQuestions(questionnaireData: FormModifyQuestionnaireUpdateData) {
         // update answer additional questions
         this.questionAnswerInEditModeClone.additionalQuestions = questionnaireData.questionnaire;
+
+        // get variables so we don't allow duplicates
+        this.determineQuestionnaireVariables();
 
         // mark answer form as dirty
         this.markAnswerFormDirty();

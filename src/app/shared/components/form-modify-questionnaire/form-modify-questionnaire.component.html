@@ -253,7 +253,11 @@
                                     [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
                                     [required]="true"
-                                    [readonly]="!questionInEditModeClone.new && questionInEditModeClone.variable">
+                                    [readonly]="!questionInEditModeClone.new && questionInEditModeClone.variable"
+                                    app-has-property-validator
+                                    [checkObject]="questionVariables"
+                                    checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"
+                                    [checkCompareValue]="questionInEditModeClone.uuid">
                                 </app-form-input>
                             </div>
 
@@ -583,7 +587,8 @@
                                                 [parent]="questionAnswerDummyParent"
                                                 (updateQuestionnaire)="updateAnswerAdditionalQuestions($event)"
                                                 [displayChangeButton]="true"
-                                                (questionEditModeChanged)="questionEditModeChangedHandler($event)">
+                                                (questionEditModeChanged)="questionEditModeChangedHandler($event)"
+                                                [extraQuestionVariables]="questionVariables">
                                             </app-form-modify-questionnaire>
                                         </form>
                                     </mat-card>
