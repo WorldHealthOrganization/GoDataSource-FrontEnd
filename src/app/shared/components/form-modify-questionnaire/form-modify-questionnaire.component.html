@@ -136,7 +136,7 @@
                         class="table-max-sized-menu">
 
                         <ng-container
-                            *ngIf="hasOutbreakWriteAccess()">
+                            *ngIf="hasWriteAccess()">
                             <button
                                 mat-menu-item
                                 type="button"
@@ -162,7 +162,7 @@
                         </button>
 
                         <ng-container
-                            *ngIf="hasOutbreakWriteAccess()">
+                            *ngIf="hasWriteAccess()">
                             <button
                                 mat-menu-item
                                 type="button"
@@ -436,7 +436,7 @@
                                             class="table-max-sized-menu">
 
                                             <ng-container
-                                                *ngIf="hasOutbreakWriteAccess()">
+                                                *ngIf="hasWriteAccess()">
                                                 <button
                                                     mat-menu-item
                                                     type="button"
@@ -462,7 +462,7 @@
                                             </button>
 
                                             <ng-container
-                                                *ngIf="hasOutbreakWriteAccess()">
+                                                *ngIf="hasWriteAccess()">
                                                 <button
                                                     mat-menu-item
                                                     type="button"

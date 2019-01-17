@@ -1,27 +1,27 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { FormModifyQuestionnaireBreadcrumbsData, FormModifyQuestionnaireComponent, FormModifyQuestionnaireUpdateData } from '../../../../shared/components';
 import { OutbreakQestionnaireTypeEnum } from '../../../../core/enums/outbreak-qestionnaire-type.enum';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
+import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 
 @Component({
-    selector: 'app-outbreak-questionnaire',
+    selector: 'app-outbreak-template-questionnaire',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './outbreak-questionnaire.component.html',
-    styleUrls: ['./outbreak-questionnaire.component.less']
+    templateUrl: './outbreak-template-questionnaire.component.html',
+    styleUrls: ['./outbreak-template-questionnaire.component.less']
 })
-export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
+export class OutbreakTemplateQuestionnaireComponent extends ConfirmOnFormChanges implements OnInit {
     // breadcrumbs
     breadcrumbs: BreadcrumbItemModel[] = [];
 
     // outbreak to modify
-    outbreak: OutbreakModel;
+    outbreakTemplate: OutbreakTemplateModel;
 
     /**
      * Questionnaire
@@ -33,7 +33,7 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      */
     constructor(
         protected route: ActivatedRoute,
-        private outbreakDataService: OutbreakDataService,
+        private outbreakTemplateDataService: OutbreakTemplateDataService,
         private snackbarService: SnackbarService,
         private i18nService: I18nService
     ) {
@@ -46,11 +46,11 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
     ngOnInit() {
         // get outbreak
         this.route.params
-            .subscribe((params: { outbreakId }) => {
-                this.outbreakDataService
-                    .getOutbreak(params.outbreakId)
-                    .subscribe((outbreakData) => {
-                        this.outbreak = outbreakData;
+            .subscribe((params: { outbreakTemplateId }) => {
+                this.outbreakTemplateDataService
+                    .getOutbreakTemplate(params.outbreakTemplateId)
+                    .subscribe((outbreakTemplateData) => {
+                        this.outbreakTemplate = outbreakTemplateData;
                     });
             });
     }
@@ -63,29 +63,29 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
         let questionnaireToken: string;
         switch (breadData.type) {
             case OutbreakQestionnaireTypeEnum.CASE:
-                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CASE_TITLE';
+                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CASE_TITLE';
                 break;
             case OutbreakQestionnaireTypeEnum.FOLLOW_UP:
-                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_FOLLOW_UP_TITLE';
+                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_FOLLOW_UP_TITLE';
                 break;
             case OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT:
-                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_LAB_RESULT_TITLE';
+                questionnaireToken = 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_LAB_RESULT_TITLE';
                 break;
         }
 
         // set breadcrumbs
         this.breadcrumbs = [
-            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks'),
+            new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'),
             new BreadcrumbItemModel(
-                'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_OUTBREAK_TITLE',
-                `/outbreaks/${this.outbreak.id}/view`,
+                'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_OUTBREAK_TITLE',
+                `/outbreak-templates/${this.outbreakTemplate.id}/view`,
                 false,
                 {},
-                this.outbreak
+                this.outbreakTemplate
             ),
             new BreadcrumbItemModel(
                 questionnaireToken,
-                `/outbreaks/${this.outbreak.id}/${breadData.type}`,
+                `/outbreak-templates/${this.outbreakTemplate.id}/${breadData.type}`,
                 true
             )
         ];
@@ -102,8 +102,8 @@ export class OutbreakQuestionnaireComponent extends ConfirmOnFormChanges impleme
      * Update Questionnaire data
      */
     updateQuestionnaire(questionnaireData: FormModifyQuestionnaireUpdateData) {
-        this.outbreakDataService
-            .modifyOutbreak(questionnaireData.parent.id, {
+        this.outbreakTemplateDataService
+            .modifyOutbreakTemplate(questionnaireData.parent.id, {
                 [questionnaireData.type]: questionnaireData.questionnaire
             })
             .catch((err) => {

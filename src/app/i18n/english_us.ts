@@ -20,11 +20,25 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab Results form',
 
         /**
+         * uiOutbreakTemplateListPage
+         */
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab Results form',
+
+        /**
          * uiModifyOutbreakPage
          */
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
         'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab form',
+
+        /**
+         * uiModifyOutbreakTemplatePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab form',
 
         /**
          * NEW GROUP
@@ -34,6 +48,15 @@ export const EnglishUsLang = {
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_CASE_TITLE': 'Case investigation',
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_FOLLOW_UP_TITLE': 'Contact follow-up',
         'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_LAB_RESULT_TITLE': 'Lab Results',
+
+        /**
+         * NEW GROUP
+         * uiModifyOutbreakTemplateQuestionnairePage
+         */
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_OUTBREAK_TITLE': '{{name}}',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_CASE_TITLE': 'Case investigation',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_FOLLOW_UP_TITLE': 'Contact follow-up',
+        'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTIONNAIRE_LAB_RESULT_TITLE': 'Lab Results',
 
         /**
          * uiOutbreakQuestionnaireTemplates
@@ -54,7 +77,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue'
 
         // some tokens might need to be removed
-        // - create & modify outbreak => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
+        // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
         // - before removing these tokens make sure they aren't used
     }
 };

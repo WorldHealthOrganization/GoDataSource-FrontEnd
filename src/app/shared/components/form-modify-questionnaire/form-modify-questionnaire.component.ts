@@ -455,11 +455,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
-     * Check if we have write access to outbreaks
+     * Check if we have write access to write to outbreaks or outbreak templates
      * @returns {boolean}
      */
-    hasOutbreakWriteAccess(): boolean {
-        return this.authUser.hasPermissions(PERMISSION.WRITE_OUTBREAK);
+    hasWriteAccess(): boolean {
+        return this.parent ?
+            this.authUser.hasPermissions(
+                this.parent instanceof OutbreakTemplateModel ?
+                    PERMISSION.WRITE_SYS_CONFIG :
+                    PERMISSION.WRITE_OUTBREAK
+            ) :
+            false;
     }
 
     /**
