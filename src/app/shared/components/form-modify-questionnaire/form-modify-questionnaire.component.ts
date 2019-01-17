@@ -1029,6 +1029,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             order: 99999
         });
         question.new = true;
+        question.uuid = uuid();
         this.questionnaireData.push(question);
 
         // sort not needed since we always add questions at the end
