@@ -22,6 +22,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import { Constants } from '../../../core/models/constants';
 import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
+import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
 
 /**
  * Used to initialize breadcrumbs
@@ -174,6 +175,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Used to mark answer form dirty
      */
     @ViewChild('inputAnswerForMakingFormDirty') inputAnswerForMakingFormDirty: NgModel;
+
+    /**
+     * Question text input
+     */
+    @ViewChild('questionText') questionText: FormInputComponent;
 
     /**
      * Breadcrumbs init
@@ -661,7 +667,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Modify Question
      * @param questionIndex
      */
-    modifyQuestion(questionIndex: number) {
+    modifyQuestion(
+        questionIndex: number,
+        focusTextBox: boolean = false
+    ) {
         // make some validations just to be sure
         if (
             !_.isEmpty(this.questionnaireData) &&
@@ -681,6 +690,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 `#${this.uniqueIDQuestion}`,
                 'nearest'
             );
+        }
+
+        // wait for binding
+        if (focusTextBox) {
+            setTimeout(() => {
+                // focus text input
+                if (this.questionText) {
+                    this.questionText.focus();
+                }
+            });
         }
     }
 
@@ -1042,7 +1061,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         );
 
         // start modifying the new question
-        this.modifyQuestion(this.questionnaireData.length - 1);
+        this.modifyQuestion(
+            this.questionnaireData.length - 1,
+            true
+        );
     }
 
     /**
