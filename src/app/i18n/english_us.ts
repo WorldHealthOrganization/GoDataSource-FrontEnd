@@ -15,27 +15,27 @@ export const EnglishUsLang = {
         /**
          * Outbreaks List Page
          */
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK': 'View Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK': 'Clone Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK': 'Modify Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK': 'Delete Outbreak',
-        'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK': 'Restore Outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK': 'View outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK': 'Clone outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK': 'Modify outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK': 'Delete outbreak',
+        'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK': 'Restore outbreak',
 
         /**
          * Outbreak Template List Page
          */
 
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE': 'View Outbreak Template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE': 'Modify Outbreak Template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE': 'Delete Outbreak Template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE': 'View outbreak template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE': 'Modify outbreak template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE': 'Delete outbreak template',
 
         /**
          * Cases List Page
          */
-        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE': 'View Case',
-        'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE': 'Modify Case',
-        'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete Case',
-        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE': 'Restore Case',
+        'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE': 'View case',
+        'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE': 'Modify case',
+        'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete case',
+        'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE': 'Restore case',
 
         /**
          * Case Lab Results List Page
@@ -170,6 +170,14 @@ export const EnglishUsLang = {
         /**
          * System Backups Page
          */
-        'LNG_PAGE_LIST_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP': 'Delete backup'
+        'LNG_PAGE_LIST_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP': 'Delete backup',
+
+        /**
+         * Entity Relationships List Page
+         */
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP': 'View relationship',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP': 'Modify relationship',
+        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP': 'Delete relationship',
+
     }
 };

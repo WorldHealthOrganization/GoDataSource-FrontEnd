@@ -326,16 +326,16 @@
                     <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                         <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                            {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                            {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP' | translate}}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="hasEntityWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                                {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                                {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP' | translate}}
                             </button>
 
                             <button *ngIf="hasEntityWriteAccess()" mat-menu-item class="mat-menu-item-delete" (click)="deleteRelationship(item)">
-                                {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                                {{'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP' | translate}}
                             </button>
                         </ng-container>
 
