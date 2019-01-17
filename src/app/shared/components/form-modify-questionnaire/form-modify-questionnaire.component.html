@@ -228,7 +228,8 @@
                                     [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER' | translate"
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ORDER_DESCRIPTION"
                                     [required]="false"
-                                    (optionChanged)="setOrderValue(questionInEditModeClone, $event)">
+                                    (optionChanged)="setOrderValue(questionInEditModeClone, $event)"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-input>
                             </div>
 
@@ -236,11 +237,13 @@
                             <div
                                 fxFlex>
                                 <app-form-input
+                                    #questionText
                                     name="questionText"
                                     [(ngModel)]="questionInEditModeClone.text"
                                     [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT' | translate"
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT_DESCRIPTION"
-                                    [required]="true">
+                                    [required]="true"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-input>
                             </div>
 
@@ -257,7 +260,8 @@
                                     app-has-property-validator
                                     [checkObject]="questionVariables"
                                     checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"
-                                    [checkCompareValue]="questionInEditModeClone.uuid">
+                                    [checkCompareValue]="questionInEditModeClone.uuid"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-input>
                             </div>
 
@@ -271,7 +275,8 @@
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY_DESCRIPTION"
                                     [required]="true"
                                     [options]="questionCategoriesInstantList"
-                                    [clearable]="false">
+                                    [clearable]="false"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-select>
                             </div>
 
@@ -284,7 +289,8 @@
                                     [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate"
                                     tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE_DESCRIPTION"
                                     [required]="true"
-                                    [options]="answerTypesInstantList">
+                                    [options]="answerTypesInstantList"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-select>
                             </div>
 
@@ -295,7 +301,8 @@
                                     name="questionRequired"
                                     [(ngModel)]="questionInEditModeClone.required"
                                     [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate"
-                                    [required]="false">
+                                    [required]="false"
+                                    [disabled]="questionAnswerIndexInEditMode !== null">
                                 </app-form-slide-toggle>
                             </div>
                         </div>
@@ -530,7 +537,8 @@
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ORDER_DESCRIPTION"
                                                         [required]="false"
-                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)">
+                                                        (optionChanged)="setOrderValue(questionAnswerInEditModeClone, $event)"
+                                                        [disabled]="childQuestionIsInEditMode">
                                                     </app-form-input>
                                                 </div>
 
@@ -542,7 +550,8 @@
                                                         [(ngModel)]="questionAnswerInEditModeClone.label"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL_DESCRIPTION"
-                                                        required="true">
+                                                        required="true"
+                                                        [disabled]="childQuestionIsInEditMode">
                                                     </app-form-input>
                                                 </div>
 
@@ -554,7 +563,8 @@
                                                         [(ngModel)]="questionAnswerInEditModeClone.value"
                                                         [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE' | translate"
                                                         tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE_DESCRIPTION"
-                                                        required="true">
+                                                        required="true"
+                                                        [disabled]="childQuestionIsInEditMode">
                                                     </app-form-input>
                                                 </div>
 
@@ -565,7 +575,8 @@
                                                         name="answerAdditionalQuestionsShow"
                                                         [(ngModel)]="questionAnswerInEditModeClone.additionalQuestionsShow"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_ADDITIONAL_QUESTIONS' | translate"
-                                                        required="false">
+                                                        required="false"
+                                                        [disabled]="childQuestionIsInEditMode">
                                                     </app-form-slide-toggle>
                                                 </div>
 
@@ -576,7 +587,8 @@
                                                         name="answerAlert"
                                                         [(ngModel)]="questionAnswerInEditModeClone.alert"
                                                         [label]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate"
-                                                        required="false">
+                                                        required="false"
+                                                        [disabled]="childQuestionIsInEditMode">
                                                     </app-form-slide-toggle>
                                                 </div>
                                             </div>
