@@ -651,23 +651,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     }
 
     /**
-     * View Question
-     * @param questionIndex
-     */
-    viewQuestion(questionIndex: number) {
-        // #TODO
-        alert('Work in progress');
-    }
-
-    /**
-     * View Question Answer
-     */
-    viewAnswer(answerIndex: number) {
-        // #TODO
-        alert('Work in progress');
-    }
-
-    /**
      * Modify Question
      * @param questionIndex
      */

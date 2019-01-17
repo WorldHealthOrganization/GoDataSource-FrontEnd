@@ -152,17 +152,7 @@
                             </button>
 
                             <mat-divider></mat-divider>
-                        </ng-container>
 
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="viewQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                        </button>
-
-                        <ng-container
-                            *ngIf="hasWriteAccess()">
                             <button
                                 mat-menu-item
                                 type="button"
@@ -452,17 +442,7 @@
                                                 </button>
 
                                                 <mat-divider></mat-divider>
-                                            </ng-container>
 
-                                            <button
-                                                mat-menu-item
-                                                type="button"
-                                                (click)="viewAnswer(answerIndex)">
-                                                {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
-                                            </button>
-
-                                            <ng-container
-                                                *ngIf="hasWriteAccess()">
                                                 <button
                                                     mat-menu-item
                                                     type="button"
