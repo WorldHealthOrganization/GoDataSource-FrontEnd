@@ -62,7 +62,10 @@ export class HasPropertyDirective implements Validator {
         // check if property exists
         if (!_.isEmpty(this.checkObject)) {
             // fast check
-            if (this.checkObject[value] !== this.checkCompareValue) {
+            if (
+                this.checkObject[value] !== undefined &&
+                this.checkObject[value] !== this.checkCompareValue
+            ) {
                 return {
                     hasPropertyValidator: {
                         err: this.checkErrorMsg,
