@@ -216,7 +216,7 @@
 
                         <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
                             <button mat-menu-item [routerLink]="['/teams', item.id, 'view']">
-                                {{'LNG_PAGE_LIST_USERS_ACTION_VIEW_TEAM'| translate}}
+                                {{'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM'| translate}}
                             </button>
 
                             <ng-container
@@ -224,13 +224,13 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['/teams', item.id, 'modify']">
-                                    {{'LNG_PAGE_LIST_USERS_ACTION_MODIFY_TEAM'| translate}}
+                                    {{'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM'| translate}}
                                 </button>
 
                                 <button
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteTeam(item)">
-                                    {{ 'LNG_PAGE_LIST_USERS_ACTION_DELETE_TEAM' | translate }}
+                                    {{ 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM' | translate }}
                                 </button>
                             </ng-container>
                         </mat-menu>

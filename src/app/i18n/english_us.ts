@@ -139,9 +139,9 @@ export const EnglishUsLang = {
         /**
          * Teams List Page
          */
-        'LNG_PAGE_LIST_USERS_ACTION_VIEW_TEAM': 'View team',
-        'LNG_PAGE_LIST_USERS_ACTION_MODIFY_TEAM': 'Modify team',
-        'LNG_PAGE_LIST_USERS_ACTION_DELETE_TEAM': 'View team',
+        'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM': 'View team',
+        'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM': 'Modify team',
+        'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM': 'View team',
 
         /**
          * System Upstream Servers List Page
