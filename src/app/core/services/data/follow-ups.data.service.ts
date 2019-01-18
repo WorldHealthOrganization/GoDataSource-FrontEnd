@@ -264,10 +264,15 @@ export class FollowUpsDataService {
         );
     }
 
-    getCountedFollowUpsGroupedByTeams(outbreakId: string): Observable<any> {
-        return this.http.get(`/outbreaks/${outbreakId}/follow-ups/per-team/count`, {});
+    /**
+     * Get counted followUps grouped by teams
+     * @param {string} outbreakId
+     * @param {RequestQueryBuilder} queryBuilder
+     * @returns {Observable<any>}
+     */
+    getCountedFollowUpsGroupedByTeams(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
+        const filter = queryBuilder.buildQuery();
+        return this.http.get(`/outbreaks/${outbreakId}/follow-ups/per-team/count?filter=${filter}`, {});
     }
-
-
 }
 

@@ -232,7 +232,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
 
                         }
 
-                        this.getFollowUpsGroupedByTeams();
                         // initialize pagination
                         this.initPaginator();
                         // ...and re-load the list when the Selected Outbreak is changed
@@ -742,6 +741,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // refresh badges
+            this.getFollowUpsGroupedByTeams();
+
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
@@ -1108,18 +1110,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             });
     }
 
+    /**
+     * Get followUps grouped by teams
+     */
     getFollowUpsGroupedByTeams() {
-        this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
-            .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id)
-            .map((data) => {
-                _.map(data.team, (team) => {
-                    return new CountedItemsListItem(
-                        team.count ? team.count : '1',
-                        team.team ? team.team.name : 'team',
-                        team.followUpIds
-                    );
+        if (this.selectedOutbreak) {
+            this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
+                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
+                    .map((data) => {
+                    return _.map(data.team, (teamData) => {
+                        return new CountedItemsListItem(
+                            teamData.count ? teamData.count : 0,
+                            teamData.team ? teamData.team.name : '',
+                            teamData.team ? teamData.team.id : []
+                        );
+                    });
                 });
-            });
-
+        }
     }
 }
