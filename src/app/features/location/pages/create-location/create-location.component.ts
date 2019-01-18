@@ -13,6 +13,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { directive } from '@angular/core/src/render3/instructions';
 
 @Component({
     selector: 'app-create-location',
@@ -73,6 +74,7 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
     createNewLocation(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+        console.log(dirtyFields);
 
         // even if we set value to float, some browser might get it as a string sicne we use form for this...
         // so..we need to force again the geo location to have numbers

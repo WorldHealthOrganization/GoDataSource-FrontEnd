@@ -157,6 +157,29 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- New Field -->
+                <ng-container matColumnDef="newField">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMSsss" | translate}}</div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="newFieldFilter"
+                                    ngModel
+                                    [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                                    (optionChanged)="filterByTextField('newField', $event)"
+                                    app-reset-input-on-side-filter
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item">
+                        {{ item.newField }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Lat / Lng -->
                 <ng-container matColumnDef="latLng">
                     <mat-header-cell *matHeaderCellDef>
