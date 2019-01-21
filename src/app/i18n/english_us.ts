@@ -103,11 +103,6 @@ export const EnglishUsLang = {
         'LNG_COMMON_BUTTON_UPDATE': 'Update',
 
         /**
-         * Follow Up Fields
-         */
-        'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED': 'Targeted',
-
-        /**
          * Follow Ups List Page
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE': 'Targeted status changed!',
