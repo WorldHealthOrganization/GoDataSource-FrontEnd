@@ -124,7 +124,15 @@
        routerLink="/cases"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
         {{elements.caseNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+        </span>
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        </span>
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_REPORTING_TITLE' | translate}}
+        </span>
     </a>
 </div>
 <div *ngIf="showContactNodesWithoutDates()"
@@ -133,7 +141,13 @@
        routerLink="/contacts"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
         {{elements.contactNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                    || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        </span>
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_REPORTING_TITLE' | translate}}
+        </span>
     </a>
 </div>
 <div *ngIf="showEventNodesWithoutDates()"
@@ -142,7 +156,13 @@
        routerLink="/events"
        [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
         {{elements.eventNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                    || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+        </span>
+        <span *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_OF_REPORTING_TITLE' | translate}}
+        </span>
     </a>
 </div>
 
