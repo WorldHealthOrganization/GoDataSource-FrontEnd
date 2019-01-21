@@ -60,16 +60,27 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<div fxLayout fxLayoutAlign="space-between end">
+
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(followUpsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <app-counted-items-list
+        *ngIf="!appliedListFilter"
+        fxFlex
+        [items]="countedFollowUpsGroupedByTeams$| async"
+        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
+    </app-counted-items-list>
+
+</div>
+
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
-
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(followUpsListCount$ | async)?.count">
-</app-total-number-of-records>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->

@@ -37,6 +37,7 @@ import { NgModel } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
 import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -60,6 +61,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<any>;
+
+    // Daily follow ups grouped by teams
+    countedFollowUpsGroupedByTeams$: Observable<any>;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -737,6 +741,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // refresh badges
+            this.getFollowUpsGroupedByTeams();
+
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
@@ -1101,5 +1108,24 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                     })
                 ];
             });
+    }
+
+    /**
+     * Get followUps grouped by teams
+     */
+    getFollowUpsGroupedByTeams() {
+        if (this.selectedOutbreak) {
+            this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
+                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
+                    .map((data) => {
+                    return _.map(data.team, (teamData) => {
+                        return new CountedItemsListItem(
+                            teamData.count ? teamData.count : 0,
+                            teamData.team ? teamData.team.name : '',
+                            teamData.team ? teamData.team.id : []
+                        );
+                    });
+                });
+        }
     }
 }
