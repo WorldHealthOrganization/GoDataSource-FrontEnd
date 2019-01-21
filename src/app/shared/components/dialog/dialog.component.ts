@@ -78,6 +78,7 @@ export class DialogField {
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
+    public visible: boolean = true;
     public disabled: boolean = false;
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
@@ -219,6 +220,23 @@ export class DialogComponent {
         // finished
         return configs;
 
+    }
+
+    setOptionSelectVisibility(selectField) {
+        if (_.isUndefined(selectField) ) {
+            _.map(this.confirmData.fieldsList, (field) => {
+                if (field.name === 'filter[where][collections]') {
+                    field.visible = false;
+                }
+                if (field.name === `filter[where][includeUsers]`) {
+                    field.visible = true;
+                }
+            });
+        } else {
+            _.map(this.confirmData.fieldsList, (field) => {
+                field.visible = field.name !== `filter[where][includeUsers]`;
+            });
+        }
     }
 
     constructor(

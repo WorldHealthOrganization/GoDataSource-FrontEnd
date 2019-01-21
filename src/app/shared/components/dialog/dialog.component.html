@@ -66,7 +66,7 @@
 
                     <!-- Select -->
                     <app-form-select
-                        *ngIf="field.fieldType === DialogFieldType.SELECT"
+                        *ngIf="field.fieldType === DialogFieldType.SELECT && field.visible"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [placeholder]="field.placeholder | translate:confirmData?.translateData"
@@ -79,7 +79,8 @@
                         [required]="field.required"
                         app-required-one-or-other-validator
                         [requiredOtherField]="field.requiredOneOfTwo"
-                        [disabled]="field.disabled">
+                        [disabled]="field.disabled"
+                        (optionChanged)="setOptionSelectVisibility($event)">
                     </app-form-select>
 
                     <!-- Text / Number -->
@@ -98,7 +99,7 @@
 
                     <!-- Boolean -->
                     <app-form-slide-toggle
-                        *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
+                        *ngIf="field.fieldType === DialogFieldType.BOOLEAN && field.visible"
                         [name]="field.name"
                         [(ngModel)]="dialogAnswerInputValue.value[field.name]"
                         [label]="field.placeholder | translate:confirmData?.translateData"

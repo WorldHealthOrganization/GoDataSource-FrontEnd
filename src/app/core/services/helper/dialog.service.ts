@@ -151,6 +151,7 @@ export class DialogService {
         extraDialogFields?: DialogField[],
         fileExtension?: string
     }) {
+        console.log(data);
         // default values
         if (!data.extensionPlaceholder) {
             data.extensionPlaceholder = 'LNG_COMMON_LABEL_EXPORT_TYPE';

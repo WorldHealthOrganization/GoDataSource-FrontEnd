@@ -504,14 +504,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'filter[where][collections]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
-                        fieldType: DialogFieldType.SELECT,
-                        inputOptions: this.mappedCollections,
-                        inputOptionsMultiple: true
-                    }),
-                    new DialogField({
                         name: 'filter[where][exportType]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
@@ -519,6 +511,14 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         inputOptions: this.mappedExportTypes,
                         inputOptionsMultiple: false,
                         value: Constants.SYNC_PACKAGE_EXPORT_TYPES.FULL.value
+                    }),
+                    new DialogField({
+                        name: 'filter[where][collections]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedCollections,
+                        inputOptionsMultiple: true
                     }),
                     new DialogField({
                         name: 'filter[where][includeUsers]',
