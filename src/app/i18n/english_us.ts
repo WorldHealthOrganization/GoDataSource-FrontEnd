@@ -106,6 +106,13 @@ export const EnglishUsLang = {
          * Follow Ups List Page
          */
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE': 'Targeted status changed!',
+
+        /**
+         * Terms of use page
+         */
+        'LNG_PAGE_TERMS_OF_USE_TITLE': 'Terms of use',
+        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'Access the link below for downloading the full document with terms of use'
+
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
         // - before removing these tokens make sure they aren't used
