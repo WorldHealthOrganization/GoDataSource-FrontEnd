@@ -6,6 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakResolver } from './services/outbreak-resolver';
+import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
 
 const routes: Routes = [
     // Outbreaks list
@@ -49,6 +50,48 @@ const routes: Routes = [
         data: {
             permissions: [PERMISSION.WRITE_OUTBREAK],
             action: ViewModifyComponentAction.MODIFY
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
+    // Edit Outbreak Case Questionnaire
+    {
+        path: ':outbreakId/case-questionnaire',
+        component: fromPages.OutbreakQuestionnaireComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_OUTBREAK],
+            questionnaire: OutbreakQestionnaireTypeEnum.CASE
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
+    // Edit Outbreak Contact Follow-up Questionnaire
+    {
+        path: ':outbreakId/contact-follow-up-questionnaire',
+        component: fromPages.OutbreakQuestionnaireComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_OUTBREAK],
+            questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
+        },
+        canDeactivate: [
+            PageChangeConfirmationGuard
+        ]
+    },
+
+    // Edit Outbreak Case Lab Results Questionnaire
+    {
+        path: ':outbreakId/case-lab-results-questionnaire',
+        component: fromPages.OutbreakQuestionnaireComponent,
+        canActivate: [AuthGuard],
+        data: {
+            permissions: [PERMISSION.READ_OUTBREAK],
+            questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
         },
         canDeactivate: [
             PageChangeConfirmationGuard
