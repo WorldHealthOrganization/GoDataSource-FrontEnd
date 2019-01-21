@@ -390,6 +390,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 visible: false
             }),
             new VisibleColumnModel({
+                field: 'targeted',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
+            }),
+            new VisibleColumnModel({
                 field: 'actions',
                 required: true,
                 excludeFromSave: true
@@ -1036,6 +1040,23 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 // show success ?
                 // this might not be the best idea...maybe we can replace / remove it
                 this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_FOLLOW_UP_TEAM_SUCCESS_MESSAGE');
+            });
+    }
+
+    /**
+     * Change FollowUp "targeted" status
+     * @param {FollowUpModel} followUp
+     * @param {boolean} targeted
+     */
+    setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
+        this.followUpsDataService
+            .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted})
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
             });
     }
 

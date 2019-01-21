@@ -100,8 +100,12 @@ export const EnglishUsLang = {
         /**
          * uiCommonButtons
          */
-        'LNG_COMMON_BUTTON_UPDATE': 'Update'
+        'LNG_COMMON_BUTTON_UPDATE': 'Update',
 
+        /**
+         * Follow Ups List Page
+         */
+        'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE': 'Targeted status changed!',
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
         // - before removing these tokens make sure they aren't used
