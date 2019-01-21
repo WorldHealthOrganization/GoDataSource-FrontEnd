@@ -108,6 +108,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE': 'Targeted status changed!',
 
         /**
+         * Terms of use page
+         */
+        'LNG_PAGE_TERMS_OF_USE_TITLE': 'Terms of use',
+        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'Access the link below for downloading the full document with terms of use'
+
+        /**
          * Form input validation errors
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_URL': 'Invalid URL, either it contains "localhost" or the path is not good',
