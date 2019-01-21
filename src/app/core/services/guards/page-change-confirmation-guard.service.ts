@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { Observer } from 'rxjs/Observer';
 import { DialogService } from '../helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../shared/components';
+import { DialogAnswer, DialogAnswerButton } from '../../../shared/components/dialog/dialog.component';
 import { NgForm } from '@angular/forms';
 
 /**
