@@ -385,13 +385,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
             }),
             new VisibleColumnModel({
+                field: 'targeted',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
+            }),
+            new VisibleColumnModel({
                 field: 'deleted',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
                 visible: false
-            }),
-            new VisibleColumnModel({
-                field: 'targeted',
-                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
             }),
             new VisibleColumnModel({
                 field: 'actions',

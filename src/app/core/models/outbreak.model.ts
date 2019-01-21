@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
-import * as moment from 'moment';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
 
@@ -81,21 +80,5 @@ export class OutbreakModel {
             (lData: any) => {
                 return new MapServerModel(lData);
             });
-    }
-
-    /**
-     * Return case id mask with data replaced
-     * @param caseIdMask
-     */
-    static generateCaseIDMask(caseIdMask: string): string {
-        // validate
-        if (_.isEmpty(caseIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return caseIdMask.replace(/YYYY/g, moment().format('YYYY'));
     }
 }

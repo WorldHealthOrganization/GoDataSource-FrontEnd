@@ -6,6 +6,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
+import * as moment from 'moment';
 
 export class CaseModel {
     id: string;
@@ -60,6 +61,24 @@ export class CaseModel {
     }[];
 
     alerted: boolean = false;
+
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
