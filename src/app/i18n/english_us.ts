@@ -111,7 +111,12 @@ export const EnglishUsLang = {
          * Terms of use page
          */
         'LNG_PAGE_TERMS_OF_USE_TITLE': 'Terms of use',
-        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'Access the link below for downloading the full document with terms of use'
+        'LNG_PAGE_TERMS_OF_USE_HEADER_TITLE': 'Access the link below for downloading the full document with terms of use',
+
+        /**
+         * Form input validation errors
+         */
+        'LNG_FORM_VALIDATION_ERROR_FIELD_URL': 'Invalid URL, either it contains "localhost" or the path is not good',
 
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
