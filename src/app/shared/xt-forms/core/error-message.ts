@@ -109,10 +109,6 @@ export class ErrorMessage {
                     (this.validator[this.key] as any).err,
                     (this.validator[this.key] as any).details
                 );
-            case 'urlValidator':
-                return new ElementBaseFailure(
-                    'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
-                );
         }
 
         // Get default message if no validator matched
