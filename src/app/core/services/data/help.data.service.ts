@@ -223,6 +223,5 @@ export class HelpDataService {
         }
         return helpItems;
     }
-
 }
 

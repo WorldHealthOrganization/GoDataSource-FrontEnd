@@ -84,10 +84,10 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
     }
 
     /**
-     * Create Category
+     * Create Category Item
      * @param {NgForm[]} stepForms
      */
-    createNewCategory(stepForms: NgForm[]) {
+    createHelpCategoryItem(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
 
@@ -118,6 +118,8 @@ export class CreateHelpItemComponent extends ConfirmOnFormChanges implements OnI
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE');
 
                     // remove help items from cache
+                    // this isn't really necessary since we retrieve & cache only approve items, and since default approve value is false..this won't be retrieved
+                    // but, we can keep it to prevent future changes that might introduce bugs
                     this.cacheService.remove(CacheKey.HELP_ITEMS);
 
                     // hide dialog

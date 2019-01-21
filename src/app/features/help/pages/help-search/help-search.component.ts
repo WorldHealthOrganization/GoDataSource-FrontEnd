@@ -10,7 +10,6 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
-import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { tap } from 'rxjs/operators';
 
@@ -100,7 +99,6 @@ export class HelpSearchComponent extends ListComponent implements OnInit {
     /**
      * Filter the list by a text field
      * @param {string} value
-     * @param {RequestFilterOperator} operator
      */
     filterByTextFieldHelpSearch(value: string) {
         this.searchedTerm = value;
