@@ -375,6 +375,37 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Targeted -->
+        <ng-container matColumnDef="targeted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-select
+                            name="targetedFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            [options]="yesNoOptionsList$ | async"
+                            (optionChanged)="filterByBooleanField('targeted', $event.value)"
+                            app-reset-input-on-side-filter
+                            [allowSelectionOfDisabledItems]="true"
+                            [displayFilterIcon]="true"
+                            [clearable]="false">
+                        </app-form-select>
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-form-slide-toggle
+                    name="targeted"
+                    [(ngModel)]="item.targeted"
+                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                    (optionChanged)="setTargetedItem(item, $event)">
+                </app-form-slide-toggle>
+            </mat-cell>
+        </ng-container>
+
         <!-- Deleted -->
         <ng-container matColumnDef="deleted">
             <mat-header-cell *matHeaderCellDef>
@@ -397,28 +428,6 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
-            </mat-cell>
-        </ng-container>
-
-
-        <!-- Targeted -->
-        <ng-container matColumnDef="targeted">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}</div>
-                    <div class="column-filter">
-                        <!--Placeholder-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                <app-form-slide-toggle
-                    name="targeted"
-                    [(ngModel)]="item.targeted"
-                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
-                    (optionChanged)="setTargetedItem(item, $event)">
-                </app-form-slide-toggle>
             </mat-cell>
         </ng-container>
 
