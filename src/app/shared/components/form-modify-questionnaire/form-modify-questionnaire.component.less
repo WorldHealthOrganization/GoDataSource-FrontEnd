@@ -1,4 +1,24 @@
 app-form-modify-questionnaire {
+    .modify-questionnaire-loading-data {
+        text-align: center;
+
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 32px !important;
+            height: 32px !important;
+
+            svg {
+                width: 32px !important;
+                height: 32px !important;
+            }
+        }
+    }
+
     @edit-form-distance: 10px;
     .modify-questionnaire-table {
         .modify-questionnaire-table-question-actions-top,
@@ -8,6 +28,18 @@ app-form-modify-questionnaire {
         .modify-questionnaire-table-question-actions-bottom,
         .modify-questionnaire-table-answer-actions-bottom {
             margin-top: 10px;
+        }
+
+        .modify-questionnaire-more-left {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .modify-questionnaire-more-right {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            min-width: 0;
+            padding: 5px;
+            line-height: normal;
         }
 
         .question-in-edit-mode,
