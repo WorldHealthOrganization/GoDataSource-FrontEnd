@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
@@ -8,7 +8,6 @@ import { Observable } from 'rxjs/Observable';
 import * as _ from 'lodash';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
@@ -17,7 +16,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { PERMISSION } from '../../../../core/models/permission.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import 'rxjs/add/operator/switchMap';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 
@@ -46,10 +44,8 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     constructor(
         private outbreakDataService: OutbreakDataService,
         protected route: ActivatedRoute,
-        private router: Router,
         private referenceDataDataService: ReferenceDataDataService,
         private snackbarService: SnackbarService,
-        private i18nService: I18nService,
         private formHelper: FormHelperService,
         private authDataService: AuthDataService,
         private dialogService: DialogService
@@ -90,31 +86,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
     }
 
     /**
-     * Remove outbreak questions new flag
-     * @param outbreakData
-     */
-    cleanQuestionnaireNewFlag(outbreakData: OutbreakModel) {
-        const actualRemoveNewFlag = (question: QuestionModel) => {
-            delete question.new;
-            _.each(question.answers, (answer: AnswerModel) => {
-                _.each(answer.additionalQuestions, (childQuestion: QuestionModel) => {
-                    actualRemoveNewFlag(childQuestion);
-                });
-            });
-        };
-
-        _.each(outbreakData.labResultsTemplate, (question: QuestionModel) => {
-            actualRemoveNewFlag(question);
-        });
-        _.each(outbreakData.contactFollowUpTemplate, (question: QuestionModel) => {
-            actualRemoveNewFlag(question);
-        });
-        _.each(outbreakData.caseInvestigationTemplate, (question: QuestionModel) => {
-            actualRemoveNewFlag(question);
-        });
-    }
-
-    /**
      * Handles form submit
      * @param form
      */
@@ -127,9 +98,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
         // const dirtyFields: any = this.formHelper.getFields(form);
         const dirtyFields: any = this.formHelper.getDirtyFields(form);
 
-        // remove property "new" for every question
-        this.cleanQuestionnaireNewFlag(dirtyFields);
-
         // modify the outbreak
         const loadingDialog = this.dialogService.showLoadingDialog();
         this.outbreakDataService
@@ -138,16 +106,6 @@ export class ModifyOutbreakComponent extends ViewModifyComponent implements OnIn
                 this.snackbarService.showError(err.message);
                 loadingDialog.close();
                 return ErrorObservable.create(err);
-            })
-            .switchMap((modifiedOutbreak) => {
-                // update language tokens to get the translation of submitted questions and answers
-                return this.i18nService.loadUserLanguage()
-                    .catch((err) => {
-                        this.snackbarService.showApiError(err);
-                        loadingDialog.close();
-                        return ErrorObservable.create(err);
-                    })
-                    .map(() => modifiedOutbreak);
             })
             .subscribe((modifiedOutbreak) => {
                 // update model
