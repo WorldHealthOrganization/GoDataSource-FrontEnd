@@ -60,16 +60,27 @@
     (visibleColumnsChanged)="applySideColumnsChanged($event)">
 </app-side-columns>
 
+<div fxLayout fxLayoutAlign="space-between end">
+
+    <!--Total number of records from the list-->
+    <app-total-number-of-records
+        [value]="(followUpsListCount$ | async)?.count">
+    </app-total-number-of-records>
+
+    <app-counted-items-list
+        *ngIf="!appliedListFilter"
+        fxFlex
+        [items]="countedFollowUpsGroupedByTeams$| async"
+        (optionChanged)="filterBySelectField('teamId', $event.ids, null)">
+    </app-counted-items-list>
+
+</div>
+
 <!-- Side filters -->
 <app-side-filters
     [filterOptions]="availableSideFilters"
     (filtersApplied)="applySideFilters($event)">
 </app-side-filters>
-
-<!--Total number of records from the list-->
-<app-total-number-of-records
-    [value]="(followUpsListCount$ | async)?.count">
-</app-total-number-of-records>
 
 <mat-card class="page-section page-content">
     <!-- Reset Filters -->
@@ -386,6 +397,28 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 <app-yes-no-label [value]="item.deleted"></app-yes-no-label>
+            </mat-cell>
+        </ng-container>
+
+
+        <!-- Targeted -->
+        <ng-container matColumnDef="targeted">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div mat-sort-header class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate }}</div>
+                    <div class="column-filter">
+                        <!--Placeholder-->
+                    </div>
+                </div>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let item">
+                <app-form-slide-toggle
+                    name="targeted"
+                    [(ngModel)]="item.targeted"
+                    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
+                    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
+                    (optionChanged)="setTargetedItem(item, $event)">
+                </app-form-slide-toggle>
             </mat-cell>
         </ng-container>
 
