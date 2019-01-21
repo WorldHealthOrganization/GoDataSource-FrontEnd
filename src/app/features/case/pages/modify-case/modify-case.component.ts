@@ -266,12 +266,12 @@ export class ModifyCaseComponent extends ViewModifyComponent implements OnInit {
 
                     // set visual ID translate data
                     this.visualIDTranslateData = {
-                        mask: OutbreakModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+                        mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
                     };
 
                     // set visual ID validator
                     this.caseIdMaskValidator = Observable.create((observer) => {
-                        this.outbreakDataService.generateVisualIDCheckValidity(
+                        this.caseDataService.checkCaseVisualIDValidity(
                             this.selectedOutbreak.id,
                             this.caseData.visualId,
                             this.caseData.id
