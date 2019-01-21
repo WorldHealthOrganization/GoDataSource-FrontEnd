@@ -104,6 +104,11 @@ export class ErrorMessage {
                     (this.validator[this.key] as any).err,
                     (this.validator[this.key] as any).details
                 );
+            case 'hasPropertyValidator':
+                return new ElementBaseFailure(
+                    (this.validator[this.key] as any).err,
+                    (this.validator[this.key] as any).details
+                );
             case 'urlValidator':
                 return new ElementBaseFailure(
                     'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
