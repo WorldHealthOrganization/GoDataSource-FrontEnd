@@ -186,6 +186,12 @@ export class TransmissionChainDataService {
                             } else {
                                 graphData.contactNodesWithoutDates.push(node.model.id);
                             }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
                             nodeProps.dateTimeline = null;
                         }
@@ -198,6 +204,12 @@ export class TransmissionChainDataService {
                             } else {
                                 graphData.eventNodesWithoutDates.push(node.model.id);
                             }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
                         } else {
                             nodeProps.dateTimeline = null;
                         }
@@ -209,9 +221,15 @@ export class TransmissionChainDataService {
                             } else {
                                 graphData.caseNodesWithoutDates.push(node.model.id);
                             }
-                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value) {
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value) {
                             if (!_.isEmpty(node.model.dateOfLastContact)) {
                                 nodeProps.dateTimeline = node.model.dateOfLastContact;
+                            } else {
+                                graphData.caseNodesWithoutDates.push(node.model.id);
+                            }
+                        } else if (selectedViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value) {
+                            if (!_.isEmpty(node.model.dateOfReporting)) {
+                                nodeProps.dateTimeline = node.model.dateOfReporting;
                             } else {
                                 graphData.caseNodesWithoutDates.push(node.model.id);
                             }
