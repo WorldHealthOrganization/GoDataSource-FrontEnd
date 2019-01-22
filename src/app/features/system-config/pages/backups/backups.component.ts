@@ -519,13 +519,18 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         fieldType: DialogFieldType.SELECT,
                         inputOptions: this.mappedCollections,
                         inputOptionsMultiple: true,
-                        visible: false
+                        visible: (fieldsData): boolean => {
+                            return !_.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
                     }),
                     new DialogField({
                         name: 'filter[where][includeUsers]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
-                        fieldType: DialogFieldType.BOOLEAN
+                        fieldType: DialogFieldType.BOOLEAN,
+                        visible: (fieldsData): boolean => {
+                            return _.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
                     }),
                     new DialogField({
                         name: 'password',
