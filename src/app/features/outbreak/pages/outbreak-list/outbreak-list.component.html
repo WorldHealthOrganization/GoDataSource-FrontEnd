@@ -297,25 +297,25 @@
                     </ng-container>
 
                     <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK' | translate}}
                     </button>
 
                     <ng-container *ngIf="hasOutbreakWriteAccess()">
                         <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item" (click)="cloneOutbreak(item)">
-                            {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK' | translate }}
                         </button>
 
                         <button *ngIf="!item.deleted" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK' | translate}}
                         </button>
 
                         <button *ngIf="!item.deleted" mat-menu-item class="mat-menu-item-delete" (click)="delete(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK' | translate}}
                         </button>
 
                         <button *ngIf="item.deleted && hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-restore"
                                 (click)="restoreOutbreak(item)">
-                            {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
+                            {{ 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

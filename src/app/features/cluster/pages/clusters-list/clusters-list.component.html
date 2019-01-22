@@ -98,7 +98,7 @@
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER' | translate }}
                     </button>
 
                     <button *ngIf="hasCaseReadAccess() || hasContactReadAccess()"
@@ -108,12 +108,12 @@
 
                     <ng-container *app-selected-outbreak-is-active>
                         <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER' | translate }}
                         </button>
 
                         <button *ngIf="hasOutbreakWriteAccess()" mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteCluster(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>

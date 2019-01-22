@@ -177,14 +177,14 @@
                     <button
                         mat-menu-item
                         [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE' | translate}}
                     </button>
 
                     <span
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot modify the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)"
                                 [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE' | translate}}
                         </button>
                     </span>
 
@@ -192,7 +192,7 @@
                         [matTooltip]="(authUser.hasRole(item.id) ? 'You cannot delete the role that is assigned to you' : '')">
                         <button mat-menu-item [disabled]="authUser.hasRole(item.id)" (click)="deleteRole(item)"
                                 class="mat-menu-item-delete">
-                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE' | translate}}
                         </button>
                     </span>
 

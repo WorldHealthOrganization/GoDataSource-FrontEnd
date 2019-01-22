@@ -293,25 +293,25 @@
                         <button *ngIf="caseId && !item.deleted"
                                 mat-menu-item
                                 [routerLink]="['/cases', caseId, 'lab-results', item.id, 'view' ]">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_VIEW_LAB_RESULT' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
                             <button *ngIf="caseId && !item.deleted"
                                     mat-menu-item
                                     [routerLink]="['/cases', caseId, 'lab-results', item.id, 'modify' ]">
-                                {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT' | translate }}
                             </button>
                             <button *ngIf="!item.deleted"
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteLabResult(item)">
-                                {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_DELETE_LAB_RESULT' | translate }}
                             </button>
 
                             <button *ngIf="item.deleted"
                                     mat-menu-item class="mat-menu-item-restore"
                                     (click)="restoreLabResult(item)">
-                                {{ 'LNG_PAGE_ACTION_RESTORE' | translate}}
+                                {{ 'LNG_PAGE_LIST_CASE_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT' | translate}}
                             </button>
                         </ng-container>
 
