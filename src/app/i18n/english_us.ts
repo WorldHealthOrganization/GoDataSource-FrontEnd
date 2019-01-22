@@ -34,7 +34,7 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Cases without date of last contact',
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_REPORTING_CHAIN': 'Cases without date of reporting',
         'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN': 'Contacts without date of reporting',
-        'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN': 'Events without date of reporting'
+        'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN': 'Events without date of reporting',
 
         /**
          * uiOutbreakListPage
