@@ -50,7 +50,9 @@
             <div>
                 {{nodeNameColorItem | translate}}
             </div>
-            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value">
+            <div *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+            || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
                 - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
             </div>
         </div>
@@ -120,38 +122,34 @@
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/cases"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN, caseIds: elements.caseNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: elements.caseNodesWithoutDates}">
         {{elements.caseNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE' | translate}}
+        {{ getCasesWithoutDatesTitle() | translate}}
     </a>
 </div>
 <div *ngIf="showContactNodesWithoutDates()"
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/contacts"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN, contactIds: elements.caseNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: elements.caseNodesWithoutDates}">
         {{elements.contactNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE' | translate}}
+        {{ getContactsWithoutDatesTitle() | translate}}
     </a>
 </div>
 <div *ngIf="showEventNodesWithoutDates()"
      class="entities-no-dates">
     <a target="_blank"
        routerLink="/events"
-       [queryParams]="{applyListFilter: Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN, eventIds: elements.eventNodesWithoutDates}">
+       [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: elements.eventNodesWithoutDates}">
         {{elements.eventNodesWithoutDates.length}}
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE' | translate}}
+        {{ getEventsWithoutDatesTitle() | translate}}
     </a>
 </div>
 
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'horizontal'"
+<button *ngIf="( transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+        || transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
     mat-raised-button
-    (click)="switchTimelineView('vertical')">
-    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' | translate }}
-</button>
-
-<button *ngIf="transmissionChainViewType == Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value && timelineViewType == 'vertical'"
-    mat-raised-button
-    (click)="switchTimelineView('horizontal')">
-    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' | translate }}
+    (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
+    {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
 </button>
