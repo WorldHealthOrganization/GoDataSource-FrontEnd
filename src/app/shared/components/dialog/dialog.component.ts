@@ -100,6 +100,7 @@ export class DialogField {
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
+        visible?: boolean,
         disabled?: boolean,
         description?: string,
         fieldType?: DialogFieldType,
@@ -222,7 +223,7 @@ export class DialogComponent {
 
     }
 
-    setOptionSelectVisibility(selectField) {
+    setFormSelectVisibility(selectField) {
         if (_.isUndefined(selectField) ) {
             _.map(this.confirmData.fieldsList, (field) => {
                 if (field.name === 'filter[where][collections]') {
