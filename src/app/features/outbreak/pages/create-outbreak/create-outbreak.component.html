@@ -85,9 +85,13 @@
                                 tooltip="LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION"
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
                             </app-form-input>
-
-                            <div fxFlex><!-- placeholder --></div>
-
+                            <app-form-input
+                                name="contactIdMask"
+                                [(ngModel)]="newOutbreak.contactIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK_DESCRIPTION"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$">
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>

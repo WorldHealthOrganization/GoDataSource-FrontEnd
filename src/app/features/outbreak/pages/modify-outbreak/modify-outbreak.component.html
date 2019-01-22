@@ -95,7 +95,15 @@
                                 pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
                                 required="true">
                             </app-form-input>
-                            <div fxFlex><!-- placeholder --></div>
+                            <app-form-input
+                                name="contactIdMask"
+                                [(ngModel)]="outbreak.contactIdMask"
+                                [placeholder]="'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK' | translate"
+                                tooltip="LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK_DESCRIPTION"
+                                [disabled]="viewOnly"
+                                pattern="^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$"
+                                required="true">
+                            </app-form-input>
                         </div>
                     </div>
                 </mat-card>

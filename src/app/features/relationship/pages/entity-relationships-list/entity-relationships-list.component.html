@@ -113,6 +113,31 @@
             </mat-cell>
         </ng-container>
 
+        <!-- Case / Contact Visual ID -->
+        <ng-container matColumnDef="people.visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell">
+                    <div class="column-header">
+                        {{ 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID' | translate }}
+                    </div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="visualIdFilter"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByRelation('people').byText('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.relatedEntity(entityId)?.type)">
+                {{ item.relatedEntity(entityId)?.model.visualId }}
+            </mat-cell>
+        </ng-container>
+
         <!-- Relation Type (Exposure or Contact) -->
         <ng-container matColumnDef="type">
             <mat-header-cell *matHeaderCellDef>

@@ -17,7 +17,6 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import * as _ from 'lodash';
-import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import 'rxjs/add/observable/throw';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
@@ -282,56 +281,6 @@ export class OutbreakDataService {
                     return new EntityModel(entity).model;
                 });
             });
-    }
-
-    /**
-     * Generate Visual ID
-     * @param outbreakId
-     * @param visualIdMask
-     * @param personId Optional
-     */
-    generateVisualID(
-        outbreakId: string,
-        visualIdMask: string,
-        personId?: string
-    ): Observable<string | VisualIdErrorModel> {
-        return this.http
-            .post(
-                `outbreaks/${outbreakId}/generate-visual-id`,
-                {
-                    visualIdMask: visualIdMask,
-                    personId: personId
-                }
-            ).catch((response: Error | VisualIdErrorModel) => {
-                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
-                    Observable.of(
-                        this.modelHelper.getModelInstance(
-                            VisualIdErrorModel,
-                            response
-                        )
-                    ) :
-                    Observable.throw(response);
-            });
-    }
-
-    /**
-     * Check if visual ID is valid
-     * @param outbreakId
-     * @param visualIdMask
-     * @param personId Optional
-     */
-    generateVisualIDCheckValidity(
-        outbreakId: string,
-        visualIdMask: string,
-        personId?: string
-    ): Observable<boolean> {
-        return this.generateVisualID(
-            outbreakId,
-            visualIdMask,
-            personId
-        ).map((visualID: string | VisualIdErrorModel) => {
-            return _.isString(visualID);
-        });
     }
 
     /**

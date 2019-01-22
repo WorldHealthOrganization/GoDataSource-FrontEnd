@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSettingsModel } from '../../models/system-settings.model';
+import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 
 @Injectable()
 export class SystemSettingsDataService {
@@ -38,6 +39,19 @@ export class SystemSettingsDataService {
      */
     getCloudBackupPaths(): Observable<any> {
         return this.http.get(`/system-settings/backup-location`);
+    }
+
+    /**
+     * Retrieve api version ( either local one if apiUrl is empty, or other api if apiUrl starts with http / https )
+     * @param apiUrl
+     */
+    getAPIVersion(
+        apiUrl: string
+    ): Observable<SystemSettingsVersionModel> {
+        return this.modelHelper.mapObservableToModel(
+            this.http.get(`${apiUrl}/system-settings/version`),
+            SystemSettingsVersionModel
+        );
     }
 }
 

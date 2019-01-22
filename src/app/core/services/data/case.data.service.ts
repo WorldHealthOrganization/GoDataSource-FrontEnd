@@ -12,10 +12,11 @@ import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
 import * as moment from 'moment';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
+import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class CaseDataService {
-
     constructor(
         private http: HttpClient,
         private modelHelper: ModelHelperService,
@@ -356,5 +357,53 @@ export class CaseDataService {
         return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/convert-to-contact`, {});
     }
 
-}
+    /**
+     * Generate Case Visual ID
+     * @param outbreakId
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    generateCaseVisualID(
+        outbreakId: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<string | VisualIdErrorModel> {
+        return this.http
+            .post(
+                `outbreaks/${outbreakId}/cases/generate-visual-id`,
+                {
+                    visualIdMask: visualIdMask,
+                    personId: personId
+                }
+            ).catch((response: Error | VisualIdErrorModel) => {
+                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                    Observable.of(
+                        this.modelHelper.getModelInstance(
+                            VisualIdErrorModel,
+                            response
+                        )
+                    ) :
+                    Observable.throw(response);
+            });
+    }
 
+    /**
+     * Check if visual ID is valid
+     * @param outbreakId
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    checkCaseVisualIDValidity(
+        outbreakId: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<boolean> {
+        return this.generateCaseVisualID(
+            outbreakId,
+            visualIdMask,
+            personId
+        ).map((visualID: string | VisualIdErrorModel) => {
+            return _.isString(visualID);
+        });
+    }
+}
