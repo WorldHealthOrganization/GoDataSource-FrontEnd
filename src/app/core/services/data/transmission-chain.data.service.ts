@@ -190,7 +190,7 @@ export class TransmissionChainDataService {
                             if (!_.isEmpty(node.model.dateOfReporting)) {
                                 nodeProps.dateTimeline = node.model.dateOfReporting;
                             } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
+                                graphData.contactNodesWithoutDates.push(node.model.id);
                             }
                         } else {
                             nodeProps.dateTimeline = null;
@@ -208,7 +208,7 @@ export class TransmissionChainDataService {
                             if (!_.isEmpty(node.model.dateOfReporting)) {
                                 nodeProps.dateTimeline = node.model.dateOfReporting;
                             } else {
-                                graphData.caseNodesWithoutDates.push(node.model.id);
+                                graphData.eventNodesWithoutDates.push(node.model.id);
                             }
                         } else {
                             nodeProps.dateTimeline = null;
