@@ -158,16 +158,16 @@
                 </ng-container>
 
                 <!-- New Field -->
-                <ng-container matColumnDef="newField">
+                <ng-container matColumnDef="identifiers">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
                             <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_SYNONYMSsss" | translate}}</div>
                             <div class="column-filter">
                                 <app-form-input
-                                    name="newFieldFilter"
+                                    name="identifiersFilter"
                                     ngModel
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    (optionChanged)="filterByTextField('newField', $event)"
+                                    (optionChanged)="filterByTextField('identifiers', $event)"
                                     app-reset-input-on-side-filter
                                     [displayFilterIcon]="true">
                                 </app-form-input>
@@ -176,7 +176,7 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        {{ item.newField }}
+                        {{ item.identifiers }}
                     </mat-cell>
                 </ng-container>
 
