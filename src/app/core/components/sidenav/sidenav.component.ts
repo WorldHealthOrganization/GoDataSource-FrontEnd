@@ -59,12 +59,12 @@ export class SidenavComponent implements OnInit {
                 [PERMISSION.READ_SYS_CONFIG],
                 '/cloud-backup'
             ),
-            // new ChildNavItem(
-            //     'terms-of-use',
-            //     'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE',
-            //     [],
-            //     '/terms-of-use'
-            // )
+            new ChildNavItem(
+                'terms-of-use',
+                'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE',
+                [],
+                '/terms-of-use'
+            )
         ]
     );
 

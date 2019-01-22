@@ -17,13 +17,11 @@
             </app-global-entity-search>
 
             <!-- context help - display help items based on the page you are on -->
-            <a *ngIf="contextSearchHelpItems"
+            <div *ngIf="contextSearchHelpItems"
                 class="context-help-trigger"
-                target="_blank"
-                [routerLink]="['/help']"
-                [queryParams]="{ applyListFilter: Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS, helpItemsIds: contextSearchHelpItems }">
+                (click)="displayHelpDialog()">
                 <span class="xt-icon">help</span>
-            </a>
+            </div>
 
             <router-outlet></router-outlet>
 

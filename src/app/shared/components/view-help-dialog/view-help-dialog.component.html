@@ -1,0 +1,102 @@
+<div
+    fxFlex fxLayout="column"
+    class="page-section">
+    <div fxFlex fxGrow="0">
+        <app-form-input
+            name="helpSearchFilter"
+            [(ngModel)]="searchedTerm"
+            placeholder="Filter"
+            (optionChanged)="filterByTextFieldHelpSearch($event)"
+            [displayFilterIcon]="true">
+        </app-form-input>
+    </div>
+
+    <div fxFlex>
+        <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
+            <!-- Title -->
+            <ng-container matColumnDef="title">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_TITLE' | translate}}</div>
+                        <div class="column-filter"><!-- placeholder --></div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ item.title | translate }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Category -->
+            <ng-container matColumnDef="categoryId">
+                <mat-header-cell *matHeaderCellDef>
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate}}</div>
+                        <div class="column-filter">
+                            <app-form-select
+                                name="categoryFilter"
+                                ngModel
+                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
+                                [options]="helpCategoriesList$ | async"
+                                (optionChanged)="filterBySelectField('categoryId', $event, 'id')"
+                                optionLabelKey="name"
+                                optionValueKey="id"
+                                [multiple]="true"
+                                [allowSelectionOfDisabledItems]="true"
+                                [displayInvisibleItems]="true"
+                                [displayFilterIcon]="true">
+                            </app-form-select>
+                        </div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item">
+                    {{ (item.category ? item.category.name: '') | translate }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- View -->
+            <ng-container matColumnDef="view">
+                <mat-header-cell *matHeaderCellDef fxFlex="120px">
+                    <div class="table-header-cell">
+                        <div mat-sort-header class="column-header"><!-- placeholder --></div>
+                        <div class="column-filter"><!-- placeholder --></div>
+                    </div>
+                </mat-header-cell>
+
+                <mat-cell *matCellDef="let item" fxFlex="120px">
+                    <button
+                        mat-flat-button
+                        type="button"
+                        (click)="viewHelpItemDetails(item)">
+                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                    </button>
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="getTableColumns()"></mat-header-row>
+            <mat-row *matRowDef="let item; columns: getTableColumns()"></mat-row>
+        </mat-table>
+
+        <div
+            *ngIf="isEmptyList"
+            class="mat-table">
+            <div class="mat-row">
+                <div class="mat-cell">
+                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        fxFlex fxGrow="0" fxLayout="row" fxLayoutAlign="end"
+        class="view-help-dialog-buttons">
+        <button
+            mat-button
+            (click)="closeDialog()"
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>

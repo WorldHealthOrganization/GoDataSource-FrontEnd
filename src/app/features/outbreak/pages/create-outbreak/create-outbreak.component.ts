@@ -8,7 +8,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable } from 'rxjs/Observable';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
@@ -45,7 +44,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
         private snackbarService: SnackbarService,
         private referenceDataDataService: ReferenceDataDataService,
         private formHelper: FormHelperService,
-        private i18nService: I18nService,
         private route: ActivatedRoute,
         private outbreakTemplateDataService: OutbreakTemplateDataService,
         private dialogService: DialogService
@@ -106,16 +104,6 @@ export class CreateOutbreakComponent extends ConfirmOnFormChanges implements OnI
                     this.snackbarService.showError(err.message);
                     loadingDialog.close();
                     return ErrorObservable.create(err);
-                })
-                .switchMap((newOutbreak) => {
-                    // update language tokens to get the translation of submitted questions and answers
-                    return this.i18nService.loadUserLanguage()
-                        .catch((err) => {
-                            this.snackbarService.showError(err.message);
-                            loadingDialog.close();
-                            return ErrorObservable.create(err);
-                        })
-                        .map(() => newOutbreak);
                 })
                 .subscribe((newOutbreak) => {
                     this.snackbarService.showSuccess('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON');

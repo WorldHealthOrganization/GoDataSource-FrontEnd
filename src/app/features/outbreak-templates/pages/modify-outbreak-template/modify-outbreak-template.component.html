@@ -118,51 +118,6 @@
                         </div>
                     </div>
                 </mat-card>
-
-            </mat-tab>
-
-            <!-- tab Case Investigation -->
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="caseInvestigationTemplate"
-                    [ngModel]="outbreakTemplate.caseInvestigationTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true"
-                    [autoSuggestVariable]="true"
-                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CASE_INVESTIGATION' | translate">
-                </app-form-question-list>
-            </mat-tab>
-
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="contactFollowUpTemplate"
-                    [ngModel]="outbreakTemplate.contactFollowUpTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true"
-                    [autoSuggestVariable]="true"
-                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_CONTACT_FOLLOWUP' | translate">
-                </app-form-question-list>
-            </mat-tab>
-
-            <!-- tab Lab Results -->
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    {{'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS' | translate}}
-                </ng-template>
-                <app-form-question-list
-                    name="labResultsTemplate"
-                    [ngModel]="outbreakTemplate.labResultsTemplate"
-                    [viewOnly]="viewOnly"
-                    [variableReadOnly]="true"
-                    [autoSuggestVariable]="true"
-                    [componentTitle]="'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_LAB_RESULTS' | translate">
-                </app-form-question-list>
             </mat-tab>
         </mat-tab-group>
 
@@ -191,5 +146,28 @@
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
+
+        <div class="page-tabs-navbar-placeholder"></div>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'contact-follow-up-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
+        </button>
+
+        <button
+            mat-raised-button
+            type="button"
+            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-lab-results-questionnaire']">
+            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
+        </button>
     </div>
 </form>

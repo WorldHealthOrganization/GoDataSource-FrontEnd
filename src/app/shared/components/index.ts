@@ -26,10 +26,6 @@ import { SideColumnsComponent } from './side-columns/side-columns.component';
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
-import { FormSubQuestionListComponent } from './form-sub-question-list/form-sub-question-list.component';
-import { FormQuestionListComponent } from './form-question-list/form-question-list.component';
-import { FormSubAnswerListComponent } from './form-sub-answer-list/form-sub-answer-list.component';
-import { FormAnswerListComponent } from './form-answer-list/form-answer-list.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
 import { WorldMapComponent } from './world-map/world-map.component';
 import { WorldMapMovementComponent } from './world-map-movement/world-map-movement.component';
@@ -45,6 +41,9 @@ import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-i
 import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
 import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node-dialog.component';
+import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
+import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
+import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -53,6 +52,9 @@ export * from './modify-contact-follow-up-questionnaire-dialog/modify-contact-fo
 export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
 export * from './view-cot-node-dialog/view-cot-node-dialog.component';
+export * from './view-help-dialog/view-help-dialog.component';
+export * from './view-help-details-dialog/view-help-details-dialog.component';
+export * from './form-modify-questionnaire/form-modify-questionnaire.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -88,17 +90,12 @@ export const components: any[] = [
     FormInputListComponent,
     FormNameUrlListComponent,
     FormLocationDropdownComponent,
+    FormModifyQuestionnaireComponent,
     FormFillQuestionnaireComponent,
     FormAgeComponent,
     FormAgeDobComponent,
     FormRelationshipQuickComponent,
     FormContactQuickComponent,
-
-    // answers/questions
-    FormAnswerListComponent,
-    FormSubAnswerListComponent,
-    FormQuestionListComponent,
-    FormSubQuestionListComponent,
 
     // display information
     CountedItemsListComponent,
@@ -115,6 +112,8 @@ export const components: any[] = [
     ModifyContactFollowUpQuestionnaireDialogComponent,
     LoadingDialogComponent,
     ViewCotNodeDialogComponent,
+    ViewHelpDialogComponent,
+    ViewHelpDetailsDialogComponent,
 
     // general
     ExportButtonComponent,

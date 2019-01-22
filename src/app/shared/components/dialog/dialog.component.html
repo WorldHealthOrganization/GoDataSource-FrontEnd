@@ -137,6 +137,21 @@
                         [target]="field.linkTarget">
                         {{ field.placeholder | translate }}
                     </a>
+
+                    <!-- Url -->
+                    <app-form-input
+                        *ngIf="field.fieldType === DialogFieldType.URL"
+                        [name]="field.name"
+                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                        [tooltip]="field.description"
+                        [required]="field.required"
+                        [disabled]="field.disabled"
+                        app-general-async-validator
+                        [asyncValidatorObservable]="field.urlAsyncValidator(dialogAnswerInputValue.value[field.name])"
+                        [asyncValidatorErrMsg]="field.urlAsyncErrorMsg"
+                        [asyncValidatorErrMsgTranslateData]="field.urlAsyncErrorMsgData">
+                    </app-form-input>
                 </div>
             </ng-container>
         </div>

@@ -4,6 +4,7 @@ import { DocumentModel } from './document.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
+import * as moment from 'moment';
 
 export class ContactModel {
     id: string;
@@ -40,6 +41,24 @@ export class ContactModel {
     age: AgeModel;
 
     inconsistencies: InconsistencyModel[];
+
+    /**
+     * Return contact id mask with data replaced
+     * @param contactIdMask
+     */
+    static generateContactIDMask(contactIdMask: string): string {
+        // validate
+        if (_.isEmpty(contactIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return contactIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
 
     constructor(data = null) {
         this.id = _.get(data, 'id');

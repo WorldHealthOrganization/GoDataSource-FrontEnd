@@ -104,6 +104,11 @@ export class ErrorMessage {
                     (this.validator[this.key] as any).err,
                     (this.validator[this.key] as any).details
                 );
+            case 'hasPropertyValidator':
+                return new ElementBaseFailure(
+                    (this.validator[this.key] as any).err,
+                    (this.validator[this.key] as any).details
+                );
         }
 
         // Get default message if no validator matched

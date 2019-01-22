@@ -233,6 +233,11 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
                 sortable: true
             }),
             new FilterModel({
+                fieldName: 'visualId',
+                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+                type: FilterType.TEXT
+            }),
+            new FilterModel({
                 fieldName: 'gender',
                 fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
                 type: FilterType.MULTISELECT,
@@ -325,8 +330,16 @@ export class AvailableEntitiesListComponent extends ListComponent implements OnI
      */
     getTableColumns(): string[] {
         const columns = [
-            'checkbox', 'lastName', 'firstName', 'age', 'gender', 'riskLevel', 'classification',
-            'place', 'address'
+            'checkbox',
+            'lastName',
+            'firstName',
+            'visualId',
+            'age',
+            'gender',
+            'riskLevel',
+            'classification',
+            'place',
+            'address'
         ];
 
         return columns;
