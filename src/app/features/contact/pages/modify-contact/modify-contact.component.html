@@ -90,6 +90,22 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutGap="20px">
+                            <!-- Due to an angular bug => compose validators, we need this validator to be able to use the async general one... -->
+                            <!-- [maxlength]="255" -->
+                            <app-form-input
+                                name="visualId"
+                                [(ngModel)]="contactData.visualId"
+                                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                [tooltipTranslateData]="visualIDTranslateData"
+                                [maxlength]="255"
+                                [disabled]="viewOnly"
+                                app-general-async-validator
+                                [asyncValidatorObservable]="contactIdMaskValidator"
+                                asyncValidatorErrMsg="LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID"
+                                [asyncValidatorErrMsgTranslateData]="visualIDTranslateData">
+                            </app-form-input>
+
                             <app-form-datepicker
                                 fxFlex
                                 name="dateOfReporting"
@@ -120,8 +136,6 @@
                                 [options]="finalFollowUpStatus$ | async"
                                 [disabled]="viewOnly">
                             </app-form-select>
-
-                            <div fxFlex><!-- placeholder --></div>
                         </div>
 
                     </div>

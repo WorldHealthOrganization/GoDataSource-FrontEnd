@@ -20,6 +20,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { environment } from '../../../../../environments/environment';
+import { Subscriber } from 'rxjs/Subscriber';
 
 @Component({
     selector: 'app-client-applications-list',
@@ -278,6 +279,35 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                 apiUrl
             );
 
+        // define api async check
+        let apiURL: string;
+        const apiObserver = Observable.create((subscriber: Subscriber<boolean>) => {
+            if (
+                _.isString(apiURL) &&
+                apiURL.includes('localhost')
+            ) {
+                subscriber.next(false);
+                subscriber.complete();
+            } else {
+                this.systemSettingsDataService
+                    .getAPIVersion(apiURL)
+                    .catch(() => {
+                        subscriber.next(false);
+                        subscriber.complete();
+                        return [];
+                    })
+                    .subscribe((versionData) => {
+                        if (_.get(versionData, 'version')) {
+                            subscriber.next(true);
+                            subscriber.complete();
+                        } else {
+                            subscriber.next(false);
+                            subscriber.complete();
+                        }
+                    });
+            }
+        });
+
         // display export dialog
         this.dialogService.showExportDialog({
             message: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE',
@@ -300,7 +330,12 @@ export class ClientApplicationsListComponent extends ListComponent implements On
                     placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
                     required: true,
                     value: apiUrl,
-                    fieldType: DialogFieldType.TEXT
+                    fieldType: DialogFieldType.URL,
+                    urlAsyncErrorMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL',
+                    urlAsyncValidator: (url: string): Observable<boolean> => {
+                        apiURL = url;
+                        return apiObserver;
+                    }
                 })
             ],
             fileExtension: 'png',

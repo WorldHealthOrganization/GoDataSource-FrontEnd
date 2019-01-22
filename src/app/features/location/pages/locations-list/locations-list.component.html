@@ -286,7 +286,7 @@
                             <mat-divider></mat-divider>
 
                             <button mat-menu-item [routerLink]="['/locations', item.id, 'view']">
-                                {{'LNG_PAGE_ACTION_VIEW'| translate}}
+                                {{'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION'| translate}}
                             </button>
 
                             <ng-container
@@ -294,13 +294,13 @@
                                 <button
                                     mat-menu-item
                                     [routerLink]="['/locations', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                                    {{'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION'| translate}}
                                 </button>
 
                                 <button
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteLocation(item)">
-                                    {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                                    {{ 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION' | translate }}
                                 </button>
                             </ng-container>
                         </mat-menu>

@@ -143,4 +143,18 @@ export class FormInputComponent extends ElementBase<string> implements AfterView
             this.inputElement.nativeElement.focus();
         }
     }
+
+    /**
+     * Select input
+     */
+    select() {
+        // select input
+        if (
+            this.inputElement &&
+            this.inputElement.nativeElement &&
+            this.inputElement.nativeElement.select
+        ) {
+            this.inputElement.nativeElement.select();
+        }
+    }
 }

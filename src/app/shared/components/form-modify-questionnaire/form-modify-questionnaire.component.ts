@@ -10,7 +10,7 @@ import { PERMISSION } from '../../../core/models/permission.model';
 import * as _ from 'lodash';
 import { AnswerModel, QuestionModel } from '../../../core/models/question.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField, DialogFieldType } from '../dialog/dialog.component';
 import { DialogService } from '../../../core/services/helper/dialog.service';
 import { Subscriber } from 'rxjs/Subscriber';
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
@@ -23,6 +23,9 @@ import { Constants } from '../../../core/models/constants';
 import { DomService } from '../../../core/services/helper/dom.service';
 import { v4 as uuid } from 'uuid';
 import { FormInputComponent } from '../../xt-forms/components/form-input/form-input.component';
+import { SnackbarService } from '../../../core/services/helper/snackbar.service';
+import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Used to initialize breadcrumbs
@@ -142,6 +145,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     savingData: boolean = false;
 
     /**
+     * Loading data
+     */
+    loadingData: boolean = true;
+
+    /**
      * List of categories for a form-question
      */
     questionCategoriesInstantList: LabelValuePair[];
@@ -155,6 +163,16 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Child question is in edit mode ?
      */
     childQuestionIsInEditMode: boolean = false;
+
+    /**
+     * Allow question variable change
+     */
+    @Input() allowQuestionVariableChange: boolean = false;
+
+    /**
+     * Remove new / uuid / clone flags when saving data
+     */
+    @Input() cleanQuestionAndAnswerFlagsOnSave: boolean = true;
 
     /**
      * Edit Mode - Question Form
@@ -182,6 +200,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     @ViewChild('questionText') questionText: FormInputComponent;
 
     /**
+     * Question Answer label input
+     */
+    @ViewChild('answerLabel') answerLabel: FormInputComponent;
+
+    /**
      * Breadcrumbs init
      */
     @Output() initBreadcrumbs = new EventEmitter<FormModifyQuestionnaireBreadcrumbsData>();
@@ -207,7 +230,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         private referenceDataDataService: ReferenceDataDataService,
         private genericDataService: GenericDataService,
         private formHelper: FormHelperService,
-        private domService: DomService
+        private domService: DomService,
+        private snackbarService: SnackbarService
     ) {
         super();
     }
@@ -216,18 +240,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Initialized
      */
     ngOnInit() {
-        // retrieve reference options
-        this.referenceDataDataService
-            .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY)
-            .subscribe((questionCategoriesList) => {
-                this.questionCategoriesInstantList = questionCategoriesList;
-            });
-        this.genericDataService
-            .getAnswerTypesList()
-            .subscribe((answerTypesInstantList) => {
-                this.answerTypesInstantList = answerTypesInstantList;
-            });
-
         // get the authenticated user
         this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -236,16 +248,37 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.initQuestionnaireData();
         });
 
-        // determine what kind of view we should display
-        this.route.data.subscribe((data: { questionnaire: OutbreakQestionnaireTypeEnum }) => {
-            // questionnaire
-            this.questionnaireType = data.questionnaire;
+        // retrieve data
+        Observable.forkJoin([
+            this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.QUESTION_CATEGORY),
+            this.genericDataService.getAnswerTypesList()
+        ]).subscribe(([
+            questionCategoriesList,
+            answerTypesInstantList
+        ]: [
+            LabelValuePair[],
+            any[]
+        ]) => {
+            // set edit options
+            this.questionCategoriesInstantList = questionCategoriesList;
+            this.answerTypesInstantList = answerTypesInstantList;
 
-            // emit breadcrumbs event
-            this.emitBreadcrumbEvent();
+            // questionnaire data
+            this.route.data.subscribe((routeData: { questionnaire: OutbreakQestionnaireTypeEnum }) => {
+                // set questionnaire data
+                this.questionnaireType = routeData.questionnaire;
 
-            // init questionnaire data
-            this.initQuestionnaireData();
+                // emit breadcrumbs event
+                this.emitBreadcrumbEvent();
+
+                // init questionnaire data
+                this.initQuestionnaireData();
+
+                // finished loading data
+                setTimeout(() => {
+                    this.loadingData = false;
+                });
+            });
         });
     }
 
@@ -320,6 +353,9 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     private determineQuestionnaireVariables() {
         // init questionnaire variables
+        const maps: {
+            [uuid: string]: string
+        } = {};
         this.questionVariables = { ...this.extraQuestionVariables };
 
         // add variables to array of variables
@@ -327,7 +363,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             _.each(questions, (question: QuestionModel) => {
                 // add variable to list
                 if (question.variable) {
-                    this.questionVariables[question.variable.toLowerCase()] = question.uuid;
+                    // check if we don't have one already set
+                    if (maps[question.uuid]) {
+                        delete this.questionVariables[maps[question.uuid]];
+                    }
+
+                    // set the new variable
+                    const uniqueVar: string = question.variable.toLowerCase();
+                    if (!this.questionVariables[uniqueVar]) {
+                        this.questionVariables[uniqueVar] = question.uuid;
+                        maps[question.uuid] = uniqueVar;
+                    }
                 }
 
                 // search for child variables
@@ -347,11 +393,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         }
 
         // append clone too since this is active information
-        if (
-            this.questionAnswerInEditModeClone &&
-            !_.isEmpty(this.questionAnswerInEditModeClone.additionalQuestions)
-        ) {
-            getQuestionVariables(this.questionAnswerInEditModeClone.additionalQuestions);
+        if (this.questionInEditModeClone) {
+            getQuestionVariables([this.questionInEditModeClone]);
         }
     }
 
@@ -640,7 +683,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             // data clone
             const questionnaireCloneData: QuestionModel[] = _.isEmpty(this.questionnaireData) ?
                 this.questionnaireData : _.map(this.questionnaireData, (question: QuestionModel) => {
-                    return new QuestionModel(question);
+                    return new QuestionModel(
+                        question,
+                        !this.cleanQuestionAndAnswerFlagsOnSave
+                    );
                 });
 
             // call event
@@ -652,8 +698,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 Subscriber.create((success) => {
                     // success saving questionnaire ?
                     if (!success) {
-                        // #TODO
                         // we can't rollback..so..what now ? try again, or disable questionnaire ?
+                        this.snackbarService.showError('LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_SAVING_QUESTIONNAIRE');
                     }
 
                     // finished saving data
@@ -669,7 +715,8 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     modifyQuestion(
         questionIndex: number,
-        focusTextBox: boolean = false
+        focusTextBox: boolean = false,
+        startDirty: boolean = false
     ) {
         // make some validations just to be sure
         if (
@@ -678,9 +725,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         ) {
             // set question edit mode
             this.questionIndexInEditMode = questionIndex;
-            this.questionInEditModeClone = new QuestionModel(this.questionnaireData[questionIndex]);
-            this.questionInEditModeClone.new = this.questionnaireData[questionIndex].new;
-            this.questionInEditModeClone.uuid = this.questionnaireData[questionIndex].uuid;
+            this.questionInEditModeClone = new QuestionModel(
+                this.questionnaireData[questionIndex],
+                true
+            );
 
             // edit mode changed
             this.questionEditModeChanged.emit(true);
@@ -698,6 +746,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // focus text input
                 if (this.questionText) {
                     this.questionText.focus();
+                    this.questionText.select();
+                }
+
+                // start dirty ?
+                if (startDirty) {
+                    // mark form as dirty
+                    this.markQuestionFormDirty();
                 }
             });
         }
@@ -706,7 +761,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Modify Question Answer
      */
-    modifyAnswer(answerIndex: number) {
+    modifyAnswer(
+        answerIndex: number,
+        focusTextBox: boolean = false,
+        startDirty: boolean = false
+    ) {
         // make some validations just to be sure
         if (
             !_.isEmpty(this.questionInEditModeClone) &&
@@ -715,8 +774,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         ) {
             // set answer edit mode
             this.questionAnswerIndexInEditMode = answerIndex;
-            this.questionAnswerInEditModeClone = new AnswerModel(this.questionInEditModeClone.answers[answerIndex]);
-            this.questionAnswerInEditModeClone.new = this.questionInEditModeClone.answers[answerIndex].new;
+            this.questionAnswerInEditModeClone = new AnswerModel(
+                this.questionInEditModeClone.answers[answerIndex],
+                true
+            );
 
             // create object to overwrite main questionnaires
             const overWriteData: {
@@ -728,9 +789,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     overWriteData[prop] = [];
                 }
             );
-
-            // set our questions
-            overWriteData[this.questionnaireType] = this.questionAnswerInEditModeClone.additionalQuestions;
 
             // create dummy parent
             const data = {
@@ -745,11 +803,30 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 this.questionAnswerDummyParent = new OutbreakModel(data);
             }
 
+            // set our questions
+            this.questionAnswerDummyParent[this.questionnaireType] = this.questionAnswerInEditModeClone.additionalQuestions;
+
             // set focus on the new answer
             this.domService.scrollItemIntoView(
                 `#${this.uniqueIDAnswer}`,
                 'nearest'
             );
+        }
+
+        // wait for binding
+        if (focusTextBox) {
+            setTimeout(() => {
+                // focus text input
+                if (this.answerLabel) {
+                    this.answerLabel.focus();
+                    this.answerLabel.select();
+                }
+
+                // start dirty ?
+                if (startDirty) {
+                    this.markAnswerFormDirty();
+                }
+            });
         }
     }
 
@@ -758,16 +835,106 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * @param questionIndex
      */
     cloneQuestion(questionIndex: number) {
-        // #TODO
-        alert('Work in progress');
+        // clone question
+        const question: QuestionModel = new QuestionModel(this.questionnaireData[questionIndex]);
+        question.new = true;
+        question.clone = true;
+        this.questionnaireData.push(question);
+
+        // allow variable change
+        this.allowQuestionVariableChange = true;
+
+        // update variables callback
+        const setCloneQuestionVariables = (childQuestions: QuestionModel[]) => {
+            _.each(childQuestions, (childQuestion: QuestionModel) => {
+                // set the new variable
+                childQuestion.variable = `${childQuestion.variable}_clone_${uuid()}`;
+                childQuestion.uuid = uuid();
+
+                // check answer questions
+                _.each(childQuestion.answers, (answer: AnswerModel) => {
+                    if (!_.isEmpty(answer.additionalQuestions)) {
+                        setCloneQuestionVariables(answer.additionalQuestions);
+                    }
+                });
+            });
+        };
+
+        // update variables
+        setCloneQuestionVariables([question]);
+
+        // determine variables to be used in duplicates
+        this.determineQuestionnaireVariables();
+
+        // sort not needed since we always add questions at the end and all questions are already sorted
+        // NOTHING
+
+        // set question order
+        this.setQuestionnaireQuestionsOrder(
+            this.questionnaireData,
+            false
+        );
+
+        // start modifying the new question
+        this.modifyQuestion(
+            this.questionnaireData.length - 1,
+            true,
+            true
+        );
     }
 
     /**
      * Clone Question Answer
      */
     cloneAnswer(answerIndex: number) {
-        // #TODO
-        alert('Work in progress');
+        // clone answer
+        const answer: AnswerModel = new AnswerModel(this.questionInEditModeClone.answers[answerIndex]);
+        answer.new = true;
+        answer.clone = true;
+        this.questionInEditModeClone.answers.push(answer);
+
+        // allow variable change
+        this.allowQuestionVariableChange = true;
+
+        // update variables callback
+        const setCloneQuestionVariables = (childQuestions: QuestionModel[]) => {
+            _.each(childQuestions, (childQuestion: QuestionModel) => {
+                // set the new variable
+                childQuestion.variable = `${childQuestion.variable}_clone_${uuid()}`;
+                childQuestion.uuid = uuid();
+
+                // check answer questions
+                _.each(childQuestion.answers, (childAnswer: AnswerModel) => {
+                    if (!_.isEmpty(childAnswer.additionalQuestions)) {
+                        setCloneQuestionVariables(childAnswer.additionalQuestions);
+                    }
+                });
+            });
+        };
+
+        // update variables
+        if (!_.isEmpty(answer.additionalQuestions)) {
+            setCloneQuestionVariables(answer.additionalQuestions);
+        }
+
+        // determine variables to be used in duplicates
+        this.determineQuestionnaireVariables();
+
+        // sort not needed since we always add questions at the end and all questions are already sorted
+        // NOTHING
+
+        // set question order
+        this.setQuestionnaireQuestionsOrder(
+            this.questionnaireData,
+            false
+        );
+
+        // start modifying the new question
+        this.modifyAnswer(
+            this.questionInEditModeClone.answers.length - 1,
+            true,
+            true
+        );
     }
 
     /**
@@ -826,6 +993,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION')
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
+                        // reset allow variable change
+                        if (this.questionInEditModeClone.clone) {
+                            this.allowQuestionVariableChange = false;
+                            delete this.questionInEditModeClone.clone;
+                        }
+
                         // delete question
                         this.questionnaireData.splice(this.questionIndexInEditMode, 1);
 
@@ -886,11 +1059,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Save Question
      */
     saveModifyQuestion() {
-        // take in account that we could change a child question too...
-        // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
-        // #TODO
-        // childQuestionIsInEditMode + answerForm
-
         // validate form
         if (
             !this.questionForm ||
@@ -899,9 +1067,19 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             return;
         }
 
-        // replace question with the one we just changed
+        // clean new flag
         const isNew: boolean = this.questionInEditModeClone.new;
         delete this.questionInEditModeClone.new;
+
+        // clean answers
+        if (
+            this.questionInEditModeClone.answerType !== this.answerTypes.MULTIPLE_OPTIONS.value &&
+            this.questionInEditModeClone.answerType !== this.answerTypes.SINGLE_SELECTION.value
+        ) {
+            this.questionInEditModeClone.answers = [];
+        }
+
+        // replace question with the one we just changed
         this.questionnaireData[this.questionIndexInEditMode] = this.questionInEditModeClone;
 
         // sort questions
@@ -911,8 +1089,17 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         this.setQuestionnaireQuestionsOrder(this.questionnaireData);
 
         // get variables so we don't allow duplicates
-        if (isNew) {
+        if (
+            isNew ||
+            this.allowQuestionVariableChange
+        ) {
             this.determineQuestionnaireVariables();
+        }
+
+        // reset allow variable change
+        if (this.questionInEditModeClone.clone) {
+            this.allowQuestionVariableChange = false;
+            delete this.questionInEditModeClone.clone;
         }
 
         // stop question edit
@@ -975,6 +1162,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
             this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER')
                 .subscribe((answer: DialogAnswer) => {
                     if (answer.button === DialogAnswerButton.Yes) {
+                        // reset allow variable change
+                        if (this.questionAnswerInEditModeClone.clone) {
+                            this.allowQuestionVariableChange = false;
+                            delete this.questionAnswerInEditModeClone.clone;
+                        }
+
                         // delete question
                         this.questionInEditModeClone.answers.splice(this.questionAnswerIndexInEditMode, 1);
 
@@ -1010,11 +1203,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      * Update answer data - no save
      */
     updateAnswerData() {
-        // take in account that we could change a child question too...
-        // this applies to saving question validation too..since it won't validate to the end since a new component is included for additional questions
-        // #TODO
-        // childQuestionIsInEditMode
-
         // validate answer form without validating parent question...
         if (
             !this.answerForm ||
@@ -1027,6 +1215,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         delete this.questionAnswerInEditModeClone.new;
         this.questionInEditModeClone.answers[this.questionAnswerIndexInEditMode] = this.questionAnswerInEditModeClone;
 
+        // reset allow variable change
+        if (this.questionAnswerInEditModeClone.clone) {
+            this.allowQuestionVariableChange = false;
+            delete this.questionAnswerInEditModeClone.clone;
+        }
+
         // stop answer edit
         this.resetQuestionAnswerEditMode();
 
@@ -1037,21 +1231,39 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Add a new question
      */
-    addNewQuestion() {
+    addNewQuestion(position?: number) {
         // check if we need to initialize questionnaire
         if (_.isEmpty(this.questionnaireData)) {
             this.questionnaireData = [];
         }
 
         // push a new question
-        const question: QuestionModel = new QuestionModel({
-            order: 99999
-        });
+        const question: QuestionModel = new QuestionModel();
         question.new = true;
         question.uuid = uuid();
-        this.questionnaireData.push(question);
 
-        // sort not needed since we always add questions at the end
+        // add question at the end
+        if (position === undefined) {
+            this.questionnaireData.push(question);
+            position = this.questionnaireData.length - 1;
+        } else {
+            // make sure position is between limits
+            if (position < 0) {
+                position = 0;
+            } else if (position > this.questionnaireData.length) {
+                position = this.questionnaireData.length;
+            }
+
+            // add it a specific position
+            // push question to the new position
+            this.questionnaireData.splice(
+                position,
+                0,
+                question
+            );
+        }
+
+        // sort not needed since we always add questions at the end and all questions are already sorted
         // NOTHING
 
         // set question order
@@ -1062,7 +1274,7 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
         // start modifying the new question
         this.modifyQuestion(
-            this.questionnaireData.length - 1,
+            position,
             true
         );
     }
@@ -1086,18 +1298,36 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     /**
      * Add new question answer
      */
-    addNewAnswer() {
+    addNewAnswer(position?: number) {
         // check if we need to initialize answers
         if (_.isEmpty(this.questionInEditModeClone.answers)) {
             this.questionInEditModeClone.answers = [];
         }
 
         // push a new answer
-        const answer: AnswerModel = new AnswerModel({
-            order: 99999
-        });
+        const answer: AnswerModel = new AnswerModel();
         answer.new = true;
-        this.questionInEditModeClone.answers.push(answer);
+
+        // add question at the end
+        if (position === undefined) {
+            this.questionInEditModeClone.answers.push(answer);
+            position = this.questionInEditModeClone.answers.length - 1;
+        } else {
+            // make sure position is between limits
+            if (position < 0) {
+                position = 0;
+            } else if (position > this.questionInEditModeClone.answers.length) {
+                position = this.questionInEditModeClone.answers.length;
+            }
+
+            // add it a specific position
+            // push question to the new position
+            this.questionInEditModeClone.answers.splice(
+                position,
+                0,
+                answer
+            );
+        }
 
         // sort not needed since we always add answers at the end
         // NOTHING
@@ -1109,7 +1339,10 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
         );
 
         // start modifying the new answer
-        this.modifyAnswer(this.questionInEditModeClone.answers.length - 1);
+        this.modifyAnswer(
+            position,
+            true
+        );
 
         // mark main form as dirty
         this.markQuestionFormDirty();
@@ -1120,5 +1353,139 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
      */
     questionEditModeChangedHandler(isInEditMode: boolean) {
         this.childQuestionIsInEditMode = isInEditMode;
+    }
+
+    /**
+     * Question Answer changed
+     */
+    questionAnswerTypeChanged(value: LabelValuePair) {
+        // there shouldn't be a way to not be in edit mode, but it is good to check anyway
+        if (_.isEmpty(this.questionInEditModeClone)) {
+            return;
+        }
+
+        // check if we need to add a new answer
+        if (
+            value.value === this.answerTypes.MULTIPLE_OPTIONS.value ||
+            value.value === this.answerTypes.SINGLE_SELECTION.value
+        ) {
+            // add a new answer only if we don't have answers already
+            if (_.isEmpty(this.questionInEditModeClone.answers)) {
+                // add a new answer and start editing it
+                this.addNewAnswer();
+            }
+        }
+    }
+
+    /**
+     * Question Text input blur event
+     * @param value - Input Value
+     */
+    questionTextBlurred(value: string) {
+        if (
+            this.questionInEditModeClone.new ||
+            this.allowQuestionVariableChange
+        ) {
+            // set variable
+            this.questionInEditModeClone.variable = _.camelCase(value);
+
+            // update variables
+            this.determineQuestionnaireVariables();
+        }
+    }
+
+    /**
+     * Question Variable input blur event
+     * @param value - Input Value
+     */
+    questionVariableBlurred(value: string) {
+        if (
+            this.questionInEditModeClone.new ||
+            this.allowQuestionVariableChange
+        ) {
+            // set variable
+            this.questionInEditModeClone.variable = _.trim(value);
+
+            // update variables
+            this.determineQuestionnaireVariables();
+        }
+    }
+
+    /**
+     * Display dialog that asks user where to add the question
+     */
+    addMoveQuestionPosition(questionIndex?: number) {
+        // check if this is a new question or we want to move an existing one
+        const isNewQuestion: boolean = questionIndex === undefined;
+
+        // display dialog
+        this.dialogService.showConfirm(new DialogConfiguration({
+            message: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_POSITION_DIALOG_CONFIRM_MSG',
+            yesLabel: isNewQuestion ? 'LNG_COMMON_BUTTON_ADD' : 'LNG_COMMON_BUTTON_CHANGE',
+            customInput: true,
+            fieldsList: [new DialogField({
+                name: 'position',
+                placeholder: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_POSITION_DIALOG_LABEL_POSITION',
+                description: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_POSITION_DIALOG_LABEL_POSITION_DESCRIPTION',
+                required: true,
+                fieldType: DialogFieldType.TEXT,
+                type: 'number',
+                value: isNewQuestion ?
+                    ( this.questionnaireData ? this.questionnaireData.length + 1 : 1 ) :
+                    questionIndex + 1
+            })]
+        })).subscribe((answer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                if (isNewQuestion) {
+                    // add new question
+                    this.addNewQuestion(answer.inputValue.value.position - 1);
+                } else {
+                    // move question
+                    this.changeQuestionPosition(
+                        questionIndex,
+                        answer.inputValue.value.position - 1
+                    );
+                }
+            }
+        });
+    }
+
+    /**
+     * Display dialog that asks user where to add the answer
+     */
+    addMoveQuestionAnswerPosition(answerIndex?: number) {
+        // check if this is a new question or we want to move an existing one
+        const isNewAnswer: boolean = answerIndex === undefined;
+
+        // display dialog
+        this.dialogService.showConfirm(new DialogConfiguration({
+            message: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_ANSWER_POSITION_DIALOG_CONFIRM_MSG',
+            yesLabel: isNewAnswer ? 'LNG_COMMON_BUTTON_ADD' : 'LNG_COMMON_BUTTON_CHANGE',
+            customInput: true,
+            fieldsList: [new DialogField({
+                name: 'position',
+                placeholder: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_ANSWER_POSITION_DIALOG_LABEL_POSITION',
+                description: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_QUESTION_ANSWER_POSITION_DIALOG_LABEL_POSITION_DESCRIPTION',
+                required: true,
+                fieldType: DialogFieldType.TEXT,
+                type: 'number',
+                value: isNewAnswer ?
+                    ( this.questionInEditModeClone && this.questionInEditModeClone.answers ? this.questionInEditModeClone.answers.length + 1 : 1 ) :
+                    answerIndex + 1
+            })]
+        })).subscribe((answer) => {
+            if (answer.button === DialogAnswerButton.Yes) {
+                if (isNewAnswer) {
+                    // add new answer
+                    this.addNewAnswer(answer.inputValue.value.position - 1);
+                } else {
+                    // move answer
+                    this.changeQuestionAnswerPosition(
+                        answerIndex,
+                        answer.inputValue.value.position - 1
+                    );
+                }
+            }
+        });
     }
 }

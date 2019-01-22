@@ -72,6 +72,18 @@ const routes: Routes = [
                     permissions: [PERMISSION.READ_SYS_CONFIG]
                 }
             },
+            // Terms of use Module routes
+            {
+                path: ModulePath.TermsOfUseModule,
+                loadChildren: './features/terms-of-use/terms-of-use.module#TermsOfUseModule',
+                canActivate: [
+                    AuthGuard,
+                    PasswordChangeGuard
+                ],
+                data: {
+                    permissions: [PERMISSION.READ_SYS_CONFIG]
+                }
+            },
             // Outbreak Module routes
             {
                 path: ModulePath.OutbreakModule,

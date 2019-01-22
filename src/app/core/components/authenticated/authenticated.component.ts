@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { MatSidenav } from '@angular/material';
@@ -11,6 +10,8 @@ import { HelpDataService } from '../../services/data/help.data.service';
 import * as _ from 'lodash';
 import { Constants } from '../../models/constants';
 import { PERMISSION } from '../../models/permission.model';
+import { ViewHelpData, ViewHelpDialogComponent } from '../../../shared/components';
+import { DialogService } from '../../services/helper/dialog.service';
 
 @Component({
     selector: 'app-authenticated',
@@ -34,7 +35,8 @@ export class AuthenticatedComponent implements OnInit {
         private snackbarService: SnackbarService,
         private outbreakDataService: OutbreakDataService,
         private referenceDataDataService: ReferenceDataDataService,
-        private helpDataService: HelpDataService
+        private helpDataService: HelpDataService,
+        private dialogService: DialogService
     ) {
         // detect when the route is changed
         this.router.events.subscribe(() => {
@@ -104,7 +106,22 @@ export class AuthenticatedComponent implements OnInit {
                 this.contextSearchHelpItems = _.map(items, 'id');
             }
         });
-
     }
 
+    /**
+     * Display help dialog
+     */
+    displayHelpDialog() {
+        this.dialogService.showCustomDialog(
+            ViewHelpDialogComponent,
+            {
+                ...ViewHelpDialogComponent.DEFAULT_CONFIG,
+                ...{
+                    data: new ViewHelpData({
+                        helpItemsIds: this.contextSearchHelpItems
+                    })
+                }
+            }
+        );
+    }
 }

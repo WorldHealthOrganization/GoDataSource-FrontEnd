@@ -6,6 +6,7 @@ import { NgForm } from '@angular/forms';
 import { Constants } from '../../../core/models/constants';
 import * as moment from 'moment';
 import { Moment } from 'moment';
+import { Observable } from 'rxjs/Observable';
 
 export enum DialogAnswerButton {
     Yes = 'Yes',
@@ -65,7 +66,8 @@ export enum DialogFieldType {
     DATE_RANGE = 'date-range',
     DATE = 'date',
     BOOLEAN = 'boolean',
-    LINK = 'link'
+    LINK = 'link',
+    URL = 'url'
 }
 
 export class DialogField {
@@ -78,6 +80,7 @@ export class DialogField {
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
+    public visible: boolean | ((dialogFieldsValues: any) => boolean) = true;
     public disabled: boolean = false;
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
@@ -89,6 +92,11 @@ export class DialogField {
     };
     public linkTarget: string;
 
+    // url
+    urlAsyncValidator: (url: string) => Observable<boolean>;
+    urlAsyncErrorMsg: string;
+    urlAsyncErrorMsgData: any;
+
     constructor(data: {
         name: string,
         placeholder?: string,
@@ -99,6 +107,7 @@ export class DialogField {
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
+        visible?: boolean | ((dialogFieldsValues: any) => boolean),
         disabled?: boolean,
         description?: string,
         fieldType?: DialogFieldType,
@@ -108,7 +117,12 @@ export class DialogField {
         queryParams?: {
             [key: string]: any
         },
-        linkTarget?: string
+        linkTarget?: string,
+
+        // url
+        urlAsyncValidator?: (url: string) => Observable<boolean>,
+        urlAsyncErrorMsg?: string,
+        urlAsyncErrorMsgData?: any
     }) {
         // set properties
         Object.assign(
@@ -120,6 +134,16 @@ export class DialogField {
         if (this.inputOptions !== undefined) {
             this.fieldType = DialogFieldType.SELECT;
         }
+    }
+
+    /**
+     * Check if dialog field is visible
+     * @returns {boolean|((dialogFieldsValues:any)=>boolean)}
+     */
+    public isVisible(dialogFieldsValues: any): boolean {
+        return _.isFunction(this.visible) ?
+            (this.visible as any)(dialogFieldsValues) :
+            this.visible;
     }
 }
 

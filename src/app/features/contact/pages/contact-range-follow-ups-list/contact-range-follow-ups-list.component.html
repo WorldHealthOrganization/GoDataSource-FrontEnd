@@ -94,7 +94,7 @@
 
                 <!-- Contact Name -->
                 <div
-                    fxFlex="240px"
+                    fxFlex="270px"
                     class="follow-up-range-date-header">
                     {{ 'LNG_CONTACT_FIELD_LABEL_NAME' | translate }}
                 </div>
@@ -140,11 +140,11 @@
 
                     <!-- Contact Name -->
                     <div
-                        fxFlex="240px"
+                        fxFlex="270px"
                         class="follow-up-range-column-data follow-up-range-name-column-data">
                         <a
                             [routerLink]="['/contacts', contactFollowUpData.contact.id, 'view' ]">
-                            {{ contactFollowUpData.contact.name }}
+                            {{ contactFollowUpData.contact.name + ( contactFollowUpData.contact.visualId ? ' ( ' + contactFollowUpData.contact.visualId + ' )' : '' ) }}
                         </a>
                     </div>
 
