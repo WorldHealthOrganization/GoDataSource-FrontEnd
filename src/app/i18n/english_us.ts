@@ -20,11 +20,6 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_LAST_CONTACT': 'Timeline Network - Date of last contact',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_REPORTING': 'Timeline Network - Date of reporting',
 
-        // The commented tokens below already exists in the language file.
-        // 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_TITLE': 'events without date',
-        // 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'contacts without date of last contact',
-        // 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_ONSET_TITLE': 'cases without date of onset',
-
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_OF_REPORTING_TITLE': 'events without date of reporting',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'cases without date of last contact',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_REPORTING_TITLE': 'cases without date of reporting',
