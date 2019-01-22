@@ -13,7 +13,7 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
         /**
-         * Outbreaks List Page
+         * uiOutbreakListPage
          */
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK': 'View outbreak',
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK': 'Clone outbreak',
@@ -25,12 +25,12 @@ export const EnglishUsLang = {
         'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab Results form',
 
         /**
-         * Outbreak Template List Page
+         * uiOutbreakTemplateListPage
          */
 
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_VIEW_OUTBREAK_TEMPLATE': 'View outbreak template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_TEMPLATE': 'Modify outbreak template',
-        'LNG_PAGE_LIST_OUTBREAK_TEMPLATE_ACTION_DELETE_OUTBREAK_TEMPLATE': 'Delete outbreak template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE': 'View outbreak template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE': 'Modify outbreak template',
+        'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE': 'Delete outbreak template',
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE': 'Case form',
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE': 'Follow-up form',
         'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE': 'Lab Results form',
@@ -100,19 +100,19 @@ export const EnglishUsLang = {
         /**
          * Global Help Page
          */
-        'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_CATEGORY': 'View category',
+        'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM': 'View item',
 
         /**
          * Reference Data Categories List Page
          */
-        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ACTION_VIEW_CATEGORY': 'View category',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY': 'View category',
 
         /**
          * Reference Data Category Entries List Page
          */
-        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_VIEW_ENTRY': 'View item',
-        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_MODIFY_ENTRY': 'Modify item',
-        'LNG_PAGE_LIST_REFERENCE_DATA_CATEGORY_ENTRIES_ACTION_DELETE_ENTRY': 'Delete item',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY': 'View item',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY': 'Modify item',
+        'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY': 'Delete item',
 
         /**
          * Locations List Page
@@ -157,16 +157,16 @@ export const EnglishUsLang = {
         /**
          * Sync Client Applications List Page
          */
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE_APP': 'Disable app',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE_APP': 'Enable app',
-        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_APP': 'Delete app',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE': 'Disable app',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE': 'Enable app',
+        'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE': 'Delete app',
 
         /**
          * System Devices Pages
          */
-        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY_DEVICE': 'Modify device',
-        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_DEVICE': 'Wipe device',
-        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_DEVICE': 'Delete device',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY': 'Modify device',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE': 'Wipe device',
+        'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE': 'Delete device',
 
         /**
          * Sync Logs List Page
@@ -176,7 +176,7 @@ export const EnglishUsLang = {
         /**
          * System Backups Page
          */
-        'LNG_PAGE_LIST_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP': 'Delete backup',
+        'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP': 'Delete backup',
 
         /**
          * Entity Relationships List Page
