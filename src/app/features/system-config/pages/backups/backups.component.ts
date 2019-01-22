@@ -510,7 +510,6 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         fieldType: DialogFieldType.SELECT,
                         inputOptions: this.mappedExportTypes,
                         inputOptionsMultiple: false,
-                        value: null
                     }),
                     new DialogField({
                         name: 'filter[where][collections]',
