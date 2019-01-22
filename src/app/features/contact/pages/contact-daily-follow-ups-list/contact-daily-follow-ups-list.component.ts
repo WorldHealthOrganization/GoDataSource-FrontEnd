@@ -355,6 +355,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'contact.visualId',
+                label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
@@ -515,6 +519,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         fieldName: 'dob',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
                         type: FilterType.RANGE_DATE,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'visualId',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                        type: FilterType.TEXT,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),

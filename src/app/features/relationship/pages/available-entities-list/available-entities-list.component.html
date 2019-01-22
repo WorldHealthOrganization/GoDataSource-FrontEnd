@@ -151,6 +151,30 @@
                     </mat-cell>
                 </ng-container>
 
+                <!-- Case / Contact Visual ID -->
+                <ng-container matColumnDef="visualId">
+                    <mat-header-cell *matHeaderCellDef>
+                        <div class="table-header-cell">
+                            <div mat-sort-header class="column-header">
+                                {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
+                            </div>
+                            <div class="column-filter">
+                                <app-form-input
+                                    name="visualIdFilter"
+                                    ngModel
+                                    placeholder="Filter"
+                                    (optionChanged)="filterByTextField('visualId', $event)"
+                                    [displayFilterIcon]="true">
+                                </app-form-input>
+                            </div>
+                        </div>
+                    </mat-header-cell>
+
+                    <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
+                        {{ item.visualId }}
+                    </mat-cell>
+                </ng-container>
+
                 <!-- Age -->
                 <ng-container matColumnDef="age">
                     <mat-header-cell *matHeaderCellDef>

@@ -189,6 +189,10 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'people.visualId',
+                label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'type',
                 label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_TYPE'
             }),

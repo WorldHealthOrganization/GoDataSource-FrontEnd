@@ -118,6 +118,36 @@ export const EnglishUsLang = {
          */
         'LNG_FORM_VALIDATION_ERROR_FIELD_URL': 'Invalid URL, either it contains "localhost" or the path is not good',
 
+        /**
+         * uiContactFields
+         */
+        'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION': '',
+
+        /**
+         * uiCreateContactPage
+         */
+        'LNG_PAGE_CREATE_CONTACT_INVALID_CASE_ID': 'Invalid contact ID ( accepted: {{mask}} )',
+
+        /**
+         * uiModifyContactPage
+         */
+        'LNG_PAGE_MODIFY_CONTACT_INVALID_CONTACT_ID': 'Invalid contact ID ( accepted: {{mask}} )',
+
+        /**
+         * uiFollowUpfields
+         */
+        'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID': 'Contact ID',
+
+        /**
+         * uiRelationshipFields
+         */
+        'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID': 'Case / Contact ID',
+
+        /**
+         * uiEntityFields
+         */
+        'LNG_ENTITY_FIELD_LABEL_VISUAL_ID': 'Case / Contact ID'
+
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
         // - before removing these tokens make sure they aren't used

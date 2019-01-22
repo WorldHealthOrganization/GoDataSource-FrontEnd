@@ -25,6 +25,7 @@ export class OutbreakModel {
     // TODO - need to allow to set case classifications on outbreak
     // caseClassification: any | null;
     caseIdMask: string;
+    contactIdMask: string;
     countries: {
         id: string
     }[];
@@ -56,6 +57,7 @@ export class OutbreakModel {
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
+        this.contactIdMask = _.get(data, 'contactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
 
         this.caseInvestigationTemplate = _.map(

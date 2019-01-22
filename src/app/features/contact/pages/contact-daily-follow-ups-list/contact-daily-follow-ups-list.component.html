@@ -190,7 +190,7 @@
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="firstContactFirstName"
+                            name="contactLastName"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('lastName', $event)"
@@ -213,7 +213,7 @@
                     <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME' | translate }}</div>
                     <div class="column-filter">
                         <app-form-input
-                            name="firstContactFirstName"
+                            name="contactFirstName"
                             ngModel
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
                             (optionChanged)="filterByRelation('contact').byText('firstName', $event)"
@@ -225,6 +225,29 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
                 {{ item.contact?.firstName }}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Contact Visual ID -->
+        <ng-container matColumnDef="contact.visualId">
+            <mat-header-cell *matHeaderCellDef>
+                <div class="table-header-cell" fxLayout="column">
+                    <div class="column-header">{{ 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_VISUAL_ID' | translate }}</div>
+                    <div class="column-filter">
+                        <app-form-input
+                            name="contactVisualId"
+                            ngModel
+                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
+                            (optionChanged)="filterByRelation('contact').byText('visualId', $event)"
+                            app-reset-input-on-side-filter
+                            [displayFilterIcon]="true">
+                        </app-form-input>
+                    </div>
+                </div>
+            </mat-header-cell>
+
+            <mat-cell *matCellDef="let item" [class.record-alert]="item.alerted">
+                {{ item.contact?.visualId }}
             </mat-cell>
         </ng-container>
 

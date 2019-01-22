@@ -10,6 +10,8 @@ import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { EntityModel } from '../../models/entity.model';
 import { EntityType } from '../../models/entity-type';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
+import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class ContactDataService {
@@ -193,6 +195,56 @@ export class ContactDataService {
      */
     convertContactToCase(outbreakId: string, contactId: string): Observable<any> {
        return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-case`, {});
+    }
+
+    /**
+     * Generate Contact Visual ID
+     * @param outbreakId
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    generateContactVisualID(
+        outbreakId: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<string | VisualIdErrorModel> {
+        return this.http
+            .post(
+                `outbreaks/${outbreakId}/contacts/generate-visual-id`,
+                {
+                    visualIdMask: visualIdMask,
+                    personId: personId
+                }
+            ).catch((response: Error | VisualIdErrorModel) => {
+                return (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                    Observable.of(
+                        this.modelHelper.getModelInstance(
+                            VisualIdErrorModel,
+                            response
+                        )
+                    ) :
+                    Observable.throw(response);
+            });
+    }
+
+    /**
+     * Check if visual ID is valid
+     * @param outbreakId
+     * @param visualIdMask
+     * @param personId Optional
+     */
+    checkContactVisualIDValidity(
+        outbreakId: string,
+        visualIdMask: string,
+        personId?: string
+    ): Observable<boolean> {
+        return this.generateContactVisualID(
+            outbreakId,
+            visualIdMask,
+            personId
+        ).map((visualID: string | VisualIdErrorModel) => {
+            return _.isString(visualID);
+        });
     }
 }
 
