@@ -80,6 +80,7 @@ export class DialogField {
     public type: string = 'text';
     public requiredOneOfTwo: string;
     public value: any;
+    public visible: boolean | ((dialogFieldsValues: any) => boolean) = true;
     public disabled: boolean = false;
     public description: string;
     public fieldType: DialogFieldType = DialogFieldType.TEXT;
@@ -106,6 +107,7 @@ export class DialogField {
         type?: string,
         requiredOneOfTwo?: string,
         value?: any,
+        visible?: boolean | ((dialogFieldsValues: any) => boolean),
         disabled?: boolean,
         description?: string,
         fieldType?: DialogFieldType,
@@ -132,6 +134,16 @@ export class DialogField {
         if (this.inputOptions !== undefined) {
             this.fieldType = DialogFieldType.SELECT;
         }
+    }
+
+    /**
+     * Check if dialog field is visible
+     * @returns {boolean|((dialogFieldsValues:any)=>boolean)}
+     */
+    public isVisible(dialogFieldsValues: any): boolean {
+        return _.isFunction(this.visible) ?
+            (this.visible as any)(dialogFieldsValues) :
+            this.visible;
     }
 }
 

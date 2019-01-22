@@ -504,27 +504,32 @@ export class BackupsComponent extends ListComponent implements OnInit {
                         inputOptionsMultiple: true
                     }),
                     new DialogField({
-                        name: 'filter[where][collections]',
-                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
-                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
-                        fieldType: DialogFieldType.SELECT,
-                        inputOptions: this.mappedCollections,
-                        inputOptionsMultiple: true
-                    }),
-                    new DialogField({
                         name: 'filter[where][exportType]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
                         fieldType: DialogFieldType.SELECT,
                         inputOptions: this.mappedExportTypes,
                         inputOptionsMultiple: false,
-                        value: Constants.SYNC_PACKAGE_EXPORT_TYPES.FULL.value
+                    }),
+                    new DialogField({
+                        name: 'filter[where][collections]',
+                        placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
+                        description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
+                        fieldType: DialogFieldType.SELECT,
+                        inputOptions: this.mappedCollections,
+                        inputOptionsMultiple: true,
+                        visible: (fieldsData): boolean => {
+                            return !_.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
                     }),
                     new DialogField({
                         name: 'filter[where][includeUsers]',
                         placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS',
                         description: 'LNG_SYNC_PACKAGE_FIELD_LABEL_INCLUDE_USERS_DESCRIPTION',
-                        fieldType: DialogFieldType.BOOLEAN
+                        fieldType: DialogFieldType.BOOLEAN,
+                        visible: (fieldsData): boolean => {
+                            return _.isEmpty(fieldsData['filter[where][exportType]']);
+                        }
                     }),
                     new DialogField({
                         name: 'password',

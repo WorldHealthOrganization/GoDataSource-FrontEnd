@@ -60,99 +60,102 @@
 
             <!-- Multiple inputs -->
             <ng-container *ngIf="confirmData?.fieldsList?.length > 0">
-                <div
-                    *ngFor="let field of confirmData.fieldsList"
-                    fxFlex fxLayout="column" fxLayoutGap="20px">
+                <ng-container
+                    *ngFor="let field of confirmData.fieldsList">
+                    <div
+                        *ngIf="field.isVisible(dialogAnswerInputValue.value)"
+                        fxFlex fxLayout="column" fxLayoutGap="20px">
 
-                    <!-- Select -->
-                    <app-form-select
-                        *ngIf="field.fieldType === DialogFieldType.SELECT"
-                        [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
-                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
-                        [tooltip]="field.description"
-                        [options]="field.inputOptions"
-                        [clearable]="field.inputOptionsClearable"
-                        optionLabelKey="label"
-                        optionValueKey="value"
-                        [multiple]="field.inputOptionsMultiple"
-                        [required]="field.required"
-                        app-required-one-or-other-validator
-                        [requiredOtherField]="field.requiredOneOfTwo"
-                        [disabled]="field.disabled">
-                    </app-form-select>
+                        <!-- Select -->
+                        <app-form-select
+                            *ngIf="field.fieldType === DialogFieldType.SELECT"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [options]="field.inputOptions"
+                            [clearable]="field.inputOptionsClearable"
+                            optionLabelKey="label"
+                            optionValueKey="value"
+                            [multiple]="field.inputOptionsMultiple"
+                            [required]="field.required"
+                            app-required-one-or-other-validator
+                            [requiredOtherField]="field.requiredOneOfTwo"
+                            [disabled]="field.disabled">
+                        </app-form-select>
 
-                    <!-- Text / Number -->
-                    <app-form-input
-                        *ngIf="field.fieldType === DialogFieldType.TEXT"
-                        [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
-                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
-                        [tooltip]="field.description"
-                        [required]="field.required"
-                        [type]="field.type"
-                        app-required-one-or-other-validator
-                        [requiredOtherField]="field.requiredOneOfTwo"
-                        [disabled]="field.disabled">
-                    </app-form-input>
+                        <!-- Text / Number -->
+                        <app-form-input
+                            *ngIf="field.fieldType === DialogFieldType.TEXT"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [required]="field.required"
+                            [type]="field.type"
+                            app-required-one-or-other-validator
+                            [requiredOtherField]="field.requiredOneOfTwo"
+                            [disabled]="field.disabled">
+                        </app-form-input>
 
-                    <!-- Boolean -->
-                    <app-form-slide-toggle
-                        *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
-                        [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
-                        [label]="field.placeholder | translate:confirmData?.translateData"
-                        [tooltip]="field.description"
-                        [required]="field.required"
-                        [disabled]="field.disabled">
-                    </app-form-slide-toggle>
+                        <!-- Boolean -->
+                        <app-form-slide-toggle
+                            *ngIf="field.fieldType === DialogFieldType.BOOLEAN"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [label]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [required]="field.required"
+                            [disabled]="field.disabled">
+                        </app-form-slide-toggle>
 
-                    <!-- Date -->
-                    <app-form-datepicker
-                        *ngIf="field.fieldType === DialogFieldType.DATE"
-                        [name]="field.name"
-                        [ngModel]="dialogAnswerInputValue.value[field.name]"
-                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
-                        [tooltip]="field.description"
-                        [required]="field.required"
-                        [disabled]="field.disabled"
-                        (optionChanged)="setDateValue(field.name, $event)"
-                        app-date-validator
-                    ></app-form-datepicker>
+                        <!-- Date -->
+                        <app-form-datepicker
+                            *ngIf="field.fieldType === DialogFieldType.DATE"
+                            [name]="field.name"
+                            [ngModel]="dialogAnswerInputValue.value[field.name]"
+                            [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [required]="field.required"
+                            [disabled]="field.disabled"
+                            (optionChanged)="setDateValue(field.name, $event)"
+                            app-date-validator
+                        ></app-form-datepicker>
 
-                    <!-- Date range -->
-                    <app-form-daterange
-                        *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
-                        [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
-                        [required]="field.required"
-                        [disabled]="field.disabled">
-                    </app-form-daterange>
+                        <!-- Date range -->
+                        <app-form-daterange
+                            *ngIf="field.fieldType === DialogFieldType.DATE_RANGE"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [required]="field.required"
+                            [disabled]="field.disabled">
+                        </app-form-daterange>
 
-                    <!-- Link -->
-                    <a
-                        *ngIf="field.fieldType === DialogFieldType.LINK"
-                        [routerLink]="field.routerLink"
-                        [queryParams]="field.queryParams"
-                        [target]="field.linkTarget">
-                        {{ field.placeholder | translate }}
-                    </a>
+                        <!-- Link -->
+                        <a
+                            *ngIf="field.fieldType === DialogFieldType.LINK"
+                            [routerLink]="field.routerLink"
+                            [queryParams]="field.queryParams"
+                            [target]="field.linkTarget">
+                            {{ field.placeholder | translate }}
+                        </a>
 
-                    <!-- Url -->
-                    <app-form-input
-                        *ngIf="field.fieldType === DialogFieldType.URL"
-                        [name]="field.name"
-                        [(ngModel)]="dialogAnswerInputValue.value[field.name]"
-                        [placeholder]="field.placeholder | translate:confirmData?.translateData"
-                        [tooltip]="field.description"
-                        [required]="field.required"
-                        [disabled]="field.disabled"
-                        app-general-async-validator
-                        [asyncValidatorObservable]="field.urlAsyncValidator(dialogAnswerInputValue.value[field.name])"
-                        [asyncValidatorErrMsg]="field.urlAsyncErrorMsg"
-                        [asyncValidatorErrMsgTranslateData]="field.urlAsyncErrorMsgData">
-                    </app-form-input>
-                </div>
+                        <!-- Url -->
+                        <app-form-input
+                            *ngIf="field.fieldType === DialogFieldType.URL"
+                            [name]="field.name"
+                            [(ngModel)]="dialogAnswerInputValue.value[field.name]"
+                            [placeholder]="field.placeholder | translate:confirmData?.translateData"
+                            [tooltip]="field.description"
+                            [required]="field.required"
+                            [disabled]="field.disabled"
+                            app-general-async-validator
+                            [asyncValidatorObservable]="field.urlAsyncValidator(dialogAnswerInputValue.value[field.name])"
+                            [asyncValidatorErrMsg]="field.urlAsyncErrorMsg"
+                            [asyncValidatorErrMsgTranslateData]="field.urlAsyncErrorMsgData">
+                        </app-form-input>
+                    </div>
+                </ng-container>
             </ng-container>
         </div>
 
