@@ -87,7 +87,7 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE' | translate }}
                         </button>
 
                         <ng-container
@@ -95,13 +95,13 @@
                             <button
                                 mat-menu-item
                                 [routerLink]="['.', item.id, 'modify']">
-                                {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                                {{'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE' | translate}}
                             </button>
 
                             <button
                                 mat-menu-item class="mat-menu-item-delete"
                                 (click)="deleteLanguage(item)">
-                                {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                                {{'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE' | translate}}
                             </button>
                         </ng-container>
                     </mat-menu>

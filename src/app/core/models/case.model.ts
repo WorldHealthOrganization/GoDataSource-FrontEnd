@@ -6,6 +6,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
+import * as moment from 'moment';
 
 export class CaseModel {
     id: string;
@@ -34,6 +35,7 @@ export class CaseModel {
     questionnaireAnswers: {};
     type: EntityType = EntityType.CASE;
     dateOfReporting: string;
+    dateOfLastContact: string;
     isDateOfReportingApproximate: boolean;
     transferRefused: boolean;
     outbreakId: string;
@@ -60,6 +62,24 @@ export class CaseModel {
     }[];
 
     alerted: boolean = false;
+
+    /**
+     * Return case id mask with data replaced
+     * @param caseIdMask
+     */
+    static generateCaseIDMask(caseIdMask: string): string {
+        // validate
+        if (_.isEmpty(caseIdMask)) {
+            return '';
+        }
+
+        // !!!!!!!!!!!!!!!
+        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+        // !!!!!!!!!!!!!!!
+        return caseIdMask
+            .replace(/YYYY/g, moment().format('YYYY'))
+            .replace(/\*/g, '');
+    }
 
     constructor(data = null) {
         this.id = _.get(data, 'id');
@@ -111,6 +131,7 @@ export class CaseModel {
 
         this.incubationDates = _.get(data, 'incubationDates', []);
         this.dateOfReporting = _.get(data, 'dateOfReporting');
+        this.dateOfLastContact = _.get(data, 'dateOfLastContact');
         this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
         this.transferRefused = _.get(data, 'transferRefused');
         this.outbreakId = _.get(data, 'outbreakId');

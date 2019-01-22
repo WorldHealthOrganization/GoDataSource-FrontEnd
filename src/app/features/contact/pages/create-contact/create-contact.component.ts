@@ -52,10 +52,16 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
     genderList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
 
-    relatedEntityData: CaseModel|EventModel;
+    relatedEntityData: CaseModel | EventModel;
     relationship: RelationshipModel = new RelationshipModel();
 
     serverToday: Moment = null;
+
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    contactIdMaskValidator: Observable<boolean>;
 
     constructor(
         private router: Router,
@@ -132,6 +138,25 @@ export class CreateContactComponent extends ConfirmOnFormChanges implements OnIn
                     })
                     .subscribe((selectedOutbreak: OutbreakModel) => {
                         this.outbreakId = selectedOutbreak.id;
+
+                        // set visual ID translate data
+                        this.visualIDTranslateData = {
+                            mask: ContactModel.generateContactIDMask(selectedOutbreak.contactIdMask)
+                        };
+
+                        // set visual id for contact
+                        this.contactData.visualId = this.visualIDTranslateData.mask;
+
+                        // set visual ID validator
+                        this.contactIdMaskValidator = Observable.create((observer) => {
+                            this.contactDataService.checkContactVisualIDValidity(
+                                selectedOutbreak.id,
+                                this.contactData.visualId
+                            ).subscribe((isValid: boolean) => {
+                                observer.next(isValid);
+                                observer.complete();
+                            });
+                        });
 
                         // retrieve Case/Event information
                         this.entityDataService

@@ -88,6 +88,16 @@
                             </div>
 
                             <div fxLayout="row" fxLayoutGap="20px">
+                                <div fxFlex>
+                                    <app-form-select
+                                        name="visualId"
+                                        [(ngModel)]="uniqueOptions?.visualId.value"
+                                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+                                        tooltip="LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
+                                        [options]="uniqueOptions?.visualId.options">
+                                    </app-form-select>
+                                </div>
+
                                 <app-form-select
                                     name="dateOfReporting"
                                     [(ngModel)]="uniqueOptions?.dateOfReporting.value"
@@ -105,7 +115,6 @@
                                     [options]="uniqueOptions?.isDateOfReportingApproximate.options">
                                 </app-form-select>
 
-                                <div fxFlex><!-- placeholder --></div>
                                 <div fxFlex><!-- placeholder --></div>
                             </div>
 

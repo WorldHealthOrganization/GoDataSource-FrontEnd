@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { DialogAnswerButton, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
