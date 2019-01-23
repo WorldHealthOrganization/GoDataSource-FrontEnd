@@ -748,12 +748,14 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.questionText.focus();
                     this.questionText.select();
                 }
+            });
+        }
 
-                // start dirty ?
-                if (startDirty) {
-                    // mark form as dirty
-                    this.markQuestionFormDirty();
-                }
+        // start dirty ?
+        if (startDirty) {
+            setTimeout(() => {
+                // mark form as dirty
+                this.markQuestionFormDirty();
             });
         }
     }
@@ -821,11 +823,13 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                     this.answerLabel.focus();
                     this.answerLabel.select();
                 }
+            });
+        }
 
-                // start dirty ?
-                if (startDirty) {
-                    this.markAnswerFormDirty();
-                }
+        // start dirty ?
+        if (startDirty) {
+            setTimeout(() => {
+                this.markAnswerFormDirty();
             });
         }
     }

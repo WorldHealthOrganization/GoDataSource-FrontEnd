@@ -44,6 +44,7 @@ import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node
 import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
 import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
 import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
+import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -55,6 +56,7 @@ export * from './view-cot-node-dialog/view-cot-node-dialog.component';
 export * from './view-help-dialog/view-help-dialog.component';
 export * from './view-help-details-dialog/view-help-details-dialog.component';
 export * from './form-modify-questionnaire/form-modify-questionnaire.component';
+export * from './hover-row-actions/hover-row-actions.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -120,4 +122,7 @@ export const components: any[] = [
     NumberOfItemsLabelComponent,
     FormCaseCenterDaterangeComponent,
     FormCaseCenterDaterangeListComponent,
+
+    // layout extensions
+    HoverRowActionsComponent
 ];

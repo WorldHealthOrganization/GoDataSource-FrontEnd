@@ -1,0 +1,18 @@
+<!-- Hover row -->
+<div
+    class="record-hover-row-effect"
+    [class.visible]="visible"
+    [ngStyle]="hoverRowStyle">
+</div>
+
+<!-- Hover actions -->
+<div
+    #actionsRow
+    class="record-hover-actions"
+    [class.visible]="visible"
+    [class.right]="position === HoverRowActionsPosition.RIGHT"
+    [ngStyle]="hoverActionsStyle"
+    (mouseenter)="actionsMouseEnter()"
+    (mouseleave)="actionsMouseLeave()">
+    Test 2
+</div>

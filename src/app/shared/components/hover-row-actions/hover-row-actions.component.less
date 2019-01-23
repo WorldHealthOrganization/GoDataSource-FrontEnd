@@ -1,0 +1,32 @@
+app-hover-row-actions {
+    .record-hover-row-effect {
+        display: none;
+        background-color: #00000015;
+        z-index: 998;
+        position: fixed;
+        pointer-events: none;
+
+        &.visible {
+            display: inline-block;
+        }
+    }
+
+    .record-hover-actions {
+        display: none;
+        background-color: red;
+        z-index: 999;
+        position: fixed;
+        opacity: 0;
+        transition: opacity 200ms;
+        width: auto;
+
+        &.visible {
+            display: inline-block;
+            opacity: 1;
+        }
+
+        &.right {
+            transform: translateX(-100%);
+        }
+    }
+}
