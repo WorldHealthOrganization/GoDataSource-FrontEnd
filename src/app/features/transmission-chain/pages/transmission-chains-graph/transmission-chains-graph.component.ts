@@ -32,6 +32,11 @@ import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 
+enum NodeAction {
+    MODIFY_PERSON = 'modify-person',
+    CREATE_CONTACT = 'create-contact'
+}
+
 @Component({
     selector: 'app-transmission-chains-graph',
     encapsulation: ViewEncapsulation.None,
@@ -59,6 +64,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
+    // action to do on the selected node
+    currentNodeAction: NodeAction = null;
 
     // Edit or View mode?
     editMode: boolean = false;
@@ -70,6 +77,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
+    NodeAction = NodeAction;
 
     constructor(
         private authDataService: AuthDataService,
@@ -226,7 +234,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     }
 
     removeSelectedNode(index) {
-        this.selectedNodes.removeNode(index);
+        this.selectedNodes.removeNodeAtIndex(index);
     }
 
     swapSelectedNodes() {
@@ -235,6 +243,36 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     resetNodes() {
         this.selectedNodes = new SelectedNodes();
+    }
+
+    modifySelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        // remove other selected node(s) (if any)
+        this.selectedNodes.keepNode(person);
+
+        this.resetFormModels();
+
+        this.currentNodeAction = NodeAction.MODIFY_PERSON;
+    }
+
+    createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        // remove other selected node(s) (if any)
+        this.selectedNodes.keepNode(person);
+
+        this.resetFormModels();
+
+        this.currentNodeAction = NodeAction.CREATE_CONTACT;
+    }
+
+    deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        // #TODO
+    }
+
+    resetFormModels() {
+        // reset Contact model
+        this.newContact = new ContactModel();
+
+        // reset Relationship model
+        this.newRelationship = new RelationshipModel();
     }
 
     /**
@@ -277,11 +315,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // refresh graph
                 this.cotDashletChild.refreshChain();
 
-                // reset Relationship model
-                this.newRelationship = new RelationshipModel();
+                // reset form
+                this.resetFormModels();
 
                 // reset selected nodes
                 this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
             });
     }
 
@@ -344,13 +385,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // refresh graph
                 this.cotDashletChild.refreshChain();
 
-                // reset Relationship model
-                this.newRelationship = new RelationshipModel();
-                // reset Contact model
-                this.newContact = new ContactModel();
+                // reset form
+                this.resetFormModels();
 
                 // reset selected nodes
                 this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
             });
     }
 }

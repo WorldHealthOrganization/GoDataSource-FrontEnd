@@ -47,7 +47,13 @@
         fxFlex="400px"
         fxLayout="column">
         <mat-card class="page-section">
-            <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
+            <app-person-summary
+                [person]="person"
+                (remove)="removeSelectedNode(index)"
+                (modifyPerson)="modifySelectedPerson($event)"
+                (deletePerson)="deleteSelectedPerson($event)"
+                (createContact)="createContactForSelectedPerson($event)"
+            ></app-person-summary>
         </mat-card>
     </div>
 
@@ -94,9 +100,20 @@
         </form>
     </mat-card>
 
+    <!-- Modify Person -->
+    <mat-card
+        *ngIf="selectedNodes.canModifyPerson && currentNodeAction === NodeAction.MODIFY_PERSON"
+        class="page-section create-contact"
+        fxFlex
+    >
+        <form #form="ngForm" (submit)="createContact(form)">
+            #TODO Modify Person
+        </form>
+    </mat-card>
+
     <!-- Create new Contact for Case/Event -->
     <mat-card
-        *ngIf="selectedNodes.canCreateContact"
+        *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
         class="page-section create-contact"
         fxFlex
     >
