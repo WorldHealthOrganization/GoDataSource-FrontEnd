@@ -107,16 +107,19 @@
     <!-- Question Data -->
     <div
         fxFlex fxLayout="column">
+
+        <!-- Hover question effects / actions -->
         <app-hover-row-actions
-            #hoverRow
-            [active]="questionIndexInEditMode === null">
+            #hoverRowQuestion
+            [active]="!savingData && questionIndexInEditMode === null">
         </app-hover-row-actions>
 
+        <!-- Question data -->
         <div
             *ngFor="let question of questionnaireData; let questionIndex = index"
             [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode"
             app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActionsComponent]="hoverRowQuestion"
             [hoverRowActions]="questionActions"
             [hoverRowActionData]="questionIndex">
 
@@ -402,10 +405,21 @@
                                 </div>
                             </div>
 
+                            <!-- Hover Answer effects / actions -->
+                            <app-hover-row-actions
+                                #hoverRowAnswers
+                                [active]="!savingData && questionAnswerIndexInEditMode === null">
+                            </app-hover-row-actions>
+
                             <!-- Answer Data -->
                             <div
                                 *ngFor="let answer of questionInEditModeClone.answers; let answerIndex = index"
-                                [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode">
+                                [class.answer-in-edit-mode]="answerIndex === questionAnswerIndexInEditMode"
+                                app-hover-row-actions
+                                [hoverRowActionsComponent]="hoverRowAnswers"
+                                [hoverRowActions]="answerActions"
+                                [hoverRowActionData]="answerIndex">
+
                                 <!-- Answer Row Data -->
                                 <div
                                     fxFlex fxLayout="row"

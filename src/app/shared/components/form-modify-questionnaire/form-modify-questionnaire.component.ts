@@ -171,6 +171,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     questionActions: HoverRowActions[] = [];
 
     /**
+     * Question Answer Actions
+     */
+    answerActions: HoverRowActions[] = [];
+
+    /**
      * Allow question variable change
      */
     @Input() allowQuestionVariableChange: boolean = false;
@@ -280,8 +285,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // init questionnaire data
                 this.initQuestionnaireData();
 
-                // // init question actions
+                // init question actions
                 this.initQuestionActions();
+
+                // init question answer actions
+                this.initQuestionAnswerActions();
 
                 // finished loading data
                 setTimeout(() => {
@@ -348,6 +356,71 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                         menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
                         click: (questionIndex) => {
                             this.deleteQuestion(questionIndex);
+                        },
+                        class: 'mat-menu-item-delete'
+                    })
+                ]
+            }));
+        }
+    }
+
+    /**
+     * Initialize question answer actions
+     */
+    private initQuestionAnswerActions() {
+        // init question actions
+        this.answerActions = [];
+
+        // add answer actions that require write permissions
+        if (this.hasWriteAccess()) {
+            // answer settings
+            this.answerActions.push(new HoverRowActions({
+                icon: 'settings',
+                click: (answerIndex) => {
+                    this.modifyAnswer(answerIndex);
+                }
+            }));
+
+            // move answer above
+            this.answerActions.push(new HoverRowActions({
+                icon: 'arrowAUp',
+                click: (answerIndex) => {
+                    this.moveAnswerAbove(answerIndex);
+                }
+            }));
+
+            // move answer bellow
+            this.answerActions.push(new HoverRowActions({
+                icon: 'arrowADown',
+                click: (answerIndex) => {
+                    this.moveAnswerBellow(answerIndex);
+                }
+            }));
+
+            // other options
+            this.answerActions.push(new HoverRowActions({
+                type: HoverRowActionsType.MENU,
+                icon: 'moreVertical',
+                menuOptions: [
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_ANSWER_TO_POSITION_X',
+                        click: (answerIndex) => {
+                            this.addMoveQuestionAnswerPosition(answerIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        type: HoverRowActionsType.DIVIDER
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                        click: (answerIndex) => {
+                            this.cloneAnswer(answerIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                        click: (answerIndex) => {
+                            this.deleteAnswer(answerIndex);
                         },
                         class: 'mat-menu-item-delete'
                     })
