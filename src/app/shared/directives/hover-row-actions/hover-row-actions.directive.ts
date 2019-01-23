@@ -29,6 +29,18 @@ export class HoverRowActionsDirective {
         }
     }
 
+
+    /**
+     * Mouse click - for tablets
+     */
+    @HostListener('click', ['$event'])
+    mouseClick() {
+        // display actions
+        if (this.hoverRowActionsComponent) {
+            this.hoverRowActionsComponent.show(this.elementRef);
+        }
+    }
+
     /**
      * Mouse left row
      */
