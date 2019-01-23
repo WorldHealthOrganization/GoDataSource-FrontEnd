@@ -13,23 +13,24 @@ app-hover-row-actions {
     }
 
     .record-hover-actions {
-        display: none;
+        display: inline-block;
+        pointer-events: none;
         background-color: transparent;
         z-index: 999;
         position: fixed;
         opacity: 0;
-        transition: opacity 200ms;
+        transition: opacity 300ms;
         width: auto;
         white-space: nowrap;
         padding: 0 5px;
 
         &.partial-visible {
-            display: inline-block;
             opacity: 0.3;
+            pointer-events: auto;
         }
 
         &.full-visible {
-            display: inline-block;
+            pointer-events: auto;
             background-color: #EDEDED;
             opacity: 1;
         }
