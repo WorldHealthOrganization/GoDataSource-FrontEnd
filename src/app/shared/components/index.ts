@@ -44,6 +44,8 @@ import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node
 import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
 import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
 import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
+import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
+import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
 
 // export necessary components individually
 export * from './snackbar/snackbar.component';
@@ -96,6 +98,8 @@ export const components: any[] = [
     FormAgeDobComponent,
     FormRelationshipQuickComponent,
     FormContactQuickComponent,
+    FormLocationIdentifierListComponent,
+    FormLocationIdentifierComponent,
 
     // display information
     CountedItemsListComponent,

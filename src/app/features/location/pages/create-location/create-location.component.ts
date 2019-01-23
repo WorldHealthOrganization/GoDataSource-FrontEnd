@@ -74,7 +74,6 @@ export class CreateLocationComponent extends ConfirmOnFormChanges implements OnI
     createNewLocation(stepForms: NgForm[]) {
         // get forms fields
         const dirtyFields: any = this.formHelper.mergeFields(stepForms);
-        console.log(dirtyFields);
 
         // even if we set value to float, some browser might get it as a string sicne we use form for this...
         // so..we need to force again the geo location to have numbers
