@@ -43,6 +43,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     @Input() selectedEntityType: EntityType = null;
 
     @Output() nodeTapped = new EventEmitter<GraphNodeModel>();
+    @Output() edgeTapped = new EventEmitter<GraphEdgeModel>();
     @Output() changeEditMode = new EventEmitter<boolean>();
 
     selectedOutbreak: OutbreakModel;
@@ -427,20 +428,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @returns {IterableIterator<any>}
      */
     onEdgeTap(relationship: GraphEdgeModel) {
-        // retrieve relationship information
-        // get relationship data
-        this.relationshipDataService
-            .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-            .catch((err) => {
-                this.snackbarService.showError(err.message);
-                return ErrorObservable.create(err);
-            })
-            .subscribe((relationshipData) => {
-                relationshipData.sourceType = relationship.sourceType;
-                relationshipData.source = relationship.source;
-                const dialogData = this.relationshipDataService.getLightObjectDisplay(relationshipData);
-                this.dialogService.showDataDialog(dialogData);
-            });
+        this.edgeTapped.emit(relationship);
     }
 
     /**

@@ -326,8 +326,15 @@ export const EnglishUsLang = {
          */
         'LNG_ENTITY_FIELD_LABEL_VISUAL_ID': 'Case / Contact ID'
 
+
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore
         // - before removing these tokens make sure they aren't used
+
+        /**
+         * REMOVE TOKENS BELOW
+         * Chains Of Transmission Graph
+         */
+        // 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE'
     }
 };

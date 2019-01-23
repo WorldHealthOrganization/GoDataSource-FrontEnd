@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { SystemSettingsModel } from '../../models/system-settings.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { CaseModel } from '../../models/case.model';
 import { DeviceModel } from '../../models/device.model';
 import { DeviceHistoryModel } from '../../models/device-history.model';
 

@@ -16,7 +16,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { tap } from 'rxjs/operators';
 import 'rxjs/add/operator/switchMap';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { IconDataService } from '../../../../core/services/data/icon.data.service';
 
 @Component({
     selector: 'app-reference-data-category-entries-list',
