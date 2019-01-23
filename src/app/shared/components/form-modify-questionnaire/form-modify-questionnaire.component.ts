@@ -285,12 +285,6 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // init questionnaire data
                 this.initQuestionnaireData();
 
-                // init question actions
-                this.initQuestionActions();
-
-                // init question answer actions
-                this.initQuestionAnswerActions();
-
                 // finished loading data
                 setTimeout(() => {
                     this.loadingData = false;
@@ -471,6 +465,12 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
 
             // format data
             this.sanitizeQuestionnaireData();
+
+            // init question actions
+            this.initQuestionActions();
+
+            // init question answer actions
+            this.initQuestionAnswerActions();
         }
     }
 
