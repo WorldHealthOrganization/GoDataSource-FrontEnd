@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /**
  * Rect handler since DomRect doesn't exist
@@ -27,7 +27,7 @@ export enum HoverRowActionsPosition {
     templateUrl: './hover-row-actions.component.html',
     styleUrls: ['./hover-row-actions.component.less']
 })
-export class HoverRowActionsComponent {
+export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Constants
      */
@@ -111,6 +111,41 @@ export class HoverRowActionsComponent {
      * Actions row
      */
     @ViewChild('actionsRow') actionsRow: ElementRef;
+
+    /**
+     * Used to keep function scope
+     */
+    onWindowScrollArrow;
+
+    /**
+     * Used to keep function scope
+     */
+    onWindowResizeArrow;
+
+    /**
+     * Component initialized
+     */
+    ngOnInit() {
+        // init arrow function
+        this.onWindowScrollArrow = () => {
+            this.onWindowScroll();
+        };
+        this.onWindowResizeArrow = () => {
+            this.onWindowResize();
+        };
+
+        // register listeners
+        window.addEventListener('scroll', this.onWindowScrollArrow, true);
+        window.addEventListener('resize', this.onWindowResizeArrow, true);
+    }
+
+    /**
+     * Component destroyed
+     */
+    ngOnDestroy() {
+        window.removeEventListener('scroll', this.onWindowScrollArrow, true);
+        window.removeEventListener('resize', this.onWindowResizeArrow, true);
+    }
 
     /**
      * Determine row bounding
@@ -217,10 +252,25 @@ export class HoverRowActionsComponent {
     }
 
     /**
-     * Window Scroll
+     * Hide row
      */
-    @HostListener('window:scroll', [])
+    hideEverything() {
+        // hide hover
+        this.hide();
+        this.actionsMouseLeave();
+    }
+
+    /**
+     * Window scroll
+     */
     onWindowScroll() {
-        console.log('scroll');
+        this.hideEverything();
+    }
+
+    /**
+     * Window resize
+     */
+    onWindowResize() {
+        this.hideEverything();
     }
 }
