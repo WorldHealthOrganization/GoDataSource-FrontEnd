@@ -102,14 +102,6 @@
             class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
             {{ 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate }}
         </div>
-
-        <!-- Actions -->
-        <div
-            *ngIf="hasWriteAccess()"
-            fxFlex="120px"
-            class="modify-questionnaire-cell-default modify-questionnaire-cell-header modify-questionnaire-cell-style">
-            <!-- placeholder -->
-        </div>
     </div>
 
     <!-- Question Data -->
@@ -172,69 +164,6 @@
                     fxFlex="100px"
                     class="modify-questionnaire-cell-default modify-questionnaire-cell-style">
                     {{ (question.required ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO') | translate }}
-                </div>
-
-                <!-- Actions -->
-                <div
-                    *ngIf="hasWriteAccess()"
-                    fxFlex="120px"
-                    class="modify-questionnaire-cell-style">
-                    <button
-                        mat-icon-button
-                        type="button"
-                        [matMenuTriggerFor]="actionsMenu"
-                        [disabled]="savingData || questionIndexInEditMode !== null">
-                        <span class="xt-icon">moreVertical</span>
-                    </button>
-
-                    <mat-menu
-                        #actionsMenu="matMenu"
-                        class="table-max-sized-menu">
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="moveQuestionAbove(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_UP' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="addMoveQuestionPosition(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="moveQuestionBellow(questionIndex)">
-                            {{ 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_DOWN' | translate }}
-                        </button>
-
-                        <mat-divider></mat-divider>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="modifyQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_MODIFY' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            (click)="cloneQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_CLONE' | translate }}
-                        </button>
-
-                        <button
-                            mat-menu-item
-                            type="button"
-                            class="mat-menu-item-delete"
-                            (click)="deleteQuestion(questionIndex)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
-                        </button>
-                    </mat-menu>
                 </div>
             </div>
 

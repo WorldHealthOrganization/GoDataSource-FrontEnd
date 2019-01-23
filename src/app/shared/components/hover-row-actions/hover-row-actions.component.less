@@ -1,7 +1,8 @@
 app-hover-row-actions {
     .record-hover-row-effect {
         display: none;
-        background-color: #00000015;
+        background-color: #000;
+        opacity: 0.07;
         z-index: 998;
         position: fixed;
         pointer-events: none;
@@ -13,7 +14,7 @@ app-hover-row-actions {
 
     .record-hover-actions {
         display: none;
-        background-color: #EAEAEA;
+        background-color: transparent;
         z-index: 999;
         position: fixed;
         opacity: 0;
@@ -24,11 +25,12 @@ app-hover-row-actions {
 
         &.partial-visible {
             display: inline-block;
-            opacity: 0.5;
+            opacity: 0.3;
         }
 
         &.full-visible {
             display: inline-block;
+            background-color: #EDEDED;
             opacity: 1;
         }
 

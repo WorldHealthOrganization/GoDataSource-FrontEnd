@@ -26,7 +26,7 @@ import { FormInputComponent } from '../../xt-forms/components/form-input/form-in
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
-import { HoverRowActions } from '../hover-row-actions/hover-row-actions.component';
+import { HoverRowActions, HoverRowActionsType } from '../hover-row-actions/hover-row-actions.component';
 
 /**
  * Used to initialize breadcrumbs
@@ -322,6 +322,36 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 click: (questionIndex) => {
                     this.moveQuestionBellow(questionIndex);
                 }
+            }));
+
+            // other options
+            this.questionActions.push(new HoverRowActions({
+                type: HoverRowActionsType.MENU,
+                icon: 'moreVertical',
+                menuOptions: [
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_QUESTIONNAIRE_TEMPLATE_ACTION_MOVE_QUESTION_TO_POSITION_X',
+                        click: (questionIndex) => {
+                            this.addMoveQuestionPosition(questionIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        type: HoverRowActionsType.DIVIDER
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_CLONE',
+                        click: (questionIndex) => {
+                            this.cloneQuestion(questionIndex);
+                        }
+                    }),
+                    new HoverRowActions({
+                        menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
+                        click: (questionIndex) => {
+                            this.deleteQuestion(questionIndex);
+                        },
+                        class: 'mat-menu-item-delete'
+                    })
+                ]
             }));
         }
     }

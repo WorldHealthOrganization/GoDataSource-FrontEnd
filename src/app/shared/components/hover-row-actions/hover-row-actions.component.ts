@@ -5,7 +5,8 @@ import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsu
  */
 export enum HoverRowActionsType {
     BUTTON = 'button',
-    MENU = 'menu'
+    MENU = 'menu',
+    DIVIDER = 'divider'
 }
 
 /**
@@ -16,17 +17,22 @@ export class HoverRowActions {
     type: HoverRowActionsType = HoverRowActionsType.BUTTON;
     icon: string;
     click: (item: any) => void;
+    class: string;
+
+    menuOptions: HoverRowActions[];
+    menuOptionLabel: string;
 
     /**
      * Constructor
      */
     constructor(data: {
-        // required
-        icon: string,
-        click: (item: any) => void,
-
         // optional
-        type?: HoverRowActionsType
+        icon?: string,
+        click?: (item: any) => void,
+        type?: HoverRowActionsType,
+        menuOptions?: HoverRowActions[],
+        menuOptionLabel?: string,
+        class?: string
     }) {
         Object.assign(this, data);
     }
@@ -65,6 +71,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Constants
      */
     HoverRowActionsPosition = HoverRowActionsPosition;
+    HoverRowActionsType = HoverRowActionsType;
 
     /**
      * Keep last reference element
