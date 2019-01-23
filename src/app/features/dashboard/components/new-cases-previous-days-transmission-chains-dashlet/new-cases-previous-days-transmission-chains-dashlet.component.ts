@@ -11,7 +11,6 @@ import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
     selector: 'app-new-cases-previous-days-transmission-chains-dashlet',

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { Observable } from 'rxjs/Observable';

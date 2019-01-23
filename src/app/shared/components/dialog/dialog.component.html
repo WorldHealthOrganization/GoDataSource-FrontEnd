@@ -5,32 +5,6 @@
         [innerHTML]="confirmData?.message | translate:confirmData?.translateData">
     </div>
 
-    <!-- section for showDataDialog: display a list of label: value objects -->
-    <div *ngIf="confirmData?.data">
-        <mat-card>
-            <mat-list>
-                <mat-list-item *ngFor="let dataItem of confirmData?.data">
-                    <!-- if the label is not LINK display the label and the value-->
-                    <div *ngIf="dataItem.label !== Constants.DIALOG.DATA_ITEM_TYPE.LINK">
-                        <span class="dialog-data-label">
-                            {{ dataItem.label | translate }}:
-                        </span>
-                        {{dataItem.value | translate}}
-                    </div>
-
-                    <!-- custom case for displaying link so the user can navigate to the full resource page -->
-                    <div *ngIf="dataItem.label === Constants.DIALOG.DATA_ITEM_TYPE.LINK">
-                        <a href="{{dataItem.value}}"
-                           target="_blank">
-                            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
-                        </a>
-                    </div>
-
-                </mat-list-item>
-            </mat-list>
-        </mat-card>
-    </div>
-
     <form #form="ngForm">
         <div *ngIf="confirmData?.customInput">
             <!-- Single input -->

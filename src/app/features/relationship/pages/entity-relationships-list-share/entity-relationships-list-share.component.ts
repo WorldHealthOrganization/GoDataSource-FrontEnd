@@ -17,7 +17,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { PERMISSION } from '../../../../core/models/permission.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';

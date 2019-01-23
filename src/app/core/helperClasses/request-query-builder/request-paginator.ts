@@ -1,4 +1,3 @@
-import { Constants } from '../../models/constants';
 import { PageEvent } from '@angular/material';
 
 export class RequestPaginator {
