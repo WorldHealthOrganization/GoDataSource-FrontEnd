@@ -13,14 +13,21 @@ app-hover-row-actions {
 
     .record-hover-actions {
         display: none;
-        background-color: red;
+        background-color: #EAEAEA;
         z-index: 999;
         position: fixed;
         opacity: 0;
         transition: opacity 200ms;
         width: auto;
+        white-space: nowrap;
+        padding: 0 5px;
 
-        &.visible {
+        &.partial-visible {
+            display: inline-block;
+            opacity: 0.5;
+        }
+
+        &.full-visible {
             display: inline-block;
             opacity: 1;
         }

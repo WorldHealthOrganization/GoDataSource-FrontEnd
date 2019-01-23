@@ -26,6 +26,7 @@ import { FormInputComponent } from '../../xt-forms/components/form-input/form-in
 import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import 'rxjs/add/observable/forkJoin';
 import { Observable } from 'rxjs/Observable';
+import { HoverRowActions } from '../hover-row-actions/hover-row-actions.component';
 
 /**
  * Used to initialize breadcrumbs
@@ -165,6 +166,11 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
     childQuestionIsInEditMode: boolean = false;
 
     /**
+     * Question Actions
+     */
+    questionActions: HoverRowActions[] = [];
+
+    /**
      * Allow question variable change
      */
     @Input() allowQuestionVariableChange: boolean = false;
@@ -274,12 +280,50 @@ export class FormModifyQuestionnaireComponent extends ConfirmOnFormChanges imple
                 // init questionnaire data
                 this.initQuestionnaireData();
 
+                // // init question actions
+                this.initQuestionActions();
+
                 // finished loading data
                 setTimeout(() => {
                     this.loadingData = false;
                 });
             });
         });
+    }
+
+    /**
+     * Initialize question actions
+     */
+    private initQuestionActions() {
+        // init question actions
+        this.questionActions = [];
+
+        // add question actions that require write permissions
+        if (this.hasWriteAccess()) {
+            // question settings
+            this.questionActions.push(new HoverRowActions({
+                icon: 'settings',
+                click: (questionIndex) => {
+                    this.modifyQuestion(questionIndex);
+                }
+            }));
+
+            // move question above
+            this.questionActions.push(new HoverRowActions({
+                icon: 'arrowAUp',
+                click: (questionIndex) => {
+                    this.moveQuestionAbove(questionIndex);
+                }
+            }));
+
+            // move question bellow
+            this.questionActions.push(new HoverRowActions({
+                icon: 'arrowADown',
+                click: (questionIndex) => {
+                    this.moveQuestionBellow(questionIndex);
+                }
+            }));
+        }
     }
 
     /**

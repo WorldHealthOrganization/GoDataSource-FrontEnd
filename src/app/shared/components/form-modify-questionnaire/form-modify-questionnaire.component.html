@@ -124,7 +124,9 @@
             *ngFor="let question of questionnaireData; let questionIndex = index"
             [class.question-in-edit-mode]="questionIndex === questionIndexInEditMode"
             app-hover-row-actions
-            [hoverRowActionsComponent]="hoverRow">
+            [hoverRowActionsComponent]="hoverRow"
+            [hoverRowActions]="questionActions"
+            [hoverRowActionData]="questionIndex">
 
             <!-- Question Row Data -->
             <div

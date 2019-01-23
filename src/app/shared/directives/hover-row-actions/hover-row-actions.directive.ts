@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
-import { HoverRowActionsComponent } from '../../components';
+import { HoverRowActions, HoverRowActionsComponent } from '../../components';
 
 @Directive({
     selector: '[app-hover-row-actions]',
@@ -12,6 +12,16 @@ export class HoverRowActionsDirective {
     @Input() hoverRowActionsComponent: HoverRowActionsComponent;
 
     /**
+     * Actions
+     */
+    @Input() hoverRowActions: HoverRowActions[] = [];
+
+    /**
+     * Actions Data
+     */
+    @Input() hoverRowActionData: any;
+
+    /**
      * Constructor
      */
     constructor(
@@ -22,22 +32,44 @@ export class HoverRowActionsDirective {
      * Mouse enter row
      */
     @HostListener('mouseenter', ['$event'])
-    mouseEnter() {
+    mouseEnter(event) {
         // display actions
         if (this.hoverRowActionsComponent) {
-            this.hoverRowActionsComponent.show(this.elementRef);
+            this.hoverRowActionsComponent.show(
+                this.elementRef,
+                this.hoverRowActions,
+                this.hoverRowActionData,
+                event
+            );
         }
     }
 
+    /**
+     * Mouse move row
+     */
+    @HostListener('mousemove', ['$event'])
+    mouseMove(event) {
+        // display actions
+        if (this.hoverRowActionsComponent) {
+            this.hoverRowActionsComponent.updateMouseEvent(
+                event
+            );
+        }
+    }
 
     /**
      * Mouse click - for tablets
      */
     @HostListener('click', ['$event'])
-    mouseClick() {
+    mouseClick(event) {
         // display actions
         if (this.hoverRowActionsComponent) {
-            this.hoverRowActionsComponent.show(this.elementRef);
+            this.hoverRowActionsComponent.show(
+                this.elementRef,
+                this.hoverRowActions,
+                this.hoverRowActionData,
+                event
+            );
         }
     }
 

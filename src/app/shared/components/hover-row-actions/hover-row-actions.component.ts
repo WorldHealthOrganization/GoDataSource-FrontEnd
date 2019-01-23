@@ -1,6 +1,38 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 
 /**
+ * Action Type
+ */
+export enum HoverRowActionsType {
+    BUTTON = 'button',
+    MENU = 'menu'
+}
+
+/**
+ * Action
+ */
+export class HoverRowActions {
+    // fields
+    type: HoverRowActionsType = HoverRowActionsType.BUTTON;
+    icon: string;
+    click: (item: any) => void;
+
+    /**
+     * Constructor
+     */
+    constructor(data: {
+        // required
+        icon: string,
+        click: (item: any) => void,
+
+        // optional
+        type?: HoverRowActionsType
+    }) {
+        Object.assign(this, data);
+    }
+}
+
+/**
  * Rect handler since DomRect doesn't exist
  */
 export class HoverRowActionsRect {
@@ -15,7 +47,8 @@ export class HoverRowActionsRect {
  */
 export enum HoverRowActionsPosition {
     LEFT = 'left',
-    RIGHT = 'right'
+    RIGHT = 'right',
+    CLOSEST = 'closest'
 }
 
 /**
@@ -80,7 +113,7 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     /**
      * Actions Position
      */
-    private _position: HoverRowActionsPosition = HoverRowActionsPosition.RIGHT;
+    private _position: HoverRowActionsPosition = HoverRowActionsPosition.CLOSEST;
     @Input() set position(position: HoverRowActionsPosition) {
         // set value
         this._position = position;
@@ -90,6 +123,32 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     }
     get position(): HoverRowActionsPosition {
         return this._position;
+    }
+
+    /**
+     * Real position
+     */
+    get realPosition(): HoverRowActionsPosition {
+        if (
+            this.position === HoverRowActionsPosition.CLOSEST &&
+            this.mouseEvent &&
+            this.elementRef
+        ) {
+            const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
+            const leftDistance = this.mouseEvent.screenX - bounding.left;
+            const rightDistance = bounding.left + bounding.width - this.mouseEvent.screenX;
+            if (leftDistance < rightDistance) {
+                // left
+                return HoverRowActionsPosition.LEFT;
+            }
+
+            // right
+            return HoverRowActionsPosition.RIGHT;
+        } else if (this.position === HoverRowActionsPosition.LEFT) {
+            return HoverRowActionsPosition.LEFT;
+        } else {
+            return HoverRowActionsPosition.RIGHT;
+        }
     }
 
     /**
@@ -123,6 +182,21 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     onWindowResizeArrow;
 
     /**
+     * Actions
+     */
+    actions: HoverRowActions[] = [];
+
+    /**
+     * Action data
+     */
+    actionData: any;
+
+    /**
+     * Mouse event data
+     */
+    mouseEvent: MouseEvent;
+
+    /**
      * Component initialized
      */
     ngOnInit() {
@@ -151,6 +225,11 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Determine row bounding
      */
     determineBounding() {
+        // nothing to do ?
+        if (!this.elementRef) {
+            return;
+        }
+
         // retrieve element bounding
         const bounding: HoverRowActionsRect = this.elementRef.nativeElement.getBoundingClientRect();
 
@@ -162,13 +241,17 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
 
         // determine hover actions bounding
         this.hoverActionsRect.top = bounding.top;
-        this.hoverActionsRect.height = bounding.height;
-        if (this.position === HoverRowActionsPosition.RIGHT) {
-            // right
-            this.hoverActionsRect.left = bounding.left + bounding.width;
-        } else {
+        this.hoverActionsRect.height = bounding.height - 1;
+        switch (this.realPosition) {
             // left
-            this.hoverActionsRect.left = 0;
+            case HoverRowActionsPosition.LEFT:
+                this.hoverActionsRect.left = bounding.left;
+                break;
+
+            // right
+            case HoverRowActionsPosition.RIGHT:
+                this.hoverActionsRect.left = bounding.left + bounding.width;
+                break;
         }
 
         // determine row styles
@@ -196,9 +279,27 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Update Mouse event
+     */
+    updateMouseEvent(mouseEvent: MouseEvent) {
+        this.mouseEvent = mouseEvent;
+        this.determineBounding();
+    }
+
+    /**
      * Show hover row
      */
-    show(elementRef: ElementRef) {
+    show(
+        elementRef: ElementRef,
+        actions: HoverRowActions[],
+        actionData: any = null,
+        mouseEvent: MouseEvent = null
+    ) {
+        // set actions
+        this.actions = actions;
+        this.actionData = actionData;
+        this.mouseEvent = mouseEvent;
+
         // determine row bounding
         this.elementRef = elementRef;
         this.determineBounding();

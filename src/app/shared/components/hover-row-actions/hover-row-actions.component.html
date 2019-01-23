@@ -9,10 +9,20 @@
 <div
     #actionsRow
     class="record-hover-actions"
-    [class.visible]="visible"
-    [class.right]="position === HoverRowActionsPosition.RIGHT"
+    [class.partial-visible]="visible && !visibleActions"
+    [class.full-visible]="visible && visibleActions"
+    [class.right]="realPosition === HoverRowActionsPosition.RIGHT"
     [ngStyle]="hoverActionsStyle"
     (mouseenter)="actionsMouseEnter()"
     (mouseleave)="actionsMouseLeave()">
-    Test 2
+    <ng-container
+        *ngFor="let buttonData of actions">
+        <button
+            mat-icon-button
+            color="accent"
+            type="button"
+            (click)="buttonData.click(actionData)">
+            <span class="xt-icon">{{ buttonData.icon }}</span>
+        </button>
+    </ng-container>
 </div>
