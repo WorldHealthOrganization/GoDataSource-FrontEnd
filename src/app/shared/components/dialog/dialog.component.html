@@ -148,17 +148,4 @@
         </div>
     </form>
 
-    <!-- only display cancel button for data dialogs -->
-    <div *ngIf="confirmData?.data"
-         fxFlex fxLayout="row" fxLayoutAlign="end">
-        <button
-            class="dialog-button"
-            mat-button
-            (click)="cancel(dialogRef)"
-            type="button">
-            {{ confirmData?.cancelLabel | translate }}
-        </button>
-
-    </div>
-
 </div>
