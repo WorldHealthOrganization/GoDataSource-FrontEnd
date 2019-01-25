@@ -167,7 +167,7 @@
                                     name="identifiersFilter"
                                     ngModel
                                     [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                    (optionChanged)="filterByPropertyValue('identifiers.code', $event)"
+                                    (optionChanged)="filterByTextContainingField('identifiers.code', $event)"
                                     app-reset-input-on-side-filter
                                     [displayFilterIcon]="true">
                                 </app-form-input>

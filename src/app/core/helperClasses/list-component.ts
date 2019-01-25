@@ -325,15 +325,6 @@ export abstract class ListComponent {
         this.needsRefreshList();
     }
 
-    filterByPropertyValue(
-        property: string,
-        value: string
-    ) {
-        this.queryBuilder.filter.byProperty(property, value);
-
-        this.needsRefreshList();
-    }
-
     /**
      * Filter the list by a text field
      * @param {string} property
