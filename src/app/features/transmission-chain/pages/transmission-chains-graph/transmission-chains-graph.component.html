@@ -60,9 +60,11 @@
     <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship"
-        class="page-section create-relationship"
+        class="page-section quick-action create-relationship"
         fxFlex
     >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE' | translate}}</h1>
+
         <form #form="ngForm" (submit)="createRelationship(form)">
 
             <div fxLayout="column" fxLayoutGap="10px">
@@ -103,9 +105,11 @@
     <!-- Modify Person -->
     <mat-card
         *ngIf="selectedNodes.canModifyPerson && currentNodeAction === NodeAction.MODIFY_PERSON"
-        class="page-section create-contact"
+        class="page-section quick-action modify-person"
         fxFlex
     >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE' | translate}}</h1>
+
         <form #form="ngForm" (submit)="createContact(form)">
             #TODO Modify Person
         </form>
@@ -114,9 +118,11 @@
     <!-- Create new Contact for Case/Event -->
     <mat-card
         *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
-        class="page-section create-contact"
+        class="page-section quick-action create-contact"
         fxFlex
     >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
+
         <form #form="ngForm" (submit)="createContact(form)">
 
             <div fxLayout="column" fxLayoutGap="10px">

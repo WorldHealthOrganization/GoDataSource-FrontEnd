@@ -23,15 +23,18 @@ export class EntityDataService {
     entityMap = {
         [EntityType.CASE]: {
             dataService: this.caseDataService,
-            getMethod: 'getCase'
+            getMethod: 'getCase',
+            deleteMethod: 'deleteCase',
         },
         [EntityType.CONTACT]: {
             dataService: this.contactDataService,
-            getMethod: 'getContact'
+            getMethod: 'getContact',
+            deleteMethod: 'deleteContact'
         },
         [EntityType.EVENT]: {
             dataService: this.evenDataService,
-            getMethod: 'getEvent'
+            getMethod: 'getEvent',
+            deleteMethod: 'deleteEvent'
         }
     };
 
@@ -104,6 +107,23 @@ export class EntityDataService {
 
         const dataService = this.entityMap[entityType].dataService;
         const method = this.entityMap[entityType].getMethod;
+
+        return dataService[method](outbreakId, entityId);
+    }
+
+    /**
+     * Delete a Person of an Outbreak
+     * @param {EntityType} entityType
+     * @param {string} entityId
+     * @param {string} outbreakId
+     */
+    deleteEntity(
+        entityType: EntityType,
+        outbreakId: string,
+        entityId: string
+    ): Observable<any> {
+        const dataService = this.entityMap[entityType].dataService;
+        const method = this.entityMap[entityType].deleteMethod;
 
         return dataService[method](outbreakId, entityId);
     }

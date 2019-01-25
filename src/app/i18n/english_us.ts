@@ -26,6 +26,10 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON': 'Delete',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON': 'Edit',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_FOR_PERSON': 'Add contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE': 'Person deleted',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE': 'Create new contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE': 'Create relationship',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE': 'Modify person',
 
         // "uiListFiltersPageTitles"
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Cases without date of last contact',
@@ -271,6 +275,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER': 'Since this is a new answer, it will be removed if you cancel. Do you want to continue?',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION': 'There are unsaved changes that will be lost if you continue',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue',
+        'LNG_DIALOG_CONFIRM_DELETE_PERSON': 'Are you sure you want to delete this person: "{{name}}"?',
 
         /**
          * uiFormInputValidationErrors

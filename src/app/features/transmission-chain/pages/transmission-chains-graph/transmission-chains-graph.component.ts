@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -264,7 +264,31 @@ export class TransmissionChainsGraphComponent implements OnInit {
     }
 
     deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
-        // #TODO
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', {name: person.name})
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete person
+                    this.entityDataService
+                        .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+
+                            // refresh graph
+                            this.cotDashletChild.refreshChain();
+
+                            // reset form
+                            this.resetFormModels();
+
+                            // reset selected nodes
+                            this.resetNodes();
+                        });
+                }
+            });
     }
 
     resetFormModels() {
