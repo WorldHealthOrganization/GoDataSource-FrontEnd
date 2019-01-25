@@ -110,8 +110,30 @@
     >
         <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE' | translate}}</h1>
 
-        <form #form="ngForm" (submit)="createContact(form)">
-            #TODO Modify Person
+        <form #form="ngForm" (submit)="modifyPerson(form)">
+            <app-form-case-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.CASE"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-case-quick>
+
+            <app-form-contact-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-contact-quick>
+
+            <app-form-event-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.EVENT"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-event-quick>
+
+            <div fxLayout="row">
+                <button mat-raised-button color="accent" type="submit">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON' | translate}}
+                </button>
+            </div>
         </form>
     </mat-card>
 

@@ -419,4 +419,44 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 this.currentNodeAction = null;
             });
     }
+
+    /**
+     * Create a new Contact for a selected node (Case or Event)
+     * @param form
+     */
+    modifyPerson(form: NgForm) {
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // get person being modified
+        const person: (CaseModel | ContactModel | EventModel) = this.selectedNodes.nodes[0];
+
+        // add the new Contact
+        this.entityDataService
+            .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
 }

@@ -2,30 +2,23 @@ import * as _ from 'lodash';
 import { Component, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { Observable } from 'rxjs/Observable';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../core/models/constants';
-import { ContactModel } from '../../../core/models/contact.model';
+import { EventModel } from '../../../core/models/event.model';
 
 @Component({
-    selector: 'app-form-contact-quick',
+    selector: 'app-form-event-quick',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-contact-quick.component.html',
-    styleUrls: ['./form-contact-quick.component.less'],
+    templateUrl: './form-event-quick.component.html',
+    styleUrls: ['./form-event-quick.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormContactQuickComponent,
+        useExisting: FormEventQuickComponent,
         multi: true
     }]
 })
-export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields {
-    genderList$: Observable<any[]>;
-    riskLevelsList$: Observable<any[]>;
-    occupationsList$: Observable<any[]>;
-    finalFollowUpStatus$: Observable<any[]>;
+export class FormEventQuickComponent extends GroupBase<EventModel> implements OnInit, GroupDirtyFields {
 
     currentDate = Constants.getCurrentDate();
 
@@ -36,8 +29,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
         @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-        private outbreakDataService: OutbreakDataService,
-        private referenceDataDataService: ReferenceDataDataService
+        private outbreakDataService: OutbreakDataService
     ) {
         super(controlContainer, validators, asyncValidators);
     }
@@ -47,13 +39,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
      */
     ngOnInit() {
         // init value
-        this.value = new ContactModel(this.value);
-
-        // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-        this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
+        this.value = new EventModel(this.value);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -64,9 +50,9 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
     }
 
     /**
-     * Contact Model
+     * Event Model
      */
-    get contact(): ContactModel {
+    get event(): EventModel {
         return this.value;
     }
 

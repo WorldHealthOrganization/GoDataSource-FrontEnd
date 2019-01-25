@@ -13,6 +13,12 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
         /**
+         * uiCaseQuickModify
+         */
+        'LNG_CASE_QUICK_MODIFY_LABEL_PERSONAL': 'Personal',
+        'LNG_CASE_QUICK_MODIFY_LABEL_EPIDEMIOLOGY': 'Epidemiology',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_ONSET should replace LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW in the translation file.
@@ -30,6 +36,8 @@ export const EnglishUsLang = {
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE': 'Create new contact',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE': 'Create relationship',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE': 'Modify person',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON': 'Modify person',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE': 'Person modified',
 
         // "uiListFiltersPageTitles"
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Cases without date of last contact',
