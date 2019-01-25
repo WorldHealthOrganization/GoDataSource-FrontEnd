@@ -435,7 +435,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
         // get person being modified
         const person: (CaseModel | ContactModel | EventModel) = this.selectedNodes.nodes[0];
 
-        // add the new Contact
+        // modify person
         this.entityDataService
             .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
             .catch((err) => {

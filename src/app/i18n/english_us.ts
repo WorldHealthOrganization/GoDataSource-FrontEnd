@@ -13,10 +13,10 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
         /**
-         * uiCaseQuickModify
+         * uiFormCaseQuick
          */
-        'LNG_CASE_QUICK_MODIFY_LABEL_PERSONAL': 'Personal',
-        'LNG_CASE_QUICK_MODIFY_LABEL_EPIDEMIOLOGY': 'Epidemiology',
+        'LNG_FORM_CASE_QUICK_LABEL_PERSONAL': 'Personal',
+        'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY': 'Epidemiology',
 
         /**
          * uiChainsOfTransmissionGraph
