@@ -137,7 +137,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
      */
     displayChart() {
         // remove existing element then create the new one
-        const elem = document.getElementById('gantt-svg-root');
+        const elem = document.getElementById('gantt-svg-root-hospitalization');
         if (elem) {
             elem.innerHTML = '';
         }
@@ -148,7 +148,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
             !_.isEmpty(this.ganttData[0].children)
         ) {
             this.ganttChart = new SVGGantt(
-                '#gantt-svg-root',
+                '#gantt-svg-root-hospitalization',
                 this.ganttData,
                 this.options
             );
