@@ -242,6 +242,15 @@
                         </div>
                     </div>
                 </div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-slide-toggle
+                        name="isDateOfOnsetApproximate"
+                        [(ngModel)]="address.geoLocationAccurate"
+                        [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
+                        [disabled]="viewOnly">
+                    </app-form-slide-toggle>
+                </div>
             </div>
         </div>
     </form>
