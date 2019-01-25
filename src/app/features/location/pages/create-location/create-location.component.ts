@@ -13,7 +13,6 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Observable } from 'rxjs/Observable';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { directive } from '@angular/core/src/render3/instructions';
 
 @Component({
     selector: 'app-create-location',

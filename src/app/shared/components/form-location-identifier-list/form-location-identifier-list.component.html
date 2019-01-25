@@ -15,15 +15,14 @@
                     [codePlaceholder]="codePlaceholder"
                     [descriptionPlaceholder]="descriptionPlaceholder"
                     (changed)="onChange(false)"
-                    (groupValidated)="validateGroup()"
-                ></app-form-location-identifier>
+                    (groupValidated)="validateGroup()">
+                </app-form-location-identifier>
             </mat-card>
 
             <button *ngIf="!disabled" type="button" mat-icon-button (click)="delete(i)">
                 <span class="xt-icon">delete</span>
             </button>
         </div>
-
 
         <button *ngIf="!disabled" type="button" mat-button color="primary" (click)="add()">
             {{'LNG_INPUT_LABEL_ADD_INPUT' | translate}}
