@@ -154,6 +154,16 @@ export class RequestFilter {
         return this;
     }
 
+
+    byProperty(property: string, value: string) {
+        console.log(property, value);
+        this.where({
+            [property] : [value]
+        });
+
+        return this;
+    }
+
     /**
      * Filter by comparing a field if it is equal to the provided value
      * @param {string} property
