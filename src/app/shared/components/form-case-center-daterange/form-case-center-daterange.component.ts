@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { GroupBase, GroupFilteredValue } from '../../xt-forms/core';
 import { CaseCenterDateRangeModel } from '../../../core/models/case-center-date-range.model';

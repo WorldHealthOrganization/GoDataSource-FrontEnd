@@ -13,7 +13,6 @@ import { I18nService } from '../helper/i18n.service';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
-import { Moment } from 'moment';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 
 @Injectable()
