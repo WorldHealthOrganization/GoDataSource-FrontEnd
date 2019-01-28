@@ -244,11 +244,12 @@
                 </div>
                 <div fxFlex fxLayout="row" fxLayoutGap="5px">
                     <app-form-slide-toggle
-                        name="geoLocationAccurate"
+                        [name]="name + '[geoLocationAccurate]'"
                         [(ngModel)]="address.geoLocationAccurate"
                         [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
-                        (input)="onChange()">
+                        (input)="onChange()"
+                        (click)="triggerCopyValue('geoLocationAccurate')">
                     </app-form-slide-toggle>
                 </div>
             </div>

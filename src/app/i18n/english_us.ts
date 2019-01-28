@@ -330,7 +330,7 @@ export const EnglishUsLang = {
         /**
          * uiAddressFields
          */
-        'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES': 'Coordinates were entered manually',
+        'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES': 'Coordinates are accurate',
         'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION': '',
 
 
