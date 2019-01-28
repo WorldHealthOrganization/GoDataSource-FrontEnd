@@ -8,24 +8,25 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../core/models/constants';
-import { ContactModel } from '../../../core/models/contact.model';
+import { CaseModel } from '../../../core/models/case.model';
 
 @Component({
-    selector: 'app-form-contact-quick',
+    selector: 'app-form-case-quick',
     encapsulation: ViewEncapsulation.None,
-    templateUrl: './form-contact-quick.component.html',
-    styleUrls: ['./form-contact-quick.component.less'],
+    templateUrl: './form-case-quick.component.html',
+    styleUrls: ['./form-case-quick.component.less'],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: FormContactQuickComponent,
+        useExisting: FormCaseQuickComponent,
         multi: true
     }]
 })
-export class FormContactQuickComponent extends GroupBase<ContactModel> implements OnInit, GroupDirtyFields {
+export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnInit, GroupDirtyFields {
     genderList$: Observable<any[]>;
-    riskLevelsList$: Observable<any[]>;
     occupationsList$: Observable<any[]>;
-    finalFollowUpStatus$: Observable<any[]>;
+    caseClassificationsList$: Observable<any[]>;
+    caseRiskLevelsList$: Observable<any[]>;
+    outcomeList$: Observable<any[]>;
 
     currentDate = Constants.getCurrentDate();
 
@@ -47,13 +48,14 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
      */
     ngOnInit() {
         // init value
-        this.value = new ContactModel(this.value);
+        this.value = new CaseModel(this.value);
 
         // reference data
         this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
         this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION);
-        this.finalFollowUpStatus$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS);
+        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
+        this.caseRiskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
+        this.outcomeList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OUTCOME);
 
         // subscribe to the Selected Outbreak
         this.outbreakDataService
@@ -64,9 +66,9 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
     }
 
     /**
-     * Contact Model
+     * Case Model
      */
-    get contact(): ContactModel {
+    get case(): CaseModel {
         return this.value;
     }
 
