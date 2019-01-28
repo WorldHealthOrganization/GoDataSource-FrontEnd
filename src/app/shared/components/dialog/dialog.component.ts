@@ -159,7 +159,6 @@ export class DialogConfiguration {
     public customInputOptions: LabelValuePair[];
     public customInputOptionsMultiple: boolean = false;
     public required: boolean = false;
-    public data: LabelValuePair[];
     public fieldsList: DialogField[];
     public buttons: DialogButton[];
     public addDefaultButtons: boolean = false;
@@ -174,7 +173,6 @@ export class DialogConfiguration {
         customInputOptions?: LabelValuePair[],
         customInputOptionsMultiple?: boolean,
         required?: boolean,
-        data?: LabelValuePair[],
         fieldsList?: DialogField[],
         buttons?: DialogButton[],
         addDefaultButtons?: boolean,

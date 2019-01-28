@@ -71,6 +71,10 @@ export class RelationshipModel {
         const personInfo = _.find(this.persons, {id: entityId});
         return _.get(personInfo, 'source', false);
     }
+
+    get sourcePerson(): RelationshipPersonModel {
+        return _.find(this.persons, {source: true});
+    }
 }
 
 export class ReportDifferenceOnsetRelationshipModel extends RelationshipModel {

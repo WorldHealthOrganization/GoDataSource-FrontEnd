@@ -1,12 +1,11 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
 import { Observable } from 'rxjs/Observable';
 import { GenericDataService } from '../../../core/services/data/generic.data.service';
-import { ApplyListFilter, Constants } from '../../../core/models/constants';
+import { Constants } from '../../../core/models/constants';
 import * as _ from 'lodash';
-import { GraphNodeModel } from '../../../core/models/graph-node.model';
 
 @Component({
     selector: 'app-cytoscape-graph',

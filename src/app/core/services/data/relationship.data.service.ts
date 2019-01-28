@@ -279,15 +279,10 @@ export class RelationshipDataService {
      * @returns {LabelValuePair[]}
      */
     getLightObjectDisplay(
-        relationship: any
+        relationship: RelationshipModel
     ): LabelValuePair[] {
 
         const lightObject = [];
-        // dialog title: Case Details
-        lightObject.push(new LabelValuePair(
-            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_DIALOG_TITLE',
-            ''
-        ));
 
         // dialog fields
         lightObject.push(new LabelValuePair(
@@ -323,11 +318,6 @@ export class RelationshipDataService {
         lightObject.push(new LabelValuePair(
             'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
             relationship.comment
-        ));
-        // insert link to full resource
-        lightObject.push(new LabelValuePair(
-            Constants.DIALOG.DATA_ITEM_TYPE.LINK,
-            `/relationships/${relationship.sourceType}/${relationship.source}/${relationship.id}/view`
         ));
 
         return lightObject;

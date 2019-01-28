@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { DialogAnswerButton, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -30,6 +30,7 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
+import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -169,7 +170,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
             .catch((err) => {
-                // show error message
                 this.snackbarService.showApiError(err);
                 return ErrorObservable.create(err);
             })
@@ -198,6 +198,30 @@ export class TransmissionChainsGraphComponent implements OnInit {
                         }
                     );
                 }
+            });
+    }
+
+    onEdgeTap(relationship: GraphEdgeModel) {
+        // retrieve relationship info
+        this.relationshipDataService
+            .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((relationshipData) => {
+                // show edge information
+                this.dialogService.showCustomDialog(
+                    ViewCotEdgeDialogComponent,
+                    {
+                        ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                        ...{
+                            data: {
+                                relationship: relationshipData
+                            }
+                        }
+                    }
+                );
             });
     }
 
