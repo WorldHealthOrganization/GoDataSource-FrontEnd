@@ -13,17 +13,31 @@ export const EnglishUsLang = {
         // 'LNG_EXAMPLE_TOKEN': 'Example value',
 
         /**
+         * uiFormCaseQuick
+         */
+        'LNG_FORM_CASE_QUICK_LABEL_PERSONAL': 'Personal',
+        'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY': 'Epidemiology',
+
+        /**
          * uiChainsOfTransmissionGraph
          */
         // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_ONSET should replace LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW in the translation file.
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_ONSET': 'Timeline Network - Date of onset',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_LAST_CONTACT': 'Timeline Network - Date of last contact',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TIMELINE_NETWORK_VIEW_DATE_OF_REPORTING': 'Timeline Network - Date of reporting',
-
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EVENTS_WITHOUT_DATE_OF_REPORTING_TITLE': 'events without date of reporting',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_LAST_CONTACT_TITLE': 'cases without date of last contact',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CASES_WITHOUT_DATE_OF_REPORTING_TITLE': 'cases without date of reporting',
         'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CONTACTS_WITHOUT_DATE_OF_REPORTING_TITLE': 'contacts without date of reporting',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON': 'Delete',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON': 'Edit',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_FOR_PERSON': 'Add contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE': 'Person deleted',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE': 'Create new contact',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE': 'Create relationship',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE': 'Modify person',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON': 'Modify person',
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE': 'Person modified',
 
         // "uiListFiltersPageTitles"
         'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN': 'Cases without date of last contact',
@@ -269,6 +283,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_DELETE_NEW_QUESTION_ANSWER': 'Since this is a new answer, it will be removed if you cancel. Do you want to continue?',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION': 'There are unsaved changes that will be lost if you continue',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue',
+        'LNG_DIALOG_CONFIRM_DELETE_PERSON': 'Are you sure you want to delete this person: "{{name}}"?',
 
         /**
          * uiFormInputValidationErrors

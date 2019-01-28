@@ -1,0 +1,51 @@
+<form #groupForm="ngForm">
+    <div fxLayout="column">
+        <div fxLayout="row" fxLayoutGap="20px">
+            <app-form-input
+                name="name"
+                [(ngModel)]="event.name"
+                [placeholder]="'LNG_EVENT_FIELD_LABEL_NAME' | translate"
+                tooltip="LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION"
+                required="true"
+                (optionChanged)="onChange()"
+                maxlength="100">
+            </app-form-input>
+
+            <app-form-datepicker
+                name="date"
+                [(ngModel)]="event.date"
+                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE' | translate"
+                tooltip="LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION"
+                required="true"
+                (optionChanged)="onChange()"
+                [maxDate]="currentDate"
+                app-date-validator
+                [dateSameOrBefore]="currentDate">
+            </app-form-datepicker>
+        </div>
+
+        <div fxLayout="row" fxLayoutGap="20px">
+            <app-form-datepicker
+                name="dateOfReporting"
+                [(ngModel)]="event.dateOfReporting"
+                [placeholder]="'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+                tooltip="LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+                required="true"
+                (optionChanged)="onChange()"
+                [maxDate]="currentDate"
+                app-date-validator
+                [dateSameOrBefore]="currentDate">
+            </app-form-datepicker>
+
+            <app-form-textarea
+                name="description"
+                [(ngModel)]="event.description"
+                [placeholder]="'LNG_EVENT_FIELD_LABEL_DESCRIPTION' | translate"
+                tooltip="LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION"
+                maxlength="500"
+                (optionChanged)="onChange()"
+                [minRows]="1">
+            </app-form-textarea>
+        </div>
+    </div>
+</form>

@@ -94,7 +94,7 @@ export class ContactModel {
         this.dateBecomeContact = _.get(data, 'dateBecomeContact');
         this.visualId = _.get(data, 'visualId', '');
 
-        this.followUp = _.get(data, 'followUp');
+        this.followUp = _.get(data, 'followUp', {});
 
         this.inconsistencies = _.get(data, 'inconsistencies', []);
         _.each(this.inconsistencies, (inconsistency, index) => {

@@ -18,24 +18,54 @@
         </div>
     </div>
 
-    <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-        <a
-            [href]="personLink"
-            target="_blank"
-            mat-raised-button
-            color="primary"
-        >
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON' | translate}}
-        </a>
+    <div fxLayout="column" fxLayoutGap="10px">
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                mat-raised-button
+                color="accent"
+                (click)="onModifyPerson()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON' | translate}}
+            </a>
 
-        <a
-            [href]="personChainLink"
-            target="_blank"
-            mat-raised-button
-            color="primary"
-        >
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON_CHAIN' | translate}}
-        </a>
+            <a
+                *ngIf="person.type === EntityType.CASE || person.type === EntityType.EVENT"
+                mat-raised-button
+                color="accent"
+                (click)="onCreateContact()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_FOR_PERSON' | translate}}
+            </a>
+
+            <a
+                mat-raised-button
+                color="warn"
+                (click)="onDeletePerson()"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON' | translate}}
+            </a>
+        </div>
+
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
+            <a
+                [href]="personLink"
+                target="_blank"
+                mat-raised-button
+                color="primary"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON' | translate}}
+            </a>
+
+            <a
+                [href]="personChainLink"
+                target="_blank"
+                mat-raised-button
+                color="primary"
+            >
+                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_PERSON_CHAIN' | translate}}
+            </a>
+        </div>
     </div>
+
 
 </div>
