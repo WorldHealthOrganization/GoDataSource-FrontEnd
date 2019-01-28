@@ -265,6 +265,14 @@
                         [id]="uniqueIDQuestionForm"
                         fxFlex fxLayout="column"
                         (submit)="saveModifyQuestion()">
+                        <!-- Dummy field used to make form dirty -->
+                        <input
+                            #inputQuestionForMakingFormDirty="ngModel"
+                            name="inputQuestionForMakingFormDirty"
+                            ngModel
+                            type="hidden"/>
+
+                        <!-- Question Inputs -->
                         <div
                             fxLayout="row"
                             fxLayoutGap="5px">
@@ -360,13 +368,6 @@
                         <div
                             *ngIf="questionInEditModeClone.answerType === answerTypes.MULTIPLE_OPTIONS.value || questionInEditModeClone.answerType === answerTypes.SINGLE_SELECTION.value"
                             fxFlex fxLayout="column">
-                            <!-- Dummy field used to make form dirty -->
-                            <input
-                                #inputQuestionForMakingFormDirty="ngModel"
-                                name="inputQuestionForMakingFormDirty"
-                                ngModel
-                                type="hidden"/>
-
                             <!-- Answers list general actions -->
                             <div
                                 *ngIf="hasWriteAccess()"
