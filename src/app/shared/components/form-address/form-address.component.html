@@ -248,8 +248,21 @@
                         [(ngModel)]="address.geoLocationAccurate"
                         [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
-                        (input)="onChange()"
-                        (click)="triggerCopyValue('geoLocationAccurate')">
+                        (input)="onChange()">
+                        <div
+                            *ngIf="displayCopyField"
+                            fxFlex="40px"
+                            fxLayout="column"
+                            fxLayoutAlign="center">
+                            <button
+                                class="copy-field-button"
+                                type="button"
+                                mat-icon-button
+                                [title]="displayCopyFieldDescription"
+                                (click)="triggerCopyValue('geoLocationAccurate')">
+                                <span class="xt-icon">fileCopy</span>
+                            </button>
+                        </div>
                     </app-form-slide-toggle>
                 </div>
             </div>
