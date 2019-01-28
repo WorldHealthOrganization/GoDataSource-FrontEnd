@@ -47,16 +47,24 @@
         fxFlex="400px"
         fxLayout="column">
         <mat-card class="page-section">
-            <app-person-summary [person]="person" (remove)="removeSelectedNode(index)"></app-person-summary>
+            <app-person-summary
+                [person]="person"
+                (remove)="removeSelectedNode(index)"
+                (modifyPerson)="modifySelectedPerson($event)"
+                (deletePerson)="deleteSelectedPerson($event)"
+                (createContact)="createContactForSelectedPerson($event)"
+            ></app-person-summary>
         </mat-card>
     </div>
 
     <!-- Create relationship between 2 nodes -->
     <mat-card
         *ngIf="selectedNodes.canCreateRelationship"
-        class="page-section create-relationship"
+        class="page-section quick-action create-relationship"
         fxFlex
     >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_TITLE' | translate}}</h1>
+
         <form #form="ngForm" (submit)="createRelationship(form)">
 
             <div fxLayout="column" fxLayoutGap="10px">
@@ -94,12 +102,49 @@
         </form>
     </mat-card>
 
-    <!-- Create new Contact for Case/Event -->
+    <!-- Modify Person -->
     <mat-card
-        *ngIf="selectedNodes.canCreateContact"
-        class="page-section create-contact"
+        *ngIf="selectedNodes.canModifyPerson && currentNodeAction === NodeAction.MODIFY_PERSON"
+        class="page-section quick-action modify-person"
         fxFlex
     >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_TITLE' | translate}}</h1>
+
+        <form #form="ngForm" (submit)="modifyPerson(form)">
+            <app-form-case-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.CASE"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-case-quick>
+
+            <app-form-contact-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-contact-quick>
+
+            <app-form-event-quick
+                *ngIf="selectedNodes.nodes[0].type === EntityType.EVENT"
+                name="person"
+                [ngModel]="selectedNodes.nodes[0]"
+            ></app-form-event-quick>
+
+            <div fxLayout="row">
+                <button mat-raised-button color="accent" type="submit">
+                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_BUTTON' | translate}}
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
+    <!-- Create new Contact for Case/Event -->
+    <mat-card
+        *ngIf="selectedNodes.canCreateContact && currentNodeAction === NodeAction.CREATE_CONTACT"
+        class="page-section quick-action create-contact"
+        fxFlex
+    >
+        <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
+
         <form #form="ngForm" (submit)="createContact(form)">
 
             <div fxLayout="column" fxLayoutGap="10px">
