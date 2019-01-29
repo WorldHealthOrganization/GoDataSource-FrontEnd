@@ -339,8 +339,14 @@ export const EnglishUsLang = {
         /**
          * uiEntityFields
          */
-        'LNG_ENTITY_FIELD_LABEL_VISUAL_ID': 'Case / Contact ID'
+        'LNG_ENTITY_FIELD_LABEL_VISUAL_ID': 'Case / Contact ID',
 
+        /**
+         * uiCaseFields
+         */
+
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL': 'Date of burial',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION': '',
 
         // some tokens might need to be removed
         // - create & modify outbreak & outbreak template => case investigation, contact follow-up, lab results tab tokens etc..since these won't be used anymore

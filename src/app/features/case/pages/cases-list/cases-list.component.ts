@@ -401,17 +401,6 @@ export class CasesListComponent extends ListComponent implements OnInit, OnDestr
                 type: FilterType.RANGE_DATE
             }),
             new FilterModel({
-                fieldName: 'deceased',
-                fieldLabel: 'LNG_CASE_FIELD_LABEL_DECEASED',
-                type: FilterType.SELECT,
-                options$: yesNoOptionsWithoutAllList$
-            }),
-            new FilterModel({
-                fieldName: 'dateDeceased',
-                fieldLabel: 'LNG_CASE_FIELD_LABEL_DATE_DECEASED',
-                type: FilterType.RANGE_DATE
-            }),
-            new FilterModel({
                 fieldName: 'safeBurial',
                 fieldLabel: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
                 type: FilterType.SELECT,

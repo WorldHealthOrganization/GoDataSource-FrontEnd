@@ -252,6 +252,15 @@ export class Constants {
         HIGH: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL_3_HIGH'
     };
 
+    /**
+     * Use to match outcome status in the logic
+     */
+    static OUTCOME_STATUS = {
+        DECEASED : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED',
+        ALIVE : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_ALIVE',
+        RECOVERED : 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_RECOVERED'
+    };
+
     //  transmission chain view types
     static TRANSMISSION_CHAIN_VIEW_TYPES = {
         BUBBLE_NETWORK: {
