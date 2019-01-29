@@ -242,6 +242,29 @@
                         </div>
                     </div>
                 </div>
+                <div fxFlex fxLayout="row" fxLayoutGap="5px">
+                    <app-form-slide-toggle
+                        [name]="name + '[geoLocationAccurate]'"
+                        [(ngModel)]="address.geoLocationAccurate"
+                        [label]="'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES' | translate"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION"
+                        (input)="onChange()">
+                    </app-form-slide-toggle>
+                    <div
+                        *ngIf="displayCopyField"
+                        fxFlex="40px"
+                        fxLayout="column"
+                        fxLayoutAlign="center">
+                        <button
+                            class="copy-field-button"
+                            type="button"
+                            mat-icon-button
+                            [title]="displayCopyFieldDescription"
+                            (click)="triggerCopyValue('geoLocationAccurate')">
+                            <span class="xt-icon">fileCopy</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
