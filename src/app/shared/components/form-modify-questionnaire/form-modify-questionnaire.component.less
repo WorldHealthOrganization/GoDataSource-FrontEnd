@@ -1,0 +1,94 @@
+app-form-modify-questionnaire {
+    .modify-questionnaire-loading-data {
+        text-align: center;
+
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 32px !important;
+            height: 32px !important;
+
+            svg {
+                width: 32px !important;
+                height: 32px !important;
+            }
+        }
+    }
+
+    @edit-form-distance: 10px;
+    .modify-questionnaire-table {
+        .modify-questionnaire-table-question-actions-top,
+        .modify-questionnaire-table-answer-actions-top {
+            margin-bottom: 10px;
+        }
+        .modify-questionnaire-table-question-actions-bottom,
+        .modify-questionnaire-table-answer-actions-bottom {
+            margin-top: 10px;
+        }
+
+        .modify-questionnaire-more-left {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .modify-questionnaire-more-right {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            min-width: 0;
+            padding: 5px;
+            line-height: normal;
+            margin-left: 1px;
+        }
+
+        .question-in-edit-mode,
+        .answer-in-edit-mode {
+            border: 2px solid #000;
+            margin-top: 10px;
+        }
+
+        .question-in-edit-row,
+        .answer-in-edit-row {
+            background-color: #4db0a0;
+        }
+
+        .modify-questionnaire-cell-default {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 10px 10px 0 10px;
+        }
+
+        .modify-questionnaire-cell-style {
+            border-bottom: 1px solid #CCC;
+        }
+
+        .modify-questionnaire-cell-header {
+            padding-bottom: 5px;
+            font-weight: bold;
+            background-color: #DDD;
+        }
+
+        .modify-questionnaire-edit-question {
+            margin-top: 5px;
+            margin-bottom: @edit-form-distance;
+        }
+
+        @edit-card-sides-distance: 25px;
+        .modify-questionnaire-edit-question-card-buttons,
+        .modify-questionnaire-edit-question-answer-card-buttons {
+            margin: 0 @edit-card-sides-distance;
+        }
+
+        .modify-questionnaire-edit-question-card,
+        .modify-questionnaire-edit-question-answer-card {
+            padding: 15px !important;
+            margin: 0 @edit-card-sides-distance !important;
+        }
+
+        .modify-questionnaire-edit-answer {
+            margin: 5px 5px @edit-form-distance 5px;
+        }
+    }
+}

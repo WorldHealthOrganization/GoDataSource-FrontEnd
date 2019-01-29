@@ -9,7 +9,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, ViewCotNodeDialogComponent } from '../../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -30,6 +30,12 @@ import { PERMISSION } from '../../../../core/models/permission.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as FileSaver from 'file-saver';
 import { DomService } from '../../../../core/services/helper/dom.service';
+import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
+
+enum NodeAction {
+    MODIFY_PERSON = 'modify-person',
+    CREATE_CONTACT = 'create-contact'
+}
 
 @Component({
     selector: 'app-transmission-chains-graph',
@@ -58,6 +64,8 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     // nodes selected from graph
     selectedNodes: SelectedNodes = new SelectedNodes();
+    // action to do on the selected node
+    currentNodeAction: NodeAction = null;
 
     // Edit or View mode?
     editMode: boolean = false;
@@ -69,6 +77,7 @@ export class TransmissionChainsGraphComponent implements OnInit {
     // provide constants to template
     Constants = Constants;
     EntityType = EntityType;
+    NodeAction = NodeAction;
 
     constructor(
         private authDataService: AuthDataService,
@@ -169,7 +178,6 @@ export class TransmissionChainsGraphComponent implements OnInit {
         this.entityDataService
             .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
             .catch((err) => {
-                // show error message
                 this.snackbarService.showApiError(err);
                 return ErrorObservable.create(err);
             })
@@ -201,8 +209,32 @@ export class TransmissionChainsGraphComponent implements OnInit {
             });
     }
 
+    onEdgeTap(relationship: GraphEdgeModel) {
+        // retrieve relationship info
+        this.relationshipDataService
+            .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe((relationshipData) => {
+                // show edge information
+                this.dialogService.showCustomDialog(
+                    ViewCotEdgeDialogComponent,
+                    {
+                        ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+                        ...{
+                            data: {
+                                relationship: relationshipData
+                            }
+                        }
+                    }
+                );
+            });
+    }
+
     removeSelectedNode(index) {
-        this.selectedNodes.removeNode(index);
+        this.selectedNodes.removeNodeAtIndex(index);
     }
 
     swapSelectedNodes() {
@@ -211,6 +243,60 @@ export class TransmissionChainsGraphComponent implements OnInit {
 
     resetNodes() {
         this.selectedNodes = new SelectedNodes();
+    }
+
+    modifySelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        // remove other selected node(s) (if any)
+        this.selectedNodes.keepNode(person);
+
+        this.resetFormModels();
+
+        this.currentNodeAction = NodeAction.MODIFY_PERSON;
+    }
+
+    createContactForSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        // remove other selected node(s) (if any)
+        this.selectedNodes.keepNode(person);
+
+        this.resetFormModels();
+
+        this.currentNodeAction = NodeAction.CREATE_CONTACT;
+    }
+
+    deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', {name: person.name})
+            .subscribe((answer: DialogAnswer) => {
+                if (answer.button === DialogAnswerButton.Yes) {
+                    // delete person
+                    this.entityDataService
+                        .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
+                        .catch((err) => {
+                            this.snackbarService.showError(err.message);
+
+                            return ErrorObservable.create(err);
+                        })
+                        .subscribe(() => {
+                            this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+
+                            // refresh graph
+                            this.cotDashletChild.refreshChain();
+
+                            // reset form
+                            this.resetFormModels();
+
+                            // reset selected nodes
+                            this.resetNodes();
+                        });
+                }
+            });
+    }
+
+    resetFormModels() {
+        // reset Contact model
+        this.newContact = new ContactModel();
+
+        // reset Relationship model
+        this.newRelationship = new RelationshipModel();
     }
 
     /**
@@ -253,11 +339,14 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // refresh graph
                 this.cotDashletChild.refreshChain();
 
-                // reset Relationship model
-                this.newRelationship = new RelationshipModel();
+                // reset form
+                this.resetFormModels();
 
                 // reset selected nodes
                 this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
             });
     }
 
@@ -320,13 +409,54 @@ export class TransmissionChainsGraphComponent implements OnInit {
                 // refresh graph
                 this.cotDashletChild.refreshChain();
 
-                // reset Relationship model
-                this.newRelationship = new RelationshipModel();
-                // reset Contact model
-                this.newContact = new ContactModel();
+                // reset form
+                this.resetFormModels();
 
                 // reset selected nodes
                 this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
+            });
+    }
+
+    /**
+     * Create a new Contact for a selected node (Case or Event)
+     * @param form
+     */
+    modifyPerson(form: NgForm) {
+        if (!this.formHelper.validateForm(form)) {
+            return;
+        }
+
+        // get forms fields
+        const dirtyFields: any = this.formHelper.getDirtyFields(form);
+
+        // get person being modified
+        const person: (CaseModel | ContactModel | EventModel) = this.selectedNodes.nodes[0];
+
+        // modify person
+        this.entityDataService
+            .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
+            .catch((err) => {
+                this.snackbarService.showApiError(err);
+
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
+
+                // refresh graph
+                this.cotDashletChild.refreshChain();
+
+                // reset form
+                this.resetFormModels();
+
+                // reset selected nodes
+                this.resetNodes();
+
+                // reset node action
+                this.currentNodeAction = null;
             });
     }
 }

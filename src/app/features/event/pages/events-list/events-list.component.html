@@ -178,19 +178,19 @@
 
                     <ng-container *ngIf="!item.deleted">
                         <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                            {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                            {{ 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT' | translate }}
                         </button>
 
                         <ng-container *app-selected-outbreak-is-active>
                             <ng-container *ngIf="hasEventWriteAccess()">
                                 <button mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                                    {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                                    {{'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT' | translate}}
                                 </button>
 
                                 <button
                                     mat-menu-item class="mat-menu-item-delete"
                                     (click)="deleteEvent(item)">
-                                    {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                                    {{'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT' | translate}}
                                 </button>
                             </ng-container>
                         </ng-container>
@@ -230,7 +230,7 @@
                             *ngIf="item.deleted && hasEventWriteAccess()"
                             mat-menu-item class="mat-menu-item-restore"
                             (click)="restoreEvent(item)">
-                            {{'LNG_PAGE_ACTION_RESTORE' | translate}}
+                            {{'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT' | translate}}
                         </button>
                     </ng-container>
                 </mat-menu>

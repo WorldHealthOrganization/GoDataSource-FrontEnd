@@ -121,8 +121,28 @@
                         <mat-divider></mat-divider>
                     </ng-container>
 
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreak-templates', item.id, 'case-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreak-templates', item.id, 'contact-follow-up-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        [routerLink]="['/outbreak-templates', item.id, 'case-lab-results-questionnaire']">
+                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
+                    </button>
+
+                    <mat-divider></mat-divider>
+
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{ 'LNG_PAGE_ACTION_VIEW' | translate }}
+                        {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE' | translate }}
                     </button>
 
                     <ng-container
@@ -130,14 +150,14 @@
                         <button
                             mat-menu-item
                             [routerLink]="['.', item.id, 'modify']">
-                            {{'LNG_PAGE_ACTION_MODIFY'| translate}}
+                            {{'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE'| translate}}
                         </button>
 
                         <button
                             mat-menu-item
                             class="mat-menu-item-delete"
                             (click)="deleteOutbreakTemplate(item)">
-                            {{ 'LNG_PAGE_ACTION_DELETE' | translate }}
+                            {{ 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE' | translate }}
                         </button>
                     </ng-container>
                 </mat-menu>

@@ -1,0 +1,21 @@
+<div fxLayout="column" fxLayoutGap="10px">
+    <!-- Specific model fields -->
+    <div *ngFor="let info of relationshipInfo" class="label-value">
+        <span>{{info.label | translate}}</span>
+        <span>{{info.value | translate}}</span>
+    </div>
+
+    <!-- Link to resource -->
+    <a *ngIf="getResourceViewPageLink()" [href]="getResourceViewPageLink()" target="_blank">
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE' | translate}}
+    </a>
+
+    <div fxLayout="row" fxLayoutAlign="end">
+        <button
+            mat-button
+            (click)="closeDialog()"
+            type="button">
+            {{ 'LNG_COMMON_BUTTON_CANCEL' | translate | uppercase }}
+        </button>
+    </div>
+</div>

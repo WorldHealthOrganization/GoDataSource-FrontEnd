@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { QuestionModel } from './question.model';
-import * as moment from 'moment';
 import { LocationModel } from './location.model';
 import { MapServerModel } from './map-server.model';
 
@@ -26,6 +25,7 @@ export class OutbreakModel {
     // TODO - need to allow to set case classifications on outbreak
     // caseClassification: any | null;
     caseIdMask: string;
+    contactIdMask: string;
     countries: {
         id: string
     }[];
@@ -57,6 +57,7 @@ export class OutbreakModel {
         // TODO read from reference data
         // this.caseClassification = [{"test": "test"}];
         this.caseIdMask = _.get(data, 'caseIdMask');
+        this.contactIdMask = _.get(data, 'contactIdMask');
         this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
 
         this.caseInvestigationTemplate = _.map(
@@ -81,21 +82,5 @@ export class OutbreakModel {
             (lData: any) => {
                 return new MapServerModel(lData);
             });
-    }
-
-    /**
-     * Return case id mask with data replaced
-     * @param caseIdMask
-     */
-    static generateCaseIDMask(caseIdMask: string): string {
-        // validate
-        if (_.isEmpty(caseIdMask)) {
-            return '';
-        }
-
-        // !!!!!!!!!!!!!!!
-        // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-        // !!!!!!!!!!!!!!!
-        return caseIdMask.replace(/YYYY/g, moment().format('YYYY'));
     }
 }

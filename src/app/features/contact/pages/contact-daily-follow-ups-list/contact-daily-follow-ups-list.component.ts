@@ -37,6 +37,7 @@ import { NgModel } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
 import { TeamModel } from '../../../../core/models/team.model';
 import { tap } from 'rxjs/operators';
+import { CountedItemsListItem } from '../../../../shared/components/counted-items-list/counted-items-list.component';
 
 @Component({
     selector: 'app-daily-follow-ups-list',
@@ -60,6 +61,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     // follow ups list
     followUpsList$: Observable<FollowUpModel[]>;
     followUpsListCount$: Observable<any>;
+
+    // Daily follow ups grouped by teams
+    countedFollowUpsGroupedByTeams$: Observable<any>;
 
     // yes / no / all options
     yesNoOptionsList$: Observable<any[]>;
@@ -351,6 +355,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'contact.visualId',
+                label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'contact.dateOfLastContact',
                 label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT'
             }),
@@ -379,6 +387,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
             new VisibleColumnModel({
                 field: 'statusId',
                 label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID'
+            }),
+            new VisibleColumnModel({
+                field: 'targeted',
+                label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED'
             }),
             new VisibleColumnModel({
                 field: 'deleted',
@@ -507,6 +519,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                         fieldName: 'dob',
                         fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
                         type: FilterType.RANGE_DATE,
+                        relationshipPath: ['contact'],
+                        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+                    }),
+                    new FilterModel({
+                        fieldName: 'visualId',
+                        fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                        type: FilterType.TEXT,
                         relationshipPath: ['contact'],
                         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
                     }),
@@ -737,6 +756,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
      */
     refreshList() {
         if (this.selectedOutbreak) {
+            // refresh badges
+            this.getFollowUpsGroupedByTeams();
+
             // add case id
             if (this.caseId) {
                 this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
@@ -1033,6 +1055,23 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
     }
 
     /**
+     * Change FollowUp "targeted" status
+     * @param {FollowUpModel} followUp
+     * @param {boolean} targeted
+     */
+    setTargetedItem(followUp: FollowUpModel, targeted: boolean) {
+        this.followUpsDataService
+            .modifyFollowUp(this.selectedOutbreak.id, followUp.personId, followUp.id, { targeted: targeted})
+            .catch((err) => {
+                this.snackbarService.showError(err.message);
+                return ErrorObservable.create(err);
+            })
+            .subscribe(() => {
+                this.snackbarService.showSuccess('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_CHANGE_TARGETED_STATUS_SUCCESS_MESSAGE');
+            });
+    }
+
+    /**
      * Filter by team
      */
     filterByTeam(data: LabelValuePair) {
@@ -1101,5 +1140,24 @@ export class ContactDailyFollowUpsListComponent extends ListComponent implements
                     })
                 ];
             });
+    }
+
+    /**
+     * Get followUps grouped by teams
+     */
+    getFollowUpsGroupedByTeams() {
+        if (this.selectedOutbreak) {
+            this.countedFollowUpsGroupedByTeams$ = this.followUpsDataService
+                .getCountedFollowUpsGroupedByTeams(this.selectedOutbreak.id, this.queryBuilder)
+                    .map((data) => {
+                    return _.map(data.team, (teamData) => {
+                        return new CountedItemsListItem(
+                            teamData.count ? teamData.count : 0,
+                            teamData.team ? teamData.team.name : '',
+                            teamData.team ? teamData.team.id : []
+                        );
+                    });
+                });
+        }
     }
 }

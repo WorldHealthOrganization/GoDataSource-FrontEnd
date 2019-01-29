@@ -247,6 +247,10 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME'
             }),
             new VisibleColumnModel({
+                field: 'visualId',
+                label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID'
+            }),
+            new VisibleColumnModel({
                 field: 'age',
                 label: 'LNG_CONTACT_FIELD_LABEL_AGE'
             }),
@@ -335,6 +339,11 @@ export class ContactsListComponent extends ListComponent implements OnInit {
                 fieldLabel: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
                 type: FilterType.RANGE_DATE,
                 sortable: true
+            }),
+            new FilterModel({
+                fieldName: 'visualId',
+                fieldLabel: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+                type: FilterType.TEXT
             }),
             new FilterModel({
                 fieldName: 'addresses',

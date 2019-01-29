@@ -100,26 +100,6 @@ export class DialogService {
     }
 
     /**
-     * Show a dialog containing data - array of objects with label and value
-     * @param {any[]} data
-     * @returns {Observable<DialogAnswer>}
-     */
-    showDataDialog(data: LabelValuePair[]): Observable<DialogAnswer> {
-        // construct dialog message data
-        const dialogConfig = new DialogConfiguration({
-            message: '',
-            data: data
-        });
-        const dialogComp = DialogComponent.defaultConfigWithData(dialogConfig);
-
-        // open dialog
-        return this.dialog.open(
-            DialogComponent,
-            dialogComp
-        ).afterClosed();
-    }
-
-    /**
      * Show export data dialog
      */
     showExportDialog(data: {

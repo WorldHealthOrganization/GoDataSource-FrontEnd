@@ -229,16 +229,16 @@
                 <mat-menu #actionsMenu="matMenu" class="table-max-sized-menu">
 
                     <button mat-menu-item [routerLink]="['.', item.id, 'view']">
-                        {{'LNG_PAGE_ACTION_VIEW' | translate}}
+                        {{'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER' | translate}}
                     </button>
 
                     <button *ngIf="hasUserWriteAccess()" mat-menu-item [routerLink]="['.', item.id, 'modify']">
-                        {{'LNG_PAGE_ACTION_MODIFY' | translate}}
+                        {{'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER' | translate}}
                     </button>
 
                     <span [matTooltip]="(item.id === authUser.id ? 'You cannot delete your own account' : '')">
                         <button *ngIf="hasUserWriteAccess()" mat-menu-item [disabled]="item.id === authUser.id" (click)="deleteUser(item)">
-                            {{'LNG_PAGE_ACTION_DELETE' | translate}}
+                            {{'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER' | translate}}
                         </button>
                     </span>
 

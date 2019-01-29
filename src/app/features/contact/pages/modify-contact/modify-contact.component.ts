@@ -55,6 +55,12 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
 
     serverToday: Moment = null;
 
+    visualIDTranslateData: {
+        mask: string
+    };
+
+    contactIdMaskValidator: Observable<boolean>;
+
     constructor(
         private referenceDataDataService: ReferenceDataDataService,
         protected route: ActivatedRoute,
@@ -103,6 +109,24 @@ export class ModifyContactComponent extends ViewModifyComponent implements OnIni
                             .getContact(selectedOutbreak.id, this.contactId)
                             .subscribe(contactDataReturned => {
                                 this.contactData = new ContactModel(contactDataReturned);
+
+                                // set visual ID translate data
+                                this.visualIDTranslateData = {
+                                    mask: ContactModel.generateContactIDMask(selectedOutbreak.contactIdMask)
+                                };
+
+                                // set visual ID validator
+                                this.contactIdMaskValidator = Observable.create((observer) => {
+                                    this.contactDataService.checkContactVisualIDValidity(
+                                        selectedOutbreak.id,
+                                        this.contactData.visualId,
+                                        this.contactData.id
+                                    ).subscribe((isValid: boolean) => {
+                                        observer.next(isValid);
+                                        observer.complete();
+                                    });
+                                });
+
                                 this.createBreadcrumbs();
                             });
                     });
