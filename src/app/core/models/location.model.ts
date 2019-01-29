@@ -30,9 +30,9 @@ export class LocationModel {
         return this.synonyms.join(' / ');
     }
 
-    get identifierCode(): string {
+    get identifiersAsString(): string {
         return _.map(this.identifiers, (identifier) => {
             return identifier.code;
-        });
+        }).join(' / ');
     }
 }

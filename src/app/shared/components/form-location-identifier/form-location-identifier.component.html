@@ -2,16 +2,16 @@
     <app-form-input
         [name]="name + '[code]'"
         [(ngModel)]="identifierModel.code"
-        [placeholder]="codePlaceholder | translate"
+        [placeholder]="'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE' | translate"
         [disabled]="disabled"
-        required="true"
+        [required]="required"
         (optionChanged)="onChange()">
     </app-form-input>
 
     <app-form-input
         [name]="name + '[description]'"
         [(ngModel)]="identifierModel.description"
-        [placeholder]="descriptionPlaceholder | translate"
+        [placeholder]="'LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION' | translate"
         [disabled]="disabled"
         required="false"
         (optionChanged)="onChange()">

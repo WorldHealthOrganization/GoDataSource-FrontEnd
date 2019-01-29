@@ -17,10 +17,6 @@ export class FormLocationIdentifierListComponent extends ListBase<LocationIdenti
     @Input() disabled: boolean = false;
     @Input() required: boolean = false;
 
-    @Input() codePlaceholder: string;
-    @Input() descriptionPlaceholder: string;
-
-
     constructor(
         @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
         @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,

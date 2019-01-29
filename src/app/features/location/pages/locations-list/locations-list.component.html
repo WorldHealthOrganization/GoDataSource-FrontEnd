@@ -161,7 +161,7 @@
                 <ng-container matColumnDef="identifiers">
                     <mat-header-cell *matHeaderCellDef>
                         <div class="table-header-cell">
-                            <div class="column-header">{{ "LNG_LOCATION_FIELD_LABEL_IDENTIFIERS" | translate}}</div>
+                            <div class="column-header">{{ 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS' | translate}}</div>
                             <div class="column-filter">
                                 <app-form-input
                                     name="identifiersFilter"
@@ -176,7 +176,7 @@
                     </mat-header-cell>
 
                     <mat-cell *matCellDef="let item">
-                        {{ item.identifierCode }}
+                        {{ item.identifiersAsString }}
                     </mat-cell>
                 </ng-container>
 
