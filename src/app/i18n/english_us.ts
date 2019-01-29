@@ -284,6 +284,7 @@ export const EnglishUsLang = {
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION': 'There are unsaved changes that will be lost if you continue',
         'LNG_DIALOG_CONFIRM_LOOSE_CHANGES_QUESTION_ANSWER': 'There are unsaved changes that will be lost if you continue',
         'LNG_DIALOG_CONFIRM_DELETE_PERSON': 'Are you sure you want to delete this person: "{{name}}"?',
+        'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION': `Do you want to replace current latitude and longitude with location's values? If you enter the coordinates manually you should turn the slider on.`,
 
         /**
          * uiFormInputValidationErrors
@@ -340,6 +341,12 @@ export const EnglishUsLang = {
          * uiEntityFields
          */
         'LNG_ENTITY_FIELD_LABEL_VISUAL_ID': 'Case / Contact ID',
+
+        /**
+         * uiAddressFields
+         */
+        'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES': 'Coordinates are accurate',
+        'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES_DESCRIPTION': '',
 
         /**
          * uiLocationFields
