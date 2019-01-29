@@ -463,8 +463,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                     arrow.setStyle(new Style({
                         text: new Text({
                             text: '>',
-                            offsetX: -5,
-                            font: 'bold 30px Roboto',
+                            offsetX: 0,
+                            offsetY: 2,
+                            font: 'bold 30px Arial',
                             fill: new Fill({
                                 color: path.color
                             }),

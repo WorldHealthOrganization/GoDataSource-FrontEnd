@@ -155,8 +155,34 @@ export class TransmissionChainDataService {
      * @param selectedViewType
      * @returns {any}
      */
-    convertChainToGraphElements(chains, filters: any, colorCriteria: any, locationsList: LocationModel[], selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value): any {
-        const graphData: any = {nodes: [], edges: [], edgesHierarchical: [], caseNodesWithoutDates: [], contactNodesWithoutDates: [], eventNodesWithoutDates: [], timelineDateCheckpoints: []};
+    convertChainToGraphElements(
+        chains,
+        filters: any,
+        colorCriteria: any,
+        locationsList: LocationModel[],
+        selectedViewType: string = Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value
+    ): {
+        nodes: {
+            data: GraphNodeModel
+        }[],
+        edges: {
+            data: GraphEdgeModel
+        }[],
+        edgesHierarchical: any[],
+        caseNodesWithoutDates: any[],
+        contactNodesWithoutDates: any[],
+        eventNodesWithoutDates: any[],
+        timelineDateCheckpoints: any[]
+    } {
+        const graphData: any = {
+            nodes: [],
+            edges: [],
+            edgesHierarchical: [],
+            caseNodesWithoutDates: [],
+            contactNodesWithoutDates: [],
+            eventNodesWithoutDates: [],
+            timelineDateCheckpoints: []
+        };
         const selectedNodeIds: string[] = [];
         // get labels for years / months - age field
         const yearsLabel = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
@@ -240,19 +266,28 @@ export class TransmissionChainDataService {
                         const nodeData = new GraphNodeModel(nodeProps);
                         nodeData.type = node.type;
                         // set node color
-                        if (Object.keys(colorCriteria.nodeColor).length) {
+                        if (
+                            !_.isEmpty(colorCriteria.nodeColor) &&
+                            Object.keys(colorCriteria.nodeColor).length
+                        ) {
                             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
                                 nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
                             }
                         }
                         // set node label color
-                        if (Object.keys(colorCriteria.nodeNameColor).length) {
+                        if (
+                            !_.isEmpty(colorCriteria.nodeNameColor) &&
+                            Object.keys(colorCriteria.nodeNameColor).length
+                        ) {
                             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
                                 nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
                             }
                         }
                         // set node icon
-                        if (Object.keys(colorCriteria.nodeIcon).length) {
+                        if (
+                            !_.isEmpty(colorCriteria.nodeIcon) &&
+                            Object.keys(colorCriteria.nodeIcon).length
+                        ) {
                             if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
                                 nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
                             }
@@ -413,7 +448,10 @@ export class TransmissionChainDataService {
                             graphEdge.targetType = relationship.persons[0].type;
                         }
                         // set colors
-                        if (Object.keys(colorCriteria.edgeColor).length) {
+                        if (
+                            !_.isEmpty(colorCriteria.edgeColor) &&
+                            Object.keys(colorCriteria.edgeColor).length
+                        ) {
                             if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
                                 graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
                             }
