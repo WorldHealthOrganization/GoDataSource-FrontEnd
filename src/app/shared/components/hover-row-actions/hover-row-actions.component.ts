@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import * as _ from 'lodash';
 
 /**
  * Action Type
@@ -136,6 +137,8 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Real position
      */
     get realPosition(): HoverRowActionsPosition {
+        // determine real position
+        let position: HoverRowActionsPosition;
         if (
             this.position === HoverRowActionsPosition.CLOSEST &&
             this.mouseEvent &&
@@ -146,16 +149,26 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
             const rightDistance = bounding.left + bounding.width - this.mouseEvent.screenX;
             if (leftDistance < rightDistance) {
                 // left
-                return HoverRowActionsPosition.LEFT;
+                position = HoverRowActionsPosition.LEFT;
+            } else {
+                // right
+                position = HoverRowActionsPosition.RIGHT;
             }
-
-            // right
-            return HoverRowActionsPosition.RIGHT;
         } else if (this.position === HoverRowActionsPosition.LEFT) {
-            return HoverRowActionsPosition.LEFT;
+            position = HoverRowActionsPosition.LEFT;
         } else {
-            return HoverRowActionsPosition.RIGHT;
+            position = HoverRowActionsPosition.RIGHT;
         }
+
+        // set rendered actions
+        if (position === HoverRowActionsPosition.RIGHT) {
+            this.realActions = this.actions;
+        } else {
+            this.realActions = this.actionsReversed;
+        }
+
+        // return real position
+        return position;
     }
 
     /**
@@ -192,6 +205,16 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
      * Actions
      */
     actions: HoverRowActions[] = [];
+
+    /**
+     * Actions reversed
+     */
+    actionsReversed: HoverRowActions[] = [];
+
+    /**
+     * Actions rendered
+     */
+    realActions: HoverRowActions[] = [];
 
     /**
      * Action data
@@ -303,8 +326,15 @@ export class HoverRowActionsComponent implements OnInit, OnDestroy {
         mouseEvent: MouseEvent = null
     ) {
         // set actions
-        this.actions = actions;
+        if (!_.isEqual(this.actions, actions)) {
+            this.actions = actions;
+            this.actionsReversed = actions ? _.cloneDeep(actions).reverse() : [];
+        }
+
+        // set data
         this.actionData = actionData;
+
+        // keep mouse event
         this.mouseEvent = mouseEvent;
 
         // determine row bounding

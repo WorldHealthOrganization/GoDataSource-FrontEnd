@@ -16,7 +16,7 @@
     (mouseenter)="actionsMouseEnter()"
     (mouseleave)="actionsMouseLeave()">
     <ng-container
-        *ngFor="let buttonData of actions">
+        *ngFor="let buttonData of realActions">
         <!-- Icon button -->
         <button
             *ngIf="buttonData.type === HoverRowActionsType.BUTTON"
