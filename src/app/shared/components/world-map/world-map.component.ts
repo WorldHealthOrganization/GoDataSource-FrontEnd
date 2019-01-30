@@ -643,8 +643,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
         // EVENTS LISTENERS
         // create click listener
         this._clickSelect = new InteractionSelect({
-            multi: false,
+            multi: true,
             filter: (feature) => {
+                console.log(feature);
                 return feature.getProperties &&
                     feature.getProperties() &&
                     feature.getProperties().dataForEventListeners &&
@@ -656,13 +657,25 @@ export class WorldMapComponent implements OnInit, OnDestroy {
             selected: any[],
             mapBrowserEvent: any
         }) => {
-            // trigger select
+            // determine feature with bigger priority
+            let selectFeature: Feature;
             _.each(data.selected, (feature: Feature | any) => {
-                feature.getProperties().dataForEventListeners.selected(
-                    this,
-                    feature.getProperties().dataForEventListeners
-                );
+                // line ?
+                if (feature.getProperties().dataForEventListeners instanceof WorldMapPath) {
+                    selectFeature = selectFeature ? selectFeature : feature;
+                } else {
+                    // anything else is more important than  a line
+                    selectFeature = feature;
+                }
             });
+
+            // trigger select
+            if (selectFeature) {
+                selectFeature.getProperties().dataForEventListeners.selected(
+                    this,
+                    selectFeature.getProperties().dataForEventListeners
+                );
+            }
         });
 
         // add events listeners
